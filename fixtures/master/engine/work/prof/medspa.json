@@ -1,0 +1,3017 @@
+{
+ "id": "medspa",
+ "name": "Med spa",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "dermatologist",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each prescriber (a physician, nurse practitioner or physician assistant) and each nurse injector holds their own active license from the state where the client is during the visit, video exams included",
+   "who": "each person; the med spa too, where the state's form registers medical spas or asks for a medical director on file",
+   "ask": "each person's license number in their invite reply (or the owner sends it); the medical director's name and license; any laser or facility registration the state's form names",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "scope": "who may examine, prescribe, inject or run a laser, and under whose order or supervision, is each state's own rule, from the state's form (a switch); Rosie offers each person only for the services that switch allows, and never books work beyond a license",
+   "video": "a good-faith exam by video only where the state's form allows it, and only with a prescriber licensed in the state where the client is that day",
+   "away": "injections at a client's home only where the state's form allows treatment away from the med spa (a switch), after the prescriber's exam, with the medical director's OK for each visit",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance for each prescriber and injector, where the state's form asks for it"
+  },
+  "pf.services": {
+   "shape": "treatments priced by the session from the list, or set at the visit by the amount used (units of a wrinkle relaxer, syringes of filler); a new client's first injection or laser visit starts with a prescriber's exam, right before the treatment or by video the day before",
+   "examples": "the example med spas' own prices (Lee Med Spa and Lee Mobile Aesthetics), not a standard",
+   "list": [
+    {
+     "name": "Consult with a prescriber",
+     "price": "free",
+     "kind": "one price ($0)",
+     "length": "15 min",
+     "where": "at the med spa, or by video",
+     "before": "nothing taken",
+     "after": "nothing to pay",
+     "note": "the same 15 minutes is the good-faith exam before a first injection"
+    },
+    {
+     "name": "Botox and other wrinkle relaxers",
+     "price": "$14 a unit; forehead lines often take 10 to 20 units ($140 to $280)",
+     "kind": "per unit, set at the visit by the injector within the prescriber's order",
+     "length": "30 min (45 for a new client, with the exam)",
+     "where": "at the med spa; at the client's home through Lee Mobile Aesthetics",
+     "before": "a $25 exam fee taken as the deposit, counted toward the price; at home, the $89 house-call fee paid as the deposit",
+     "after": "the rest at the front desk; at home, Rosie texts the bill, or the saved card is charged",
+     "note": "the client sees the units and the price on the secure page, and says yes before any injection"
+    },
+    {
+     "name": "Filler",
+     "price": "$750 a syringe; often 1 or 2",
+     "kind": "per syringe, set at the visit",
+     "length": "45 min",
+     "where": "at the med spa",
+     "before": "a $25 exam fee taken as the deposit, counted toward the price",
+     "after": "the rest at the front desk",
+     "note": "only injectors the plug-in lists for filler"
+    },
+    {
+     "name": "Laser hair removal, small area (lip, chin or underarms)",
+     "price": "$150 a session",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the med spa",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk",
+     "note": "6 to 8 sessions, 4 to 6 weeks apart; only an operator the state's form allows"
+    },
+    {
+     "name": "Laser hair removal, large area (legs or back)",
+     "price": "$300 a session",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the med spa",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Laser package: 6 sessions, small area",
+     "price": "$750",
+     "kind": "one price, paid in full when booking the first session",
+     "length": "20 min a session",
+     "where": "at the med spa",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "each later session uses a credit; unused sessions refunded under the med spa's own policy and the state's rules"
+    },
+    {
+     "name": "Microneedling",
+     "price": "$300",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the med spa",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk",
+     "note": "only a provider the state's form allows; screening questions on the secure page first"
+    },
+    {
+     "name": "2-week check after injections",
+     "price": "free",
+     "kind": "one price ($0)",
+     "length": "15 min",
+     "where": "at the med spa",
+     "before": "nothing taken",
+     "after": "nothing to pay",
+     "note": "booked by the injector at checkout"
+    },
+    {
+     "name": "Monthly membership",
+     "price": "$99 a month: one small-area laser session a month, and 10% off injections",
+     "kind": "a monthly plan",
+     "where": "at the med spa",
+     "before": "a card saved; each month's charge needs the membership's own yes",
+     "after": "charged to the saved card each month",
+     "note": "texted the day before each charge; pause or end by text"
+    },
+    {
+     "name": "IV hydration at home (Lee Mobile Aesthetics)",
+     "price": "$175",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the client's home",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "set up, waiting for its nurse's license; ordered by a prescriber after a health screen"
+    }
+   ],
+   "capacity": "one client per injector at a time; a treatment room for each; the laser room for laser sessions",
+   "nobodyHome": "never: the client is always there",
+   "online": "the free consult and the good-faith exam by video, counted as at the med spa; a treatment is never done by video"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new or returning client (a new client's first injection or laser visit adds the 15-minute exam)",
+    "which treatment, by its general name only",
+    "for laser: which area, since it sets the length",
+    "for a video exam: the state the client will be in"
+   ],
+   "afterTime": [
+    "anything that helps at the visit, like a step-free door or an interpreter",
+    "at home: a private room with a table, a clean surface and good light"
+   ],
+   "securePage": [
+    "birth date (18 or older)",
+    "health history, medicines and allergies",
+    "pregnant or nursing",
+    "the screening the medical director set: like blood thinners, a nerve or muscle condition, an infection at the area, a past bad reaction to the product, a recent tan or acne medicine before laser",
+    "a recent treatment: a wrinkle relaxer in the last 3 months, or filler or laser on the same area in the last 2 weeks",
+    "consent to the treatment",
+    "photo consent: for the chart only, or for ads too (a separate yes)"
+   ],
+   "whoMayBook": "an adult 18 or older, for themselves; another adult may book and pay for them, but the client fills in and signs their own forms; nobody under 18 is booked for injections or laser through Rosie",
+   "screening": "any yes to the screening pauses the booking: the prescriber reads the answers on the secure page first and says OK, no, or asks one question; a no is told kindly, never why",
+   "neverAsked": "health details, medicine names and photos are never asked or typed in the AI chat or a text"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "vision changes or loss, or skin turning white, gray or blue, after a filler",
+     "say": "Call 911 now, or the medical director's line right away: (555) 010-0190. Don't wait.",
+     "booking": "no booking; the medical director is told at once"
+    },
+    {
+     "words": "trouble breathing or swallowing, or swelling of the face, lips, tongue or throat",
+     "say": "Call 911 now.",
+     "booking": "no booking; the medical director is told at once"
+    },
+    {
+     "words": "weakness that spreads, a drooping face, or trouble speaking after a wrinkle relaxer",
+     "say": "Call 911 now, or the medical director's line right away: (555) 010-0190.",
+     "booking": "no booking; the medical director is told at once"
+    },
+    {
+     "words": "chest pain, fainting, or a burn after laser that is large, blistering or spreading",
+     "say": "Call 911 now. Then call the medical director's line.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a heavy eyelid, a lump, or more bruising or swelling than expected, days after a treatment",
+     "what": "the 911 words first; then a nurse calls the client today on the medical director's line; Rosie gives no advice"
+    },
+    {
+     "words": "pregnant, nursing, a medicine or a condition, said while asking to book",
+     "what": "not typed in the chat: the AI says the screening is on the secure page, and the prescriber reads it before anything is booked"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988",
+   "medicalDirector": "the medical director's line, (555) 010-0190 at the example med spa, answered day and night; told at once about any warning sign after a treatment"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "The good-faith exam by a prescriber",
+     "when": "before a client's first injection or prescription treatment: right before it, in person, or by video the day before where the state allows",
+     "who": "a physician, nurse practitioner or physician assistant licensed where the client is",
+     "goodFor": "12 months, or until health or medicines change (the example med spa's rule; the state's form may set less)",
+     "result": "cleared, with an order the injector follows; or not today: no treatment, the deposit refunded in full, and the reason given in person, never by text"
+    },
+    {
+     "name": "Health history, screening and consent",
+     "when": "on the secure page only, before the booking is written; updated at each visit",
+     "who": "every client",
+     "result": "any yes to the screening: the prescriber reads it first (OK, no, or one question)"
+    },
+    {
+     "name": "Before photos",
+     "when": "at the visit, before any treatment, with the client's consent",
+     "who": "every injection and laser client",
+     "result": "kept in the med spa's chart only, never in a text or the AI chat"
+    },
+    {
+     "name": "A written price estimate for self-pay clients",
+     "when": "told while booking, where the rules require it; sent within 1 business day (the example med spa's rule)",
+     "who": "every client: all treatments are self-pay",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "The medical director's OK for a home visit",
+     "when": "before any treatment at a client's home",
+     "who": "Sam, as medical director, for each request",
+     "result": "OK, another time, or no; a home visit is never booked without it"
+    }
+   ],
+   "prep": "the med spa's own prep notes, on the secure page (like arriving with a clean face, or a shaved area for laser); bring a photo ID; new clients arrive 10 minutes early"
+  },
+  "pf.visit": {
+   "checkIn": "at the med spa: the check-in code at the front desk; a video exam: the code read out at the start; at home: the code given at the door to the injector",
+   "beforeWork": "a new client's exam by the prescriber; the consent and screening checked; before photos for the chart, with consent",
+   "changes": "units or syringes are set at the visit within the prescriber's order; the client sees the price on the secure page and says yes before any injection; more later only with a new yes",
+   "done": "the check-in code or DONE; the treatment record (the product, its lot number, the units, the areas, the injector) goes in the med spa's chart, never in a text",
+   "aftercare": "aftercare in person and on paper, and on the secure page, with the warning signs and the medical director's line",
+   "followUp": "the free 2-week check, booked by the injector at checkout; any touch-up there is the injector's call",
+   "away": "at home: only after the prescriber's exam and Sam's OK; a private room with a table, a clean surface and good light; the injector brings the med spa's emergency kit"
+  },
+  "pf.money": {
+   "before": "wrinkle relaxers and filler: a $25 exam fee taken as the deposit, counted toward the price; refunded in full if the prescriber doesn't clear the client; after a no to the price at the visit, it pays for the exam; laser and microneedling: a card saved for the $20 fee; the free consult and the 2-week check: nothing taken; a laser package: paid in full when booking; at home: the $89 house-call fee paid as the deposit",
+   "after": "at the med spa: the rest at the front desk, its own way; at home: Rosie texts the bill when the injector texts DONE with the units, or charges the saved card, after the client's yes to the price",
+   "fees": "the late-cancel or no-show fee: $20 at the example med spa (on injections, the $25 deposit; at home, the $89 house call), only when the owner confirms it; free to cancel until 24 hours before",
+   "packages": "packs of sessions are paid in full, and each visit uses a credit; a late cancel or a no-show may use up a credit, only when the owner confirms it",
+   "membership": "a monthly membership, $99 at the example med spa, charged to the saved card each month only after its own yes; texted the day before each charge; pause or end by text",
+   "selfPay": "every treatment is self-pay: no health plan is billed; a client is told while booking that they can get a written price estimate, where the rules require it",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form; any limit on fees for medical care: from the state form",
+   "tips": "none",
+   "tax": "a tax line on cosmetic treatments only where the state taxes them (a switch from the state form)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the med spa's name, the date, the time, the address, the provider's first name and a secure link: never the treatment, units, the reason, health details, medicine names, photos or results",
+   "staff": "texts to the owner and staff use the client's initials, with no health detail, medicine name or photo: only 'an update on the secure page'",
+   "photos": "before and after photos stay in the med spa's chart, never in a text or the AI chat; a client sees theirs at the next visit or asks the front desk",
+   "channels": "a client who says texts aren't safe is reached only the way they pick",
+   "languages": "English and Spanish",
+   "minors": "nobody under 18 is booked, so no treatment texts go to a minor"
+  },
+  "pf.staff": {
+   "licenses": "each prescriber's and injector's own license, per state; the medical director's license on file",
+   "skills": "the medical director (a physician): exams, orders, every treatment; nurse practitioners: exams, orders and injections where the state allows; nurse injectors: injections and laser on a prescriber's order, where the state allows; estheticians: skin care only, and microneedling only where the state's form allows; medical assistants and the front desk: no clinical work or OKs",
+   "supervision": "a nurse injects only on a prescriber's order, with the medical director or a supervising prescriber on site or reachable, as the state's form sets (a switch); a physician assistant works with a supervising physician as the state sets",
+   "oks": "the owner, as medical director, OKs fees and each home visit; prices come from the list or are set at the visit within the order, so no quote waits for him",
+   "standIn": "another listed injector who may do that treatment, only with the client's yes; with no yes, nobody is moved: the time stays, and the desk calls",
+   "away": "home visits: only injectors cleared for work away from the med spa, licensed where the client is",
+   "never": "Rosie never offers anyone for work beyond their license or the state's switch"
+  },
+  "pf.rules": {
+   "records": "the treatment record and photos are kept by the med spa as long as the state's rules require; a delete request removes only Rosie's own booking details",
+   "consent": "a signed consent before any injection or laser, on the secure page",
+   "photos": "a separate yes before any photo is used in ads",
+   "estimate": "the written price estimate for self-pay clients, where the rules require it",
+   "telehealth": "a video exam follows the rules of the state the client is in",
+   "away": "treatment at home only where the state's form allows it, with the medical director's OK",
+   "age": "nobody under 18 is booked for injections or laser through Rosie; the med spa's desk handles any question from a parent",
+   "ads": "no claims about results the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen, in the time left; later: the desk moves the visit, since the exam and the treatment are back to back (Rosie never changes the booking itself)",
+   "screening": "a yes on the screening: the prescriber reads it before anything is booked; a no is told kindly, never why",
+   "notCleared": "the prescriber doesn't clear the client: no treatment, the deposit refunded in full, the reason given in person",
+   "reaction": "warning signs after a treatment: 911 or the medical director's line first; then a nurse calls; Rosie gives no advice",
+   "photos": "a client asks for photos by text: never sent; seen at the next visit or from the front desk",
+   "question": "a health question by text: the clinical team answers on the secure page; Rosie gives no advice",
+   "standIn": "an injector out: another listed injector, only with the client's yes; or new times with no fee",
+   "minors": "under 18: no booking; the desk talks with a parent",
+   "credits": "a late cancel or a no-show on a package or membership may use up a credit, only when the owner confirms it",
+   "twoBookings": "a client with two open bookings: Rosie asks which one before any change",
+   "video": "out of state that day: the exam in person, or by video on a day they're back"
+  },
+  "pf.facts": [
+   "firststeps",
+   "forms",
+   "packs",
+   "plans",
+   "video",
+   "aftercare",
+   "waitlist"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Med Spa",
+   "staff": "Nora (nurse injector) and Dev (nurse practitioner, who does the exams)",
+   "cust": "Alex M. (client) · other clients"
+  },
+  "B": {
+   "business": "Lee Mobile Aesthetics",
+   "staff": "Ethan (nurse injector) and Leo (nurse practitioner, who does the video exams)",
+   "cust": "Alex M. (client, at home at 18 Cedar Ln) · other clients"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nora"
+  },
+  "B": {
+   "staff": "Ethan"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "the $25 consult included",
+    "the $25 exam fee included"
+   ],
+   [
+    "The $25 consult included",
+    "The $25 exam fee included"
+   ],
+   [
+    "A no to the price: the $25 pays for the consult",
+    "A no to the price: the $25 pays for the exam"
+   ],
+   [
+    "The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "The med spa offers a plan. Rosie books the first visit and saves the next ones on the same day and time."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "A laser package is paid in full when booked."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Laser package, 6 sessions · $750"
+   ],
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "An treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a injector who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own clients."
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A touch-up' or 'my forehead lines' fits a treatment."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free treatment room:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "How would you like it on top?",
+    "Which area would you like treated?"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No.",
+    "Photos for the chart only, never for ads? Yes / No."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "Photos for the chart only, never for ads?"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, make it a full-face treatment' goes back to the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter visit in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter visit."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during my visit?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please come without makeup on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please come without makeup."
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped part of A.M.'s visit."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the visit and answers questions."
+   ],
+   [
+    "A.M. says Saturday's cut is uneven on one side.",
+    "A.M. asks for a recheck after Saturday's visit."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The treated area is still swollen."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An injector's example: skin turning white or gray after filler gets 'call the medical director's line now'."
+   ],
+   [
+    "Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+    "Sam taps 1: the two mobile kinds share Lee Mobile Aesthetics, and the med spa is its own company."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some care takes several visits, like IV hydration."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most med spas set it."
+   ],
+   [
+    "Signature cut and shave",
+    "Laser package"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Treatments, laser sessions and filler care."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Treatments and follow-up visits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A touch-up visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see clients at the med spa; Riley also does filler care and home visits."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for laser hair removal, which isn't on the med spa's list."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: 14 units, recheck in 2 weeks"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a treatment at the med spa or at home"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: in many states, injections away from a clinic need the medical director's OK."
+   ],
+   [
+    "is already in the chair",
+    "is already in the treatment room"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for a self-pay laser session at $130, an old price. Rosie answers with the real price, $140."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A self-pay laser session at Lee Med Spa is $140, not $130. Here are the open times at $140."
+   ],
+   [
+    "for a new customer. It's $20. Accept it?",
+    "for a new client, self-pay. Accept it?"
+   ],
+   [
+    "MP045210",
+    "MD045210"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A treatment could mean a med spa or a dermatologist."
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds times side by side with Nora and Dev."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A parent books visits for three children on one morning."
+   ],
+   [
+    "like a color correction done in two steps",
+    "like IV hydration, placed Monday and read Wednesday and Friday"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Med Spa doesn't do laser hair removal."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books Botox and a toner"
+   ],
+   [
+    "Riley couldn't start today's visit",
+    "The med spa couldn't start today's visit"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex asks for a little more"
+   ],
+   [
+    "like a skin-test result",
+    "like the date of the last full-face treatment"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Laser hair removal for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds laser hair removal to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW laser hair removal"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A treatment is rated, so the shop takes the first branch."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a Botox plan with Riley, every 3 months."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat May 1 · 10:00am"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's med spa takes no jobs sent now, at the med spa or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Botox plan · every 3 months"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Lip balm · $15"
+   ],
+   [
+    "gloss",
+    "lip balm"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Med Spa LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Aesthetics'"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Med Spa"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Aesthetics"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Injectables and Lee IV Hydration"
+   ],
+   [
+    "plumbing and electrical",
+    "home injectables and IV hydration"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home injectables and IV hydration"
+   ],
+   [
+    "1200 Main St",
+    "77 Market St"
+   ],
+   [
+    "88 Elm St",
+    "215 Birch Ave"
+   ],
+   [
+    "Riley Chen",
+    "Nora Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Dev Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Ethan Price"
+   ],
+   [
+    "Casey Moore",
+    "Leo Moore"
+   ],
+   [
+    "Riley",
+    "Nora"
+   ],
+   [
+    "Avery",
+    "Dev"
+   ],
+   [
+    "Jordan",
+    "Ethan"
+   ],
+   [
+    "Casey",
+    "Leo"
+   ],
+   [
+    "electrical",
+    "IV hydration"
+   ],
+   [
+    "Electrical",
+    "IV hydration"
+   ],
+   [
+    "plumber",
+    "injector"
+   ],
+   [
+    "Plumber",
+    "Injector"
+   ],
+   [
+    "plumbing",
+    "home injectables"
+   ],
+   [
+    "Plumbing",
+    "Home injectables"
+   ],
+   [
+    "barbershop",
+    "med spa"
+   ],
+   [
+    "Barbershop",
+    "Med spa"
+   ],
+   [
+    "barbers",
+    "injectors"
+   ],
+   [
+    "Barbers",
+    "Injectors"
+   ],
+   [
+    "barber",
+    "injector"
+   ],
+   [
+    "Barber",
+    "Injector"
+   ],
+   [
+    "Groom's package",
+    "Filler visit"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "laser package"
+   ],
+   [
+    "Color and cut",
+    "Laser package"
+   ],
+   [
+    "color correction",
+    "Botox"
+   ],
+   [
+    "Color correction",
+    "Botox"
+   ],
+   [
+    "kids cuts",
+    "consults"
+   ],
+   [
+    "Kids cut",
+    "Consult"
+   ],
+   [
+    "kids cut",
+    "consult"
+   ],
+   [
+    "skin fade",
+    "new client Botox"
+   ],
+   [
+    "Skin fade",
+    "New client Botox"
+   ],
+   [
+    "beard trim",
+    "toner"
+   ],
+   [
+    "Beard trim",
+    "Toner"
+   ],
+   [
+    "haircuts",
+    "treatments"
+   ],
+   [
+    "Haircuts",
+    "Treatments"
+   ],
+   [
+    "haircut",
+    "treatment"
+   ],
+   [
+    "Haircut",
+    "Treatment"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "color",
+    "filler"
+   ],
+   [
+    "Color",
+    "Filler"
+   ],
+   [
+    "a patch test",
+    "a good-faith exam"
+   ],
+   [
+    "patch test",
+    "good-faith exam"
+   ],
+   [
+    "Consult",
+    "Exam"
+   ],
+   [
+    "shops",
+    "med spas"
+   ],
+   [
+    "shop",
+    "med spa"
+   ],
+   [
+    "Shop",
+    "Med spa"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "set at the chair",
+    "set in the treatment room"
+   ],
+   [
+    "quote at the chair",
+    "quote in the treatment room"
+   ],
+   [
+    "is at the chair",
+    "is in the treatment room"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "Treatment"
+   ],
+   [
+    "home warranty plan",
+    "membership"
+   ],
+   [
+    "home warranty",
+    "membership"
+   ],
+   [
+    "warranty plan",
+    "membership"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a treatment on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books Botox every 3 months"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for Botox every 3 months."
+   ],
+   [
+    "staff cut",
+    "staff treatment"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una revisión de la piel el sábado."
+   ],
+   [
+    "A step-free door on Elm St",
+    "A step-free door on Birch Ave"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Birch Ave"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bib clip ripped my shirt collar."
+   ],
+   [
+    "says the cape clip ripped",
+    "says the bib clip ripped"
+   ]
+  ],
+  "B": [
+   [
+    "Nora is a new customer",
+    "Nadia is a new customer"
+   ],
+   [
+    "Nora S.",
+    "Nadia S."
+   ],
+   [
+    "Nora hears",
+    "Nadia hears"
+   ],
+   [
+    "like a cheaper part or one line only",
+    "like fewer units or one line only"
+   ],
+   [
+    "Can Jordan use a cheaper part?",
+    "Can Ethan use fewer units?"
+   ],
+   [
+    "asks for a cheaper part",
+    "asks for fewer units"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached during care?"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Ethan sets the units and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Ethan checked the areas. Here's the price for today."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 first area 165 second area 80"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "First area, more units · $540"
+   ],
+   [
+    "Shutoff valve · $165",
+    "First area · $165"
+   ],
+   [
+    "Supply line · $80",
+    "Second area · $80"
+   ],
+   [
+    "OK'd the shutoff valve only, $165.",
+    "OK'd the first area only, $165."
+   ],
+   [
+    "Leave the supply line.",
+    "Leave the second area."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "OK: Ethan treats the first area today, $165."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 for the second area stays good until Thu Oct 29."
+   ],
+   [
+    "can clear the drain:",
+    "can do a treatment at home:"
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "A laser package is paid in full when booked."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Laser package · $90"
+   ],
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "An treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a injector who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own clients."
+   ],
+   [
+    "Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+    "Sam taps 1: the two mobile kinds share Lee Mobile Aesthetics, and the med spa is its own company."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some care takes several visits, like IV hydration."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A recheck within 30 days is free: just reply here."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Ethan finds an infection at the area to treat."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a injector stops there, so Alex gets a written note on the secure page."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most med spas start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules med spas often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Treatments, laser sessions and filler care."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Treatments and follow-up visits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A touch-up visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see clients at the med spa; Riley also does filler care and home visits."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like Botox for my forehead lines."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Tengo un sarpullido que me pica mucho."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "My lip is swelling after yesterday's filler."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about Botox for my forehead."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An injector's example: skin turning white or gray after filler gets 'call the medical director's line now'."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene la cara o la boca hinchada, o le cuesta respirar?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face or mouth swollen, or is it hard to breathe?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo me pica."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It just itches."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No se rasque. Si se le hincha la cara o le cuesta respirar, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't scratch it. If your face swells or it's hard to breathe, call 911."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told not to scratch, and to call 911 if her face swells or it's hard to breathe."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Should I stop my blood thinner before the visit?"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is that safe?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a injector do a treatment at my home this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa treatment Thu 12pm Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My forehead lines' fits Botox at home."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a prescription for someone who won't be seen."
+   ],
+   [
+    "'Adding a faucet check?",
+    "'Adding the frown lines too?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is it the forehead only, or the frown lines too?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "The forehead only."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a treatment every year."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes more than one visit, like a laser series, 4 to 6 weeks apart."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you do my treatment every year, too?"
+   ],
+   [
+    "has a yearly flush plan, $150 a visit.",
+    "has a yearly check-up plan, $179 a visit."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly check-up plan"
+   ],
+   [
+    "Each visit: $150",
+    "Each visit: $179"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about the frown lines."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Ethan also do my frown lines?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The frown lines are priced at the visit, by the units used."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount",
+    "The $640 lip filler is over the plug-in's amount"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the swelling getting worse?"
+   ],
+   [
+    "Yes, it won't drain",
+    "No, it looks the same"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 treatment needs none."
+   ],
+   [
+    "he's the one who replaces water heaters.",
+    "Ethan is the one who does filler."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Ethan also do my lips?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months.",
+    "a treatment every 3 months, at home."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's treatment?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the swelling is getting worse."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The swelling is getting worse now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Press on it with a clean cloth for 20 minutes. If it won't stop, call 911."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A Botox at home is priced at the visit: only the $89 house-call fee was promised."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Ethan finds an area that needs a prescriber's look first."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 4 units between the brows"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Extra for A.M.: added care, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Added care · $160"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the added care for $160."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD infection at one area, stopped that part"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan stopped part of today's visit for your safety. The note is on your secure page."
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · today's visit"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: one area to treat first"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the check of that area"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your own doctor first"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Area not checked"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked A.M.'s glasses with the lamp stand"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked glasses"
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's lamp stand cracked A.M.'s glasses."
+   ],
+   [
+    "The before photo shows no crack.",
+    "The photo shows the crack."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's lamp stand knocks Alex's glasses off a table, and Jordan texts a photo."
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE 14 units, recheck in 2 weeks."
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Bring the cooling pack next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The treated area is still uneven 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "One side looks uneven. Can someone look at it?"
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M. asks for a recheck after the Thu Oct 22 visit. A recheck within 30 days is free."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "A recheck within 30 days is free, so this visit is free."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan rushed and didn't explain anything."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My glasses were cracked at the visit."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Ethan do my frown lines next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a laser session."
+   ],
+   [
+    "for a water heater flush.",
+    "for a touch-up visit."
+   ],
+   [
+    "water heater flush",
+    "touch-up visit"
+   ],
+   [
+    "Water heater flush",
+    "Touch-up visit"
+   ],
+   [
+    "Water heater replacement",
+    "Lip filler"
+   ],
+   [
+    "water heater replacement",
+    "lip filler"
+   ],
+   [
+    "water heater quote",
+    "lip filler price"
+   ],
+   [
+    "Leak repair",
+    "Botox at home"
+   ],
+   [
+    "leak repair",
+    "Botox at home"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a Botox at home, today,"
+   ],
+   [
+    "Say Alex was told at DONE that a sewer camera report comes Fri Oct 23.",
+    "Say Alex was told at DONE that the 2-week check is Fri Oct 23."
+   ],
+   [
+    "your sewer camera report from Thursday is ready.",
+    "the med spa has news about Thursday's visit. See the note on your secure page."
+   ],
+   [
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "the med spa has news about your Thu Oct 22 visit. See the note on your secure page."
+   ],
+   [
+    "your sewer camera report needs a little more time.",
+    "the med spa needs a little more time."
+   ],
+   [
+    "Sewer camera report",
+    "Visit note"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Jordan's note"
+   ],
+   [
+    "Sewer camera inspection",
+    "Added treatment"
+   ],
+   [
+    "sewer camera inspection",
+    "added treatment"
+   ],
+   [
+    "service call fee",
+    "house-call fee"
+   ],
+   [
+    "Service call fee",
+    "House-call fee"
+   ],
+   [
+    "Drain clearings already booked",
+    "Treatments already booked"
+   ],
+   [
+    "Drain clearing plans",
+    "Check-up plans"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a treatment at the med spa or at home"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobileaesthetics.com"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: in many states, injections away from a clinic need the medical director's OK."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the one for home injectables now, and the others when Sam gets to them."
+   ],
+   [
+    "MP045210",
+    "MD045210"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A treatment could mean a med spa or a dermatologist."
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Nora can ask to be next for that time."
+   ],
+   [
+    "under different names, and nobody was home for any of them.",
+    "under different names, and missed them all."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "IV hydration for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds IV hydration to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW IV hydration"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the try-in is done, $800 at the finish"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "no proof Alex may have this work done",
+    "no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's med spa takes no jobs sent now, at the med spa or away."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "like a move-out day",
+    "like a move to another home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Aesthetics LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Aesthetics'"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Med Spa"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Aesthetics"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Injectables and Lee IV Hydration"
+   ],
+   [
+    "plumbing and electrical",
+    "home injectables and IV hydration"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home injectables and IV hydration"
+   ],
+   [
+    "1200 Main St",
+    "77 Market St"
+   ],
+   [
+    "88 Elm St",
+    "215 Birch Ave"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ln"
+   ],
+   [
+    "Riley Chen",
+    "Nora Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Dev Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Ethan Price"
+   ],
+   [
+    "Casey Moore",
+    "Leo Moore"
+   ],
+   [
+    "Riley",
+    "Nora"
+   ],
+   [
+    "Avery",
+    "Dev"
+   ],
+   [
+    "Jordan",
+    "Ethan"
+   ],
+   [
+    "Casey",
+    "Leo"
+   ],
+   [
+    "electrical",
+    "IV hydration"
+   ],
+   [
+    "Electrical",
+    "IV hydration"
+   ],
+   [
+    "plumbing license",
+    "medical license"
+   ],
+   [
+    "Plumbing license",
+    "Medical license"
+   ],
+   [
+    "plumber",
+    "injector"
+   ],
+   [
+    "Plumber",
+    "Injector"
+   ],
+   [
+    "plumbing",
+    "home injectables"
+   ],
+   [
+    "Plumbing",
+    "Home injectables"
+   ],
+   [
+    "barbershop",
+    "med spa"
+   ],
+   [
+    "Barbershop",
+    "Med spa"
+   ],
+   [
+    "barbers",
+    "injectors"
+   ],
+   [
+    "Barbers",
+    "Injectors"
+   ],
+   [
+    "barber",
+    "injector"
+   ],
+   [
+    "Barber",
+    "Injector"
+   ],
+   [
+    "beard trim",
+    "toner"
+   ],
+   [
+    "Beard trim",
+    "Toner"
+   ],
+   [
+    "haircut",
+    "treatment"
+   ],
+   [
+    "Haircut",
+    "Treatment"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "color",
+    "filler"
+   ],
+   [
+    "shops",
+    "med spas"
+   ],
+   [
+    "shop",
+    "med spa"
+   ],
+   [
+    "Shop",
+    "Med spa"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Treatment"
+   ],
+   [
+    "drain clearing",
+    "treatment"
+   ],
+   [
+    "Drain clearing",
+    "Treatment"
+   ],
+   [
+    "service call fee",
+    "house-call fee"
+   ],
+   [
+    "service call",
+    "house call"
+   ],
+   [
+    "Service call fee",
+    "House-call fee"
+   ],
+   [
+    "Service call",
+    "House call"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if her face swells with a fever."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene la cara hinchada o fiebre?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face swollen, or do you have a fever?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tengo fiebre."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't have a fever."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se le hincha la cara con fiebre, vaya a urgencias o llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If your face swells with a fever, go to the emergency room or call 911."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a med spa visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like braces"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: new or returning, which areas, and a private room at home."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: swelling of the face, lips or throat, trouble breathing, or bleeding that won't stop."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which membership should pay?"
+   ],
+   [
+    "home warranty plan",
+    "membership"
+   ],
+   [
+    "home warranty",
+    "membership"
+   ],
+   [
+    "warranty plan",
+    "membership"
+   ],
+   [
+    "the warranty company",
+    "the card on file"
+   ],
+   [
+    "Alex says yes before any work",
+    "Alex says yes first"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID ready."
+   ],
+   [
+    "Rental 1",
+    "Resident 1"
+   ],
+   [
+    "Rental 2",
+    "Resident 2"
+   ],
+   [
+    "Kitchen drain",
+    "Treatment"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD no safe outlet for the chair, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: no safe outlet for the chair"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your own doctor first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the wall by the bed"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed wall"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 treatment"
+   ],
+   [
+    "The kitchen drain",
+    "The treatment"
+   ],
+   [
+    "with the store's receipt",
+    "with the receipt"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "The repair price",
+    "The treatment price"
+   ],
+   [
+    "the repair price",
+    "the treatment price"
+   ],
+   [
+    "Book the repair",
+    "Book the treatment"
+   ],
+   [
+    "to the repair",
+    "to the treatment"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It hurts a lot. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back in my room 30 minutes late, sorry!"
+   ],
+   [
+    "arriving 8–10am",
+    "at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "at 12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "2–4pm",
+    "2:00pm"
+   ],
+   [
+    "Alex M.'s",
+    "A.M.'s"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "house call"
+ ],
+ "story": {
+  "A": "Sam Lee, a physician and medical director, signs up two companies by text. Then Alex books a first Botox visit at Lee Med Spa for Sat Oct 24 at 11:00am: a 15-minute exam with Dev, a nurse practitioner, then Nora, a nurse injector. The health forms and screening go only on the secure page, Nora sets the units at the visit, and Alex pays the rest at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Botox at home with Lee Mobile Aesthetics. Leo, a nurse practitioner, does the exam by video the evening before, Sam OKs the home visit as medical director, and Ethan, a nurse injector, comes to 18 Cedar Ln on Thu Oct 22 at 8:00am. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "visit|deposit|counter",
+   "combos": [
+    "visit|deposit|counter",
+    "list|card|counter",
+    "list|none|none"
+   ],
+   "examples": {
+    "visit|deposit|counter": "The main story: a first Botox visit. $14 a unit, set by Nora at the visit after Dev's exam. A $25 exam fee now, counted toward it, and the rest at the front desk. A no to the price: the $25 pays for the exam. Not cleared by the prescriber: it goes back.",
+    "list|card|counter": "Laser hair removal, a small area: $150 a session. A card is saved for the $20 late-cancel or no-show fee, and Alex pays at the front desk.",
+    "list|none|none": "A free 15-minute consult with Dev about filler. Nothing is taken, and there's nothing to pay."
+   },
+   "labels": {
+    "price": {
+     "visit": "Set at the visit, by the units used"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Laser hair removal"
+    },
+    "visit|deposit|*": {
+     "deposit": "$25",
+     "fee": "$25",
+     "name": "Botox"
+    },
+    "list|card|*": {
+     "price": "$150",
+     "fee": "$20",
+     "name": "Laser hair removal"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Consult"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Microneedling",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$300",
+      "fee": "$50"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Laser package, 6 sessions",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$750",
+      "paid": "$750",
+      "fee": "$50"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Laser session (package)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|deposit|bill",
+   "combos": [
+    "visit|deposit|bill",
+    "visit|deposit|card"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ],
+    "approval": [
+     "ownerok"
+    ]
+   },
+   "examples": {
+    "visit|deposit|bill": "The main story: Botox at Alex's home, after Leo's video exam and Sam's OK. Priced by Ethan at the visit, by area and units: $245 in the example. The $89 house call is paid now as the deposit and counts toward the price; Rosie texts the bill for the $156 rest when Ethan texts DONE.",
+    "visit|deposit|card": "The same home visit, where the saved card is charged for the rest when Ethan texts DONE, after Alex's yes to the price."
+   },
+   "labels": {
+    "price": {
+     "visit": "Set at the visit, by the units used"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Botox at home"
+    },
+    "visit|deposit|*": {
+     "deposit": "$89",
+     "price": "$245",
+     "rest": "$156",
+     "fee": "$89",
+     "name": "Botox at home"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Lip touch-up at home",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$120",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Botox at home, 3-visit plan",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$540",
+      "paid": "$540",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Botox at home (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Med spa work always needs a license: each prescriber and injector, and the medical director."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A med spa books people (a prescriber or an injector), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "A med spa runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each prescriber and injector holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No med spa work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "Lee Med Spa treats clients only at the med spa. Home visits are Lee Mobile Aesthetics' own, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Each client books their own visit, with their own exam, forms and consent, so a group is never booked as one."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Every treatment is self-pay: no health plan is billed."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A med spa visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A med spa visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A med spa visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "An adult the booker acts for",
+    "why": "Each client consents for themselves to a cosmetic treatment, so a guardian never books one."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A med spa treatment needs no written contract: the consent is signed on the secure page, and a membership's terms get their own yes."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A med spa visit has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A med spa runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "A med spa takes no drop-offs or mail-ins."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the med spa: the client is in the treatment room."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Nobody under 18 is treated, so no child is left here."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "Every treatment is self-pay: no plan pays part."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "Lee Med Spa books treatments at checkout (A10-07). It sends no proposals to sign."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing goes to a lab from a med spa treatment, so no result comes later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the med spa."
+   },
+   {
+    "op": "off",
+    "at": "A8-26",
+    "why": "Units come from the list price, within the prescriber's order, so no price waits for Sam's OK (pf.staff.oks)."
+   },
+   {
+    "op": "off",
+    "at": "A8-29",
+    "label": "No reply: not there to answer",
+    "why": "Alex is always in the room at the med spa, so a price never waits for someone who isn't there."
+   },
+   {
+    "op": "off",
+    "at": "A4-80",
+    "label": "A teen may agree alone",
+    "why": "Nobody under 18 is booked for injections or laser (pf.questions whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "A4-80",
+    "label": "A teen books alone",
+    "why": "Nobody under 18 is booked for injections or laser: no parent link either."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A med spa never treats children."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "more",
+    "at": "A8-71",
+    "more": [
+     "Here: a new client's first injection starts with Dev's good-faith exam, right before it. It stays good for 12 months.",
+     "Not cleared: no treatment today, and the deposit goes back in full. Dev explains in person, never by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "Vision changes, or skin turning white, gray or blue after a filler: call 911, or the medical director's line now.",
+     "Trouble breathing or swallowing, or spreading weakness: call 911 now."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Med spa work always needs a license: each prescriber and injector, and the medical director."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A med spa books people (a prescriber or an injector), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "A med spa runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each prescriber and injector holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No med spa work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "No Lee Mobile Aesthetics service is offered in two places: home visits are its whole work."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Every treatment is self-pay: no plan or warranty pays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A home visit gives a set start time, not an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A treatment is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Each client has their own visit, not a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "No home visit is sent now (S2-30), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B4-26",
+    "label": "2 Someone else meets the pro",
+    "why": "Alex is the one treated, so Alex meets Ethan at the door."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "An adult the booker acts for",
+    "why": "Each client consents for themselves to a cosmetic treatment, so a guardian never books one."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A treatment needs no signed contract. The consent is signed on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call at a med spa (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No home visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Each guest at a home books their own visit, so no group needs a smallest size."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A home plan's visits are billed like single ones, never charged to a card on a schedule."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No home visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A treatment always needs the client there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A treatment always needs the client there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the injector's care: Alex, the adult being treated, must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Updates go in person: Alex is in the room for the whole visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A treatment is billed once, after the visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each home visit gets its own bill."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Every treatment is self-pay: no plan pays part."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Lee Mobile Aesthetics books treatments at checkout. It sends no proposals to sign."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing goes to a lab from a home treatment, so no report comes later."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "No reply: not there to answer",
+    "why": "Alex is the one treated, so Alex is always there to answer."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "A treatment priced at the visit never becomes a big job of its own at the home."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam left bank transfer off for home visits: the bills are small."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord or other payer pays for a treatment."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "Nothing sold at a home visit is still to be given: a treatment done that day has no cancel period."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Nothing sold at a home visit is still to be given: a treatment done that day has no cancel period."
+   },
+   {
+    "op": "off",
+    "at": "B4-92",
+    "label": "A teen may agree alone",
+    "why": "Nobody under 18 is booked for injections (pf.questions whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "B4-92",
+    "label": "A teen books alone",
+    "why": "Nobody under 18 is booked for injections: no parent link either."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "A med spa never treats children."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "more",
+    "at": "B8-89",
+    "more": [
+     "Here: a new client's first home visit needs Leo's video exam the evening before. It stays good for 12 months.",
+     "Not cleared: no treatment, and the deposit goes back in full. The reason is given by phone, never by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-24",
+    "more": [
+     "Vision changes, or skin turning white, gray or blue after a filler: call 911, or the medical director's line now.",
+     "Trouble breathing or swallowing, or spreading weakness: call 911 now."
+    ]
+   }
+  ]
+ },
+ "notes": "Refit Tue Oct 27 2026 (R12) to the REDESIGN 2 master: plug-in facts, switches and settings; money facts per path; rename pairs; few ops. Every old words op is gone (the record and the homes word money, contact and fees now).\nPilot: from dermatologist (itself from dentist). A med spa: a prescriber's good-faith exam before a first injection (the master's first step, A8-71 / B8-89), health forms and screening only on the secure page, a deposit toward a price set at the visit, the rest at the front desk, no $2, and a second, mobile company. Every treatment is self-pay.\nNames: Sam Lee, a physician and the medical director, owns Lee Mobile Aesthetics LLC (home injectables) and Lee Med Spa LLC (215 Birch Ave). Flow A is at the med spa. Flow B is Botox at Alex's home, 18 Cedar Ln.\nPeople: at the med spa Nora (nurse injector) and Dev (nurse practitioner, who does the exams); on the mobile team Ethan (nurse injector) and Leo (nurse practitioner, who does video exams). Sam is the medical director in both flows.\nSwitches: sensitive on (health care, S13-22: no treatment names in texts, initials to staff, no rating). No $2 (S1-62 '1 Yes' off): a medical practice. Settings: set start times, free cancel until 24 hours before.\nFacts: firststeps (the good-faith exam), forms (health history, screening, consent, photo consent), packs (laser packages, the $99 membership), plans (Botox every 3 months), video (video exams and consults), aftercare (the free 2-week check), waitlist. Not children (nobody under 18: A4-80 / B4-92 teen branches and A4-24 / B4-32 'A child' off).\nMoney A (the example med spa's own prices): visit|deposit|counter main (Botox $14 a unit, set at the visit; $25 exam fee taken as the deposit toward it, owed after a no to the price (A4-14), the rest at the front desk; the late-cancel fee is the deposit); list|card|counter (laser small area $150, card saved for the $20 fee). The master's example numbers ($25, $20, $110 + $15 quote) are kept so the literal lines add up (SPEC-prof); list|none|none (the free consult). The laser package is a pack (packs fact, a credit per visit), not its own path any more.\nMoney B: visit|deposit|bill main (the $89 house-call fee paid as the deposit; it counts toward the price and is owed even after a no to the price, B4-14; the example quote $245 in two areas, $156 on the bill) and visit|deposit|card. Every home visit waits for Sam's OK (B6-03 'Right away' off).\nRemoved in the refit: the own branches for under 18 (A4-80 / B4-92 'Adults only' now say it), the own exam step A8-x01 / A8-x02 (the master's first step A8-71 / A8-72 does it; plug-in pf.first_steps holds the 12-month rule and the full refund), every say/vary words op.",
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "the $25 consult included",
+    "The $25 consult included",
+    "A no to the price: the $25 pays for the consult",
+    "The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "The signature cut, $55, is paid in full when booked.",
+    "Signature cut and hot towel shave · $55",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "A chair renter asked for by name",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Access, like a step-free chair:",
+    "My employer pays for this cut.",
+    "How would you like it on top?",
+    "May the shop show photos of your hair?",
+    "'Yes, make it a fade' goes back to the times.",
+    "Riley can do a shorter cut in the time left",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "Stopped A.M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "A.M. says Saturday's cut is uneven on one side.",
+    "The cut is uneven on one side.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "Each service starts the way most barbershops set it.",
+    "Signature cut and shave",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "like a haircut at the shop or at home",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "is already in the chair",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "for a new customer. It's $20. Accept it?",
+    "MP045210",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Elm Street Dental",
+    "A haircut could mean a salon or a barbershop.",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "like a color correction done in two steps",
+    "Lee's Barbershop doesn't do perms.",
+    "Books a haircut and a beard trim",
+    "Riley couldn't start today's visit",
+    "Alex adds a beard trim",
+    "like a skin-test result",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "Consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "quote at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "home warranty plan",
+    "home warranty",
+    "warranty plan",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "staff cut",
+    "Quiero un corte el sábado.",
+    "A step-free door on Elm St",
+    "Step-free door on Elm St",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped"
+   ],
+   "B": [
+    "Nora is a new customer",
+    "Nora S.",
+    "Nora hears",
+    "like a cheaper part or one line only",
+    "Can Jordan use a cheaper part?",
+    "asks for a cheaper part",
+    "or can't be reached while care is due?",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "OK'd the shutoff valve only, $165.",
+    "Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "can clear the drain:",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Jordan finds mold behind the sink wall.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "My kitchen drain is clogged.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "My gas water heater got wet in a flood.",
+    "Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Just the kitchen sink.",
+    "Say Alex asks for a water heater flush every year.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "has a yearly flush plan, $150 a visit.",
+    "Yearly water heater flush plan",
+    "Each visit: $150",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "The $640 water heater is over the plug-in's amount",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "he's the one who replaces water heaters.",
+    "Can Jordan also run a camera down my sewer line?",
+    "a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Safety note · your home",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "The before photo shows no crack.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "NOTE grease clog 12 ft in.",
+    "Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Your drain is under warranty, so this visit is free.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "for a water heater flush.",
+    "water heater flush",
+    "Water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heater quote",
+    "Leak repair",
+    "leak repair",
+    "It's a leak under the sink, today,",
+    "Say Alex was told at DONE that a sewer camera report comes Fri Oct 23.",
+    "your sewer camera report from Thursday is ready.",
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "your sewer camera report needs a little more time.",
+    "Sewer camera report",
+    "Video and Jordan's notes",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "Drain clearings already booked",
+    "Drain clearing plans",
+    "like a haircut at the shop or at home",
+    "leehomeservices.com",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "MP045210",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Elm Street Dental",
+    "A haircut could mean a salon or a barbershop.",
+    "Nora can ask to be next for that window.",
+    "under different names, and nobody was home for any of them.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "CANT START no proof Alex may have this work done",
+    "no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "like a move-out day",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "color",
+    "shops",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "credited to the repair",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Which home warranty plan should pay?",
+    "home warranty plan",
+    "home warranty",
+    "warranty plan",
+    "the warranty company",
+    "Alex says yes before any work",
+    "Please clear the cabinet under the sink.",
+    "Rental 1",
+    "Rental 2",
+    "Kitchen drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "The kitchen drain",
+    "with the store's receipt",
+    "The plug-in says how long the warranty lasts.",
+    "The repair price",
+    "the repair price",
+    "Book the repair",
+    "to the repair",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "2–4pm",
+    "Alex M.'s"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "9d65299834",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A5-19": "5d5db6f3c1",
+   "A7-93": "46cca94e45",
+   "A8-03": "7fe61cccf5",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A8-26": "1e164bc165",
+   "A8-29": "6b776f2a37",
+   "A4-80": "624ec2e303",
+   "A10-34": "78c2d9a6a3",
+   "A8-71": "99bb99f6fa",
+   "A3-24": "78e61fd50f"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "826f4058c2",
+   "B4-43": "fc9855955a",
+   "B4-83": "93095f28e5",
+   "B4-16": "37cd99137d",
+   "B4-26": "912686f788",
+   "B4-32": "fcfe092e37",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B8-93": "c1406fd6bc",
+   "B9-06": "f091432f2d",
+   "B10-05": "a326ea3c0b",
+   "B4-92": "36a6823417",
+   "B10-32": "7713bff255",
+   "B8-89": "bbc8171a22",
+   "B3-24": "a31b436ff1"
+  }
+ }
+}

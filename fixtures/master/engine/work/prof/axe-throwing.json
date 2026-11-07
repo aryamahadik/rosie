@@ -1,0 +1,3434 @@
+{
+ "id": "axe-throwing",
+ "name": "Axe throwing and game venues",
+ "style": "Table",
+ "pattern": "table",
+ "from": "restaurant",
+ "plugin": {
+  "pf.license": {
+   "need": "where the state's rules require it: the business's registration, and a permit for the lanes where the state requires one; a mobile lane follows the same rules where they cover it",
+   "who": "the business",
+   "ask": "the business registration, and any state permit for the lanes with its last inspection date; the liability insurance certificate",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "goes live on identity and the registration; where the state requires a permit, only once it's on file",
+   "renewals": "permits and insurance reminded 30 and 7 days before; a lapse pauses new bookings",
+   "insurance": "liability insurance for the lanes and for events at a customer's place, as the state or the venue asks",
+   "staff": "lane hosts trained by the venue, with first-aid and CPR cards (certificates, not state licenses)",
+   "background": "background checks for hosts who work with children, where the venue or the rules require them"
+  },
+  "pf.services": {
+   "shape": "table: a lane is a space for an hour (up to 4 throwers) or for a set party; each lane holds a set number of throwers per start time",
+   "examples": "the example venue's own prices (Lee Axe Lanes, and Lee Mobile Axes for a lane at a customer's place), not a standard",
+   "list": [
+    {
+     "name": "Lane, 1 hour (up to 4 throwers)",
+     "price": "$120 a lane",
+     "kind": "one price per lane",
+     "length": "60 min",
+     "where": "at the venue",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "6 lanes, a start every 30 minutes"
+    },
+    {
+     "name": "Open lane, 1 hour (2 to 4 throwers)",
+     "price": "$120 a lane",
+     "kind": "one price per lane",
+     "length": "60 min",
+     "where": "at the venue",
+     "before": "nothing: a YES books it",
+     "after": "the bill at the counter"
+    },
+    {
+     "name": "Birthday party package, 10 throwers, 2 hours",
+     "price": "$200 for 10 throwers, $20 each extra, up to 16",
+     "kind": "one price per party, with a minimum",
+     "length": "2 hours: a lane for 90 minutes, then 30 minutes in the party room",
+     "where": "at the venue",
+     "before": "a $40 deposit when booking",
+     "after": "the $160 rest paid at the counter on the day, for the final count"
+    },
+    {
+     "name": "Extra 30 minutes on a lane",
+     "price": "$20",
+     "kind": "an extra on a booking",
+     "where": "at the venue",
+     "before": "a card saved for it",
+     "after": "the counter"
+    },
+    {
+     "name": "Mobile lanes for a company event (2 hours, 2 lanes, up to 20 throwers)",
+     "price": "$400",
+     "kind": "one price per event",
+     "length": "2 hours",
+     "where": "at the customer's place",
+     "before": "a $100 deposit once the booking is confirmed",
+     "after": "the $300 rest charged to the saved card when the crew texts DONE"
+    },
+    {
+     "name": "Backyard party, 10 throwers, 2 hours",
+     "price": "$240",
+     "kind": "one price per party",
+     "length": "2 hours",
+     "where": "at the customer's place",
+     "before": "a card saved for the $60 late-cancel fee",
+     "after": "the bill texted after the party"
+    },
+    {
+     "name": "Mobile lane, 1 hour at home (up to 4 throwers)",
+     "price": "$120",
+     "kind": "one price per lane",
+     "length": "60 min",
+     "where": "at the customer's place",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Extra 30 minutes at the party",
+     "price": "$60",
+     "kind": "an extra on a booking",
+     "where": "at the customer's place",
+     "before": "a card saved for it",
+     "after": "the bill"
+    }
+   ],
+   "capacity": "lanes per start time, set by the number of lanes and the venue's safety limit; a party room is a space for the party's time",
+   "times": "every 30 minutes inside the venue's hours; same-day bookings until 1 hour before; up to 30 days ahead",
+   "notBookings": "walk-ins are the open lanes at the counter; food, drinks and the bar are outside Rosie"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which lane or party, and the date and time",
+    "how many throwers, and each one's age group (adult, 12 to 17, or under 12)",
+    "for a party: the expected number of throwers",
+    "for a mobile lane: the kind of place (a yard, a company site, a school) and the town"
+   ],
+   "afterTime": [
+    "the birthday person's first name, if the booker wants it used",
+    "anything staff should know to help (answers about health stay on the secure page)"
+   ],
+   "securePage": [
+    "a waiver for every thrower: an adult signs their own; a parent or legal guardian signs for each thrower aged 12 to 17",
+    "the waiver's health check: a heart condition, a seizure disorder, a recent surgery, or a shoulder, back or neck injury (the answer stays on the secure page)",
+    "the party's guest list (first names only), and an emergency contact",
+    "for a mobile lane: the street address and a flat, clear area about 20 by 20 feet"
+   ],
+   "whoMayBook": "an adult (18 or over) books for the group; a parent or guardian books for a 12 to 17 year old; nobody under 12 is booked to throw",
+   "told": "throwers stay behind the line and never walk into a lane while someone throws; the venue's own drink rule applies; arrive 15 minutes early to check in"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone hit by an axe, or bleeding, hurt in the head, face or neck, or not breathing right now",
+     "say": "Call 911 now. Don't move someone with a head, neck or back injury.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a heart condition, a seizure disorder, a recent surgery, or a shoulder, back or neck injury",
+     "what": "the booking can go on for the others; the waiver says who shouldn't throw; the person decides, and Rosie gives no health advice"
+    }
+   ],
+   "atTheVenue": "a thrower hurt at a lane: the host stops that lane, gives first aid, calls 911 when needed, and calls the parent at once if the parent isn't with them; an incident report goes on the secure page the same day; the owner is told",
+   "turnAway": "anyone who seems drunk or high doesn't throw; a thrower who ignores the lane rules after a warning leaves the lane",
+   "weather": "indoors: no weather limit; a mobile lane outdoors stops in lightning or high wind, as the crew decides"
+  },
+  "pf.first_steps": {
+   "steps": [
+    "a waiver for every thrower, signed on the secure page before the visit and good for 12 months; a parent signs for each 12 to 17 year old",
+    "the group's final headcount 3 days before (it sets the rest due on a party)",
+    "a mobile lane: the customer confirms the flat area, any outlet the crew needs, and any permission the place needs, 3 days before"
+   ],
+   "prep": "closed-toe shoes; comfortable clothes; arrive 15 minutes early"
+  },
+  "pf.visit": {
+   "checkIn": "at the front desk: the booker's code for the group; the desk sees which throwers have a waiver on file, and each one gets a wristband; the host checks the party in",
+   "lateEntry": "the lane time ends at the set end; a late thrower gets the time left",
+   "missing": "a thrower without a waiver signs on the desk tablet (a parent for a 12 to 17 year old) before throwing; only that thrower waits",
+   "changes": "extra throwers on the day are added at the per-thrower price if the lane has room; the booker says yes first",
+   "children": "nobody under 12 is booked to throw; 12 to 17 year olds throw only with a parent on site, who signs their waiver",
+   "done": "the desk's check-in confirms the visit; the host texts DONE at the end of the party; the crew texts DONE after takedown"
+  },
+  "pf.money": {
+   "before": "lanes paid in full when booking; a party's $40 deposit; open lanes nothing before; a company event's $100 deposit",
+   "after": "a party's $160 rest at the counter for the final count; open lanes at the counter; a company event's $300 rest charged to the saved card when the crew texts DONE; a backyard party's bill texted after",
+   "cancel": "a lane: a full refund if moved or cancelled 2 hours or more before; a late cancel or no-show keeps $20. A party: free to cancel up to 7 days before; later the $40 deposit may be kept, only with the owner's yes. A company event keeps its $100 deposit on a late cancel, with the owner's yes",
+   "membership": "none: no monthly membership is sold through Rosie",
+   "caps": "the state's general limits",
+   "tips": "a tip for the host on the venue's own reader, the business's own way; Rosie never asks",
+   "tax": "where the state taxes admissions",
+   "fee2": "Rosfield's $2 per confirmed booking applies: one $2 per booking, however many throwers",
+   "noSale": "food, drinks, gloves and merchandise are outside Rosie"
+  },
+  "pf.messages": {
+   "never": "children's names, ages and health answers, and injury details: only on the secure page",
+   "staffTexts": "the host's day list shows the booker's name and the number of throwers; the guest list opens on the secure page",
+   "languages": "English and Spanish",
+   "minors": "texts go to the parent who booked, never to a 12 to 17 year old or a child"
+  },
+  "pf.staff": {
+   "licenses": "none from the state; first-aid and CPR cards for hosts, tracked by the venue",
+   "skills": "lane host, party host, mobile lane crew",
+   "ratio": "one host per 3 lanes, as the venue's safety plan sets; a mobile lane always has 2 crew",
+   "standIn": "any trained host or crew member; nobody is booked by name",
+   "oks": "the owner OKs refunds, party changes and anything over $500"
+  },
+  "pf.rules": {
+   "waiver": "no thrower at a lane without a signed waiver; a 12 to 17 year old's waiver signed only by a parent or legal guardian",
+   "lanes": "one thrower per target area; throwers stay behind the line; the lane rules as the venue posts them",
+   "ages": "adults, and 12 to 17 year olds with a parent on site; nobody under 12 is booked to throw",
+   "alcohol": "alcohol and throwing are never mixed: anyone who has been drinking doesn't throw that day; drink service follows the venue's own rule and is never a Rosie step",
+   "inspections": "the venue's daily lane checks, and the state's inspections where its rules require them",
+   "records": "waivers kept as long as the insurer requires, and with the booking for 7 years; incident reports kept with the booking",
+   "cancelRight": "no cancel period for lane time already given",
+   "reviews": "a rating once after the visit, never after an injury"
+  },
+  "pf.edges": {
+   "headcount": "the group's final headcount 3 days before sets the rest; more on the day are added if a lane has room; fewer than 10 on a party still pay for 10",
+   "injury": "a thrower hurt: first aid, 911 if needed, the parent called at once, an incident report the same day; no rating asked after it",
+   "noWaiver": "a thrower without a waiver signs at the desk before throwing; only that thrower waits",
+   "impaired": "a thrower who seems drunk or high doesn't throw; the rest of the group throws; no refund for that person",
+   "closed": "a power cut or a lane problem closes the lanes: new times or a full refund",
+   "wind": "a mobile lane: the crew stops in lightning or high wind; time lost to weather comes back as a partial refund or a new date",
+   "membership": "none: no membership is sold",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "groups",
+   "children",
+   "forms",
+   "spaces",
+   "capacitycheck",
+   "extrawork"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each host where the state asks. Lanes have a set price. Repairs are priced at the visit. A fire stops the booking."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: the lane booking price changes for visits from Mon Nov 2. Lane bookings already booked keep their price. Lane booking plans go up from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a lane booking at its old price. Rosie answers with the real price. That's the price Ben sees before saying yes."
+   ],
+   [
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the lane booking price changes for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the lane booking for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Riley stops the visit if it isn't safe to go on: a person, smoke, a gas smell, or weather that turns unsafe.",
+    "Rory stops the visit if it isn't safe to go on: a person, smoke, a fire, or weather that turns unsafe."
+   ],
+   [
+    "Never: start before a gas, water or power line is confirmed off, or buried lines are marked before digging.",
+    "Never: start before a power line is confirmed off, or buried lines are marked before setup."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now, and not to move anyone hurt in the head, neck or back."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Llame al 911 ahora. No mueva a la persona si se golpeó la cabeza, el cuello o la espalda."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay clear of the lanes, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Call 911 now. Don't move the person if they hit their head, neck or back."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone hit by an axe, gets the safety steps first."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For lanes, someone hit by an axe, bleeding badly, or not breathing stops the booking."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A lane booking at Lee Axe Lanes is shown at its real price. Here are the open times at that price."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit.",
+    "Sam switches the lane booking from a card saved for the fee to a deposit."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A host's example: someone hit by an axe gets 'Call 911 now'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Someone got hurt by an axe."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Our lanes got wet in a flood. Is it safe to open?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hit by an axe, bleeding badly, or not breathing."
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Lane booking, price changes from Nov 2 · Lane, 1 hour · Extra 30 minutes"
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Lane bookings already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Alguien se lastimó con el hacha."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the party quote."
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: lanes and party rooms"
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour.",
+    "Jordan does party rooms too."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Sangra mucho?"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Lane, 1 hour (up to 4 throwers)"
+   ],
+   [
+    "Booked for 8 people · $25 each",
+    "Booked for 8 people · the group rate"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly league plan"
+   ],
+   [
+    "Water heater replacement",
+    "Lane rebuild"
+   ],
+   [
+    "water heater replacement",
+    "lane rebuild"
+   ],
+   [
+    "Signature cut and shave",
+    "Lane, 1 hour"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Lane for 12 to 17, with a parent"
+   ],
+   [
+    "Plumbing and electrical",
+    "Lanes and party rooms"
+   ],
+   [
+    "plumbing and electrical",
+    "lanes and party rooms"
+   ],
+   [
+    "sewer camera inspection",
+    "lane check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Lane check"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Kitchen lane reset"
+   ],
+   [
+    "kitchen drain clearing",
+    "kitchen lane reset"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Axe Lanes LLC"
+   ],
+   [
+    "No. No huele a gas.",
+    "Sí. Sangra mucho."
+   ],
+   [
+    "heating and cooling",
+    "party rooms"
+   ],
+   [
+    "Heating and cooling",
+    "Party rooms"
+   ],
+   [
+    "Plumbing price list",
+    "Lane price list"
+   ],
+   [
+    "plumbing price list",
+    "lane price list"
+   ],
+   [
+    "SPRING10 · $10 off",
+    "SPRING10 · 10% off"
+   ],
+   [
+    "a Extra 30 minutes",
+    "an Extra 30 minutes"
+   ],
+   [
+    "a extra 30 minutes",
+    "an extra 30 minutes"
+   ],
+   [
+    "Water heater flush",
+    "Extra lane time"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Axes"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Axe Lanes"
+   ],
+   [
+    "Color correction",
+    "Party room"
+   ],
+   [
+    "color correction",
+    "party room"
+   ],
+   [
+    "Skin fade · $40",
+    "Lane"
+   ],
+   [
+    "Groom's package",
+    "Birthday party package"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Color touch-up",
+    "Extra lane time"
+   ],
+   [
+    "color touch-up",
+    "extra lane time"
+   ],
+   [
+    "Drain clearing",
+    "Lane reset"
+   ],
+   [
+    "drain clearing",
+    "lane reset"
+   ],
+   [
+    "Drain clearing",
+    "Lane reset"
+   ],
+   [
+    "shutoff valves",
+    "power switches"
+   ],
+   [
+    "signature cut",
+    "lane"
+   ],
+   [
+    "Color and cut",
+    "Birthday party package"
+   ],
+   [
+    "color and cut",
+    "birthday party package"
+   ],
+   [
+    "water heaters",
+    "lanes"
+   ],
+   [
+    "Kitchen drain",
+    "Kitchen lane"
+   ],
+   [
+    "kitchen drain",
+    "kitchen lane"
+   ],
+   [
+    "shutoff valve",
+    "power switch"
+   ],
+   [
+    "Shutoff valve",
+    "Power switch"
+   ],
+   [
+    "cabinet floor",
+    "wall floor"
+   ],
+   [
+    "a beard trim",
+    "an extra 30 minutes"
+   ],
+   [
+    "A beard trim",
+    "An extra 30 minutes"
+   ],
+   [
+    "a Beard trim",
+    "an Extra 30 minutes"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Party Lanes"
+   ],
+   [
+    "Lee Electric",
+    "Lee Event Lanes"
+   ],
+   [
+    "Jordan Price",
+    "Hal Price"
+   ],
+   [
+    "1200 Main St",
+    "300 Cedar Ave"
+   ],
+   [
+    "color quotes",
+    "party quotes"
+   ],
+   [
+    "barber chair",
+    "lane"
+   ],
+   [
+    "at the chair",
+    "at the lane"
+   ],
+   [
+    "in the chair",
+    "at a lane"
+   ],
+   [
+    "water heater",
+    "lane"
+   ],
+   [
+    "Haircut plan",
+    "League plan"
+   ],
+   [
+    "haircut plan",
+    "league plan"
+   ],
+   [
+    "Service call",
+    "Lane setup"
+   ],
+   [
+    "service call",
+    "lane setup"
+   ],
+   [
+    "water heater",
+    "generator"
+   ],
+   [
+    "Water heater",
+    "Generator"
+   ],
+   [
+    "a skin fade",
+    "a lane"
+   ],
+   [
+    "a Skin fade",
+    "A lane"
+   ],
+   [
+    "Casey Moore",
+    "Dee Moore"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "color quote",
+    "party quote"
+   ],
+   [
+    "Color quote",
+    "Party quote"
+   ],
+   [
+    "barbershops",
+    "axe venues"
+   ],
+   [
+    "house calls",
+    "mobile lanes"
+   ],
+   [
+    "House calls",
+    "Mobile lanes"
+   ],
+   [
+    "Leak repair",
+    "Lane repair"
+   ],
+   [
+    "leak repair",
+    "lane repair"
+   ],
+   [
+    "overflowing",
+    "spilling"
+   ],
+   [
+    "patch test",
+    "safety check"
+   ],
+   [
+    "Riley Chen",
+    "Rory Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Quinn Diaz"
+   ],
+   [
+    "color plan",
+    "league plan"
+   ],
+   [
+    "Color plan",
+    "League plan"
+   ],
+   [
+    "Skin fades",
+    "Lanes"
+   ],
+   [
+    "skin fades",
+    "lanes"
+   ],
+   [
+    "Beard trim",
+    "Extra 30 minutes"
+   ],
+   [
+    "beard trim",
+    "extra 30 minutes"
+   ],
+   [
+    "beard line",
+    "lane line"
+   ],
+   [
+    "barbershop",
+    "axe venue"
+   ],
+   [
+    "Barbershop",
+    "Axe venue"
+   ],
+   [
+    "the shop's",
+    "the venue's"
+   ],
+   [
+    "The shop's",
+    "The venue's"
+   ],
+   [
+    "Electrical",
+    "Party rooms"
+   ],
+   [
+    "electrical",
+    "party rooms"
+   ],
+   [
+    "house call",
+    "mobile lane"
+   ],
+   [
+    "House call",
+    "Mobile lane"
+   ],
+   [
+    "sewer line",
+    "lane"
+   ],
+   [
+    "Yard drain",
+    "Yard lane"
+   ],
+   [
+    "yard drain",
+    "yard lane"
+   ],
+   [
+    "dishwasher",
+    "speaker"
+   ],
+   [
+    "Dishwasher",
+    "Speaker"
+   ],
+   [
+    "water line",
+    "power line"
+   ],
+   [
+    "Water line",
+    "Power line"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "a haircut",
+    "a lane booking"
+   ],
+   [
+    "a Haircut",
+    "A lane booking"
+   ],
+   [
+    "42 Oak St",
+    "215 Grove Ave"
+   ],
+   [
+    "88 Elm St",
+    "14 Cedar Ln"
+   ],
+   [
+    "kids cuts",
+    "youth lanes"
+   ],
+   [
+    "Kids cuts",
+    "Youth lanes"
+   ],
+   [
+    "Skin fade",
+    "Lane"
+   ],
+   [
+    "skin fade",
+    "lane"
+   ],
+   [
+    "the chair",
+    "the lane"
+   ],
+   [
+    "The chair",
+    "The lane"
+   ],
+   [
+    "cape clip",
+    "target"
+   ],
+   [
+    "hot towel",
+    "lane"
+   ],
+   [
+    "Hot towel",
+    "Lane"
+   ],
+   [
+    "2020-1187",
+    "EX-1047"
+   ],
+   [
+    "cut hair",
+    "run the lanes"
+   ],
+   [
+    "Kids cut",
+    "Youth lane"
+   ],
+   [
+    "kids cut",
+    "youth lane"
+   ],
+   [
+    "Haircuts",
+    "Lane bookings"
+   ],
+   [
+    "haircuts",
+    "lane bookings"
+   ],
+   [
+    "the shop",
+    "the venue"
+   ],
+   [
+    "The shop",
+    "The venue"
+   ],
+   [
+    "Plumbing",
+    "Lanes"
+   ],
+   [
+    "plumbing",
+    "lanes"
+   ],
+   [
+    "catering",
+    "mobile lanes"
+   ],
+   [
+    "Catering",
+    "Mobile lanes"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "JP031552",
+    "EX-1045"
+   ],
+   [
+    "Haircut",
+    "Lane booking"
+   ],
+   [
+    "haircut",
+    "lane booking"
+   ],
+   [
+    "barbers",
+    "hosts"
+   ],
+   [
+    "plumber",
+    "host"
+   ],
+   [
+    "Plumber",
+    "Host"
+   ],
+   [
+    "massage",
+    "party room"
+   ],
+   [
+    "Massage",
+    "Party room"
+   ],
+   [
+    "EC22871",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "shutoff",
+    "power"
+   ],
+   [
+    "Shutoff",
+    "Power"
+   ],
+   [
+    "cabinet",
+    "back wall"
+   ],
+   [
+    "Cabinet",
+    "Back wall"
+   ],
+   [
+    "clogged",
+    "jammed"
+   ],
+   [
+    "Jordan",
+    "Hal"
+   ],
+   [
+    "barber",
+    "host"
+   ],
+   [
+    "Barber",
+    "Host"
+   ],
+   [
+    "chairs",
+    "lanes"
+   ],
+   [
+    "shop's",
+    "venue's"
+   ],
+   [
+    "shaves",
+    "lanes"
+   ],
+   [
+    "drains",
+    "lanes"
+   ],
+   [
+    "Drains",
+    "Lanes"
+   ],
+   [
+    "valves",
+    "switches"
+   ],
+   [
+    "faucet",
+    "target"
+   ],
+   [
+    "Faucet",
+    "Target"
+   ],
+   [
+    "heater",
+    "generator"
+   ],
+   [
+    "Heater",
+    "Generator"
+   ],
+   [
+    "Riley",
+    "Rory"
+   ],
+   [
+    "Avery",
+    "Quinn"
+   ],
+   [
+    "Casey",
+    "Dee"
+   ],
+   [
+    "beard",
+    "lane"
+   ],
+   [
+    "chair",
+    "lane"
+   ],
+   [
+    "shops",
+    "venues"
+   ],
+   [
+    "perms",
+    "lanes"
+   ],
+   [
+    "shave",
+    "lane"
+   ],
+   [
+    "color",
+    "party"
+   ],
+   [
+    "Color",
+    "Party"
+   ],
+   [
+    "Sewer",
+    "Lane"
+   ],
+   [
+    "sewer",
+    "lane"
+   ],
+   [
+    "Leaks",
+    "Spills"
+   ],
+   [
+    "leaks",
+    "spills"
+   ],
+   [
+    "drain",
+    "lane"
+   ],
+   [
+    "Drain",
+    "Lane"
+   ],
+   [
+    "valve",
+    "switch"
+   ],
+   [
+    "Valve",
+    "Switch"
+   ],
+   [
+    "pipes",
+    "cables"
+   ],
+   [
+    "Pipes",
+    "Cables"
+   ],
+   [
+    "flush",
+    "reset"
+   ],
+   [
+    "Flush",
+    "Reset"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "shop",
+    "venue"
+   ],
+   [
+    "Shop",
+    "Venue"
+   ],
+   [
+    "perm",
+    "lane"
+   ],
+   [
+    "cape",
+    "target"
+   ],
+   [
+    "Leak",
+    "Spill"
+   ],
+   [
+    "leak",
+    "spill"
+   ],
+   [
+    "sink",
+    "lane"
+   ],
+   [
+    "Sink",
+    "Lane"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "$20",
+    "@@fee@@"
+   ],
+   [
+    "$40",
+    "@@dep@@"
+   ],
+   [
+    "$55",
+    "@@lane@@"
+   ],
+   [
+    "$35",
+    "@@lane@@"
+   ],
+   [
+    "$25",
+    "@@extra@@"
+   ],
+   [
+    "$90",
+    "@@lane@@"
+   ],
+   [
+    "$70",
+    "@@rest@@"
+   ],
+   [
+    "$100",
+    "@@rest@@"
+   ],
+   [
+    "$75",
+    "@@mlane@@"
+   ],
+   [
+    "$140",
+    "@@party@@"
+   ],
+   [
+    "$125",
+    "@@party@@"
+   ],
+   [
+    "$110",
+    "@@lane@@"
+   ],
+   [
+    "$15",
+    "@@extra@@"
+   ],
+   [
+    "$89",
+    "@@fee@@"
+   ],
+   [
+    "$150",
+    "@@mback@@"
+   ],
+   [
+    "$130",
+    "@@lane@@"
+   ],
+   [
+    "$85",
+    "@@lane@@"
+   ],
+   [
+    "$80",
+    "@@fee@@"
+   ],
+   [
+    "$120",
+    "@@lane@@"
+   ],
+   [
+    "$10",
+    "@@extra@@"
+   ],
+   [
+    "$160",
+    "@@rest@@"
+   ],
+   [
+    "$640",
+    "@@event@@"
+   ],
+   [
+    "$179",
+    "@@mback@@"
+   ],
+   [
+    "$245",
+    "@@mback@@"
+   ],
+   [
+    "$480",
+    "@@mrest@@"
+   ],
+   [
+    "$156",
+    "@@lane@@"
+   ],
+   [
+    "$199",
+    "@@mback@@"
+   ],
+   [
+    "$165",
+    "@@lane@@"
+   ],
+   [
+    "$2,400",
+    "@@event@@"
+   ],
+   [
+    "$800",
+    "@@event@@"
+   ],
+   [
+    "$358",
+    "@@mback@@"
+   ],
+   [
+    "$620",
+    "@@event@@"
+   ],
+   [
+    "$540",
+    "@@mrest@@"
+   ],
+   [
+    "$700",
+    "@@event@@"
+   ],
+   [
+    "$600",
+    "@@event@@"
+   ],
+   [
+    "$1,200",
+    "@@event@@"
+   ],
+   [
+    "@@fee@@",
+    "$20"
+   ],
+   [
+    "@@dep@@",
+    "$40"
+   ],
+   [
+    "@@lane@@",
+    "$120"
+   ],
+   [
+    "@@extra@@",
+    "$20"
+   ],
+   [
+    "@@rest@@",
+    "$160"
+   ],
+   [
+    "@@party@@",
+    "$200"
+   ],
+   [
+    "@@mlane@@",
+    "$120"
+   ],
+   [
+    "@@mfee@@",
+    "$60"
+   ],
+   [
+    "@@mback@@",
+    "$240"
+   ],
+   [
+    "@@mrest@@",
+    "$300"
+   ],
+   [
+    "@@event@@",
+    "$400"
+   ]
+  ],
+  "B": [
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: the mobile lane price changes for visits from Mon Nov 2. Mobile lanes already booked keep their price. Mobile lane plans go up from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each host where the state asks. Lanes have a set price. Repairs are priced at the visit. A fire stops the booking."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: the lane booking price changes for visits from Mon Nov 2. Lane bookings already booked keep their price. Lane booking plans go up from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for a mobile lane at its old price. Rosie answers with the real price. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a lane booking at its old price. Rosie answers with the real price. That's the price Ben sees before saying yes."
+   ],
+   [
+    "Reading it back: drain clearing goes to $199 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the mobile lane price changes for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the lane booking price changes for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the lane booking for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Riley stops the visit if it isn't safe to go on: a person, smoke, a gas smell, or weather that turns unsafe.",
+    "Rory stops the visit if it isn't safe to go on: a person, smoke, a fire, or weather that turns unsafe."
+   ],
+   [
+    "Never: start before a gas, water or power line is confirmed off, or buried lines are marked before digging.",
+    "Never: start before a power line is confirmed off, or buried lines are marked before setup."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now, and not to move anyone hurt in the head, neck or back."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Llame al 911 ahora. No mueva a la persona si se golpeó la cabeza, el cuello o la espalda."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A mobile lane with Lee Mobile Axes is shown at its real price. Here are the open times at that price."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Tess's phone, you said yes to adding 30 minutes for @@bextra@@."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay clear of the lanes, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Call 911 now. Don't move the person if they hit their head, neck or back."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A job over the plug-in's amount gets a written estimate to sign, if the owner turns that on."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the mobile lane from a card saved for the fee to a deposit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone hit by an axe, gets the safety steps first."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For lanes, someone hit by an axe, bleeding badly, or not breathing stops the booking."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A lane booking at Lee Axe Lanes is shown at its real price. Here are the open times at that price."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit.",
+    "Sam switches the lane booking from a card saved for the fee to a deposit."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A host's example: someone hit by an axe gets 'Call 911 now'."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Mobile lane, price changes from Nov 2 · Extra 30 minutes at the party"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Someone got hurt by an axe."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Our lanes got wet in a flood. Is it safe to open?"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: 30 extra minutes at the party, @@bextra@@. Sent to Alex."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hit by an axe, bleeding badly, or not breathing."
+   ],
+   [
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the mobile lane for visits from Mon Nov 2."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Lane booking, price changes from Nov 2 · Lane, 1 hour · Extra 30 minutes"
+   ],
+   [
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Send Alex M. @@bevent@@ for the party for 10?"
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Mobile lanes already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Lane bookings already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Alguien se lastimó con el hacha."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the party quote."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA @@bextra@@ 30 extra minutes at the party, added"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: lanes and party rooms"
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour.",
+    "Jordan does party rooms too."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Sangra mucho?"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The @@bextra@@ extra time is good for 7 days."
+   ],
+   [
+    "replacing both shutoff valves for $160.",
+    "adding 30 minutes for @@bextra@@."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Tess finds more time is needed."
+   ],
+   [
+    "A lane repair is priced at the visit",
+    "Extra work is priced at the visit"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Extra 30 minutes at the party · @@bextra@@"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "add 30 minutes, @@bextra@@"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Lane, 1 hour (up to 4 throwers)"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is anything still spilling?"
+   ],
+   [
+    "Water heater replacement · $640",
+    "Mobile lanes for a company event · @@bevent@@"
+   ],
+   [
+    "Booked for 8 people · $25 each",
+    "Booked for 8 people · the group rate"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra 30 minutes at the party · @@bextra@@"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra 30 minutes at the party · @@bextra@@"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly league plan"
+   ],
+   [
+    "the extra work now, for $160.",
+    "the extra time now, for @@bextra@@."
+   ],
+   [
+    "Kitchen drain clearing · $179",
+    "Backyard party, 10 throwers · @@bback@@"
+   ],
+   [
+    "$160 for today's extra work.",
+    "@@bextra@@ for today's extra time."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Extra 30 minutes at the party"
+   ],
+   [
+    "replace both shutoff valves",
+    "add 30 minutes"
+   ],
+   [
+    "Water pressure check · Free",
+    "Lane check · Free"
+   ],
+   [
+    "service call was promised",
+    "call-out fee was promised"
+   ],
+   [
+    "Water heater flush · $150",
+    "Backyard party, 10 throwers · @@bback@@"
+   ],
+   [
+    "Water heater replacement",
+    "Mobile lanes for a company event"
+   ],
+   [
+    "water heater replacement",
+    "mobile lanes for a company event"
+   ],
+   [
+    "Water heater replacement",
+    "Lane rebuild"
+   ],
+   [
+    "water heater replacement",
+    "lane rebuild"
+   ],
+   [
+    "Sewer camera inspection",
+    "Backyard party, 10 throwers"
+   ],
+   [
+    "Signature cut and shave",
+    "Lane, 1 hour"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Lane for 12 to 17, with a parent"
+   ],
+   [
+    "Plumbing and electrical",
+    "Lanes and party rooms"
+   ],
+   [
+    "plumbing and electrical",
+    "lanes and party rooms"
+   ],
+   [
+    "sewer camera inspection",
+    "lane check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Lane check"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Mobile lane, 1 hour at home"
+   ],
+   [
+    "kitchen drain clearing",
+    "mobile lane"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Kitchen lane reset"
+   ],
+   [
+    "kitchen drain clearing",
+    "kitchen lane reset"
+   ],
+   [
+    "Drain clearing · $179",
+    "Mobile lane · @@blane@@"
+   ],
+   [
+    "Labor · $120 an hour",
+    "Crew time · $120 an hour"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Axe Lanes LLC"
+   ],
+   [
+    "No. No huele a gas.",
+    "Sí. Sangra mucho."
+   ],
+   [
+    "heating and cooling",
+    "party rooms"
+   ],
+   [
+    "Heating and cooling",
+    "Party rooms"
+   ],
+   [
+    "Plumbing price list",
+    "Lane price list"
+   ],
+   [
+    "plumbing price list",
+    "lane price list"
+   ],
+   [
+    "SPRING10 · $10 off",
+    "SPRING10 · 10% off"
+   ],
+   [
+    "the shutoff valves",
+    "the extra time"
+   ],
+   [
+    "Water heater flush",
+    "Extra 30 minutes at the party"
+   ],
+   [
+    "a Extra 30 minutes",
+    "an Extra 30 minutes"
+   ],
+   [
+    "a extra 30 minutes",
+    "an extra 30 minutes"
+   ],
+   [
+    "Water heater flush",
+    "Extra lane time"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Axes"
+   ],
+   [
+    "service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Axe Lanes"
+   ],
+   [
+    "Color correction",
+    "Party room"
+   ],
+   [
+    "color correction",
+    "party room"
+   ],
+   [
+    "Skin fade · $40",
+    "Lane"
+   ],
+   [
+    "Groom's package",
+    "Birthday party package"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Drain clearing",
+    "Mobile lane"
+   ],
+   [
+    "drain clearing",
+    "mobile lane"
+   ],
+   [
+    "Color touch-up",
+    "Extra lane time"
+   ],
+   [
+    "color touch-up",
+    "extra lane time"
+   ],
+   [
+    "Drain clearing",
+    "Lane reset"
+   ],
+   [
+    "drain clearing",
+    "lane reset"
+   ],
+   [
+    "Drain clearing",
+    "Lane reset"
+   ],
+   [
+    "shutoff valves",
+    "power switches"
+   ],
+   [
+    "signature cut",
+    "lane"
+   ],
+   [
+    "Color and cut",
+    "Birthday party package"
+   ],
+   [
+    "color and cut",
+    "birthday party package"
+   ],
+   [
+    "water heaters",
+    "lanes"
+   ],
+   [
+    "Kitchen drain",
+    "Kitchen lane"
+   ],
+   [
+    "kitchen drain",
+    "kitchen lane"
+   ],
+   [
+    "shutoff valve",
+    "power switch"
+   ],
+   [
+    "Shutoff valve",
+    "Power switch"
+   ],
+   [
+    "cabinet floor",
+    "wall floor"
+   ],
+   [
+    "Service call",
+    "Mobile lane, 1 hour at home"
+   ],
+   [
+    "a beard trim",
+    "an extra 30 minutes"
+   ],
+   [
+    "A beard trim",
+    "An extra 30 minutes"
+   ],
+   [
+    "a Beard trim",
+    "an Extra 30 minutes"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Party Lanes"
+   ],
+   [
+    "Lee Electric",
+    "Lee Event Lanes"
+   ],
+   [
+    "Jordan Price",
+    "Hal Price"
+   ],
+   [
+    "1200 Main St",
+    "300 Cedar Ave"
+   ],
+   [
+    "color quotes",
+    "party quotes"
+   ],
+   [
+    "barber chair",
+    "lane"
+   ],
+   [
+    "at the chair",
+    "at the lane"
+   ],
+   [
+    "in the chair",
+    "at a lane"
+   ],
+   [
+    "water heater",
+    "lane"
+   ],
+   [
+    "Haircut plan",
+    "League plan"
+   ],
+   [
+    "haircut plan",
+    "league plan"
+   ],
+   [
+    "Service call",
+    "Lane setup"
+   ],
+   [
+    "service call",
+    "lane setup"
+   ],
+   [
+    "water heater",
+    "generator"
+   ],
+   [
+    "Water heater",
+    "Generator"
+   ],
+   [
+    "lane repair",
+    "extra work"
+   ],
+   [
+    "Lane repair",
+    "Extra work"
+   ],
+   [
+    "Leak repair",
+    "Mobile lanes for a company event"
+   ],
+   [
+    "a skin fade",
+    "a lane"
+   ],
+   [
+    "a Skin fade",
+    "A lane"
+   ],
+   [
+    "Casey Moore",
+    "Dee Moore"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "color quote",
+    "party quote"
+   ],
+   [
+    "Color quote",
+    "Party quote"
+   ],
+   [
+    "barbershops",
+    "axe venues"
+   ],
+   [
+    "house calls",
+    "mobile lanes"
+   ],
+   [
+    "House calls",
+    "Mobile lanes"
+   ],
+   [
+    "Leak repair",
+    "Lane repair"
+   ],
+   [
+    "leak repair",
+    "lane repair"
+   ],
+   [
+    "overflowing",
+    "spilling"
+   ],
+   [
+    "patch test",
+    "safety check"
+   ],
+   [
+    "Riley Chen",
+    "Rory Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Quinn Diaz"
+   ],
+   [
+    "color plan",
+    "league plan"
+   ],
+   [
+    "Color plan",
+    "League plan"
+   ],
+   [
+    "Skin fades",
+    "Lanes"
+   ],
+   [
+    "skin fades",
+    "lanes"
+   ],
+   [
+    "Beard trim",
+    "Extra 30 minutes"
+   ],
+   [
+    "beard trim",
+    "extra 30 minutes"
+   ],
+   [
+    "beard line",
+    "lane line"
+   ],
+   [
+    "barbershop",
+    "axe venue"
+   ],
+   [
+    "Barbershop",
+    "Axe venue"
+   ],
+   [
+    "the shop's",
+    "the venue's"
+   ],
+   [
+    "The shop's",
+    "The venue's"
+   ],
+   [
+    "Electrical",
+    "Party rooms"
+   ],
+   [
+    "electrical",
+    "party rooms"
+   ],
+   [
+    "house call",
+    "mobile lane"
+   ],
+   [
+    "House call",
+    "Mobile lane"
+   ],
+   [
+    "sewer line",
+    "lane"
+   ],
+   [
+    "Yard drain",
+    "Yard lane"
+   ],
+   [
+    "yard drain",
+    "yard lane"
+   ],
+   [
+    "dishwasher",
+    "speaker"
+   ],
+   [
+    "Dishwasher",
+    "Speaker"
+   ],
+   [
+    "water line",
+    "power line"
+   ],
+   [
+    "Water line",
+    "Power line"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "a haircut",
+    "a lane booking"
+   ],
+   [
+    "a Haircut",
+    "A lane booking"
+   ],
+   [
+    "42 Oak St",
+    "215 Grove Ave"
+   ],
+   [
+    "88 Elm St",
+    "14 Cedar Ln"
+   ],
+   [
+    "kids cuts",
+    "youth lanes"
+   ],
+   [
+    "Kids cuts",
+    "Youth lanes"
+   ],
+   [
+    "Skin fade",
+    "Lane"
+   ],
+   [
+    "skin fade",
+    "lane"
+   ],
+   [
+    "the chair",
+    "the lane"
+   ],
+   [
+    "The chair",
+    "The lane"
+   ],
+   [
+    "cape clip",
+    "target"
+   ],
+   [
+    "hot towel",
+    "lane"
+   ],
+   [
+    "Hot towel",
+    "Lane"
+   ],
+   [
+    "2020-1187",
+    "EX-1047"
+   ],
+   [
+    "cut hair",
+    "run the lanes"
+   ],
+   [
+    "Kids cut",
+    "Youth lane"
+   ],
+   [
+    "kids cut",
+    "youth lane"
+   ],
+   [
+    "Haircuts",
+    "Lane bookings"
+   ],
+   [
+    "haircuts",
+    "lane bookings"
+   ],
+   [
+    "the shop",
+    "the venue"
+   ],
+   [
+    "The shop",
+    "The venue"
+   ],
+   [
+    "Plumbing",
+    "Lanes"
+   ],
+   [
+    "plumbing",
+    "lanes"
+   ],
+   [
+    "catering",
+    "mobile lanes"
+   ],
+   [
+    "Catering",
+    "Mobile lanes"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "JP031552",
+    "EX-1045"
+   ],
+   [
+    "Haircut",
+    "Lane booking"
+   ],
+   [
+    "haircut",
+    "lane booking"
+   ],
+   [
+    "barbers",
+    "hosts"
+   ],
+   [
+    "plumber",
+    "host"
+   ],
+   [
+    "Plumber",
+    "Host"
+   ],
+   [
+    "massage",
+    "party room"
+   ],
+   [
+    "Massage",
+    "Party room"
+   ],
+   [
+    "EC22871",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "shutoff",
+    "power"
+   ],
+   [
+    "Shutoff",
+    "Power"
+   ],
+   [
+    "cabinet",
+    "back wall"
+   ],
+   [
+    "Cabinet",
+    "Back wall"
+   ],
+   [
+    "clogged",
+    "jammed"
+   ],
+   [
+    "Jordan",
+    "Hal"
+   ],
+   [
+    "barber",
+    "host"
+   ],
+   [
+    "Barber",
+    "Host"
+   ],
+   [
+    "chairs",
+    "lanes"
+   ],
+   [
+    "shop's",
+    "venue's"
+   ],
+   [
+    "shaves",
+    "lanes"
+   ],
+   [
+    "drains",
+    "lanes"
+   ],
+   [
+    "Drains",
+    "Lanes"
+   ],
+   [
+    "valves",
+    "switches"
+   ],
+   [
+    "faucet",
+    "target"
+   ],
+   [
+    "Faucet",
+    "Target"
+   ],
+   [
+    "heater",
+    "generator"
+   ],
+   [
+    "Heater",
+    "Generator"
+   ],
+   [
+    "Riley",
+    "Rory"
+   ],
+   [
+    "Avery",
+    "Quinn"
+   ],
+   [
+    "Casey",
+    "Dee"
+   ],
+   [
+    "beard",
+    "lane"
+   ],
+   [
+    "chair",
+    "lane"
+   ],
+   [
+    "shops",
+    "venues"
+   ],
+   [
+    "perms",
+    "lanes"
+   ],
+   [
+    "shave",
+    "lane"
+   ],
+   [
+    "color",
+    "party"
+   ],
+   [
+    "Color",
+    "Party"
+   ],
+   [
+    "Sewer",
+    "Lane"
+   ],
+   [
+    "sewer",
+    "lane"
+   ],
+   [
+    "Leaks",
+    "Spills"
+   ],
+   [
+    "leaks",
+    "spills"
+   ],
+   [
+    "drain",
+    "lane"
+   ],
+   [
+    "Drain",
+    "Lane"
+   ],
+   [
+    "valve",
+    "switch"
+   ],
+   [
+    "Valve",
+    "Switch"
+   ],
+   [
+    "pipes",
+    "cables"
+   ],
+   [
+    "Pipes",
+    "Cables"
+   ],
+   [
+    "flush",
+    "reset"
+   ],
+   [
+    "Flush",
+    "Reset"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "shop",
+    "venue"
+   ],
+   [
+    "Shop",
+    "Venue"
+   ],
+   [
+    "perm",
+    "lane"
+   ],
+   [
+    "cape",
+    "target"
+   ],
+   [
+    "Leak",
+    "Spill"
+   ],
+   [
+    "leak",
+    "spill"
+   ],
+   [
+    "sink",
+    "lane"
+   ],
+   [
+    "Sink",
+    "Lane"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "$150",
+    "@@bback@@"
+   ],
+   [
+    "$89",
+    "@@bfee@@"
+   ],
+   [
+    "$40",
+    "@@bdep@@"
+   ],
+   [
+    "$640",
+    "@@bevent@@"
+   ],
+   [
+    "$179",
+    "@@bback@@"
+   ],
+   [
+    "$160",
+    "@@bextra@@"
+   ],
+   [
+    "$245",
+    "@@bback@@"
+   ],
+   [
+    "$110",
+    "@@brest@@"
+   ],
+   [
+    "$480",
+    "@@brest@@"
+   ],
+   [
+    "$156",
+    "@@blane@@"
+   ],
+   [
+    "$199",
+    "@@bback@@"
+   ],
+   [
+    "$165",
+    "@@blane@@"
+   ],
+   [
+    "$2,400",
+    "@@bevent@@"
+   ],
+   [
+    "$800",
+    "@@bevent@@"
+   ],
+   [
+    "$358",
+    "@@bback@@"
+   ],
+   [
+    "$620",
+    "@@bevent@@"
+   ],
+   [
+    "$540",
+    "@@brest@@"
+   ],
+   [
+    "$700",
+    "@@bevent@@"
+   ],
+   [
+    "$600",
+    "@@bevent@@"
+   ],
+   [
+    "$1,200",
+    "@@bevent@@"
+   ],
+   [
+    "$55",
+    "@@blane@@"
+   ],
+   [
+    "$80",
+    "@@bfee@@"
+   ],
+   [
+    "$20",
+    "@@bextra@@"
+   ],
+   [
+    "$35",
+    "@@blane@@"
+   ],
+   [
+    "$25",
+    "@@bextra@@"
+   ],
+   [
+    "$90",
+    "@@blane@@"
+   ],
+   [
+    "$75",
+    "@@blane@@"
+   ],
+   [
+    "$125",
+    "@@bback@@"
+   ],
+   [
+    "$70",
+    "@@blane@@"
+   ],
+   [
+    "$100",
+    "@@bdep@@"
+   ],
+   [
+    "$15",
+    "@@bextra@@"
+   ],
+   [
+    "$130",
+    "@@blane@@"
+   ],
+   [
+    "$85",
+    "@@bfee@@"
+   ],
+   [
+    "$120",
+    "@@blane@@"
+   ],
+   [
+    "$10",
+    "@@bextra@@"
+   ],
+   [
+    "$169",
+    "@@bback@@"
+   ],
+   [
+    "@@bdep@@",
+    "$100"
+   ],
+   [
+    "@@brest@@",
+    "$300"
+   ],
+   [
+    "@@bevent@@",
+    "$400"
+   ],
+   [
+    "@@bfee@@",
+    "$60"
+   ],
+   [
+    "@@bback@@",
+    "$240"
+   ],
+   [
+    "@@blane@@",
+    "$120"
+   ],
+   [
+    "@@bextra@@",
+    "$60"
+   ]
+  ]
+ },
+ "keep": [
+  "host",
+  "Host",
+  "travel fee",
+  "Travel fee"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books a lane for 4 at Lee Axe Lanes, Sat Oct 24 at 11:00am, for a sister's birthday. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Mobile Axes for a company event at 14 Cedar Ln: 2 lanes for 2 hours. Hal and Dee set up Thu Oct 22 at 2:00pm and pack up after the event."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|deposit|counter",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a lane for 4 for 1 hour, $120 paid in full when booking. A late cancel or no-show keeps $20.",
+    "list|deposit|counter": "A birthday party for 10: a $40 deposit when booking, the $160 rest paid at the counter on the day.",
+    "list|none|counter": "An open lane for 2 to 4 throwers: nothing taken, the bill paid at the counter."
+   },
+   "amounts": {
+    "list|full|*": {
+     "price": "$120",
+     "paid": "$120",
+     "fee": "$20",
+     "name": "Lane, 1 hour (up to 4 throwers)"
+    },
+    "list|deposit|*": {
+     "price": "$200",
+     "deposit": "$40",
+     "rest": "$160",
+     "fee": "$40",
+     "name": "Birthday party package, 10 throwers"
+    },
+    "list|none|*": {
+     "price": "$120",
+     "name": "Open lane, 1 hour (2 to 4 throwers)"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra 30 minutes on a lane",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Lane, 1 hour (up to 4 throwers)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$120",
+      "paid": "$120",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|card|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: a company event with 2 lanes for 2 hours, $400. A $100 deposit now, the $300 rest charged to the saved card when the crew texts DONE.",
+    "list|card|bill": "A backyard party for 10: $240, a card saved for the $60 late-cancel fee; the crew sends the bill after the party.",
+    "list|full|none": "A 1-hour lane at home for up to 4, paid in full when booking: $120."
+   },
+   "amounts": {
+    "list|deposit|*": {
+     "price": "$400",
+     "deposit": "$100",
+     "rest": "$300",
+     "fee": "$100",
+     "name": "Mobile lanes for a company event"
+    },
+    "list|card|*": {
+     "price": "$240",
+     "fee": "$60",
+     "name": "Backyard party, 10 throwers, 2 hours"
+    },
+    "list|full|*": {
+     "price": "$120",
+     "paid": "$120",
+     "fee": "$20",
+     "name": "Mobile lane, 1 hour at home"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra 30 minutes at the party",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$60",
+      "fee": "$60"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Mobile lane, 1 hour at home",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$120",
+      "paid": "$120",
+      "fee": "$20"
+     }
+    }
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Rory and Quinn (hosts)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a school, a party's parents)"
+  },
+  "B": {
+   "staff": "Hal and Dee (crew)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a company, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Rory"
+  },
+  "B": {
+   "staff": "Hal"
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted from photos first",
+    "why": "A lane is never quoted: the price list shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted at the visit",
+    "why": "A lane is never quoted: the price list shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A8-24",
+    "label": "Priced at the visit",
+    "why": "A lane is never quoted: the price list shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A9-01",
+    "label": "Rosie sends the bill",
+    "why": "Lanes are paid in full, at the counter, or on a card at the venue; Rosie sends no bill for a lane."
+   },
+   {
+    "op": "off",
+    "at": "A9-01",
+    "label": "Saved card charged",
+    "why": "No money is charged later on a card for a lane: the rest is paid at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A lane is not paid in stages (the stages fact is not listed)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "A lane is never billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a lane."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a lane."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A group checks in with one code for the whole group, not a class roster."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at a lane."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A lane has no results that come later."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked lane and party pays the $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable: lanes are booked by the hour."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Lanes are never sent now: a lane is booked ahead or walked in."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A lane is never played by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "The venue books a lane or a party room, never a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A lane is a space, not a seat in a session (the space branch is kept)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A lane is booked for a set time, never as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at a lane: the group is at the lane."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A lane is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No plan charge goes on a saved card: a lane is paid in full, at the counter, or in the deposit and rest."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No one is left at a lane: a 12 to 17 year old throws with a parent on site."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for a venue (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for hosts (D96): the venue's own first-aid cards only."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B4-06",
+    "label": "Quoted at the visit",
+    "why": "A mobile lane is priced before the visit: the price list, or the quote for the event."
+   },
+   {
+    "op": "off",
+    "at": "B8-19",
+    "label": "Priced at the visit",
+    "why": "A mobile lane is priced before the visit: the price list, or the quote for the event."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a lane."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a lane."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A mobile lane is not paid in stages (the stages fact is not listed)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No event is billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Bank transfer is for big jobs this venue never takes (no bank-transfer fact)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A lane has no report that comes later."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Mobile lanes start at a set time the booker picks (the booking setting), not a window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Lanes are booked for a set time, never as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A lane is a space, not a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Mobile lanes are never sent now: the crew sets up at a set start time, so B4-19 shows the soonest times."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "No crew is on call for a sent-now job: lanes are booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Mobile lanes are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Mobile lanes are never sent now, so the day list and the crew's OMW come first."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A lane is never played by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked lane and party pays the $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable: lanes are booked by the hour."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No mobile lane is sent now: the crew sets up at a booked start time."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for a venue (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for crew (D96)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No plans: no plan charge goes on a saved card."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "No child is left in the crew's care: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-68",
+    "why": "No child is left in the crew's care."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A lane is rated like any visit."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-29",
+   "S1-80",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "S1-29",
+   "S1-80"
+  ]
+ },
+ "notes": "Axe throwing (T1, Oct 27, 2026): a lane venue (table style), from restaurant (copied; trampoline-park used as reference for lanes, groups and waivers). Flow A (the group comes to Lee Axe Lanes): one lane for 1 hour up to 4 throwers, $120 paid in full when booking, $20 kept on a late cancel or no-show (main); a birthday party for 10 throwers, $200: $40 deposit when booking, $160 rest paid at the counter for the final count, $40 kept on a late cancel; an open lane for 2 to 4, nothing taken, the bill at the counter. Flow B (Lee Mobile Axes comes to the customer): a company event, 2 lanes for 2 hours, $400: $100 deposit, $300 rest charged to the saved card when the crew texts DONE, $100 kept (main); a backyard party for 10 throwers, $240: a card saved for the $60 late-cancel fee, the bill texted after; a mobile lane at home for up to 4, $120 paid in full, $20 kept. Services (two per flow, for the mixed-booking examples): A a-add 'Extra 30 minutes on a lane' $20 (card, counter), a-full 'Lane, 1 hour (up to 4 throwers)' $120 paid in full; B b-add 'Extra 30 minutes at the party' $60 (card, bill), b-full 'Mobile lane, 1 hour at home' $120 paid in full. Who may book: adults; a 12 to 17 year old throws only with a parent on site (the example setting); nobody under 12 is booked to throw. Alcohol and throwing never mix: anyone who has been drinking doesn't throw; drink service follows the venue's own rule. Safety: someone hit by an axe, bleeding badly, hurt in the head, face or neck, or not breathing = 911, no booking; the danger examples in B3-11, B3-18, B3-19 and the flood example are rewritten for an axe venue. Licenses: D96 (the lookup branches off in S1-60 and S2-28; registration and insurance shown as given, never checked). $2 on every booking (D97). Settings: set start times in both flows; cutoff 24 hours before (A), 2 days before (B). Money B limited to set-start times (money.B.booking). Names: Lee Axe Lanes (flow A, 215 Grove Ave), Lee Mobile Axes (flow B), hosts Rory and Quinn (A), crew Hal and Dee (B); customer Alex M. The master's price-change, discount and rate examples are number-free or use this venue's own rows (the discount example is a percentage). Plans, classes, stages, bank transfer, sent-now and drop-off are off; the plan-only branches stay hidden by the plans fact.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Riley stops the visit if it isn't safe to go on: a person, smoke, a gas smell, or weather that turns unsafe.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan does electrical too, at $140 an hour.",
+    "Signature cut and hot towel shave",
+    "Booked for 8 people · $25 each",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Lee's Barbershop LLC",
+    "Plumbing price list",
+    "SPRING10 · $10 off",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Skin fade · $40",
+    "Groom's package",
+    "Color touch-up",
+    "color touch-up",
+    "Drain clearing",
+    "Drain clearing",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "water heaters",
+    "a beard trim",
+    "A beard trim",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "at the chair",
+    "in the chair",
+    "water heater",
+    "Haircut plan",
+    "haircut plan",
+    "water heater",
+    "a skin fade",
+    "Casey Moore",
+    "Springfield",
+    "color quote",
+    "Color quote",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "patch test",
+    "Riley Chen",
+    "Avery Diaz",
+    "color plan",
+    "Color plan",
+    "skin fades",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "barbershop",
+    "Barbershop",
+    "the shop's",
+    "The shop's",
+    "Electrical",
+    "electrical",
+    "house call",
+    "House call",
+    "travel fee",
+    "a haircut",
+    "88 Elm St",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "the chair",
+    "The chair",
+    "cape clip",
+    "hot towel",
+    "2020-1187",
+    "cut hair",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "the shop",
+    "The shop",
+    "Plumbing",
+    "plumbing",
+    "catering",
+    "MP045210",
+    "JP031552",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "plumber",
+    "Plumber",
+    "massage",
+    "Massage",
+    "EC22871",
+    "BS20981",
+    "JE30417",
+    "Jordan",
+    "barber",
+    "Barber",
+    "chairs",
+    "shop's",
+    "shaves",
+    "Drains",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "chair",
+    "shops",
+    "perms",
+    "shave",
+    "color",
+    "Color",
+    "Leaks",
+    "Drain",
+    "valve",
+    "shop",
+    "Shop",
+    "perm",
+    "cape",
+    "Leak",
+    "leak",
+    "pipe",
+    "$20",
+    "$40",
+    "$55",
+    "$35",
+    "$25",
+    "$90",
+    "$70",
+    "$100",
+    "$75",
+    "$140",
+    "$125",
+    "$110",
+    "$15",
+    "$89",
+    "$130",
+    "$85",
+    "$80",
+    "$10",
+    "$160"
+   ],
+   "B": [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Reading it back: drain clearing goes to $199 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Never: start before a gas, water or power line is confirmed off, or buried lines are marked before digging.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan does electrical too, at $140 an hour.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The $160 valve quote is good for 7 days.",
+    "replacing both shutoff valves for $160.",
+    "Jordan finds corroded shutoff valves.",
+    "Replace both shutoff valves · $160",
+    "replace both shutoff valves, $160",
+    "Is the sink still full of water?",
+    "Water heater replacement · $640",
+    "Sewer camera inspection · $199",
+    "Sewer camera inspection · $199",
+    "Yearly water heater flush plan",
+    "the extra work now, for $160.",
+    "$160 for today's extra work.",
+    "Replace both shutoff valves",
+    "replace both shutoff valves",
+    "service call was promised",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater replacement",
+    "Sewer camera inspection",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "sewer camera inspection",
+    "Sewer camera inspection",
+    "Kitchen drain clearing",
+    "Kitchen drain clearing",
+    "Drain clearing · $179",
+    "No. No huele a gas.",
+    "heating and cooling",
+    "Heating and cooling",
+    "Plumbing price list",
+    "SPRING10 · $10 off",
+    "the shutoff valves",
+    "Water heater flush",
+    "Water heater flush",
+    "Lee Home Services",
+    "service-call fee",
+    "service call fee",
+    "Lee's Barbershop",
+    "Yes, every year",
+    "Drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "shutoff valves",
+    "water heaters",
+    "Kitchen drain",
+    "kitchen drain",
+    "shutoff valve",
+    "Shutoff valve",
+    "cabinet floor",
+    "Service call",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "at the chair",
+    "water heater",
+    "Service call",
+    "service call",
+    "water heater",
+    "Water heater",
+    "Leak repair",
+    "Casey Moore",
+    "Springfield",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "Leak repair",
+    "leak repair",
+    "overflowing",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "barbershop",
+    "Barbershop",
+    "the shop's",
+    "The shop's",
+    "Electrical",
+    "electrical",
+    "house call",
+    "House call",
+    "sewer line",
+    "Yard drain",
+    "yard drain",
+    "dishwasher",
+    "water line",
+    "travel fee",
+    "a haircut",
+    "42 Oak St",
+    "88 Elm St",
+    "the chair",
+    "The chair",
+    "hot towel",
+    "cut hair",
+    "the shop",
+    "The shop",
+    "Plumbing",
+    "plumbing",
+    "catering",
+    "MP045210",
+    "JP031552",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "plumber",
+    "Plumber",
+    "EC22871",
+    "BS20981",
+    "JE30417",
+    "shutoff",
+    "Shutoff",
+    "cabinet",
+    "Cabinet",
+    "clogged",
+    "Jordan",
+    "barber",
+    "Barber",
+    "chairs",
+    "shop's",
+    "shaves",
+    "Drains",
+    "valves",
+    "faucet",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "chair",
+    "shops",
+    "shave",
+    "color",
+    "Sewer",
+    "sewer",
+    "Leaks",
+    "drain",
+    "Drain",
+    "valve",
+    "pipes",
+    "flush",
+    "clogs",
+    "shop",
+    "Shop",
+    "perm",
+    "Leak",
+    "leak",
+    "sink",
+    "pipe",
+    "clog",
+    "$150",
+    "$89",
+    "$40",
+    "$640",
+    "$179",
+    "$160",
+    "$245",
+    "$110",
+    "$480",
+    "$156",
+    "$199",
+    "$165",
+    "$2,400",
+    "$800",
+    "$358",
+    "$620",
+    "$540",
+    "$700",
+    "$600",
+    "$80",
+    "$20",
+    "$35",
+    "$90",
+    "$75",
+    "$70",
+    "$100",
+    "$15",
+    "$120",
+    "$10",
+    "$169"
+   ]
+  },
+  "A": {
+   "A4-05": "8b3e838019",
+   "A8-24": "c802ca35ab",
+   "A9-01": "bad55310a4",
+   "A9-15": "bd2a17c3c5",
+   "A4-28": "c8e677520c",
+   "A8-03": "7fe61cccf5",
+   "A10-45": "855be6050a",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "9d65299834",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7"
+  },
+  "B": {
+   "B4-06": "223e119ea0",
+   "B8-19": "11e79a26d8",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-38": "867fe1ab7c",
+   "B4-83": "93095f28e5",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-01": "826f4058c2",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "B7-91": "7132851ec1",
+   "B8-67": "b66ffbd04d",
+   "B8-68": "8ede790b60",
+   "B10-32": "7713bff255"
+  }
+ }
+}

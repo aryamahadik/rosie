@@ -1,0 +1,2851 @@
+{
+ "id": "appliance",
+ "name": "Appliance repair",
+ "style": "Home visit",
+ "pattern": "fix",
+ "from": "plumber",
+ "plugin": {
+  "pf.license": {
+   "need": "Most states don't license appliance repair. Some register repair companies, and some cities license repair shops: the state's or city's form says. Refrigeration work and gas or electric hookups can need that trade's own license.",
+   "who holds it": "The company, where the state registers repair companies. Each tech, only for what their own card or license covers: an EPA refrigerant card for sealed systems, and a refrigeration or gas license where the state asks.",
+   "what to ask": [
+    "The company's repair registration or license number, where the state's form asks for one",
+    "Each tech's EPA refrigerant card number and type, for anyone who opens a sealed system",
+    "Each tech's refrigeration or gas license, where the state's form asks, in their invite reply",
+    "A maker's authorized-servicer number, only if the business takes that maker's warranty jobs"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "Reminders before each license or registration expires, on the dates the owner picks. EPA cards don't expire. A lapsed license pauses new bookings for that person.",
+   "insurance or bond": "Liability insurance, and a bond where the state's form asks for one: from the state form.",
+   "background checks": "Only where the state's form asks.",
+   "at the shop": "A small-appliance repair shop: the state's or city's form says if it needs a registration. Safe default: the business registration on file, shown on the listing.",
+   "local rules": "Some cities license repair shops or home repair businesses on their own: the form for that place applies, by the customer's address."
+  },
+  "pf.services": {
+   "at the customer's home (the example: Delta Appliance Repair's own list)": [
+    {
+     "service": "Service call (find the problem)",
+     "price kind": "one price",
+     "price": "$89, credited to the repair",
+     "length": "45 to 60 min",
+     "place": "at the customer's home",
+     "before": "a card saved; the $89 service call is owed",
+     "after": "Rosie texts the bill",
+     "note": "Goes on the repairs below; not booked alone"
+    },
+    {
+     "service": "Fridge or freezer repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "60 to 90 min, plus a return visit if a part is ordered",
+     "place": "at the customer's home",
+     "before": "a card saved; the $89 service call is owed",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Washer, dryer or dishwasher repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "60 to 90 min",
+     "place": "at the customer's home",
+     "before": "a card saved; the $89 service call is owed",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Range, oven or cooktop repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "60 to 90 min",
+     "place": "at the customer's home",
+     "before": "a card saved; the $89 service call is owed",
+     "after": "Rosie texts the bill",
+     "note": "Gas models only by a tech with the gas skill"
+    },
+    {
+     "service": "Dryer heat repair (a dryer that runs but won't heat)",
+     "price kind": "one price",
+     "price": "$179, the $89 call included",
+     "length": "60 min",
+     "place": "at the customer's home",
+     "before": "a card saved; the $89 service call is owed",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Dryer vent cleaning",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "60 min",
+     "place": "at the customer's home",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Often rebooked once a year"
+    },
+    {
+     "service": "Built-in fridge install (a fridge the customer bought)",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $640)",
+     "length": "half a day, a crew of two",
+     "place": "at the customer's home",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill"
+    },
+    {
+     "service": "Sealed-system repair (a fridge's refrigerant system)",
+     "price kind": "quoted at the visit",
+     "price": "its own quote, after the service call",
+     "length": "set by the owner",
+     "place": "at the customer's home",
+     "before": "a card saved; the $89 service call is owed",
+     "after": "Rosie texts the bill",
+     "note": "Only techs with an EPA card. The maker's longer cover is checked from the serial first."
+    },
+    {
+     "service": "Failure report for an insurance claim",
+     "price kind": "by person",
+     "price": "$199, or $249 when the owner goes",
+     "length": "60 min",
+     "place": "at the customer's home",
+     "before": "a card saved; the $89 service call is owed",
+     "after": "Rosie texts the bill",
+     "note": "The report link comes later"
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum",
+     "place": "at the customer's home",
+     "note": "Goes on quoted jobs; not booked alone"
+    },
+    {
+     "service": "Return visit for a part on order",
+     "price kind": "part of the same job",
+     "price": "no new service call",
+     "place": "at the customer's home",
+     "note": "Booked once the part's due date is known"
+    }
+   ],
+   "at the business (the example: Delta Repair Shop's own price list)": [
+    {
+     "service": "Small appliance repair (a mixer, a coffee maker, a vacuum)",
+     "price kind": "quoted at the counter",
+     "price": "only the $25 bench check is promised, credited to the repair",
+     "length": "30 min, or left until it's ready",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Vacuum tune-up",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "both: at the shop, or at the customer's home as a $75 home visit paid in full",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Coffee maker descale",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "New power cord, fitted",
+     "price kind": "one price",
+     "price": "$20",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Toaster repair",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Sewing machine tune-up",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the shop",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Espresso machine rebuild",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours, or a drop-off",
+     "place": "at the shop",
+     "before": "a card saved for a $40 fee (over 2 hours)",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Vintage mixer restore",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $90)",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Only Nadia does restores. The owner OKs each quote."
+    },
+    {
+     "service": "Video check of a small appliance",
+     "price kind": "the owner's own price",
+     "place": "at the business (a video session)",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Only where the owner offers it"
+    }
+   ],
+   "capacity": "One tech per booking. A built-in install, or pulling a built-in fridge out, needs a crew of two. The shop's restores need its restore bench.",
+   "skills each needs": "Sealed-system work needs an EPA refrigerant card. Gas ranges, ovens and dryers need the gas skill. Built-ins need a tech cleared for them. Restores at the shop need the restore skill.",
+   "nobody home": "Never at the home: an adult (18 or older) is there for the whole visit. At the shop, a drop-off needs nobody to wait.",
+   "online": "A video check of a small appliance only, where the owner offers it. No repair is done by video.",
+   "warranty jobs": "Under the maker's warranty: the maker sends its own servicer, so Rosie points the customer there and takes nothing. Only a business the maker authorized takes them, and the owner adds that service.",
+   "extras": "Travel inside the service area only (the example: 25 miles). Parts at the owner's price, shown on the quote. No tax line unless the owner sets a rate. The business's own warranty on the receipt (the example: 90 days on parts and labor). A loaner mini fridge while a part is on order, only where the owner offers one: the customer says yes on the secure page, and the general rules for rentals set any deposit or card saved for damage."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "Which appliance, and its brand: a fridge, freezer, washer, dryer, dishwasher, range, oven or cooktop",
+    "Gas or electric, for a range, oven or dryer",
+    "Built in, or freestanding",
+    "What it's doing, since when, and any error code on the display",
+    "Bought when, and any warranty: the maker's, a store plan or a home warranty, or not sure",
+    "At the shop: which small appliance, its brand, and what it's doing"
+   ],
+   "after a time is picked": [
+    "Who will be home: the customer, or another adult (their name and mobile go on the secure page)",
+    "Can the appliance be reached and pulled out, and is there room behind it",
+    "Access, parking and pets",
+    "Own or rent, and who pays: the customer, or the landlord or manager",
+    "A home warranty or store plan: its name, so the owner can check it"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "The appliance's label photo (brand, model and serial): it tells the tech which parts fit and dates the appliance",
+    "Gate or lock codes",
+    "The landlord's or manager's name and mobile",
+    "Photos inside the home",
+    "The card"
+   ],
+   "who may book": "An adult. A renter books, and the landlord or manager OKs it where they pay. A person the owner of the home names may book for them."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A gas smell or a carbon monoxide alarm (a gas range, oven or dryer)",
+     "says": "Leave the house now and keep everyone out. Don't flip switches, unplug anything or use a phone inside. Once outside, call 911 and the gas company.",
+     "booking": "No booking. A new request must say the gas company cleared the home."
+    },
+    {
+     "words": "Smoke or flames",
+     "says": "Get everyone out now. Once outside, call 911. Don't go back in.",
+     "booking": "No booking until it's safe; the customer can come back."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "Sparks or a burning smell from an appliance",
+     "says": "Unplug it, or switch off its breaker, only if that's safe. Don't use it until it's fixed."
+    },
+    {
+     "words": "Water near outlets (a washer, a dishwasher, a fridge's water line)",
+     "says": "Stay away from wet outlets and cords. Turn off the appliance's water supply if you can reach it without touching the water."
+    }
+   ],
+   "at the shop": "A small appliance that smoked, sparked or got wet is brought in unplugged and isn't used. A gas appliance part isn't worked on at the shop: the customer is offered a home visit by a tech with the gas skill.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The warranty check",
+     "for": "Any appliance bought in the last few years, or 'not sure'",
+     "timing": "Before times show. 'Not sure' means the label photo is checked before the booking is confirmed."
+    },
+    {
+     "step": "The owner's OK",
+     "for": "Built-in and commercial units: special parts, and two people to pull one out",
+     "timing": "Before the booking is confirmed"
+    },
+    {
+     "step": "Photos first",
+     "for": "A built-in fridge install",
+     "timing": "Before the quote"
+    },
+    {
+     "step": "A part check (the item brought in, or its label photo)",
+     "for": "A special-order part at the shop",
+     "timing": "At least 2 days before; stays good 3 months"
+    }
+   ],
+   "prep for the reminder": [
+    "A fridge that isn't cooling: leave it plugged in and don't defrost it. The frost shows what failed. Move food to a cooler.",
+    "Clear a path to the appliance, and space to pull it out",
+    "A washer or dishwasher with water in it: leave the water in, and put towels down",
+    "Put pets in another room",
+    "At the shop: bring the appliance with all its parts, like the bowl, the lid and the cord"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's home": "The check-in code at the door. The on-my-way text names the tech, with a photo.",
+   "check-in at the shop": "The code at the counter (the tech or the desk types it). A drop-off gets its code when the item is left, and READY when it's tested.",
+   "quotes at the visit": "The tech texts the quote with its lines before any work, and says if a part must be ordered. The customer may OK part of it. The quote stays good 7 days.",
+   "parts on order": "A part that isn't on the van is ordered at the visit. The job stays open, the return visit is booked after the part's due date, and it adds no new service call. At the shop, the item stays until it's READY.",
+   "extra work": "Quoted by text up to the owner's limit (the example: $500). Above it, the owner OKs it first. A bigger job found, like a sealed-system repair, gets its own quote.",
+   "work sold at the home": "A written right to cancel, where the rules require it.",
+   "repair or replace": "The tech gives the price. Repair or replace is the customer's call; Rosie never advises.",
+   "proof it's done": "The tech runs the appliance with the customer, then texts DONE with the bill's lines.",
+   "maker's cover": "From the serial, the tech checks if the maker may still cover a part, like a fridge's sealed system. If so, only the service call is owed, and the customer is sent to the maker."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's home: a card saved for the $89 service call, credited to the repair, and Rosie texts the bill after the job",
+    "An owner may take nothing before, at the home or at the shop (the old example's own choice): then no fee can be charged for a no-show",
+    "An owner may save a card only, for the $89 fee they confirm",
+    "An owner may take the $89 service call when booking, as a deposit toward the repair",
+    "At the shop: a card saved for the $20 fee; paid at the counter. Over 2 hours: a card saved for a $40 fee"
+   ],
+   "limits": [
+    "Work quoted at the visit: nothing more than the service call is taken before",
+    "A deposit only on a quoted install (the example: 25%). Deposit cap: from the state form",
+    "A parts deposit on a special-order part, only where the owner asks and the state's rules allow it",
+    "A service call charge shown before every visit, where the state's rules require it",
+    "Late cancel or nobody home: the $89 service call. The owner confirms each one; no answer, no fee",
+    "A customer who says no to the quote owes only the service call"
+   ],
+   "insurance and plans": "A home warranty or store plan pays only once the owner checks it. The maker's warranty goes to the maker's own servicer. Insurance: the customer pays, and gets the receipt and the failure report for the claim.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work or the parts.",
+   "parts": "Parts at the owner's price, on the quote. A part ordered just for the customer is billed if they cancel only if they agreed in writing before it was ordered.",
+   "Rosfield's $2": "Applies, as for every kind of work. A return visit for a part on order is the same booking."
+  },
+  "pf.messages": {
+   "never in a text": "Gate or lock codes, card details, the label photo's serial number, and photos from inside the home: these stay on the secure page.",
+   "languages": "English and Spanish.",
+   "danger words": "Gas words always get the safety message first, before anything else."
+  },
+  "pf.staff": {
+   "levels": "Tech and lead tech, by the owner's own titles. A state license per person only where the state's form asks.",
+   "skills": [
+    "Fridges and freezers",
+    "Washers and dryers",
+    "Dishwashers",
+    "Ranges, ovens and cooktops",
+    "Gas appliances",
+    "Sealed systems (EPA card)",
+    "Built-ins",
+    "Shop repairs and restores"
+   ],
+   "supervision": "A trainee works only alongside a tech. A trainee is never sent alone, and never opens a sealed system.",
+   "special work": "Sealed-system work only by a tech with an EPA card of the right type. Gas appliances only by people with the gas skill, and its license where the state requires one.",
+   "who OKs what": "The owner OKs fees, quotes over the limit, built-in and commercial jobs, and same-day jobs. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "Another tech with the same skills, at the same window and price. A sealed-system job only goes to another tech with an EPA card."
+  },
+  "pf.rules": {
+   "service call shown first": "The service call charge shown before every visit: where the state's rules require it.",
+   "written estimate": "A written estimate before any repair, and nothing above it without the customer's OK: from the state form.",
+   "OK when not home": "A customer who isn't home OKs the quote by text, and the OK is kept with the date, time and name: where the rules require it.",
+   "contract": "A signed contract before work above an amount, and any days to cancel: from the state form.",
+   "license on papers": "The registration or license number on confirmations, quotes and bills: from the state form.",
+   "invoice": "What the bill must list, like each part and whether it's new, used or rebuilt: from the state form.",
+   "old parts": "Replaced parts given back, unless they go back to the maker under warranty: where the state's rules require it.",
+   "refrigerant": "A sealed system is opened only by a tech with an EPA card, and the refrigerant is recovered: always.",
+   "warranty": "The owner's own (the example: 90 days on parts and labor), shown on the receipt.",
+   "records": "7 years, as for every kind of work, or longer where the state's form asks."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for appliance repair:",
+   "appliance repair": [
+    "Still under the maker's warranty: pointed to the maker before any time is saved; 'not sure' is checked from the label photo",
+    "A part must be ordered: the job stays open, and the return visit is booked after the due date",
+    "The part comes late: new times after the new date, or the repair is cancelled and only what was agreed is owed",
+    "A sealed-system leak: only a tech with an EPA card; the maker's longer cover is checked from the serial first",
+    "A gas smell or a carbon monoxide alarm at any point: stop, get out, call 911 and the gas company",
+    "Water near outlets from a washer or dishwasher: the safety steps, then urgent",
+    "Repair or replace: the price only; the customer decides",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "A built-in unit: the owner's OK first, and a crew of two",
+    "At the shop: an item that can't be fixed, a part that's out of stock, or a drop-off nobody picks up",
+    "A fridge or freezer that stopped cooling isn't a danger: the soonest times show first, and the AI says to keep the doors shut and move food to a cooler"
+   ]
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork",
+   "planbill",
+   "photos",
+   "firststeps",
+   "documents",
+   "video",
+   "results"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Quotes already sent keep their price."
+   ],
+   [
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Nia K.'s refund for a cancelled repair was due yesterday."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Restore quotes come to you first. Board prices never need one"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A restore's example: 'A restore here needs a quick part check first. Had one at Delta in the last 3 months?'"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most repair shops set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood repair shop on Dock St. Mixers, vacuums, coffee makers and sewing machines fixed."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Appliance repair for homes in Springfield. Fridges, washers, dryers and ranges, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A fridge repair"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a TV repair, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Delta Repair Shop doesn't fix TVs."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7",
+    "Ben T. books a toaster repair for Sat Nov 7"
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7",
+    "you now have two toaster repairs on Sat Nov 7"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A cafe owner brings in five coffee makers on one morning. Rosie finds counter spots side by side across Nadia and Gwen."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Nadia's price for your mixer repair is with the owner. You can wait for it, or have the bench check only today."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like Nadia's restore plan after a bench check, or a lawyer's engagement letter."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two appliances from one kitchen work the same way. Both are asked before the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Nadia can still fit the bench check if you're here by 11:20, or you can move to a later time."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included.",
+    "Alex M.'s price: $110 mixer repair and a $15 new beater, $125 in all, the $25 bench check included."
+   ],
+   [
+    "The color correction alone is the $110 starting price, so no choice comes in under it.",
+    "The mixer repair alone is the $110 starting price, so no choice comes in under it."
+   ],
+   [
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Done. Today: the mixer repair, $110. The $15 beater price is good until Sat Oct 31."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Delta Repair Shop prices a small appliance repair at the counter, once Nadia sees it on the bench."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A repair shop takes drop-offs: Alex leaves the mixer, and picks it up when it's ready."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An appliance tech's example: sparks or a burning smell gets 'unplug it, if that's safe'."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Nadia stopped Alex M.'s repair. The note and photo are on the secure page."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Add photos of your mixer, and a shop tech will price your vintage mixer restore."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like a part number."
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Nadia says to keep it unplugged and bring it in as booked. Or you can move your visit, with no fee."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: tilt-head mixer, new gears, motor brushes fine"
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the mixer repair only, $110. No beater today."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped Alex M.'s repair. I put a note and a photo on the page."
+   ],
+   [
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Signed, thanks! Pick a time for your first restore plan visit:"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Delta Repair Shop sent you a proposal: Nadia's restore plan."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a mixer fixed on Saturday."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The repair shop's plug-in adds its own: smoke, sparks or a burning smell from an appliance."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the bench vise scratched the mixer's paint today."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Small engine repair for Delta Repair Shop: is it the same company?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My mixer smoked when I tried it again. Can I still come in?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Appliance repair and the shop take no jobs sent now. An urgent ask gets the soonest time."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's mixer still clicks a little."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Some work takes jobs sent now, like a lockout."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero arreglar una batidora el sábado."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for a mixer that smoked: unplug it, and don't use it before it's fixed."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 restore quote."
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "Some parts of the mixer are missing."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 bench check, then a price"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A mixer repair could mean a repair shop or the maker's service."
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 mixer gears + 15 new beater Alex M."
+   ],
+   [
+    "Riley's price for Alex M., at the chair now.",
+    "Nadia's price for Alex M., at the counter now."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A registration for the shop. No license for each shop tech."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I leave the mixer and come back later?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, bench work and home visits"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A new power cord is on the price list: $20."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "EPA card 031552 · refrigeration RT30417"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the shop show photos of your mixer?"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the bench check; the price stays open"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds small engine repair to Delta Repair Shop."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench vise scratched my mixer's paint."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nadia: shop tech, bench work and home visits"
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Shop services work like this:"
+   ],
+   [
+    "The $25 consult is part of the $110.",
+    "The $25 bench check is part of the $110."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "The repair shop books a tech's time, or a drop-off slot."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex runs a cafe, and asks for a coffee maker descale every 4 weeks."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Sewing machine tune-up"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Mixer repair $110 · new beater $15"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you fix toasters too?"
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "At the repair shop, an item left for repair is a drop-off: the shop takes a few a day."
+   ],
+   [
+    "Books the groom's party together",
+    "Books the cafe's five coffee makers together"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a toaster repair is $25"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a small appliance"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Bench work always stays with Nadia."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The mixer still clicks a little."
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Vacuum tune-up, mixer service and new cord"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like the shop's other services?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a descale every 4 weeks"
+   ],
+   [
+    "A haircut needs nothing.",
+    "Alex brought the appliance with all its parts."
+   ],
+   [
+    "Signature cut and shave",
+    "Sewing machine tune-up"
+   ],
+   [
+    "Haircuts work like this",
+    "Shop services work like this"
+   ],
+   [
+    "Color correction · $125",
+    "Mixer repair · $125"
+   ],
+   [
+    "Color correction · $110",
+    "Mixer repair · $110"
+   ],
+   [
+    "Haircuts never pause.",
+    "The shop's other services never pause."
+   ],
+   [
+    "Gloss to finish · $15",
+    "New flat beater · $15"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Restore plan"
+   ],
+   [
+    "color and house calls",
+    "bench work and home visits"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Delta Repair Shop LLC"
+   ],
+   [
+    "pays for the consult",
+    "pays for the bench check"
+   ],
+   [
+    "the Groom's package",
+    "the espresso machine rebuild"
+   ],
+   [
+    "The Groom's package",
+    "The espresso machine rebuild"
+   ],
+   [
+    "Lee Home Services'",
+    "Delta Appliance Repair's"
+   ],
+   [
+    "a color correction",
+    "a mixer repair"
+   ],
+   [
+    "color, house calls",
+    "bench work, home visits"
+   ],
+   [
+    "Lee Home Services",
+    "Delta Appliance Repair"
+   ],
+   [
+    "Lee's Barbershop",
+    "Delta Repair Shop"
+   ],
+   [
+    "the barbershop's",
+    "the repair shop's"
+   ],
+   [
+    "Color correction",
+    "Mixer repair"
+   ],
+   [
+    "color correction",
+    "mixer repair"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "Groom's package",
+    "Espresso machine rebuild"
+   ],
+   [
+    "a color and cut",
+    "a vintage mixer restore"
+   ],
+   [
+    "Shorter is fine",
+    "I'll be there"
+   ],
+   [
+    "the barbershop",
+    "the repair shop"
+   ],
+   [
+    "Panel upgrade",
+    "Walk-in cooler install"
+   ],
+   [
+    "signature cut",
+    "sewing machine tune-up"
+   ],
+   [
+    "Color and cut",
+    "Vintage mixer restore"
+   ],
+   [
+    "color and cut",
+    "vintage mixer restore"
+   ],
+   [
+    "1 color quote",
+    "1 bench quote"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Lee Plumbing",
+    "Delta Appliance Repair"
+   ],
+   [
+    "Lee Electric",
+    "Delta Refrigeration"
+   ],
+   [
+    "A barbershop",
+    "A repair shop"
+   ],
+   [
+    "Jordan Price",
+    "Isaac Okafor"
+   ],
+   [
+    "1200 Main St",
+    "1450 Front St"
+   ],
+   [
+    "a beard trim",
+    "a new power cord"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "Consult only",
+    "Bench check only"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Casey Moore",
+    "Luis Ortega"
+   ],
+   [
+    "A skin fade",
+    "A coffee maker descale"
+   ],
+   [
+    "a skin fade",
+    "a coffee maker descale"
+   ],
+   [
+    "$25 consult",
+    "$25 bench check"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "NEW massage",
+    "NEW small engine repair"
+   ],
+   [
+    "Barbershop",
+    "Repair shop"
+   ],
+   [
+    "barbershop",
+    "repair shop"
+   ],
+   [
+    "Riley Chen",
+    "Nadia Shah"
+   ],
+   [
+    "Avery Diaz",
+    "Gwen Ito"
+   ],
+   [
+    "Electrical",
+    "Refrigeration"
+   ],
+   [
+    "electrical",
+    "refrigeration"
+   ],
+   [
+    "Beard trim",
+    "New power cord"
+   ],
+   [
+    "beard trim",
+    "new power cord"
+   ],
+   [
+    "patch test",
+    "part check"
+   ],
+   [
+    "88 Elm St",
+    "350 Dock St"
+   ],
+   [
+    "Barbering",
+    "Shop repairs"
+   ],
+   [
+    "Skin fade",
+    "Coffee maker descale"
+   ],
+   [
+    "MP045210",
+    "AR045210"
+   ],
+   [
+    "Plumbing",
+    "Appliance repair"
+   ],
+   [
+    "plumbing",
+    "appliance repair"
+   ],
+   [
+    "a barber",
+    "a shop tech"
+   ],
+   [
+    "A barber",
+    "A shop tech"
+   ],
+   [
+    "Kids cut",
+    "Toaster repair"
+   ],
+   [
+    "kids cut",
+    "toaster repair"
+   ],
+   [
+    "Haircuts",
+    "Vacuum tune-ups"
+   ],
+   [
+    "haircuts",
+    "vacuum tune-ups"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "EC22871",
+    "RC22871"
+   ],
+   [
+    "BS20981",
+    "RS20981"
+   ],
+   [
+    "plumber",
+    "appliance tech"
+   ],
+   [
+    "Plumber",
+    "Appliance tech"
+   ],
+   [
+    "barbers",
+    "shop techs"
+   ],
+   [
+    "Haircut",
+    "Vacuum tune-up"
+   ],
+   [
+    "haircut",
+    "vacuum tune-up"
+   ],
+   [
+    "the cut",
+    "the repair"
+   ],
+   [
+    "Jordan",
+    "Isaac"
+   ],
+   [
+    "Elm St",
+    "Dock St"
+   ],
+   [
+    "barber",
+    "shop tech"
+   ],
+   [
+    "Barber",
+    "Shop tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Riley",
+    "Nadia"
+   ],
+   [
+    "Avery",
+    "Gwen"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "gloss",
+    "new beater"
+   ],
+   [
+    "cuts",
+    "repairs"
+   ]
+  ],
+  "B": [
+   [
+    "Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Quotes already sent keep their price."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most repair shops start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules repair shops often set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood repair shop on Dock St. Mixers, vacuums, coffee makers and sewing machines fixed."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Appliance repair for homes in Springfield. Fridges, washers, dryers and ranges, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A fridge repair"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Delta Appliance Repair. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my fridge. It stopped cooling. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My dryer runs but stays cold' fits a dryer heat repair."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a dryer vent check? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And which appliance is it, and what is it doing?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Delta Appliance Repair can fix the dryer's heat:"
+   ],
+   [
+    "Alex M. · water heater",
+    "Alex M. · built-in fridge"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount",
+    "The $640 built-in fridge install is over the plug-in's amount"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, about a foot"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 dryer heat repair needs none."
+   ],
+   [
+    "Your water heater contract",
+    "Your built-in fridge contract"
+   ],
+   [
+    "Your water heater visit",
+    "Your built-in fridge visit"
+   ],
+   [
+    "the water heater contract",
+    "the built-in fridge contract"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Compressor and refrigerant · $540"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found water on the floor under the dishwasher this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a washer leaking onto the floor, today"
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9",
+    "you have two dryer heat repairs on Mon Nov 9"
+   ],
+   [
+    "Jordan cuts a hand",
+    "Isaac cuts a hand"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Isaac finds a scorched outlet behind the fridge. The plug-in says an appliance tech stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Delta Repair Shop can tune up your vacuum at the shop for $35, or at your home for $75. Where would you like it?"
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Isaac fits the defrost heater, $165. The $80 thermostat stays good until Thu Oct 29."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a built-in install is priced from photos, so Rosie's first text asks for them."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs the home warranty's OK first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to turn off the washer's water and keep away from wet outlets. If there's a gas smell, she leaves and calls 911."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which appliance and brand, what it's doing and since when, any error code, and any warranty."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Cierre el agua detrás de la lavadora, y no toque enchufes mojados. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Unplug the dryer or switch off its breaker, if that's safe, and don't use it."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Isaac's times show: he leads built-in installs."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My dryer runs but won't heat. Can a tech come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Turn off the water behind the washer, and keep away from wet outlets. If you smell gas, get out and call 911."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Isaac found a scorched outlet behind your fridge and stopped that part of the work."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Isaac scratched the kitchen floor at Alex M.'s. The before photo shows no scratch."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A home appliance repair happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Delta Appliance Repair sent you a proposal for a new dishwasher pump, from Isaac's notes."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An appliance tech's example: sparks or a burning smell gets 'unplug it, if that's safe'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Water is coming out of my washer."
+   ],
+   [
+    "not roofing. Nothing was saved. You can look for a roofer near you.",
+    "not TV repair. Nothing was saved. You can look for a TV repair shop near you."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My gas dryer got wet in a flood. Is it safe to turn back on?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a tech fix a dryer that won't heat this Thursday? What does it cost?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell or a carbon monoxide alarm, smoke, sparks or a burning smell."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the opening, the water line and the outlet, and a tech will price the job."
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the defrost heater only, $165. Leave the thermostat."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE thermal fuse blown. Vent half blocked: clean it next time."
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Isaac's estimate visit at Harper J.'s cafe is for a $2,400 walk-in cooler repair."
+   ],
+   [
+    "would like to talk about the water heater quote before booking",
+    "would like to talk about the fridge install quote before booking"
+   ],
+   [
+    "Lee Home Services couldn't price your water heater this time.",
+    "Delta Appliance Repair couldn't price your fridge install this time."
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the new compressor is in, $800 at the finish"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Isaac finds the fault and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Isaac found the fault: the defrost heater burned out. Here's the price. The parts come in a few days, and Isaac comes back to fit them."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Isaac's next times for a dishwasher repair."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The dishwasher is a repair quoted at the visit."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s dryer, fixed Thu Oct 22, won't heat again."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Isaac says no. Leave it plugged in, and don't defrost it."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Appliance repair and the shop take no jobs sent now. An urgent ask gets the soonest time."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your fridge install price is with Delta Appliance Repair."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Some work takes jobs sent now, like a lockout."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Isaac also write a failure report for my insurance?"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Delta Appliance Repair's quote for your walk-in cooler."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Sale agua de mi lavadora."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace both door gaskets, torn"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you clean my dryer vent every year, too?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a dryer vent check at two rentals every 3 months"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Isaac look at my dishwasher next week?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the dryer now smells like burning."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the shop's techs does home visits."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A registration for the shop. No license for each shop tech."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My fridge died, and it's full of food. Can someone come tonight?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a dishwasher that won't start."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The dryer smells like burning now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scuff on the floor by the fridge"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Isaac also look at my dishwasher? It won't start."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I unplug the fridge or defrost it before you come?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD scorched outlet behind the fridge, stopped"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like replacing the dishwasher pump Isaac noted"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a path to the appliance, and leave it plugged in."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 gasket quote is good for 7 days."
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every appliance job, and refrigeration jobs"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "EPA card 031552 · refrigeration RT30417"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's vent check?"
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a part it needed that isn't in"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Isaac finds both door gaskets torn."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nadia: shop tech, bench work and home visits"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The dryer won't heat again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My dryer won't heat again."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 defrost heater 165 thermostat 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: anything plugged into that outlet"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Isaac left a mess behind the fridge."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the outlet checked first"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there room behind the dryer?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a scorched outlet behind the fridge"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the kitchen floor"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Replace the dishwasher pump"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa dryer Thu 12-2 Luis"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly dryer vent cleaning plan"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing both door gaskets"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Vacuum tune-up, mixer service and new cord"
+   ],
+   [
+    "Your drain is under warranty",
+    "Your dryer repair is under warranty"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 walk-in cooler repair, 3 stages"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace both door gaskets"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both door gaskets"
+   ],
+   [
+    "a water heater replacement",
+    "a built-in fridge install"
+   ],
+   [
+    "for the water heater flush",
+    "for the dryer vent cleaning"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Scorched outlet behind the fridge"
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $2,400 walk-in cooler repair"
+   ],
+   [
+    "the 1-year labor warranty",
+    "the 90-day warranty"
+   ],
+   [
+    "Water heater replacement",
+    "Built-in fridge install"
+   ],
+   [
+    "water heater replacement",
+    "built-in fridge install"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Isaac's notes"
+   ],
+   [
+    "Sewer camera inspection",
+    "Insurance failure report"
+   ],
+   [
+    "sewer camera inspection",
+    "insurance failure report"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Dryer heat repair"
+   ],
+   [
+    "Just the kitchen sink.",
+    "It's electric. It tumbles, but stays cold."
+   ],
+   [
+    "Under the sink, before",
+    "Behind the fridge, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your cooler repair"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Delta Appliance Repair LLC"
+   ],
+   [
+    "Cabinet floor, before",
+    "Kitchen floor, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched kitchen floor"
+   ],
+   [
+    "1-year labor warranty",
+    "90-day warranty"
+   ],
+   [
+    "color and house calls",
+    "bench work and home visits"
+   ],
+   [
+    "a water heater flush",
+    "a dryer vent cleaning"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Defrost heater · $165"
+   ],
+   [
+    "leehomeservices.com",
+    "deltaappliancerepair.com"
+   ],
+   [
+    "heating and cooling",
+    "small engine repair"
+   ],
+   [
+    "Heating and cooling",
+    "Small engine repair"
+   ],
+   [
+    "Sewer camera report",
+    "Failure report"
+   ],
+   [
+    "sewer camera report",
+    "failure report"
+   ],
+   [
+    "Lee Home Services'",
+    "Delta Appliance Repair's"
+   ],
+   [
+    "Water heater flush",
+    "Dryer vent cleaning"
+   ],
+   [
+    "water heater flush",
+    "dryer vent cleaning"
+   ],
+   [
+    "the shutoff valves",
+    "the door gaskets"
+   ],
+   [
+    "color, house calls",
+    "bench work, home visits"
+   ],
+   [
+    "Lee Home Services",
+    "Delta Appliance Repair"
+   ],
+   [
+    "camera inspection",
+    "failure report"
+   ],
+   [
+    "yearly flush plan",
+    "yearly vent cleaning plan"
+   ],
+   [
+    "Supply line · $80",
+    "Defrost thermostat · $80"
+   ],
+   [
+    "the kitchen drain",
+    "the dryer repair"
+   ],
+   [
+    "Lee's Barbershop",
+    "Delta Repair Shop"
+   ],
+   [
+    "the barbershop's",
+    "the repair shop's"
+   ],
+   [
+    "A drain clearing",
+    "A dryer heat repair"
+   ],
+   [
+    "a drain clearing",
+    "a dryer heat repair"
+   ],
+   [
+    "like a roof leak",
+    "like a TV repair"
+   ],
+   [
+    "Drain clearings",
+    "Dryer heat repairs"
+   ],
+   [
+    "Repipe · $2,400",
+    "Walk-in cooler repair · $2,400"
+   ],
+   [
+    "the barbershop",
+    "the repair shop"
+   ],
+   [
+    "plumbing visit",
+    "repair visit"
+   ],
+   [
+    "Drain clearing",
+    "Dryer heat repair"
+   ],
+   [
+    "drain clearing",
+    "dryer heat repair"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 dryer heat repair"
+   ],
+   [
+    "Panel upgrade",
+    "Walk-in cooler install"
+   ],
+   [
+    "A leak repair",
+    "A fridge repair"
+   ],
+   [
+    "a leak repair",
+    "a fridge repair"
+   ],
+   [
+    "camera report",
+    "failure report"
+   ],
+   [
+    "Kitchen drain",
+    "Dryer heat repair"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Lee Plumbing",
+    "Delta Appliance Repair"
+   ],
+   [
+    "Lee Electric",
+    "Delta Refrigeration"
+   ],
+   [
+    "Jordan Price",
+    "Isaac Okafor"
+   ],
+   [
+    "1200 Main St",
+    "1450 Front St"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Casey Moore",
+    "Luis Ortega"
+   ],
+   [
+    "Leak repair",
+    "Fridge repair"
+   ],
+   [
+    "leak repair",
+    "fridge repair"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Barbershop",
+    "Repair shop"
+   ],
+   [
+    "barbershop",
+    "repair shop"
+   ],
+   [
+    "Riley Chen",
+    "Nadia Shah"
+   ],
+   [
+    "Avery Diaz",
+    "Gwen Ito"
+   ],
+   [
+    "Electrical",
+    "Refrigeration"
+   ],
+   [
+    "electrical",
+    "refrigeration"
+   ],
+   [
+    "Yard drain",
+    "Dryer heat repair"
+   ],
+   [
+    "yard drain",
+    "dryer job"
+   ],
+   [
+    "88 Elm St",
+    "350 Dock St"
+   ],
+   [
+    "42 Oak St",
+    "9 Cedar Ct"
+   ],
+   [
+    "a plumber",
+    "an appliance tech"
+   ],
+   [
+    "MP045210",
+    "AR045210"
+   ],
+   [
+    "Plumbing",
+    "Appliance repair"
+   ],
+   [
+    "plumbing",
+    "appliance repair"
+   ],
+   [
+    "a barber",
+    "a shop tech"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "EC22871",
+    "RC22871"
+   ],
+   [
+    "BS20981",
+    "RS20981"
+   ],
+   [
+    "plumber",
+    "appliance tech"
+   ],
+   [
+    "Plumber",
+    "Appliance tech"
+   ],
+   [
+    "haircut",
+    "vacuum tune-up"
+   ],
+   [
+    "Jordan",
+    "Isaac"
+   ],
+   [
+    "barber",
+    "shop tech"
+   ],
+   [
+    "Barber",
+    "Shop tech"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Riley",
+    "Nadia"
+   ],
+   [
+    "Avery",
+    "Gwen"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "cuts",
+    "repairs"
+   ]
+  ]
+ },
+ "cast": {
+  "A": {
+   "staff": "Nadia and Gwen (techs at the repair shop)"
+  },
+  "B": {
+   "staff": "Isaac and Luis (appliance techs)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nadia"
+  },
+  "B": {
+   "staff": "Isaac"
+  }
+ },
+ "keep": [
+  "service call",
+  "leak",
+  "dishwasher",
+  "water line",
+  "heater",
+  "cabinet",
+  "drips"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings a stand mixer that stopped turning to Delta Repair Shop, Sam's small appliance repair shop, and Nadia looks at it on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Delta Appliance Repair at 9 Cedar Ct for a fridge that stopped cooling. Isaac comes Thu Oct 22 between 8 and 10am and finds the fault; a part to order means a second visit on the same booking. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "visit|card|counter",
+   "combos": [
+    "visit|card|counter",
+    "visit|none|counter",
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "photos|card|counter"
+   ],
+   "examples": {
+    "visit|card|counter": "The main story: Alex's stand mixer won't turn. Only the $25 bench check is promised; Nadia prices the repair at the counter. A card is saved for the shop's $20 late-cancel fee, and Alex pays at the counter.",
+    "visit|none|counter": "The same mixer repair, priced at the counter. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|card|counter": "A $35 vacuum tune-up. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+    "list|none|counter": "A $35 vacuum tune-up. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|full|none": "The $55 sewing machine tune-up, paid in full when booking.",
+    "photos|card|counter": "A vintage mixer restore, priced from Alex's photos at $90. Booked once Sam OKs it; paid at the counter."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Small appliance repair"
+    },
+    "visit|*|*": {
+     "name": "Stand mixer repair"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Vacuum tune-up"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Sewing machine tune-up"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Vintage mixer restore"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|card|bill",
+   "combos": [
+    "visit|card|bill",
+    "visit|none|bill",
+    "visit|deposit|bill",
+    "list|card|bill",
+    "list|full|none",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "visit|card|bill": "The main story: a fridge that stopped cooling, priced at the visit. A card is saved; the $89 service call is owed, even after a no to the price, and counts toward the repair. Rosie texts the bill.",
+    "visit|none|bill": "The same fridge repair. Nothing is taken before, as the old example's owner chose. Rosie texts the bill after the job.",
+    "visit|deposit|bill": "The same fridge repair. Alex pays the $89 service call when booking, as a deposit. It comes off the $245 bill.",
+    "list|card|bill": "A $179 dryer heat repair, from the price list. A card is saved for the $89 fee. Rosie texts the bill after the job.",
+    "list|full|none": "A $150 dryer vent cleaning, paid in full when booking.",
+    "photos|deposit|bill": "A built-in fridge install, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Fridge repair"
+    },
+    "visit|*|*": {
+     "name": "Fridge repair"
+    },
+    "visit|deposit|*": {
+     "deposit": "$89",
+     "price": "$245",
+     "rest": "$156",
+     "name": "Fridge repair"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Dryer heat repair"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Dryer vent cleaning"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Built-in fridge install"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Built-in fridge install"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-59",
+   "A7-15",
+   "A8-02",
+   "A8-53",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B5-34",
+   "B8-72"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "A video check shows the appliance on the call. Nadia says what to bring, or if a tech should come to the home."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-11",
+    "more": [
+     "A part on order: the item stays at the shop. Nadia texts PARTS with the due date, and Alex is told.",
+     "The part comes late: Alex gets the new ready date, or takes the item back, owing only what was agreed."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-11",
+    "more": [
+     "An EPA refrigerant card isn't on a state lookup. A person on Rosie's team checks a photo of the card within 1 business day."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Appliance repair and shop repairs pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Appliance repair books techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Appliance repair runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Appliance repair sends nobody now: an urgent ask, like a washer leaking onto the floor, gets the soonest times first."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at a repair shop is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Shop repairs are rated, like every visit."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Delta Repair Shop bills no plan or insurance: the customer pays at the counter, and a small appliance under the maker's warranty goes to the maker (A4-38). A home warranty plan is checked only on a home visit (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "Delta Repair Shop bills no plan or insurance: the customer pays at the counter, and a small appliance under the maker's warranty goes to the maker (A4-38). A home warranty plan is checked only on a home visit (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A shop repair has no later result: the item is READY and picked up (A10-22 says the shop has none)."
+   },
+   {
+    "op": "off",
+    "at": "A4-37",
+    "why": "Delta Repair Shop bills no plan: a home warranty is checked only on a home visit (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A shop repair needs no document signed before booking: a written estimate, where the state's rules require one, is given at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The repair shop sends no proposals: the item is READY and picked up."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The shop's plug-in names no form to sign. Its first steps are a warranty check or a part check."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at a repair shop."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "Appliance repair is booked by the adult who owns the appliance, never for a child."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "after",
+    "at": "B4-05",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.26",
+       "4.7"
+      ],
+      "who": "agent",
+      "to": "cust",
+      "via": "chat",
+      "title": "Asks about the maker's warranty",
+      "q": "Is the repair under the maker's warranty?",
+      "does": "For a repair, the AI asks when the appliance was bought, and about any warranty. A repair under the maker's warranty goes to the maker's own servicer.",
+      "more": [
+       "The plug-in asks this before any times, since makers send their own servicers.",
+       "A store plan or a home warranty isn't the maker's. It's a plan that pays, checked later.",
+       "Delta takes a maker's warranty job only if it's authorized for that brand. Then Sam adds it as its own service.",
+       "An install or a vent cleaning skips this question."
+      ],
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Delta Appliance Repair asks: when did you buy it? Is it still under the maker's warranty?",
+        {
+         "buttons": [
+          "No, it's past it",
+          "Yes",
+          "Not sure"
+         ]
+        }
+       ],
+       [
+        "cust",
+        "agent",
+        "1 We bought it in 2022."
+       ]
+      ],
+      "needs": [
+       "pf.questions",
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 No, or not a repair",
+        "end": "merge",
+        "steps": []
+       },
+       {
+        "label": "2 Yes: the maker's warranty",
+        "end": "end",
+        "endText": "Alex is pointed to the maker's servicer. No time was saved, and nothing was taken.",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.26"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "chat",
+          "title": "Points Alex to the maker's servicer",
+          "does": "Repairs under the maker's warranty are booked through the maker, which sends its own servicer at no cost. So nothing is saved or taken here.",
+          "more": [
+           "Rosie never says how long a maker covers a part. Alex checks the manual or the maker's website."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Repairs under the maker's warranty are usually booked through the maker. It sends its own servicer, at no cost to you. Call the service number in your manual, or on the maker's website."
+           ]
+          ],
+          "needs": [
+           "pf.services"
+          ],
+          "tells": [
+           "agent"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "3 Not sure: the label photo",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "4.11",
+           "4.26"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Checks the label photo before the yes",
+          "does": "Not sure: the secure page asks for the label photo and the purchase date before anything is confirmed. Rosie reads the build date from the label.",
+          "more": [
+           "Under the maker's warranty: Alex is pointed to the maker, the time is let go, and nothing is charged.",
+           "Past it: the booking goes on, and Isaac sees the warranty note.",
+           "Longer cover on some parts, like a fridge's sealed system, is checked from the serial at the visit."
+          ],
+          "needs": [
+           "pf.questions"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "For a repair, the page also asks for the appliance's label photo: brand, model and serial. It tells Isaac which parts fit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "more": [
+     "Here it books right away: it isn't for today, and the price is from the list or already OK'd.",
+     "Built-in and commercial units ask Sam first: they need special parts, and two people to pull one out.",
+     "Appliance repair is never sent now, so no job skips Sam's same-day OK."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "The label photo is on the job's page, so Isaac brings the parts that fit that model."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-20",
+    "more": [
+     "A sealed-system leak the maker may still cover: Isaac stops, and only the $89 service call is owed. Alex calls the maker."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Only a tech with an EPA card opens a sealed system. Isaac has one.",
+     "Repair or replace is Alex's call. Rosie gives the price, never advice."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-30",
+    "more": [
+     "A gas smell from a gas range or dryer: Isaac stops, gets everyone out, and calls 911 and the gas company."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-39",
+    "more": [
+     "Where the state's rules require it, Isaac offers Alex the old parts, unless they go back to the maker under warranty."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-58",
+    "more": [
+     "Appliance repair is never sent now, so every visit gets the day list and an on-my-way text."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Appliance repair is never sent now, so no job goes to a tech on call."
+   },
+   {
+    "op": "more",
+    "at": "S2-11",
+    "more": [
+     "An EPA refrigerant card isn't on a state lookup. A person on Rosie's team checks a photo of the card within 1 business day."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Appliance repair and shop repairs pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Appliance repair books techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Appliance repair runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Appliance repair sends nobody now: an urgent ask, like a washer leaking onto the floor, gets the soonest times first."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Appliance repair books a tech in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in appliance repair is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A home visit books a tech in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Appliance repair is never sent now, so every visit has a set time and a reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Appliance repair is never sent now, so every visit starts with the day list and OMW."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "Appliance repair is never left with a child: the tech waits for an adult on the booking."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "An adult is home for every appliance visit: the tech works inside, and pulls the appliance out."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "Appliance repair is booked by the adult who owns the appliance, never for a child. An adult is home for the whole visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Home repairs are rated, like every visit."
+   }
+  ]
+ },
+ "notes": "Refit Tue Oct 27 (R09, REDESIGN 2 master): facts dropoff, extrawork, planbill (home warranty plans, flow B only; A4-37, A4-28 and A9-15 off in A), photos, firststeps, documents (a signed contract above an amount, B5-34; off in A), video (the shop's video check), results (the insurance failure report). Settings: cutoff 24 hours before in both flows; arrival windows in B. No holds: the $89 service call is a card saved (visit|card|bill main), the late-cancel and no-show fee, and owed after a no to the quote (B4-14). Money words per path, the own part-order steps (B8-x01 to B8-x10), the maker-cover branch (B8-x11), the shop's 'It can't be fixed' branch (A8-x01) and the plan words ops are gone: the master's families (A8-85, B8-96), A8-37 and the record say them. A child as the person served is off (A4-24, B4-32). Rename pairs: 657 dead pairs pruned; new full-sentence pairs for the rebuilt master's examples.\nBefore the refit (history):\nPilot: the plumber (pattern fix), the CURRENT reviewed work/prof/plumber.json. Appliance repair runs like a plumber's home visit: the $89 service call held and credited to the repair, a quote at the visit, 2-hour arrival windows, and the bill after. Its shop side gives flow A, like the plumber's counter.\nUnlike the plumber, appliance repair is never sent now: an urgent ask (a dead fridge full of food, a washer leaking onto the floor) gets the soonest times first. Every sent-now branch is off: S2-30, B4-81, B4-16, B6-03, B7-55, B8-58.\nFlow B is the usual side. Lee Home Services becomes Delta Appliance Repair (the old flowchart's business). Jordan becomes Isaac and Casey becomes Luis (the old flowchart's Ben clashes with the master's customer Ben T.; both are he). 42 Oak St is 9 Cedar Ct; 1200 Main St is 1450 Front St.\nFlow B's services keep the master's numbers, as the example business's own prices: the $89 service call (the old flowchart's own $89); the $179 drain is a dryer heat repair; the $245 leak repair quoted at the visit is a fridge repair (defrost heater $165, thermostat $80; the old $295 job is the master's $245 here); the $150 flush is a dryer vent cleaning, also the yearly plan; the $640 water heater replacement from photos is a built-in fridge install (25% deposit, $160); the $199/$249 sewer camera inspection is an insurance failure report with the report later; the $900 main line is a sealed-system repair.\nMore of flow B's master examples, renamed: Harper's $2,400 repipe in 3 stages is a cafe's walk-in cooler repair (refrigeration); the faucet taken to the shop is a washer control board; the drying fan is a loaner mini fridge left while a part is on order; the jetter is the parts van; mold behind the sink wall is a scorched outlet behind the fridge; corroded shutoff valves are torn door gaskets; the cracked drain trap is a crushed dryer vent hose; the garbage disposal is an ice maker; Kim's yard drain is a dryer job.\nFlow B's main story (visit|hold|bill) is the user's: a home visit to find the fault, a part ordered, and a second visit to fit it. Own steps B8-x01 to B8-x10 sit right after B8-19: PARTS with the due date, return times only after it, the parts-in check the day before, a late part (new times or cancel the repair, owing only the $89), no reply means Sam calls (by 7pm, inside text hours), and the return visit with its own code. '1 Ordered: a second visit' is the split's first branch, so the main path runs through it.\nTimes: the steps after the return visit happen Wed Oct 28 on the main path, so B8-41, B9-06, B10-01 and B10-02 get t Wed Oct 28 (words ops), and the visit path's receipt names both dates. The list path's own texts keep Thu Oct 22.\nBoth visits are one booking, so Rosfield's $2 counts once. The master's B9-18 and B8-37 already say one $2 per booking however many visits; the gap asks the master to draw the parts-ordered return visit itself.\nThe maker's warranty (old ap4): own split B4-x01 to B4-x03 after B4-05. Yes goes to the maker's own servicer with nothing saved; not sure asks for the label photo on the secure page, checked before the yes. A maker's warranty length is never stated (the exceptions file's fix).\nThe sealed system (old ap20b to ap20f): a branch on B8-20, B8-x11 (the maker's longer cover may pay, so only the $89 is owed), and more lines on B8-27 (only a tech with an EPA card; repair or replace is the customer's call).\nBuilt-in and commercial units ask Sam first (B6-03 words op), and a built-in install is led by Isaac with a crew of two. The label photo is asked on the secure page (B4-29 more) and shown to the tech (B6-14 more).\nSafety (pf.safety): a gas smell or a carbon monoxide alarm, smoke or flames stop the booking; sparks or a burning smell, water near outlets and a fridge that stopped cooling get the safety steps, then the booking goes on, marked urgent. Rosa's call is a washer leak; a gas smell at the visit is a more line on B8-30.\nThe second kind of work in sign-up (the master's electrical) is refrigeration (ice machines and walk-in coolers), with Delta Refrigeration as its trade name. It is a common pair for appliance repair and has its own license; Isaac holds an EPA card (031552) and the refrigeration license RT30417. The later NEW kind of work (the master's heating and cooling, and the shop's massage) is small engine repair.\nLicenses: most states don't license appliance repair; some register repair companies. The example state ('where Sam is') registers appliance repair companies (AR045210), refrigeration (RC22871) and repair shops (RS20981), and licenses each refrigeration tech; shop techs need none. An EPA card isn't on a state lookup, so a person on Rosie's team checks a photo (S2-11 more, both flows). S1-60, S1-63 and S2-28 keep both branches: it's state by state.\nFlow A is the less usual side: a small appliance brought to the shop. The master's Lee's Barbershop is Delta Repair Shop, Sam's small appliance repair shop with its own tax number. Riley is Nadia (only Nadia does bench work: repairs priced at the counter and restores) and Avery is Gwen; 88 Elm St is 350 Dock St.\nFlow A's prices keep the master's amounts, as the example shop's own: vacuum tune-up $35 (the haircut, also a $75 home visit), coffee maker descale $40, new power cord $20, toaster repair $25, sewing machine tune-up $55 paid in full, espresso machine rebuild $140 (2½ hours: the $40 fee held, a $40 deposit, or a drop-off), vintage mixer restore from photos $90, and the main story: a stand mixer repair priced at the counter after a $25 bench check ($110 repair and a $15 new beater). The patch test is a part check; gloss is a new flat beater; the cape clip is the bench vise; the towel steamer is a motor tester; the perm the shop doesn't do is a phone screen repair.\nFlow A ops: a video check (A4-36 more), a small appliance still under the maker's warranty (A4-38 more), drop-off slots (A4-67 words), a part on order while the item is in (A8-11 more), an appliance that can't be fixed (A8-x01, a branch on A8-32), and a drop-off while Nadia is out (A7-60 words).\nPlug-in splits, both flows: the $2 is paid, no agreement to sign, people not spaces, no classes, never sent now; S1-60, S1-63 and S2-28 kept whole. Flow A: walk-ins wait in a line or a drop-off is checked in at once; a tech's time or a drop-off slot; adults only; no reaction step and no form; no damage hold, crew, fixed date or minimum; late means the time left or the next open time; rated. A7-59, S11-87 and S11-90 kept whole (a drop-off names no tech), A7-61 (bench work is Nadia's alone), A8-02 (an item with all its parts), A8-53 (the counter, or a drop-off).\nPlug-in splits, flow B: arrival windows only; own or rent asked; no damage hold at booking (a loaner gets its hold when it's left, B10-21); one tech by name or a crew of two; no date that can't move, no group minimum; an adult is home for every visit (B8-67 child branch, B8-69 and B8-70 nobody-home branches off); no delivery (the store delivers, Delta installs); no outside check partway and no permit inspection. B4-57 kept whole (a written contract over the state form's amount) and B8-72 (a control board may go to the shop).\nOther master branches turned off, with reasons: B7-05 'Weather stops the job' (indoor work), B4-38 'A form signed on the secure page' and B7-05 'A form isn't signed in time' (no form), A8-03 'A class: names on a roster' (no classes).\nMoney, flow B: main visit|hold|bill, the plug-in's starting answer. The old flowchart took nothing up front, so visit|none|bill; owners who save a card, visit|card|bill; owners who take the service call when booking, visit|deposit|bill; the flat-price dryer job, list|hold|bill; the vent cleaning paid in full, list|full|none; the built-in install from photos, photos|deposit|bill. No saved-card charge at DONE and no business's-own-way billing: the bill after the job is how the old flowchart and the plug-in work.\nMoney, flow A: main visit|card|counter (a bench check, then a price at the counter), plus nothing taken, the list prices with a card, a hold, a deposit or paid in full, and a restore priced from photos.\nkeep: service call (the old flowchart's own word), leak (a refrigerant leak, a washer leak), dishwasher (one of the services) and water line (a fridge's water line on installs). Every master use of these words is renamed; only appliance uses remain.\nNo state is named anywhere: registration, the service call shown first, written estimates, the OK when not home, contracts, invoices, old parts, deposit caps and records are switches filled from each state's form. The old flowchart's California rules applied 'everywhere', and its $750 contractor rule, are OUTDATED.\nOutdated: Workiz, Housecall Pro, Jobber, ServiceTitan, Rosie Book and the QuickBooks export (Rosie is the software now; only the phone calendar and Stripe connect), and the ring-and-wait door (the check-in code).\nReview (Oct 22): a fridge that stopped cooling is no longer a plug-in danger word (the main story opens with it, and the danger check says No); it's an edge case, and the prep line covers it. Flow A's plan, insurance, rental and later-result branches are off (the shop bills no plan, rents nothing, and has no later result). The shop takes no deposit, so A list|deposit|counter is gone and A's S11-56 moves the espresso rebuild to a saved card; B's S11-56 moves the vent cleaning to the $89 hold. The part-order split B8-x01 now sits after the quote (B8-20), so only the visit path runs it. DONE, the bill, the receipt and the rating read Wed Oct 28 only on the visit path, and the pay page, the declined card, the 4-day reminder, the rating, refund, complaint and dispute texts on that path name Wed Oct 28. 'Jordan cuts a hand' is renamed as a sentence, so it no longer reads 'Isaac repairs a hand'. Two more rename pairs: \"Only Jordan does replacements\" (B8-34, photos path) and \"the rest of the water heater replacement\" (B9-26), which read \"replacements\" and \"fridge install replacement\".\nReview (Oct 22): side branches the work never has are off too, where their own step said so: the live line (B3-01), seats at a host's place (B4-43), an expert's read (B6-03, A6-01), weather at the counter (A7-02). The plug-in now names the card-only way at the home (B visit|card|bill), which the money paths already listed.\nReview, round 2 (Oct 22): the loaner fridge is picked up after the return visit (Wed Oct 28), and having been out 6 days it took a refundable deposit, as the rental rules say (B10-21). Morgan's plan is the plug-in's yearly dryer vent cleaning at $150 a visit, at two rentals (B7-32, B7-51, B7-52, B9-22, S11-54). The extra work found matches each path's appliance: a torn freezer door gasket at the fridge repair, the dryer's vent hose and wall cap at the dryer jobs, and a cabinet opening to trim at the built-in install (B8-23 to B8-26, B8-57, B9-04, B9-05, B10-06).\ntouch-up 4 (Oct 23): keep 'heater', 'cabinet' and 'drips': a fridge's defrost heater (the part Isaac orders), trimming the cabinet opening for a built-in fridge, and a new fridge's water line that drips are all real appliance repair words.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Color quotes come to you first. Board prices never need one",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Ben T. books a skin fade for Sat Nov 7",
+    "you now have two skin fades on Sat Nov 7",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included.",
+    "The color correction alone is the $110 starting price, so no choice comes in under it.",
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "A barbershop has none, so nothing is sent here.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "The signed form this service needs is missing.",
+    "Promises the $25 consult; priced at the chair",
+    "A haircut could mean a salon or a barbershop.",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Riley's price for Alex M., at the chair now.",
+    "A license for the shop and for each barber.",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "A beard trim is on the price board: $20.",
+    "Plumbing JP031552 · electrical JE30417",
+    "May the shop show photos of your hair?",
+    "Only the consult; the price stays open",
+    "Sam adds massage to Lee's Barbershop.",
+    "The cape clip ripped my shirt collar.",
+    "Riley: barber, color and house calls",
+    "Haircuts at the shop work like this:",
+    "The $25 consult is part of the $110.",
+    "A barbershop books a person's time.",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Color correction $110 · gloss $15",
+    "Do you do kids cuts? My son is 8.",
+    "A barbershop's plug-in has none.",
+    "Books the groom's party together",
+    "a Kids cut (12 and under) is $25",
+    "like a 15-minute style consult",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Haircut, fade and beard trim",
+    "Does it work like haircuts?",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "Signature cut and shave",
+    "Haircuts work like this",
+    "Color correction · $125",
+    "Color correction · $110",
+    "Haircuts never pause.",
+    "Gloss to finish · $15",
+    "Proposal · Color plan",
+    "color and house calls",
+    "Lee's Barbershop LLC",
+    "pays for the consult",
+    "the Groom's package",
+    "The Groom's package",
+    "Lee Home Services'",
+    "a color correction",
+    "color, house calls",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "the barbershop's",
+    "Color correction",
+    "color correction",
+    "the shop's board",
+    "Groom's package",
+    "a color and cut",
+    "Shorter is fine",
+    "the barbershop",
+    "Panel upgrade",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "1 color quote",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "A barbershop",
+    "Jordan Price",
+    "1200 Main St",
+    "a beard trim",
+    "a house call",
+    "Consult only",
+    "at the chair",
+    "Casey Moore",
+    "A skin fade",
+    "a skin fade",
+    "$25 consult",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "NEW massage",
+    "Barbershop",
+    "barbershop",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "88 Elm St",
+    "Barbering",
+    "Skin fade",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "a barber",
+    "A barber",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "EC22871",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Jordan",
+    "Elm St",
+    "barber",
+    "Barber",
+    "chairs",
+    "Casey",
+    "Riley",
+    "Avery",
+    "chair",
+    "gloss",
+    "cuts"
+   ],
+   "B": [
+    "Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Alex M. · water heater",
+    "The $640 water heater is over the plug-in's amount",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Your water heater contract",
+    "Your water heater visit",
+    "the water heater contract",
+    "Shutoff valve and wall pipe · $540",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "you have two drain clearings on Mon Nov 9",
+    "Jordan cuts a hand",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "not roofing. Nothing was saved. You can look for a roofer near you.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "would like to talk about the water heater quote before booking",
+    "Lee Home Services couldn't price your water heater this time.",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Jordan says no. Please wait until the job is done.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Your water heater price is with Lee Home Services.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Alex texts that the sink is now overflowing.",
+    "One of the shop's barbers does house calls.",
+    "A license for the shop and for each barber.",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "like replacing the old pipes Jordan noted",
+    "Please clear the cabinet under the sink.",
+    "The $160 valve quote is good for 7 days.",
+    "Every plumbing job, and electrical jobs",
+    "Plumbing JP031552 · electrical JE30417",
+    "Can I skip next week's drain cleaning?",
+    "like a permit it needed that isn't in",
+    "Jordan finds corroded shutoff valves.",
+    "Riley: barber, color and house calls",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "Proposal · Replace the old pipes",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Yearly water heater flush plan",
+    "replacing both shutoff valves",
+    "Haircut, fade and beard trim",
+    "Your drain is under warranty",
+    "QUOTE 2400 repipe, 3 stages",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "a water heater replacement",
+    "for the water heater flush",
+    "Mold behind the sink wall",
+    "Harper J.'s $2,400 repipe",
+    "the 1-year labor warranty",
+    "Water heater replacement",
+    "water heater replacement",
+    "Video and Jordan's notes",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Kitchen drain clearing",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "Lee Home Services LLC",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "1-year labor warranty",
+    "color and house calls",
+    "a water heater flush",
+    "Shutoff valve · $165",
+    "leehomeservices.com",
+    "heating and cooling",
+    "Heating and cooling",
+    "Sewer camera report",
+    "sewer camera report",
+    "Lee Home Services'",
+    "Water heater flush",
+    "water heater flush",
+    "the shutoff valves",
+    "color, house calls",
+    "Lee Home Services",
+    "camera inspection",
+    "yearly flush plan",
+    "Supply line · $80",
+    "the kitchen drain",
+    "Lee's Barbershop",
+    "the barbershop's",
+    "A drain clearing",
+    "a drain clearing",
+    "like a roof leak",
+    "Drain clearings",
+    "Repipe · $2,400",
+    "the barbershop",
+    "plumbing visit",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "Panel upgrade",
+    "A leak repair",
+    "a leak repair",
+    "camera report",
+    "Kitchen drain",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "at the chair",
+    "Casey Moore",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "House calls",
+    "Price board",
+    "Barbershop",
+    "barbershop",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Yard drain",
+    "yard drain",
+    "88 Elm St",
+    "42 Oak St",
+    "a plumber",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "a barber",
+    "cut hair",
+    "EC22871",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "haircut",
+    "Jordan",
+    "barber",
+    "Barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "chair",
+    "cuts"
+   ]
+  },
+  "A": {
+   "A4-36": "f261af1660",
+   "A8-11": "d5522790d9",
+   "S2-11": "07b9eace96",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A4-37": "4ee9e74e71",
+   "A5-19": "5d5db6f3c1",
+   "A4-43": "c17d56f766",
+   "A8-67": "e9fd748fc5",
+   "A4-24": "0a292df05b"
+  },
+  "B": {
+   "B4-05": "fb3a9061c8",
+   "B4-29": "9234c5ed40",
+   "B6-03": "dcc1eb310c",
+   "B6-14": "dfd03ee673",
+   "B8-20": "53903a8275",
+   "B8-23": "dd780a2ec8",
+   "B8-30": "a1ef4983e4",
+   "B8-39": "aa75251207",
+   "B8-58": "6a101417a1",
+   "S2-11": "07b9eace96",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B4-32": "fcfe092e37",
+   "B10-32": "7713bff255"
+  }
+ }
+}

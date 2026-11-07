@@ -1,0 +1,2597 @@
+{
+ "id": "fishing-charter",
+ "name": "Fishing and boat charter",
+ "style": "Table",
+ "pattern": "table",
+ "from": "rentals",
+ "plugin": {
+  "pf.license": {
+   "need": "always, to carry paying passengers: each captain holds the federal captain's license for the boat's waters and passenger count (a 6-passenger license for an uninspected boat, a master's license for an inspected boat), with the drug-testing program and medical certificate it requires; the business holds any charter or fishing guide license where the state's rules require one; each boat has its own registration or federal documentation, and an inspected boat its certificate of inspection",
+   "who": "each captain, for their license, drug-testing enrollment and medical certificate; the business, for any state charter or guide license; each boat, for its own papers",
+   "ask": "the business registration and any state charter or guide license; each captain's license number, its passenger limit and end date; each boat's registration or documentation number, its passenger limit, and for an inspected boat its certificate of inspection",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "scope": "a captain is offered only for boats and passenger counts their license covers",
+   "blocks": "a boat goes live only with a licensed captain on file and its own papers in date; the business only with its state charter license where the state requires one",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability and boat insurance, shown only once proof is sent",
+   "how it's checked": "Not checked by Rosie. Each captain's federal license, the boat's papers and the inspection certificate are the owner's own, shown as given (D96)."
+  },
+  "pf.services": {
+   "shape": "table: a boat booked for a set trip time by one group (a space with a passenger limit); a shared trip sells seats on a set departure (a seat in a session)",
+   "examples": "the example charter's own prices (Lee Sportfishing), not a standard",
+   "list": [
+    {
+     "name": "Private half-day inshore charter",
+     "price": "$600 for up to 4 anglers, $50 each extra up to 6",
+     "kind": "one price per boat",
+     "length": "4 hours (7 to 11am, or 12:30 to 4:30pm)",
+     "where": "leaves from the example marina, slip 12",
+     "before": "a $150 deposit when booking",
+     "after": "the rest paid at the dock before leaving, the business's own way",
+     "capacity": "6 passengers (the boat's limit)",
+     "note": "rods, reels, bait and tackle included"
+    },
+    {
+     "name": "Private full-day offshore charter",
+     "price": "$1,400 for up to 6",
+     "kind": "one price per boat",
+     "length": "8 hours",
+     "where": "from the example marina",
+     "before": "a $350 deposit",
+     "after": "the rest at the dock",
+     "capacity": "6 passengers"
+    },
+    {
+     "name": "Shared trip (open boat)",
+     "price": "$140 a person",
+     "kind": "one price per person",
+     "length": "6 hours",
+     "where": "from the example marina",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "6 seats; runs with 3"
+    },
+    {
+     "name": "Sunset cruise (no fishing)",
+     "price": "$250 for up to 6",
+     "kind": "one price per boat",
+     "length": "2 hours",
+     "where": "from the example marina",
+     "before": "a $100 deposit",
+     "after": "the rest at the dock"
+    },
+    {
+     "name": "Charter with dock pick-up",
+     "price": "the charter's price plus $75",
+     "kind": "one price per boat",
+     "length": "as the charter",
+     "where": "the captain picks the group up at their own dock or a hotel marina within 10 miles by water (flow B)",
+     "before": "the charter's deposit",
+     "after": "the rest charged to the saved card when the captain texts DONE"
+    },
+    {
+     "name": "Fish cleaning",
+     "price": "$1 a pound",
+     "kind": "per pound",
+     "length": "at the dock after the trip",
+     "where": "at the dock",
+     "before": "added at the dock, with the group's yes",
+     "after": "with the rest"
+    },
+    {
+     "name": "Extra hour on the water",
+     "price": "$150 an hour",
+     "kind": "per hour",
+     "length": "added during the trip, if the next trip allows",
+     "where": "on the boat",
+     "before": "the group's yes first",
+     "after": "with the rest"
+    }
+   ],
+   "capacity": "each boat's passenger limit, from its papers and the captain's license (6 for an uninspected boat); a booking never goes over it; children count as passengers",
+   "minimum": "a shared trip runs with 3 anglers, counted at 6pm the evening before; too few: Sam runs it or cancels with a full refund",
+   "trips": "set trip times each day; one boat does at most two half-day trips",
+   "skills": "inshore, offshore, fly fishing; which boats each captain is licensed and insured to run",
+   "online": "no",
+   "nobodyHome": "never",
+   "notBookings": "rods, tackle, bait, ice, drinks and clothing sold at the dock stay outside Rosie; the catch is never sold through a booking"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "a private boat, or a seat on a shared trip",
+    "how many people in all, adults and children (sets the price and must fit the boat's limit)",
+    "inshore or offshore, and the date",
+    "for a pick-up: the kind of place (a home dock or a hotel marina) and the town"
+   ],
+   "afterTime": [
+    "anything the captain should know: first time on a boat, a target fish, a celebration",
+    "who will fish, and the children's ages"
+   ],
+   "securePage": [
+    "each passenger's name for the passenger list, and an emergency contact on shore",
+    "each passenger's waiver, signed by that passenger, or by a parent or guardian for a child",
+    "each angler's fishing license number where the boat's license doesn't cover its passengers",
+    "health details a passenger wants the captain to know (a heart condition, pregnancy, a recent surgery, trouble climbing)",
+    "for a pick-up: the dock's street address and how to reach it"
+   ],
+   "whoMayBook": "an adult books for the group; children come with an adult from the group, who stays on board with them",
+   "told": "be at the slip 30 minutes before the trip; the boat's rules (no glass, soft-soled shoes, alcohol only as the captain allows); the captain makes the weather call; the boat waits 15 minutes for a late group"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone overboard or a boat in trouble on the water right now",
+     "say": "Call 911, or the Coast Guard on VHF channel 16 if you're on the water.",
+     "booking": "no booking"
+    },
+    {
+     "words": "someone unwell right now: chest pain, trouble breathing, a bad fall",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "pregnant, a heart condition, a recent surgery, trouble walking or climbing",
+     "what": "the booking goes on; the captain reads the private note before the trip and may say the trip isn't safe for that person; Rosie gives no health advice"
+    },
+    {
+     "words": "seasickness",
+     "what": "the booking goes on; the reminder suggests asking a pharmacist or doctor about seasickness options ahead of time"
+    }
+   ],
+   "boarding": "a passenger who seems drunk or high, or won't follow the captain's safety rules, doesn't board; the captain's word is final, and the rest of the group's trip goes on",
+   "onTheWater": "a safety talk before leaving; life jackets for everyone, and children wear theirs as the federal rules require; an emergency on the water: the captain calls the Coast Guard first, then Sam is told",
+   "weather": "the captain makes the go or no-go call from the marine forecast for the waters fished (wind, waves, a small craft advisory, lightning), the evening before and again at the dock; a trip can turn back early for safety"
+  },
+  "pf.first_steps": {
+   "steps": [
+    "each passenger's waiver on the secure page before the trip (a parent or guardian signs for a child), good for the season",
+    "the passenger list (names and a shore contact) on the secure page by 6pm the evening before",
+    "fishing licenses: where the boat's license doesn't cover its passengers, each angler who needs one buys it before the trip, and the number goes on the secure page"
+   ],
+   "prep": "at the slip 30 minutes early; soft-soled shoes, layers, sunscreen and a hat; food and drinks in a soft cooler, no glass; ask a pharmacist about seasickness options ahead of time; fishing licenses where needed"
+  },
+  "pf.visit": {
+   "checkIn": "at the slip the captain or mate takes the booker's code, checks the passenger list against who's there, and counts heads against the boat's limit",
+   "grace": "the boat waits 15 minutes for a late group, then may leave; a private trip still ends at its set time",
+   "changes": "fish cleaning or an extra hour is priced first and the group says yes; an extra hour only if the next trip allows",
+   "endEarly": "a trip the group asks to end early (seasick, cold) is the full price; a trip the captain turns back for weather or a boat problem follows the captain's terms: back within half the trip time, a free rain check or half the price back",
+   "done": "the captain texts DONE back at the dock; the rest is paid there"
+  },
+  "pf.money": {
+   "before": "a deposit holds a private trip (about 25%); a shared seat is paid in full",
+   "after": "the rest paid at the dock before leaving (card, cash or check, the business's own way), or charged to the saved card at DONE for a pick-up trip",
+   "cancel": "free to cancel up to 72 hours before; later, the deposit may be kept, only with Sam's yes; the captain's weather call: a full refund or a new date, the group picks",
+   "groupPays": "one person books and pays the deposit; at the dock the group pays the rest together, or splits it, the business's own way",
+   "tips": "a tip for the crew is the group's choice, in cash at the dock; Rosie never asks",
+   "caps": "deposits within the state's limits where they apply",
+   "tax": "where the state taxes charters",
+   "fee2": "Rosfield's $2 per confirmed booking applies: one $2 per trip, however many on board"
+  },
+  "pf.messages": {
+   "never": "passengers' health details, shore contacts, fishing license numbers and dates of birth: only on the secure page",
+   "staffTexts": "the captain's day list shows the booker's name and the number on board; the passenger list opens only on the captain's signed-in phone",
+   "languages": "English and Spanish",
+   "minors": "texts go to the adult who booked"
+  },
+  "pf.staff": {
+   "licenses": "each captain's federal license for the boat and passenger count, with drug testing and a medical certificate; a mate needs no license unless the boat's papers require a licensed crew",
+   "skills": "which boats each captain may run; inshore, offshore, fly fishing",
+   "crews": "a 6-passenger trip: a captain, with a mate on full days; an inspected boat: the crew its certificate requires",
+   "standIn": "another captain licensed and insured for that boat and passenger count; a group that asked for a captain by name is asked first, and nobody moves on silence",
+   "oks": "Sam OKs refunds, rain checks and extra hours past the trip time"
+  },
+  "pf.rules": {
+   "passengers": "never more passengers than the boat's papers and the captain's license allow",
+   "safety": "life jackets for everyone on board; children wear theirs as the rules require; a safety talk before leaving",
+   "fishing": "fishing licenses, catch limits and seasons follow the rules of the waters fished; the captain decides what's kept; Rosie never promises a catch",
+   "alcohol": "only as the captain allows; no glass",
+   "records": "the passenger list for each trip kept with the booking for 7 years",
+   "cancelRight": "no cancel period for time on the water already given",
+   "reviews": "a rating once after the trip"
+  },
+  "pf.edges": {
+   "weatherCall": "the captain calls it the evening before or at the dock from the marine forecast: the group gets a new date or a full refund",
+   "turnBack": "the captain turns back for weather or a boat problem: back within half the trip time, a free rain check or half back; later than that, Sam decides",
+   "endEarly": "the group asks to come in early: the full price",
+   "boatOut": "a boat problem before the trip: another boat that fits, a new date, or a full refund",
+   "captainOut": "another licensed captain for that boat; a group that named a captain is asked first; nobody moves on silence",
+   "tooMany": "more people at the dock than the boat may carry: only up to the limit board",
+   "impaired": "a passenger who seems drunk doesn't board; the group's trip goes on without them; no refund for that person",
+   "noLicense": "an angler without a needed fishing license can ride along but not fish; the trip goes on",
+   "minors": "children with an adult from the group, in a life jacket",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "groups",
+   "forms",
+   "children",
+   "tips",
+   "multiday",
+   "extrawork",
+   "firststeps",
+   "spaces"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "72 hours before",
+    "B": "72 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "cabinet",
+    "dock box"
+   ],
+   [
+    "Cabinet",
+    "Dock box"
+   ],
+   [
+    "Shop's",
+    "Dock's"
+   ],
+   [
+    "Color quotes",
+    "Catch quotes"
+   ],
+   [
+    "Color quote",
+    "Catch quote"
+   ],
+   [
+    "At the chair",
+    "At the dock"
+   ],
+   [
+    "valves",
+    "lines"
+   ],
+   [
+    "Valves",
+    "Lines"
+   ],
+   [
+    "clogs",
+    "snags"
+   ],
+   [
+    "Clogs",
+    "Snags"
+   ],
+   [
+    "water heaters",
+    "outboards"
+   ],
+   [
+    "Water heaters",
+    "Outboards"
+   ],
+   [
+    "heaters",
+    "motors"
+   ],
+   [
+    "Heaters",
+    "Motors"
+   ],
+   [
+    "travel fee",
+    "pick-up fee"
+   ],
+   [
+    "Travel fee",
+    "Pick-up fee"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Dock pick-up charter"
+   ],
+   [
+    "kitchen drain clearing",
+    "dock pick-up charter"
+   ],
+   [
+    "Drain clearing",
+    "Dock charter"
+   ],
+   [
+    "drain clearing",
+    "dock charter"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Charters LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Charters"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Sportfishing"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Sunset Cruises"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bait and Tackle"
+   ],
+   [
+    "Riley Chen",
+    "Gus Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Ana Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Rafe Price"
+   ],
+   [
+    "Casey Moore",
+    "Ruth Moore"
+   ],
+   [
+    "Riley",
+    "Gus"
+   ],
+   [
+    "Avery",
+    "Ana"
+   ],
+   [
+    "Jordan",
+    "Rafe"
+   ],
+   [
+    "Casey",
+    "Ruth"
+   ],
+   [
+    "barbershops",
+    "charter docks"
+   ],
+   [
+    "barbershop",
+    "charter dock"
+   ],
+   [
+    "Barbershop",
+    "Charter dock"
+   ],
+   [
+    "barbers",
+    "captains"
+   ],
+   [
+    "barber chair",
+    "fighting chair"
+   ],
+   [
+    "barber",
+    "captain"
+   ],
+   [
+    "Barber",
+    "Captain"
+   ],
+   [
+    "the shop's",
+    "the dock's"
+   ],
+   [
+    "The shop's",
+    "The dock's"
+   ],
+   [
+    "shop's",
+    "dock's"
+   ],
+   [
+    "the shop",
+    "the dock"
+   ],
+   [
+    "The shop",
+    "The dock"
+   ],
+   [
+    "shops",
+    "docks"
+   ],
+   [
+    "shop",
+    "dock"
+   ],
+   [
+    "Shop",
+    "Dock"
+   ],
+   [
+    "Haircuts",
+    "Half-day charters"
+   ],
+   [
+    "haircuts",
+    "half-day charters"
+   ],
+   [
+    "Haircut",
+    "Half-day charter"
+   ],
+   [
+    "haircut",
+    "half-day charter"
+   ],
+   [
+    "Beard trim",
+    "Fish cleaning"
+   ],
+   [
+    "beard trim",
+    "fish cleaning"
+   ],
+   [
+    "beard line",
+    "hook line"
+   ],
+   [
+    "beard",
+    "hook"
+   ],
+   [
+    "Skin fades",
+    "Shared trips"
+   ],
+   [
+    "skin fades",
+    "shared trips"
+   ],
+   [
+    "Skin fade",
+    "Shared trip"
+   ],
+   [
+    "skin fade",
+    "shared trip"
+   ],
+   [
+    "Kids cuts",
+    "Youth seats"
+   ],
+   [
+    "kids cuts",
+    "youth seats"
+   ],
+   [
+    "Kids cut",
+    "Youth seat"
+   ],
+   [
+    "kids cut",
+    "youth seat"
+   ],
+   [
+    "Color and cut",
+    "Full-day charter"
+   ],
+   [
+    "color and cut",
+    "full-day charter"
+   ],
+   [
+    "Color correction",
+    "Extra hour on the water"
+   ],
+   [
+    "color correction",
+    "extra hour on the water"
+   ],
+   [
+    "Color touch-up",
+    "Extra hour"
+   ],
+   [
+    "color touch-up",
+    "extra hour"
+   ],
+   [
+    "color plan",
+    "trip plan"
+   ],
+   [
+    "Color plan",
+    "Trip plan"
+   ],
+   [
+    "Color",
+    "Catch"
+   ],
+   [
+    "color",
+    "catch"
+   ],
+   [
+    "patch test",
+    "safety brief"
+   ],
+   [
+    "cut hair",
+    "fish"
+   ],
+   [
+    "Groom's package",
+    "Sunset cruise"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Full-day charter"
+   ],
+   [
+    "Signature cut and shave",
+    "Full-day charter"
+   ],
+   [
+    "hot towel shaves",
+    "shared trips"
+   ],
+   [
+    "hot towel",
+    "fish"
+   ],
+   [
+    "shaves",
+    "trips"
+   ],
+   [
+    "shave",
+    "trip"
+   ],
+   [
+    "perms",
+    "fishing trips"
+   ],
+   [
+    "perm",
+    "fishing trip"
+   ],
+   [
+    "cape clip",
+    "life vest"
+   ],
+   [
+    "cape",
+    "vest"
+   ],
+   [
+    "massage",
+    "sunset cruise"
+   ],
+   [
+    "Massage",
+    "Sunset cruise"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "fish"
+   ],
+   [
+    "house calls",
+    "dock pick-ups"
+   ],
+   [
+    "house call",
+    "dock pick-up"
+   ],
+   [
+    "House calls",
+    "Dock pick-ups"
+   ],
+   [
+    "House call",
+    "Dock pick-up"
+   ],
+   [
+    "at the chair",
+    "at the dock"
+   ],
+   [
+    "in the chair",
+    "at the dock"
+   ],
+   [
+    "the chair",
+    "the dock"
+   ],
+   [
+    "The chair",
+    "The dock"
+   ],
+   [
+    "chair",
+    "seat"
+   ],
+   [
+    "Plumbing and electrical",
+    "Charters and sunset cruises"
+   ],
+   [
+    "plumbing and electrical",
+    "charters and sunset cruises"
+   ],
+   [
+    "plumber",
+    "captain"
+   ],
+   [
+    "Plumber",
+    "Captain"
+   ],
+   [
+    "plumbing",
+    "charter"
+   ],
+   [
+    "Plumbing",
+    "Charter"
+   ],
+   [
+    "electrician",
+    "captain"
+   ],
+   [
+    "electrical",
+    "charter"
+   ],
+   [
+    "Electrical",
+    "Charter"
+   ],
+   [
+    "clogged drain",
+    "snagged line"
+   ],
+   [
+    "drain",
+    "line"
+   ],
+   [
+    "Drain",
+    "Line"
+   ],
+   [
+    "water heater flush",
+    "boat cleaning"
+   ],
+   [
+    "Water heater flush",
+    "Boat cleaning"
+   ],
+   [
+    "water heater replacement",
+    "outboard service"
+   ],
+   [
+    "Water heater replacement",
+    "Outboard service"
+   ],
+   [
+    "water heater",
+    "outboard"
+   ],
+   [
+    "Water heater",
+    "Outboard"
+   ],
+   [
+    "heater",
+    "motor"
+   ],
+   [
+    "flush",
+    "rinse"
+   ],
+   [
+    "service call",
+    "dock visit"
+   ],
+   [
+    "Service call",
+    "Dock visit"
+   ],
+   [
+    "faucet",
+    "rod"
+   ],
+   [
+    "dishwasher",
+    "cooler"
+   ],
+   [
+    "garbage disposal",
+    "dock box"
+   ],
+   [
+    "sewer",
+    "dock box"
+   ],
+   [
+    "toilet",
+    "dock box"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "snag"
+   ],
+   [
+    "pipes",
+    "lines"
+   ],
+   [
+    "pipe",
+    "line"
+   ],
+   [
+    "valve",
+    "line"
+   ],
+   [
+    "shutoff",
+    "wait"
+   ],
+   [
+    "repipe",
+    "re-rig"
+   ],
+   [
+    "supply line",
+    "fuel line"
+   ],
+   [
+    "water line",
+    "fuel line"
+   ],
+   [
+    "heating and cooling",
+    "weather check"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "snag"
+   ],
+   [
+    "leaks",
+    "snags"
+   ],
+   [
+    "Short on the sides",
+    "Short on the deck"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "12 Harbor Rd"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "14 Cedar Ln"
+   ],
+   [
+    "Elm St",
+    "Harbor Rd"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "Barbershops",
+    "Charter docks"
+   ],
+   [
+    "Barbers",
+    "Captains"
+   ],
+   [
+    "Barber chair",
+    "Fighting chair"
+   ],
+   [
+    "Shops",
+    "Docks"
+   ],
+   [
+    "Beard line",
+    "Hook line"
+   ],
+   [
+    "Beard",
+    "Hook"
+   ],
+   [
+    "Patch test",
+    "Safety brief"
+   ],
+   [
+    "Cut hair",
+    "Fish"
+   ],
+   [
+    "Hot towel shaves",
+    "Shared trips"
+   ],
+   [
+    "Hot towel",
+    "Fish"
+   ],
+   [
+    "Shaves",
+    "Trips"
+   ],
+   [
+    "Shave",
+    "Trip"
+   ],
+   [
+    "Perms",
+    "Fishing trips"
+   ],
+   [
+    "Perm",
+    "Fishing trip"
+   ],
+   [
+    "Cape clip",
+    "Life vest"
+   ],
+   [
+    "Cape",
+    "Vest"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Fish"
+   ],
+   [
+    "In the chair",
+    "At the dock"
+   ],
+   [
+    "Chair",
+    "Seat"
+   ],
+   [
+    "Electrician",
+    "Captain"
+   ],
+   [
+    "Clogged drain",
+    "Snagged line"
+   ],
+   [
+    "Heater",
+    "Motor"
+   ],
+   [
+    "Flush",
+    "Rinse"
+   ],
+   [
+    "Faucet",
+    "Rod"
+   ],
+   [
+    "Dishwasher",
+    "Cooler"
+   ],
+   [
+    "Garbage disposal",
+    "Dock box"
+   ],
+   [
+    "Sewer",
+    "Dock box"
+   ],
+   [
+    "Toilet",
+    "Dock box"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Snag"
+   ],
+   [
+    "Pipes",
+    "Lines"
+   ],
+   [
+    "Pipe",
+    "Line"
+   ],
+   [
+    "Valve",
+    "Line"
+   ],
+   [
+    "Shutoff",
+    "Wait"
+   ],
+   [
+    "Repipe",
+    "Re-rig"
+   ],
+   [
+    "Supply line",
+    "Fuel line"
+   ],
+   [
+    "Water line",
+    "Fuel line"
+   ],
+   [
+    "Heating and cooling",
+    "Weather check"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Snag"
+   ],
+   [
+    "Leaks",
+    "Snags"
+   ],
+   [
+    "$100",
+    "@@0@@"
+   ],
+   [
+    "$350",
+    "@@1@@"
+   ],
+   [
+    "$35",
+    "@@2@@"
+   ],
+   [
+    "$40",
+    "@@3@@"
+   ],
+   [
+    "$20",
+    "@@4@@"
+   ],
+   [
+    "$55",
+    "@@5@@"
+   ],
+   [
+    "$90",
+    "@@6@@"
+   ],
+   [
+    "$25",
+    "@@7@@"
+   ],
+   [
+    "$89",
+    "@@8@@"
+   ],
+   [
+    "@@0@@",
+    "$250"
+   ],
+   [
+    "@@1@@",
+    "$400"
+   ],
+   [
+    "@@2@@",
+    "$600"
+   ],
+   [
+    "@@3@@",
+    "$150"
+   ],
+   [
+    "@@4@@",
+    "$30"
+   ],
+   [
+    "@@5@@",
+    "$140"
+   ],
+   [
+    "@@6@@",
+    "$140"
+   ],
+   [
+    "@@7@@",
+    "$30"
+   ],
+   [
+    "@@8@@",
+    "$150"
+   ]
+  ],
+  "B": [
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like anchoring on a neighbor's reef without asking."
+   ],
+   [
+    "cabinet",
+    "dock box"
+   ],
+   [
+    "Cabinet",
+    "Dock box"
+   ],
+   [
+    "Shop's",
+    "Dock's"
+   ],
+   [
+    "Color quotes",
+    "Catch quotes"
+   ],
+   [
+    "Color quote",
+    "Catch quote"
+   ],
+   [
+    "At the chair",
+    "At the dock"
+   ],
+   [
+    "valves",
+    "lines"
+   ],
+   [
+    "Valves",
+    "Lines"
+   ],
+   [
+    "clogs",
+    "snags"
+   ],
+   [
+    "Clogs",
+    "Snags"
+   ],
+   [
+    "water heaters",
+    "outboards"
+   ],
+   [
+    "Water heaters",
+    "Outboards"
+   ],
+   [
+    "heaters",
+    "motors"
+   ],
+   [
+    "Heaters",
+    "Motors"
+   ],
+   [
+    "travel fee",
+    "pick-up fee"
+   ],
+   [
+    "Travel fee",
+    "Pick-up fee"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Dock pick-up charter"
+   ],
+   [
+    "kitchen drain clearing",
+    "dock pick-up charter"
+   ],
+   [
+    "Drain clearing",
+    "Dock charter"
+   ],
+   [
+    "drain clearing",
+    "dock charter"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Charters LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Charters"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Sportfishing"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Sunset Cruises"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bait and Tackle"
+   ],
+   [
+    "Riley Chen",
+    "Gus Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Ana Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Rafe Price"
+   ],
+   [
+    "Casey Moore",
+    "Ruth Moore"
+   ],
+   [
+    "Riley",
+    "Gus"
+   ],
+   [
+    "Avery",
+    "Ana"
+   ],
+   [
+    "Jordan",
+    "Rafe"
+   ],
+   [
+    "Casey",
+    "Ruth"
+   ],
+   [
+    "barbershops",
+    "charter docks"
+   ],
+   [
+    "barbershop",
+    "charter dock"
+   ],
+   [
+    "Barbershop",
+    "Charter dock"
+   ],
+   [
+    "barbers",
+    "captains"
+   ],
+   [
+    "barber chair",
+    "fighting chair"
+   ],
+   [
+    "barber",
+    "captain"
+   ],
+   [
+    "Barber",
+    "Captain"
+   ],
+   [
+    "the shop's",
+    "the dock's"
+   ],
+   [
+    "The shop's",
+    "The dock's"
+   ],
+   [
+    "shop's",
+    "dock's"
+   ],
+   [
+    "the shop",
+    "the dock"
+   ],
+   [
+    "The shop",
+    "The dock"
+   ],
+   [
+    "shops",
+    "docks"
+   ],
+   [
+    "shop",
+    "dock"
+   ],
+   [
+    "Shop",
+    "Dock"
+   ],
+   [
+    "Haircuts",
+    "Half-day charters"
+   ],
+   [
+    "haircuts",
+    "half-day charters"
+   ],
+   [
+    "Haircut",
+    "Half-day charter"
+   ],
+   [
+    "haircut",
+    "half-day charter"
+   ],
+   [
+    "Beard trim",
+    "Fish cleaning"
+   ],
+   [
+    "beard trim",
+    "fish cleaning"
+   ],
+   [
+    "beard line",
+    "hook line"
+   ],
+   [
+    "beard",
+    "hook"
+   ],
+   [
+    "Skin fades",
+    "Shared trips"
+   ],
+   [
+    "skin fades",
+    "shared trips"
+   ],
+   [
+    "Skin fade",
+    "Shared trip"
+   ],
+   [
+    "skin fade",
+    "shared trip"
+   ],
+   [
+    "Kids cuts",
+    "Youth seats"
+   ],
+   [
+    "kids cuts",
+    "youth seats"
+   ],
+   [
+    "Kids cut",
+    "Youth seat"
+   ],
+   [
+    "kids cut",
+    "youth seat"
+   ],
+   [
+    "Color and cut",
+    "Full-day charter"
+   ],
+   [
+    "color and cut",
+    "full-day charter"
+   ],
+   [
+    "Color correction",
+    "Extra hour on the water"
+   ],
+   [
+    "color correction",
+    "extra hour on the water"
+   ],
+   [
+    "Color touch-up",
+    "Extra hour"
+   ],
+   [
+    "color touch-up",
+    "extra hour"
+   ],
+   [
+    "color plan",
+    "trip plan"
+   ],
+   [
+    "Color plan",
+    "Trip plan"
+   ],
+   [
+    "Color",
+    "Catch"
+   ],
+   [
+    "color",
+    "catch"
+   ],
+   [
+    "patch test",
+    "safety brief"
+   ],
+   [
+    "cut hair",
+    "fish"
+   ],
+   [
+    "Groom's package",
+    "Sunset cruise"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Full-day charter"
+   ],
+   [
+    "Signature cut and shave",
+    "Full-day charter"
+   ],
+   [
+    "hot towel shaves",
+    "shared trips"
+   ],
+   [
+    "hot towel",
+    "fish"
+   ],
+   [
+    "shaves",
+    "trips"
+   ],
+   [
+    "shave",
+    "trip"
+   ],
+   [
+    "perms",
+    "fishing trips"
+   ],
+   [
+    "perm",
+    "fishing trip"
+   ],
+   [
+    "cape clip",
+    "life vest"
+   ],
+   [
+    "cape",
+    "vest"
+   ],
+   [
+    "massage",
+    "sunset cruise"
+   ],
+   [
+    "Massage",
+    "Sunset cruise"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "fish"
+   ],
+   [
+    "house calls",
+    "dock pick-ups"
+   ],
+   [
+    "house call",
+    "dock pick-up"
+   ],
+   [
+    "House calls",
+    "Dock pick-ups"
+   ],
+   [
+    "House call",
+    "Dock pick-up"
+   ],
+   [
+    "at the chair",
+    "at the dock"
+   ],
+   [
+    "in the chair",
+    "at the dock"
+   ],
+   [
+    "the chair",
+    "the dock"
+   ],
+   [
+    "The chair",
+    "The dock"
+   ],
+   [
+    "chair",
+    "seat"
+   ],
+   [
+    "Plumbing and electrical",
+    "Charters and sunset cruises"
+   ],
+   [
+    "plumbing and electrical",
+    "charters and sunset cruises"
+   ],
+   [
+    "plumber",
+    "captain"
+   ],
+   [
+    "Plumber",
+    "Captain"
+   ],
+   [
+    "plumbing",
+    "charter"
+   ],
+   [
+    "Plumbing",
+    "Charter"
+   ],
+   [
+    "electrician",
+    "captain"
+   ],
+   [
+    "electrical",
+    "charter"
+   ],
+   [
+    "Electrical",
+    "Charter"
+   ],
+   [
+    "clogged drain",
+    "snagged line"
+   ],
+   [
+    "drain",
+    "line"
+   ],
+   [
+    "Drain",
+    "Line"
+   ],
+   [
+    "water heater flush",
+    "boat cleaning"
+   ],
+   [
+    "Water heater flush",
+    "Boat cleaning"
+   ],
+   [
+    "water heater replacement",
+    "outboard service"
+   ],
+   [
+    "Water heater replacement",
+    "Outboard service"
+   ],
+   [
+    "water heater",
+    "outboard"
+   ],
+   [
+    "Water heater",
+    "Outboard"
+   ],
+   [
+    "heater",
+    "motor"
+   ],
+   [
+    "flush",
+    "rinse"
+   ],
+   [
+    "service call",
+    "dock visit"
+   ],
+   [
+    "Service call",
+    "Dock visit"
+   ],
+   [
+    "faucet",
+    "rod"
+   ],
+   [
+    "dishwasher",
+    "cooler"
+   ],
+   [
+    "garbage disposal",
+    "dock box"
+   ],
+   [
+    "sewer",
+    "dock box"
+   ],
+   [
+    "toilet",
+    "dock box"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "snag"
+   ],
+   [
+    "pipes",
+    "lines"
+   ],
+   [
+    "pipe",
+    "line"
+   ],
+   [
+    "valve",
+    "line"
+   ],
+   [
+    "shutoff",
+    "wait"
+   ],
+   [
+    "repipe",
+    "re-rig"
+   ],
+   [
+    "supply line",
+    "fuel line"
+   ],
+   [
+    "water line",
+    "fuel line"
+   ],
+   [
+    "heating and cooling",
+    "weather check"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "snag"
+   ],
+   [
+    "leaks",
+    "snags"
+   ],
+   [
+    "Short on the sides",
+    "Short on the deck"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "12 Harbor Rd"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "14 Cedar Ln"
+   ],
+   [
+    "Elm St",
+    "Harbor Rd"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "Barbershops",
+    "Charter docks"
+   ],
+   [
+    "Barbers",
+    "Captains"
+   ],
+   [
+    "Barber chair",
+    "Fighting chair"
+   ],
+   [
+    "Shops",
+    "Docks"
+   ],
+   [
+    "Beard line",
+    "Hook line"
+   ],
+   [
+    "Beard",
+    "Hook"
+   ],
+   [
+    "Patch test",
+    "Safety brief"
+   ],
+   [
+    "Cut hair",
+    "Fish"
+   ],
+   [
+    "Hot towel shaves",
+    "Shared trips"
+   ],
+   [
+    "Hot towel",
+    "Fish"
+   ],
+   [
+    "Shaves",
+    "Trips"
+   ],
+   [
+    "Shave",
+    "Trip"
+   ],
+   [
+    "Perms",
+    "Fishing trips"
+   ],
+   [
+    "Perm",
+    "Fishing trip"
+   ],
+   [
+    "Cape clip",
+    "Life vest"
+   ],
+   [
+    "Cape",
+    "Vest"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Fish"
+   ],
+   [
+    "In the chair",
+    "At the dock"
+   ],
+   [
+    "Chair",
+    "Seat"
+   ],
+   [
+    "Electrician",
+    "Captain"
+   ],
+   [
+    "Clogged drain",
+    "Snagged line"
+   ],
+   [
+    "Heater",
+    "Motor"
+   ],
+   [
+    "Flush",
+    "Rinse"
+   ],
+   [
+    "Faucet",
+    "Rod"
+   ],
+   [
+    "Dishwasher",
+    "Cooler"
+   ],
+   [
+    "Garbage disposal",
+    "Dock box"
+   ],
+   [
+    "Sewer",
+    "Dock box"
+   ],
+   [
+    "Toilet",
+    "Dock box"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Snag"
+   ],
+   [
+    "Pipes",
+    "Lines"
+   ],
+   [
+    "Pipe",
+    "Line"
+   ],
+   [
+    "Valve",
+    "Line"
+   ],
+   [
+    "Shutoff",
+    "Wait"
+   ],
+   [
+    "Repipe",
+    "Re-rig"
+   ],
+   [
+    "Supply line",
+    "Fuel line"
+   ],
+   [
+    "Water line",
+    "Fuel line"
+   ],
+   [
+    "Heating and cooling",
+    "Weather check"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Snag"
+   ],
+   [
+    "Leaks",
+    "Snags"
+   ],
+   [
+    "$179",
+    "@@0@@"
+   ],
+   [
+    "$199",
+    "@@1@@"
+   ],
+   [
+    "$89",
+    "@@2@@"
+   ],
+   [
+    "$40",
+    "@@3@@"
+   ],
+   [
+    "$110",
+    "@@4@@"
+   ],
+   [
+    "$160",
+    "@@5@@"
+   ],
+   [
+    "$640",
+    "@@6@@"
+   ],
+   [
+    "$358",
+    "@@7@@"
+   ],
+   [
+    "$120",
+    "@@8@@"
+   ],
+   [
+    "$35",
+    "@@9@@"
+   ],
+   [
+    "$169",
+    "@@10@@"
+   ],
+   [
+    "@@0@@",
+    "$675"
+   ],
+   [
+    "@@1@@",
+    "$75"
+   ],
+   [
+    "@@2@@",
+    "$150"
+   ],
+   [
+    "@@3@@",
+    "$150"
+   ],
+   [
+    "@@4@@",
+    "$525"
+   ],
+   [
+    "@@5@@",
+    "$150"
+   ],
+   [
+    "@@6@@",
+    "$1200"
+   ],
+   [
+    "@@7@@",
+    "$1050"
+   ],
+   [
+    "@@8@@",
+    "$75"
+   ],
+   [
+    "@@9@@",
+    "$600"
+   ],
+   [
+    "@@10@@",
+    "$665"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books a private half-day inshore charter for 4 from Lee Charters, Sat Oct 24 at 11:00am. Gus meets the group at the dock, and the $150 deposit holds the boat.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Sportfishing for a full day with pick-up at the group's dock, 14 Cedar Ln. Ruth and Rafe pick up the group Thu Oct 22 at 6:00am, and the rest is charged to Alex's saved card when the captain texts DONE."
+ },
+ "cast": {
+  "A": {
+   "staff": "Gus and Ana (captains at the dock)",
+   "cust": "Alex M. (customer) · other anglers",
+   "other": "Others (a group, a harbor office)"
+  },
+  "B": {
+   "staff": "Ruth and Rafe (captains)",
+   "cust": "Alex M. (customer) · other anglers",
+   "other": "Others (a marina, a group, a bank)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Gus"
+  },
+  "B": {
+   "staff": "Ruth"
+  }
+ },
+ "keep": [],
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: a private half-day inshore charter for 4: $600, a $150 deposit when booking, the $450 rest paid at the dock before leaving.",
+    "list|full|none": "A seat on a shared trip, $140, paid in full when booking."
+   },
+   "amounts": {
+    "list|deposit|*": {
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "fee": "$150",
+     "name": "Private half-day inshore charter"
+    },
+    "list|full|*": {
+     "price": "$140",
+     "paid": "$140",
+     "fee": "$30",
+     "name": "Shared trip seat"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: a full-day charter with dock pick-up: $675 ($600 plus the $75 pick-up). A $150 deposit when booking; the $525 rest charged to the saved card when the captain texts DONE."
+   },
+   "amounts": {
+    "list|deposit|*": {
+     "price": "$675",
+     "deposit": "$150",
+     "rest": "$525",
+     "fee": "$150",
+     "name": "Charter with dock pick-up"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02",
+   "S1-80"
+  ],
+  "B": [
+   "B4-38",
+   "B8-45",
+   "B10-32"
+  ]
+ },
+ "notes": "Fishing and boat charter (table style; from rentals, with the verified sample plug-in as the base, work/testdrive/fishing-charter.md). Refit for the rebuilt master (N4, Oct 27): the sample's money words are gone and money is the amounts rows. Flow A (Lee Charters, the group comes to the dock): a private half-day inshore charter for up to 4, $600, a $150 deposit when booking, the $450 rest paid at the dock before leaving (the deposit kept on a late cancel); a shared-trip seat, $140, paid in full ($30 kept on a late cancel). Flow B (Lee Sportfishing, the captain picks the group up at their own dock): a full-day charter with pick-up, $675 ($600 plus the $75 pick-up), a $150 deposit, the $525 rest charged to the saved card when the captain texts DONE. The rest is never charged on a set day. The captain's weather call and the marine forecast are the sample's verified rules. Licenses: each captain's federal license, the boat's papers and inspection are the owner's own, shown as given, never checked (D96). $2 applies once per trip (D97). Sensitive is off. The verified sample findings (work/gaps/fishing-charter.json) stand.",
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup (D96): each captain's and the boat's papers are the owner's own, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person-license lookup (D96): the captain's own papers only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every trip pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes at a charter."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "no health, vision or pet plan pays for this work"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "no repeat plan; each booking stands alone"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "no repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "no insurance pays"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "nothing is left with the business"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "No: people",
+    "why": "boats are booked as spaces with a passenger limit"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "trips are never sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "the boat is booked, not a person's time"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "no overnight trips in the example"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "children stay with an adult from the group"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "nothing is left with the business"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "a rating is asked once after a trip"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "no results come later"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup (D96): each captain's and the boat's papers are the owner's own, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person-license lookup (D96): the captain's own papers only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every trip pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes at a charter."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "no plan or warranty pays for this work"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "no repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "no repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "no repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "no repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "no repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "no insurance pays"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "No: people",
+    "why": "boats are booked as spaces with a passenger limit"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "trips are never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "a pick-up has a set time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "no overnight trips"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "pick-ups are private charters only"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "no contract beyond each passenger's waiver"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "an adult from the group stays with each child"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "the group must be there"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "no report comes later"
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "We'd share only where they're working, only after a missed check.",
+    "Shop's",
+    "Color quotes",
+    "Color quote",
+    "At the chair",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Drain clearing",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "beard",
+    "skin fades",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Color touch-up",
+    "color touch-up",
+    "color plan",
+    "Color plan",
+    "Color",
+    "color",
+    "patch test",
+    "cut hair",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perms",
+    "perm",
+    "cape clip",
+    "cape",
+    "massage",
+    "Massage",
+    "gloss",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain",
+    "water heater",
+    "heater",
+    "pipe",
+    "valve",
+    "leak",
+    "Springfield",
+    "2020-1187",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Beard",
+    "Gloss",
+    "Leak",
+    "Leaks",
+    "$100",
+    "$35",
+    "$40",
+    "$20",
+    "$55",
+    "$90",
+    "$25",
+    "$89"
+   ],
+   "B": [
+    "We'd share only where they're working, only after a missed check.",
+    "Like tapping a neighbor's water line without asking.",
+    "cabinet",
+    "Cabinet",
+    "valves",
+    "clogs",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircut",
+    "haircut",
+    "beard trim",
+    "beard",
+    "color",
+    "cut hair",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perm",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "drain",
+    "Drain",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater",
+    "Water heater",
+    "heater",
+    "flush",
+    "service call",
+    "Service call",
+    "faucet",
+    "dishwasher",
+    "sewer",
+    "overflowing",
+    "sink",
+    "clog",
+    "pipes",
+    "pipe",
+    "valve",
+    "shutoff",
+    "repipe",
+    "supply line",
+    "water line",
+    "heating and cooling",
+    "leak",
+    "Springfield",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Sewer",
+    "Overflowing",
+    "Shutoff",
+    "Repipe",
+    "Supply line",
+    "Heating and cooling",
+    "Leak",
+    "Leaks",
+    "$179",
+    "$199",
+    "$89",
+    "$40",
+    "$110",
+    "$160",
+    "$640",
+    "$358",
+    "$120",
+    "$35",
+    "$169"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "S1-80": "1d7be919fe",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "B4-43": "fc9855955a",
+   "B5-01": "841c417586",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-19": "b97bfbf0d2",
+   "S1-80": "1d7be919fe",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B5-34": "917f89b62f",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B10-38": "867fe1ab7c"
+  }
+ }
+}

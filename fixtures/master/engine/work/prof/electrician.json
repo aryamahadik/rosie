@@ -1,0 +1,2898 @@
+{
+ "id": "electrician",
+ "name": "Electrician",
+ "style": "Home visit",
+ "pattern": "fix",
+ "from": "plumber",
+ "plugin": {
+  "pf.license": {
+   "need": "Electrical work in a home needs a license where the state, city or county licenses electricians. Some states license by job size or kind of work, like residential-only or limited licenses.",
+   "who holds it": "Both: the company (an electrical contractor license, where the state asks) and each electrician (apprentice, journeyman or master, where the state licenses people).",
+   "what to ask": [
+    "The company's license number and class",
+    "Each electrician's own number and level, in their invite reply",
+    "The local license for the job's city or county, where only cities or counties license home electrical work",
+    "Any specialty license and its limits, like low voltage, solar or signs: from the state form"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "The company's electrical listing goes live once it's set up. Each electrician is offered only once the owner says yes.",
+   "job limits": "Where a license stops at a job size or a kind of work, each quote and extra job is checked against it before it's sent.",
+   "renewals": "Reminders before each expiry, on the dates the owner picks (the example: 5 weeks and 1 week before). A lapsed license pauses new bookings for that person.",
+   "insurance or bond": "Liability insurance, and a bond where the state's form asks for one: from the state form.",
+   "background checks": "Only where the state's form asks.",
+   "lead-safe work": "Cutting into painted walls or ceilings in an older home: a lead-safe certified firm and worker, where the rules require it.",
+   "at the counter": "Lamps and fixtures brought to the shop counter are cord-and-plug work, not wiring in a building: the state's form says if it needs a license. Safe default: the company's license on file, shown on the listing.",
+   "local rules": "Where only a city or county licenses home electrical work, the license for the job's address is the one checked."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Highline Electric's own list)": [
+    {
+     "service": "Service call (find any problem)",
+     "price kind": "one price",
+     "price": "$89, taken off the repair",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill",
+     "note": "Goes on the jobs below; not booked alone"
+    },
+    {
+     "service": "Kitchen outlet repair (dead outlets, or a reset outlet that won't reset)",
+     "price kind": "one price",
+     "price": "$179, the $89 call included",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Light fixture or ceiling fan swap (on an existing box)",
+     "price kind": "one price",
+     "price": "$169, the $89 call included",
+     "length": "60 to 90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Breaker repair (a breaker that keeps tripping)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "60 to 90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Wiring repair (flickering lights, a dead circuit)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Yard light repair",
+     "price kind": "one price",
+     "price": "$179",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call fee",
+     "after": "Rosie texts the bill",
+     "note": "Nobody needs to be home. A new buried line needs a utility locate first."
+    },
+    {
+     "service": "Generator tune-up (a standby generator)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Also sold as a yearly plan"
+    },
+    {
+     "service": "Smoke and CO alarm check",
+     "price kind": "the owner's own price",
+     "place": "at the customer's place",
+     "note": "Often a plan for rentals, every 3 months"
+    },
+    {
+     "service": "EV charger install",
+     "price kind": "quoted from photos of the panel and the garage, or after a free estimate visit (a load check)",
+     "price": "the quote (the example: $640)",
+     "length": "half a day",
+     "place": "at the customer's place",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill",
+     "note": "A permit and an inspection where the local rules require them. Only the people the owner names (the example: Darnell)."
+    },
+    {
+     "service": "Panel replacement or upgrade",
+     "price kind": "a free estimate visit, then a written quote",
+     "price": "the quote (the example: $2,400, billed in 3 stages)",
+     "length": "1 to 2 days",
+     "place": "at the customer's place",
+     "before": "the first stage as a deposit, once the contract is signed",
+     "after": "each stage billed when it's done",
+     "note": "The owner OKs each booking first. A permit, the power company's shut-off and turn-on, and the inspection."
+    },
+    {
+     "service": "New circuit",
+     "price kind": "a free estimate visit, then a quote",
+     "price": "the quote",
+     "place": "at the customer's place",
+     "before": "set with the quote",
+     "after": "Rosie texts the bill",
+     "note": "A permit where the local rules require one"
+    },
+    {
+     "service": "Electrical safety inspection",
+     "price kind": "by person",
+     "price": "journeyman $199, master $249",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call fee",
+     "after": "Rosie texts the bill",
+     "note": "The report link comes later"
+    },
+    {
+     "service": "After-hours emergency call",
+     "price kind": "one price",
+     "price": "$149, taken off the repair; flat-price jobs $60 more",
+     "length": "sent now: an arrival estimate, not a window",
+     "place": "at the customer's place",
+     "before": "a card saved for the $149 fee",
+     "after": "Rosie texts the bill",
+     "note": "Sent now to the electrician on call, then the backup. Free to cancel until they text OMW. Never for fire, smoke or a downed line: that's 911 first."
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum",
+     "place": "at the customer's place",
+     "note": "Goes on quoted jobs; not booked alone"
+    }
+   ],
+   "at the business (the example: Highline Lamp Shop's counter list)": [
+    {
+     "service": "Lamp rewire (bring the lamp)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "both: at the shop, or at the customer's home as a $75 home visit paid in full",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "New cord and plug",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "New switch or socket",
+     "price kind": "one price",
+     "price": "$20",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Holiday light repair",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Floor lamp rewire",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the shop",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Chandelier rewire (up to 6 lights)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours, or a drop-off",
+     "place": "at the shop",
+     "before": "a card saved for the $40 fee (over 2 hours)",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Antique lamp restore",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $90)",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "The owner OKs each quote. Only Nina does antique lamps."
+    },
+    {
+     "service": "Lamp repair (one that won't light or flickers)",
+     "price kind": "quoted at the visit",
+     "price": "only the $25 bench check is promised",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Video check of a lamp, a fixture or a dead outlet",
+     "price kind": "the owner's own price",
+     "place": "at the business (a video session)",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Only where the owner offers it"
+    }
+   ],
+   "capacity": "One electrician per home visit. A panel replacement or a long trench can need a crew of two. The counter: one lamp tech per booking, and its one test bench for antique lamps.",
+   "skills each needs": "EV chargers and panel work need the skill the owner names. Antique lamps at the counter need the antique skill. Solar work needs its own license where the state asks.",
+   "nobody home": "Outdoor work with its own access, like a yard light or an outside outlet: nobody needs to be home. DONE comes with a photo.",
+   "online": "A video check only, where the owner offers it. No repair is done by video.",
+   "extras": "Travel inside the service area only (the example: 25 miles). Parts at cost or at list, the owner's pick. Permit fees shown on the quote. No tax line unless the owner sets a rate."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What's wrong: dead outlets, a breaker that trips, flickering lights, no power, a new install, or something else",
+    "Which rooms",
+    "Did a breaker trip? Does the reset button on an outlet reset?",
+    "What was plugged in or running when it went off",
+    "After hours: is power out right now",
+    "For an EV charger or a new circuit: which charger or appliance, and where the panel is",
+    "At the counter: which lamp or fixture, how many sockets, and how old"
+   ],
+   "after a time is picked": [
+    "Who will be there: the customer, or someone else (their name and mobile go on the secure page)",
+    "Access, parking and pets, and where the panel is",
+    "Own or rent, and who pays: the customer, or the landlord or manager",
+    "A home warranty or an insurance claim: the customer pays, and gets the receipt and photos for the claim",
+    "The year the home was built: only for jobs that may open a wall",
+    "HOA or building rules: only for outside work or a shared panel"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "Gate or lock codes",
+    "The landlord's or manager's name and mobile",
+    "A photo of the panel (optional)",
+    "Photos inside the home",
+    "The card"
+   ],
+   "who may book": "An adult. A renter books, and the landlord or manager OKs it where they pay. A person the owner of the home names may book for them."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "Smoke, sparks, a burning smell, or a hot panel, outlet or switch",
+     "says": "Get everyone out, and don't touch the panel. Call 911 from outside.",
+     "booking": "No booking until the fire department says the home is safe. The customer can come back then."
+    },
+    {
+     "words": "A downed or sparking power line",
+     "says": "Stay at least 30 feet away, and keep others away. Call the power company's emergency line, or 911 if it's sparking or anyone is hurt.",
+     "booking": "No booking now. Damage on the house's side, like the meter box or the pipe the wires come in through, is booked once the power company makes it safe."
+    },
+    {
+     "words": "Someone got a shock or is hurt",
+     "says": "Don't touch them if they may still be touching power. Call 911.",
+     "booking": "No booking until it's safe; the customer can come back."
+    },
+    {
+     "words": "A gas smell",
+     "says": "Leave the house now. Then call 911 and the gas company.",
+     "booking": "No booking."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "Water near outlets, a light or the panel",
+     "says": "Stay away from the water and anything plugged in. Don't touch a switch or the panel while standing in water. Switch off that breaker only from a dry spot."
+    },
+    {
+     "words": "A breaker that won't reset, or power out in part of the home",
+     "says": "Don't keep resetting it. Unplug what's on that circuit. If you smell burning, get out and call 911."
+    },
+    {
+     "words": "A lamp or cord that sparked (at the counter)",
+     "says": "Unplug it and don't use it. Bring it in, or book a home visit if it's wired into the house."
+    }
+   ],
+   "a fix the customer declines": "A hazard left as it is: the circuit is switched off and labeled, and the customer gets a written safety note not to use it. The note stays with the job.",
+   "at the counter": "A light that's still wired into the house isn't worked on at the counter. Taking it down or putting it up is a home visit.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "A free estimate visit (a load check), or photos first",
+     "for": "Panel replacements and upgrades, new circuits and EV chargers",
+     "timing": "Before the quote; the owner picks which"
+    },
+    {
+     "step": "A permit",
+     "for": "Panels, new circuits, EV chargers, service changes, and jobs the local rules name",
+     "timing": "Pulled by the license holder before the work, where the local rules require one (a to-do for the owner). Permit fees go on the quote."
+    },
+    {
+     "step": "The power company's shut-off and turn-on",
+     "for": "A panel swap or a service change",
+     "timing": "Set up by the business with the power company; the customer is told both dates"
+    },
+    {
+     "step": "A utility locate (call 811) before any digging",
+     "for": "Yard lights and other buried lines",
+     "timing": "Done by the business, with the lead time the locate service sets"
+    },
+    {
+     "step": "A lead-safe work notice",
+     "for": "Work that cuts into painted walls or ceilings in an older home",
+     "timing": "Signed on the secure page before the visit, where the rules require it"
+    },
+    {
+     "step": "The owner's OK",
+     "for": "Panel work, and same-day jobs",
+     "timing": "Before the booking is confirmed"
+    },
+    {
+     "step": "A parts check (the antique lamp brought in)",
+     "for": "An antique lamp restore at the counter",
+     "timing": "At least 2 days before; stays good 3 months"
+    }
+   ],
+   "prep for the reminder": [
+    "Clear a path to the panel, and around the outlets or lights to fix",
+    "Don't keep resetting a breaker that trips",
+    "Put pets in another room",
+    "At the counter: bring the lamp with its shade, harp and bulb; a chandelier comes with its chain and canopy"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code at the door. The on-my-way text names the electrician, with a photo.",
+   "check-in at the counter": "The code at the counter (the lamp tech or the desk types it). A drop-off gets its code when the item is left, and READY when it's tested.",
+   "quotes at the visit": "The electrician texts the quote with its lines before any work. The customer may OK part of it. The quote stays good 7 days.",
+   "extra work": "Quoted by text up to the owner's limit (the example: $500). Above it, the owner OKs it first. A bigger job, like a panel, gets its own quote.",
+   "a fix declined": "If the customer says no to a fix for a hazard, the electrician leaves that circuit off and labeled, and Rosie texts the written safety note.",
+   "work sold at the home": "A written right to cancel, where the rules require it. The work starts at once only if the customer asks for that in writing, where the rules allow it.",
+   "old parts": "The replaced parts are offered to the customer, where the state's rules require it.",
+   "before work": "Photos of the panel and the work area before work; the year the home was built before opening a wall.",
+   "proof it's done": "The electrician texts DONE with the bill's lines, and photos after. Nobody home needed: DONE with a photo.",
+   "permits": "Where a permit was pulled, the inspection is set up after the work, and the power company turns the power back on where it shut it off. The result is kept with the job."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's place: a card saved for the $89 service call fee, and Rosie texts the bill after the job",
+    "An owner may take nothing before, or save a card only, with no hold (the old example took nothing before)",
+    "At the counter: nothing held; a card saved for the $20 fee; paid at the counter. Over 2 hours: a card saved for the $40 fee",
+    "After hours: the $149 call held, taken off the repair",
+    "An owner who saves a card may have it charged for the bill when the electrician texts DONE",
+    "At the counter, an owner may also take nothing before (a YES books it), or a $40 deposit on a chandelier rewire in place of the hold"
+   ],
+   "limits": [
+    "Work quoted at the visit: nothing more than the service call is taken before",
+    "Money before a repair: only where the state form allows it",
+    "Deposits only on quoted big jobs (the example: 25% on an EV charger, or a panel's first stage). Deposit cap: from the state form",
+    "A signed written contract before any money, for jobs over the state form's amount",
+    "Late cancel or nobody home: the $89 fee (after hours, the $149 call once the electrician has headed out). The owner confirms each one; no answer, no fee",
+    "Emergency prices: where the state's rules limit prices in a declared emergency, those limits apply"
+   ],
+   "one service charge": "One service call per visit, trip included, shown before the customer agrees, where the state's rules require it.",
+   "insurance and plans": "A home warranty plan pays only once the owner checks it. Insurance: the customer pays, and gets the receipt and photos for the claim.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "parts": "Parts at cost or at list, the owner's pick; permit fees on the quote; parts billed after go on the bill.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Gate or lock codes, card details, and photos from inside the home or of the panel: these stay on the secure page.",
+   "languages": "English and Spanish.",
+   "danger words": "Fire, smoke and power line words always get the safety message first, before anything else."
+  },
+  "pf.staff": {
+   "levels": "Apprentice (or trainee), journeyman and master; each person's own license per state, where the state licenses electricians.",
+   "skills": [
+    "Outlets and switches",
+    "Breakers and circuits",
+    "Lights and fans",
+    "Panels and service changes",
+    "EV chargers",
+    "Generators",
+    "Safety inspections",
+    "Solar (its own license where the state asks)",
+    "Counter: lamps and fixtures",
+    "Counter: antique lamps"
+   ],
+   "supervision": "An apprentice works only with a journeyman or master on the job, where the state's rules require it. An apprentice is never sent alone by default.",
+   "special work": "Panel work only by a master electrician or a person the owner names. A specialty or limited license limits what that person may be booked for. Lead-safe work only by people with the lead-safe card, where the rules require it.",
+   "who OKs what": "The owner OKs fees, quotes over the limit, panel jobs and same-day jobs. After hours, a job sent now goes to the electrician on call, then the backup set at sign-up. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "Another electrician with the same skill and level, at the same window and price."
+  },
+  "pf.rules": {
+   "written contract": "A signed written contract before work above an amount, and no money before it's signed: from the state form.",
+   "right to cancel": "A written right to cancel for work sold at the home: where the rules require it.",
+   "permits": "Pulled by the license holder where the local rules require one; the inspection follows.",
+   "power company": "The power company's shut-off and turn-on for a panel swap or a service change.",
+   "lead-safe work": "Lead-safe work rules for older homes: where the rules require it.",
+   "license on papers": "The license number on listings, confirmations, quotes and bills: from the state form.",
+   "one service charge": "One service charge per visit, shown before the customer agrees: where the state's rules require it.",
+   "old parts": "Offer the customer the replaced parts: where the state's rules require it.",
+   "digging": "A utility locate before any digging: always.",
+   "declared emergency": "Price limits in a declared emergency: where the state's rules require it.",
+   "warranty": "The owner's own (the example: 1 year on labor), shown on the receipt.",
+   "records": "7 years, as for every kind of work."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for electrical work:",
+   "electrical": [
+    "Smoke, sparks or a burning smell at any point: stop, get everyone out, call 911",
+    "A downed power line: 30 feet away, and call the power company",
+    "The problem gets worse before the visit: the safety steps again, then urgent",
+    "After hours: sent now to the electrician on call, then the backup; nobody takes it means no visit tonight and the hold released",
+    "A fix for a hazard declined: the circuit left off and labeled, with a written safety note",
+    "A bigger job found, like a scorched panel: its own quote, OK'd by the owner over the limit, with its permit",
+    "A panel swap: the permit, the power company's shut-off and turn-on, and the inspection before the last stage is billed",
+    "A quote past what the license allows: not sent, and the owner is told",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "A renter whose landlord pays: the landlord's OK first, or the renter pays instead",
+    "A storm brings many outage calls: PAUSE, and a declared emergency's price limits",
+    "At the counter: a lamp that can't be fixed safely, a light still wired in, or a drop-off nobody picks up"
+   ]
+  },
+  "pf.facts": [
+   "photos",
+   "firststeps",
+   "dropoff",
+   "extrawork",
+   "stages",
+   "documents",
+   "video"
+  ],
+  "pf.switches": {
+   "sensitive": false,
+   "cancelright": false
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds appliance repair to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Appliance repair for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW appliance repair"
+   ],
+   [
+    "Panel upgrade",
+    "Solar install"
+   ],
+   [
+    "Lee Electric",
+    "Highline Solar"
+   ],
+   [
+    "electrical",
+    "solar"
+   ],
+   [
+    "Electrical",
+    "Solar"
+   ],
+   [
+    "Electric.",
+    "Natural gas."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across",
+    "A landlord brings in five lamps from one building, on one morning. Rosie finds counter spots side by side across"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two lamps from one room work the same way. Both are asked before the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Nina can still fit the rewire if you're here by 11:20, or you can move to a later time."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Dead outlets have a set price. Tripping breakers are priced at the visit. Sparks or a burning smell stop the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company, and one for each electrician where the state asks."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A chandelier rewire can be a drop-off: Alex leaves it, and picks it up when it's ready."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An electrician's example: water on a light or an outlet gets 'stay away from it, and don't touch the switch'."
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Nina says to keep it unplugged and bring it in as booked. Or you can move your visit, with no fee."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The lamp shop's plug-in adds its own: sparks, smoke or a burning smell."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My lamp sparked when I switched it on. Can I still come in?"
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "brass table lamp, new socket and cord, 3-way switch"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for a lamp that sparked: unplug it, and don't use it before it's fixed."
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "Some parts of the lamp are missing."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lamp rewire could mean a lamp shop or an electrician at home."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 bench check, then prices it"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "The shop's license, and each lamp tech's, only where the state asks."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop the lamp off and come back later?"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A new switch is on the price list: $20."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench vise scratched my lamp's base."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's lamp still flickers a little"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you fix holiday light strings too?"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks",
+    "Alex runs a vintage store, and asks for a repair slot every 4 weeks"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Floor lamp rewire"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a holiday light repair is $25"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a power outage or a lockout"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a lamp"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The lamp still flickers a little."
+   ],
+   [
+    "Color always stays with Riley",
+    "Antique lamps always stay with Nina"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Lamp rewire, new cord and new switch"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a lamp fixed on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero arreglar una lámpara el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a repair slot every 4 weeks"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A lamp rewire needs the lamp, with its shade and harp."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Nina sees the lamp"
+   ],
+   [
+    "like a skin-test result",
+    "like a part number"
+   ],
+   [
+    "Signature cut and shave",
+    "Floor lamp rewire"
+   ],
+   [
+    "signature cut and shave",
+    "floor lamp rewire"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Holiday light repair"
+   ],
+   [
+    "color and house calls",
+    "antique lamps and home visits"
+   ],
+   [
+    "pays for the consult",
+    "pays for the bench check"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 chandelier rewire"
+   ],
+   [
+    "The Groom's package",
+    "The chandelier rewire"
+   ],
+   [
+    "the Groom's package",
+    "the chandelier rewire"
+   ],
+   [
+    "photos of your hair",
+    "photos of your lamp"
+   ],
+   [
+    "Lee Home Services'",
+    "Highline Electric's"
+   ],
+   [
+    "Water heater flush",
+    "Generator tune-up"
+   ],
+   [
+    "color, house calls",
+    "antique lamps, home visits"
+   ],
+   [
+    "a color correction",
+    "a lamp repair"
+   ],
+   [
+    "Lee Home Services",
+    "Highline Electric"
+   ],
+   [
+    "like a burst pipe",
+    "like a power outage"
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't repair TVs."
+   ],
+   [
+    "Groom's package ·",
+    "Chandelier rewire ·"
+   ],
+   [
+    "Lee's Barbershop",
+    "Highline Lamps"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "Color correction",
+    "Lamp repair"
+   ],
+   [
+    "color correction",
+    "lamp repair"
+   ],
+   [
+    "Shorter is fine",
+    "I'll be there"
+   ],
+   [
+    "Gloss to finish",
+    "New harp"
+   ],
+   [
+    "Groom's package",
+    "Chandelier rewire"
+   ],
+   [
+    "a color and cut",
+    "an antique lamp restore"
+   ],
+   [
+    "Drain clearing",
+    "Outlet repair"
+   ],
+   [
+    "A water heater",
+    "An EV charger"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "groom's party",
+    "landlord's lamps"
+   ],
+   [
+    "Signature cut",
+    "Floor lamp rewire"
+   ],
+   [
+    "signature cut",
+    "floor lamp rewire"
+   ],
+   [
+    "Color and cut",
+    "Antique lamp restore"
+   ],
+   [
+    "color and cut",
+    "antique lamp restore"
+   ],
+   [
+    "Lee Plumbing",
+    "Highline Electric"
+   ],
+   [
+    "1200 Main St",
+    "940 High St"
+   ],
+   [
+    "Jordan Price",
+    "Darnell Cole"
+   ],
+   [
+    "water heater",
+    "EV charger"
+   ],
+   [
+    "Water heater",
+    "EV charger"
+   ],
+   [
+    "a beard trim",
+    "a new switch"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "Casey Moore",
+    "Wes Ortiz"
+   ],
+   [
+    "color quote",
+    "antique lamp quote"
+   ],
+   [
+    "$25 consult",
+    "$25 bench check"
+   ],
+   [
+    "a skin fade",
+    "a new cord and plug"
+   ],
+   [
+    "A skin fade",
+    "A new cord and plug"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Riley Chen",
+    "Nina Shaw"
+   ],
+   [
+    "Avery Diaz",
+    "Hank Webb"
+   ],
+   [
+    "does color",
+    "does antique lamps"
+   ],
+   [
+    "Beard trim",
+    "New switch"
+   ],
+   [
+    "beard trim",
+    "new switch"
+   ],
+   [
+    "patch test",
+    "parts check"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "barbershop",
+    "lamp shop"
+   ],
+   [
+    "Barbershop",
+    "Lamp shop"
+   ],
+   [
+    "color plan",
+    "repair plan"
+   ],
+   [
+    "Color plan",
+    "Repair plan"
+   ],
+   [
+    "88 Elm St",
+    "16 Canal St"
+   ],
+   [
+    "Skin fade",
+    "New cord and plug"
+   ],
+   [
+    "skin fade",
+    "new cord and plug"
+   ],
+   [
+    "Barbering",
+    "Lamp work"
+   ],
+   [
+    "MP045210",
+    "ME045210"
+   ],
+   [
+    "JP031552",
+    "JE031552"
+   ],
+   [
+    "plumbing",
+    "electrical"
+   ],
+   [
+    "Plumbing",
+    "Electrical"
+   ],
+   [
+    "kids cut",
+    "holiday light repair"
+   ],
+   [
+    "Haircuts",
+    "Lamp rewires"
+   ],
+   [
+    "haircuts",
+    "lamp rewires"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "a barber",
+    "a lamp tech"
+   ],
+   [
+    "EC22871",
+    "SC22871"
+   ],
+   [
+    "JE30417",
+    "SI30417"
+   ],
+   [
+    "BS20981",
+    "LS20981"
+   ],
+   [
+    "plumber",
+    "electrician"
+   ],
+   [
+    "Plumber",
+    "Electrician"
+   ],
+   [
+    "Haircut",
+    "Lamp rewire"
+   ],
+   [
+    "haircut",
+    "lamp rewire"
+   ],
+   [
+    "barbers",
+    "lamp techs"
+   ],
+   [
+    "the cut",
+    "the rewire"
+   ],
+   [
+    "Elm St",
+    "Canal St"
+   ],
+   [
+    "Jordan",
+    "Darnell"
+   ],
+   [
+    "a leak",
+    "a tripping breaker"
+   ],
+   [
+    "Faucet",
+    "Chandelier"
+   ],
+   [
+    "barber",
+    "lamp tech"
+   ],
+   [
+    "Barber",
+    "Lamp tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Casey",
+    "Wes"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Hank"
+   ],
+   [
+    "flush",
+    "tune-up"
+   ],
+   [
+    "A cut",
+    "A rewire"
+   ],
+   [
+    "gloss",
+    "new harp"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "a cut",
+    "a rewire"
+   ],
+   [
+    "cuts",
+    "rewires"
+   ],
+   [
+    "You told us the holiday light repair is for your son, and that you're his parent.",
+    "You told us it's for your son, and that you're his parent."
+   ],
+   [
+    "skin fades",
+    "lamp checks"
+   ],
+   [
+    "the way most barbershops start",
+    "the way most electricians start"
+   ],
+   [
+    "barbershops often set",
+    "electricians often set"
+   ],
+   [
+    "Alex picked a holiday light repair for a son before the times, so the times fit it.",
+    "Alex picked a lamp repair for a son, so the times fit it."
+   ],
+   [
+    "asks for a perm",
+    "asks for a spa treatment"
+   ],
+   [
+    "the cape clip ripped a shirt collar today",
+    "the cord ripped a sleeve today"
+   ],
+   [
+    "the way most barbershops set it",
+    "the way most electricians set it"
+   ],
+   [
+    "barbershops",
+    "electrical shops"
+   ],
+   [
+    "Kids cut",
+    "Kids room"
+   ],
+   [
+    "hot towel shaves",
+    "lamp rewires"
+   ]
+  ],
+  "B": [
+   [
+    "Panel upgrade",
+    "Solar install"
+   ],
+   [
+    "Lee Electric",
+    "Highline Solar"
+   ],
+   [
+    "electrical",
+    "solar"
+   ],
+   [
+    "Electrical",
+    "Solar"
+   ],
+   [
+    "Electric.",
+    "Natural gas."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Darnell finds scorched old wiring behind the kitchen wall. The plug-in says an electrician stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Get everyone out now, and don't touch the panel. Then call 911 from outside."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said an outlet sparked and smells burning. They got the safety message, and nothing was booked."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep away from the wet light and its switch. If she sees sparks or smells burning, she leaves and calls 911."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what's dead or tripping, which rooms, and if a breaker or a reset button was tried."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No toque la lámpara ni el interruptor. Si ve chispas o huele a quemado, salga y llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Leave that breaker off, and unplug what's on those outlets. If you smell burning, get out and call 911."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Dead outlets have a set price. Tripping breakers are priced at the visit. Sparks or a burning smell stop the booking."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My kitchen outlets went dead with a pop. Can an electrician come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't touch the light or its switch. If you see sparks or smell burning, get out and call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Highline Electric doesn't do, like a roof repair."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Darnell found scorched old wiring behind your kitchen wall and stopped that part of the work."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like sparks or a burning smell, gets the safety steps first."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company, and one for each electrician where the state asks."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a smoke alarm check at two rentals every 3 months."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Highline Electric sent you a proposal for new wiring, from Darnell's notes."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An electrician's example: water on a light or an outlet gets 'stay away from it, and don't touch the switch'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Water is dripping onto a ceiling light."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My panel got wet in a flood. Is it safe to turn the power back on?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: smoke, sparks, a burning smell, a hot panel or outlet, or a downed power line."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can an electrician fix a yard light this Thursday? What does it cost?"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your panel and where the charger goes, and an electrician will price the job."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE loose wire at the first outlet. Old wiring: check the panel next time."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Darnell finds why the breaker trips and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Darnell found why the breaker trips. Here's the price to fix it today."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The light is a wiring repair, quoted at the visit."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Darnell's next times for a bathroom light."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Darnell says no. Please leave it until he's there."
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to get out, then call 911 from outside"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Darnell also check the rest of the wiring?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Gotea agua sobre una lámpara del techo."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "OK: Darnell puts in the breaker today, $165."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace two scorched outlets"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you tune up my generator every year, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Darnell look at my bathroom light next week?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lamp rewire could mean a lamp shop or an electrician at home."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the kitchen lights are out now too."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Ve chispas o huele a quemado?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a flickering light."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Half the house lost power. Can someone come tonight?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Now the kitchen lights are out too."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scorch mark on the outlet, tile fine"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "The shop's license, and each lamp tech's, only where the state asks."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Darnell also look at a flickering light?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD scorched old wiring behind the kitchen wall, stopped"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I try resetting the breaker before you come?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Do you see sparks, or smell burning?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a path to your panel."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Darnell finds two scorched outlets."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The kitchen outlets go dead again 2 weeks later."
+   ],
+   [
+    "replacing the old pipes Jordan noted",
+    "replacing the old wiring Darnell noted"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My kitchen outlets are dead again."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 breaker 165 GFCI outlet 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the outlet on that wall. Its circuit is off and labeled."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Darnell left a mess by the panel."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Don't switch that circuit back on"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Floor lamp rewire"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Does the reset button on the outlet push in?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: scorched old wiring behind the wall"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa outlet Thu 12-2 Wes"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Darnell cracks a backsplash tile"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. No sparks, and no smell."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a power outage or a lockout"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly generator tune-up plan"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing both scorched outlets"
+   ],
+   [
+    "can cut your hair at the shop",
+    "can rewire your lamp at the counter"
+   ],
+   [
+    "Your drain is under warranty",
+    "Your outlet repair is under warranty"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Lamp rewire, new cord and new switch"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace both scorched outlets"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both scorched outlets"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 panel replacement, 3 stages"
+   ],
+   [
+    "$800 when the pipes are in",
+    "$800 when the new panel is in"
+   ],
+   [
+    "a water heater replacement",
+    "an EV charger install"
+   ],
+   [
+    "cuts a hand and texts HURT",
+    "hurts a hand and texts HURT"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Power out in half the house"
+   ],
+   [
+    "like an overflowing drain",
+    "like power out in half the house"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Scorched wiring behind the wall"
+   ],
+   [
+    "cracked the cabinet floor",
+    "cracked a backsplash tile"
+   ],
+   [
+    "water heater replacement",
+    "EV charger install"
+   ],
+   [
+    "Water heater replacement",
+    "EV charger install"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Darnell's notes"
+   ],
+   [
+    "A gas smell at the home",
+    "Sparks and a burning smell at the home"
+   ],
+   [
+    "sewer camera inspection",
+    "electrical safety inspection"
+   ],
+   [
+    "Sewer camera inspection",
+    "Electrical safety inspection"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW handyman work"
+   ],
+   [
+    "Just the kitchen sink.",
+    "The kitchen counter ones. The breakers look fine."
+   ],
+   [
+    "Under the sink, before",
+    "Panel, before"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Kitchen outlet repair"
+   ],
+   [
+    "replaces water heaters",
+    "installs EV chargers"
+   ],
+   [
+    "Replace the old pipes",
+    "Replace the old wiring"
+   ],
+   [
+    "Cabinet floor, before",
+    "Backsplash, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked backsplash tile"
+   ],
+   [
+    "color and house calls",
+    "antique lamps and home visits"
+   ],
+   [
+    "Drain clearing plans",
+    "Outlet repair plans"
+   ],
+   [
+    "a water heater flush",
+    "a generator tune-up"
+   ],
+   [
+    "leehomeservices.com",
+    "highlineelectric.com"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay chispas ni olor."
+   ],
+   [
+    "sewer camera report",
+    "safety inspection report"
+   ],
+   [
+    "Sewer camera report",
+    "Safety inspection report"
+   ],
+   [
+    "heating and cooling",
+    "handyman work"
+   ],
+   [
+    "Heating and cooling",
+    "Handyman work"
+   ],
+   [
+    "Lee Home Services'",
+    "Highline Electric's"
+   ],
+   [
+    "the shutoff valves",
+    "the two outlets"
+   ],
+   [
+    "water heater flush",
+    "generator tune-up"
+   ],
+   [
+    "Water heater flush",
+    "Generator tune-up"
+   ],
+   [
+    "color, house calls",
+    "antique lamps, home visits"
+   ],
+   [
+    "Lee Home Services",
+    "Highline Electric"
+   ],
+   [
+    "like a burst pipe",
+    "like a power outage"
+   ],
+   [
+    "yearly flush plan",
+    "yearly tune-up plan"
+   ],
+   [
+    "camera inspection",
+    "safety inspection"
+   ],
+   [
+    "Lee's Barbershop",
+    "Highline Lamp Shop"
+   ],
+   [
+    "$160 valve quote",
+    "$160 outlet quote"
+   ],
+   [
+    "a drain clearing",
+    "an outlet repair"
+   ],
+   [
+    "A drain clearing",
+    "An outlet repair"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 panel replacement"
+   ],
+   [
+    "clear the drain",
+    "fix the outlets"
+   ],
+   [
+    "Drain clearings",
+    "Outlet repairs"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 outlets"
+   ],
+   [
+    "drain cleaning",
+    "smoke alarm check"
+   ],
+   [
+    "drain clearing",
+    "outlet repair"
+   ],
+   [
+    "Drain clearing",
+    "Outlet repair"
+   ],
+   [
+    "The $179 drain",
+    "The $179 outlet repair"
+   ],
+   [
+    "a water heater",
+    "an EV charger"
+   ],
+   [
+    "A water heater",
+    "An EV charger"
+   ],
+   [
+    "plumbing visit",
+    "electrician visit"
+   ],
+   [
+    "shutoff valve",
+    "breaker"
+   ],
+   [
+    "Shutoff valve",
+    "Breaker"
+   ],
+   [
+    "kitchen drain",
+    "kitchen outlet repair"
+   ],
+   [
+    "Kitchen drain",
+    "Kitchen outlet repair"
+   ],
+   [
+    "a leak repair",
+    "a breaker repair"
+   ],
+   [
+    "A leak repair",
+    "A breaker repair"
+   ],
+   [
+    "camera report",
+    "inspection report"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Signature cut",
+    "Floor lamp rewire"
+   ],
+   [
+    "Lee Plumbing",
+    "Highline Electric"
+   ],
+   [
+    "1200 Main St",
+    "940 High St"
+   ],
+   [
+    "Jordan Price",
+    "Darnell Cole"
+   ],
+   [
+    "water heater",
+    "EV charger"
+   ],
+   [
+    "Water heater",
+    "EV charger"
+   ],
+   [
+    "Casey Moore",
+    "Wes Ortiz"
+   ],
+   [
+    "supply line",
+    "GFCI outlet"
+   ],
+   [
+    "Supply line",
+    "GFCI outlet"
+   ],
+   [
+    "leak repair",
+    "breaker repair"
+   ],
+   [
+    "Leak repair",
+    "Breaker repair"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Riley Chen",
+    "Nina Shaw"
+   ],
+   [
+    "Avery Diaz",
+    "Hank Webb"
+   ],
+   [
+    "valve work",
+    "outlet work"
+   ],
+   [
+    "yard drain",
+    "yard light line"
+   ],
+   [
+    "Yard drain",
+    "Yard light line"
+   ],
+   [
+    "does color",
+    "does antique lamps"
+   ],
+   [
+    "Beard trim",
+    "New switch"
+   ],
+   [
+    "beard trim",
+    "new switch"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "barbershop",
+    "lamp shop"
+   ],
+   [
+    "Barbershop",
+    "Lamp shop"
+   ],
+   [
+    "88 Elm St",
+    "16 Canal St"
+   ],
+   [
+    "42 Oak St",
+    "31 Birch Ln"
+   ],
+   [
+    "a plumber",
+    "an electrician"
+   ],
+   [
+    "MP045210",
+    "ME045210"
+   ],
+   [
+    "JP031552",
+    "JE031552"
+   ],
+   [
+    "the leak",
+    "the breaker"
+   ],
+   [
+    "plumbing",
+    "electrical"
+   ],
+   [
+    "Plumbing",
+    "Electrical"
+   ],
+   [
+    "plumbers",
+    "electricians"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "a barber",
+    "a lamp tech"
+   ],
+   [
+    "EC22871",
+    "SC22871"
+   ],
+   [
+    "JE30417",
+    "SI30417"
+   ],
+   [
+    "BS20981",
+    "LS20981"
+   ],
+   [
+    "a drain",
+    "an outlet repair"
+   ],
+   [
+    "plumber",
+    "electrician"
+   ],
+   [
+    "Plumber",
+    "Electrician"
+   ],
+   [
+    "Haircut",
+    "Lamp rewire"
+   ],
+   [
+    "haircut",
+    "lamp rewire"
+   ],
+   [
+    "barbers",
+    "lamp techs"
+   ],
+   [
+    "the cut",
+    "the rewire"
+   ],
+   [
+    "Elm St",
+    "Canal St"
+   ],
+   [
+    "Jordan",
+    "Darnell"
+   ],
+   [
+    "repipe",
+    "panel replacement"
+   ],
+   [
+    "Repipe",
+    "Panel replacement"
+   ],
+   [
+    "a leak",
+    "a tripping breaker"
+   ],
+   [
+    "Faucet",
+    "Chandelier"
+   ],
+   [
+    "barber",
+    "lamp tech"
+   ],
+   [
+    "Barber",
+    "Lamp tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Casey",
+    "Wes"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Hank"
+   ],
+   [
+    "drain",
+    "outlet repair"
+   ],
+   [
+    "flush",
+    "tune-up"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "cuts",
+    "rewires"
+   ],
+   [
+    "hot towel shaves",
+    "lamp rewires"
+   ],
+   [
+    "shave",
+    "rewire"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a dead outlet under my sink."
+   ],
+   [
+    "under the sink this morning",
+    "under the sink this morning"
+   ],
+   [
+    "It's a leak under the sink, today, arriving 3–5pm, with Wes.",
+    "It's a dead outlet under the sink, today, arriving 3–5pm, with Wes."
+   ],
+   [
+    "a neighbor's water line",
+    "a neighbor's panel"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a fixture check? Say so."
+   ],
+   [
+    "under my sink.",
+    "in my kitchen."
+   ],
+   [
+    "My sink won't outlet repair",
+    "My kitchen outlet is dead"
+   ],
+   [
+    "water damage under the sink this morning",
+    "a dead outlet in the kitchen this morning"
+   ],
+   [
+    "under the sink, today",
+    "in the kitchen, today"
+   ],
+   [
+    "Breaker and wall pipe",
+    "Breaker and wall box"
+   ],
+   [
+    "your new pipes are in",
+    "your new panel is in"
+   ],
+   [
+    "new pipes",
+    "new panel"
+   ],
+   [
+    "the way most barbershops start",
+    "the way most electricians start"
+   ],
+   [
+    "barbershops often set",
+    "electrical shops often set"
+   ],
+   [
+    "barbershops",
+    "electrical shops"
+   ]
+  ]
+ },
+ "cast": {
+  "A": {
+   "staff": "Nina and Hank (lamp techs at the counter)"
+  },
+  "B": {
+   "staff": "Darnell and Wes (electricians)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nina"
+  },
+  "B": {
+   "staff": "Darnell"
+  }
+ },
+ "keep": [
+  "electrical",
+  "electrician",
+  "service call",
+  "heater",
+  "water heater",
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings a flickering brass table lamp to the counter at Highline Lamp Shop, Sam's lamp and light repair shop, and Nina rewires it on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Highline Electric at 31 Birch Ln, and Darnell comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: dead kitchen outlets, a tripping breaker, a generator tune-up or an EV charger."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 lamp rewire at the counter. A card is saved for the shop's $20 fee, and Alex pays at the counter at pick-up.",
+    "list|none|counter": "A $20 new switch or socket at the counter: nothing is taken before; paid at the counter.",
+    "list|full|none": "A $55 floor lamp rewire, paid in full when booked.",
+    "photos|card|counter": "An antique lamp restore, priced from Alex's photos at $90. A card is saved for the $20 fee; paid at the counter.",
+    "visit|card|counter": "A lamp repair: only the $25 bench check is promised. A card is saved for the $20 fee; paid at the counter."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Lamp rewire"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Lamp rewire"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Floor lamp rewire",
+     "fee": "$20"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Antique lamp restore"
+    },
+    "visit|*|*": {
+     "price": "$25",
+     "name": "Lamp repair bench check"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "New switch or socket",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Floor lamp rewire",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Lamp rewire (plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "visit|card|bill",
+    "visit|none|bill",
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 kitchen outlet repair at Alex's home. A card is saved for the $89 service-call fee, and the bill is texted after the job.",
+    "list|none|bill": "A $179 yard light repair, nothing taken; the bill is texted after the job.",
+    "list|card|card": "A $179 light fixture swap. A card is saved for the $89 fee and charged $179 when Wes texts DONE.",
+    "visit|card|bill": "A breaker that keeps tripping: only the $89 service call is promised, and a card is saved for it.",
+    "visit|none|bill": "A wiring repair priced at the visit, nothing taken before; the bill is texted after.",
+    "photos|deposit|bill": "An EV charger install, quoted at $640. A 25% deposit ($160) holds the date once the quote is OK'd; the $480 rest is on the bill after the job.",
+    "list|full|none": "A generator tune-up, $150, paid in full when booked. A late cancel keeps only the $89 fee."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Service call"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Kitchen outlet repair"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Generator tune-up"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "EV charger install"
+    },
+    "visit|*|*": {
+     "price": "$89",
+     "name": "Breaker repair"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Yard light repair",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$179",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Generator tune-up",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Smoke and CO alarm check (plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-59",
+   "A7-15",
+   "A8-02",
+   "A8-53",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B4-81",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "B8-71",
+   "B8-65",
+   "B8-72",
+   "B10-29",
+   "B10-32"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "An electrician's video check shows a lamp or a dead outlet on the call. Nina says what to bring in, or if a home visit is needed."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say Alex's lamp sparks at home before the visit. The plug-in's danger words are checked first. Then Nina is asked if the visit can go ahead.",
+    "more": [
+     "A sign of danger gets the safety message first, like 'unplug it' or 'call 911'.",
+     "A light wired into the house that sparks needs an electrician at the home. That's a new booking with Highline Electric.",
+     "Nina asked for the move, so there's no fee.",
+     "A question only a pro should answer gets the shop's line, (555) 010-0177, and the visit stays booked."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "My lamp sparked when I switched it on. I unplugged it. Can I still bring it in Saturday?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. (Sat 11:00am) sent an update before the visit. It's on the secure page. Can the visit go ahead?",
+      {
+       "card": {
+        "title": "Alex M.'s update",
+        "lines": [
+         "On the secure page"
+        ]
+       },
+       "buttons": [
+        "Yes, come in",
+        "Better to move it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Nina wants to order a new socket first. Keep the lamp unplugged until then. Your visit can move, with no fee. Pick a new time:",
+      {
+       "times": [
+        "Sat Oct 31 · 11:00am · Nina",
+        "Tue Nov 3 · 11:00am · Nina"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "It can't be fixed safely",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.19",
+        "8.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Sat Oct 24, 11:15am",
+       "title": "Offers a new lamp, or hands it back",
+       "does": "Nina finds the lamp can't be rewired safely. Nothing is charged for the rewire. Alex picks a new lamp at the counter, or takes the old one back unplugged.",
+       "more": [
+        "A new lamp is sold at the shop's own price, once Alex says yes.",
+        "The old lamp goes back with a tag: not safe to plug in.",
+        "A light wired into the house is a home visit with Highline Electric, at the customer's place.",
+        "Sam sets any price for the time spent, as with a visit stopped early.",
+        "No answer: nothing more is done, and Alex takes the old lamp home, tagged."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "Alex M.'s lamp stem is cracked, and the wire inside is worn through. It can't be rewired safely."
+        ],
+        [
+         "san",
+         "cust",
+         "Nina found a crack in the lamp's metal stem, so it can't be rewired safely. Nothing is charged for the rewire. What would you like?",
+         {
+          "buttons": [
+           "A new lamp here",
+           "Take it back"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.services",
+        "pf.safety"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Electrical and lamp work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Electrical work books electricians, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Electrical work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Electrical work takes urgent jobs sent now, like a power outage after hours."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The counter books a lamp tech's time, or a drop-off slot for a chandelier. No class seats."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The counter books a lamp tech's time, or a drop-off slot for a chandelier. No spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at a lamp counter is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The counter's plug-in names no form to sign. Its first steps are a parts check, or the owner's OK."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Counter work is rated, like every repair."
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "The owner sets the daily number at sign-up. A full day isn't shown.",
+     "Pick-up comes once it's READY, in the pick-up hours.",
+     "At the counter, a chandelier left for a rewire is a drop-off: the shop takes a few a day."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The lamp counter bills no plan or insurance: the customer pays at the counter. A home warranty plan is checked only on a home visit (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The lamp counter bills no plan or insurance: the customer pays at the counter. A home warranty plan is checked only on a home visit (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A home electrician or a lamp counter never leaves a child; a parent stays."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B3-19",
+    "more": [
+     "A downed or sparking power line: stay at least 30 feet away, keep others away, and call the power company. Call 911 if anyone is hurt.",
+     "A booking can come later, once the fire department or the power company says it's safe."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-91",
+    "does": "Say half of Alex's home loses power at 6:40pm. The plug-in marks it urgent, and Sam has an electrician on call tonight. So the AI offers to send someone now, with an arrival estimate, not a window.",
+    "more": [
+     "After hours, the service call is $149, not $89. It's held the same way, not taken, and comes off the repair.",
+     "Flat-price jobs cost $60 more after hours. Alex sees the after-hours price before booking.",
+     "The electrician on call takes it once Alex books. If nobody does, anything held is released, and Alex is told.",
+     "Sam set who's on call with his team: open hours too, plus nights, weekends and holidays, with a backup.",
+     "Nobody on call right now: the soonest times show first, as for work that's never sent now.",
+     "Sparks, smoke or a burning smell is never sent now. It gets the 911 message first.",
+     "Where the state's rules limit prices in a declared emergency, those limits apply."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Half the house lost power. Can someone come tonight?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Highline Electric has an electrician on call tonight. Sent now, they'd arrive in about 60 to 90 minutes. After hours, the service call is $149, with a card saved for it and taken off the repair.",
+      {
+       "buttons": [
+        "Send someone now",
+        "See the soonest times"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-16",
+    "more": [
+     "Alex also gets the safety steps again: don't keep resetting breakers, and call 911 for sparks, smoke or a burning smell."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-21",
+    "more": [
+     "If Darnell marks a hazard Alex won't fix today, that circuit stays off and labeled. Alex gets a written safety note, kept with the job."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-39",
+    "more": [
+     "Where the state's rules require it, Darnell offers Alex the replaced parts before DONE. Alex's answer is kept with the job."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-30",
+    "more": [
+     "Sparks, smoke or a burning smell at the visit: Darnell gets everyone out and calls 911.",
+     "He shuts off the power at the panel only if it's safe. Nothing more is done that day."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Electrical and lamp work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Electrical work books electricians, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Electrical work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Electrical work takes urgent jobs sent now, like a power outage after hours."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Electrical work books an electrician in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in electrical work is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Electrical work at the home books an electrician in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "Electrical work is never with a child: the electrician waits for an adult on the booking."
+   }
+  ]
+ },
+ "notes": "Pilot: the plumber (pattern fix). An electrician runs the same way: a home visit in a 2-hour arrival window, the service call held and taken off the repair, a quote at the visit, permits, and someone on call after hours. Its counter side gives flow A. Unlike the plumber, the master's flow B story is plumbing, so every plumbing word there is renamed to electrical work (about 570 rename pairs, built the way the locksmith's are).\nFlow B: Lee Home Services becomes Highline Electric (the old flowchart's business); Jordan becomes Darnell and Casey becomes Wes (male names, since the master's texts say he and him for both); 42 Oak St becomes 31 Birch Ln.\nFlow B's services keep the master's numbers, one for one: the $179 drain clearing is a kitchen outlet repair (the old flowchart's dead kitchen outlets); the leak repair quoted at the visit is a breaker repair (a breaker that keeps tripping); the $150 water heater flush is a generator tune-up, also the yearly plan; the $640 water heater replacement from photos is an EV charger install (photos of the panel and the garage, a 25% deposit, a contract, a permit, delivery and setup); the $199/$249 sewer camera inspection is an electrical safety inspection with a report; the $2,400 repipe in 3 stages is a panel replacement from an estimate visit; the yard drain is a yard light line (outdoor, nobody home, a trencher, the weather); the faucet taken to the shop is a chandelier to rewire; the drying fan is a loaner generator; the shutoff valves are two scorched outlets; the drain trap is a light switch.\nThe master's second kind of work (electrical) becomes solar: Highline Solar, with a solar installer whose license is checked before it goes live. Solar is a common pair for electrical contractors, and it reads as a noun the way the master uses 'electrical'. The rename runs the master's electrical words first (to solar), then plumbing to electrical, so nothing is renamed twice.\nFlow A, the less usual side: Sam's second company (the master's Lee's Barbershop) is Highline Lamp Shop, a lamp and light repair counter where a customer brings a lamp, a chandelier or a fixture in. It loads the electrical plug-in's counter side. Riley becomes Nina (only Nina does antique lamps) and Avery becomes Hank; 88 Elm St becomes 16 Canal St.\nThe counter's example prices keep the master's amounts: lamp rewire $35, new cord and plug $40, new switch $20, holiday light repair $25, floor lamp rewire $55 (paid in full), chandelier rewire $140 (2½ hours: a card saved for the $40 fee, a $40 deposit, or a drop-off), antique lamp restore from photos $90, lamp repair priced at the counter after a $25 bench check, a home visit $75. These are examples, not facts about prices.\nThe master's barbershop words get their counter version: the patch test is a parts check (the antique lamp brought in first, so the right old-style parts can be ordered); color work is antique lamps; the perm the shop doesn't do is a TV repair; the gloss on a quote is a new harp; the cape clip is the bench vise; the towel steamer is the lamp tester.\nLamps at a counter are cord-and-plug work, not wiring in a building, so whether they're licensed is the state form's call. S1-63 and S2-28 keep both branches; the example state licenses the shop and each lamp tech, worded 'where Sam is'.\nSafety first (pf.safety): smoke, sparks, a burning smell or a hot panel, outlet or switch stops the booking (get everyone out, call 911 from outside, book again once the fire department says the home is safe). A downed power line: 30 feet away, the power company, 911 if it's sparking or anyone is hurt; damage on the house's side is booked once the power company makes it safe. Water near outlets, a light or the panel gets safety steps, then the booking goes on, marked urgent. A breaker that won't reset: don't keep resetting it.\nFlow B safety ops: the power line on B3-19 (more), the safety words again when nobody on call can come (B6-18 more), and sparks at the visit (B8-30 more). The master's own safety examples (Rosa's call, the problem that gets worse, the hazard behind the wall) are renamed to electrical ones: water dripping onto a ceiling light, kitchen lights going out too, scorched old wiring behind the kitchen wall with its circuit left off and labeled.\nA fix the customer declines for a hazard: the circuit stays off and labeled, and a written safety note goes out (B8-21 more, the plug-in). The master lacks this for every trade: gap.\nOld parts offered back, where the state's rules require it: B8-39 (more) and a pf.rules switch. Gap.\nPanel swaps: the permit to-do also asks for the power company's shut-off and turn-on dates (B4-42 more), and the power comes back on once the city passes it (B10-24 more). The master has the inspection, not the utility: gap.\nMoney, flow B: main list|hold|bill, the plug-in's starting answer (a card saved for the $89 service call fee, Rosie texts the bill). The old flowchart took nothing up front and sent a $95 fee by pay link, so list|none|bill and visit|none|bill are listed; with nothing taken the master charges no fee (S11-30), which is why the hold is the starting answer. list|card|bill, visit|card|bill and list|card|card are for owners who save a card; photos|deposit|bill is the EV charger; list|full|none is the generator tune-up. No deposit on visit-priced work, and no business's-own-way billing.\nMoney, flow A: the counter's set, as the plumber's: list|card|counter main, plus nothing taken, the $40 hold, the $40 deposit, the full price, priced from photos, and priced at the counter.\nThe old flowchart's $95 service call is the master's $89 here, so every sum and fee stays right.\nkeep: electrical and electrician (this profession's own words, which are also on the master's list of example words) and service call (the old flowchart's own word).\nPlug-in splits, the same decisions as the plumber's. Both flows: the $2, no added agreement, people not spaces, no classes, work sent now (an after-hours outage); the license splits S1-60, S1-63 and S2-28 kept whole. Flow A: walk-ins wait in a line or a drop-off is checked in at once; a lamp tech's time or a chandelier drop-off slot; adults only; no form, no damage hold, no crew, no date that can't move, no minimum; late means a shorter visit or the next open time; rated. Flow B: arrival windows only; own or rent asked; no damage hold at booking; one electrician by name or a crew of two; no group minimum; an adult must be there when a child answers.\nsplitsKept, flow A: S1-60, S1-63, S2-28; A7-59, S11-87, S11-90 (a chandelier drop-off names no lamp tech); A7-61 (antique lamps are Nina's alone); A8-02 (a rewire needs the lamp with its parts); A8-53 (the counter, or a drop-off). Flow B: S1-60, S1-63, S2-28; B4-81, B7-55, B8-58 (an after-hours outage is sent now, an EV charger never); B4-57 (a written contract over the state form's amount); B8-69, B8-70 (a yard light with nobody home); B8-71 (an EV charger delivered and set up); B8-65 (a panel replacement's inspection partway); B10-29 (the permit inspection after); B8-72 (a chandelier to the shop).\nFlow A ops: a video check (A4-36 more), a lamp that sparks at home before the visit (A7-13 words), a lamp that can't be rewired safely (A8-x01, a new branch on A8-32), a chandelier drop-off while Nina is out (A7-60 words) and the drop-off slots (A4-67). The rush (A4-29) and the landlord's five lamps (A4-32) are rename pairs on the master's own sentences, so they need no op.\nThe master's bigger job found at the visit (B8-27) is Alex asking about an EV charger at the outlet visit, priced from photos as its own job; on the EV charger path it's a panel too small for the charger ($900). The old flowchart's panel found at the visit is the master's estimate that becomes its own job (B8-62: Harper's $2,400 panel replacement).\nNo state is named: licenses (state, city or county), job-size limits, permits, lead-safe work, contracts and money before the work, deposit caps, one service charge, old parts, cancel days and emergency prices are switches filled from each state's form. The old flowchart's Ohio, Pennsylvania, California and Texas rules applied everywhere are OUTDATED.\nOutdated: Housecall Pro, Jobber, ServiceTitan, Rosie Book and Rosie Calendar as separate tools, and the QuickBooks export. Rosie is the business's software now; only the phone calendar and Stripe connect.\nReview (Oct 22): flow A's plan and insurance branches off at the counter (A4-28, A4-54, A7-02, A9-15: they showed an eye exam's lens fitting), and A10-06's rented items off; the plug-in's starting answers now name the saved card charged at DONE (B list|card|card) and, at the counter, nothing taken or a $40 deposit (A list|none|counter, list|deposit|counter); S11-58's second kind of work at the lamp shop is appliance repair.\nTouch-up Oct 22: the master's \"package cut\" now reads \"rewire from a package\" (A5-04, A5-13, A5-16), matching A5-03 (\"Uses a rewire from Alex's package\"), instead of \"package repair\".\ntouch-up 4 (Oct 23): keep 'heater': 'don't run two heaters on one circuit' is a real electrician's tip (space heaters trip breakers).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Panel upgrade",
+    "Lee Electric",
+    "electrical",
+    "Electrical",
+    "Electric.",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "#2 on the sides, scissors on top, low beard line",
+    "A barbershop has none, so nothing is sent here.",
+    "The signed form this service needs is missing.",
+    "A haircut could mean a salon or a barbershop.",
+    "Promises the $25 consult; priced at the chair",
+    "A license for the shop and for each barber.",
+    "Can my son wait in the shop during my cut?",
+    "A beard trim is on the price board: $20.",
+    "The cape clip ripped my shirt collar.",
+    "Saturday's cut is uneven on one side",
+    "Do you do kids cuts? My son is 8.",
+    "Alex asks for a cut every 4 weeks",
+    "Signature cut and hot towel shave",
+    "a Kids cut (12 and under) is $25",
+    "like a burst pipe or a lockout",
+    "like a 15-minute style consult",
+    "The cut is uneven on one side.",
+    "Color always stays with Riley",
+    "Haircut, fade and beard trim",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "once Riley sees the hair",
+    "like a skin-test result",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "color and house calls",
+    "pays for the consult",
+    "The Groom's package",
+    "the Groom's package",
+    "photos of your hair",
+    "Lee Home Services'",
+    "color, house calls",
+    "a color correction",
+    "Lee Home Services",
+    "like a burst pipe",
+    "doesn't do perms.",
+    "Groom's package ·",
+    "Lee's Barbershop",
+    "the shop's board",
+    "Color correction",
+    "color correction",
+    "Shorter is fine",
+    "Gloss to finish",
+    "Groom's package",
+    "a color and cut",
+    "Drain clearing",
+    "A water heater",
+    "rents a chair",
+    "groom's party",
+    "Signature cut",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "a beard trim",
+    "a house call",
+    "Casey Moore",
+    "color quote",
+    "$25 consult",
+    "a skin fade",
+    "A skin fade",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "Riley Chen",
+    "Avery Diaz",
+    "does color",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "house call",
+    "barbershop",
+    "Barbershop",
+    "color plan",
+    "Color plan",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "Barbering",
+    "MP045210",
+    "JP031552",
+    "plumbing",
+    "Plumbing",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "a barber",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "the cut",
+    "Elm St",
+    "Jordan",
+    "a leak",
+    "barber",
+    "Barber",
+    "chairs",
+    "Casey",
+    "Riley",
+    "Avery",
+    "A cut",
+    "gloss",
+    "chair",
+    "a cut",
+    "cuts",
+    "skin fades",
+    "asks for a perm",
+    "the cape clip ripped a shirt collar today",
+    "the way most barbershops set it",
+    "barbershops",
+    "Kids cut",
+    "hot towel shaves"
+   ],
+   "B": [
+    "Panel upgrade",
+    "Lee Electric",
+    "electrical",
+    "Electrical",
+    "Electric.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Jordan says no. Please wait until the job is done.",
+    "Told to leave, then call 911 and the gas company",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "A haircut could mean a salon or a barbershop.",
+    "Alex texts that the sink is now overflowing.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "It's overflowing. Can someone come tonight?",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "A license for the shop and for each barber.",
+    "Can Jordan also look at a dripping faucet?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Can I run the dishwasher before you come?",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "Jordan finds corroded shutoff valves.",
+    "The drain clogs again 2 weeks later.",
+    "replacing the old pipes Jordan noted",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Jordan cracks the cabinet floor",
+    "No. It doesn't smell like gas.",
+    "like a burst pipe or a lockout",
+    "Yearly water heater flush plan",
+    "replacing both shutoff valves",
+    "can cut your hair at the shop",
+    "Your drain is under warranty",
+    "Haircut, fade and beard trim",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "QUOTE 2400 repipe, 3 stages",
+    "$800 when the pipes are in",
+    "a water heater replacement",
+    "cuts a hand and texts HURT",
+    "Overflowing kitchen drain",
+    "like an overflowing drain",
+    "Mold behind the sink wall",
+    "cracked the cabinet floor",
+    "water heater replacement",
+    "Water heater replacement",
+    "Video and Jordan's notes",
+    "A gas smell at the home",
+    "sewer camera inspection",
+    "Sewer camera inspection",
+    "NEW heating and cooling",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Kitchen drain clearing",
+    "replaces water heaters",
+    "Replace the old pipes",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "color and house calls",
+    "Drain clearing plans",
+    "a water heater flush",
+    "leehomeservices.com",
+    "No. No huele a gas.",
+    "sewer camera report",
+    "Sewer camera report",
+    "heating and cooling",
+    "Heating and cooling",
+    "Lee Home Services'",
+    "the shutoff valves",
+    "water heater flush",
+    "Water heater flush",
+    "color, house calls",
+    "Lee Home Services",
+    "like a burst pipe",
+    "yearly flush plan",
+    "camera inspection",
+    "Lee's Barbershop",
+    "$160 valve quote",
+    "a drain clearing",
+    "A drain clearing",
+    "a $2,400 repipe",
+    "clear the drain",
+    "Drain clearings",
+    "DONE 179 drain",
+    "drain cleaning",
+    "drain clearing",
+    "Drain clearing",
+    "The $179 drain",
+    "a water heater",
+    "A water heater",
+    "plumbing visit",
+    "shutoff valve",
+    "Shutoff valve",
+    "kitchen drain",
+    "Kitchen drain",
+    "a leak repair",
+    "A leak repair",
+    "camera report",
+    "rents a chair",
+    "Lee Plumbing",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Water heater",
+    "Casey Moore",
+    "supply line",
+    "Supply line",
+    "leak repair",
+    "Leak repair",
+    "house calls",
+    "House calls",
+    "Price board",
+    "Riley Chen",
+    "Avery Diaz",
+    "valve work",
+    "yard drain",
+    "Yard drain",
+    "does color",
+    "beard trim",
+    "house call",
+    "barbershop",
+    "Barbershop",
+    "88 Elm St",
+    "42 Oak St",
+    "a plumber",
+    "MP045210",
+    "JP031552",
+    "the leak",
+    "plumbing",
+    "Plumbing",
+    "cut hair",
+    "a barber",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "a drain",
+    "plumber",
+    "Plumber",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "the cut",
+    "Elm St",
+    "Jordan",
+    "repipe",
+    "Repipe",
+    "a leak",
+    "barber",
+    "Barber",
+    "chairs",
+    "Casey",
+    "Riley",
+    "Avery",
+    "drain",
+    "flush",
+    "chair",
+    "cuts",
+    "hot towel shaves",
+    "shave",
+    "Hi, it's about a leaking pipe under my sink.",
+    "under the sink this morning",
+    "a neighbor's water line",
+    "Adding a faucet check? Say so.",
+    "under my sink.",
+    "water damage under the sink this morning",
+    "under the sink, today",
+    "your new pipes are in",
+    "new pipes",
+    "the way most barbershops start",
+    "barbershops often set",
+    "barbershops"
+   ]
+  },
+  "A": {
+   "A4-36": "f261af1660",
+   "A7-13": "e41528a397",
+   "A8-32": "632f2b5b40",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3",
+   "A4-14": "95c7ffcfab",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B3-19": "2f53161fb2",
+   "B4-91": "eb948968a8",
+   "B6-16": "d428d8c29e",
+   "B8-21": "43557106b2",
+   "B8-39": "aa75251207",
+   "B8-30": "a1ef4983e4",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d"
+  }
+ }
+}

@@ -1,0 +1,3484 @@
+{
+ "id": "rv-repair",
+ "name": "RV repair and service",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "auto-repair",
+ "plugin": {
+  "pf.license": {
+   "need": "if: where the state registers repair shops or certifies technicians; a propane (LP-gas) certificate where the state requires one; an EPA certificate for refrigerant work",
+   "ask": [
+    "The shop's repair-shop registration number, where the state has one",
+    "Each technician's certificates for the work they do: a propane certificate where the state requires one, and an EPA certificate for refrigerant work",
+    "Industry certificates (RV technician or inspector), shown only as what the business says"
+   ],
+   "who": "both: the shop, and each person",
+   "check": "the state's license lookup; where there's none, a person on Rosie's team checks within 1 business day",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "every_state": "refrigerant work (roof A/C, refrigerators, chassis A/C) only by a person with the EPA certificate for it",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "garage liability and coverage for customers' RVs in the shop's care, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'"
+  },
+  "pf.services": {
+   "pattern": "drop-off: the RV is left at the shop and picked up when it's ready (jobs can take days)",
+   "list": [
+    {
+     "name": "Diagnosis (A/C, refrigerator, furnace, water heater, slide-out, leveling jacks, electrical, leaks)",
+     "price": "one price (the example shop: $149), OK'd in writing on the drop-off page",
+     "length": "a set time, like 1 hour; more time is new work that needs a new yes",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Repair after a diagnosis",
+     "price": "quoted at the visit: a written estimate with the most it can cost, signed before any repair",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill Rosie texts with the ready text"
+    },
+    {
+     "name": "Battery check, tire pressure check, smoke and carbon monoxide alarm test, fuse and bulb swap, brake and bearing check, slide-out lube and check",
+     "price": "one price from the shop's board (the example shop: battery check $35)",
+     "length": "30 to 60 minutes; wait or drop off",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Water pump replacement, water heater service",
+     "price": "one price from the shop's list",
+     "length": "about 1 to 2 hours",
+     "place": "at the shop; also mobile"
+    },
+    {
+     "name": "Propane system leak test and safety check",
+     "price": "one price",
+     "length": "about 1 hour",
+     "place": "at the shop; also mobile"
+    },
+    {
+     "name": "Roof seal inspection and reseal",
+     "price": "inspection: one price; reseal: quoted from the roof's size, signed before the work",
+     "length": "an hour for the inspection; a reseal takes a day or two",
+     "place": "at the shop; also mobile (dry weather)"
+    },
+    {
+     "name": "Winterizing and de-winterizing",
+     "price": "one price, from the shop's list",
+     "length": "about 1 to 2 hours",
+     "place": "at the shop; also mobile"
+    },
+    {
+     "name": "Awning and body-part replacement",
+     "price": "quoted from photos; the parts are ordered after the deposit (the example: $640, $160 deposit)",
+     "length": "a few days to a few weeks, for the parts",
+     "place": "at the shop; also mobile"
+    },
+    {
+     "name": "Tow-in",
+     "price": "the tow's own price, booked with a towing company the customer picks, plus the diagnosis",
+     "place": "the RV arrives by tow at any time, keys in the key box"
+    },
+    {
+     "name": "Mobile RV repair (at a home, a storage lot or a campground)",
+     "price": "one price, quoted from photos and the RV's details, or quoted at the visit",
+     "place": "at the customer's place",
+     "before": "a card saved for the trip fee; nothing else taken",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    },
+    {
+     "name": "Pre-purchase or pre-trip inspection",
+     "price": "one price",
+     "place": "at the shop, or where the RV for sale is parked"
+    }
+   ],
+   "capacity": "a daily cap on diagnoses (the example shop: 3 a day); one bay and one technician per job; a length and height limit for the bays (the example shop: up to 40 feet and 13 feet)",
+   "drop_off_window": "drop-off slots by the shop's daily number (the example shop: 3 RVs a day), shown as drop-off times with no technician named; big rigs by appointment; plus an after-hours key box once the drop-off page is signed",
+   "living_in": "the shop's rule, set by the owner: nobody lives in the RV while it is at the shop, and pets are never left inside; the customer says where they will stay",
+   "loaners": "none: the shop lends no RVs",
+   "shuttle": "none",
+   "warranty": "on the receipt: 90 days on labor; parts as the maker covers them",
+   "nobody_home": "a mobile job on a parked RV can be done with nobody there: the keys or the lockbox are used as agreed, and DONE comes with a photo; at a campground, the campground's rules apply",
+   "online": "no"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What is the RV doing, and since when? In the customer's own words",
+    "Type (motorhome, travel trailer, fifth wheel, camper van), year, make and model",
+    "Length and height, and the mileage if it has an engine",
+    "Any propane smell, carbon monoxide alarm, burning smell or water near the wiring?",
+    "For a mobile job: where it's parked (home, storage lot, campground and site), and whether it has power and water hookups"
+   ],
+   "after_time": [
+    "Where will the customer stay while it's at the shop? Nobody stays in it, and no pets are left inside",
+    "Old parts back? Yes or no",
+    "Anything the technician should know, like when the leak or the noise happens"
+   ],
+   "secure_page_only": [
+    "The VIN",
+    "The campground gate code and the site, or the lockbox code",
+    "Someone else who may say yes to the estimate, named in writing"
+   ],
+   "who_may_book": "an adult: the RV's owner, or someone the owner lets bring it in; a renter or a borrower can book a diagnosis, but a repair needs the owner's yes, named in writing"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "a fire, or flames",
+    "a propane smell or hissing",
+    "a carbon monoxide alarm sounding",
+    "someone hurt or shocked"
+   ],
+   "stop_action": "'Get everyone out and away, and call 911' and the generic emergency steps; no booking",
+   "dont_drive_words": [
+    "brakes that grab or fail",
+    "a tire with a bulge, or tread coming off",
+    "a wheel that wobbles or smokes",
+    "smoke or steam from the engine",
+    "a burning smell or sparks from the wiring",
+    "a slide-out or step stuck out",
+    "a fuel leak or smell"
+   ],
+   "dont_drive_action": "Rosie says: park somewhere safe, switch the engine off, switch the power off where it is safe to, and don't drive or tow it. The booking can go on as a tow-in or a mobile visit.",
+   "mobile_stops": "a propane or fuel leak, no level and safe place to work, or a roof job in rain, wind or lightning: the technician stops, and the job moves to the shop or another day",
+   "can_continue": "yes, after the don't-drive steps"
+  },
+  "pf.first_steps": {
+   "required": "none before the visit; the diagnosis fee is OK'd in writing on the drop-off page when booking",
+   "at_check_in": [
+    "A recall check on the VIN",
+    "The walk-around, the odometer and the generator hours, and photos",
+    "The propane tanks shut at the valve"
+   ],
+   "prep_for_reminder": [
+    "Bring every key, including the compartment and storage-bay keys",
+    "Empty the refrigerator, and take out food, valuables and pets",
+    "Shut the propane tank valves",
+    "Know where you'll stay while it's in the shop",
+    "For a mobile job: level ground, power and water hookups if you have them, and room for the slide-outs"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "a drop-off: the customer gives the check-in code at the counter when leaving the RV. A key-box drop-off or a tow-in has no code: the technician texts IN once the RV and keys are found. Mobile: the code at the RV, as at any door.",
+   "intake": "the odometer and the generator hours, the keys, a walk-around with photos, the problem in the customer's words, old parts back or not, the propane tanks shut",
+   "recall_check": "the VIN is checked for open safety recalls at check-in; an open recall is told to the customer, and its fix is free at the maker's dealers",
+   "diagnosis": "the OK'd fee covers a set time; more time is new work that needs a new yes; no answer is never a yes",
+   "estimate": "written, with parts and labor lines, new or used, maker or aftermarket parts, and the most it can cost; signed before any repair",
+   "added_work": "anything over the signed estimate needs a new yes before it's done, logged with the time, the phone and the new total",
+   "status_words": [
+    "IN",
+    "DIAGNOSING",
+    "WAITING ON A YES",
+    "WAITING ON A PART",
+    "STARTED",
+    "READY"
+   ],
+   "ready": "READY texts the customer the total, the pick-up hours and any storage terms",
+   "pick_up": "the RV goes only to the customer, or someone they name; the work and any old parts are shown, with a water or leak test where it applies",
+   "done_proof": "the drop-off code, or IN, checks the RV in; READY and the pick-up close it",
+   "late_drop_off": "the shop's rule: diagnosed the same day if there's room, or else the next day",
+   "pick_up_and_delivery": "not offered: an RV arrives under its own power or by a tow the customer books"
+  },
+  "pf.money": {
+   "before": "the starting answer is nothing taken; the diagnosis fee is OK'd in writing, not charged; a special-order part (an awning) can take a deposit on a price set before the visit",
+   "after": "paid at the counter at pick-up, the shop's own way; or the bill Rosie texts with the ready text, if the owner turns it on",
+   "mobile": "a card saved for the trip fee, kept only for a late cancel or a no-show; the bill after DONE, or the saved card charged at DONE",
+   "deposit": "a parts deposit only on a price set before the visit; deposit cap: from the state form",
+   "storage": "a daily storage fee only after the free working days that follow the ready text, told before drop-off, and only once the owner confirms it; storage limits: from the state form",
+   "after_a_no": "after a no to the estimate, only the OK'd diagnosis, plus any putting-back-together the state's rules allow",
+   "fees": "no cancel or no-show fee to start at the shop; the mobile trip fee is the late-cancel and no-show fee",
+   "cancel": "free until the cutoff (the example: 2 days before); a late cancel or a no-show keeps only the trip fee on a mobile visit, and the owner can turn a shop fee on for long jobs",
+   "tips": "no tip line",
+   "tax": "the shop's tax rate on parts and labor",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "The VIN",
+    "The campground gate code or the lockbox code",
+    "The key-box code"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a teen's RV go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "diagnosis",
+    "roof and seals",
+    "slide-outs and leveling jacks",
+    "A/C and refrigeration",
+    "propane and appliances",
+    "12-volt and shore-power electrical",
+    "plumbing and tanks",
+    "brakes, axles and tires",
+    "inspections",
+    "mobile jobs"
+   ],
+   "licenses": "each technician's certificates for the work they do: a propane certificate where the state requires one; an EPA certificate for refrigerant work, in every state; industry certificates as the business says",
+   "supervision": "an apprentice works only while a certified technician who may supervise them is on, where the state's rules require it",
+   "who_oks": "the owner or the service writer OKs estimates, added work and storage fees",
+   "stand_in": "only someone certified for that kind of work"
+  },
+  "pf.rules": {
+   "written_estimate": "switch: a written estimate before work, above an amount: from the state form",
+   "written_ok_for_diagnosis": "switch: a written OK for the diagnosis fee: from the state form",
+   "overage": "Rosie's rule: never over the signed estimate without a new yes; no state leeway is used",
+   "choose_any_shop": "switch: a line saying the customer may pick any shop: from the state form",
+   "old_parts": "switch: offer the old parts back: from the state form; warranty or core-exchange parts are shown, not given",
+   "show_number": "switch: the shop's state number on estimates and receipts: from the state form",
+   "work_order": "switch: what the work order must carry, like the odometer and the problem in the customer's words: from the state form",
+   "storage_notice": "switch: storage terms told before drop-off, and the free days: from the state form",
+   "unclaimed_vehicle": "switch: the state's garage-lien and abandoned-vehicle steps; the owner runs them, and Rosie sends only the notices the owner OKs",
+   "propane_work": "propane system work and leak tests only by a person with the propane certificate, where the state requires one",
+   "recalls": "the maker's dealers fix open recalls for free; the shop tells the customer and doesn't do the recall work itself",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A no-show at drop-off: no fee to start",
+    "A late drop-off",
+    "The RV gets worse before drop-off: the don't-drive steps, then a tow-in or a mobile visit",
+    "More diagnosis time needed",
+    "No answer to the estimate",
+    "A no to the estimate",
+    "More work found, like rotted wood behind a leak",
+    "A part is late",
+    "Someone is living in the RV at drop-off",
+    "The RV isn't picked up: storage, then written notice",
+    "An open recall",
+    "The problem comes back under warranty",
+    "A charge questioned at pick-up"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "2 days before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Walt and Corinne (technicians)",
+   "other": "Others (a bank, a parent, the maker's dealer)"
+  },
+  "B": {
+   "staff": "Hal and Beth (technicians)",
+   "other": "Others (a bank, a landlord)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Walt"
+  },
+  "B": {
+   "staff": "Hal"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "would like to see your hair before pricing it",
+    "would like to see your RV before pricing it"
+   ],
+   [
+    "BS20918",
+    "EX-3318"
+   ],
+   [
+    "JE30417",
+    "EX-4417"
+   ],
+   [
+    "JP031552",
+    "EX-5521"
+   ],
+   [
+    "MP045201",
+    "EX-1043"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked the work for a son's RV, so the times fit it."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "You told us the work is on your son's RV, and that you're his parent."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Walt can look at the RV later today if there's room, or you can move to a later time. No reply by 11:00am means later today."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair. {{pay.asks}}. The rest is quoted at the chair, before any work.",
+    "Lee's RV Service prices a roof A/C repair at the counter, once Walt sees the RV. {{pay.asks}}. The rest is quoted at the counter, before any work."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Walt shows the work, with the old parts in a box. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My house battery keeps dying' fits a battery check."
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the RV's brakes start to grab before the drop-off, and the customer asks if they can still drive it in."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee's RV Service about your Sat 11:00am visit: please bring every key."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The brakes are grabbing now. Can I still drive it in?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring every key on Saturday."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My business pays for this repair."
+   ],
+   [
+    "A chair, ready",
+    "A service bay, ready"
+   ],
+   [
+    "Style consult",
+    "Free walk-around check"
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "Lee's RV Service: you now have two battery checks on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex asks for a full repaint, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "Alex M.'s price: $487 roof A/C repair and $96 slide-out seal treatment, $583 in all, the $149 diagnosis included. It goes to Sam first."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A repair's example: 'A long repair starts with a short pre-check. Had one here in the last 3 months?'"
+   ],
+   [
+    "Here they OK the $110 color correction and skip the $15 gloss. The $25 consult is part of the $110.",
+    "Here they OK the $487 roof A/C repair and skip the $96 slide-out seal treatment. The $149 diagnosis is part of the $487."
+   ],
+   [
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Done. Today: the roof A/C repair, $487. The $96 slide-out seal treatment price is good until Sat Oct 31."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood RV service shop on Quarry Rd. Diagnosis, roof and slide-out work, A/C, appliances and winterizing."
+   ],
+   [
+    "Riley's new price for today: $130. Nothing is done until you say yes.",
+    "Walt's new price for today: $507. Nothing is done until you say yes."
+   ],
+   [
+    "Alex M. asks for a toner instead of the gloss. What's the new price?",
+    "Alex M. asks for an awning lube instead of the slide-out seal treatment. What's the new price?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: new capacitor and fan motor in the roof A/C. Check the roof seals at the next visit."
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the roof A/C repair only, $487. No slide-out seal treatment today."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Repair estimates come to you first. Board prices never need one"
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 487 roof A/C repair + 96 slide-out seal treatment Alex M."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Walt do an awning lube instead of the slide-out seal treatment?"
+   ],
+   [
+    "quote 110 color correction + 20 toner",
+    "quote 487 roof A/C repair + 20 awning lube"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Roof A/C repair $487 · Slide-out seal treatment $96"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Slide-out seal treatment · $96"
+   ],
+   [
+    "Today's price · $130",
+    "Today's price · $507"
+   ],
+   [
+    "Toner · $20",
+    "Awning lube · $20"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds RV detailing to Lee's RV Service."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "RV detailing for Lee's RV Service: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW RV detailing"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's RV Service doesn't do body and paint work."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Mobile RV Repair and Lee RV Inspections."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una revisión de mi casa rodante el sábado."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "An RV service shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no technician. A day shows only if a technician with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's RV Service · drop-off"
+   ],
+   [
+    "$125",
+    "$583"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like the roof reseal Riley noted, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's RV Service sent you a proposal: the roof reseal Riley noted."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Roof reseal"
+   ],
+   [
+    "3 visits with Riley",
+    "One visit · about 2 days"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The work is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a drop-off time for the roof reseal:"
+   ],
+   [
+    "$110",
+    "$487"
+   ],
+   [
+    "Drain clearing",
+    "Water pump replacement"
+   ],
+   [
+    "home warranty plan",
+    "RV warranty plan"
+   ],
+   [
+    "home warranty",
+    "RV warranty"
+   ],
+   [
+    "a package of cuts",
+    "a package of inspections"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many RV service shops are registered at one address"
+   ],
+   [
+    "patch test",
+    "pre-check"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A roof repair could mean an RV shop or a roofing company."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "An RV shop's plug-in adds danger words, like a propane smell or a carbon monoxide alarm."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A mobile RV technician's example: a burning smell from the wiring gets 'switch the power off, and step outside'."
+   ],
+   [
+    "A barbershop's services need none.",
+    "An RV service shop needs none at booking: its written estimate comes after the diagnosis."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a rental fleet's RVs together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A rental company books battery checks for four RVs on one morning. Rosie finds bays side by side across Riley and Avery."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "There's a new scratch on the side panel."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says there's a new scratch on the side panel"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The roof A/C is warm again."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the roof A/C is warm again since Saturday's repair"
+   ],
+   [
+    "Riley looks, then prices it",
+    "Riley diagnoses, then writes the estimate"
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Diagnosis only; it goes back together"
+   ],
+   [
+    "Checks in a drop-off or mail-in",
+    "Checks in an RV left at the shop"
+   ],
+   [
+    "Follows up on an item left behind",
+    "Follows up on an RV left behind"
+   ],
+   [
+    "Electric.",
+    "A 2017 Class C motorhome."
+   ],
+   [
+    "Kids cut (12 and under)",
+    "tire pressure check"
+   ],
+   [
+    "a skin-test result",
+    "a recall check result"
+   ],
+   [
+    "color and house calls",
+    "appliance work and mobile visits"
+   ],
+   [
+    "color, house calls",
+    "appliance work, mobile visits"
+   ],
+   [
+    "does color",
+    "does appliance work"
+   ],
+   [
+    "Color always stays",
+    "Appliance work always stays"
+   ],
+   [
+    "Consult only",
+    "Diagnosis only"
+   ],
+   [
+    "photos of your hair",
+    "photos of the damage"
+   ],
+   [
+    "a cut on Saturday",
+    "a battery check on Saturday"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a rental RV check every 4 weeks"
+   ],
+   [
+    "a cut every 4 weeks",
+    "a rental RV check every 4 weeks"
+   ],
+   [
+    "for a staff cut",
+    "for a rental RV's battery check"
+   ],
+   [
+    "during my cut",
+    "during my battery check"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s job"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's RV Service"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile RV's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile RV"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile RV Repair and Lee RV Inspections"
+   ],
+   [
+    "electrical license",
+    "inspector certificate"
+   ],
+   [
+    "Electrical",
+    "RV inspections"
+   ],
+   [
+    "electrical",
+    "RV inspections"
+   ],
+   [
+    "plumber",
+    "technician"
+   ],
+   [
+    "Plumber",
+    "Technician"
+   ],
+   [
+    "Plumbing",
+    "Mobile RV repair"
+   ],
+   [
+    "plumbing",
+    "mobile RV repair"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A salon takes no drop-offs. An RV service shop, a tailor or a groomer does."
+   ],
+   [
+    "A barbershop",
+    "An RV service shop"
+   ],
+   [
+    "a barbershop",
+    "an RV service shop"
+   ],
+   [
+    "Barbershop",
+    "RV service shop"
+   ],
+   [
+    "barbershops",
+    "RV service shops"
+   ],
+   [
+    "barbershop",
+    "RV service shop"
+   ],
+   [
+    "Barber license",
+    "Technician certificate"
+   ],
+   [
+    "barbers",
+    "technicians"
+   ],
+   [
+    "Barbers",
+    "Technicians"
+   ],
+   [
+    "barber",
+    "technician"
+   ],
+   [
+    "Barber",
+    "Technician"
+   ],
+   [
+    "cut hair",
+    "fix RVs"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "EC22871",
+    "EX-2210"
+   ],
+   [
+    "BS20981",
+    "EX-3317"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Walt texts READY when Alex's RV is done. Alex hears what was done, the pick-up hours, and anything due."
+   ],
+   [
+    "READY Sofia G. Photo added.",
+    "READY Alex M."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your RV is ready for pick-up at Lee's RV Service."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Mon to Sat, 8am to 5pm"
+   ],
+   [
+    "4471",
+    "7420"
+   ],
+   [
+    "Sofia",
+    "Alex"
+   ],
+   [
+    "Riley",
+    "Walt"
+   ],
+   [
+    "Avery",
+    "Corinne"
+   ],
+   [
+    "Jordan",
+    "Hal"
+   ],
+   [
+    "Casey",
+    "Beth"
+   ],
+   [
+    "88 Elm St",
+    "1400 Quarry Rd"
+   ],
+   [
+    "Elm St",
+    "Quarry Rd"
+   ],
+   [
+    "Oak St",
+    "Maple Ct"
+   ],
+   [
+    "1200 Main St",
+    "22 Depot St"
+   ],
+   [
+    "Haircuts",
+    "Battery checks"
+   ],
+   [
+    "haircuts",
+    "battery checks"
+   ],
+   [
+    "A haircut",
+    "A battery check"
+   ],
+   [
+    "a haircut",
+    "a battery check"
+   ],
+   [
+    "Haircut",
+    "Battery check"
+   ],
+   [
+    "haircut",
+    "battery check"
+   ],
+   [
+    "kids cuts",
+    "tire pressure checks"
+   ],
+   [
+    "a kids cut",
+    "a tire pressure check"
+   ],
+   [
+    "Kids cut",
+    "Tire pressure check"
+   ],
+   [
+    "kids cut",
+    "tire pressure check"
+   ],
+   [
+    "Skin fade",
+    "Brake and bearing check"
+   ],
+   [
+    "skin fade",
+    "brake and bearing check"
+   ],
+   [
+    "fade",
+    "brake and bearing check"
+   ],
+   [
+    "Beard trim",
+    "Fuse and bulb swap"
+   ],
+   [
+    "beard trim",
+    "fuse and bulb swap"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Slide-out lube and check"
+   ],
+   [
+    "Signature cut and shave",
+    "Slide-out lube and check"
+   ],
+   [
+    "Signature cut",
+    "Slide-out lube and check"
+   ],
+   [
+    "signature cut",
+    "slide-out lube and check"
+   ],
+   [
+    "Groom's package",
+    "Winterizing"
+   ],
+   [
+    "Color and cut",
+    "New awning"
+   ],
+   [
+    "color and cut",
+    "new awning"
+   ],
+   [
+    "Color correction",
+    "Roof A/C repair"
+   ],
+   [
+    "color correction",
+    "roof A/C repair"
+   ],
+   [
+    "color quote",
+    "repair estimate"
+   ],
+   [
+    "$25 consult",
+    "$149 diagnosis"
+   ],
+   [
+    "Only the consult",
+    "Only the diagnosis"
+   ],
+   [
+    "the consult",
+    "the diagnosis"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the job?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the shop"
+   ],
+   [
+    "priced at the chair",
+    "priced at the shop"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "chairs",
+    "bays"
+   ],
+   [
+    "House calls",
+    "Mobile visits"
+   ],
+   [
+    "house calls",
+    "mobile visits"
+   ],
+   [
+    "a house call",
+    "a mobile visit"
+   ],
+   [
+    "House call",
+    "Mobile visit"
+   ],
+   [
+    "house call",
+    "mobile visit"
+   ],
+   [
+    "water heaters",
+    "roof A/C units"
+   ],
+   [
+    "water heater",
+    "roof A/C unit"
+   ],
+   [
+    "Panel upgrade",
+    "Pre-purchase RV inspection"
+   ],
+   [
+    "like a burst pipe",
+    "like a car that won't start"
+   ]
+  ],
+  "B": [
+   [
+    "BS20918",
+    "EX-3318"
+   ],
+   [
+    "JE30417",
+    "EX-4417"
+   ],
+   [
+    "JP031552",
+    "EX-5521"
+   ],
+   [
+    "MP045201",
+    "EX-1043"
+   ],
+   [
+    "service-call fee",
+    "trip fee"
+   ],
+   [
+    "Service-call fee",
+    "Trip fee"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a propane supplier first"
+   ],
+   [
+    "a customer's AI said they smell gas",
+    "a customer's AI said they smell propane"
+   ],
+   [
+    "A gas smell at the home",
+    "A propane smell at the RV"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to get everyone out, then call 911 and the gas supplier"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a propane smell, hissing or a carbon monoxide alarm."
+   ],
+   [
+    "like new pipes put in one day and finished another",
+    "like a roof replacement started one day and finished another"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you inspect my roof seals every year, too?"
+   ],
+   [
+    "a yearly flush plan",
+    "a yearly roof seal plan"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a new scratch on the side panel this morning."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my RV."
+   ],
+   [
+    "Water pressure check",
+    "Free walk-around check"
+   ],
+   [
+    "A chair, ready",
+    "A service bay, ready"
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like bypassing a gas safety shut-off. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note."
+   ],
+   [
+    "Only where the plug-in sends this work now, like an overflowing drain at night: Alex takes 'Send someone now'. The booking is marked sent now, with an arrival estimate, not a window.",
+    "Only where the plug-in sends this work now, like a furnace that won't light in freezing weather: Alex takes 'Send someone now'. The booking is marked sent now, with an arrival estimate, not a window."
+   ],
+   [
+    "Lee Home Services: you have two drain clearings on Mon Nov 9. They're at 10am–12pm and 12–2pm. Keep both, or was that the same visit? No reply by 6:00pm Sun Nov 8: we keep 10am–12pm.",
+    "Lee Mobile RV: you have two water pump replacements on Mon Nov 9. They're at 10am–12pm and 12–2pm. Keep both, or was that the same visit? No reply by 6:00pm Sun Nov 8: we keep 10am–12pm."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Jordan scratches the side panel and texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds a propane leak at a fitting. The plug-in says a technician stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My pump runs, but no water' fits a water pump replacement."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what RV it is, what it's doing, and where it's parked."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 water pump replacement needs none."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a propane leak at a fitting and stopped that part of the work. Please keep the propane off until it's fixed."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a water filter check? Say so.'"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood RV service shop on Quarry Rd. Diagnosis, roof and slide-out work, A/C, appliances and winterizing."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my water pump. A text back is fine."
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the roof sealant only, $165. Leave the vent seal."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD propane leak at a fitting, stopped"
+   ],
+   [
+    "Sent now · Overflowing kitchen drain",
+    "Sent now · Furnace won't light"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Roof sealant and edge trim replacement · $540"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the propane fitting"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a propane leak at a fitting"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Propane leak at a fitting"
+   ],
+   [
+    "Yes, it won't drain",
+    "In the driveway, level, with power on"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds RV detailing to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "RV detailing for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW RV detailing"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I run the generator before you come?"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Mobile RV Repair and Lee RV Inspections."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's RV Service can check your battery at the shop for $35, or at your home for $75."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's bay is in the other flow."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 roof membrane replacement, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Mobile RV's quote for your roof membrane replacement."
+   ],
+   [
+    "Repipe · $2,400",
+    "Roof membrane replacement · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the new roof membrane is on, $800 at the finish"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 roof membrane replacement"
+   ],
+   [
+    "of your repipe",
+    "of your roof membrane replacement"
+   ],
+   [
+    "repipe",
+    "roof membrane replacement"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both rental RVs' visits go on one bill on the 1st."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like resealing the roof Jordan noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Mobile RV sent you a proposal for a roof reseal, from Jordan's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Reseal the roof"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan look at my tow vehicle next week?"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left grease on the carpet."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My water pump runs, but no water comes out."
+   ],
+   [
+    "Just the kitchen sink.",
+    "A 2017 Class C motorhome. Since last week."
+   ],
+   [
+    "a leak under the sink",
+    "a leak under the RV"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please level the RV and leave room around the slide-out."
+   ],
+   [
+    "a drain cleaning at two rentals",
+    "a battery check for two rental RVs"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's battery check"
+   ],
+   [
+    "clear a yard drain",
+    "service an RV parked at a campsite"
+   ],
+   [
+    "Yard drain",
+    "Campsite RV"
+   ],
+   [
+    "yard drain",
+    "campsite RV"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa pump"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Water pump replacement"
+   ],
+   [
+    "Kitchen drain",
+    "Water pump"
+   ],
+   [
+    "Drain clearing",
+    "Water pump replacement"
+   ],
+   [
+    "drain clearing",
+    "water pump replacement"
+   ],
+   [
+    "clear the drain",
+    "replace the water pump"
+   ],
+   [
+    "your new pipes are in",
+    "your new roof membrane is on"
+   ],
+   [
+    "a roof leak",
+    "a torn awning"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Jordan's notes"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds a cracked water pump housing."
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "replace the pump housing, cracked"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the pump housing"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the pump housing"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing the pump housing"
+   ],
+   [
+    "shutoff valves",
+    "pump housing"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a campground books the same job for 4 RVs at one park."
+   ],
+   [
+    "Each unit's notes",
+    "Each RV's notes"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow RV Care, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "RV warranty plan"
+   ],
+   [
+    "home warranty",
+    "RV warranty"
+   ],
+   [
+    "supply house",
+    "parts store"
+   ],
+   [
+    "Rental 1",
+    "RV 1"
+   ],
+   [
+    "Rental 2",
+    "RV 2"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the side panel"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched side panel"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan scratched the side panel on Alex M.'s RV. The before photo shows no scratch."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the roof A/C now smells like burning."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The roof A/C smells like burning now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Please switch the A/C and the power off, and don't use them. Step outside if the smell grows."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a propane smell or burning wiring, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The water pump stops again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My water pump stopped again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s water pump, replaced Thu Oct 22, stopped again."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your water pump is under warranty"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It's getting worse. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also check an RV I want to buy?"
+   ],
+   [
+    "$160 valve quote",
+    "$160 pump housing quote"
+   ],
+   [
+    "$160 valve work",
+    "$160 pump housing work"
+   ],
+   [
+    "a bathroom drain",
+    "your other RV"
+   ],
+   [
+    "Drain clearings",
+    "Water pump replacements"
+   ],
+   [
+    "kitchen drain",
+    "water pump"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The leak repair is priced at the visit."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many RV service shops are registered at one address"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A roof repair could mean an RV shop or a roofing company."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A mobile RV technician's example: a burning smell from the wiring gets 'switch the power off, and step outside'."
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? El aire acondicionado del techo está goteando adentro."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? The roof air conditioner is dripping inside."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to switch the A/C off, and to leave and call 911 if there's a gas or burning smell."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas o a quemado?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Do you smell gas or burning?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No huele a gas ni a quemado."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no gas or burning smell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Apague el aire acondicionado y no toque las salidas mojadas. Si huele a gas o a quemado, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Switch the A/C off, and keep away from any wet outlet. If you smell gas or burning, get out and call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For RV repair, a propane smell, hissing or a carbon monoxide alarm stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If you smell propane, get everyone out of the RV now. Then call 911 and the gas supplier."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My RV's furnace got wet in a flood. Is it safe to turn back on?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "what RV is it, and does the pump run?"
+   ],
+   [
+    "Electric.",
+    "A 2017 Class C motorhome."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Where is the RV parked?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scratch on the rear corner. Odometer 41,300."
+   ],
+   [
+    "Under the sink, before",
+    "Rear corner, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Dashboard, before"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 water pump"
+   ],
+   [
+    "245 valve 165 supply line 80",
+    "245 roof sealant 165 vent seal 80"
+   ],
+   [
+    "Shutoff valve",
+    "Roof sealant"
+   ],
+   [
+    "Supply line",
+    "Vent seal"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE roof sealant is cracking. Check it at the next visit."
+   ],
+   [
+    "1-year labor warranty",
+    "90-day labor warranty"
+   ],
+   [
+    "a dripping faucet",
+    "a roof leak"
+   ],
+   [
+    "color and house calls",
+    "appliance work and mobile visits"
+   ],
+   [
+    "color, house calls",
+    "appliance work, mobile visits"
+   ],
+   [
+    "does color",
+    "does appliance work"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's RV Service"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile RV's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile RV"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilerv.com"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile RV Repair and Lee RV Inspections"
+   ],
+   [
+    "plumbing license",
+    "repair registration"
+   ],
+   [
+    "Plumbing license",
+    "Repair registration"
+   ],
+   [
+    "electrical license",
+    "inspector certificate"
+   ],
+   [
+    "Electrical license",
+    "Inspector certificate"
+   ],
+   [
+    "Electrical",
+    "RV inspections"
+   ],
+   [
+    "electrical",
+    "RV inspections"
+   ],
+   [
+    "plumber",
+    "technician"
+   ],
+   [
+    "Plumber",
+    "Technician"
+   ],
+   [
+    "Plumbing",
+    "Mobile RV repair"
+   ],
+   [
+    "plumbing",
+    "mobile RV repair"
+   ],
+   [
+    "A barbershop",
+    "An RV service shop"
+   ],
+   [
+    "a barbershop",
+    "an RV service shop"
+   ],
+   [
+    "Barbershop",
+    "RV service shop"
+   ],
+   [
+    "barbershops",
+    "RV service shops"
+   ],
+   [
+    "barbershop",
+    "RV service shop"
+   ],
+   [
+    "barbers",
+    "technicians"
+   ],
+   [
+    "Barbers",
+    "Technicians"
+   ],
+   [
+    "barber",
+    "technician"
+   ],
+   [
+    "Barber",
+    "Technician"
+   ],
+   [
+    "cut hair",
+    "fix RVs"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "EC22871",
+    "EX-2210"
+   ],
+   [
+    "BS20981",
+    "EX-3317"
+   ],
+   [
+    "Riley",
+    "Walt"
+   ],
+   [
+    "Avery",
+    "Corinne"
+   ],
+   [
+    "Jordan",
+    "Hal"
+   ],
+   [
+    "Casey",
+    "Beth"
+   ],
+   [
+    "88 Elm St",
+    "1400 Quarry Rd"
+   ],
+   [
+    "Elm St",
+    "Quarry Rd"
+   ],
+   [
+    "42 Oak St",
+    "14 Maple Ct"
+   ],
+   [
+    "Oak St",
+    "Maple Ct"
+   ],
+   [
+    "1200 Main St",
+    "22 Depot St"
+   ],
+   [
+    "A haircut",
+    "A battery check"
+   ],
+   [
+    "a haircut",
+    "a battery check"
+   ],
+   [
+    "Haircut",
+    "Battery check"
+   ],
+   [
+    "haircut",
+    "battery check"
+   ],
+   [
+    "fade",
+    "brake and bearing check"
+   ],
+   [
+    "beard trim",
+    "fuse and bulb swap"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "chairs",
+    "bays"
+   ],
+   [
+    "House calls",
+    "Mobile visits"
+   ],
+   [
+    "house calls",
+    "mobile visits"
+   ],
+   [
+    "House call",
+    "Mobile visit"
+   ],
+   [
+    "house call",
+    "mobile visit"
+   ],
+   [
+    "Water heater flush",
+    "Roof seal inspection"
+   ],
+   [
+    "water heater flush",
+    "roof seal inspection"
+   ],
+   [
+    "Water heater replacement",
+    "New awning"
+   ],
+   [
+    "water heater replacement",
+    "new awning"
+   ],
+   [
+    "water heaters",
+    "roof A/C units"
+   ],
+   [
+    "Water heater",
+    "Roof A/C unit"
+   ],
+   [
+    "water heater",
+    "roof A/C unit"
+   ],
+   [
+    "the heater",
+    "the roof A/C unit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Roof moisture scan"
+   ],
+   [
+    "sewer camera inspection",
+    "roof moisture scan"
+   ],
+   [
+    "Sewer camera report",
+    "Roof moisture scan report"
+   ],
+   [
+    "sewer camera report",
+    "roof moisture scan report"
+   ],
+   [
+    "camera inspection",
+    "roof moisture scan"
+   ],
+   [
+    "camera report",
+    "roof moisture scan report"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Panel upgrade",
+    "Pre-purchase RV inspection"
+   ],
+   [
+    "under my sink",
+    "under my RV"
+   ],
+   [
+    "under the sink",
+    "under the RV"
+   ],
+   [
+    "like a burst pipe",
+    "like a car that won't start"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 vent seal stays good until Thu Oct 29."
+   ],
+   [
+    "shutoff valve",
+    "roof sealant"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off slot at Lee's RV Service for an RV whose roof A/C blows warm, Sat Oct 24. Walt diagnoses it, and the repair is done only once Alex signs the written estimate. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile RV to fix the RV at home, at 14 Maple Ct, and Hal comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: a water pump, a roof leak, or a new awning."
+ },
+ "money": {
+  "A": {
+   "main": "visit|none|counter",
+   "combos": [
+    "visit|none|counter",
+    "list|none|counter",
+    "visit|none|bill",
+    "list|none|bill"
+   ],
+   "examples": {
+    "visit|none|counter": "The main story: an RV whose roof A/C blows warm. Only the $149 diagnosis is promised, OK'd on the drop-off page. The repair waits for Alex's signed estimate, and Alex pays at the counter at pick-up.",
+    "list|none|counter": "A $35 battery check from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "visit|none|bill": "The roof A/C repair, with the bill texted once the RV is ready, so Alex can pay before pick-up.",
+    "list|none|bill": "A $35 battery check, dropped off before work. Rosie texts the bill when it's ready."
+   },
+   "amounts": {
+    "*": {
+     "name": "Battery check"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Battery check"
+    },
+    "visit|*|*": {
+     "fee": "$149",
+     "name": "Roof A/C diagnosis and repair"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Awning lube",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Slide-out lube and check",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$55"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Battery check (pack)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "visit|card|bill",
+    "list|card|card",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 water pump replacement at Alex's home. A card is saved for the $89 trip fee, and nothing is taken. Rosie texts the bill after the job.",
+    "visit|card|bill": "A roof leak, priced at the visit. Only the $89 trip fee is promised, with a card saved for it.",
+    "list|card|card": "A $179 water pump replacement. A card is saved, and it's charged when Hal texts DONE.",
+    "photos|deposit|bill": "A new awning, priced from photos at $640. Sam OKs it. A $160 deposit now for the parts, and the rest on the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Water pump replacement"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Water pump replacement"
+    },
+    "visit|*|*": {
+     "name": "Leak repair"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "New awning"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "New awning"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Roof seal inspection",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$150"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Pre-purchase RV inspection",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$199"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Water pump replacement (pack)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "keep": [
+  "flush",
+  "leak",
+  "valve",
+  "drips",
+  "Trip fee",
+  "trip fee",
+  "Towing",
+  "towing"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-03",
+    "more": [
+     "For an RV service shop, the parts also hold its drop-off window and its daily cap on diagnoses."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "For a drop-off, Alex gives the code at the counter when leaving the RV. After hours, the keys go in the key box instead."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-11",
+    "more": [
+     "For an RV, Walt's status words are IN, DIAGNOSING, WAITING ON A PART and READY.",
+     "Nothing over the signed estimate is done without a new yes. The signed repair goes on while the added work waits."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "type": "split",
+      "line": [
+       "8.3",
+       "7.13"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 11:10am",
+      "title": "Walt checks the RV for open recalls",
+      "q": "Any open safety recall?",
+      "does": "Walt runs the RV's VIN on the maker's recall lookup. The plug-in asks for this at every check-in.",
+      "more": [
+       "Recall fixes are free at the maker's dealers. The shop tells Alex, and doesn't do the recall work itself.",
+       "Where the state's rules require it, the check is noted on the work order."
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "None open",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "One open",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x02",
+          "line": [
+           "7.13",
+           "4.26"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Tells Alex about the open recall",
+          "does": "The maker has an open safety recall on this RV. Alex hears about it today, and where to get it fixed for free.",
+          "more": [
+           "Today's work goes on as booked.",
+           "Rosie names the kind of place, the maker's dealer, never a company."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "One more thing: the maker has an open safety recall on your RV.",
+            {
+             "card": {
+              "title": "Open safety recall",
+              "lines": [
+               "Fixed for free at the maker's dealers",
+               "Today's work goes on as booked"
+              ],
+              "button": "See the recall",
+              "link": "rosfield.com/n/a7"
+             }
+            }
+           ]
+          ],
+          "needs": [
+           "pf.visit"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A8-25",
+    "steps": [
+     {
+      "id": "A8-x03",
+      "type": "split",
+      "line": [
+       "8.7",
+       "8.8"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 11:30am",
+      "title": "Walt diagnoses within the OK'd hour",
+      "q": "Found within the OK'd hour?",
+      "does": "The $149 Alex OK'd covers 1 hour of diagnosis. Walt texts DIAGNOSING, and finds a bad capacitor and fan motor in the roof A/C.",
+      "more": [
+       "More time is new work. It needs Alex's yes first, and no answer is never a yes.",
+       "The plug-in sets the time the diagnosis fee covers."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "DIAGNOSING Alex M."
+       ],
+       [
+        "san",
+        "cust",
+        "Walt is diagnosing your RV now. You'll get a written estimate before any repair."
+       ]
+      ],
+      "needs": [
+       "visit_fee",
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Yes: found in time",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Needs more time",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x04",
+          "type": "split",
+          "line": [
+           "8.8",
+           "8.9"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Asks Alex before more diagnosis",
+          "q": "Does Alex OK more time?",
+          "does": "Walt needs about 1 more hour to find the cause. Alex says yes before any more time is spent.",
+          "more": [
+           "Alex's yes is logged with the time and the phone it came from.",
+           "No answer in 1 hour counts as no."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Walt needs about 1 more hour to find what's wrong with your RV. Nothing more is done without your OK.",
+            {
+             "card": {
+              "title": "More diagnosis · $160",
+              "lines": [
+               "About 1 more hour",
+               "Or stop now: you pay the $149"
+              ]
+             },
+             "buttons": [
+              "Yes, go on",
+              "Stop here"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Yes, go on",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Stop, or no reply in 1 hour",
+            "end": "end",
+            "endText": "Diagnosis stops at the hour. Alex pays the $149 at pick-up, and the RV comes back as it was.",
+            "steps": [
+             {
+              "id": "A8-x05",
+              "line": [
+               "8.19"
+              ],
+              "who": "san",
+              "to": "owner",
+              "via": "msg",
+              "title": "Stops at the hour; tells Sam and Alex",
+              "does": "Alex didn't OK more time, so Walt stops at the hour. The RV goes back together, and Alex owes only the $149.",
+              "say": [
+               [
+                "san",
+                "owner",
+                "Alex M. didn't OK more diagnosis, so Walt stopped at the hour.",
+                {
+                 "card": {
+                  "title": "Alex M. · diagnosis stopped",
+                  "lines": [
+                   "$149 owed at pick-up",
+                   "RV back together, not repaired"
+                  ]
+                 }
+                }
+               ],
+               [
+                "san",
+                "cust",
+                "Walt stopped at the hour, as you chose. Your RV is ready to pick up, not repaired.",
+                {
+                 "card": {
+                  "title": "Ready · not repaired",
+                  "lines": [
+                   "$149 diagnosis, at the counter",
+                   "Open until 5pm"
+                  ]
+                 }
+                }
+               ]
+              ],
+              "tells": [
+               "owner",
+               "cust"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "A part is late",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x09",
+       "line": [
+        "7.17",
+        "8.16"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "title": "Walt says a part is late",
+       "does": "The fan motor Walt ordered comes Monday, so the RV won't be ready today. Alex gets the new ready time.",
+       "more": [
+        "A moved ready time is always sent, with the new time.",
+        "Storage never starts while the shop waits on a part.",
+        "Nobody can stay in the RV at the shop, so Alex plans where to stay until it's ready."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "WAITING ON A PART Alex M. Fan motor comes Mon 10am."
+        ],
+        [
+         "san",
+         "cust",
+         "The fan motor for your RV comes Monday morning, so it won't be ready today.",
+         {
+          "card": {
+           "title": "New ready time",
+           "lines": [
+            "Mon Oct 26 · about 2pm",
+            "No storage while we wait on a part"
+           ]
+          }
+         }
+        ]
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "A10-01",
+    "more": [
+     "The shop's warranty, 90 days on labor (parts as the maker covers them), is on its receipt."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Repair-shop registration and technician certificates (propane, refrigerant) come from the state's form where the state has them (S1-23)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked repair and mobile job pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "An RV service shop books drop-off slots and technicians, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each technician sends the certificates their work needs (propane, refrigerant) where the state or the law asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "RV repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "RV repair is booked for a set time or an arrival window: nothing is sent now and nobody is on call."
+   },
+   {
+    "op": "words",
+    "at": "S2-30",
+    "more": [
+     "No RV work is sent now: every job has a set time or an arrival window, and nobody is on call. An urgent ask gets the soonest open time."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "Then the travel area, the phone line and bills Rosie sends.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "For an RV, the counter takes the keys, the odometer and the generator hours, and the problem in the customer's words."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "An RV is looked at in the shop. Nothing is diagnosed or fixed by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee's RV Service books drop-off slots, set by how many RVs it takes in a day (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee's RV Service books drop-off slots, set by how many RVs it takes in a day (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee's RV Service books drop-off slots, set by how many RVs it takes in a day (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "RV repair needs no first step: the diagnosis fee is OK'd on the drop-off page."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "Every RV is left at the shop (the next branch)."
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "For an RV, the keys are handed over only then, and Walt shows the work and any old parts (the next step)."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A repair is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no technician. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "An RV waits in its drop-off slot, so a technician running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child is never left at an RV service shop: a teen's RV is dropped off and picked up by the parent."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The RV repair plug-in adds no agreement before going live."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "A mobile RV technician's plug-in adds RV danger words, like a propane smell, a carbon monoxide alarm or burning wiring."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "The RV must be level with room to work and for the slide-outs. A campground or lot that bans repairs sends the job to the shop."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for an RV repair, so no bill goes to one."
+   },
+   {
+    "op": "more",
+    "at": "B8-04",
+    "more": [
+     "Alex leaves the keys or the lockbox as agreed, once the code is in."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Hal also runs the RV's VIN for open safety recalls. An open one is texted to Alex: the maker's dealers fix it for free."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-20",
+    "more": [
+     "Where the state's rules require it, the quote is a written estimate Alex signs on the page."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Repair-shop registration and technician certificates (propane, refrigerant) come from the state's form where the state has them (S1-23)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked repair and mobile job pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "An RV service shop books a technician's time, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each technician sends the certificates their work needs (propane, refrigerant) where the state or the law asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "RV repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "RV repair is booked for a set time or an arrival window: nothing is sent now and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No work here is sent now (S2-30), so every visit is a set time with a reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No work here is sent now (S2-30), so the day list and the on-my-way text always come first."
+   },
+   {
+    "op": "words",
+    "at": "S2-30",
+    "more": [
+     "No RV work is sent now: every job has a set time or an arrival window, and nobody is on call. An urgent ask gets the soonest open time."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are the rules businesses like yours often set. Your call: keep them, or change any. They become your own rules. You follow your state's rules for your trade. Rosie doesn't check licenses.",
+      {
+       "list": {
+        "head": [
+         "Rule",
+         "Suggested"
+        ],
+        "rows": [
+         [
+          "Hours and times",
+          "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead"
+         ],
+         [
+          "Cancel",
+          "Free until 7am on the visit day. After that, or nobody home: up to the $89 trip fee, only if a card, a deposit or the full price was taken and you say yes"
+         ],
+         [
+          "Same-day jobs",
+          "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am"
+         ],
+         [
+          "Price OKs",
+          "Quotes and bills over $500 come to you first"
+         ],
+         [
+          "Travel area",
+          "25 miles from 22 Depot St"
+         ],
+         [
+          "Your phone line",
+          "Missed and after-hours calls go to Rosie"
+         ],
+         [
+          "Bills I send",
+          "A tip line · bank transfer over $500"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Now forward missed and after-hours calls from (555) 010-0142 to Rosie.",
+      {
+       "card": {
+        "title": "Call forwarding",
+        "lines": [
+         "Your line rings you first",
+         "Missed and after-hours calls go to Rosie",
+         "If Rosie's line is down, calls ring your own phones",
+         "Calls a person must take: to the number you give, or a callback"
+        ],
+        "button": "Set it up",
+        "link": "rosfield.com/fwd/s01"
+       },
+       "buttons": [
+        "Done",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Done"
+     ]
+    ],
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "Then the travel area, the phone line and bills Rosie sends.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ],
+    "vary": {
+     "after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here are the rules businesses like yours often set. Your call: keep them, or change any. They become your own rules. You follow your state's rules for your trade. Rosie doesn't check licenses.",
+        {
+         "list": {
+          "head": [
+           "Rule",
+           "Suggested"
+          ],
+          "rows": [
+           [
+            "Hours and times",
+            "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead"
+           ],
+           [
+            "Cancel",
+            "Free until 7am on the visit day. After that, or nobody home: up to the $89 trip fee, only if a card, a deposit or the full price was taken and you say yes"
+           ],
+           [
+            "Same-day jobs",
+            "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am"
+           ],
+           [
+            "Price OKs",
+            "Quotes and bills over $500 come to you first"
+           ],
+           [
+            "Travel area",
+            "25 miles from 22 Depot St"
+           ],
+           [
+            "Your phone line",
+            "Missed and after-hours calls go to Rosie"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "Keep them",
+          "Change one"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Now forward missed and after-hours calls from (555) 010-0142 to Rosie.",
+        {
+         "card": {
+          "title": "Call forwarding",
+          "lines": [
+           "Your line rings you first",
+           "Missed and after-hours calls go to Rosie",
+           "If Rosie's line is down, calls ring your own phones",
+           "Calls a person must take: to the number you give, or a callback"
+          ],
+          "button": "Set it up",
+          "link": "rosfield.com/fwd/s01"
+         },
+         "buttons": [
+          "Done",
+          "Later"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Done"
+       ]
+      ]
+     },
+     "after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here are the rules businesses like yours often set. Your call: keep them, or change any. They become your own rules. You follow your state's rules for your trade. Rosie doesn't check licenses.",
+        {
+         "list": {
+          "head": [
+           "Rule",
+           "Suggested"
+          ],
+          "rows": [
+           [
+            "Hours and times",
+            "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead"
+           ],
+           [
+            "Cancel",
+            "Free until 7am on the visit day. After that, or nobody home: up to the $89 trip fee, only if a card, a deposit or the full price was taken and you say yes"
+           ],
+           [
+            "Same-day jobs",
+            "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am"
+           ],
+           [
+            "Price OKs",
+            "Quotes and bills over $500 come to you first"
+           ],
+           [
+            "Travel area",
+            "25 miles from 22 Depot St"
+           ],
+           [
+            "Your phone line",
+            "Missed and after-hours calls go to Rosie"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "Keep them",
+          "Change one"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Now forward missed and after-hours calls from (555) 010-0142 to Rosie.",
+        {
+         "card": {
+          "title": "Call forwarding",
+          "lines": [
+           "Your line rings you first",
+           "Missed and after-hours calls go to Rosie",
+           "If Rosie's line is down, calls ring your own phones",
+           "Calls a person must take: to the number you give, or a callback"
+          ],
+          "button": "Set it up",
+          "link": "rosfield.com/fwd/s01"
+         },
+         "buttons": [
+          "Done",
+          "Later"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Done"
+       ]
+      ]
+     },
+     "before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here are the rules businesses like yours often set. Your call: keep them, or change any. They become your own rules. You follow your state's rules for your trade. Rosie doesn't check licenses.",
+        {
+         "list": {
+          "head": [
+           "Rule",
+           "Suggested"
+          ],
+          "rows": [
+           [
+            "Hours and times",
+            "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead"
+           ],
+           [
+            "Cancel",
+            "Free until 7am on the visit day. After that, or nobody home: up to the $89 trip fee, only if a card, a deposit or the full price was taken and you say yes"
+           ],
+           [
+            "Same-day jobs",
+            "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am"
+           ],
+           [
+            "Price OKs",
+            "Quotes and bills over $500 come to you first"
+           ],
+           [
+            "Travel area",
+            "25 miles from 22 Depot St"
+           ],
+           [
+            "Your phone line",
+            "Missed and after-hours calls go to Rosie"
+           ],
+           [
+            "Bills I send",
+            "A tip line · bank transfer over $500"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "Keep them",
+          "Change one"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Now forward missed and after-hours calls from (555) 010-0142 to Rosie.",
+        {
+         "card": {
+          "title": "Call forwarding",
+          "lines": [
+           "Your line rings you first",
+           "Missed and after-hours calls go to Rosie",
+           "If Rosie's line is down, calls ring your own phones",
+           "Calls a person must take: to the number you give, or a callback"
+          ],
+          "button": "Set it up",
+          "link": "rosfield.com/fwd/s01"
+         },
+         "buttons": [
+          "Done",
+          "Later"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Done"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "An RV is looked at where it is. Nothing is fixed by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Mobile repair arrives in a 2-hour window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Mobile repair arrives in a 2-hour window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "Mobile repair needs no first step."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The RV repair plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile repair arrives in a 2-hour window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A technician never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A repair is rated like any visit."
+   }
+  ]
+ },
+ "notes": "NEW Tue Oct 27 2026 (REDESIGN 2, professions pass P3, batch D2). Built from the refitted auto-repair parent (set \"from\"); no old flowchart or base plug-in existed, so the plug-in is built from the trade's norm.\nWhy auto-repair: an RV is left at a shop with a written estimate OK'd before any repair and picked up when ready (jobs can run for days), and a mobile technician goes to a home, a storage lot or a campground.\nFacts dropoff, extrawork; no switches; settings A set start (a drop-off time), B 2-hour window, cutoff 2 days before (big rigs, travel). Sent now is OFF: RV repair is booked for a set time or a window. So S2-30 branch 1 (and B7-55, B8-58 'Sent now') are off, S2-30 and S1-21 (flow B and the more lines of flow A) carry words that say nothing is sent now, and S1-21's 'Jobs sent now' row is gone.\nMoney A (4): visit|none|counter (main: a $149 diagnosis OK'd on the drop-off page, then a signed estimate: $487 roof A/C repair + $96 slide-out seal treatment, the $149 inside the $487), list|none|counter ($35 battery check), visit|none|bill, list|none|bill. Money B (4): list|card|bill (main: $179 water pump replacement, $89 trip fee as the late-cancel and no-show fee), visit|card|bill (Leak repair: a roof leak priced at the visit; quote lines roof sealant $165 + vent seal $80), list|card|card, photos|deposit|bill ($640 awning from photos, $160 deposit for the parts, $480 rest). No A photos path (master S1-13 shows a $20 deposit for it in flow A). No hold, no full price.\nReal RV points in the plug-in: bay length and height limits; nobody lives in the RV at the shop and no pets left inside (the owner's rule); the propane tanks shut at check-in; propane and refrigerant work only by a person with the certificate the law needs (propane certificate where the state asks, EPA certificate in every state); a renter or borrower can book a diagnosis, but a repair needs the owner's yes in writing; stop words are fire, a propane smell or hissing, a carbon monoxide alarm, someone hurt or shocked (911, everyone out); don't-drive words are brakes that grab, a tire bulge, a wobbling or smoking wheel, smoke or steam, burning wiring, a stuck slide-out, a fuel leak; a roof job stops in rain, wind or lightning; a tow-in is booked by the customer with a towing company (no pick-up and delivery); a 90-day labor warranty.\nKinds of work in sign-up: mobile RV repair + RV inspections (an inspector certificate shown as what the business says) for Lee Mobile RV, and the RV service shop as the second company. Names under 20 characters. License numbers are EX-xxxx style. Extra rename pairs as in motorcycle (found by reading the joined flows).\nOwn steps: A8-x01/x02 recall check, A8-x03 to x05 the diagnosis inside the OK'd hour, A8-x09 a late part (Alex plans where to stay).\nSelf-checks: (1) after turning sent now off I searched the joined text for 'sent now', 'on call' and 'Jobs sent now': what is left is master text about other work (S2-30's example line, S2-31 'no jobs sent now', B6-16 behind the sent-now gate); (2) the example messages avoid the stop words (the Spanish call is about a dripping roof A/C and the danger-first question asks about gas or burning); (3) B3-11 and B3-18 are one conversation.\nKeep: flush, leak (a roof or plumbing leak is the main RV repair), valve, drips, Trip fee, Towing (master text 'Work like towing or a lockout is sent now').",
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "would like to see your hair before pricing it",
+    "BS20918",
+    "JE30417",
+    "JP031552",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair. {{pay.asks}}. The rest is quoted at the chair, before any work.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "My employer pays for this cut.",
+    "A chair, ready",
+    "Style consult",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Here they OK the $110 color correction and skip the $15 gloss. The $25 consult is part of the $110.",
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Riley's new price for today: $130. Nothing is done until you say yes.",
+    "Alex M. asks for a toner instead of the gloss. What's the new price?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Color quotes come to you first. Board prices never need one",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Could Riley use a toner instead of the gloss?",
+    "quote 110 color correction + 20 toner",
+    "Color correction $110 · gloss $15",
+    "Gloss to finish · $15",
+    "Today's price · $130",
+    "Toner · $20",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "like Lee Plumbing and Lee Electric.",
+    "Quiero un corte el sábado.",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "$125",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Pick a time for your first color plan visit:",
+    "$110",
+    "Drain clearing",
+    "home warranty plan",
+    "home warranty",
+    "a package of cuts",
+    "many barbers, salons and groomers are licensed to their shop",
+    "patch test",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop's services need none.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "Riley looks, then prices it",
+    "Texts Alex the price",
+    "Only the consult; the price stays open",
+    "Checks in a drop-off or mail-in",
+    "Follows up on an item left behind",
+    "Electric.",
+    "Kids cut (12 and under)",
+    "a skin-test result",
+    "color and house calls",
+    "color, house calls",
+    "does color",
+    "Color always stays",
+    "Consult only",
+    "photos of your hair",
+    "a cut on Saturday",
+    "Books a cut every 4 weeks",
+    "a cut every 4 weeks",
+    "for a staff cut",
+    "during my cut",
+    "Alex M.'s cut",
+    "in the chair",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A barbershop",
+    "a barbershop",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "Barber license",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "READY Sofia G. Photo added.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "4471",
+    "Sofia",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "fade",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "$25 consult",
+    "Only the consult",
+    "the consult",
+    "What happens at the chair?",
+    "Priced at the chair",
+    "priced at the chair",
+    "Paid at the chair",
+    "At the chair",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "a house call",
+    "House call",
+    "house call",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "like a burst pipe"
+   ],
+   "B": [
+    "JE30417",
+    "JP031552",
+    "MP045201",
+    "service-call fee",
+    "Call a mold cleanup company first",
+    "a customer's AI said they smell gas",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "like new pipes put in one day and finished another",
+    "Can you flush my water heater every year, too?",
+    "a yearly flush plan",
+    "I found water damage under the sink this morning.",
+    "Me, and yes. It's my kitchen.",
+    "Water pressure check",
+    "A chair, ready",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Only where the plug-in sends this work now, like an overflowing drain at night: Alex takes 'Send someone now'. The booking is marked sent now, with an arrival estimate, not a window.",
+    "Lee Home Services: you have two drain clearings on Mon Nov 9. They're at 10am–12pm and 12–2pm. Keep both, or was that the same visit? No reply by 6:00pm Sun Nov 8: we keep 10am–12pm.",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Sent now · Overflowing kitchen drain",
+    "Shutoff valve and wall pipe · $540",
+    "Not done: the pipe behind the wall",
+    "Found: mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Yes, it won't drain",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "like Lee Plumbing and Lee Electric.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "a $2,400 repipe",
+    "of your repipe",
+    "repipe",
+    "Both rentals' visits go on one bill on the 1st.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "Just the kitchen sink.",
+    "a leak under the sink",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals",
+    "next week's drain cleaning",
+    "clear a yard drain",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "your new pipes are in",
+    "a roof leak",
+    "Video and Jordan's notes",
+    "Jordan finds corroded shutoff valves.",
+    "replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "shutoff valves",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "supply house",
+    "Rental 1",
+    "Rental 2",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also run a camera down my sewer line?",
+    "$160 valve quote",
+    "$160 valve work",
+    "a bathroom drain",
+    "Drain clearings",
+    "kitchen drain",
+    "The faucet is a leak repair, quoted at the visit.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A haircut could mean a salon or a barbershop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Texts Alex the price",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Electric.",
+    "Is the sink still full of water?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "DONE 179 drain",
+    "245 valve 165 supply line 80",
+    "Shutoff valve",
+    "Supply line",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "1-year labor warranty",
+    "a dripping faucet",
+    "color and house calls",
+    "color, house calls",
+    "does color",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing and Lee Electric",
+    "plumbing license",
+    "Plumbing license",
+    "electrical license",
+    "Electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "a barbershop",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "Oak St",
+    "1200 Main St",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "fade",
+    "beard trim",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "House call",
+    "house call",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "the heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "camera inspection",
+    "camera report",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Panel upgrade",
+    "under my sink",
+    "under the sink",
+    "like a burst pipe",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "shutoff valve"
+   ]
+  },
+  "A": {
+   "A4-03": "c24298dc38",
+   "A6-14": "b17b52115e",
+   "A8-11": "d5522790d9",
+   "A8-23": "e3a35f7f9e",
+   "A8-25": "a79292eae2",
+   "A8-32": "632f2b5b40",
+   "A10-01": "77ff9c7550",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-21": "913a9558f4",
+   "A3-20": "b8251d2535",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A8-54": "bc2f9467fd",
+   "A10-34": "78c2d9a6a3",
+   "A4-15": "db5792db95",
+   "A7-93": "46cca94e45",
+   "A8-67": "e9fd748fc5",
+   "S1-29": "ed36650e05"
+  },
+  "B": {
+   "B3-17": "3eb7d7f259",
+   "B4-34": "74ff52d83d",
+   "B9-06": "f091432f2d",
+   "B8-04": "6c9782920d",
+   "B8-18": "530038d2b8",
+   "B8-20": "53903a8275",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "S1-21": "334e0a791c",
+   "B4-01": "15f683e6cb",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "S1-29": "69d8f12a68",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

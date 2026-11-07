@@ -1,0 +1,2429 @@
+{
+ "id": "lab",
+ "name": "Lab tests and mobile blood draw",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "primary-care",
+ "plugin": {
+  "pf.license": {
+   "need": "the lab's federal certificate for the kinds of tests it runs, and the state's lab license where the state requires one; a phlebotomist's certificate where the state requires one; collector training for drug tests (federal transport tests follow the federal collection rules); a doctor's order where the state requires one for a test",
+   "who": "both: the lab or draw business, and each phlebotomist or collector where the state's rules or the test's rules require it",
+   "ask": "optional, for the owner's own page: the lab's certificate number, the state license number, each phlebotomist's certificate; nothing is needed to book",
+   "check": "none: Rosie never looks up a license, certificate or training record; the owner keeps them current",
+   "scope": "only tests on the lab's certificate (tests sent on to a reference lab are named as sent out); a test needs a doctor's order unless the state's rules let the patient order it directly (a switch from the state form); a phlebotomist draws blood and collects samples, and never reads results or gives health advice",
+   "blocks": "none from Rosie: no booking is held or refused because a license can't be read",
+   "renewals": "none kept by Rosie: the owner keeps the renewal dates",
+   "insurance": "the owner's own liability insurance; Rosie never verifies it",
+   "background": "the practice's own background checks for phlebotomists who go into homes and care homes, where its rules or the state require them; Rosie never verifies them",
+   "telehealth": "none: a draw is always in person"
+  },
+  "pf.services": {
+   "shape": "clinic: a patient books a short draw slot at the patient service center (one of its draw chairs, staffed by whoever is on; nobody is booked by name), or a mobile draw at home, at work or in a care home; walk-ins wait in line for the next chair; tests come from a doctor's order or the lab's direct-to-you list; results come later",
+   "examples": "the example lab's own prices and lengths, not a standard",
+   "list": [
+    {
+     "name": "Blood draw with a doctor's order",
+     "price": "billed to the health plan; self-pay from the lab's price list (example: basic metabolic panel $25, complete blood count $20)",
+     "kind": "one price per test",
+     "length": "15 min",
+     "where": "at the patient service center",
+     "before": "nothing taken",
+     "after": "the plan is billed; any share is billed after the plan pays",
+     "note": "the doctor's order must be on file or brought along"
+    },
+    {
+     "name": "Fasting blood test (cholesterol, glucose)",
+     "price": "as above",
+     "kind": "one price per test",
+     "length": "15 min",
+     "where": "at the patient service center",
+     "before": "nothing taken",
+     "after": "as above",
+     "note": "morning times only (the lab's setting, example before 10am); nothing to eat or drink but water for 8 to 12 hours, as the test says"
+    },
+    {
+     "name": "Glucose tolerance test",
+     "price": "billed to the plan; $65 self-pay (example)",
+     "kind": "one price",
+     "length": "2 to 3 hours at the center",
+     "where": "at the patient service center",
+     "before": "nothing taken",
+     "after": "as above",
+     "note": "fasting; a sweet drink, then draws over 2 or 3 hours; the patient stays the whole time; morning starts only"
+    },
+    {
+     "name": "Direct-to-you test panel",
+     "price": "example: wellness panel $79, vitamin D $45, A1C $35",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "at the patient service center",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "only where the state's rules let a patient order the test; results go to the patient's secure page"
+    },
+    {
+     "name": "Sample drop-off (urine, stool or a 24-hour collection)",
+     "price": "billed with the order",
+     "kind": "one price per test",
+     "length": "5 min",
+     "where": "at the patient service center",
+     "before": "nothing taken",
+     "after": "as the order is billed",
+     "note": "the container is picked up before; walk in during drop-off hours"
+    },
+    {
+     "name": "Mobile blood draw",
+     "price": "$65 visit fee (example) plus the tests",
+     "kind": "one price plus the tests",
+     "length": "20 min at the place; a 2-hour arrival window in the morning",
+     "where": "at the patient's home, workplace or care home",
+     "before": "nothing taken (the visit fee billed after), or paid in full for a direct-to-you panel, or a card saved and charged at DONE",
+     "after": "the bill after the plan pays, or the saved card",
+     "note": "samples reach the lab by the courier's cut-off the same day"
+    },
+    {
+     "name": "Employer drug test (urine)",
+     "price": "$45 (example), on the employer's account",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the patient service center, or at the workplace",
+     "before": "nothing taken from the employee",
+     "after": "billed to the employer its own way",
+     "note": "photo ID and the chain-of-custody form; results go only to the employer's medical review officer, never through Rosie"
+    },
+    {
+     "name": "Legal paternity DNA test",
+     "price": "$350 (example) for the parent and one child",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the patient service center",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "each adult shows photo ID and signs their own consent; a parent or guardian consents for the child; the chain of custody is kept"
+    }
+   ],
+   "capacity": "draw chairs at the center (example 3), each a 15-minute slot; walk-ins fill open slots; mobile draws by route, a set number each morning; every sample must reach the lab within the time its test allows",
+   "online": "none: every draw is in person; results are on the secure page",
+   "nobodyHome": "never: the patient must be there",
+   "walkIns": "a line for the next open chair at the service center; booked times go first; sample drop-offs are checked in at once"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which test, or whether there's a doctor's order (sets the length, fasting and price)",
+    "does the test need fasting (the order or the test list says; sets morning-only times)",
+    "a health plan or self-pay (only the plan's name here)",
+    "for a child: the child's age",
+    "for a mobile draw: the town, and whether the patient can come to the door",
+    "for a drug test: the employer's account (who pays)"
+   ],
+   "afterTime": [
+    "any access need",
+    "fainted at a draw before, or hard to draw (a note for the phlebotomist)",
+    "for a mobile draw: the address, parking and any gate code"
+   ],
+   "securePage": [
+    "the doctor's order (a photo, or the doctor's office sends it), or the consent for a direct-to-you test",
+    "the plan's member details",
+    "date of birth (every sample is matched to the patient by two details)",
+    "medicines that matter for the test, like a blood thinner, only where the order asks",
+    "for a drug test: the employee's own consent and the employer's chain-of-custody details",
+    "for a paternity test: each person's ID and consent; a parent or guardian consents for the child",
+    "who may get the results: the ordering doctor; for a direct-to-you test, the patient; never the payer unless the patient says so"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for a child; an employer may book and pay for an employee's drug test, but the employee consents on their own link and the result goes only to the employer's medical review officer; each adult in a paternity test consents for themselves"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, fainting with an injury, or bleeding that won't stop",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "faints at the sight of needles, or fainted at a draw before",
+     "what": "the booking goes on; the phlebotomist is told on the secure page and draws with the patient lying back where the center can"
+    },
+    {
+     "words": "on a blood thinner, or bleeds easily",
+     "what": "the booking goes on; noted for the phlebotomist"
+    },
+    {
+     "words": "asks what a result means, or about a medicine",
+     "what": "never answered by Rosie: the ordering doctor; for a direct-to-you test, the lab's own doctor service line"
+    },
+    {
+     "words": "a result the lab finds dangerous (a critical value)",
+     "what": "the lab's own process calls the ordering doctor at once; never a text from Rosie"
+    }
+   ],
+   "fasting": "a fasting test when the patient has eaten: the fasting part can't be drawn; other tests on the order can be, or the patient picks another morning; no fee",
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "The doctor's order",
+     "when": "on file before the draw: the doctor's office sends it, or the patient brings it",
+     "who": "the lab gets it from the doctor's office when the patient hasn't got it",
+     "result": "on file: the draw goes on; missing at the visit: the draw waits while the desk asks the doctor's office, or moves with no fee"
+    },
+    {
+     "name": "Consent for a direct-to-you test",
+     "when": "signed on the secure page while booking",
+     "result": "signed: booked; not signed: no booking"
+    },
+    {
+     "name": "The plan check",
+     "when": "by the desk before the visit",
+     "result": "covered, part covered (the share shown), or not covered (self-pay or a free cancel); where the plan's rules require it, a notice of likely non-coverage is signed before the draw"
+    },
+    {
+     "name": "Fasting",
+     "when": "from the hour the test says, the night before",
+     "result": "fasted: drawn; ate: the fasting part moves"
+    },
+    {
+     "name": "A 24-hour collection container",
+     "when": "picked up at the center before the collection day",
+     "result": "the sample is dropped off within the time the test allows"
+    },
+    {
+     "name": "Employer drug test papers",
+     "when": "the employer's authorization on the account before the visit; the employee's photo ID at the visit",
+     "result": "no ID: no collection; the employer's own rules decide what follows"
+    }
+   ],
+   "prep": "for the reminder: the fasting hours if the test needs them (water is fine), drink water, bring photo ID, the plan card and the doctor's order, and wear a short-sleeved shirt; for a 24-hour urine test, the container and the start time"
+  },
+  "pf.visit": {
+   "checkIn": "at the service center: the code at the desk, then photo ID and date of birth checked against the order (two details on every sample); mobile: the code at the door, then ID; a drug test: photo ID and the chain-of-custody form, watched only where the test's rules require it and then by a collector of the same gender",
+   "changes": "the doctor adds a test to the order: drawn at the same visit if the samples allow, priced first for self-pay; nothing else is sold at a draw",
+   "cantGoAhead": "no order, no ID, not fasting for a fasting test, the vein can't be found after two tries (the lab's limit), or the patient feels faint: the draw stops; a new draw is booked with no charge",
+   "done": "the code, then DONE from the phlebotomist once the samples are labeled; the samples go to the lab by courier the same day; results go to the ordering doctor, and for a direct-to-you test to the patient's secure page; Rosie keeps only booking records",
+   "rejected": "a sample the lab can't use (clotted, too little, too old): the patient is offered a new draw with no charge, by a secure link",
+   "dropOff": "a sample container dropped off at the desk is checked in at once with the patient's two details"
+  },
+  "pf.money": {
+   "before": "doctor-ordered draws take nothing when booking; direct-to-you panels and paternity tests are paid in full when booking; a mobile draw takes nothing (its fee billed after), or a card saved and charged at DONE (the practice's setting)",
+   "insurance": "health plans: only the plan's name before times; member details on the secure page; the lab bills the plan after the samples are run; the patient's share is billed after the plan pays (Rosie texts the bill); a notice of likely non-coverage is signed before the draw where the plan's rules require it",
+   "thirdParty": "an employer pays for its drug tests on its own account, billed its own way; the employee pays nothing",
+   "estimate": "a self-pay patient gets a written price estimate before a scheduled test, where the rules require it",
+   "caps": "deposit cap: from the state form",
+   "fees": "no missed-visit fee at the service center; a mobile draw's visit fee may be kept for a late cancel or nobody home only if agreed when booking and the owner confirms; never for public-plan patients",
+   "refunds": "a direct-to-you test that can't be run and isn't drawn again: refunded in full",
+   "tips": "none",
+   "tax": "no tax on lab tests"
+  },
+  "pf.messages": {
+   "never": "the test names, the order, results, health answers, medicines, ID numbers and plan details never go in a text: only the secure page; texts say only the lab's name, the day, the time and the place; a drug test or a paternity test is never named in a text",
+   "staffTexts": "the owner and phlebotomists get the patient's initials, the time and the place; the tests are on the secure page",
+   "results": "a text says only 'your results are ready on the secure page' (direct-to-you tests) or 'your results went to your doctor'",
+   "languages": "English and Spanish",
+   "minors": "a child's texts go to the parent or guardian"
+  },
+  "pf.staff": {
+   "licenses": "phlebotomy certificates and collector training, on the owner's own records (where the state requires them); Rosie never looks them up",
+   "skills": "phlebotomy, children's draws, glucose tolerance tests, drug-test collection, paternity collection, mobile draws, Spanish",
+   "supervision": "the lab director (the certificate holder) is responsible for the tests; a new phlebotomist draws under a trained one until signed off",
+   "oks": "the owner OKs fees, refunds and free re-draws",
+   "standIn": "any phlebotomist with the skill; nobody is booked by name; a drug test that must be watched only by a trained collector of the same gender",
+   "away": "only phlebotomists cleared for mobile draws (with a background check where required) go to homes and care homes"
+  },
+  "pf.rules": {
+   "privacy": "a health privacy agreement (a business associate agreement) is signed before going live; health details only on the secure page",
+   "records": "lab records and orders are the lab's own, kept as long as the federal and state rules require; never deleted on request while the rules say keep them; Rosie keeps only booking records",
+   "consent": "direct-to-you testing only where the state's rules allow it, with consent on the secure page; drug tests follow the employer's program (federal transport tests follow the federal collection rules); legal paternity tests keep the chain of custody",
+   "showFacts": "the lab's certificate shown where the rules require it; a notice of likely non-coverage where the plan's rules require it",
+   "results": "results go first to the ordering doctor; a patient's own copy of a completed test is given on the secure page within the time the health privacy rules set",
+   "reviews": "a rating may be asked; any reply never confirms the person was a patient"
+  },
+  "pf.edges": {
+   "fasting": "ate before a fasting test: the fasting part moves to another morning; no fee",
+   "noOrder": "no doctor's order at the visit: the desk asks the doctor's office while the patient waits, or the draw moves with no fee",
+   "rejected": "a sample the lab can't use: a free new draw",
+   "critical": "a dangerous result: the lab's own process calls the doctor; never a text",
+   "faint": "a patient feels faint or faints: the draw stops, the patient lies down, 911 if hurt; the owner is told",
+   "kids": "a child is drawn with a parent or guardian there",
+   "mobile": "a homebound patient doesn't come to the door: the phlebotomist calls, then the contact on the booking; the owner decides; no fee while the patient's safety is unknown",
+   "drugTest": "an employer's drug test: the employee's own consent; results only to the employer's medical review officer",
+   "paternity": "every adult consents for themselves; the child with a parent or guardian",
+   "results": "results to the ordering doctor; direct-to-you results on the secure page",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "forms",
+   "firststeps",
+   "planbill",
+   "children",
+   "results",
+   "dropoff",
+   "spaces",
+   "incare",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Lab & Draw",
+   "staff": "Bea and Oren (phlebotomists)",
+   "cust": "Alex M. (a patient with a doctor's order) · other patients",
+   "other": "Others (a bank, a parent or guardian, an employer, a health plan, a doctor's office)"
+  },
+  "B": {
+   "business": "Lee Mobile Draw",
+   "staff": "Tomas and Lucia (mobile phlebotomists)",
+   "cust": "Alex M. (a patient who can't easily leave home) · other patients",
+   "other": "Others (a bank, a daughter or caregiver, a care home's nurse, a health plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Bea"
+  },
+  "B": {
+   "staff": "Tomas"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's employer for a drug test."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this draw."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Tomas and Lucia draw blood at homes; Tomas also runs employer drug tests. Bea and Oren draw at the center; Bea also does mobile draws. Pat is my office manager, for prices over $500. Jules rents a draw chair, with their own clients."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Bea: phlebotomist, mobile draws"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Bea: phlebotomist and mobile draws"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Doctor's orders come to you first. Direct-to-you tests never need one"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A patient stays with the phlebotomist they picked."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about a self-pay price before booking."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Blood draws, fasting tests, glucose tests and drug tests."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mobile draws for patients in Springfield who can't easily leave home, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A blood draw at home"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Blood draws, fasting tests and glucose tests"
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Draws at the center work like this:"
+   ],
+   [
+    "A $35 haircut can work this way.",
+    "Every blood draw can work this way."
+   ],
+   [
+    "Haircut · $35",
+    "Blood draw · $25"
+   ],
+   [
+    "A tip at the chair is the shop's own way. Rosie never asks for one.",
+    "Rosie never asks for a tip."
+   ],
+   [
+    "a $20 fee ($40 for the Groom's package)",
+    "a $65 visit fee"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a test the lab doesn't run, which isn't on the center's list."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't run that test."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can I add a glucose test on Saturday?"
+   ],
+   [
+    "Add a beard trim to your Sat 11:00am visit?",
+    "Add it to your Sat 11:00am draw?"
+   ],
+   [
+    "Add a beard trim today?",
+    "Add one more test today? Its name is on your secure page."
+   ],
+   [
+    "Beard trim · $20",
+    "Added test · $35"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The draw chair's armrest tore my jacket."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says the draw chair's armrest tore a jacket today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "prefers morning draws and a Spanish interpreter"
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Fasting blood test $25 ($27 from Nov 2) · Direct-to-you panel $79 · Glucose test $35"
+   ],
+   [
+    "Haircuts",
+    "Blood draws"
+   ],
+   [
+    "haircuts",
+    "blood draws"
+   ],
+   [
+    "massage",
+    "fasting test"
+   ],
+   [
+    "Massage",
+    "Fasting test"
+   ],
+   [
+    "Hugo",
+    "Nadia"
+   ],
+   [
+    "1200 Main St",
+    "250 Market St"
+   ],
+   [
+    "Beard trim",
+    "Glucose test"
+   ],
+   [
+    "Kids cut",
+    "Child's draw"
+   ],
+   [
+    "kids cut",
+    "child's draw"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A blood draw could mean a lab or a doctor's office."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a fasting blood test and a glucose test"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "shop's board",
+    "center's price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lost sample or a missed draw"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A blood draw is rated, so the center takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's lab sends no draws now, at the center or away."
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Lab & Draw LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Lab & Draw"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Draw"
+   ],
+   [
+    "plumbing and electrical",
+    "blood draws and drug tests"
+   ],
+   [
+    "88 Elm St",
+    "410 Linden Ave"
+   ],
+   [
+    "Riley",
+    "Bea"
+   ],
+   [
+    "Avery",
+    "Oren"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Lucia"
+   ],
+   [
+    "electrical",
+    "drug testing"
+   ],
+   [
+    "Electrical",
+    "Drug testing"
+   ],
+   [
+    "plumber",
+    "phlebotomist"
+   ],
+   [
+    "Plumber",
+    "Phlebotomist"
+   ],
+   [
+    "plumbing",
+    "mobile draws"
+   ],
+   [
+    "Plumbing",
+    "Mobile draws"
+   ],
+   [
+    "barbershop",
+    "lab"
+   ],
+   [
+    "Barbershop",
+    "Lab"
+   ],
+   [
+    "barbers",
+    "phlebotomists"
+   ],
+   [
+    "barber",
+    "phlebotomist"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "skin fade",
+    "fasting test"
+   ],
+   [
+    "Skin fade",
+    "Fasting test"
+   ],
+   [
+    "beard trim",
+    "glucose test"
+   ],
+   [
+    "Groom's package",
+    "Wellness panel"
+   ],
+   [
+    "Signature cut and shave",
+    "Wellness panel"
+   ],
+   [
+    "haircut",
+    "blood draw"
+   ],
+   [
+    "Haircut",
+    "Blood draw"
+   ],
+   [
+    "shops",
+    "centers"
+   ],
+   [
+    "shop",
+    "center"
+   ],
+   [
+    "Shop",
+    "Center"
+   ],
+   [
+    "priced at the chair",
+    "priced at the draw chair"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the draw chair"
+   ],
+   [
+    "is at the chair",
+    "is at the draw chair"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Bea · Sat Oct 24",
+    "Your Sat Oct 24 draw"
+   ],
+   [
+    "Bea marked you as not here",
+    "The center marked you as not here"
+   ],
+   [
+    "How was your visit with Bea?",
+    "How was your draw?"
+   ],
+   [
+    "Why: many phlebotomists, salons and groomers are licensed to their center.",
+    "Why: in many states, blood draws away from a lab have their own rules."
+   ],
+   [
+    "It's 11:00am, and Alex is at the draw chair. Alex reads the code from the confirmation or the reminder, and Bea texts it in.",
+    "It's Sat 10:45am, and Alex is at the front desk, 15 minutes early. Alex reads the code from the confirmation or the reminder, and the desk enters it."
+   ],
+   [
+    "What happens at the front desk?",
+    "What happens at the front desk?"
+   ],
+   [
+    "A center",
+    "A center"
+   ],
+   [
+    "like a blood draw at the center or at home",
+    "like a blood draw at the center or a home visit"
+   ],
+   [
+    "license checked out on the second state's lookup.",
+    "license is the owner's own word."
+   ],
+   [
+    "Addresses there are offered once a license checks out, and only for the people it covers.",
+    "Addresses there are offered once the owner says so, and only for the people they cover."
+   ],
+   [
+    "Reese can be booked once the license checks out on the state's lookup, and Sam says yes.",
+    "Reese can be booked once Sam says yes."
+   ],
+   [
+    "patch test",
+    "fasting test"
+   ],
+   [
+    "Patch test",
+    "Fasting test"
+   ],
+   [
+    "house call",
+    "mobile draw"
+   ],
+   [
+    "House call",
+    "Mobile draw"
+   ],
+   [
+    "color correction",
+    "glucose test"
+   ],
+   [
+    "color and cut",
+    "fasting test"
+   ],
+   [
+    "House calls",
+    "Mobile draws"
+   ],
+   [
+    "house calls",
+    "mobile draws"
+   ],
+   [
+    "barbershop",
+    "lab"
+   ],
+   [
+    "Barbershop",
+    "Lab"
+   ],
+   [
+    "barbershops",
+    "labs"
+   ],
+   [
+    "Barbershops",
+    "Labs"
+   ],
+   [
+    "kids cuts",
+    "child's draws"
+   ],
+   [
+    "barber",
+    "phlebotomist"
+   ],
+   [
+    "Barber",
+    "Phlebotomist"
+   ],
+   [
+    "valve",
+    "cap"
+   ],
+   [
+    "kids cut",
+    "child's draw"
+   ],
+   [
+    "clinician",
+    "phlebotomist"
+   ],
+   [
+    "Clinician",
+    "Phlebotomist"
+   ],
+   [
+    "color",
+    "glucose"
+   ],
+   [
+    "Color",
+    "Glucose"
+   ]
+  ],
+  "B": [
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can someone draw blood at home this Thursday?"
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee Lab & Draw for a blood draw instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Lab & Draw can draw your blood at the center for $25, or at your home for $65. Where would you like it?"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The center's draw chair is in the other flow."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This draw needs a doctor's order first. It takes about 2 days, so the first open times are next week."
+   ],
+   [
+    "like a chair renter",
+    "like a phlebotomist who rents a draw chair"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Tomas and Lucia draw blood at homes; Tomas also runs employer drug tests. Bea and Oren draw at the center; Bea also does mobile draws. Pat is my office manager, for prices over $500. Jules rents a draw chair, with their own clients."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Bea: phlebotomist, mobile draws"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Bea: phlebotomist and mobile draws"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Doctor's orders come to you first. Direct-to-you tests never need one"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A patient stays with the phlebotomist they picked."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about a self-pay price before booking."
+   ],
+   [
+    "would like to talk about the color quote before booking.",
+    "would like to talk about the price before booking."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like drawing blood without a doctor's order."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mobile draws for patients in Springfield who can't easily leave home, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A blood draw at home"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Fasting tests, glucose tests and drug tests."
+   ],
+   [
+    "barbershops",
+    "labs"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, I'd like a blood draw at home this week. A text back is fine."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa draw Thu 12-2 Lucia"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for a test Lee Mobile Draw doesn't run, like a scan."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I can't get to the center' fits a mobile draw."
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Mobile Draw can come to you:"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Will someone else be home?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, my daughter"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $65 mobile draw needs none."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Tomas's times show: he's the one who draws at homes."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your doctor's order and plan card ready."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Tomas also draw my blood at that visit?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Glucose test · $35"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my dog stay in the room during the draw?"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $35 test price is good for 7 days."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Added test · $35 · details on your secure page"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the added test for $35."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Tomas suggests one more test at the draw."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 35 added test, details on the secure page"
+   ],
+   [
+    "replace both shutoff valves, $160.",
+    "added test, $35."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Tomas drops a vial and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE dropped a vial, broken"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken vial"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "dropped a vial at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows it whole."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE ring the side door; the front steps are steep."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Tomas left the gate open."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on my floor this morning."
+   ],
+   [
+    "asked overnight for a drain clearing today.",
+    "asked overnight for a mobile draw today."
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the mobile draw price before booking."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Mobile blood draw $65 ($70 from Nov 2) · Drug test $45"
+   ],
+   [
+    "heating and cooling",
+    "drug testing"
+   ],
+   [
+    "Heating and cooling",
+    "Drug testing"
+   ],
+   [
+    "Water heater flush",
+    "Glucose test"
+   ],
+   [
+    "Water heater replacement",
+    "Blood draw at home"
+   ],
+   [
+    "Water heater fix",
+    "Blood draw at home"
+   ],
+   [
+    "Leak repair",
+    "Home visit"
+   ],
+   [
+    "leak repair",
+    "home visit"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Mobile blood draw"
+   ],
+   [
+    "Drain clearing",
+    "Mobile blood draw"
+   ],
+   [
+    "drain clearing",
+    "mobile blood draw"
+   ],
+   [
+    "water heater",
+    "blood draw"
+   ],
+   [
+    "Water heater",
+    "Blood draw"
+   ],
+   [
+    "Hugo",
+    "Nadia"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lost sample or a missed draw"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's lab sends no draws now, at the center or away."
+   ],
+   [
+    "The work never started, so there's no $2.",
+    "The work never started."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Draw'"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Lab & Draw"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Draw"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile draws and drug tests"
+   ],
+   [
+    "1200 Main St",
+    "250 Market St"
+   ],
+   [
+    "88 Elm St",
+    "410 Linden Ave"
+   ],
+   [
+    "42 Oak St",
+    "73 Hawthorn Rd"
+   ],
+   [
+    "Riley",
+    "Bea"
+   ],
+   [
+    "Avery",
+    "Oren"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Lucia"
+   ],
+   [
+    "electrical",
+    "drug testing"
+   ],
+   [
+    "Electrical",
+    "Drug testing"
+   ],
+   [
+    "plumber",
+    "phlebotomist"
+   ],
+   [
+    "Plumber",
+    "Phlebotomist"
+   ],
+   [
+    "plumbing",
+    "mobile draws"
+   ],
+   [
+    "Plumbing",
+    "Mobile draws"
+   ],
+   [
+    "barbershop",
+    "lab"
+   ],
+   [
+    "Barbershop",
+    "Lab"
+   ],
+   [
+    "barbers",
+    "phlebotomists"
+   ],
+   [
+    "barber",
+    "phlebotomist"
+   ],
+   [
+    "beard trim",
+    "glucose test"
+   ],
+   [
+    "haircut",
+    "blood draw"
+   ],
+   [
+    "Haircut",
+    "Blood draw"
+   ],
+   [
+    "shop",
+    "center"
+   ],
+   [
+    "Shop",
+    "Center"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Tomas needs a part from the supply house.",
+    "Tomas needs supplies from the van."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 65 mobile draw"
+   ],
+   [
+    "Why: many phlebotomists, salons and groomers are licensed to their center.",
+    "Why: in many states, blood draws away from a lab have their own rules."
+   ],
+   [
+    "like a blood draw at the center or at home",
+    "like a blood draw at the center or a home visit"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Blood draw at home"
+   ],
+   [
+    "A center",
+    "A center"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the desk",
+    "At the desk"
+   ],
+   [
+    "A certificate or background check it names is checked instead.",
+    "A certificate or background check it names is the owner's own word, never looked up."
+   ],
+   [
+    "and checked on its lookup where one exists.",
+    "and kept as the owner's own word."
+   ],
+   [
+    "It's re-checked like a license: S13-41.",
+    "Rosie never re-checks it."
+   ],
+   [
+    "and it's checked then.",
+    "."
+   ],
+   [
+    "Quinn can be booked once the license checks out on the state's lookup, and Sam says yes.",
+    "Quinn can be booked once Sam says yes."
+   ],
+   [
+    "Each is checked on the lookup the plug-in names.",
+    "Each is the owner's own word, never looked up."
+   ],
+   [
+    "A license that doesn't match keeps Quinn hidden, and Sam is told.",
+    "Nothing is looked up, so a license never keeps anyone hidden."
+   ],
+   [
+    "Checked on the official lookup",
+    "The owner's own word, never looked up"
+   ],
+   [
+    "Please add your license number.",
+    "Add your license number if you want it shown."
+   ],
+   [
+    "Your license, checked while you go on",
+    "Your license, kept as your own word"
+   ],
+   [
+    "licenses only as checked,",
+    "licenses only as the owner's own word,"
+   ],
+   [
+    "Licenses as checked, and agreements signed.",
+    "Licenses as the owner's own word, and agreements signed."
+   ],
+   [
+    "beyond 'on file, checked'.",
+    "beyond 'on file'."
+   ],
+   [
+    "A skill added later is checked against that person's license before it's offered.",
+    "A skill added later is offered once the owner says so."
+   ],
+   [
+    "and a license for that service and place, checked that day,",
+    "and the skill for that service and place,"
+   ],
+   [
+    "has the skill and a license for the work, checked that day.",
+    "has the skill for the work."
+   ],
+   [
+    "Addresses there are offered once a license checks out, and only for the people it covers.",
+    "Addresses there are offered once the owner says so, and only for the people they cover."
+   ],
+   [
+    "Reese can be booked once the license checks out on the state's lookup, and Sam says yes.",
+    "Reese can be booked once Sam says yes."
+   ],
+   [
+    "color",
+    "glucose"
+   ],
+   [
+    "House calls",
+    "Mobile draws"
+   ],
+   [
+    "house calls",
+    "mobile draws"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "clinician",
+    "phlebotomist"
+   ],
+   [
+    "Clinician",
+    "Phlebotomist"
+   ],
+   [
+    "drain",
+    "draw"
+   ],
+   [
+    "Drain",
+    "Draw"
+   ],
+   [
+    "sink",
+    "chair"
+   ],
+   [
+    "Sink",
+    "Chair"
+   ],
+   [
+    "valves",
+    "caps"
+   ],
+   [
+    "valve",
+    "cap"
+   ],
+   [
+    "pipes",
+    "tubes"
+   ],
+   [
+    "pipe",
+    "tube"
+   ],
+   [
+    "faucet",
+    "tap"
+   ],
+   [
+    "Faucet",
+    "Tap"
+   ],
+   [
+    "Cabinet",
+    "Cart"
+   ],
+   [
+    "service calls",
+    "visits"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "clogged",
+    "clotted"
+   ],
+   [
+    "clog",
+    "clot"
+   ],
+   [
+    "overflowing",
+    "spilling"
+   ],
+   [
+    "cabinet",
+    "cart"
+   ],
+   [
+    "shutoff",
+    "cap"
+   ],
+   [
+    "flush",
+    "rinse"
+   ],
+   [
+    "Flush",
+    "Rinse"
+   ],
+   [
+    "sewer",
+    "vein"
+   ],
+   [
+    "Sewer",
+    "Vein"
+   ],
+   [
+    "heater",
+    "cooler"
+   ],
+   [
+    "Heater",
+    "Cooler"
+   ],
+   [
+    "Barber, as given",
+    "Phlebotomist, as given"
+   ]
+  ]
+ },
+ "keep": [
+  "blood draw",
+  "blood draws",
+  "home blood work",
+  "drug test",
+  "drug tests",
+  "mobile draw",
+  "mobile draws",
+  "draw chair",
+  "draw center",
+  "lab",
+  "center",
+  "phlebotomist",
+  "phlebotomists",
+  "glucose test",
+  "fasting test",
+  "Glucose test",
+  "Fasting test",
+  "visit fee",
+  "Visit fee",
+  "health plan",
+  "Health plan",
+  "blood draw at home",
+  "Blood draw at home",
+  "a sample",
+  "samples",
+  "leak",
+  "Leak"
+ ],
+ "story": {
+  "A": "A patient with a doctor's order books a fasting blood test at Lee Lab & Draw for an early-morning slot. The lab bills the health plan, and Rosie texts the patient's share once the plan pays. Results go to the ordering doctor.",
+  "B": "A homebound patient's daughter books a mobile blood draw at the patient's home. A phlebotomist comes in a morning window, draws the tests on the doctor's order, and the samples reach the lab the same day; the plan is billed, then the visit fee and any share."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|bill",
+   "combos": [
+    "list|none|bill",
+    "list|full|none",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|none|bill": "The main story: a fasting blood test on a doctor's order. Nothing taken when booking; the plan is billed, then the patient's share is billed after.",
+    "list|full|none": "A direct-to-you wellness panel ($79), paid in full when booking; nothing more after the draw.",
+    "list|none|counter": "A self-pay draw on a doctor's order with no plan, paid at the desk after the draw."
+   },
+   "amounts": {
+    "*": {
+     "name": "Blood draw"
+    },
+    "list|none|bill": {
+     "price": "$25",
+     "name": "Fasting blood test (basic metabolic panel)",
+     "fee": "$0"
+    },
+    "list|full|none": {
+     "price": "$79",
+     "name": "Direct-to-you wellness panel",
+     "paid": "$79",
+     "fee": "$0"
+    },
+    "list|none|counter": {
+     "price": "$20",
+     "name": "Complete blood count"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|bill",
+   "combos": [
+    "list|none|bill",
+    "list|full|none",
+    "list|card|card",
+    "list|none|own"
+   ],
+   "examples": {
+    "list|none|bill": "The main story: a mobile draw on a doctor's order. Nothing taken; the plan is billed, then the $65 visit fee and any share are billed after.",
+    "list|full|none": "A direct-to-you panel drawn at home, paid in full when booking.",
+    "list|card|card": "A mobile draw with a card saved; the $65 visit fee is charged to that card at DONE.",
+    "list|none|own": "An employer's drug tests at the workplace, billed to the employer's account its own way."
+   },
+   "amounts": {
+    "*": {
+     "name": "Mobile blood draw"
+    },
+    "list|*|*": {
+     "price": "$65",
+     "name": "Mobile blood draw",
+     "fee": "$65"
+    },
+    "list|full|none": {
+     "price": "$79",
+     "name": "Direct-to-you panel at home",
+     "paid": "$79",
+     "fee": "$65"
+    },
+    "list|card|card": {
+     "price": "$65",
+     "fee": "$65",
+     "name": "Mobile blood draw"
+    },
+    "list|none|own": {
+     "price": "$45",
+     "name": "Employer drug test"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-02",
+    "label": "One isn't on the list yet",
+    "why": "a lab's own kinds of work are all on its plug-in; no new kind is drafted here"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "D96: no license is re-checked when its holder leaves"
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee Lab & Draw",
+      "250 Market St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Fasting blood test $25 ($27 from Nov 2) · Direct-to-you panel $79 · Glucose test $35"
+     ],
+     [
+      "To book",
+      "{{pay.asks}}"
+     ],
+     [
+      "Licenses",
+      "The owner's own word, never looked up"
+     ],
+     [
+      "About us",
+      "'A neighborhood lab on Market St.' · 3 pictures"
+     ],
+     [
+      "Lee Mobile Draw",
+      "Mobile draws · within 25 miles of 250 Market St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "D96: no license lapse can be seen without a lookup; nothing is re-checked"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "D96: licenses are optional and never looked up by Rosie: no lookup branch"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "D96: no person license lookup; the lab's certificates stay the owner's own record"
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "label": "The number isn't found",
+    "why": "D96: no license lookup runs, so no lookup result"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "D96: no license lookup to ask about"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license lookup to be down"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "D96: licenses are never re-checked by Rosie"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "D96: Rosie checks no license before anyone is offered"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "D96: no claim is shown as checked"
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration number only where one is required, and keeps it as the owner's own word. Rosie never looks it up.",
+    "more": [
+     "Insured or bonded shows only once the owner sends proof.",
+     "The registration's name and number must match the listing. Stripe's name check reads it (S1-27).",
+     "Customers see no license claim. Each person is asked for nothing either, unless the plug-in names something.",
+     "A price-list service that is a licensed kind of work still takes its license step (S1-12). Registration never covers it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the center's business registration number, if it has one. It's kept as your own word; Rosie doesn't look it up."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-32",
+    "does": "Nothing shows to AI assistants until the ID and the control of the business are confirmed. The license is the owner's own word and is never looked up.",
+    "more": [
+     "Means 'Confirmed in minutes': the ID and the control of the business check out.",
+     "Means 'The ID doesn't match': the ID check can't match the photo to the selfie.",
+     "Never: show a business to AI assistants before the ID and control checks are confirmed."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "The ID and control checks came back in minutes. Lee Lab & Draw goes live at 2:20pm. Customers can book it now; the license is the owner's own word, never looked up. One neutral notice goes to its listing."
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until the owner says yes.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone's details are in. Let them take bookings now?"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S13-15",
+    "why": "D96: nothing is kept inside a license lookup; the owner's own word covers what the lab offers"
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "The lab signs the health privacy agreement once, before its first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Lab records stay with the lab as long as the federal and state rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "every profession pays the $2 per booking (D97)"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "No: people",
+    "why": "draw chairs are booked as spaces, not a person"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "a lab runs no classes"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "draws are never sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "nobody is booked by name: a draw chair's slot"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "a lab runs no sessions"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "a draw is never a stay"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "a lab books anyone who may book (the plug-in)"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "a parent or guardian stays with a child for the draw"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "health work is sensitive: no rating request (S13-22)"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "no repeat plan: each draw is booked on its own"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "no repeat plan here"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "the lab sells no packages or memberships"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "the lab sells no packs or memberships"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "no repeat plan here"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "no repeat plan here"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "no repeat plan here"
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "nothing sold at a draw comes with a cancel period"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "health care has no free-fix visit: a worry after a draw goes to the lab's doctor line"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "a lab sends no proposals"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "nothing is left at the lab desk"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "a lab runs no classes"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-02",
+    "label": "One isn't on the list yet",
+    "why": "a lab's own kinds of work are all on its plug-in; no new kind is drafted here"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "D96: no license is re-checked when its holder leaves"
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee Lab & Draw",
+      "250 Market St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Fasting blood test $25 ($27 from Nov 2) · Direct-to-you panel $79 · Glucose test $35"
+     ],
+     [
+      "To book",
+      "{{pay.asks}}"
+     ],
+     [
+      "Licenses",
+      "The owner's own word, never looked up"
+     ],
+     [
+      "About us",
+      "'A neighborhood lab on Market St.' · 3 pictures"
+     ],
+     [
+      "Lee Mobile Draw",
+      "Mobile draws · within 25 miles of 250 Market St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "D96: no license lapse can be seen without a lookup; nothing is re-checked"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "D96: licenses are optional and never looked up by Rosie: no lookup branch"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "D96: no person license lookup; the lab's certificates stay the owner's own record"
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "label": "The number isn't found",
+    "why": "D96: no license lookup runs, so no lookup result"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "D96: no license lookup to ask about"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license lookup to be down"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "D96: licenses are never re-checked by Rosie"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "D96: Rosie checks no license before anyone is offered"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "D96: no claim is shown as checked"
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration number only where one is required, and keeps it as the owner's own word. Rosie never looks it up.",
+    "more": [
+     "Insured or bonded shows only once the owner sends proof.",
+     "The registration's name and number must match the listing. Stripe's name check reads it (S1-27).",
+     "Customers see no license claim. Each person is asked for nothing either, unless the plug-in names something.",
+     "A price-list service that is a licensed kind of work still takes its license step (S1-12). Registration never covers it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the center's business registration number, if it has one. It's kept as your own word; Rosie doesn't look it up."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-32",
+    "does": "Nothing shows to AI assistants until the ID and the control of the business are confirmed. The license is the owner's own word and is never looked up.",
+    "more": [
+     "Means 'Confirmed in minutes': the ID and the control of the business check out.",
+     "Means 'The ID doesn't match': the ID check can't match the photo to the selfie.",
+     "Never: show a business to AI assistants before the ID and control checks are confirmed."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "The ID and control checks came back in minutes. Lee Lab & Draw goes live at 2:20pm. Customers can book it now; the license is the owner's own word, never looked up. One neutral notice goes to its listing."
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until the owner says yes.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone's details are in. Let them take bookings now?"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S13-15",
+    "why": "D96: nothing is kept inside a license lookup; the owner's own word covers what the lab offers"
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "The lab signs the health privacy agreement once, before its first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B9-17",
+    "more": [
+     "The employer's account is billed its own way. The employee pays nothing through Rosie."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Lab records stay with the lab as long as the federal and state rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "every profession pays the $2 per booking (D97)"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "a mobile draw books a phlebotomist's route, not a space"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "a lab runs no classes"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "draws are never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "a mobile draw is never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "mobile draws come in a morning window"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "a draw is never a stay"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "a lab runs no sessions"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "a mobile draw is never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "a mobile draw is never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "a mobile draw is never sent now, and nobody is on call"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "a child is never drawn without a parent or guardian there (B8-09)"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "consents, not a contract"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "no repeat plan here"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "no repeat plan: each draw is booked on its own"
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "no repeat plan here"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "no repeat plan here"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "no repeat plan here"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "no mobile draw is billed in stages"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "no repeat plan here, so there's no monthly bill for draws"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "no bill here is that big"
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "health care has no free-fix visit: a worry after a draw goes to the lab's doctor line"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "a lab sends no proposals"
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "care already given can't be cancelled; no cancel period for a draw already done"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "health work is sensitive: no rating request (S13-22)"
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A3-20",
+   "A4-43",
+   "A8-02",
+   "A8-53",
+   "S2-28"
+  ],
+  "B": [
+   "S2-28"
+  ]
+ },
+ "notes": "Built Oct 27 2026 on the R01-refitted primary-care (the sibling), with lab's verified base plug-in (Oct 24 test-drive) kept: services, questions, safety words, first steps, visit rules, messages, rules and edges. Changes: no $2 (D97: the $2 applies to every profession; the no-$2 branch is off, the Yes branch stays); licenses are never looked up or claimed checked by Rosie (D96); a paid-in-full path carries the direct-to-you panel's price as its example, with the paternity test ($350, pf.services) on the same path (a one-price-per-path limit, flagged for review); the health privacy agreement kept as required; sensitive on for health; welfare on for the mobile flow (a homebound patient who doesn't answer); flow A's draw chairs are spaces, flow B's mobile draws are windows with no person named.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "like Alex's employer for a staff cut.",
+    "My employer pays for this cut.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Color quotes come to you first. Board prices never need one",
+    "Color always stays with Riley.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Signature cut and hot towel shave",
+    "Haircuts at the shop work like this:",
+    "A $35 haircut can work this way.",
+    "Haircut · $35",
+    "A tip at the chair is the shop's own way. Rosie never asks for one.",
+    "a $20 fee ($40 for the Groom's package)",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "doesn't do perms.",
+    "Can I add a beard trim on Saturday?",
+    "Add a beard trim to your Sat 11:00am visit?",
+    "Add a beard trim today?",
+    "Beard trim · $20",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Haircuts",
+    "haircuts",
+    "massage",
+    "Massage",
+    "Hugo",
+    "1200 Main St",
+    "Beard trim",
+    "Kids cut",
+    "kids cut",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a haircut and a beard trim",
+    "price board",
+    "shop's board",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "plumbing and electrical",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "groom's party",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Groom's package",
+    "Signature cut and shave",
+    "haircut",
+    "Haircut",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "patch test",
+    "house call",
+    "House call",
+    "color correction",
+    "color and cut",
+    "House calls",
+    "house calls",
+    "barbershop",
+    "Barbershop",
+    "barbershops",
+    "kids cuts",
+    "barber",
+    "Barber",
+    "valve",
+    "kids cut",
+    "clinician",
+    "color",
+    "Color"
+   ],
+   "B": [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "The shop's chair is in the other flow.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "like a chair renter",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Like tapping a neighbor's water line without asking.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Classic cuts, fades and hot towel shaves.",
+    "barbershops",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Lee Home Services can clear the drain:",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Please clear the cabinet under the sink.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Can I run the dishwasher before you come?",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Replace both shutoff valves · $160",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "asked overnight for a drain clearing today.",
+    "service call fee",
+    "Service call fee",
+    "would like to talk about the water heater quote before booking.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "heating and cooling",
+    "Heating and cooling",
+    "Water heater flush",
+    "Water heater replacement",
+    "Water heater fix",
+    "Leak repair",
+    "leak repair",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "water heater",
+    "Water heater",
+    "like a burst pipe or a lockout",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The work never started, so there's no $2.",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "shop",
+    "Shop",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "A plan or warranty pays",
+    "DONE 179 drain",
+    "service call",
+    "Sewer camera inspection",
+    "at the chair",
+    "color",
+    "House calls",
+    "house calls",
+    "service call",
+    "clinician",
+    "drain",
+    "Drain",
+    "sink",
+    "valves",
+    "valve",
+    "pipes",
+    "pipe",
+    "faucet",
+    "Cabinet",
+    "Service call",
+    "clogged",
+    "clog",
+    "overflowing",
+    "cabinet",
+    "shutoff",
+    "flush",
+    "sewer",
+    "Sewer",
+    "heater",
+    "Barber, as given"
+   ]
+  },
+  "A": {
+   "S1-02": "cc33089d5b",
+   "S11-99": "efed1e4f4d",
+   "S11-57": "a3996ae84e",
+   "S11-50": "c4536a448c",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-32": "60f59eda70",
+   "S1-33": "eeaadba298",
+   "S12-19": "07db0515b2",
+   "S13-41": "18b280aaa2",
+   "S13-43": "a1049201f6",
+   "S13-11": "4345036419",
+   "S1-61": "7421d186d5",
+   "S1-35": "39adfc0799",
+   "S2-22": "6fe11c094c",
+   "S13-15": "f6fe416511",
+   "S1-29": "ed36650e05",
+   "A10-21": "08514557c8",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A10-05": "63c3536c7a",
+   "A10-44": "50aad85ac2",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A8-03": "7accda6f86"
+  },
+  "B": {
+   "S1-02": "e00621fff5",
+   "S11-99": "a97de4ca58",
+   "S11-57": "2f34f23d8a",
+   "S11-50": "b9d718f51a",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-32": "60f59eda70",
+   "S1-33": "2b5d1fa4ab",
+   "S12-19": "176d3d2beb",
+   "S13-41": "fb75fbb382",
+   "S13-43": "55206e4cb1",
+   "S13-11": "6561316ed7",
+   "S1-61": "e30e71f65d",
+   "S1-35": "1b680a4c71",
+   "S2-22": "6fe11c094c",
+   "S13-15": "bd04205b7b",
+   "S1-29": "69d8f12a68",
+   "B9-17": "24b5acdf89",
+   "B10-17": "b5f4aef51b",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B6-03": "dcc1eb310c",
+   "B8-67": "b66ffbd04d",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B4-43": "fc9855955a",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255"
+  }
+ }
+}

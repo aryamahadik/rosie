@@ -1,0 +1,5034 @@
+{
+ "id": "naturopath",
+ "name": "Naturopathic practice",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "acupuncturist",
+ "plugin": {
+  "pf.license": {
+   "need": "Optional, and Rosie checks nothing. The practice may list each practitioner's license or credential, where the state licenses the work, and any insurance it carries; Rosie shows what the practice enters, as given.",
+   "ask": "Optional: each practitioner's license or credential and its end date, as the practice keeps them.",
+   "who holds it": "The practice; each practitioner; each wellness coach.",
+   "how it's checked": "Rosie does not check, look up or verify any license, credential or insurance (D96). The practice's own word only.",
+   "blocks going live": "None for a license: nothing is held back because a credential is not on the page.",
+   "renewals": "None tracked by Rosie; the practice keeps its own dates.",
+   "insurance or bond": "Optional: the practice may list its liability insurance; Rosie does not check it.",
+   "background check": "The practice's own choice; Rosie does not run one.",
+   "own word": "If the practice says a visit needs a credential a person doesn't have, that person isn't offered that visit (the practice's own word, not a check)."
+  },
+  "pf.services": {
+   "shape": "Naturopathic practice: a first consult for a health plan built on food, sleep, movement and natural remedies; follow-up visits; a wellness coach visit; in person at the practice, by video where the practitioner is licensed where the patient is during the visit, and at home in a few places.",
+   "examples": "The example practice's own self-pay prices, not a standard. Plans rarely pay for naturopathic care here; a self-pay price is the default.",
+   "at the practice (flow A)": [
+    {
+     "name": "First naturopathic consult",
+     "length": "60 minutes",
+     "price": "$185 self-pay",
+     "order": "none; the intake form on the secure page first",
+     "before": "nothing taken",
+     "after": "paid at the front desk after the visit, the practice's own way"
+    },
+    {
+     "name": "Follow-up visit",
+     "length": "30 minutes",
+     "price": "$110 self-pay",
+     "order": "none",
+     "before": "nothing taken; a card saved only for the no-show fee, if the owner turns it on",
+     "after": "as above"
+    },
+    {
+     "name": "Wellness coach visit",
+     "length": "30 minutes",
+     "price": "$75 self-pay",
+     "order": "none",
+     "before": "nothing taken",
+     "after": "as above"
+    },
+    {
+     "name": "Video follow-up",
+     "length": "30 minutes",
+     "price": "$110 self-pay",
+     "order": "none",
+     "before": "nothing taken",
+     "after": "billed by the practice its own way after the visit",
+     "note": "only where the practitioner is licensed where the patient is during the visit"
+    }
+   ],
+   "at the patient's place (flow B)": [
+    {
+     "name": "Home naturopathic consult",
+     "length": "60 minutes on site",
+     "price": "$245 self-pay, the trip included",
+     "order": "none",
+     "before": "nothing taken",
+     "after": "one bill from Rosie after the visit, or the plan's share billed by the practice its own way"
+    },
+    {
+     "name": "Home follow-up",
+     "length": "30 minutes on site",
+     "price": "$175 self-pay",
+     "order": "none",
+     "before": "nothing taken",
+     "after": "as above"
+    }
+   ],
+   "capacity": "one patient per visit; a practitioner or coach per room; home visits one at a time per practitioner",
+   "skills": "naturopathic practitioner (the health plan), wellness coach (coaching visits), by kind of visit",
+   "online": "video follow-ups only where the practitioner is licensed where the patient is during the visit"
+  },
+  "pf.questions": {
+   "before times": [
+    "Which visit: a first consult, a follow-up, or a coach visit?",
+    "Will a plan pay? Just its name here.",
+    "Is it for a child? (yes or no here; a parent or guardian books and stays)"
+   ],
+   "after a time is picked": [
+    "Anything that helps the visit, like a step-free way in, an interpreter, or a coach who speaks the patient's language.",
+    "Would you like a woman or a man as the practitioner? (asked before anyone else is booked; offered where one is free)"
+   ],
+   "only on the secure page": [
+    "Date of birth; the plan's member number",
+    "The intake form: health history, conditions, medicines and supplements, allergies",
+    "Could you be pregnant or breastfeeding? (for anyone who could be)",
+    "Who your notes go to: your doctor, or no one",
+    "Consent for the plan, and for any remedy the practitioner suggests"
+   ],
+   "whoMayBook": "An adult for themselves; a parent or guardian for a child, who stays; a health care agent for an adult who can't consent; a doctor's office for its patient."
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, a stroke sign, or a fainting spell now",
+     "say": "Call 911 now. A naturopathic visit is not for an emergency.",
+     "booking": "no booking in that chat"
+    },
+    {
+     "words": "crisis words, or thoughts of harming yourself",
+     "say": "the 988 line and 911",
+     "booking": "no booking in that chat"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a pregnancy, or could be",
+     "what": "no remedy or fasting plan until the practitioner OKs it; the practitioner asks again at the visit"
+    },
+    {
+     "words": "a prescription medicine, or a serious condition such as heart disease, cancer, diabetes, kidney or liver disease",
+     "what": "the practitioner reviews it before any remedy is suggested; a change to a prescription comes only from the patient's own doctor"
+    },
+    {
+     "words": "a child",
+     "what": "a parent or guardian books and stays; the practice's own rules for children apply"
+    }
+   ],
+   "medical questions": "Never answered: whether a remedy treats a condition, whether to stop or start a medicine, or what a test means. Those go to the practitioner or the patient's own doctor. Rosie gives no health advice and makes no claim that a remedy works."
+  },
+  "pf.first_steps": {
+   "required": [
+    {
+     "name": "Intake form",
+     "when": "at booking",
+     "who": "the patient, on the secure page",
+     "result": "the practitioner reads it before the visit; a flag moves the visit to the practitioner"
+    },
+    {
+     "name": "Health history and medicines",
+     "when": "by the day before",
+     "who": "the patient, on the secure page",
+     "result": "the practitioner OKs any remedy before it is suggested"
+    },
+    {
+     "name": "Doctor's note (where the practice asks for one)",
+     "when": "before the visit",
+     "who": "the patient's doctor's office",
+     "result": "not in by the day before: the desk calls the doctor's office; still not in, the visit can move with no fee"
+    }
+   ],
+   "prep for the reminder": "On a secure link: what to bring (a photo ID, the list of medicines and supplements, the plan card, any food diary the practitioner asked for).",
+   "prep timing": "Usually none. A lab test, if the practitioner orders one, may need fasting from the night before; that prep is on the secure link."
+  },
+  "pf.visit": {
+   "check-in": "The check-in code at the front desk. A video visit: the code is read out at the start.",
+   "at the visit": "The practitioner checks the intake form and the health history before any remedy. A chaperone is offered for any hands-on work.",
+   "work changes": "A new remedy or a new lab test comes only from the practitioner; the desk never adds one on its own.",
+   "stops": "A pregnancy, a flag the practitioner won't clear, or a missed fast for a lab test: the visit doesn't go ahead; another time, with no fee.",
+   "what proves it's done": "The code, or DONE when the visit ends.",
+   "results": "Lab results and the practitioner's notes stay in the practice's own records and portal. Rosie never texts a result."
+  },
+  "pf.money": {
+   "before": "Nothing taken at booking (the starting answer). No card is saved unless the owner turns on the no-show fee.",
+   "after": "At the practice: paid at the front desk after the visit, card or cash, the practice's own way. At home: one bill from Rosie after the visit, with the trip fee in it; a plan's share billed by the practice its own way.",
+   "fees": "A no-show or a late cancel within 24 hours: $40, only if the owner says yes, and only where a card was saved at booking.",
+   "tips": "None.",
+   "tax": "None.",
+   "rosfield": "Rosfield's $2 per booking applies as for every business (D97); the practice pays it, never the patient."
+  },
+  "pf.messages": {
+   "never in a text": "The concern, the remedy, the medicine, the test, the reason for the visit, and any health history. Texts name only the practice, the date, the time, the place and a secure link; staff and owner texts use initials.",
+   "results": "Never in a text; 'your practitioner has the report' at most, only where the patient agreed.",
+   "languages": "English and Spanish, plus the practice's interpreter line.",
+   "minors": "A parent or guardian books; texts go to them."
+  },
+  "pf.staff": {
+   "roles": "Naturopathic practitioners (as licensed where the state licenses the work), wellness coaches, and the front desk.",
+   "supervision": "A remedy decision is the practitioner's alone; a coach gives no medical advice.",
+   "skills": "each person's visit kinds, as the practice lists them",
+   "who OKs": "The practitioner OKs every remedy and any flag; a coach doesn't.",
+   "stand-ins": "Another practitioner or coach with the same skill. A patient who asked for a woman or a man is asked before anyone else is booked; nobody moves on silence.",
+   "chaperone": "Offered for any hands-on work; a patient's request is honored."
+  },
+  "pf.rules": {
+   "orders": "No remedy or plan without the intake form and the health history.",
+   "health privacy": "The practice signs Rosie's health-privacy agreement before going live.",
+   "claims": "No claim in any text or booking page that a remedy treats or cures a condition.",
+   "results": "Lab results and notes go to the patient through the practice's own portal; Rosie never carries them.",
+   "records": "Records kept as long as the state's rules require, in the practice's own system; a patient's copy within 30 days.",
+   "minors": "Who may consent for a child, and what a minor may consent to alone: the practice's own rule, from the state's form.",
+   "video": "A video visit only where the practitioner is licensed where the patient is during the visit."
+  },
+  "pf.edges": {
+   "matter most": {
+    "no intake form on the day": "The desk calls; no form, no visit, no fee.",
+    "a flag the practitioner won't clear": "The visit moves to a call with the practitioner, with no fee.",
+    "missed fast for a lab test": "Moved with no fee.",
+    "could be pregnant": "Stopped until the practitioner OKs it.",
+    "a prescription change asked": "The patient's own doctor decides; the practitioner is told.",
+    "a child": "A parent stays and books.",
+    "a care home resident who can't consent": "The agent's consent on file.",
+    "results questions": "The practitioner, or the patient's doctor.",
+    "emergency signs": "911 at once, before anything else."
+   },
+   "the rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "planbill",
+   "forms",
+   "firststeps",
+   "children",
+   "video"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Natural Health",
+   "staff": "Dana (naturopathic doctor) and Omar (wellness coach), with the front desk",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Home Wellness",
+   "staff": "Priya (naturopathic doctor, home visits) and Ben (wellness coach, the backup)",
+   "cust": "Alex M. (patient, at home) · other patients",
+   "other": "Others (a parent or guardian, a plan, a family member who pays)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dana"
+  },
+  "B": {
+   "staff": "Priya"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for a first visit), only if a card was saved and you say yes"
+   ],
+   [
+    "a $20 fee ($40 for the Bone density scan), only if a card, a deposit or the full price was taken and you say yes",
+    "no fee, since nothing is taken at booking"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "An practitioner's example: 'A first visit needs the health history first. Filled it in at Lee's in the last year?'"
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Omar's phone, you said yes to a follow-up visit for $175."
+   ],
+   [
+    "Extra for {{alex.staff}}: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for {{alex.staff}}: a home follow-up, $175. Sent to Alex."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An practitioner's example: chest pain or trouble breathing gets 'call 911 now'."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the visit's address, after a missed check."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Dana and Omar treat patients; Dana also sees children and makes home visits."
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: a home follow-up, $175. Sent to Alex."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A parent books follow-ups for three children on one morning."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE added for A.M. on the secure page."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Board prices never need one"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a spine adjustment, which isn't on the shop's list."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Tai chi for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "The price, {{price}}, comes straight from Sam's list.",
+    "The price, {{price:$245}}, comes straight from Sam's list."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most naturopathic practices set it."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My sore muscle got worse. Can I still come in?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A follow-up is rated, so the shop takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's naturopathic care takes no jobs sent now, at the practice or away."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 175 a home follow-up"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a follow-up plan with Dana, every 6 months."
+   ],
+   [
+    "Adding a wellness coach visit, +$20? Say so.",
+    "Adding a wellness coach visit, +$75? Say so."
+   ],
+   [
+    "a card saved for the $89 service-call fee",
+    "nothing taken"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the practice show photos of your tongue?"
+   ],
+   [
+    "Priya finds corroded follow-up valves.",
+    "Omar finds the visit needs a follow-up."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bib clip ripped my shirt collar."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Omar finds the visit needs a follow-up."
+   ],
+   [
+    "Classic cuts, fades and warm shaves.",
+    "Classic remedies, herbs and warm compresses."
+   ],
+   [
+    "only the $89 trip fee was promised.",
+    "only the price for the visit was promised."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do spine adjustments."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a follow-up every 6 months."
+   ],
+   [
+    "Today's visit is the $89 trip fee.",
+    "Today's visit is paid as agreed."
+   ],
+   [
+    "a card saved, for a $20 fee you OK",
+    "nothing taken"
+   ],
+   [
+    "$20 fee ($40 for a first visit)",
+    "$40 no-show fee"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A child's visit always stays with Dana."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "My point has been sore since the treatment."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Wellness and Lee Natural Health"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Wellness and Lee Herbal"
+   ],
+   [
+    "adds the prices: $35 and $20.",
+    "adds the prices: $75 and $40."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Follow-up plan · every 6 months"
+   ],
+   [
+    "Someone calls for a dentist",
+    "Someone calls for an eye doctor"
+   ],
+   [
+    "I need to move my cleaning.",
+    "I need to move my eye exam."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a follow-up on Saturday."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat May 1 · 10:00am"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una cita de acupuntura el sábado."
+   ],
+   [
+    "A step-free door on Elm St",
+    "A step-free door on Harbor St"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a follow-up every 6 months"
+   ],
+   [
+    "says the cape clip ripped",
+    "says the bib clip ripped"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Harbor St"
+   ],
+   [
+    "$179, paid after the job",
+    "$245, paid after the visit"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "plumbing and electrical",
+    "home naturopathic care and herbal consults"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home naturopathic care and herbal consults"
+   ],
+   [
+    "First home visit · $199",
+    "Home follow-up · $175"
+   ],
+   [
+    "Acupuncture visit · $20",
+    "Naturopathic visit · $75"
+   ],
+   [
+    "plumbing and electrical",
+    "naturopathic care and coaching"
+   ],
+   [
+    "Plumbing and electrical",
+    "Naturopathic care and coaching"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Sensitivity gel · $15"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Natural Health LLC"
+   ],
+   [
+    "photos of your hair",
+    "photos of your tongue"
+   ],
+   [
+    "priced at the chair",
+    "priced in the treatment room"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the treatment room"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Wellness's"
+   ],
+   [
+    "quote at the chair",
+    "quote in the treatment room"
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Wellness"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Natural Health"
+   ],
+   [
+    "color correction",
+    "pain visit"
+   ],
+   [
+    "Color correction",
+    "Pain visit"
+   ],
+   [
+    "set at the chair",
+    "set in the treatment room"
+   ],
+   [
+    "Groom's package",
+    "First visit"
+   ],
+   [
+    "is at the chair",
+    "is in the treatment room"
+   ],
+   [
+    "at $140 an hour",
+    "at an hourly rate Sam sets"
+   ],
+   [
+    "Groom's package",
+    "Wellness check"
+   ],
+   [
+    "Drain clearing",
+    "Home treatment"
+   ],
+   [
+    "rents a chair",
+    "rents a room"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "herbal formula"
+   ],
+   [
+    "Color and cut",
+    "Herbal formula"
+   ],
+   [
+    "water heaters",
+    "herbs"
+   ],
+   [
+    "Panel upgrade",
+    "Herb plan"
+   ],
+   [
+    "Cupping · $20",
+    "Wellness coach visit · $75"
+   ],
+   [
+    "Color and cut",
+    "Follow-up visit"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "1200 Main St",
+    "500 Main St"
+   ],
+   [
+    "Jordan Price",
+    "Omar Chen"
+   ],
+   [
+    "A beard trim",
+    "Cupping"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "water heater",
+    "herb plan"
+   ],
+   [
+    "NEW massage",
+    "NEW tai chi"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Casey Moore",
+    "Ben Moore"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Riley Chen",
+    "Dana Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Omar Diaz"
+   ],
+   [
+    "electrical",
+    "herbal consults"
+   ],
+   [
+    "Electrical",
+    "Herbal consults"
+   ],
+   [
+    "barbershop",
+    "practice"
+   ],
+   [
+    "Barbershop",
+    "Practice"
+   ],
+   [
+    "Beard trim",
+    "Cupping"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "Beard trim",
+    "Wellness coach visit"
+   ],
+   [
+    "beard trim",
+    "wellness coach visit"
+   ],
+   [
+    "barbershop",
+    "naturopathic practice"
+   ],
+   [
+    "Barbershop",
+    "Naturopathic practice"
+   ],
+   [
+    "electrical",
+    "coaching"
+   ],
+   [
+    "Electrical",
+    "Coaching"
+   ],
+   [
+    "88 Elm St",
+    "60 Harbor St"
+   ],
+   [
+    "kids cuts",
+    "child's visits"
+   ],
+   [
+    "Skin fade",
+    "Acupressure visit"
+   ],
+   [
+    "staff cut",
+    "staff follow-up"
+   ],
+   [
+    "Skin fade",
+    "Follow-up visit"
+   ],
+   [
+    "MP045210",
+    "AC045210"
+   ],
+   [
+    "a barber",
+    "an practitioner"
+   ],
+   [
+    "A barber",
+    "An practitioner"
+   ],
+   [
+    "plumbing",
+    "home naturopathic care"
+   ],
+   [
+    "Plumbing",
+    "Home naturopathic care"
+   ],
+   [
+    "Kids cut",
+    "Child's visit"
+   ],
+   [
+    "kids cut",
+    "child's visit"
+   ],
+   [
+    "haircuts",
+    "follow-ups"
+   ],
+   [
+    "Haircuts",
+    "Follow-ups"
+   ],
+   [
+    "plumbing",
+    "naturopathic care"
+   ],
+   [
+    "Plumbing",
+    "Naturopathic care"
+   ],
+   [
+    "cut hair",
+    "see patients"
+   ],
+   [
+    "plumber",
+    "practitioner"
+   ],
+   [
+    "barbers",
+    "practitioners"
+   ],
+   [
+    "haircut",
+    "follow-up"
+   ],
+   [
+    "Haircut",
+    "Follow-up"
+   ],
+   [
+    "Haircut",
+    "First consult"
+   ],
+   [
+    "haircut",
+    "first consult"
+   ],
+   [
+    "Jordan",
+    "Omar"
+   ],
+   [
+    "barber",
+    "practitioner"
+   ],
+   [
+    "Barber",
+    "Practitioner"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Omar"
+   ],
+   [
+    "gloss",
+    "sensitivity gel"
+   ],
+   [
+    "Casey",
+    "Ben"
+   ],
+   [
+    "color",
+    "child's visits"
+   ],
+   [
+    "Color",
+    "Child's visits"
+   ],
+   [
+    "shops",
+    "practices"
+   ],
+   [
+    "labor",
+    "extra time"
+   ],
+   [
+    "Lena",
+    "Maya"
+   ],
+   [
+    "shop",
+    "practice"
+   ],
+   [
+    "Shop",
+    "Practice"
+   ],
+   [
+    "patch test",
+    "skin test"
+   ],
+   [
+    "warm shaves",
+    "warm compresses"
+   ],
+   [
+    "shaves",
+    "compresses"
+   ],
+   [
+    "shave",
+    "visit"
+   ],
+   [
+    "Shave",
+    "Visit"
+   ],
+   [
+    "skin fade",
+    "wellness check"
+   ],
+   [
+    "Skin fade",
+    "Wellness check"
+   ],
+   [
+    "Acupressure visit",
+    "Wellness coach visit"
+   ],
+   [
+    "acupressure visit",
+    "wellness coach visit"
+   ],
+   [
+    "massage",
+    "coaching"
+   ],
+   [
+    "Massage",
+    "Coaching"
+   ],
+   [
+    "hot towel",
+    "warm"
+   ],
+   [
+    "valve",
+    "visit"
+   ],
+   [
+    "Valve",
+    "Visit"
+   ],
+   [
+    "Shutoff valve",
+    "Follow-up visit"
+   ],
+   [
+    "Shutoff valves",
+    "Follow-up visits"
+   ],
+   [
+    "Jordan",
+    "Dana"
+   ],
+   [
+    "Casey",
+    "Omar"
+   ],
+   [
+    "Grace",
+    "Dana"
+   ],
+   [
+    "Priya",
+    "Omar"
+   ],
+   [
+    "Weight-care care",
+    "naturopathic care"
+   ]
+  ],
+  "B": [
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or nobody home: up to the $89 trip fee, only if a card was saved and you say yes"
+   ],
+   [
+    "a $20 fee ($40 for the Bone density scan), only if a card, a deposit or the full price was taken and you say yes",
+    "no fee, since nothing is taken at booking"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for an naturopathic visit."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if chest pain or trouble breathing starts."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si tiene dolor en el pecho o le falta el aire, llame al 911."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Priya's phone, you said yes to a follow-up visit for $175."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "If you have chest pain or trouble breathing, call 911 now."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If you have chest pain or trouble breathing, call 911."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like chest pain or trouble breathing, gets the safety steps first."
+   ],
+   [
+    "Extra for {{alex.staff}}: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for {{alex.staff}}: a home follow-up, $175. Sent to Alex."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan runs Pine Court care home, with a repeat plan: treatments for two residents every 6 months."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An practitioner's example: chest pain or trouble breathing gets 'call 911 now'."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A question about the visit? Reply here."
+   ],
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. A check within 30 days is free, so this visit is free."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is there a quiet room with space for a portable table?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Nutrition counseling for Lee Home Wellness: is it the same company?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: chest pain, trouble breathing, a drooping face or a sudden very bad headache."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the visit's address, after a missed check."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every visit is booked ahead"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M. added on the secure page"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Priya and Ben treat patients; Priya also sees children and makes home visits."
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: a home follow-up, $175. Sent to Alex."
+   ],
+   [
+    "It's a leak under the sink, today, arriving 3–5pm, with Jordan.",
+    "It's a home treatment, today, arriving 3–5pm, with Priya."
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the second visit is done, $800 at the finish"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Priya's portable table scuffs the floor, and Priya texts a photo."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most naturopathic practices start."
+   ],
+   [
+    "The price, {{price}}, comes straight from Sam's list.",
+    "The price, {{price:$245}}, comes straight from Sam's list."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a treatment outside the license."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Priya's next times for a home follow-up."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds nutrition counseling to Lee Home Wellness."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's naturopathic care takes no jobs sent now, at the practice or away."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on my floor this morning."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can an practitioner come to my home this Thursday?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me duele mucho una muela."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 175 a home follow-up"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Priya come back for another treatment next week?"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a longer plan, from Priya's notes"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a home naturopathic visit."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Naturopathic care at my place' fits a home treatment."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the pain is worse now."
+   ],
+   [
+    "Adding a wellness coach visit, +$20? Say so.",
+    "Adding a wellness coach visit, +$75? Say so."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Priya's table scuffed the floor at A.M.'s."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene dolor en el pecho o le falta el aire?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a loose herb plan."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The pain is worse now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The pain is worse today. Can someone come tonight?"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules naturopathic practices often set."
+   ],
+   [
+    "One booking, so one $2 for the whole job.",
+    "It's one booking for the whole job."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a longer plan for the sore spot Priya noted"
+   ],
+   [
+    "The work never started, so there's no $2.",
+    "The work never started."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD no safe outlet for the table, stopped"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "a card saved for the $89 service-call fee",
+    "nothing taken"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: do you have chest pain, or trouble breathing?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and insurance card ready."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's treatments?"
+   ],
+   [
+    "Priya finds corroded follow-up valves.",
+    "Priya finds the visit needs a follow-up."
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Priya finds the visit needs a follow-up."
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Classic cuts, fades and warm shaves.",
+    "Classic remedies, herbs and warm compresses."
+   ],
+   [
+    "never takes more than the visit fee",
+    "never takes more than the trip fee"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My muscle has been sore since the treatment."
+   ],
+   [
+    "only the $89 trip fee was promised.",
+    "only the price for the visit was promised."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Priya left used cotton balls on the floor."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Cupping · $20"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the treatment"
+   ],
+   [
+    "Today's visit is the $89 trip fee.",
+    "Today's visit is paid as agreed."
+   ],
+   [
+    "a card saved, for a $20 fee you OK",
+    "nothing taken"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the care home to fix the outlet first"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A longer plan for the sore spot"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Which room are you in at Alex's home?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: no safe outlet for the table"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the wall by the bed"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa home treatment Thu 12-2 Ben"
+   ],
+   [
+    "$20 fee ($40 for a first visit)",
+    "$40 no-show fee"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't have chest pain."
+   ],
+   [
+    "Drain clearings already booked",
+    "Home treatments already booked"
+   ],
+   [
+    "One booking, so no second $2.",
+    "The extra stays part of the one booking."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Wellness and Lee Herbal"
+   ],
+   [
+    "Alex says yes before any work",
+    "Alex says yes first"
+   ],
+   [
+    "adds the prices: $35 and $20.",
+    "adds the prices: $75 and $40."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like naturopathic care at home."
+   ],
+   [
+    "Someone calls for a dentist",
+    "Someone calls for an eye doctor"
+   ],
+   [
+    "I need to move my cleaning.",
+    "I need to move my eye exam."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 herb plan, 3 stages"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Cupping"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home treatment needs none."
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Water heater replacement",
+    "Herb plan"
+   ],
+   [
+    "water heater replacement",
+    "herb plan"
+   ],
+   [
+    "with the store's receipt",
+    "with the supplier's receipt"
+   ],
+   [
+    "$179, paid after the job",
+    "$245, paid after the visit"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW nutrition counseling"
+   ],
+   [
+    "plumbing and electrical",
+    "home naturopathic care and herbal consults"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home naturopathic care and herbal consults"
+   ],
+   [
+    "Sewer camera inspection",
+    "First home visit"
+   ],
+   [
+    "sewer camera inspection",
+    "first home visit"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "First home visit · $199",
+    "Home follow-up · $175"
+   ],
+   [
+    "Acupuncture visit · $20",
+    "Naturopathic visit · $75"
+   ],
+   [
+    "plumbing and electrical",
+    "home care and coaching"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home care and coaching"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your herb plan"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home treatment"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your herb plan"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Wellness LLC"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed wall"
+   ],
+   [
+    "the warranty company",
+    "the plan"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Cupping · $165"
+   ],
+   [
+    "can clear the drain",
+    "can come for a home treatment"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomenaturopathic care.com"
+   ],
+   [
+    "No visit, so no $2.",
+    "No visit."
+   ],
+   [
+    "like a move-out day",
+    "like a move to another home"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the treatment room"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tengo dolor en el pecho."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Wellness's"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up"
+   ],
+   [
+    "water heater flush",
+    "home follow-up"
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Wellness"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Natural Health"
+   ],
+   [
+    "plumbing license",
+    "naturopathic care license"
+   ],
+   [
+    "Plumbing license",
+    "Naturopathic care license"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "like a roof leak",
+    "like braces"
+   ],
+   [
+    "The repair price",
+    "The treatment price"
+   ],
+   [
+    "the repair price",
+    "the treatment price"
+   ],
+   [
+    "Repipe · $2,400",
+    "Herb plan · $2,400"
+   ],
+   [
+    "Book the repair",
+    "Book the treatment"
+   ],
+   [
+    "at $140 an hour",
+    "at an hourly rate Sam sets"
+   ],
+   [
+    "drain clearing",
+    "home treatment"
+   ],
+   [
+    "Drain clearing",
+    "Home treatment"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 home treatment"
+   ],
+   [
+    "rents a chair",
+    "rents a room"
+   ],
+   [
+    "water heaters",
+    "herbs"
+   ],
+   [
+    "Panel upgrade",
+    "Herb plan"
+   ],
+   [
+    "home warranty",
+    "health plan"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 herb plan"
+   ],
+   [
+    "Cupping · $20",
+    "Wellness coach visit · $75"
+   ],
+   [
+    "1200 Main St",
+    "500 Main St"
+   ],
+   [
+    "Jordan Price",
+    "Priya Chen"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "water heater",
+    "herb plan"
+   ],
+   [
+    "Water heater",
+    "Herb plan"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Casey Moore",
+    "Ben Moore"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "leak repair",
+    "pain visit"
+   ],
+   [
+    "Leak repair",
+    "Pain visit"
+   ],
+   [
+    "electrician",
+    "coach"
+   ],
+   [
+    "Electrician",
+    "Coach"
+   ],
+   [
+    "Riley Chen",
+    "Dana Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Omar Diaz"
+   ],
+   [
+    "electrical",
+    "herbal consults"
+   ],
+   [
+    "Electrical",
+    "Herbal consults"
+   ],
+   [
+    "barbershop",
+    "practice"
+   ],
+   [
+    "Electrical",
+    "Coaching"
+   ],
+   [
+    "electrical",
+    "coaching"
+   ],
+   [
+    "barbershop",
+    "naturopathic practice"
+   ],
+   [
+    "Barbershop",
+    "Naturopathic practice"
+   ],
+   [
+    "88 Elm St",
+    "60 Harbor St"
+   ],
+   [
+    "42 Oak St",
+    "31 Linden Ave"
+   ],
+   [
+    "a plumber",
+    "an practitioner"
+   ],
+   [
+    "MP045210",
+    "AC045210"
+   ],
+   [
+    "a barber",
+    "an practitioner"
+   ],
+   [
+    "plumbing",
+    "home naturopathic care"
+   ],
+   [
+    "Plumbing",
+    "Home naturopathic care"
+   ],
+   [
+    "Rental 1",
+    "Resident 1"
+   ],
+   [
+    "Rental 2",
+    "Resident 2"
+   ],
+   [
+    "Plumbing",
+    "Home care"
+   ],
+   [
+    "plumbing",
+    "home care"
+   ],
+   [
+    "plumber",
+    "practitioner"
+   ],
+   [
+    "barbers",
+    "practitioners"
+   ],
+   [
+    "haircut",
+    "follow-up"
+   ],
+   [
+    "Plumber",
+    "Practitioner"
+   ],
+   [
+    "Haircut",
+    "Home consult"
+   ],
+   [
+    "haircut",
+    "home consult"
+   ],
+   [
+    "Jordan",
+    "Priya"
+   ],
+   [
+    "barber",
+    "practitioner"
+   ],
+   [
+    "Barber",
+    "Practitioner"
+   ],
+   [
+    "faucet",
+    "herb plan"
+   ],
+   [
+    "Casey",
+    "Ben"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Omar"
+   ],
+   [
+    "color",
+    "child's visits"
+   ],
+   [
+    "labor",
+    "extra time"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "flush",
+    "follow-up"
+   ],
+   [
+    "Riley",
+    "Priya"
+   ],
+   [
+    "Avery",
+    "Ben"
+   ],
+   [
+    "shop",
+    "practice"
+   ],
+   [
+    "Shop",
+    "Practice"
+   ],
+   [
+    "replacing both follow-up valves",
+    "a follow-up visit"
+   ],
+   [
+    "both follow-up valves",
+    "a follow-up visit"
+   ],
+   [
+    "warm shaves",
+    "warm compresses"
+   ],
+   [
+    "shaves",
+    "compresses"
+   ],
+   [
+    "follow-up valves",
+    "follow-up visits"
+   ],
+   [
+    "follow-up valve",
+    "follow-up visit"
+   ],
+   [
+    "$160",
+    "$175"
+   ],
+   [
+    "under your sink",
+    "in your room"
+   ],
+   [
+    "Grace",
+    "Priya"
+   ],
+   [
+    "Iris",
+    "Priya"
+   ],
+   [
+    "hot towel",
+    "warm"
+   ],
+   [
+    "shave",
+    "visit"
+   ],
+   [
+    "pain visit",
+    "wellness visit"
+   ],
+   [
+    "Pain visit",
+    "Wellness visit"
+   ],
+   [
+    "sewer",
+    "home"
+   ],
+   [
+    "valve",
+    "visit"
+   ],
+   [
+    "shutoff",
+    "follow-up"
+   ],
+   [
+    "sink",
+    "table"
+   ]
+  ]
+ },
+ "keep": [
+  "31 Linden Ave",
+  "herbal consult",
+  "Herbal consult",
+  "herbal consults",
+  "Herbal consults",
+  "herb plan",
+  "Herb plan",
+  "60 Harbor St",
+  "500 Main St",
+  "clinic",
+  "Clinic",
+  "practice",
+  "Practice",
+  "First visit",
+  "first visit",
+  "First consult",
+  "first consult",
+  "Teen visit",
+  "teen visit",
+  "Child's visit",
+  "child's visit",
+  "video visit",
+  "Video visit",
+  "color",
+  "leak",
+  "grace",
+  "follow-up",
+  "Priya",
+  "Dana",
+  "Omar",
+  "Ben",
+  "Jules",
+  "19 Birch Ln",
+  "16 Cedar Ct",
+  "75 Market St",
+  "640 Main St",
+  "late-cancel fee",
+  "Late-cancel fee",
+  "300 Main St",
+  "60 Grove St",
+  "trip fee",
+  "Trip fee"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then on Sat Oct 24 at 9:30am, Alex asks an AI for a first naturopathic consult at Lee Natural Health and books Mon Oct 26 at 10:00am. The intake form is filled in on the secure page, nothing is taken, and Alex pays at the front desk after the visit.",
+  "B": "Sam Lee signs up two companies by text. Then on Thu Oct 22 at 6:40am, Alex, who isn't driving for a few weeks, asks an AI for a home consult. Lee Home Wellness books the next arrival window with Priya. Nothing is taken when booked, and Rosie sends the one bill after the visit."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a first naturopathic consult; nothing taken when booked; paid at the front desk after the visit.",
+    "list|card|counter": "A follow-up with a card saved for the $40 no-show fee, charged only if the owner says yes after a missed visit."
+   },
+   "amounts": {
+    "*": {
+     "name": "Naturopathic visit",
+     "fee": "$0"
+    },
+    "list|none|*": {
+     "price": "$185",
+     "fee": "$0",
+     "name": "First naturopathic consult"
+    },
+    "list|card|*": {
+     "price": "$110",
+     "fee": "$40",
+     "name": "Follow-up visit"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Wellness coach visit, added",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$75"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Wellness check, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$95",
+      "paid": "$95",
+      "fee": "$0"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Naturopathic visit (plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|bill",
+   "combos": [
+    "list|none|bill",
+    "list|none|own"
+   ],
+   "examples": {
+    "list|none|bill": "The main story: a home consult; nothing taken when booked; Rosie sends the one bill after the visit, trip included.",
+    "list|none|own": "A home consult with a plan that pays; the practice bills the plan and any share its own way."
+   },
+   "amounts": {
+    "*": {
+     "name": "Home naturopathic consult",
+     "fee": "$0"
+    },
+    "list|none|bill": {
+     "price": "$245",
+     "fee": "$0",
+     "name": "Home naturopathic consult (trip included)"
+    },
+    "list|none|own": {
+     "price": "$245",
+     "name": "Home naturopathic consult, plan visit",
+     "fee": "$0"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Home follow-up, added",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$175"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Home follow-up, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$175",
+      "paid": "$175",
+      "fee": "$0"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Home visit (plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Acupuncture books people (an practitioner), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Acupuncture runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No naturopathic care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "An naturopathic care visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "An naturopathic care visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "An naturopathic care visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the clinic: the patient is in the treatment room."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's naturopathic care visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "Lee Acupuncture Clinic's services happen only at the clinic. Home visits are Lee Home Acupuncture's (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "Follow-ups are booked as a series from the treatment plan, with Alex's own yes (A4-31), not as an open-ended plan."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Each naturopathic care visit is one patient with one practitioner."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every naturopathic care visit has the health questions: on file from the first visit, or filled in on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "No naturopathic care visit needs a written contract: the 5-visit package is bought at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No open-ended plans: follow-ups are booked as a series (A4-31)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The 5-visit package is sold only at the clinic, never while booking (pf.money.packages)."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No open-ended plans at the clinic (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No open-ended plans at the clinic (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No open-ended plans at the clinic (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Each visit is paid at the visit."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each visit is paid at the visit, even in a series."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Nothing is signed at a clinic visit that comes with a right to cancel: the package is bought at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A treatment plan is suggested in person, never sent to sign (pf.visit.after)."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "An naturopathic care visit has nothing to fix or redo for free."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "No results come later: nothing is sent to a lab."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A clinic runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "A clinic takes no drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Acupuncture is health care, sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession, health included; no no-$2 choice"
+   },
+   {
+    "op": "before",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "line": [
+       "6.1",
+       "7.16"
+      ],
+      "who": "staff",
+      "via": "page",
+      "t": "Thu Oct 22, 9:00am",
+      "title": "Dana reads Alex's health update",
+      "does": "Dana reads Alex's health update before the visit. Nothing stands out, so the visit stays as booked.",
+      "more": [
+       "Rosie never judges the answers. Only the practitioner decides what's safe.",
+       "A flag to talk over: Dana calls Alex first. A medicine change is the patient's own doctor's call.",
+       "Not right for a remedy now: Dana calls and says who to see. The visit is cancelled with no fee.",
+       "The answers stay on the secure page. Nothing about them goes in a text, to Alex or to the team."
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When patients book, do you take anything? Each visit starts the way most naturopathic practices set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every visit, to start",
+        "lines": [
+         "At your practice, paid at the front desk after the visit",
+         "When they book: nothing taken; no card saved",
+         "A card saved only for a no-show fee, if you turn it on",
+         "A plan's share: billed by your practice its own way"
+        ]
+       },
+       "list": {
+        "head": [
+         "Visit",
+         "Self-pay price"
+        ],
+        "rows": [
+         [
+          "First naturopathic consult",
+          "$185"
+         ],
+         [
+          "Follow-up visit",
+          "$110"
+         ],
+         [
+          "Wellness coach visit",
+          "$75"
+         ],
+         [
+          "Video follow-up",
+          "$110"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "A card saved for the no-show fee"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A card is saved for the $40 no-show or late-cancel fee, charged only if you say yes after a missed visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each visit: nothing taken when booked; the price is paid at the front desk after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-14",
+    "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+      {
+       "card": {
+        "title": "Your practice's money",
+        "lines": [
+         "Nothing taken when booked",
+         "No card unless you turn on the no-show fee",
+         "Paid at the desk after the visit"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I send no bill for a desk payment."
+     ]
+    ],
+    "vary": {
+     "before:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "before:full": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:photos+before:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:photos+before:card": {
+      "does": "A card is saved for the $40 no-show fee only. Nothing is charged unless the owner says yes after a missed visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "A card is saved for the $40 no-show fee, and charged only if you say yes after a missed visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:full": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:visit+before:card": {
+      "does": "A card is saved for the $40 no-show fee only. Nothing is charged unless the owner says yes after a missed visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "A card is saved for the $40 no-show fee, and charged only if you say yes after a missed visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:list+before:none+after:counter": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:list+before:none+after:bill": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:list+before:card+after:bill": {
+      "does": "A card is saved for the $40 no-show fee only. Nothing is charged unless the owner says yes after a missed visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "A card is saved for the $40 no-show fee, and charged only if you say yes after a missed visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:card+after:card": {
+      "does": "A card is saved for the $40 no-show fee only. Nothing is charged unless the owner says yes after a missed visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "A card is saved for the $40 no-show fee, and charged only if you say yes after a missed visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:counter": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:card": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:photos+before:card+after:bill": {
+      "does": "A card is saved for the $40 no-show fee only. Nothing is charged unless the owner says yes after a missed visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "A card is saved for the $40 no-show fee, and charged only if you say yes after a missed visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:card+after:card": {
+      "does": "A card is saved for the $40 no-show fee only. Nothing is charged unless the owner says yes after a missed visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "A card is saved for the $40 no-show fee, and charged only if you say yes after a missed visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:counter": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:bill": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:visit+before:card+after:bill": {
+      "does": "A card is saved for the $40 no-show fee only. Nothing is charged unless the owner says yes after a missed visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "A card is saved for the $40 no-show fee, and charged only if you say yes after a missed visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:card+after:card": {
+      "does": "A card is saved for the $40 no-show fee only. Nothing is charged unless the owner says yes after a missed visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "A card is saved for the $40 no-show fee, and charged only if you say yes after a missed visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:list+before:none+after:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. The visit is paid at the front desk after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Visits at your practice: nothing is taken when they book, and no card is asked for. The visit is paid at the front desk after.",
+        {
+         "card": {
+          "title": "Your practice's money",
+          "lines": [
+           "Nothing taken when booked",
+           "No card unless you turn on the no-show fee",
+           "Paid at the desk after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "I send no bill for a desk payment."
+       ]
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "An naturopathic care visit always needs the patient there."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Home naturopathic care takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for naturopathic care (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "An naturopathic care visit always needs the patient there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the practitioner's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Acupuncture books people (an practitioner), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Acupuncture runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No naturopathic care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Home naturopathic care books a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "An naturopathic care visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Home naturopathic care sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No naturopathic care visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No naturopathic care visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Lee Home Acupuncture works only at the patient's home. The clinic is Lee Acupuncture Clinic (flow A)."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "Follow-ups are booked as a series from the treatment plan, with Alex's own yes (B4-45), not as an open-ended plan."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "Each home visit is one patient with one practitioner."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "No",
+    "why": "Every home visit has the health questions: on file, or filled in on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A home naturopathic care visit is one list price, under any amount that needs a contract, and nothing is sold to sign at the home."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No open-ended plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No open-ended plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No open-ended plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No open-ended plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "No home naturopathic care bill comes near $500, and Sam keeps bank transfer off (S1-57)."
+   },
+   {
+    "op": "off",
+    "at": "B8-97",
+    "label": "A finding stops the work",
+    "why": "Nothing in a home stops part of an naturopathic care visit. A health reason is 'Stopped or done differently'."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Alex is there for the whole visit, so no update is texted."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Each home visit is paid after that visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each home visit is billed on its own, even in a series."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at a home visit (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at a home visit (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "An naturopathic care visit has no warranty or free redo."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A treatment plan is suggested in person, never sent to sign (pf.visit.after)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "No report comes later from a home visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "A plan or a claim is billed by the business its own way (list|none|own): Rosie never texts a plan's share."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Acupuncture is health care, sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession, health included; no no-$2 choice"
+   },
+   {
+    "op": "before",
+    "at": "B7-55",
+    "steps": [
+     {
+      "id": "B7-x01",
+      "line": [
+       "6.1",
+       "7.16"
+      ],
+      "who": "staff",
+      "via": "page",
+      "t": "Tue Oct 20, 9:00am",
+      "title": "Priya reads Alex's health update",
+      "does": "Priya reads Alex's health update before the visit. Nothing stands out, so the visit stays as booked.",
+      "more": [
+       "Rosie never judges the answers. Only the practitioner decides what's safe.",
+       "A flag to talk over: Priya calls Alex first. A medicine change is the patient's own doctor's call.",
+       "Not right for a remedy now: Priya calls and says who to see. The visit is cancelled with no fee.",
+       "The answers stay on the secure page. Nothing about them goes in a text, to Alex or to the team."
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When clients book, do you take anything? Each home visit starts the way most home practices set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every home visit, to start",
+        "lines": [
+         "Where: at the client's home",
+         "When they book: nothing taken; no card saved",
+         "After the visit: Rosie sends the one bill, trip included",
+         "A plan's share: billed by you its own way"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Home naturopathic consult (trip included)",
+          "$245"
+         ],
+         [
+          "Home follow-up",
+          "$175"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Nothing is taken when booked. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Nothing is taken when booked. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Nothing is taken when booked. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Nothing is taken when booked. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:none+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after the visit."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A home visit: nothing taken when booked, and one bill after the visit, trip included. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-14",
+    "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Home visits: nothing is taken when they book, and no card is asked for.",
+      {
+       "card": {
+        "title": "Your home visits",
+        "lines": [
+         "Nothing taken when booked",
+         "No card, and no late fee",
+         "One bill after the visit"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "The one bill comes after the visit, trip included."
+     ]
+    ],
+    "vary": {
+     "before:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "before:deposit": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "before:full": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "before:none+after:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "before:none+after:own": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "before:card+after:card": {
+      "does": "Nothing is taken when booked. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Nothing taken when booked. One bill comes after the visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:card+after:own": {
+      "does": "Nothing is taken when booked. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Nothing taken when booked. One bill comes after the visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "before:deposit+after:own": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "does": "Nothing is taken when booked, and no card is asked for. One bill comes after the visit.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Home visits: nothing is taken when they book, and no card is asked for.",
+        {
+         "card": {
+          "title": "Your home visits",
+          "lines": [
+           "Nothing taken when booked",
+           "No card, and no late fee",
+           "One bill after the visit"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "The one bill comes after the visit, trip included."
+       ]
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "S1-80",
+   "S2-30",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28",
+   "S1-80",
+   "S2-30",
+   "B7-55",
+   "B8-58",
+   "B7-62"
+  ]
+ },
+ "notes": "Built Oct 27 2026 (K10, Haiku builder) from the refitted acupuncturist overlay (R13). Health work: sensitive on; no $2 switch (D97: the $2 applies); licenses optional and never checked (D96): S1-60 and S2-28 keep both branches. Flow A money: list|none|counter (main: first consult $185, paid at the desk after; no fee), list|card|counter (follow-up $110 with a card saved for a $40 no-show fee, charged only with the owner's yes). Flow B: list|none|bill (main: home consult $245, trip included, one bill from Rosie after the visit), list|none|own (a plan visit, the practice's own way). Video follow-ups: fact video, A4-01 and B4-01 video options kept. Own steps: the health-update read before the visit (A7-x01 / B7-x01; the acupuncturist's steps, reworded). Acupuncture steps and the acupuncturist's plan steps are not carried over.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "We'd share only where they're working, only after a missed check.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "Color quotes come to you first. Board prices never need one",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Each service starts the way most barbershops set it.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "a card saved for the $89 service-call fee",
+    "May the shop show photos of your hair?",
+    "The cape clip ripped my shirt collar.",
+    "Lee's Barbershop doesn't do perms.",
+    "Alex asks for a cut every 4 weeks.",
+    "a card saved, for a $20 fee you OK",
+    "Color always stays with Riley.",
+    "like a burst pipe or a lockout",
+    "The cut is uneven on one side.",
+    "Lee Plumbing and Lee Electric",
+    "Lee Plumbing and Lee Electric",
+    "adds the prices: $35 and $20.",
+    "Haircut plan · every 4 weeks",
+    "Someone calls for a dentist",
+    "I need to move my cleaning.",
+    "I'd like a cut on Saturday.",
+    "Next: Sat Nov 28 · 10:00am",
+    "Quiero un corte el sábado.",
+    "A step-free door on Elm St",
+    "Books a cut every 4 weeks",
+    "says the cape clip ripped",
+    "Step-free door on Elm St",
+    "15-minute style consult",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Gloss to finish · $15",
+    "Lee's Barbershop LLC",
+    "photos of your hair",
+    "priced at the chair",
+    "Priced at the chair",
+    "Lee Home Services'",
+    "quote at the chair",
+    "home warranty plan",
+    "Elm Street Dental",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "color correction",
+    "Color correction",
+    "set at the chair",
+    "Groom's package",
+    "is at the chair",
+    "at $140 an hour",
+    "Groom's package",
+    "Drain clearing",
+    "rents a chair",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "water heaters",
+    "Panel upgrade",
+    "Color and cut",
+    "shop's board",
+    "1200 Main St",
+    "Jordan Price",
+    "A beard trim",
+    "at the chair",
+    "At the chair",
+    "water heater",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "Casey Moore",
+    "house calls",
+    "House calls",
+    "Riley Chen",
+    "Avery Diaz",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "Beard trim",
+    "house call",
+    "Beard trim",
+    "beard trim",
+    "barbershop",
+    "Barbershop",
+    "electrical",
+    "Electrical",
+    "88 Elm St",
+    "kids cuts",
+    "Skin fade",
+    "staff cut",
+    "Skin fade",
+    "MP045210",
+    "a barber",
+    "A barber",
+    "plumbing",
+    "Plumbing",
+    "Kids cut",
+    "kids cut",
+    "haircuts",
+    "Haircuts",
+    "plumbing",
+    "Plumbing",
+    "cut hair",
+    "plumber",
+    "barbers",
+    "haircut",
+    "Haircut",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "barber",
+    "Barber",
+    "Riley",
+    "Avery",
+    "gloss",
+    "Casey",
+    "color",
+    "Color",
+    "shops",
+    "labor",
+    "Lena",
+    "shop",
+    "Shop",
+    "patch test",
+    "shaves",
+    "shave",
+    "skin fade",
+    "Skin fade",
+    "massage",
+    "Massage",
+    "hot towel",
+    "valve",
+    "Jordan",
+    "Casey"
+   ],
+   "B": [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "We'd share only where they're working, only after a missed check.",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "It's a leak under the sink, today, arriving 3–5pm, with Jordan.",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Its money card is set the way most barbershops start.",
+    "The price, {{price}}, comes straight from Sam's list.",
+    "Like tapping a neighbor's water line without asking.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "I found water damage under the sink this morning.",
+    "CANT START no proof Alex may have this work done",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can Jordan look at my bathroom sink next week?",
+    "a proposal for new pipes, from Jordan's notes",
+    "The plug-in says how long the warranty lasts.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Alex texts that the sink is now overflowing.",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "It's overflowing. Can someone come tonight?",
+    "Here are the rules barbershops often set.",
+    "One booking, so one $2 for the whole job.",
+    "like replacing the old pipes Jordan noted",
+    "The work never started, so there's no $2.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Can I run the dishwasher before you come?",
+    "a card saved for the $89 service-call fee",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "Can I skip next week's drain cleaning?",
+    "Willow Home Warranty, the basic plan.",
+    "Jordan finds corroded shutoff valves.",
+    "A tip line · bank transfer over $500",
+    "Which home warranty plan should pay?",
+    "never takes more than the visit fee",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "a card saved, for a $20 fee you OK",
+    "Call a mold cleanup company first",
+    "Proposal · Replace the old pipes",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "like a burst pipe or a lockout",
+    "No. It doesn't smell like gas.",
+    "Drain clearings already booked",
+    "One booking, so no second $2.",
+    "LATE camera report Mon Oct 26",
+    "Lee Plumbing and Lee Electric",
+    "Alex says yes before any work",
+    "My kitchen drain is clogged.",
+    "Someone calls for a dentist",
+    "I need to move my cleaning.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Replace both shutoff valves",
+    "The $179 drain needs none.",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "with the store's receipt",
+    "$179, paid after the job",
+    "NEW heating and cooling",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "A plan or warranty pays",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "stage 2 of your repipe",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "quote for your repipe",
+    "Lee Home Services LLC",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "the warranty company",
+    "Shutoff valve · $165",
+    "can clear the drain",
+    "Yes, it won't drain",
+    "leehomeservices.com",
+    "No visit, so no $2.",
+    "like a move-out day",
+    "No. No huele a gas.",
+    "Lee Home Services'",
+    "Water heater flush",
+    "water heater flush",
+    "home warranty plan",
+    "Lee Home Services",
+    "Elm Street Dental",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "service call fee",
+    "Service call fee",
+    "like a roof leak",
+    "The repair price",
+    "the repair price",
+    "Repipe · $2,400",
+    "Book the repair",
+    "at $140 an hour",
+    "drain clearing",
+    "Drain clearing",
+    "DONE 179 drain",
+    "rents a chair",
+    "water heaters",
+    "Panel upgrade",
+    "home warranty",
+    "$2,400 repipe",
+    "1200 Main St",
+    "Jordan Price",
+    "at the chair",
+    "water heater",
+    "Water heater",
+    "service call",
+    "Service call",
+    "Price board",
+    "Casey Moore",
+    "house calls",
+    "leak repair",
+    "Leak repair",
+    "Riley Chen",
+    "Avery Diaz",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "88 Elm St",
+    "42 Oak St",
+    "a plumber",
+    "MP045210",
+    "a barber",
+    "plumbing",
+    "Plumbing",
+    "Rental 1",
+    "Rental 2",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "barbers",
+    "haircut",
+    "Plumber",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "barber",
+    "Barber",
+    "faucet",
+    "Casey",
+    "Riley",
+    "Avery",
+    "color",
+    "labor",
+    "Labor",
+    "flush",
+    "Riley",
+    "Avery",
+    "shop",
+    "Shop",
+    "shaves",
+    "$160",
+    "under your sink",
+    "Iris",
+    "hot towel",
+    "shave",
+    "sewer",
+    "valve",
+    "shutoff",
+    "sink"
+   ]
+  },
+  "A": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A4-01": "9d65299834",
+   "A4-28": "c8e677520c",
+   "A4-43": "c17d56f766",
+   "A5-19": "5d5db6f3c1",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A9-15": "bd2a17c3c5",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A8-03": "7fe61cccf5",
+   "A10-34": "78c2d9a6a3",
+   "S1-62": "b5b0310865",
+   "A7-01": "afb51b5e1b",
+   "S1-13": "eca22651fd",
+   "S1-14": "e0738aa15a"
+  },
+  "B": {
+   "B8-03": "ac9d404766",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-01": "826f4058c2",
+   "B4-43": "fc9855955a",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-06": "f091432f2d",
+   "B8-97": "1e3f69ef38",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B10-05": "a326ea3c0b",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255",
+   "S1-62": "b5b0310865",
+   "S1-13": "6964bfbe60",
+   "S1-14": "9497795524"
+  }
+ }
+}

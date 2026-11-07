@@ -1,0 +1,4028 @@
+{
+ "id": "tree",
+ "name": "Tree service",
+ "style": "Project",
+ "pattern": "project",
+ "from": "contractor",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a tree care license, a tree expert license or a tree care registration for the company, where the state's form or the city requires one; a pesticide applicator license for any spraying or trunk injection, in every state",
+   "ask": [
+    "The company's tree care license or registration number, where the state or city has one",
+    "Each sprayer's pesticide applicator license number and category",
+    "General liability insurance; workers' comp where the business has employees",
+    "Any arborist certificate the business wants shown (it shown as given by the business, not checked by Rosie)"
+   ],
+   "holder": "",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No tree work goes live until the company's license or registration checks out, where one is required",
+    "Spraying never goes live without a licensed sprayer on the team",
+    "Work near power lines is never offered: only the utility or a line-clearance crew may do it"
+   ],
+   "renewals": "License, registry, insurance and applicator dates kept; reminded 30 days out; a lapse pauses new bookings for that work",
+   "trust": "'Certified arborist' or 'insured' shows only once Rosie has read the certificate or the official lookup; otherwise it's the business's own words",
+   "wood_yard": "A firewood, wood chip and mulch yard needs no state license; its business registration is checked. Firewood sold by the cord or face cord, with a written receipt, where the state's rules require it.",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Arborist visit, then project: a tree removal is booked as the arborist's visit, then a written quote, a signed contract and a job day",
+   "B": [
+    {
+     "name": "Arborist visit (the estimate)",
+     "price": "$89, credited to the job if Alex signs (the example business's own price; a free estimate is the plug-in's starting answer)",
+     "length": "30 to 60 minutes",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "nothing taken",
+     "after": "billed only if no contract follows"
+    },
+    {
+     "name": "Tree removal",
+     "price": "quoted after the arborist visit, in writing, good for 30 days",
+     "length": "one job day, 8am to 3pm; a crane job may take two",
+     "where": "at the customer's place",
+     "before": "nothing at booking; a deposit once the contract is signed",
+     "after": "the rest on the bill after the walk-through"
+    },
+    {
+     "name": "Pruning",
+     "price": "quoted after the arborist visit, or from the list for a small tree",
+     "where": "at the customer's place",
+     "season": "no oak pruning April to July (the example business's own oak wilt practice)"
+    },
+    {
+     "name": "Small tree removal",
+     "price": "priced from photos for a small tree with nothing near it (example: $640); over $500, Sam OKs it",
+     "length": "half a day",
+     "before": "a signed estimate, then a 25% deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Stump grinding",
+     "price": "$179 a stump up to 2 feet across, from the list; bigger ones quoted",
+     "length": "1 to 2 hours",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Small tree pruning",
+     "price": "$150, from the list",
+     "where": "at the customer's place",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Tree risk check",
+     "price": "$199, with a written report",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Storm work",
+     "price": "sent now, with an arrival estimate; priced before anyone climbs",
+     "where": "at the customer's place",
+     "on_call": "an arborist on call nights and weekends"
+    },
+    {
+     "name": "Brush pile pickup",
+     "price": "from the list",
+     "where": "outside; nobody needs to be home"
+    },
+    {
+     "name": "Lift or crane",
+     "price": "a tracked lift is part of the job when it fits the gate; a crane is quoted on its own line"
+    },
+    {
+     "name": "Wood",
+     "price": "hauled away (included), or left in rounds at no charge"
+    },
+    {
+     "name": "Tree spraying (Lee Plant Health)",
+     "price": "ash tree injection $149, deep root feeding $189; orchard spraying quoted",
+     "staff": "a licensed sprayer only"
+    },
+    {
+     "name": "Work near power lines",
+     "price": "not offered: the utility or a line-clearance crew"
+    }
+   ],
+   "A": [
+    {
+     "name": "Wood chip pickup (a pickup load)",
+     "price": "$35, 30 minutes",
+     "where": "at the yard; or delivered to the customer's home for $75 (the other flow)",
+     "before": "a card saved for the $20 missed-loading fee",
+     "after": "paid at the yard office"
+    },
+    {
+     "name": "Mulch pickup (a pickup load of shredded hardwood)",
+     "price": "$40",
+     "where": "at the yard"
+    },
+    {
+     "name": "Brush drop-off (a pickup load)",
+     "price": "$20, an add-on to a pickup or on its own",
+     "where": "at the yard"
+    },
+    {
+     "name": "Kindling crate",
+     "price": "$25",
+     "where": "at the yard"
+    },
+    {
+     "name": "Firewood, half a face cord (a face cord is a stack 4 feet high and 8 feet long)",
+     "price": "$55, 60 minutes, hand-stacked in the truck",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Log milling (your log sawn into boards)",
+     "price": "$140, 2½ hours on the yard's sawmill",
+     "before": "",
+     "after": "the rest at the yard office"
+    },
+    {
+     "name": "Log splitting",
+     "price": "priced from photos of the logs (example: $90); Sam OKs each one"
+    },
+    {
+     "name": "Slab cutting",
+     "price": "priced at the yard once Nell sees the log, after a $25 log check"
+    }
+   ],
+   "capacity": "One arborist per arborist visit; one big job per crew a day, with the lift, the chipper and the grinder booked with it; one loader and one sawmill at the yard",
+   "skills": "Arborist visits and quotes: the arborist (Eli). Climbing and removals: a crew with a crew lead. Stumps: anyone trained on the grinder. Spraying: licensed sprayers only. The yard: Nell and Wes; the sawmill and the log splitter: Nell only.",
+   "nobody_home": "Arborist visits, stump grinding and brush pickups: nobody needs to be home (DONE with a photo). A removal: an adult walks the job with the crew at the start, where possible.",
+   "online": "No video service",
+   "months": "Each service can carry the months it's offered (the example: no oak pruning April to July)"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What should be done? (take down, prune, grind a stump, storm damage)",
+    "Is any part of the tree within 10 feet of a power line? (no; only the line to the house; street lines)",
+    "About how tall is the tree, and how wide is the trunk?",
+    "Is it leaning, cracked or dead?"
+   ],
+   "after_time": [
+    "Whose tree is it? (yours; on the property line; someone else's)",
+    "Is it on the city strip by the street?",
+    "How wide is the gate to the yard? Any pets?",
+    "The wood and the stump: hauled away or left; ground or left",
+    "Will you be home for the arborist visit? (not needed)"
+   ],
+   "secure_page_only": [
+    "Gate or lockbox codes",
+    "Photos of the tree (optional)",
+    "Private buried lines near the stump (sprinklers, a dog fence, yard lights)"
+   ],
+   "who_may_book": "An adult who owns the tree. A tree on the property line needs the neighbor's yes too, given on the secure page. Someone else's tree, or a renter's, is booked or OK'd by its owner.",
+   "yard": [
+    "What are you bringing: a pickup or a trailer, and how long is the bed?",
+    "For milling or splitting: how many logs, and photos of them"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a limb or tree on a power line, wires down, sparks, a tree touching the street lines",
+     "says": "Stay far away, and keep everyone back. Call 911 and the electric company. Only the utility or a line-clearance crew may work on it.",
+     "booking": "no booking"
+    },
+    {
+     "words": "someone hurt or trapped, a gas smell after a tree fell",
+     "says": "Call 911 now, and leave the area if you smell gas.",
+     "booking": "no booking until it's safe"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "a tree or a big limb on the house or the garage",
+     "says": "Get everyone out of the rooms under it, and keep them out. Don't go on the roof or cut anything. Call 911 first if anyone is hurt, wires are down or you smell gas.",
+     "booking": "goes on, marked urgent; sent now where the business takes storm work"
+    },
+    {
+     "words": "a tree leaning more, or a new crack at the base",
+     "says": "Keep people and cars away from the side it leans toward.",
+     "booking": "goes on; the soonest time is offered"
+    },
+    {
+     "words": "a gas line marked near a stump",
+     "says": "Nobody grinds inside the marked zone.",
+     "booking": "the grinding stops there; a partial grind or none, with Alex's yes"
+    }
+   ],
+   "business_line": "Questions about whether a tree is safe to climb or cut yourself go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_quote": "The arborist visit at the property (nobody needs to be home)",
+   "power_lines": "Only the line to the house within 10 feet: the customer asks the utility to make it safe for the job day; the arborist visit goes ahead, but no job day is set until the utility's date is known",
+   "after_contract": [
+    "The cancel window ends before the job day, where the state's rules give one",
+    "A city tree permit, where the city protects the tree or it's on the city strip: Sam applies, and the job day waits for it",
+    "The 811 locate before any stump is ground: Sam places it, keeps its ticket number on the job, and the marks come before the job day (the lead time is the state's)",
+    "The utility's date, when only the line to the house was near the tree"
+   ],
+   "prep": [
+    "Mark any private buried lines near the stump (sprinklers, a dog fence, yard lights): 811 marks only the utilities' lines",
+    "Move cars away from the tree and the drop zone the night before",
+    "Unlock the gate, and keep pets inside"
+   ],
+   "yard_prep": [
+    "Bring a truck or trailer that can carry the load, with the bed empty",
+    "Bring a tarp to cover the load, where the state's rules require loads to be covered"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "The arborist visit and each job day: the check-in code at the door or the gate, or DONE with a photo when nobody is home. The yard: the code at the yard office.",
+   "at_the_visit": "The arborist looks at the trunk, the height, the lean and the condition, checks the city's tree rules, and checks that the lift fits the gate. The written quote follows within a day, good for 30 days.",
+   "on_the_job_day": "Walk the job with the customer; ground mats from the gate; check the 811 paint and the customer's flags; rope off the work area; branches first, then the trunk in short sections lowered away from buildings; brush straight into the chipper; before and after photos",
+   "changes": "Extra work (another tree, a dead limb) is priced and OK'd in writing before it's done. Less work (a partial grind by a gas line) is priced down, with the customer's yes.",
+   "done": "The walk-through against the quote, line by line; ruts from the lift leveled and seeded before leaving; then DONE",
+   "yard_done": "The load leveled and tarped, shown to the customer before paying; DONE with the load's photo",
+   "before_photos": "The lawn by the gate, the driveway, the fence, the garden beds and anything already damaged"
+  },
+  "pf.money": {
+   "estimate": "The example's $89 arborist visit is credited to the job; billed only if no contract follows. A free estimate is the plug-in's starting answer.",
+   "no_money_before_contract": "On a removal quoted at the visit, nothing is taken before the contract is signed",
+   "deposit": "A deposit when the quote is signed (the example: 10%), within the state's deposit cap",
+   "kept_apart": "Money paid before the work is kept apart where the state's rules require it (a switch from the state's form)",
+   "last_payment": "After the walk-through, on the bill Rosie texts: pay link, card, bank transfer for big bills, or a check",
+   "cancel": "The example's policy: a full refund until 48 hours before the job day; later, Sam may keep the deposit, and he confirms each time",
+   "weather": "A job moved for wind or ice costs nothing, and cancelling stays free",
+   "storms": "Storm prices stay inside the state's limits during a declared emergency",
+   "tips": "No tip line",
+   "tax": "Tax follows the state's form",
+   "yard": "The $20 missed-loading fee ($40 for log milling) only after Sam OKs it; paid at the yard office"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate or lockbox codes",
+    "Contract and permit papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who walks the job with the crew"
+  },
+  "pf.staff": {
+   "roles": "Eli: the arborist, who does arborist visits and quotes and leads the crew. Hugo: crew lead, stumps and storm work on call. Nell and Wes at the yard; only Nell runs the sawmill and the log splitter.",
+   "licenses": "The yard's people need none.",
+   "line_clearance": "Only line-clearance-qualified crews work near power lines; this business has none, so that work is never offered",
+   "who_oks": "Sam OKs quotes, change orders and job days over $500; Pat may OK them too, and Sam's answer wins",
+   "weather_call": "The crew lead may move a job day for wind or ice",
+   "stand_in": "Hugo may take an arborist visit for a stump or pruning; a removal keeps its arborist unless Sam moves it"
+  },
+  "pf.rules": {
+   "contract": "A written quote and contract before any tree removal, where the state's rules require one (and always in the example), signed by the tree's owner and the business before any money",
+   "where_signed": "A yes that follows a visit at the property counts as a sale at the home wherever it is signed, so the cancel notice goes out, until each state's rule is read",
+   "cancel_window": "A cancel window after signing, where the state's rules give one; the job day waits for it",
+   "tree_permits": "City tree permits for protected trees or trees on the city strip, where the city requires one",
+   "locate": "The 811 locate before any digging or stump grinding, with the state's own lead time and ticket life; a moved job day re-checks it",
+   "power_lines": "No work within the state's distance of power lines unless the crew is line-clearance qualified",
+   "show": "The license or registry number on the listing, the quote and the receipt, where the state's rules require it",
+   "guarantee": "Cleanup or damage the crew missed is fixed free within 30 days (the example's)",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "power_line_to_house": "The arborist visit goes ahead; the job day waits for the utility's date",
+   "street_lines": "No booking: only the utility or a line-clearance crew",
+   "boundary_tree": "The neighbor's yes on the secure page before the removal; the arborist visit can go ahead",
+   "someone_elses_tree": "No booking; the customer forwards a link to the tree's owner",
+   "permit_pending": "The job day waits for the city's OK; moved with no fee",
+   "no_locate_marks": "The tree still comes down on the job day; only the grinding moves, and the customer is told",
+   "wind_or_ice": "Over the lift's limit on the job day: the job moves to the next free day, no fee",
+   "storm_before_job_day": "A limb falls on a building before the job day: the safety steps, the job moved up where the crew is free, and any extra signed first",
+   "gas_line_by_stump": "A partial grind at a lower price, or none, with the customer's yes",
+   "lift_ruts": "Leveled and seeded before the crew leaves",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "extrawork",
+   "multiday",
+   "dropoff",
+   "banktransfer"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "cutoff": "2 days before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a palm tree trim, which isn't on the yard's list."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a tree on a house after a storm"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a tree on a house after a storm"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nell: yard, sawmill and deliveries"
+   ],
+   [
+    "Avery: barber",
+    "Wes: yard"
+   ],
+   [
+    "rents a chair",
+    "works for several companies"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "No license for the yard, only its registration. Wood chips, mulch and firewood at the yard. Deliveries too."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A tree care license or registration behind the company, where the state asks. Spraying needs each sprayer's license."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Stumps have a set price. Big trees are quoted at the visit. A limb on a power line stops the booking."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric",
+    "like Lee Tree Care and Lee Plant Health"
+   ],
+   [
+    "Panel upgrade",
+    "Orchard spraying"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A tree service's example: a tree on the house gets 'keep everyone out of the rooms under it'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent",
+    "A wood yard has none, so nothing is sent"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Wood Yard doesn't sell topsoil."
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a kindling crate is $25"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you sell kindling? I need some for the fire pit."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero recoger astillas de madera el sábado."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like to pick up wood chips on Saturday."
+   ],
+   [
+    "Gloss to finish",
+    "Sealing the slab"
+   ],
+   [
+    "gloss",
+    "slab sealing"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair business, a tailor or a groomer does."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A mulch pickup at Lee Wood Yard is $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for a mulch pickup at $35"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The loader bucket scratched my tailgate."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Nell sees the log"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free office door on Quarry Ln"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Wood chips could mean a tree service's yard or a garden center."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group's pickups together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A garden club books five pickups on one morning. Rosie finds loading times back to back across Nell and Wes."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Wood chips and a kindling crate work the same way."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the yard show photos of your load?"
+   ],
+   [
+    "photos of your hair",
+    "photos of your logs"
+   ],
+   [
+    "Alex's hair",
+    "Alex's logs"
+   ],
+   [
+    "patch test",
+    "log check"
+   ],
+   [
+    "skin-test result",
+    "log check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the yard office while you load?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My trailer has a flat tire. Can I still come in?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Half the load was bark, not chips."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's load was half bark"
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex pulls into the yard. Nell checks what the plug-in asked Alex to bring: a truck bed that fits the load, and a tarp."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Nell's milling plan for a big log"
+   ],
+   [
+    "$25 consult",
+    "$25 log check"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every yard service, milling and deliveries"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the yard, and deliveries"
+   ],
+   [
+    "house calls",
+    "deliveries"
+   ],
+   [
+    "a house call",
+    "a delivery"
+   ],
+   [
+    "house call",
+    "delivery"
+   ],
+   [
+    "JP031552",
+    "TW031552"
+   ],
+   [
+    "JE30417",
+    "PA30417"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Nell can still load you in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "Nell suggests moving your pickup until the tire is fixed, with no fee. Pick a new time:"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Tree Care's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Tree Care"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Wood Yard LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Wood Yard"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Tree Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Plant Health"
+   ],
+   [
+    "1200 Main St",
+    "310 Ridge Rd"
+   ],
+   [
+    "88 Elm St",
+    "4 Quarry Ln"
+   ],
+   [
+    "42 Oak St",
+    "19 Hillcrest Rd"
+   ],
+   [
+    "MP045210",
+    "TC045210"
+   ],
+   [
+    "EC22871",
+    "PA22871"
+   ],
+   [
+    "BS20981",
+    "2020-1187"
+   ],
+   [
+    "Riley",
+    "Nell"
+   ],
+   [
+    "Avery",
+    "Wes"
+   ],
+   [
+    "Jordan",
+    "Eli"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "estimate visit",
+    "arborist visit"
+   ],
+   [
+    "service call",
+    "arborist visit"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Stump grinding"
+   ],
+   [
+    "Drain clearing",
+    "Stump grinding"
+   ],
+   [
+    "drain clearing",
+    "stump grinding"
+   ],
+   [
+    "Kitchen drain",
+    "Stump"
+   ],
+   [
+    "Water heater flush",
+    "Small tree pruning"
+   ],
+   [
+    "water heater flush",
+    "small tree pruning"
+   ],
+   [
+    "a flush",
+    "a pruning"
+   ],
+   [
+    "flush",
+    "pruning"
+   ],
+   [
+    "Water heater replacement",
+    "Small tree removal"
+   ],
+   [
+    "Leak repair",
+    "Tree removal"
+   ],
+   [
+    "leak repair",
+    "tree removal"
+   ],
+   [
+    "water heaters",
+    "small trees"
+   ],
+   [
+    "Water heater",
+    "Small tree"
+   ],
+   [
+    "water heater",
+    "small tree"
+   ],
+   [
+    "$245",
+    "$2,100"
+   ],
+   [
+    "Plumbing and electrical",
+    "Tree work and spraying"
+   ],
+   [
+    "plumbing and electrical",
+    "tree work and spraying"
+   ],
+   [
+    "an electrical",
+    "a spraying"
+   ],
+   [
+    "electrical",
+    "tree spraying"
+   ],
+   [
+    "Electrical",
+    "Tree spraying"
+   ],
+   [
+    "A plumber",
+    "An arborist"
+   ],
+   [
+    "plumbers",
+    "arborists"
+   ],
+   [
+    "plumber",
+    "arborist"
+   ],
+   [
+    "Plumber",
+    "Arborist"
+   ],
+   [
+    "plumbing",
+    "tree work"
+   ],
+   [
+    "Plumbing",
+    "Tree work"
+   ],
+   [
+    "Faucet",
+    "Item"
+   ],
+   [
+    "Drains",
+    "Stumps"
+   ],
+   [
+    "drain",
+    "stump"
+   ],
+   [
+    "Drain",
+    "Stump"
+   ],
+   [
+    "barbershop",
+    "wood yard"
+   ],
+   [
+    "Barbershop",
+    "Wood yard"
+   ],
+   [
+    "Barbering",
+    "The yard's work"
+   ],
+   [
+    "barbers",
+    "yard hands"
+   ],
+   [
+    "Barbers",
+    "Yard hands"
+   ],
+   [
+    "barber",
+    "yard hand"
+   ],
+   [
+    "Barber",
+    "Yard hand"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Firewood, half a face cord"
+   ],
+   [
+    "Signature cut and shave",
+    "Firewood, half face cord"
+   ],
+   [
+    "signature cut and shave",
+    "half face cord"
+   ],
+   [
+    "Signature cut",
+    "Half face cord"
+   ],
+   [
+    "signature cut",
+    "half face cord"
+   ],
+   [
+    "hot towel shave",
+    "second load"
+   ],
+   [
+    "for the Groom's package",
+    "for the log milling"
+   ],
+   [
+    "the Groom's package",
+    "the log milling"
+   ],
+   [
+    "The Groom's package",
+    "Log milling"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 log milling"
+   ],
+   [
+    "Groom's package",
+    "Log milling"
+   ],
+   [
+    "Color and cut",
+    "Log splitting"
+   ],
+   [
+    "color and cut",
+    "log splitting"
+   ],
+   [
+    "Color correction",
+    "Slab cutting"
+   ],
+   [
+    "color correction",
+    "slab cutting"
+   ],
+   [
+    "color quote",
+    "milling quote"
+   ],
+   [
+    "color",
+    "milling"
+   ],
+   [
+    "Color",
+    "Milling"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kindling crate"
+   ],
+   [
+    "kids cuts",
+    "kindling crates"
+   ],
+   [
+    "Kids cut",
+    "Kindling crate"
+   ],
+   [
+    "kids cut",
+    "kindling crate"
+   ],
+   [
+    "Skin fade",
+    "Mulch pickup"
+   ],
+   [
+    "skin fade",
+    "mulch pickup"
+   ],
+   [
+    "Beard trim",
+    "Brush drop-off"
+   ],
+   [
+    "beard trim",
+    "brush drop-off"
+   ],
+   [
+    "Haircuts",
+    "Wood chip pickups"
+   ],
+   [
+    "haircuts",
+    "wood chip pickups"
+   ],
+   [
+    "Haircut",
+    "Wood chip pickup"
+   ],
+   [
+    "haircut",
+    "wood chip pickup"
+   ],
+   [
+    "cuts",
+    "pickups"
+   ],
+   [
+    "the chair",
+    "the yard"
+   ],
+   [
+    "The chair",
+    "The yard"
+   ],
+   [
+    "chairs",
+    "loading times"
+   ],
+   [
+    "chair",
+    "loader"
+   ],
+   [
+    "shops",
+    "yards"
+   ],
+   [
+    "shop",
+    "yard"
+   ],
+   [
+    "Shop",
+    "Yard"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most tree services set it."
+   ],
+   [
+    "'Matched': the request fits a listed service",
+    "'Matched': the request fits a listed service"
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't do stump removal in the rain."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a branch clipped the fence today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A branch clipped my fence."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "a healthy crown, the lower limbs cleared"
+   ],
+   [
+    "Barbershop",
+    "Tree service"
+   ],
+   [
+    "barbershop",
+    "tree service"
+   ]
+  ],
+  "B": [
+   [
+    "replace both shutoff valves",
+    "trim the lower limbs"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds land clearing to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Land clearing for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW land clearing"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a tree on a house after a storm"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a tree on a house after a storm"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nell: yard, sawmill and deliveries"
+   ],
+   [
+    "Avery: barber",
+    "Wes: yard"
+   ],
+   [
+    "rents a chair",
+    "works for several companies"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "No license for the yard, only its registration. Wood chips, mulch and firewood at the yard. Deliveries too."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A tree care license or registration behind the company, where the state asks. Spraying needs each sprayer's license."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Stumps have a set price. Big trees are quoted at the visit. A limb on a power line stops the booking."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric",
+    "like Lee Tree Care and Lee Plant Health"
+   ],
+   [
+    "Panel upgrade",
+    "Orchard spraying"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I have an old stump in the front yard. Can someone grind it Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Se cayó una rama grande sobre mi techo."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A big branch fell on my roof."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A tree service's example: a tree on the house gets 'keep everyone out of the rooms under it'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone out of the rooms under the branch. If there's a gas smell or wires are down, she leaves and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No entre a los cuartos debajo de la rama. Si huele a gas o hay cables caídos, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay out of the rooms under the branch. If you smell gas or see wires down, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to climb up and saw the branch off my roof myself?"
+   ],
+   [
+    "a dripping faucet",
+    "a dead branch over the driveway"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The branch is pruning, quoted at the visit too. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone haul away a brush pile this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa stump Thu 12-2 Hugo"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A tree removal happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The yard's pickups are in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Wood Yard loads wood chips at the yard for $35, or delivers them to your home for $75."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Tree Care doesn't do, like a new fence."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Tree Care does tree work and spraying, not fences. Nothing was saved. You can look for a fence builder near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what's the work, how big the tree is, and if any part is near a power line."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a limb on a power line, wires down, a tree on the house, or a gas smell."
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 2 feet across. Nothing near it."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Should the wood chips stay, or be hauled away?"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "A big limb fell on my roof. Can someone come tonight?"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Limb on the roof"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you prune my maple every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Tree Care has a yearly pruning plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a maple pruning every year."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the stump's roots are now lifting the front walk."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The stump's roots are lifting the front walk now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep people off the lifted part of the walk until the visit."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "Nell drives the yard's deliveries."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead.",
+    "Say Alex had asked Lee Wood Yard for wood chips instead."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a brush pile pickup at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's brush pile pickup?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Eli also check the big oak while he's here?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE ash leans toward the garage. Old crack in the driveway"
+   ],
+   [
+    "Under the sink, before",
+    "The ash and the garage, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Driveway crack, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A big tree is quoted at the visit: only the $89 arborist visit was promised."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Eli finds two dead limbs on the maple over the driveway."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Eli finds the gas line marked right by the stump. The plug-in says nobody grinds inside the marked zone, so Alex gets a written note and the photo."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Eli found the gas line marked right by your stump, so the crew stopped grinding there."
+   ],
+   [
+    "Mold behind the sink wall",
+    "Gas line marked by the stump"
+   ],
+   [
+    "mold behind the sink wall",
+    "the gas line marked by the stump"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the stump inside the marked zone"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "The gas company can hand-dig it out, if you want"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE stump ground 8 inches down. Roots near the walk: check them next spring."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 stump"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Wood chips turn up in the flower bed 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "There are wood chips all over my flower bed."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your job is under the cleanup guarantee"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left sawdust on the driveway."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Eli look at my front oak next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Eli's next times to look at the oak."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the branch visit for today"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like pruning the oak Eli noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to prune the oak, from Eli's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Prune the front oak"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Eli's notes"
+   ],
+   [
+    "LATE camera report",
+    "LATE risk report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the risk report link"
+   ],
+   [
+    "Sewer camera report",
+    "Tree risk report"
+   ],
+   [
+    "sewer camera report",
+    "tree risk report"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 hedge row removal"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your hedge row job"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Wood chips could mean a tree service's yard or a garden center."
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "your share of today's repair",
+    "your share of today's job"
+   ],
+   [
+    "The main story: Alex asks an AI for a plumber",
+    "The main story: Alex asks an AI for a tree service"
+   ],
+   [
+    "The $640 water heater is over",
+    "The $640 small tree removal is over"
+   ],
+   [
+    "like an overflowing drain",
+    "like a limb on a roof"
+   ],
+   [
+    "like water near outlets or a gas smell",
+    "like a limb on a power line or a gas smell"
+   ],
+   [
+    "the one who replaces water heaters",
+    "the one who takes down small trees"
+   ],
+   [
+    "replaces water heaters",
+    "takes down small trees"
+   ],
+   [
+    "replace both shutoff valves",
+    "remove both dead maple limbs"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Remove both dead maple limbs"
+   ],
+   [
+    "Signed: the deposit, then the work days",
+    "Signed: the deposit, then the job day"
+   ],
+   [
+    "$25 consult",
+    "$25 log check"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the yard, and deliveries"
+   ],
+   [
+    "house calls",
+    "deliveries"
+   ],
+   [
+    "house call",
+    "delivery"
+   ],
+   [
+    "JP031552",
+    "TW031552"
+   ],
+   [
+    "JE30417",
+    "PA30417"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I park in the driveway before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Eli says no. Please keep the driveway clear for his truck."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Tree Care LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Tree Care's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Tree Care"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Wood Yard"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Tree Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Plant Health"
+   ],
+   [
+    "leehomeservices.com",
+    "leetreecare.com"
+   ],
+   [
+    "1200 Main St",
+    "310 Ridge Rd"
+   ],
+   [
+    "88 Elm St",
+    "4 Quarry Ln"
+   ],
+   [
+    "42 Oak St",
+    "19 Hillcrest Rd"
+   ],
+   [
+    "MP045210",
+    "TC045210"
+   ],
+   [
+    "EC22871",
+    "PA22871"
+   ],
+   [
+    "BS20981",
+    "2020-1187"
+   ],
+   [
+    "Riley",
+    "Nell"
+   ],
+   [
+    "Avery",
+    "Wes"
+   ],
+   [
+    "Jordan",
+    "Eli"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "estimate visit",
+    "arborist visit"
+   ],
+   [
+    "Estimate visit",
+    "Arborist visit"
+   ],
+   [
+    "service call",
+    "arborist visit"
+   ],
+   [
+    "Service call",
+    "Arborist visit"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Stump grinding"
+   ],
+   [
+    "Drain clearings",
+    "Stump grindings"
+   ],
+   [
+    "drain clearings",
+    "stump grindings"
+   ],
+   [
+    "Drain clearing",
+    "Stump grinding"
+   ],
+   [
+    "drain clearing",
+    "stump grinding"
+   ],
+   [
+    "clear the drain",
+    "grind the stump"
+   ],
+   [
+    "Kitchen drain",
+    "Stump"
+   ],
+   [
+    "kitchen drain",
+    "stump"
+   ],
+   [
+    "Water heater flush",
+    "Small tree pruning"
+   ],
+   [
+    "water heater flush",
+    "small tree pruning"
+   ],
+   [
+    "a flush",
+    "a pruning"
+   ],
+   [
+    "flush",
+    "pruning"
+   ],
+   [
+    "Water heater replacement",
+    "Small tree removal"
+   ],
+   [
+    "water heater replacement",
+    "small tree removal"
+   ],
+   [
+    "Leak repair",
+    "Tree removal"
+   ],
+   [
+    "leak repair",
+    "tree removal"
+   ],
+   [
+    "Sewer camera inspection",
+    "Tree risk check"
+   ],
+   [
+    "sewer camera inspection",
+    "tree risk check"
+   ],
+   [
+    "water heaters",
+    "small trees"
+   ],
+   [
+    "Water heater",
+    "Small tree"
+   ],
+   [
+    "water heater",
+    "small tree"
+   ],
+   [
+    "Yard drain",
+    "Brush pile"
+   ],
+   [
+    "yard drain",
+    "brush pile"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Remove both dead maple limbs"
+   ],
+   [
+    "both shutoff valves",
+    "both dead maple limbs"
+   ],
+   [
+    "the shutoff valves",
+    "the dead maple limbs"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 maple quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 maple work"
+   ],
+   [
+    "the repair",
+    "the job"
+   ],
+   [
+    "$245",
+    "$2,100"
+   ],
+   [
+    "1-year labor warranty",
+    "30-day cleanup guarantee"
+   ],
+   [
+    "labor warranty",
+    "cleanup guarantee"
+   ],
+   [
+    "Plumbing and electrical",
+    "Tree work and spraying"
+   ],
+   [
+    "plumbing and electrical",
+    "tree work and spraying"
+   ],
+   [
+    "an electrical",
+    "a spraying"
+   ],
+   [
+    "electrical",
+    "tree spraying"
+   ],
+   [
+    "Electrical",
+    "Tree spraying"
+   ],
+   [
+    "a plumber",
+    "an arborist"
+   ],
+   [
+    "A plumber",
+    "An arborist"
+   ],
+   [
+    "plumbers",
+    "arborists"
+   ],
+   [
+    "plumber",
+    "arborist"
+   ],
+   [
+    "Plumber",
+    "Arborist"
+   ],
+   [
+    "plumbing",
+    "tree work"
+   ],
+   [
+    "Plumbing",
+    "Tree work"
+   ],
+   [
+    "faucet",
+    "item"
+   ],
+   [
+    "Faucet",
+    "Item"
+   ],
+   [
+    "Drains",
+    "Stumps"
+   ],
+   [
+    "drain",
+    "stump"
+   ],
+   [
+    "Drain",
+    "Stump"
+   ],
+   [
+    "barbershop",
+    "wood yard"
+   ],
+   [
+    "Barbershop",
+    "Wood yard"
+   ],
+   [
+    "barbers",
+    "yard hands"
+   ],
+   [
+    "Barbers",
+    "Yard hands"
+   ],
+   [
+    "barber",
+    "yard hand"
+   ],
+   [
+    "Barber",
+    "Yard hand"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Firewood, half a face cord"
+   ],
+   [
+    "signature cut and shave",
+    "half face cord"
+   ],
+   [
+    "Signature cut",
+    "Half face cord"
+   ],
+   [
+    "signature cut",
+    "half face cord"
+   ],
+   [
+    "hot towel shave",
+    "second load"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 log milling"
+   ],
+   [
+    "Groom's package",
+    "Log milling"
+   ],
+   [
+    "Color and cut",
+    "Log splitting"
+   ],
+   [
+    "Color correction",
+    "Slab cutting"
+   ],
+   [
+    "color",
+    "milling"
+   ],
+   [
+    "Color",
+    "Milling"
+   ],
+   [
+    "Beard trim",
+    "Brush drop-off"
+   ],
+   [
+    "beard trim",
+    "brush drop-off"
+   ],
+   [
+    "Haircut",
+    "Wood chip pickup"
+   ],
+   [
+    "haircut",
+    "wood chip pickup"
+   ],
+   [
+    "cuts",
+    "pickups"
+   ],
+   [
+    "the chair",
+    "the yard"
+   ],
+   [
+    "The chair",
+    "The yard"
+   ],
+   [
+    "chairs",
+    "loading times"
+   ],
+   [
+    "chair",
+    "loader"
+   ],
+   [
+    "shops",
+    "yards"
+   ],
+   [
+    "shop",
+    "yard"
+   ],
+   [
+    "Shop",
+    "Yard"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the yard under the tree."
+   ],
+   [
+    "Eli found the leak.",
+    "Eli found the rot."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Stump grinding · $165"
+   ],
+   [
+    "Supply line · $80",
+    "Crown cleaning · $80"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Crown cleaning and limb removal"
+   ],
+   [
+    "it's about a leaking pipe under my sink.",
+    "it's about a limb over my roof."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a limb down, today,"
+   ],
+   [
+    "'My sink won't stump' fits",
+    "'My branch won't stay up' fits"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a split limb under the tree this morning."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like cutting a neighbor's tree without asking."
+   ],
+   [
+    "the supply line",
+    "the crown"
+   ],
+   [
+    "the shutoff valve",
+    "the crown"
+   ],
+   [
+    "Shutoff valves",
+    "Limbs"
+   ],
+   [
+    "Supply line",
+    "Crown cleaning"
+   ],
+   [
+    "Cabinet floor, before",
+    "Stump, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked stump"
+   ],
+   [
+    "cabinet",
+    "stump"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most tree services set it."
+   ],
+   [
+    "barbershops",
+    "tree services"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "lawyer",
+  "Lawyer",
+  "law office",
+  "Law office"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex comes to Lee Wood Yard, Sam's firewood and wood chip yard, to pick up a load of wood chips with Nell on Sat Oct 24 at 11:00am. The pickup depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Tree Care for a dead ash leaning toward the garage at 19 Hillcrest Rd. Eli, the arborist, looks at it Thu Oct 22 between 8 and 10am, sends a written quote, and his crew takes the tree down on the job day once the contract is signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "A pickup load of wood chips, $35; a card saved for the $20 missed-loading fee; paid at the yard office.",
+    "list|none|counter": "A pickup load of wood chips, $35; nothing taken; a YES books it; paid at the yard office.",
+    "list|full|none": "Half a face cord of firewood, $55, paid in full when booking.",
+    "list|deposit|counter": "Log milling on the yard's sawmill, $140; a $40 deposit now; the $100 rest at the yard office.",
+    "photos|card|counter": "Log splitting, priced from photos of the logs at $90 (Sam OKs it); a card saved for the $20 fee; paid at the yard office.",
+    "visit|card|counter": "Stump or tree removal, quoted at the visit; a card saved for the $20 fee; paid at the yard office."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$0",
+     "name": "Tree work"
+    },
+    "list|none|*": {
+     "price": "$35",
+     "name": "Wood chip load"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Wood chip load"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Firewood, half face cord"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Log milling"
+    },
+    "photos|card|*": {
+     "price": "$90",
+     "fee": "$20",
+     "name": "Log splitting"
+    },
+    "visit|card|*": {
+     "price": "set at the visit",
+     "fee": "$20",
+     "name": "Tree removal"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Log milling",
+     "price": "list",
+     "before": "deposit",
+     "after": "counter",
+     "amounts": {
+      "price": "$140",
+      "deposit": "$40",
+      "rest": "$100",
+      "fee": "$40"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Firewood, half face cord",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$55"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "photos|deposit|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "list|card|bill",
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "visit|none|bill": "Ash removal: the $89 arborist visit, nothing taken; Eli's written quote of $2,100; the contract and a $210 deposit; the job day; the last $1,890 on the bill Rosie texts.",
+    "visit|none|own": "The same ash removal, but Sam bills the deposit and the rest his own way; Rosie sends nothing about money.",
+    "list|card|bill": "A stump grinding from the list, $179; a card saved for the $89 visit fee, kept only for a late cancel or no-show; Rosie texts the bill.",
+    "photos|deposit|bill": "A small crabapple priced from photos at $640 (over $500, so Sam OKs it); a signed estimate; a 25% deposit of $160; the rest on the bill.",
+    "list|full|none": "Small tree pruning, $150 paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$0",
+     "name": "Tree work"
+    },
+    "visit|none|*": {
+     "price": "set at the visit",
+     "name": "Ash removal"
+    },
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Stump grinding"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Small tree pruning"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Crabapple removal"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Stump grinding",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$179",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Small tree pruning",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$150"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A8-02",
+   "S1-60",
+   "S2-28"
+  ],
+  "B": [
+   "B4-81",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "B8-71",
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-06",
+    "more": [
+     "A face cord of firewood is a stack 4 feet high and 8 feet long."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-65",
+    "more": [
+     "For firewood, the AI asks where it's going. Where the rules limit moving firewood, like a pest quarantine, the plug-in says so."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A5-16",
+    "more": [
+     "The yard sets the firewood aside for Alex once it's paid."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-01",
+    "more": [
+     "A firewood receipt names how much was sold, like half a face cord, where the state's rules require it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A yard pickup is for an adult with a truck. A child is never the one served."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Wood chips, mulch and firewood are loaded at the yard; there's no video or phone service."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The yard books a yard hand's loading time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The yard books a yard hand's loading time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The yard books a yard hand's loading time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A yard pickup has no form to sign first."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays with the truck while it's loaded; nothing is left at the yard."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A yard pickup is rated."
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "Where the rules limit moving firewood, like out of a pest quarantine area, Rosie won't offer firewood delivery past that line. Firewood stays a pickup at the yard there.",
+    "more": [
+     "Wood chips and mulch can still be delivered.",
+     "If a customer asks for a delivery where none may go, Rosie offers a pickup at the yard instead.",
+     "The limits come from the state's form, never one rule for all."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where your yard is, the rules limit moving firewood out of the pest quarantine area. So firewood deliveries stay inside it.",
+      {
+       "card": {
+        "title": "Firewood · deliveries limited",
+        "lines": [
+         "Only inside the quarantine area",
+         "Pickups at the yard as usual"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Tree work, spraying and the wood yard all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The tree service plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Arborists, crews and yard hands are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: arborist visits, tree jobs and yard pickups."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Storm work is sent now, like a tree on a house (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No health, vision or pet plan pays for a yard pickup, and the yard bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No health, vision or pet plan pays for a yard pickup, and the yard bills no insurance."
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the yard hands themselves. Nell can go over it at your visit. For anything sooner, call Lee Wood Yard at (555) 010-0177. If anyone is in danger, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "does": "Sam adds kiln-dried firewood to Lee Wood Yard. It brings its own plug-in, and only what's new is asked.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW kiln-dried firewood"
+     ],
+     [
+      "san",
+      "owner",
+      "Kiln-dried firewood for Lee Wood Yard: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like wood chip pickups?",
+      {
+       "card": {
+        "title": "Wood chip pickups work like this",
+        "lines": [
+         "Customers come to you",
+         "A card saved for the $20 fee",
+         "Paid at the yard"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ],
+    "more": [
+     "What's new: the prices, the license, and who does the work.",
+     "People already on the team get one text to confirm, never a second invite.",
+     "It goes live on its own once it's set up. Wood chip pickups never pause.",
+     "Left unanswered, it's saved. Sam texts MORE to finish it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-28",
+    "does": "Nothing goes out until someone OKs it, and Sam gets one reminder. Alex can wait, or have only the log check today.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Nell's price for your slab cutting is with the owner. You can wait for it, or have only the log check today.",
+      {
+       "buttons": [
+        "Wait for it",
+        "Log check only"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-30",
+    "does": "Nell does the log check only, and that's all Alex pays today. The price stays good for 7 days."
+   },
+   {
+    "op": "words",
+    "at": "S12-32",
+    "does": "Ben T. books a tree trim for Sat Nov 7 at 2:00pm. A second one at 2:30pm comes from another app. Rosie asks once which Ben meant. Nothing is charged twice.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Tree Care: you now have two visits on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+      {
+       "buttons": [
+        "Keep both",
+        "Just one: keep 2:00pm"
+       ],
+       "as": "Ben T.",
+       "stop": "first"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-84",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how Lee Tree Care will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Tree removal, trimming, stump grinding and firewood at the yard, by appointment."
+        ]
+       },
+       "photos": [
+        "The yard",
+        "The chipper",
+        "A cut log pile"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A tree job never leaves a child at the yard."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "after",
+    "at": "B4-05",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.26"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks the tree for power lines",
+      "q": "Is any part of the tree near a power line?",
+      "does": "Every tree job is checked for power lines before any time is offered. Alex said no wires are near the ash, so the booking goes on.",
+      "more": [
+       "The plug-in asks it on every tree job: no lines, only the line to the house, or street lines.",
+       "Only the utility or a line-clearance crew may work near live lines. This business has no such crew.",
+       "Eli checks again at the visit, and the quote names any line he finds."
+      ],
+      "needs": [
+       "pf.safety",
+       "pf.questions"
+      ],
+      "branches": [
+       {
+        "label": "No lines near the tree",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Only the line to the house",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.14",
+           "7.16"
+          ],
+          "who": "agent",
+          "to": "cust",
+          "via": "chat",
+          "title": "Asks Alex to call the utility first",
+          "does": "Say only the line to Alex's house runs near the tree. The arborist visit goes ahead. The job day waits until the utility makes the line safe for the work.",
+          "more": [
+           "Alex asks the electric company for a date to drop or cover the line. It's often free.",
+           "Alex sends that date with the signed contract, and only later job days are offered."
+          ],
+          "say": [
+           [
+            "agent",
+            "cust",
+            "Lee Tree Care can come look at the tree. Before the job day, please ask your electric company to make the line to your house safe for the work. It's often free."
+           ]
+          ],
+          "needs": [
+           "pf.first_steps"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Street lines through the tree",
+        "end": "end",
+        "endText": "Not booked: only the utility or a line-clearance crew may work there. Alex is told who to call.",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "4.26",
+           "3.9"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "chat",
+          "title": "Says only the utility can do it",
+          "does": "Say the tree grows through the street's power lines. Only the utility or a line-clearance crew may work there, so nothing is booked.",
+          "more": [
+           "Alex is told to stay well away from the lines.",
+           "Nothing was saved or charged."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Lee Tree Care can't work near street power lines. Only the electric company or a line-clearance crew may. Please stay well away from the lines, and call the electric company."
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ],
+          "tells": [
+           "agent"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-97",
+    "does": "Say the plug-in sets a first step with a lead time, like the 811 locate before a stump is ground. The AI says so, and the open times start only after it.",
+    "more": [
+     "The first step itself is booked or asked for once the time is saved.",
+     "The lead time is the state's, from the plug-in. Here it's about 3 business days.",
+     "A pruning or a tree visit has none, so its times start today."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A stump can't be ground until the buried lines are marked. That takes about 3 business days, so the first open times start Thursday."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE stump by the front walk. Old crack in the walk",
+      {
+       "photos": [
+        "The stump, before",
+        "Front walk, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s job."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "does": "Eli looks at the ash, measures the gate and checks the city's tree rules. His written quote reaches Alex's secure page that day, once Sam OKs it.",
+    "more": [
+     "It's over Sam's $500, so Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+     "The quote is good for 30 days. Signing it credits the $89 visit to the job.",
+     "Its lines: the removal, the stump and the wood. On the page, Alex can keep the wood in rounds, at no charge.",
+     "Any fact the state's rules require, like a license number, is on the quote.",
+     "No city permit is needed for this ash. A protected tree's permit is a first step after signing."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 2100 ash in sections 1650, stump 300, haul wood 150",
+      {
+       "photos": [
+        "The ash, measured",
+        "Gate, 4 feet wide"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Eli's quote for Alex M. is $2,100. It's over your $500 limit.",
+      {
+       "card": {
+        "title": "Ash removal · $2,100",
+        "lines": [
+         "Take down in sections, grind the stump, haul the wood",
+         "One job day, with the lift"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Here's your written quote from Lee Tree Care. It's good until Sat Nov 21.",
+      {
+       "card": {
+        "title": "Ash removal · $2,100",
+        "lines": [
+         "Take down in sections · $1,650",
+         "Grind the stump · $300",
+         "Haul the wood and brush · $150",
+         "$210 deposit once you sign",
+         "$1,890 on the bill after the job"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/r4"
+       },
+       "buttons": [
+        "Sign the contract",
+        "Not now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "does": "Alex taps Not now. Only the $89 arborist visit is owed, and the quote stays good until Sat Nov 21.",
+    "more": [
+     "Eli texts DONE 89 arborist visit. The bill, or the business's own bill, is $89.",
+     "Alex can sign later from the same page, until the quote's date.",
+     "Alex can ask for a call first. Eli or Sam calls, and the quote stays open."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your quote stays good until Sat Nov 21. For now, only the $89 arborist visit is billed.",
+      {
+       "card": {
+        "title": "Ash removal · $2,100",
+        "lines": [
+         "Good until Sat Nov 21"
+        ],
+        "button": "Sign it later",
+        "link": "rosfield.com/q/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "does": "Alex hasn't answered the quote in 5 days. Rosie sends one reminder. Still nothing 2 days later: Sam picks to call Alex, or let the quote run to its date.",
+    "more": [
+     "Nothing is booked without the signed contract.",
+     "Let it run: only the $89 arborist visit is owed, as with Not now.",
+     "Alex can still sign from the page until Sat Nov 21.",
+     "Rosie sends no more texts about it.",
+     "No answer from Sam in 2 days: the quote runs to its date, as with Let it run."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "A reminder: your quote from Lee Tree Care for the ash is good until Sat Nov 21.",
+      {
+       "card": {
+        "title": "Ash removal · $2,100",
+        "lines": [
+         "Good until Sat Nov 21"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered Eli's $2,100 quote for the ash in 7 days. It's good until Sat Nov 21.",
+      {
+       "buttons": [
+        "I'll call Alex",
+        "Let it run"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-62",
+    "does": "Alex taps Sign the contract. Rosie builds it from the quote and the parts the state's rules require. The tree's owner signs, then Sam does.",
+    "more": [
+     "Alex owns the tree alone. A tree on the property line needs the neighbor's signature too, on a link Alex forwards.",
+     "Sam signs within 24 hours. Each one gets a copy by text and email.",
+     "Nothing is taken before everyone has signed.",
+     "Not signed by Sat Nov 21: one reminder 3 days before, then the quote lapses. Only the $89 visit is owed.",
+     "The contract shows the license or registry number and the state's notices, where the rules require them."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. signed the contract for the ash removal. Please sign it too. Nothing is charged until you do.",
+      {
+       "card": {
+        "title": "Contract · Ash removal · $2,100",
+        "lines": [
+         "Signed by Alex M. · Fri 7:40pm"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Tree Care signed your contract. Your copy is on the page and in your email.",
+      {
+       "card": {
+        "title": "Contract signed by both",
+        "lines": [
+         "Ash removal · $2,100",
+         "Alex M. · Fri Oct 23",
+         "Sam Lee · Sat Oct 24"
+        ],
+        "button": "See your copy",
+        "link": "rosfield.com/k/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-63",
+    "does": "With both signatures in, Alex pays the $210 deposit on the secure page, into Lee Tree Care's own Stripe. Then Alex picks the job day from days the crew and the lift are free.",
+    "more": [
+     "The deposit is 10% of the quote, Sam's own setting, within the state's cap.",
+     "It lands less Stripe's card fee and Rosfield's $2. The $2 for this booking comes out here, just once.",
+     "Where the rules keep money paid before the work apart, it goes to the account Sam named. The $2 then comes from the last bill.",
+     "Not paid in 2 days: one reminder. A day later, Sam is asked to call Alex or cancel under the contract.",
+     "The job day is a new visit on the same booking, with its own check-in code.",
+     "No day picked in 48 hours: one reminder, then Sam calls. The deposit stays."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your contract is signed. The next step is the deposit.",
+      {
+       "pay": {
+        "amount": "$210",
+        "what": "your ash removal deposit",
+        "link": "rosfield.com/p/r4d"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Paid: your $210 deposit to Lee Tree Care. The receipt is on the page. Pick your job day:",
+      {
+       "times": [
+        "Thu Oct 29 · 8am to 3pm · Eli's crew",
+        "Fri Oct 30 · 8am to 3pm · Eli's crew"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "A"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-63",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "type": "split",
+      "line": [
+       "10.3",
+       "7.13"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Sat Oct 24, 8:21am",
+      "title": "Waits out the cancel window",
+      "q": "Does Alex cancel in the window?",
+      "does": "The quote followed Eli's visit at Alex's home, so it counts as a sale at the home. Where the state's rules give a cancel window, Alex can cancel until 11:59pm Tue Oct 27.",
+      "more": [
+       "That holds even though Alex signed on his phone, away from home.",
+       "The cancel notice goes by text and email, with the contract.",
+       "The job day comes after the window ends.",
+       "Alex's first message counts, even if Alex confirms later.",
+       "No window where the job is: this step is skipped."
+      ],
+      "rule": "Rosie's rule: a yes that follows a visit at the customer's home counts as a sale at the home, wherever it's signed. Why: an extra notice only adds a wait, and a missing one is the costly mistake.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "You can cancel this contract until 11:59pm Tue Oct 27, for a full refund.",
+        {
+         "card": {
+          "title": "Right to cancel · Ash removal",
+          "lines": [
+           "Until 11:59pm Tue Oct 27",
+           "Full refund of the $210 deposit",
+           "Sent by text and email"
+          ],
+          "button": "Cancel the contract",
+          "link": "rosfield.com/x/r4"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Keeps it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Cancels in the window",
+        "end": "end",
+        "endText": "Cancelled in the window. The $210 is refunded, and Sam and Eli are told.",
+        "steps": [
+         {
+          "id": "B8-x02",
+          "line": [
+           "10.3",
+           "10.5"
+          ],
+          "who": "pay",
+          "to": "cust",
+          "via": "sync",
+          "t": "Mon Oct 26, 10:00am",
+          "title": "Cancels; refunds the deposit in full",
+          "does": "Alex cancels on the page. Rosie asks once to confirm, then refunds the full $210 in the time the rules set.",
+          "more": [
+           "Only the $89 arborist visit stays owed, as if Alex hadn't signed.",
+           "Sam and Eli are told, and the job day is let go."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "Cancel the contract"
+           ],
+           [
+            "san",
+            "cust",
+            "Done: your contract is cancelled, and the deposit is refunded.",
+            {
+             "card": {
+              "title": "Refund · $210",
+              "lines": [
+               "Contract cancelled Mon Oct 26",
+               "Back to your card"
+              ]
+             }
+            }
+           ],
+           [
+            "san",
+            "owner",
+            "Alex M. cancelled the ash removal contract in the window. The $210 deposit is refunded."
+           ]
+          ],
+          "vary": {
+           "price:visit+before:none+after:own": {
+            "does": "Alex cancels on the page. Rosie asks once to confirm. Sam refunds the deposit his own way, in the time the rules set.",
+            "say": [
+             [
+              "cust",
+              "san",
+              "Cancel the contract"
+             ],
+             [
+              "san",
+              "cust",
+              "Done: your contract is cancelled. Lee Tree Care refunds your deposit its own way."
+             ],
+             [
+              "san",
+              "owner",
+              "Alex M. cancelled the ash removal contract in the window. Please refund the deposit your own way."
+             ]
+            ]
+           }
+          },
+          "tells": [
+           "cust",
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x03",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Mon Oct 26, 8:00am",
+      "title": "Sam places the 811 locate request",
+      "q": "Are the marks in before the job day?",
+      "does": "The stump can't be ground until buried lines are marked. Sam gets a to-do to place the free 811 locate request, then texts back its ticket number.",
+      "more": [
+       "811 is the free call before digging. The utilities paint their buried gas, power and cable lines.",
+       "The ticket number is kept on the job. Its lead time and its life come from the state's rules.",
+       "The marks show only the utilities' lines. Alex flags any private ones, like sprinklers.",
+       "No ticket number by 5pm: one reminder.",
+       "Eli checked the city's rules at the visit: no permit is needed for this ash."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s ash removal on Thu Oct 29: place the 811 locate request today. Then text me its ticket number.",
+        {
+         "card": {
+          "title": "811 locate · 19 Hillcrest Rd",
+          "lines": [
+           "Due today, before 5pm",
+           "Marks needed before the stump is ground"
+          ]
+         }
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "TICKET 2610-26-0441"
+       ],
+       [
+        "san",
+        "owner",
+        "Saved on Alex M.'s job: ticket 2610-26-0441. The marks are due by Wed Oct 28."
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner"
+      ],
+      "branches": [
+       {
+        "label": "Marks in by the day before",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "The city needs a permit first",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "line": [
+           "4.14",
+           "7.16"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 26, 9:00am",
+          "title": "Moves the job day until the permit",
+          "does": "A what-if: Eli finds the tree is protected by the city, so Sam applies for a permit. The job day waits for the city's OK. The business caused the move, so it's free.",
+          "more": [
+           "Sam gets a to-do for the permit, and replies once it's approved.",
+           "Only days after the permit's expected date are offered.",
+           "The 811 request is placed again if its ticket runs out before the new day."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your tree needs a city permit before it can come down. Sam has applied for it. Your job day moves, with no fee. We'll text new days once it's approved."
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No marks by the day before",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x05",
+          "line": [
+           "7.16",
+           "8.19"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Wed Oct 28, 4:00pm",
+          "title": "The tree comes down; the grinding moves",
+          "does": "A what-if: the locators haven't marked the lines by the day before. The ash still comes down Thursday. Only the stump grinding moves to a later day.",
+          "more": [
+           "Nothing is dug or ground without the marks.",
+           "The second day costs Alex nothing, and the last bill waits for it.",
+           "Sam is told, and the ticket is checked again."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The buried lines by your stump aren't marked yet. The ash still comes down Thu Oct 29. The stump grinding moves to a later day, at no cost.",
+            {
+             "times": [
+              "Mon Nov 2 · stump grinding · Hugo",
+              "Tue Nov 3 · stump grinding · Hugo"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x06",
+      "line": [
+       "7.1",
+       "4.14"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Wed Oct 28, 10:00am",
+      "title": "Reminds Alex the day before the job",
+      "does": "The day before, Alex gets the job day's plan and a new check-in code. The crew comes 8am to 3pm, with the lift, the chipper and the grinder.",
+      "more": [
+       "The plug-in's prep: flag any private lines near the stump, move the cars and unlock the gate.",
+       "811 marks only the utilities' lines, so sprinklers or a dog fence need Alex's flags.",
+       "The cancel window and the 48 hours before the job have passed. A cancel now goes to Sam, for the deposit.",
+       "Alex need not be home. If Alex is, Eli walks the job with him first."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Reminder: Eli's crew takes down your ash tomorrow, 8am to 3pm. Please move your cars, and flag any sprinklers or buried lights near the stump.",
+        {
+         "card": {
+          "title": "Job day · Thu Oct 29",
+          "lines": [
+           "8am to 3pm · Eli's crew",
+           "Lift, chipper and stump grinder",
+           "811 marks are in"
+          ]
+         },
+         "code": "7254"
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "B8-x07",
+      "type": "split",
+      "line": [
+       "7.2",
+       "7.18"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Does anything change before the job day?",
+      "q": "What happens before the job day?",
+      "does": "Each branch is one thing that can happen before the job day. The rules from before the first visit apply again. Most rejoin; a cancel ends it.",
+      "more": [
+       "The forecast is checked the day before, against the plug-in's wind limit for the lift.",
+       "Every message is checked for danger first, after booking too."
+      ],
+      "needs": [
+       "pf.edges"
+      ],
+      "branches": [
+       {
+        "label": "Nothing changes",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Wind over the lift's limit",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x08",
+          "line": [
+           "7.18",
+           "7.12"
+          ],
+          "who": "staff",
+          "to": "san",
+          "via": "msg",
+          "t": "Wed Oct 28, 5:00pm",
+          "title": "Hugo moves the job a day for wind",
+          "does": "A what-if: gusts over the lift's limit are forecast for Thursday. Hugo, the crew lead, moves the job to Fri Oct 30, the next day the crew and the lift are free.",
+          "more": [
+           "A move for weather costs Alex nothing, and cancelling stays free.",
+           "The 811 ticket is checked: it still covers Friday.",
+           "Alex can pick another free day instead."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "WEATHER gusts over the lift's limit Thu. Move Alex M. to Fri"
+           ],
+           [
+            "san",
+            "cust",
+            "High wind is forecast for Thursday, too strong for the lift. Your job moves to Fri Oct 30, 8am to 3pm, at no cost.",
+            {
+             "buttons": [
+              "Friday is fine",
+              "Pick another day"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.edges"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "A storm drops a limb on the garage",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x09",
+          "type": "split",
+          "line": [
+           "7.6",
+           "7.14"
+          ],
+          "who": "cust",
+          "to": "san",
+          "via": "msg",
+          "t": "Tue Oct 27, 9:30pm",
+          "title": "A limb hits the garage; the job moves up",
+          "q": "Does Alex sign the change in writing?",
+          "does": "A what-if: a storm drops a big limb from the ash onto the garage roof. Rosie sends the safety steps first. Sam moves the job up and prices the extra.",
+          "more": [
+           "The safety steps are the plug-in's: stay out of the garage and away from the tree.",
+           "Lifting the limb off the roof adds $300. It needs Alex's written yes, like a change order.",
+           "The business moved the date, so cancelling stays free.",
+           "The stump grinding waits for the 811 marks, if they aren't in yet.",
+           "Storm prices stay inside the state's limits in a declared emergency."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "A big limb from the ash just fell on the garage roof."
+           ],
+           [
+            "san",
+            "cust",
+            "Stay out of the garage and away from the tree. If anyone is hurt, wires are down or you smell gas, call 911 first. Sam is being told now."
+           ],
+           [
+            "san",
+            "cust",
+            "Eli's crew can come tomorrow, Wed Oct 28, instead. Lifting the limb off the garage roof adds $300.",
+            {
+             "card": {
+              "title": "Change order 1 · $300",
+              "lines": [
+               "Lift the limb off the garage roof",
+               "Job moved up to Wed Oct 28"
+              ],
+              "button": "Read and sign",
+              "link": "rosfield.com/k/r4c1"
+             },
+             "buttons": [
+              "Sign it",
+              "Call me first"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.safety",
+           "pf.rules"
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Signs it",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Call first, or no reply",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "B8-x10",
+              "line": [
+               "7.14",
+               "11.22"
+              ],
+              "who": "san",
+              "to": "owner",
+              "via": "msg",
+              "title": "Asks Sam to call Alex",
+              "does": "Alex wants a call first, or doesn't answer by Wed 6am. Sam gets a to-do to call. Without the signed change, only the signed work is done.",
+              "more": [
+               "The crew still comes for the signed work.",
+               "Rosie moves no money on its own."
+              ],
+              "say": [
+               [
+                "san",
+                "owner",
+                "Alex M. wants a call about change order 1: $300 to lift the limb off the garage roof. Please call today.",
+                {
+                 "buttons": [
+                  "I called",
+                  "Remind me at 8am"
+                 ]
+                }
+               ]
+              ],
+              "tells": [
+               "owner"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Alex moves the job day",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x11",
+          "line": [
+           "7.2",
+           "7.16"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 26, 6:00pm",
+          "title": "Offers days the crew and the lift are free",
+          "does": "A what-if: Alex asks to move the job day. Only days the crew and the lift are free, and the 811 ticket still covers, are offered.",
+          "more": [
+           "A day past the ticket's life gets a new 811 request, and Sam a to-do.",
+           "A move made more than 48 hours ahead is free.",
+           "No reply in 30 minutes: the job day stays as it was."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "Can we do the tree next week instead?"
+           ],
+           [
+            "san",
+            "cust",
+            "Sure. These days have the crew and the lift free:",
+            {
+             "times": [
+              "Tue Nov 3 · 8am to 3pm · Eli's crew",
+              "Thu Nov 5 · 8am to 3pm · Eli's crew"
+             ],
+             "buttons": [
+              [
+               "C",
+               "Keep Thu Oct 29"
+              ]
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.first_steps"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Alex cancels the job",
+        "end": "end",
+        "endText": "Cancelled. Sam decided the deposit under the contract, and Alex and Eli were told.",
+        "steps": [
+         {
+          "id": "B8-x12",
+          "type": "split",
+          "line": [
+           "7.3",
+           "11.4"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "t": "Wed Oct 28, 11:00am",
+          "title": "Sam decides about the deposit",
+          "q": "What does Sam decide about the $210?",
+          "does": "A what-if: Alex cancels the day before the job. The window and the 48 hours have passed, so Sam may keep the deposit under the contract. Sam decides.",
+          "more": [
+           "The job comes off the crew's day at once.",
+           "Earlier, it's a full refund, with nothing to decide.",
+           "No answer from Sam in 24 hours: one reminder, then a full refund."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "I need to cancel the tree job, sorry."
+           ],
+           [
+            "san",
+            "cust",
+            "Cancelled. The crew won't come Thursday. Sam will decide about your $210 deposit, under your contract."
+           ],
+           [
+            "san",
+            "owner",
+            "Alex M. cancelled tomorrow's ash removal. Under the contract, you may keep the $210 deposit.",
+            {
+             "buttons": [
+              "Keep the $210",
+              "Refund it"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.money"
+          ],
+          "tells": [
+           "cust",
+           "owner"
+          ],
+          "branches": [
+           {
+            "label": "1 Keep the $210",
+            "steps": [],
+            "end": "end",
+            "endText": "The deposit is kept, and Alex is told."
+           },
+           {
+            "label": "2 Refund it, or no answer",
+            "steps": [],
+            "end": "end",
+            "endText": "The $210 is refunded, and Alex is told."
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x13",
+      "line": [
+       "8.2",
+       "8.3"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "t": "Thu Oct 29, 7:55am",
+      "title": "The crew checks in and sets up",
+      "does": "Eli texts on his way with the crew. At the gate, Alex gives the job day's code. Eli walks the job with him: the tree, the drop zone and the stump.",
+      "more": [
+       "The crew lays ground mats from the gate, so the lift doesn't rut the lawn.",
+       "Eli checks the 811 paint and Alex's flags, then ropes off the work area.",
+       "Nobody home: Eli texts DONE with photos at the end, instead of the code.",
+       "The code is new for the job day. Check-in works as at the first visit."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "OMW"
+       ],
+       [
+        "san",
+        "cust",
+        "Eli from Lee Tree Care is on the way with the crew, about 15 minutes. When Eli arrives, give your job-day code. If someone else comes, don't let them in.",
+        {
+         "photos": [
+          "Eli, from Lee Tree Care"
+         ],
+         "photoLink": "rosfield.com/m/r4j",
+         "code": "7254",
+         "buttons": [
+          [
+           "2",
+           "It isn't Eli"
+          ]
+         ]
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "7254"
+       ],
+       [
+        "san",
+        "cust",
+        "Eli from Lee Tree Care is checked in for your job day."
+       ]
+      ],
+      "needs": [
+       "code",
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "B8-x14",
+      "line": [
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 29, 12:30pm",
+      "title": "Takes the ash down in sections",
+      "does": "The crew takes the branches off first, then lowers the trunk in short sections, away from the garage. The brush goes straight into the chipper.",
+      "more": [
+       "The plug-in sets how a tree comes down. Nothing is dropped near the garage or the wires.",
+       "The wood is hauled away, as the quote says. Rounds left for firewood cost nothing.",
+       "Then the stump is ground below the grass, outside any marked zone.",
+       "Eli texts a short update, with a photo, once the tree is down."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "UPDATE ash is down, no damage. Grinding the stump next",
+        {
+         "photos": [
+          "The ash, down to the stump"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Eli's crew has your ash down safely. They're grinding the stump now."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A tree removal never starts at the arborist visit: the crew, the lift and the 811 marks come on a job day, after a signed contract (the branch below)."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A tree quote is signed whole, as one contract. Alex picks the wood and stump lines on the quote's page before signing."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An arborist visit has no form to sign first; the removal's contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Arborist visits and job days are booked in 2-hour arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Tree work books visits and job days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Tree work books an arborist's or a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking walks the job (pf.messages)."
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "Where the rules limit moving firewood, like out of a pest quarantine area, Rosie won't offer firewood delivery past that line. Firewood stays a pickup at the yard there.",
+    "more": [
+     "Wood chips and mulch can still be delivered.",
+     "If a customer asks for a delivery where none may go, Rosie offers a pickup at the yard instead.",
+     "The limits come from the state's form, never one rule for all."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where your yard is, the rules limit moving firewood out of the pest quarantine area. So firewood deliveries stay inside it.",
+      {
+       "card": {
+        "title": "Firewood · deliveries limited",
+        "lines": [
+         "Only inside the quarantine area",
+         "Pickups at the yard as usual"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Tree work, spraying and the wood yard all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The tree service plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Arborists, crews and yard hands are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: arborist visits, tree jobs and yard pickups."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Storm work is sent now, like a tree on a house (S2-27)."
+   },
+   {
+    "op": "words",
+    "at": "B3-05",
+    "say": [
+     [
+      "agent",
+      "san",
+      "Hi, I'm an automated assistant from Google, calling for a customer, Kim. Can someone haul away a brush pile this Thursday? What does it cost?"
+     ],
+     [
+      "san",
+      "agent",
+      "Lee Tree Care has open times this Thursday, Oct 22. A brush pile pickup is $179. I can't book on this call. I'll text Kim a secure link to pick a time and book. Which mobile should I text?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Before this visit, Lee Tree Care needs an arborist visit first. Pick a time:",
+      {
+       "times": [
+        "Tue Oct 20 · arriving 4–5pm",
+        "Wed Oct 21 · arriving 8–9am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-34",
+    "does": "Eli cuts a hand and texts HURT. Rosie tells Sam at once. If anyone needs care, call 911 first.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT cut my hand, need to stop"
+     ],
+     [
+      "san",
+      "owner",
+      "Eli is hurt at Alex M.'s visit (19 Hillcrest Rd) and needs to stop. Call Eli now.",
+      {
+       "buttons": [
+        "Send Hugo",
+        "New time for Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam is told. If you need care, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-35",
+    "does": "A what-if: the lift's track cracks a patio stone, and Eli texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DAMAGE the lift cracked a patio stone",
+      {
+       "photos": [
+        "Cracked patio stone"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Eli's crew cracked a patio stone at Alex M.'s. The before photo shows no crack.",
+      {
+       "photos": [
+        "Before",
+        "After"
+       ],
+       "buttons": [
+        "Fix it, no charge",
+        "Take money off",
+        "I'll call Alex"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-25",
+    "does": "A what-if: Alex's home insurance covers part of a storm job, like a tree on the house. Sam bills the insurer the business's own way. Alex gets a bill for their share.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Tree Care: your share of the storm job. Your home insurance covers the rest.",
+      {
+       "pay": {
+        "amount": "$75",
+        "what": "your share",
+        "link": "rosfield.com/p/r4i"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "more": [
+     "Prunings already booked stay paid in full.",
+     "A deposit is taken when the customer books, and comes off the price.",
+     "A deposit stays within the state's limits, from the plug-in.",
+     "A deposit on a price set at the visit is never more than its starting price.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-07",
+    "does": "The price comes from Sam's list, or is quoted at the visit when the list doesn't set it. List prices never need Sam's OK."
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Next: send the prices for the next kind of work, or say none.",
+      {}
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A tree job is rated, like the company's."
+   }
+  ]
+ },
+ "notes": "Pilot: started from the contractor (pattern project). A tree job runs the same way: an arborist visit at the property, a written quote, a signed contract with a deposit, then the work on a later day. What the contractor lacked, the overlay adds: the power-line check, whose tree it is, the 811 locate, the job day's own what-ifs and check-in.\nFlow B (main path visit|none|bill): Alex's dead ash leaning toward the garage at 19 Hillcrest Rd. The $89 arborist visit Thu Oct 22 (nothing taken, credited to the job if Alex signs); Eli's written quote of $2,100 (B8-20 words); the contract signed by Alex and Sam (B8-62); the $210 deposit and the job day Thu Oct 29 (B8-63); then the own steps B8-x01 to B8-x14: the cancel window, Sam's 811 locate to-do (with a city permit and missing marks as what-ifs), the day-before reminder with its own code, what can change before the job day, the crew's check-in and the take-down. The last $1,890 is the bill Rosie texts (B9-05 to B9-11 words); receipt, rating and the 30-day cleanup guarantee follow (B10 words).\nThe example's $89 arborist visit keeps the master's $89 numbers and fee math. The old flow's free estimate is the plug-in's starting answer (pf.money estimate, pf.services). The old flow's numbers stay: $2,100 total, a 10% deposit of $210, a $1,890 rest, job day Thu Oct 29.\nB8-20's '1 Yes, fix it', '3 OK some lines' and 'Over the landlord's top amount' are off (B9-27's '3 OK some lines' too): a removal never starts at the arborist visit, its quote is signed whole (the wood and stump lines are picked on the quote's page), and a renter's tree is the landlord's to sign. Rename pairs give the master branches '1 Signs the contract' and 'No reply in 5 days', so the quote's buttons (Sign the contract, Not now) match the branch numbers.\nDates: the cancel window ends 11:59pm Tue Oct 27, before the job day; Sam's 48-hour cancel policy (pf.money cancel) also ends by then, so a cancel the day before goes to Sam for the deposit (B8-x12). The storm what-if moves the job up to Wed Oct 28, after the window. Extra work found on the job day gets its own dates (B8-24, B8-25, B10-05, B10-06 words: cancel until Mon Nov 2, quote good until Thu Nov 5).\nWhere the yes was given: Alex signed on his phone away from home, but the quote followed Eli's visit there, so B8-x01 treats it as a sale at the home (Rosie's safe default, a rule box). No state's number of days is written; the window's date is the example's.\nPower lines: B4-x01 asks on every tree job before any time (pf.questions). Only the line to the house: the visit goes ahead, the job day waits for the utility (B4-x02). Street lines: no booking (B4-x03). The 10-foot distance is the plug-in's question; no law is cited.\nWhose tree: B4-35 words plus two branches (B4-x04 the neighbor's yes for a tree on the property line; B4-x05 someone else's tree, not booked). B4-78's '2 No: nobody asks' is off: tree work always asks.\n811 locate: the business's own first step. On the main path it's Sam's to-do after signing (B8-x03, the ticket number kept on the job); on the stump path (list|hold|bill) it's the master's 'The business gets it first' (B4-42 words) with the lead time (B4-87 words). Missing marks move only the grinding (B8-x05). No state's lead time is written.\nMoney combinations used: B visit|none|bill, visit|none|own, list|hold|bill (a stump grinding from the list, $179, with the $89 visit fee held, the plug-in's starting answer for work at the customer's place paid after, as in Sam's sign-up setup), photos|deposit|bill (a small crabapple priced from photos at $640, a signed estimate, a $160 deposit). A list|card|counter, list|none|counter, list|full|none, list|deposit|counter. Left out: the saved card charged at DONE (tree bills are paid by link, transfer or check), the visit hold (the old flow takes nothing before the quote), A's photo and at-the-yard pricing (kept only as examples).\nWords ops on the visit path set the full combination keys (price:visit+before:none+after:bill and +after:own); the build also writes the same words onto every master vary key that only those two combinations light, so no plumber words show on the page.\nFlow A is Sam's second company, Lee Wood Yard (the master's Lee's Barbershop): firewood, wood chips and mulch picked up at the yard, 4 Quarry Ln. Main path list|card|counter: a $35 pickup load of wood chips with Nell, Sat Oct 24 11:00am, a card saved for the $20 missed-loading fee, paid at the yard office. The yard's board keeps the barbershop's prices: wood chips $35, mulch $40, brush drop-off $20, kindling crate $25, half a face cord of firewood $55 (paid in full), log milling $140 for 2½ hours ($40 deposit), log splitting from photos $90, slab cutting at the yard after a $25 log check. Delivery to a home ($75) is the other flow.\nFlow A ops: A8-02 keeps both branches (splitsKept): the yard checks for a truck bed that fits the load and a tarp, and a trailer too small for the load is 'Something required is missing' (rename pairs). A4-43 keeps only 'No' and A7-02's first-step branches are off: a pickup has no first step. A7-70 keeps 'Shorter, in the time left' (a late truck is loaded in the time left, or moves). More lines: the face cord explained (A4-06), firewood moves where the rules allow (A4-22), firewood set aside once paid (A5-16), the firewood receipt names the amount where the rules require it (A10-01).\nLicenses: tree work is licensed or only registered state by state (some states license tree experts, some register tree care, many have neither), and spraying always needs each sprayer's applicator license. So S1-60 and S2-28 keep both branches (splitsKept). The wood yard needs no license: S1-63's '1 A license (the yard)' is off, and rename pairs take the barber license out of the yard's sign-up and team steps (Nell replies YES with no number). License numbers renamed: TC045210 (the company), PA22871 (spraying), TW031552 and PA30417 (Eli's own).\nS1-44 words (both flows): where the rules limit moving firewood, like out of a pest quarantine area, firewood delivery stays inside the line. That's the yard's version of the master's 'not allowed there'.\nSecond kind of work in the same company: tree spraying (trade name Lee Plant Health: ash tree injection $149, deep root feeding $189, orchard spraying quoted), which waits for a licensed sprayer, like the master's electrical.\nStorm work is sent now (S2-30's '2 No: never sent now' is off; B4-81, B7-55, B8-58 keep both branches): a limb on a roof, with Hugo on call. A planned removal is never sent now.\nPlug-in splits kept whole (splitsKept): S1-60, S2-28 (licenses vary by state and by work), A7-61 (anyone loads chips; only Nell runs the sawmill), A8-02, B4-81, B7-55, B8-58 (storm work sent now), B4-57 (a contract for a removal or a photo-priced tree, none for a stump), B8-69, B8-70 (nobody needs to be home for a visit or a stump), B8-71 (firewood delivered and stacked, or no delivery). Off: B8-65's outside check partway, B8-22's 'A part goes to the yard', B10-07's item and rented fan, B10-29's city inspection after the work (a city permit comes before the job day).\nNames: Riley and Avery are yard hands Nell and Wes; Jordan and Casey are the arborist Eli and the crew lead Hugo. Lee Home Services is Lee Tree Care (310 Ridge Rd), Lee's Barbershop is Lee Wood Yard (4 Quarry Ln), Alex lives at 19 Hillcrest Rd. The master's list jobs keep their prices as the example business's own: stump grinding $179 (drain clearing), small tree pruning $150 (water heater flush), small tree removal $640 from photos (water heater replacement), tree risk check $199 with a report (sewer camera inspection), the maple limbs $160 and a roof limb $95 as extras, oak cabling $900 as a bigger job, a brush pile pickup for Kim.\nEvery state rule is a switch from the state's form: the tree care license or registry, applicator licenses, the written contract, the deposit cap, money kept apart, the cancel window, city tree permits, the 811 lead time and ticket life, power-line distances, load covering, firewood moves, what must be shown. The old flow's Minnesota, California, Louisiana, Hawaii and federal citations are dropped.\nThe gaps are named in work/gaps/tree.json; each old node is still covered by the master or an own step (coverage gap count 0).\nprof-read.js was run; its joined readings are work/prof/tree-read-A.md and tree-read-B.md.\nkeep: none. No master or pilot example word is left on the paths this profession uses.\nReview (Oct 22): money paths the plug-in names were added: A list|hold|counter (log milling, $40 held), photos|card|counter (log splitting from photos), visit|card|counter (slab cutting after a $25 log check); B list|full|none (small tree pruning, $150 paid in full). Their words were fixed (a 'facial', a 'brassy' note, a 'milling-correction session', answers that didn't fit their questions, a pickup reminder on the milling, splitting and slab paths, crabapple removal words on the pruning path). 'Log milling' now reads lower case mid-sentence (rename pairs).\nReview: A's plan and insurance branches are off (A4-28, A4-54, A7-02, A9-15). Fixed: 'Eli pickups a hand' (B8-34), a garbage disposal in B4-51 (an ash injection's treatment now), a cabinet floor in B8-35 (a patio stone), the firewood delivery card (B8-36), 'Flushes' in S11-56, 'massage' in S11-58 (kiln-dried firewood now), 'see a doctor' in A3-26, Kim's brush pile priced as a stump (B3-05), a 'free' arborist visit (B4-40), and the job-day dates and amounts on the pay page, pay-over-time, landlord bill, rating, refund, complaint and dispute (Thu Oct 29, $1,890). B9-25's home warranty is home insurance on a storm job. The log splitter is Nell's alone (pf.services skills).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "like a burst pipe or a lockout",
+    "takes jobs sent now, like a burst pipe",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "rents a chair",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "like Lee Plumbing and Lee Electric",
+    "Panel upgrade",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent",
+    "Lee's Barbershop doesn't do perms.",
+    "a Kids cut (12 and under) is $25",
+    "Do you do kids cuts? My son is 8.",
+    "Quiero un corte el sábado.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Gloss to finish",
+    "gloss",
+    "A repair shop, a tailor or a groomer does.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "The cape clip ripped my shirt collar.",
+    "once Riley sees the hair",
+    "Step-free door on Elm St",
+    "A haircut could mean a salon or a barbershop.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "May the shop show photos of your hair?",
+    "photos of your hair",
+    "Alex's hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "like Riley's color plan after a consult",
+    "$25 consult",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "house calls",
+    "a house call",
+    "house call",
+    "JP031552",
+    "JE30417",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "estimate visit",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "an electrical",
+    "electrical",
+    "Electrical",
+    "A plumber",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "Drains",
+    "Drain",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "hot towel shave",
+    "for the Groom's package",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color",
+    "Color",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "the chair",
+    "The chair",
+    "chairs",
+    "chair",
+    "shops",
+    "shop",
+    "Shop",
+    "Each service starts the way most barbershops set it.",
+    "'Matched': the request fits a listed service",
+    "doesn't do perms.",
+    "says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Barbershop",
+    "barbershop"
+   ],
+   "B": [
+    "replace both shutoff valves",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "like a burst pipe or a lockout",
+    "takes jobs sent now, like a burst pipe",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "rents a chair",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "like Lee Plumbing and Lee Electric",
+    "Panel upgrade",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "It's overflowing. Can someone come tonight?",
+    "Overflowing kitchen drain",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "One of the shop's barbers does house calls.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Can Jordan also run a camera down my sewer line?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Mold behind the sink wall",
+    "mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "DONE 179 drain",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Video and Jordan's notes",
+    "LATE camera report",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "sewer camera report",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "A haircut could mean a salon or a barbershop.",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "your share of today's repair",
+    "The main story: Alex asks an AI for a plumber",
+    "The $640 water heater is over",
+    "like an overflowing drain",
+    "like water near outlets or a gas smell",
+    "the one who replaces water heaters",
+    "replaces water heaters",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "Signed: the deposit, then the work days",
+    "At the shop, and house calls",
+    "house calls",
+    "house call",
+    "JP031552",
+    "JE30417",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "leehomeservices.com",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "credited to the repair",
+    "estimate visit",
+    "Estimate visit",
+    "service call",
+    "Service call",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Yard drain",
+    "yard drain",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "the repair",
+    "$245",
+    "1-year labor warranty",
+    "labor warranty",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "an electrical",
+    "electrical",
+    "Electrical",
+    "a plumber",
+    "A plumber",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "faucet",
+    "Drains",
+    "drain",
+    "Drain",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "hot towel shave",
+    "color",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "the chair",
+    "The chair",
+    "chairs",
+    "chair",
+    "shops",
+    "shop",
+    "Shop",
+    "Please clear the cabinet under the sink.",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "Shutoff valve and wall pipe",
+    "it's about a leaking pipe under my sink.",
+    "It's a leak under the sink, today,",
+    "I found water damage under the sink this morning.",
+    "Like tapping a neighbor's water line without asking.",
+    "the supply line",
+    "the shutoff valve",
+    "Supply line",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "cabinet",
+    "barbershops"
+   ]
+  },
+  "A": {
+   "A4-06": "e9e9bb848b",
+   "A4-65": "fa7ec0389d",
+   "A5-16": "8045a6b80c",
+   "A10-01": "77ff9c7550",
+   "A4-24": "0a292df05b",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "S1-43": "6ae26657a1",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A3-26": "9e3630dc0b",
+   "S11-58": "87f7492a91",
+   "A8-28": "ce2597e46a",
+   "A8-30": "c0f4d7c935",
+   "S12-32": "69107511cd",
+   "S1-84": "1747e13d81",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B4-05": "fb3a9061c8",
+   "B4-97": "04796bf8db",
+   "B8-18": "530038d2b8",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-49": "4fcfdeb80b",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "B8-93": "c1406fd6bc",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "S1-43": "dd3ae2a1a9",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B3-05": "c2996f5c4f",
+   "B4-15": "f13240b9c6",
+   "B8-34": "643812e26f",
+   "B8-35": "93207824c7",
+   "B9-25": "ba71e46cce",
+   "S11-56": "8b6c6c101f",
+   "B4-07": "9d0dbc90ad",
+   "S1-38": "6301c86637",
+   "B10-32": "7713bff255"
+  }
+ }
+}

@@ -1,0 +1,3747 @@
+{
+ "id": "florist",
+ "name": "Florist",
+ "style": "Event",
+ "pattern": "event",
+ "from": "caterer",
+ "plugin": {
+  "pf.license": {
+   "need": "Floral design and a flower shop: no state license in most places. The business registration, and a seller's permit for sales tax where the state's form asks for one. Plant care that treats plants for pests: a pest control license for the company and an applicator license for each plant tech, where the state's rules require them. All from the state's form.",
+   "who holds it": "The business holds its registration, any seller's permit and any pest control license. Each plant tech holds their own applicator license. Designers hold no license of their own.",
+   "what to ask": [
+    "The business registration number",
+    "The seller's permit number, where the state's form asks for one",
+    "The company's pest control license, if it treats plants for pests",
+    "Each plant tech's applicator license, in their invite reply"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "A reminder 30 days before a permit, a license or the insurance runs out. Once one lapses, the services it covers pause.",
+   "insurance or bond": "Liability insurance on file, with its end date. Many venues ask for a certificate naming them before setup (B4-70).",
+   "background checks": "Only where the state's form asks."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Lee Floral Design's own list)": [
+    {
+     "service": "Event flowers (weddings, parties, brunches), delivered and set up",
+     "price kind": "quoted from the plan first (the date, the venue, the tables or guests, the colors, photos)",
+     "price": "the quote (the example: $640 for an anniversary brunch, 8 tables)",
+     "length": "a 2-hour setup window before the event",
+     "place": "at the venue",
+     "before": "a signed contract, then a 25% deposit (a wedding: a 30% deposit that holds the date)",
+     "after": "the rest on the bill after the event (a wedding: the rest on the bill after the wedding)",
+     "note": "Delivery, setup and the pickup of loaned vases are in the quote. Sam OKs every wedding, and every quote over $500."
+    },
+    {
+     "service": "Sympathy arrangement, delivered",
+     "price kind": "one price",
+     "price": "$150, delivery included",
+     "length": "a 2-hour delivery window that ends before the service",
+     "place": "at a funeral home or the family's home",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Gentle words only, no rating and no sales text after."
+    },
+    {
+     "service": "Standing spray, delivered",
+     "price kind": "one price",
+     "price": "$179",
+     "length": "a delivery window before the service",
+     "place": "at a funeral home",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Everyday arrangement, delivered",
+     "price kind": "one price",
+     "price": "the shop's own price plus delivery",
+     "length": "a delivery window, Mon to Sat",
+     "place": "at the recipient's home or office",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Same-day delivery when ordered by noon. The recipient gets no texts."
+    },
+    {
+     "service": "Ceremony arch flowers",
+     "price kind": "one price, by person",
+     "price": "$199, or $249 designed by Sam",
+     "length": "set up with the event",
+     "place": "at the venue",
+     "before": "with the event",
+     "after": "with the event"
+    },
+    {
+     "service": "Flower wall or hanging installation",
+     "price kind": "quoted after a free venue walk-through",
+     "price": "the quote",
+     "length": "set up with the event",
+     "place": "at the venue, where it allows hanging pieces",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest on the bill after the install"
+    },
+    {
+     "service": "On-site florist time",
+     "price kind": "per hour, by person",
+     "price": "$120 an hour, $140 with Luca (the example)",
+     "length": "1-hour minimum",
+     "place": "at the event",
+     "before": "nothing: asked on the day",
+     "after": "one pay link",
+     "note": "Only with the customer's written yes, at the rate shown before booking."
+    },
+    {
+     "service": "Plant care (the second kind of work): a plant visit, porch planters, a pest treatment",
+     "price kind": "one price",
+     "price": "$89 a visit for up to 10 plants, $149 for porch planters, $189 for a pest treatment (the example)",
+     "length": "a 2-hour window",
+     "place": "at the customer's home or office; nobody needs to be there for outdoor planters",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "A pest treatment only by a plant tech with a current applicator license, where required."
+    }
+   ],
+   "at the business (the example: Lee's Flower Shop's own list)": [
+    {
+     "service": "Wedding consultation",
+     "price kind": "one price",
+     "price": "free (at the shop or by video); $75 as a walk-through at the venue",
+     "length": "45 min",
+     "place": "at the shop's design table, by video, or at the venue",
+     "before": "nothing: a YES books it",
+     "after": "nothing to pay",
+     "note": "Leads to the proposal, which holds the date for 7 days."
+    },
+    {
+     "service": "Everyday arrangement, picked up",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "a 15-minute pickup slot",
+     "place": "at the shop's counter",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Hand-tied bouquet · boutonniere · corsage, picked up",
+     "price kind": "one price",
+     "price": "$40 · $20 · $25",
+     "length": "a pickup slot",
+     "place": "at the counter",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Courthouse wedding set (a bouquet and 2 boutonnieres), picked up",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "a pickup slot on the wedding day",
+     "place": "at the counter",
+     "before": "a $40 deposit",
+     "after": "the $100 rest at pickup, at the counter"
+    },
+    {
+     "service": "Custom arrangement",
+     "price kind": "priced from the customer's photos",
+     "price": "the quote (the example: $90)",
+     "length": "a pickup slot",
+     "place": "at the counter",
+     "before": "the full price, once Sam OKs it",
+     "after": "nothing more"
+    },
+    {
+     "service": "Your vase, filled while you wait",
+     "price kind": "priced at the counter",
+     "price": "a $25 design fee, plus the flowers picked",
+     "length": "about 20 min",
+     "place": "at the counter",
+     "before": "nothing",
+     "after": "at the counter"
+    },
+    {
+     "service": "Weekly flowers plan",
+     "price kind": "one price",
+     "price": "$35 a week",
+     "length": "a pickup slot each Saturday",
+     "place": "at the counter",
+     "before": "a card saved",
+     "after": "each charge only after its own yes and a reminder (a plan, not in this work's money paths)"
+    }
+   ],
+   "capacity": "Sam takes 2 weddings a Saturday at most. Pickup orders are capped at a daily number Sam sets.",
+   "note": "Every price is the example businesses' own, not a standard."
+  },
+  "pf.questions": {
+   "before times": [
+    "An event: the date, the venue's town, how many tables or guests, the colors, and a flower budget if there is one",
+    "A sympathy order: the day and time of the service, and the funeral home",
+    "An everyday order: the occasion, and pickup or delivery",
+    "A consultation: a wedding or another event, and about how many guests"
+   ],
+   "after a time is picked": [
+    "Where each piece goes",
+    "The venue's rules: setup and pickup times, open flame, what can hang",
+    "The wedding party: bouquets and boutonnieres",
+    "The card message for a delivery"
+   ],
+   "only on the secure page": [
+    "Allergy details, like flowers to avoid",
+    "The name for a sympathy card, and the name of the person who died",
+    "The card message",
+    "A recipient's address and phone (the recipient gets no texts)",
+    "The venue's contact for the day"
+   ],
+   "who may book": "An adult (18 or older). A teen asks a parent to order. Anyone may order for another adult, as a gift, and pay for it. A company may pay for an event (B4-35)."
+  },
+  "pf.safety": {
+   "danger words": [
+    "A fire, or open flame near flowers",
+    "A gas smell at the venue",
+    "Someone hurt or unwell",
+    "A bad allergic reaction, like trouble breathing"
+   ],
+   "what Rosie says": "Danger now: get everyone out, and call 911. No booking until it's safe. A candle fire that's already out gets the safety steps first, then the booking goes on: keep candles away from the flowers, and call 911 if smoke comes back.",
+   "grief and crisis": "Sympathy orders often come in grief. Crisis words get the 988 and 911 message, and no order goes on in that chat.",
+   "pets": "A pet that ate a plant (lilies are dangerous for cats): Rosie gives no advice. It says to call a vet or a pet poison line now.",
+   "at the venue": "Nothing is hung on an unsafe hook. Candles sit in glass, where the venue allows them. Nothing blocks an exit or a sprinkler."
+  },
+  "pf.first_steps": {
+   "wedding": "A free consultation first (45 minutes, at the shop, by video, or $75 at the venue). Then the proposal holds the date for 7 days, and signing it with the 30% deposit books the wedding. The final count is due 30 days before.",
+   "installation": "A free venue walk-through before a flower wall or hanging pieces, and the venue's written OK where it asks.",
+   "everything else": "None.",
+   "prep in the reminder": "The venue's side door or loading door open at the setup time; candles in glass. For a consultation: bring photos you love, and the venue's rules if you have them."
+  },
+  "pf.visit": {
+   "check-in": "An event: the code at the venue's door, from whoever meets the designer (the customer, or the venue's contact for the day). A consultation: the code at the shop's desk, or read out at the start by video. A pickup: the code at the counter. A delivery to a funeral home, an office or a recipient: no code; DONE with a photo, and the sender gets the photo.",
+   "nobody there for a delivery": "The driver calls the number once, and brings the flowers back the next morning, free. A second miss: Sam decides.",
+   "changes on the day": "More pieces need the customer's written yes, at list prices, paid by one pay link. A stand-in flower agreed in the contract is used as written; anything else needs a new yes.",
+   "done": "DONE with photos of the setup. Loaned vases are counted at pickup, at the time the venue set. A missing one is a fee only with Sam's yes.",
+   "right to cancel": "Extras placed at a venue get a right to cancel only where the state's rules say so."
+  },
+  "pf.money": {
+   "events": "Quoted from the plan, with a signed contract. A 25% deposit when booked (a wedding: a 30% deposit at signing that holds the date). The rest is paid on the bill after the event (a wedding: on the bill after the wedding). Nothing is charged on a set day. The state's caps on deposits win (from the state's form).",
+   "deliveries and pickups": "Paid in full when ordered. Free to cancel until noon the day before (the shop: 24 hours before pickup). After that, the flowers are made, so the price may be kept, only with Sam's yes. No answer in 24 hours: a full refund.",
+   "wedding cancel schedule (the example's own)": "90 days or more before: all back, except a fee of up to $250, never more than what was paid. 21 to 89 days: the deposit is kept. Under 21 days: everything paid is kept. Sam confirms every kept amount. If the business cancels, everything comes back.",
+   "loaned vases": "No hold. $18 for each vase not returned (the example's own), only with Sam's yes, by one pay link.",
+   "holds": "None.",
+   "tips": "A tip line on a bill only if Sam turns it on.",
+   "tax": "Sales tax on flowers where the state's form says so (the seller's permit switch).",
+   "Rosfield's $2": "Yes: both companies pay Rosfield's $2 for each confirmed booking."
+  },
+  "pf.messages": {
+   "never in a text": [
+    "Allergy details",
+    "The name of the person who died",
+    "A card message",
+    "A recipient's address"
+   ],
+   "sympathy": "Texts to a sympathy sender are short and gentle: no exclamation marks, no rating, no offers, and no 'book again'. They name only what's needed: the funeral home, the day and the time.",
+   "recipients": "The person who gets the flowers gets no texts: they never agreed to them. Only the driver calls their number, and only to deliver.",
+   "languages": "English and Spanish."
+  },
+  "pf.staff": {
+   "skills": "Luca leads quoted events and does plant care. Felix does sympathy pieces, deliveries and setups. Elliot leads consultations and custom pieces at the shop, and Hazel does everyday work at the counter.",
+   "licenses": "Designers hold no license of their own. Plant techs hold an applicator license where the state's rules require one (Luca; Reese, who joins later).",
+   "who may OK": "Sam OKs every wedding and every quote over $500. Pat may OK Lee Floral Design prices over $500; Sam's answer wins.",
+   "stand-in": "For an event on a date that can't move: a lead designer Sam trusts from outside the team (Petra Lund), or a full refund.",
+   "crews": "A large setup may need two designers and the van."
+  },
+  "pf.rules": {
+   "contract": "Every event quoted from the plan has a written contract both sign before any money: each piece, the stand-in flowers if one is short, the loaned pieces and their fees, and the dated cancel schedule.",
+   "venue rules": "Setup and pickup times, open flame, what can hang and the loading door come from the venue, for each booking. A venue may ask for the insurance certificate first.",
+   "seller's permit and sales tax": "From the state's form.",
+   "deposit caps, money kept apart": "From the state's form (S1-54).",
+   "right to cancel": "For extras sold at a home, where the state's rules say so.",
+   "records": "Kept 7 years.",
+   "delivery area": "25 miles from the business; same-day delivery when ordered by noon."
+  },
+  "pf.edges": {
+   "a date that can't move": "A wedding or an event: a stand-in lead designer with the skill, or a full refund (B7-54).",
+   "a flower short at the wholesaler": "The stand-in agreed in the contract is used, at the same price; anything else needs the customer's new yes (B7-34).",
+   "the final count": "Due 30 days before a wedding. A late count leaves the order as signed (B7-x01).",
+   "rain on an outdoor ceremony": "The venue's rain plan: the same flowers move inside, with no extra fee (B7-35, B8-31).",
+   "a van in traffic": "The customer hears only if the flowers won't be set up by the start (B7-18).",
+   "nobody there for a delivery": "One call, then a free redelivery the next morning (B8-17).",
+   "a sympathy service moves": "The sender hears the new delivery time first; Sam confirms it with the funeral home (B4-x01).",
+   "a missing loaned vase": "Sam decides the fee, never more than the contract says (B10-21).",
+   "an unsafe hook": "Nothing is hung; the customer gets a written note (B8-30).",
+   "a business cancel": "Everything paid comes back.",
+   "STOP": "Stops texts, never the booking.",
+   "crisis words": "The 988 and 911 message, and no order in that chat."
+  },
+  "pf.facts": [
+   "photos",
+   "documents",
+   "forms",
+   "extrawork",
+   "capacitycheck"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Elliot and Hazel (designers at the shop)"
+  },
+  "B": {
+   "staff": "Luca and Felix (designers and drivers)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Elliot"
+  },
+  "B": {
+   "staff": "Luca"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Standing spray and water heaters",
+    "Standing sprays and wedding arches"
+   ],
+   [
+    "fades and hot towel shaves",
+    "weddings and everyday bouquets"
+   ],
+   [
+    "asks for a perm",
+    "asks for a balloon arch"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do balloon arches"
+   ],
+   [
+    "skin fades",
+    "pickups"
+   ],
+   [
+    "barbershops",
+    "floral studios"
+   ],
+   [
+    "a catering job's",
+    "a wedding's"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, that's right"
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a card message?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "what is the occasion, and how many people?"
+   ],
+   [
+    "can clear the drain",
+    "can make the arrangement"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 standing spray needs none."
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody there.",
+    "Say Kim L.'s garden delivery needs nobody there."
+   ],
+   [
+    "Drain clearings already booked",
+    "Standing sprays already booked"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "taking a neighbor's flowers without asking"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "wilting flowers on my table"
+   ],
+   [
+    "My sink won't drain",
+    "My vase is cracked"
+   ],
+   [
+    "water damage under the sink this morning",
+    "a broken vase on the table this morning"
+   ],
+   [
+    "a leak under the sink, today",
+    "a wilted order, today"
+   ],
+   [
+    "It's my kitchen.",
+    "It's my office."
+   ],
+   [
+    "cut hair;",
+    "arrange flowers;"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a wedding consultation at the shop or at the venue"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book me a free wedding flower consultation at Lee's Flower Shop on Saturday. Our wedding is Sat Jun 12, 2027."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a boutonniere order to pick up after. Rosie finds one time for both, with one designer: free, and $20."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Weekly flowers · every Saturday"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks. What would you like?",
+    "Your bouquet is part of a weekly plan with Elliot. What would you like?"
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Bouquet every Saturday · Elliot"
+   ],
+   [
+    "Haircut · Sat Oct 31 · 10:00am · Riley",
+    "Bouquet · Sat Oct 31 · 10:00am · Elliot"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a bouquet every week"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for a bouquet every week. The shop offers a plan, so Rosie books the first pickup and saves the next ones on the same day and time."
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the weekly bouquet to $40 for pickups from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Bouquets already booked keep $35, even after Nov 2."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Weekly bouquet $35 ($40 from Nov 2) · Hand-tied bouquet $40 · Boutonniere $20"
+   ],
+   [
+    "Walk-in for a haircut",
+    "Walk-in for a bouquet"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A consultation could mean a florist or a wedding planner."
+   ],
+   [
+    "Haircut · $35",
+    "Wedding consultation · free"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "Charged Sat Oct 31, after the visit",
+    "Charged Sat Oct 31, before your 10:00am pickup"
+   ],
+   [
+    "At my home",
+    "At my venue"
+   ],
+   [
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute style consult.",
+    "A what-if: Alex picks the consultation by video instead."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some jobs take several visits, like a wedding: this consultation, then a planning call."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At the shop, no child is left: a parent stays, so nothing more happens."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do corsages? It's for my son's school dance."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a corsage is $25, picked up. Want a pickup time?"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan. Read it, then sign or decline on the secure page.",
+    "Lee's Flower Shop sent you Elliot's proposal for your wedding flowers. Read it, then sign or decline on the secure page."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds flower workshops to Lee's Flower Shop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Flower workshops for Lee's Flower Shop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW flower workshops"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A dripping bucket stained my coat."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a dripping bucket stained a coat today."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The shop's plug-in adds a bad allergic reaction, like trouble breathing near flowers, to the danger words."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "Lee's Flower Shop books a designer's time for a consultation, and a pickup slot for an order."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Lee's Flower Shop prices an event flower plan at a consult, once Elliot hears the plan."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Elliot hears the plan"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A consultation is rated, so the shop takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Elliot's event flower plan after a consult"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Flower Shop sent you a proposal: Elliot's event flower plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Event flower plan"
+   ],
+   [
+    "your first color plan visit",
+    "your first event flower plan order"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of your flowers? Yes / No"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Elliot can do a shorter consultation in the time left, or you can move to a later time."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee's Flower Shop can book you from now on, at the shop and for venue visits."
+   ],
+   [
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet.",
+    "Reese K.'s license is on file, as the business gave it."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A pest control license for the company, and one for each plant tech where the state asks."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A florist's example: a strong reaction to pollen gets 'move away from the flowers, and call 911 if breathing is hard'."
+   ],
+   [
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "The plug-in sets the status words, like in, being made, ready."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Add photos of your table and your guest count, and a designer will price your custom arrangement."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only for their own place."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like colors, favorite flowers and any to avoid."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A bride orders boutonnieres and corsages for her wedding party, all picked up one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: blush and ivory, garden roses, no lilies, arch on one side"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds pickup slots back to back, with Elliot and Hazel."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your wedding consultation is part of a plan with Elliot, every 4 weeks."
+   ],
+   [
+    "Avery's license is checked again when the lookup answers.",
+    "Luca's license is on file, as the business gave it."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Deliveries only where the shop's permit covers them."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's bouquet wilted in a day."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 custom arrangement."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A registration for the shop; a license only for plant techs."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a pack of 5 bouquets at the shop."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my mom come to the consultation?"
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Wedding consultations, salad trays and cookie boxes at the shop."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, custom pieces and venue visits"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a seasonal bouquet is $25."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Applicator license PA30417"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Elliot also designs custom pieces and goes on venue visits"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Elliot: designer, custom pieces and venue visits"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a wedding consultation every 4 weeks."
+   ],
+   [
+    "A barbershop takes no drop-offs.",
+    "A flower shop takes no drop-offs."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Custom pieces always stay with Elliot."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The bouquet wilted in a day."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Taco bars are priced at the event."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "A fire or gas smell at the venue stops the booking."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Elliot stopped Alex M.'s visit."
+   ],
+   [
+    "plumbing and electrical jobs",
+    "floral design and plant care jobs"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a consultation on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una consulta el sábado."
+   ],
+   [
+    "Avery · license not found",
+    "Luca · license not found"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A consultation needs nothing. Photos help."
+   ],
+   [
+    "Drains have a set price.",
+    "Hot lunches have a set price."
+   ],
+   [
+    "Avery · license expired",
+    "Luca · license expired"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s visit."
+   ],
+   [
+    "License renewal",
+    "Renewal due"
+   ],
+   [
+    "1 color quote",
+    "1 custom price"
+   ],
+   [
+    "Panel upgrade",
+    "Wedding bar"
+   ],
+   [
+    "Avery: barber",
+    "Hazel: designer"
+   ],
+   [
+    "At the chair",
+    "At the shop"
+   ],
+   [
+    "EC22871",
+    "PC22871"
+   ],
+   [
+    "BS20981",
+    "FP020981"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Floral Design's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Floral Design"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Floral"
+   ],
+   [
+    "Lee Electric",
+    "Lee Plant Care"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Flower Shop LLC"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Flower Shop's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Flower Shop"
+   ],
+   [
+    "Jordan Price",
+    "Luca Moreno"
+   ],
+   [
+    "Casey Moore",
+    "Felix Grant"
+   ],
+   [
+    "Riley Chen",
+    "Elliot Shaw"
+   ],
+   [
+    "Avery Diaz",
+    "Hazel Ortiz"
+   ],
+   [
+    "Jordan",
+    "Luca"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "Riley",
+    "Elliot"
+   ],
+   [
+    "Avery",
+    "Hazel"
+   ],
+   [
+    "1200 Main St",
+    "410 Linden Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow St"
+   ],
+   [
+    "Elm St",
+    "Willow St"
+   ],
+   [
+    "plumbing and electrical",
+    "floral design and plant care"
+   ],
+   [
+    "Plumbing and electrical",
+    "Floral design and plant care"
+   ],
+   [
+    "electrical license",
+    "pest control license"
+   ],
+   [
+    "electrical jobs",
+    "bar jobs"
+   ],
+   [
+    "Electrical",
+    "Plant care"
+   ],
+   [
+    "electrical",
+    "plant care"
+   ],
+   [
+    "Plumbing",
+    "Floral design"
+   ],
+   [
+    "plumbing",
+    "floral design"
+   ],
+   [
+    "plumber",
+    "designer"
+   ],
+   [
+    "Plumber",
+    "Designer"
+   ],
+   [
+    "Barbershop",
+    "Shop"
+   ],
+   [
+    "a barbershop",
+    "a floral design shop"
+   ],
+   [
+    "barbershop",
+    "shop"
+   ],
+   [
+    "barbers",
+    "designers"
+   ],
+   [
+    "a barber",
+    "a designer"
+   ],
+   [
+    "barber",
+    "designer"
+   ],
+   [
+    "Barber",
+    "Designer"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Everyday arrangement"
+   ],
+   [
+    "Signature cut and shave",
+    "Everyday arrangement"
+   ],
+   [
+    "Signature cut",
+    "Everyday arrangement"
+   ],
+   [
+    "signature cut",
+    "everyday arrangement"
+   ],
+   [
+    "the Groom's package",
+    "the courthouse wedding set"
+   ],
+   [
+    "The Groom's package",
+    "The courthouse wedding set"
+   ],
+   [
+    "Groom's package",
+    "Courthouse wedding set"
+   ],
+   [
+    "groom's party",
+    "wedding party"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Corsage"
+   ],
+   [
+    "kids cuts",
+    "corsages"
+   ],
+   [
+    "Kids cut",
+    "Seasonal bouquet"
+   ],
+   [
+    "kids cut",
+    "corsage"
+   ],
+   [
+    "a skin fade",
+    "a hand-tied bouquet"
+   ],
+   [
+    "A skin fade",
+    "A hand-tied bouquet"
+   ],
+   [
+    "Skin fade",
+    "Hand-tied bouquet"
+   ],
+   [
+    "skin fade",
+    "hand-tied bouquet"
+   ],
+   [
+    "A beard trim is",
+    "A boutonniere is"
+   ],
+   [
+    "A beard trim",
+    "A cookie box"
+   ],
+   [
+    "a beard trim",
+    "a boutonniere"
+   ],
+   [
+    "Beard trim",
+    "Boutonniere"
+   ],
+   [
+    "beard trim",
+    "boutonniere"
+   ],
+   [
+    "Haircuts",
+    "Wedding consultations"
+   ],
+   [
+    "haircuts",
+    "wedding consultations"
+   ],
+   [
+    "Haircut",
+    "Wedding consultation"
+   ],
+   [
+    "haircut",
+    "wedding consultation"
+   ],
+   [
+    "Color and cut",
+    "Custom arrangement"
+   ],
+   [
+    "color and cut",
+    "custom arrangement"
+   ],
+   [
+    "a color correction",
+    "a custom piece"
+   ],
+   [
+    "A color correction",
+    "A custom piece"
+   ],
+   [
+    "Color correction",
+    "Custom piece"
+   ],
+   [
+    "color correction",
+    "custom piece"
+   ],
+   [
+    "house calls",
+    "venue visits"
+   ],
+   [
+    "House calls",
+    "Home deliveries"
+   ],
+   [
+    "house call",
+    "venue visit"
+   ],
+   [
+    "House call",
+    "Home delivery"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "at the chair",
+    "at the shop"
+   ],
+   [
+    "Drain clearing",
+    "Standing spray"
+   ],
+   [
+    "patch test",
+    "first visit"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a flooded basement or a lockout"
+   ],
+   [
+    "travel fee",
+    "delivery fee"
+   ],
+   [
+    "Gloss to finish",
+    "Dessert to finish"
+   ],
+   [
+    "Gloss",
+    "Dessert"
+   ],
+   [
+    "gloss",
+    "dessert"
+   ],
+   [
+    "yard drain",
+    "garden delivery"
+   ],
+   [
+    "drain clearings",
+    "standing sprays"
+   ],
+   [
+    "Drain clearings",
+    "Standing sprays"
+   ],
+   [
+    "Standing spray and water heaters",
+    "Standing sprays and wedding arches"
+   ],
+   [
+    "water heater",
+    "wedding arch"
+   ],
+   [
+    "Kitchen",
+    "Office"
+   ],
+   [
+    "kitchen",
+    "office"
+   ],
+   [
+    "cabinet",
+    "vase"
+   ]
+  ],
+  "B": [
+   [
+    "Standing spray and water heaters",
+    "Standing sprays and wedding arches"
+   ],
+   [
+    "fades and hot towel shaves",
+    "weddings and everyday bouquets"
+   ],
+   [
+    "asks for a perm",
+    "asks for a balloon arch"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do balloon arches"
+   ],
+   [
+    "skin fades",
+    "pickups"
+   ],
+   [
+    "barbershops",
+    "floral studios"
+   ],
+   [
+    "a catering job's",
+    "a wedding's"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, that's right"
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a card message?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "what is the occasion, and how many people?"
+   ],
+   [
+    "can clear the drain",
+    "can make the arrangement"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 standing spray needs none."
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody there.",
+    "Say Kim L.'s garden delivery needs nobody there."
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "taking a neighbor's flowers without asking"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "wilting flowers on my table"
+   ],
+   [
+    "My sink won't drain",
+    "My vase is cracked"
+   ],
+   [
+    "water damage under the sink this morning",
+    "a broken vase on the table this morning"
+   ],
+   [
+    "a leak under the sink, today",
+    "a wilted order, today"
+   ],
+   [
+    "It's my kitchen.",
+    "It's my office."
+   ],
+   [
+    "cut hair;",
+    "arrange flowers;"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a wedding consultation at the shop or at the venue"
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs the venue's OK first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "Entry statement: I live here, or may let the pro in",
+    "The venue's OK: our setup is allowed there"
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Floral Design books up to 18 months ahead, but Luca's calendar isn't set yet. We'll text you times for next year's anniversary flowers in late Aug 2027."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Luca to do the flowers again for next year's anniversary."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say an office manager books lobby flowers for 4 floors at one address."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START Maple Hall needs Alex's loading pass"
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: anniversary flowers, 12 months"
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every floral design job, and plant care jobs"
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a venue's OK it needed that isn't in"
+   ],
+   [
+    "Written estimate and terms",
+    "Contract and terms"
+   ],
+   [
+    "At my home.",
+    "At a venue, Maple Hall."
+   ],
+   [
+    "At my home",
+    "At my venue"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds event rentals to Lee Floral Design."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Event rentals for Lee Floral Design: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW event rentals"
+   ],
+   [
+    "Rental 1",
+    "Office 1"
+   ],
+   [
+    "Rental 2",
+    "Office 2"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a lobby arrangement every week."
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every week?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every week"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Weekly lobby flowers plan"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Every day, 7am–11pm"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can we light candles near the flowers?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Luca says no: open flame near flowers isn't safe. Maple Hall allows candles in glass, away from the pieces."
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Luca's walk-through at Harper J.'s office is for $2,400 of conference lunches."
+   ],
+   [
+    "Today's estimate visit",
+    "Today's walk-through"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 conference lunches, 3 days"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your conference lunches"
+   ],
+   [
+    "Repipe · $2,400",
+    "Conference lunches · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 after day 2, $800 after day 3"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The service is tomorrow morning. Can someone deliver tonight?"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "A florist books a 2-hour setup or delivery window."
+   ],
+   [
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "Your flowers take two days: today, and Fri Oct 23, set up 8–10am, for the wedding."
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 hotel holiday decor"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your holiday decor"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like weekly lobby flowers Luca suggested"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for weekly lobby flowers, from Luca's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Weekly lobby flowers"
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "Elliot, a designer at the shop, also meets couples at their venue."
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Maple Hall in Springfield is inside it."
+   ],
+   [
+    "Is the report ready on time?",
+    "Are the photos ready on time?"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE event photos Mon Oct 26"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the tacos only, $165. Leave the dessert table."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Luca serves the tacos today, $165. The $80 dessert table stays good until Thu Oct 29."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If there's a fire or a gas smell, get everyone out now. Then call 911."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says event flowers are quoted from the plan, so Rosie's first text asks for it."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep candles away from flowers, and to call 911 if there's smoke again."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the date, the venue, the guest count, and the look Alex wants."
+   ],
+   [
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Before setting up, Luca photographs the room and notes anything already damaged."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Aleje las velas de las flores. Si hay humo otra vez, salga y llame al 911."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee's Flower Shop can book you from now on, at the shop and for venue visits."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Luca's phone, you said yes to 2 more centerpieces and cake flowers for $160."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the quoted path, only Luca's times show: he's the one who leads quoted events."
+   ],
+   [
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Luca can set up 30 minutes later if the next job allows, or you can pick another time."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep candles away from the flowers. If there's smoke again, get out and call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Floral Design doesn't do, like a wedding cake."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Luca found a loose ceiling hook, so he didn't hang the garland."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a florist hangs nothing on an unsafe hook, so Alex gets a note and the photo."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For florist work, a fire, a gas smell or someone hurt at the venue stops the booking."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Flower Shop does consultations free at the shop, or at your venue for $75."
+   ],
+   [
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "Luca tries the door again and checks in with the code, so it's a normal visit."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Florist work always has its price before: from the list, or quoted from the plan."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "The registration for Lee Floral Design is on file, as the business gave it."
+   ],
+   [
+    "The state's license lookup is down, so Reese K.'s license isn't checked yet.",
+    "Reese K.'s license is on file, as the business gave it."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A pest control license for the company, and one for each plant tech where the state asks."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Florist work is done at the customer's place, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: lobby flowers at two offices every week."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A florist's example: a candle fire that's out still gets 'keep candles away from the flowers'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A candle set a centerpiece on fire. It's out now."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a fire, open flame near flowers, or someone hurt."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add your plan and photos of the room, and a florist will price it."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only for their own place."
+   ],
+   [
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "A gate or door code shows to Luca only on the day of the visit."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Floral Design does flowers and plant care, not cakes."
+   ],
+   [
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Luca is at the door for your 8–10am setup and can't reach you."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Standing sprays already booked keep $179, even after Nov 2."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Luca counts the pieces and texts the price with its lines."
+   ],
+   [
+    "Casey's license is checked again when the lookup answers.",
+    "Luca's license is on file, as the business gave it."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Floral Design has weekly lobby flowers, $179 a week."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Luca went back to the shop for ribbon and will be back about 9:30am."
+   ],
+   [
+    "Sam bills the warranty company the business's own way.",
+    "Sam bills the company the business's own way."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s standing spray from Thu Oct 22 wilted early."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: 2 more centerpieces and cake flowers, $160."
+   ],
+   [
+    "Jordan priced a water heater replacement for Alex M.",
+    "Luca priced anniversary brunch flowers for Alex M."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your flowers are under our fresh-flower promise, so this is free."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Deliveries only where the shop's permit covers them."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Setup and delivery windows are 2 hours, as Sam set at sign-up."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your brunch flowers price is with Lee Floral Design."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Luca's next times for shower flowers."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "It's added to the quote, priced from the plan."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Luca also add arch flowers at the entrance?"
+   ],
+   [
+    "Lee Home Services: your share of today's repair.",
+    "Lee Floral Design: your share of today's event."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Una vela prendió fuego a un centro de mesa. Ya está apagado."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a florist refresh porch planters this Thursday?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 2 more centerpieces and cake flowers"
+   ],
+   [
+    "Alex's home warranty covers part of the repair.",
+    "Alex's company account covers part of the bill."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you bring lobby flowers every week, too?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "A vase left a water ring on Maple Hall's table."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Luca do flowers for my sister's shower next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long fresh flowers are promised."
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "Luca only, until others are cleared there"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿El fuego está apagado?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a bouquet for Alex's mom."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the welcome table"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A registration for the shop; a license only for plant techs."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Luca also make a bouquet for my mom?"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · Anniversary brunch flowers · $640"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Luca needs more ribbon from the shop."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD loose ceiling hook, garland not hung"
+   ],
+   [
+    "Drain clearings already booked keep $179.",
+    "Standing sprays already booked keep $179."
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Wedding consultations, salad trays and cookie boxes at the shop."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the fire out?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please make sure the side door opens at 8."
+   ],
+   [
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "Cancel your flower setup (Thu 8–10am)?"
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "My cat chewed a lily from my bouquet."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Luca finds a loose ceiling hook."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A consultation at the shop is in the other flow."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's lobby flowers?"
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Mom loves peonies."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Applicator license PA30417"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Bayside Design, our company account."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks for 2 more centerpieces and cake flowers."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It's inside the fresh-flower promise."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Elliot also designs custom pieces and goes on venue visits"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which company account should pay?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be at Maple Hall 30 minutes late, sorry!"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The standing spray wilts the next day."
+   ],
+   [
+    "Give this code to Casey at the door.",
+    "Give this code to Felix when he arrives."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Elliot: designer, custom pieces and venue visits"
+   ],
+   [
+    "Say Alex books for a parent's home.",
+    "Say Alex books flowers for a parent's home."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a bakery near you."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "Your company account covers the rest."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The standing spray wilted already."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 tacos 165 desserts 80"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "2 more centerpieces, cake flowers · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the hanging garland"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Luca cuts a hand and texts HURT."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Luca left petals and water on the floor."
+   ],
+   [
+    "Here's the price to fix it today.",
+    "Here's the price for today's flower wall."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the venue to fix the hook first"
+   ],
+   [
+    "Is the sink still full of water?",
+    "What should the card say?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a loose ceiling hook"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting ribbon, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE water ring on a table"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no mark."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa standing spray Thu 12-2 Felix"
+   ],
+   [
+    "The job should be done by 10am.",
+    "Setup should be done by 10am."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "Yes. Nobody is hurt."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Taco bars are priced at the event."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "A fire or gas smell at the venue stops the booking."
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no counter at a venue."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My aunt's service is Thursday."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the event photos link"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "floral design and plant care jobs"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is that dangerous?"
+   ],
+   [
+    "Replace both shutoff valves",
+    "2 more centerpieces, cake flowers"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, credited to the order"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE the office lobby is dim."
+   ],
+   [
+    "Mold behind the sink wall",
+    "Loose ceiling hook"
+   ],
+   [
+    "Casey · license not found",
+    "Luca · license not found"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos of the setup"
+   ],
+   [
+    "The service call is $89.",
+    "It's paid in full when booked."
+   ],
+   [
+    "Drains have a set price.",
+    "Hot lunches have a set price."
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or account pays"
+   ],
+   [
+    "Priced from your photos",
+    "Quoted from your plan"
+   ],
+   [
+    "Jordan found more work.",
+    "You asked Luca for more."
+   ],
+   [
+    "Casey · license expired",
+    "Luca · license expired"
+   ],
+   [
+    "Just the kitchen sink.",
+    "White, with a little lavender."
+   ],
+   [
+    "Under the sink, before",
+    "Meeting room, before"
+   ],
+   [
+    "Jordan found the leak.",
+    "Luca counted the plates."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Standing spray"
+   ],
+   [
+    "Cabinet floor, before",
+    "Welcome table, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Water ring on a table"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Tacos · $165"
+   ],
+   [
+    "No. No huele a gas.",
+    "Sí. Nadie está herido."
+   ],
+   [
+    "Sewer camera report",
+    "Event photos"
+   ],
+   [
+    "the shutoff valves",
+    "the extra pieces"
+   ],
+   [
+    "Supply line · $80",
+    "Dessert table · $80"
+   ],
+   [
+    "the kitchen drain",
+    "the lobby arrangement"
+   ],
+   [
+    "Book the repair",
+    "Book the flower wall"
+   ],
+   [
+    "Book a free fix",
+    "Book a free replacement"
+   ],
+   [
+    "Arrival windows",
+    "Setup windows"
+   ],
+   [
+    "License renewal",
+    "Renewal due"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 standing spray"
+   ],
+   [
+    "Kitchen drain",
+    "Standing spray"
+   ],
+   [
+    "Panel upgrade",
+    "Wedding bar"
+   ],
+   [
+    "Avery: barber",
+    "Hazel: designer"
+   ],
+   [
+    "Add photos",
+    "Add your plan"
+   ],
+   [
+    "Yard drain",
+    "Porch planters"
+   ],
+   [
+    "EC22871",
+    "PC22871"
+   ],
+   [
+    "BS20981",
+    "FP020981"
+   ],
+   [
+    "leehomeservices.com",
+    "leefloraldesign.com"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Floral Design LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Floral Design's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Floral Design"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Floral"
+   ],
+   [
+    "Lee Electric",
+    "Lee Plant Care"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Flower Shop"
+   ],
+   [
+    "Jordan Price",
+    "Luca Moreno"
+   ],
+   [
+    "Casey Moore",
+    "Felix Grant"
+   ],
+   [
+    "Riley Chen",
+    "Elliot Shaw"
+   ],
+   [
+    "Avery Diaz",
+    "Hazel Ortiz"
+   ],
+   [
+    "Jordan",
+    "Luca"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "Riley",
+    "Elliot"
+   ],
+   [
+    "Avery",
+    "Hazel"
+   ],
+   [
+    "1200 Main St",
+    "410 Linden Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow St"
+   ],
+   [
+    "Elm St",
+    "Willow St"
+   ],
+   [
+    "42 Oak St",
+    "300 River Rd"
+   ],
+   [
+    "plumbing and electrical work",
+    "floral design and plant care work"
+   ],
+   [
+    "plumbing and electrical",
+    "floral design and plant care"
+   ],
+   [
+    "Plumbing and electrical",
+    "Floral design and plant care"
+   ],
+   [
+    "electrical license",
+    "pest control license"
+   ],
+   [
+    "electrical prices",
+    "bar prices"
+   ],
+   [
+    "electrical jobs",
+    "bar jobs"
+   ],
+   [
+    "Electrical",
+    "Plant care"
+   ],
+   [
+    "electrical",
+    "plant care"
+   ],
+   [
+    "plumbing license",
+    "pest control license"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Plumbing",
+    "Floral design"
+   ],
+   [
+    "plumbing",
+    "floral design"
+   ],
+   [
+    "a plumber",
+    "a florist"
+   ],
+   [
+    "plumber",
+    "designer"
+   ],
+   [
+    "Plumber",
+    "Designer"
+   ],
+   [
+    "Barbershop",
+    "Shop"
+   ],
+   [
+    "a barbershop",
+    "a floral design shop"
+   ],
+   [
+    "barbershop",
+    "shop"
+   ],
+   [
+    "barbers",
+    "designers"
+   ],
+   [
+    "a barber",
+    "a designer"
+   ],
+   [
+    "barber",
+    "designer"
+   ],
+   [
+    "Barber",
+    "Designer"
+   ],
+   [
+    "beard trim",
+    "cookie box"
+   ],
+   [
+    "Haircut",
+    "Wedding consultation"
+   ],
+   [
+    "haircut",
+    "wedding consultation"
+   ],
+   [
+    "house calls",
+    "venue visits"
+   ],
+   [
+    "House calls",
+    "Home deliveries"
+   ],
+   [
+    "house call",
+    "venue visit"
+   ],
+   [
+    "House call",
+    "Home delivery"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "at the chair",
+    "at the shop"
+   ],
+   [
+    "shops",
+    "kitchens"
+   ],
+   [
+    "A drain clearing with",
+    "A standing spray with"
+   ],
+   [
+    "a drain clearing",
+    "a standing spray"
+   ],
+   [
+    "A drain clearing",
+    "A standing spray"
+   ],
+   [
+    "Drain clearing",
+    "Standing spray"
+   ],
+   [
+    "drain clearing",
+    "standing spray"
+   ],
+   [
+    "Water heater replacement",
+    "Anniversary brunch flowers"
+   ],
+   [
+    "water heater replacement",
+    "anniversary brunch flowers"
+   ],
+   [
+    "Water heater flush",
+    "Sympathy arrangement"
+   ],
+   [
+    "water heater flush",
+    "sympathy arrangement"
+   ],
+   [
+    "Leak repair",
+    "Sympathy flowers"
+   ],
+   [
+    "leak repair",
+    "flower wall"
+   ],
+   [
+    "Sewer camera inspection",
+    "Ceremony arch flowers"
+   ],
+   [
+    "sewer camera inspection",
+    "ceremony arch flowers"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "Service call",
+    "Delivery fee"
+   ],
+   [
+    "Labor",
+    "On-site time"
+   ],
+   [
+    "arriving 8–10am",
+    "set up 8–10am"
+   ],
+   [
+    "arriving 10am–12pm",
+    "set up 10am–12pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "set up 12–2pm"
+   ],
+   [
+    "arriving 2–4pm",
+    "set up 2–4pm"
+   ],
+   [
+    "new arrival time",
+    "new setup time"
+   ],
+   [
+    "Water heater",
+    "Anniversary brunch"
+   ],
+   [
+    "water heater",
+    "brunch flowers"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Alex is home",
+    "Alex is there"
+   ],
+   [
+    "they're home",
+    "they're there"
+   ],
+   [
+    "you're home",
+    "you're there"
+   ],
+   [
+    "late-cancel or nobody-home fee",
+    "late-cancel or no-show fee"
+   ],
+   [
+    "Nobody home",
+    "Nobody there"
+   ],
+   [
+    "nobody home",
+    "nobody there"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "was home",
+    "was there"
+   ],
+   [
+    "replaces water heaters",
+    "leads quoted events"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a flooded basement or a lockout"
+   ],
+   [
+    "travel fee",
+    "delivery charge"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 quote"
+   ],
+   [
+    "shutoff valve",
+    "tacos"
+   ],
+   [
+    "supply line",
+    "dessert table"
+   ],
+   [
+    "The repair price",
+    "The flower wall price"
+   ],
+   [
+    "Electric.",
+    "The service is Thursday at 11."
+   ],
+   [
+    "yard drain",
+    "garden delivery"
+   ],
+   [
+    "drain clearings",
+    "standing sprays"
+   ],
+   [
+    "Drain clearings",
+    "Standing sprays"
+   ],
+   [
+    "Standing spray and water heaters",
+    "Standing sprays and wedding arches"
+   ],
+   [
+    "water heater",
+    "wedding arch"
+   ],
+   [
+    "Kitchen",
+    "Office"
+   ],
+   [
+    "kitchen",
+    "office"
+   ],
+   [
+    "cabinet",
+    "vase"
+   ]
+  ]
+ },
+ "keep": [
+  "delivery fee",
+  "leak",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a free wedding flower consultation at Lee's Flower Shop, Sam's own shop, with Elliot on Sat Oct 24 at 11:00am. Pickup orders work the same way at the counter. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Floral Design for Alex's parents' anniversary brunch at Maple Hall, and Luca sets up the flowers Thu Oct 22 between 8 and 10am. The price is quoted from Alex's plan, both sign a contract, and the rest is charged the day before."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a free 45-minute wedding consultation with Elliot at the shop. Nothing is taken: a YES books it, and nothing is paid after.",
+    "list|full|none": "A $55 everyday arrangement picked up at the shop, paid in full when ordered.",
+    "list|deposit|counter": "A $140 courthouse wedding set (a bouquet and 2 boutonnieres) picked up Saturday: a $40 deposit now, and the $100 rest paid at pickup, at the counter."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Everyday arrangement"
+    },
+    "list|none|*": {
+     "price": "free",
+     "name": "Wedding consultation"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Everyday arrangement"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$20",
+     "name": "Courthouse wedding set"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Boutonniere",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Everyday arrangement",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "photos|deposit|bill",
+   "combos": [
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "photos|deposit|bill": "The main story: flowers for Alex's parents' anniversary brunch at Maple Hall, quoted from the plan at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit now, and the $480 rest on the bill after the event.",
+    "list|full|none": "A $150 sympathy arrangement for Alex's aunt's service, delivered to Brookside Funeral Home before 11am, paid in full when ordered. Everyday deliveries go the same way."
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from the plan first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Event flowers"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$20",
+     "name": "Anniversary brunch flowers"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Sympathy arrangement, delivered"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Standing spray, delivered",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$179",
+      "paid": "$179",
+      "fee": "$20"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Sympathy arrangement, delivered",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$20"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S2-28",
+   "A7-15",
+   "S11-87",
+   "S11-90",
+   "A7-59"
+  ],
+  "B": [
+   "S2-28",
+   "B5-34",
+   "B8-69",
+   "B10-32"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Floral design needs no state license in most places. The company gives its registration, and a seller's permit where the state's form asks for one (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The florist's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A florist books designers and pickup slots, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: consultations, pickups, deliveries and events."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Flowers are bought and designed ahead, so nothing is sent now and nobody is on call (S2-31). A same-day delivery is a window booked today."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The shop books a designer's time for a consultation, and a pickup slot for an order."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The shop books a designer's time for a consultation, and a pickup slot for an order."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The shop books a designer's time for a consultation, and a pickup slot for an order."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "No form to sign first: allergy details go on the secure page as answers."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "Nothing is required at the shop: photos for a consultation help, but they're never needed."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing of the customer's is left at the shop. A pickup is checked in with its code at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Consultations and orders are rated."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "Flowers have no problem that gets worse. A change goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for flowers."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for flowers."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Everything is handed over at the consultation or the pickup. A proposal after a consultation is its own branch."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Flowers aren't stored: an order not picked up by closing is a no-show (A8-14)."
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Floral Design",
+       "At the customer's place",
+       "None needed: registration 2019-0451",
+       "Yes"
+      ],
+      [
+       "Luca Moreno",
+       "Lee Floral Design",
+       "At the customer's place",
+       "Applicator license PA30417",
+       "Once Sam says yes"
+      ],
+      [
+       "Felix Grant",
+       "Lee Floral Design",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Floral Design",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Elliot Shaw",
+       "Lee's Flower Shop",
+       "At the shop, and venue visits",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Hazel Ortiz",
+       "Lee's Flower Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "more": [
+     "Elliot notes the colors, the flowers to avoid, and a stand-in for any flower scarce in that season.",
+     "Anything new needs Alex's yes and its price first, in the proposal.",
+     "At a pickup, Alex checks the flowers at the counter before leaving.",
+     "Work with nothing to show, like a class, skips this."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-65",
+    "more": [
+     "Flowers to avoid can be named here. Allergy details go only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-03",
+    "more": [
+     "A pickup checks in the same way: Alex gives the code at the counter."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-70",
+    "more": [
+     "A late pickup isn't moved: the flowers wait in the cooler until closing."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-42",
+    "more": [
+     "Care tips: fresh water every day, and a fresh cut every 2 days.",
+     "A reaction to pollen goes to Sam at once. Trouble breathing gets 'call 911' first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Here, allergy details, card messages, a sympathy card's name and a recipient's address are private.",
+     "Only the designer on the order and Sam see them.",
+     "A card message is printed on the card, never texted."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Floral design needs no state license in most places. The company gives its registration, and a seller's permit where the state's form asks for one (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The florist's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A florist books designers and pickup slots, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: consultations, pickups, deliveries and events."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Flowers are bought and designed ahead, so nothing is sent now and nobody is on call (S2-31). A same-day delivery is a window booked today."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Florist work is never sent now (B4-81), so 'Send someone now' is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Florist work is never sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Florist work is never sent now, so every booking gets its reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Florist work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "A florist books a window: a setup window for an event, a delivery window for an order."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A florist books a window: a setup window for an event, a delivery window for an order."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A florist books a window: a setup window for an event, a delivery window for an order."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A florist never looks after a child. An adult on the booking is there."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Everything is handed over at the event or the delivery. Nothing comes later."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "Flowers have no problem that gets worse. A changed plan goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for flowers."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Florist work at the customer's place is a delivery or an event. A video consultation is flow A's."
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "form": [
+     [
+      "I'm 18 or older",
+      "Yes"
+     ],
+     [
+      "An adult (18+) will be there Thu 8–10am",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B4-43",
+    "branch": {
+     "label": "A sympathy order",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B4-x01",
+       "line": [
+        "4.22",
+        "4.17"
+       ],
+       "who": "san",
+       "via": "auto",
+       "title": "Times it to arrive before the service",
+       "does": "A sympathy order must arrive before the service. So only delivery windows that end before it are offered, and Sam confirms the time with the funeral home.",
+       "more": [
+        "Every word to the sender stays short and kind: no sales, no offers, and no rating later.",
+        "The name of the person who died, and the card message, go only on the secure page and on the card.",
+        "Texts name only what's needed: the funeral home, the day and the time.",
+        "If the service moves, the sender hears the new delivery time first.",
+        "At a funeral home, the flowers go to its staff, with a photo for the sender."
+       ],
+       "needs": [
+        "pf.services",
+        "pf.messages"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "The final count is due",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.14",
+        "7.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "as": "Morgan P.",
+       "t": "Thu Nov 12, 10:00am",
+       "type": "split",
+       "q": "Is the final count in by its day?",
+       "title": "Asks for the final count by its day",
+       "does": "A what-if: Morgan P. booked wedding flowers for Sat Dec 12, with 12 tables. The plug-in sets when the final count is due: here, 30 days before.",
+       "more": [
+        "The count Morgan sends sets the pieces and the price, as the contract says.",
+        "Changes are fine until that day. The flowers are ordered 21 days before, so the order is set then.",
+        "One reminder goes out 2 days before the due day, inside text hours."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Your final count for your wedding flowers on Sat Dec 12 is due today by 6pm.",
+         {
+          "card": {
+           "title": "Final count · due Thu Nov 12, 6pm",
+           "lines": [
+            "How many tables",
+            "The wedding party: bouquets and boutonnieres",
+            "Where each piece goes, and the venue's rules"
+           ],
+           "button": "Send the count",
+           "link": "rosfield.com/f/m12"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.rules",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust"
+       ],
+       "branches": [
+        {
+         "label": "In by its day",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x02",
+           "line": [
+            "7.14",
+            "7.10"
+           ],
+           "who": "san",
+           "to": "cust",
+           "via": "msg",
+           "as": "Morgan P.",
+           "t": "Thu Nov 12, 4:10pm",
+           "title": "Reads back the new total",
+           "does": "Morgan sends 14 tables. The new total is read back, and the rest due on the set day changes to match.",
+           "more": [
+            "More tables are priced from the proposal's own prices.",
+            "Sam and Luca get the new count and the piece list."
+           ],
+           "say": [
+            [
+             "san",
+             "cust",
+             "Thanks, Morgan. Your count is in.",
+             {
+              "card": {
+               "title": "Wedding flowers · 14 tables",
+               "lines": [
+                "Was 12 · now $3,520",
+                "The rest is charged Sat Nov 21, as your contract says"
+               ]
+              }
+             }
+            ]
+           ],
+           "needs": [
+            "pf.rules"
+           ],
+           "tells": [
+            "cust"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "Not in by its day",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x03",
+           "line": [
+            "7.14",
+            "7.16"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "t": "Thu Nov 12, 6:05pm",
+           "title": "No count: the order stays as signed",
+           "does": "The count isn't in by 6pm. The contract's 12 tables stay as signed, and Sam is asked to call Morgan.",
+           "more": [
+            "Morgan is told the same by text, inside text hours.",
+            "Nothing is cancelled for a late count. A count sent later is Sam's call.",
+            "A booking never changes without a yes."
+           ],
+           "say": [
+            [
+             "san",
+             "owner",
+             "Morgan P. didn't send the final count for Sat Dec 12. The contract's 12 tables stay as signed. Please call Morgan today."
+            ],
+            [
+             "san",
+             "cust",
+             "We didn't get your final count, so your order stays as signed: 12 tables. Sam will call you.",
+             {
+              "as": "Morgan P."
+             }
+            ]
+           ],
+           "needs": [
+            "pf.rules",
+            "pf.messages"
+           ],
+           "tells": [
+            "owner",
+            "cust"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-23",
+    "vary": {
+     "before:deposit": {
+      "does": "Say another customer, Lin W., booked party flowers, set up Fri 10am to 12pm by Felix. Nobody was there to let him in, and she didn't answer in 30 minutes. A fee comes only from what she agreed to."
+     },
+     "before:full": {
+      "does": "Say another customer, Lin W., paid in full for sympathy flowers to her family's home. Nobody was there for the free second try either. Any fee comes only from what she agreed to."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "form": [
+     [
+      "Form",
+      "Wedding details: tables, the wedding party, where each piece goes"
+     ],
+     [
+      "Due",
+      "30 days before the wedding"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Floral Design",
+       "At the customer's place",
+       "None needed: registration 2019-0451",
+       "Yes"
+      ],
+      [
+       "Luca Moreno",
+       "Lee Floral Design",
+       "At the customer's place",
+       "Applicator license PA30417",
+       "Once Sam says yes"
+      ],
+      [
+       "Felix Grant",
+       "Lee Floral Design",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Floral Design",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Elliot Shaw",
+       "Lee's Flower Shop",
+       "At the shop, and venue visits",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Hazel Ortiz",
+       "Lee's Flower Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "does": "Sam adds event rentals to Lee Floral Design. It brings its own plug-in, and only what's new is asked.",
+    "more": [
+     "What's new: the prices, any license, and who does the work.",
+     "People already on the team get one text to confirm, never a second invite.",
+     "It goes live on its own once its checks come back. Floral design never pauses.",
+     "Left unanswered, it's saved. Sam texts MORE to finish it."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW event rentals"
+     ],
+     [
+      "san",
+      "owner",
+      "Event rentals for Lee Floral Design: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like floral design?",
+      {
+       "card": {
+        "title": "Floral design works like this",
+        "lines": [
+         "You go to customers",
+         "Paid before: in full, or a deposit",
+         "Extras on one pay link"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Here, allergy details, card messages, a sympathy card's name and a recipient's address are private.",
+     "Only the designer on the order and Sam see them.",
+     "A card message is printed on the card, never texted."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Extra pieces already given have no cancel period (B8-24); only something sold at the customer's place and not given yet can have one."
+   }
+  ]
+ },
+ "notes": "Pilot: started from the caterer (from: caterer), an event florist: a free wedding consult at the shop, the event flowers quoted from the plan with a signed contract and a deposit (the rest on the bill after the event, never on a set day), delivery and setup at a venue, a final count, loaned pieces, a sympathy order delivered to a funeral home, and everyday orders at the counter.\nPlug-in facts: photos, documents, forms, extrawork, capacitycheck (the owner's daily pickup number and Sam's two-weddings-a-Saturday cap). Switches: cancelright on in flow B only (event work sold at the customer's place under a contract, the master's B8-78 cancel window); sensitive, welfare and no2 off (the $2 is paid, D97). Settings: arrive setstart in flow A (the consult at a set time), window in flow B (the delivery window); cutoff 24 hours before.\nFlow A money: list|none|counter (main; a free 45-minute wedding consult, nothing taken, a YES books it), list|full|none ($55 everyday arrangement, paid in full), list|deposit|counter ($140 courthouse wedding set: $40 deposit now, $100 rest paid at pickup at the counter; $40 fee).\nFlow B money: photos|deposit|bill (main; the $640 anniversary brunch quoted from the plan, Sam OKs over $500: $160 deposit, $480 rest on the bill after the event; $20 fee), list|full|none ($150 sympathy arrangement, delivered, paid in full). Mixed walks: the standing spray ($179, paid in full per the plug-in) is the second service in the two-service fixture.\nRemoved in this refit: every rest charged on a set day (the noon-the-day-before rest and the 21-days-before wedding rest), the weekly plan's monthly-day charge (now only after its own yes), the $250 wedding schedule kept only up to what was paid, every hold wording, all legacy money words ops (vary keys by price and before), the plan and stand-in what-if steps (B5-21, B7-52, B7-68 family), the outside check and the delivery words that belonged to other kinds of work, all dead off ops.\nRenames: the example's haircut, barber, cut, color, kids cut, skin fade, perm, catering, plumbing words renamed to flower words; \"delivery fee\", \"leak\", \"color\" kept (real here: delivery charges, a leak in a privacy rule, flower colors).\nLicenses: optional registration only; a pest-control license for plant care is the business's own word where the state requires it; never checked by Rosie (D96).\nChildren: no child-left split is turned off here (the plug-in keeps the master's parent-stays rule); kids are not booked alone.\nNot sure (verifier): the wedding deposit \"holds the date\" wording; the sympathy row's price paths (B list|full|none is one row for the whole sympathy line); the pickup-number cap (capacitycheck) is the owner's setting.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "fades and hot towel shaves",
+    "asks for a perm",
+    "doesn't do perms",
+    "skin fades",
+    "barbershops",
+    "a catering job's",
+    "cut hair;",
+    "like a haircut at the shop or at home",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Haircut plan · every 4 weeks",
+    "Your haircut is part of a plan with Riley, every 4 weeks. What would you like?",
+    "Haircut every 4 weeks · Riley",
+    "Haircut · Sat Oct 31 · 10:00am · Riley",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Walk-in for a haircut",
+    "A haircut could mean a salon or a barbershop.",
+    "Haircut · $35",
+    "Next: Sat Nov 28 · 10:00am",
+    "Charged Sat Oct 31, after the visit",
+    "At my home",
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute style consult.",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Lee's Barbershop sent you a proposal: Riley's color plan. Read it, then sign or decline on the secure page.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "once Riley sees the hair",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "May the shop show photos of your hair? Yes / No",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Avery's license is checked again when the lookup answers.",
+    "House calls only where the state's rules allow them.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "A license for the shop and for each barber.",
+    "Alex bought a package of cuts at the shop.",
+    "Can my son wait in the shop during my cut?",
+    "Haircut, fade and beard trim at the shop.",
+    "Every shop service, color and house calls",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a cut every 4 weeks.",
+    "A barbershop takes no drop-offs.",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Riley stopped Alex M.'s cut.",
+    "plumbing and electrical jobs",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Avery · license not found",
+    "A haircut needs nothing.",
+    "Drains have a set price.",
+    "Avery · license expired",
+    "Stopped Alex M.'s cut.",
+    "License renewal",
+    "1 color quote",
+    "Panel upgrade",
+    "Avery: barber",
+    "At the chair",
+    "EC22871",
+    "BS20981",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop's",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "electrical jobs",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "a barbershop",
+    "barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "groom's party",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "skin fade",
+    "A beard trim is",
+    "A beard trim",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Color and cut",
+    "color and cut",
+    "a color correction",
+    "A color correction",
+    "Color correction",
+    "color correction",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "price board",
+    "Price board",
+    "the shop's board",
+    "at the chair",
+    "Drain clearing",
+    "patch test",
+    "like a burst pipe or a lockout",
+    "travel fee",
+    "Gloss to finish",
+    "Gloss",
+    "gloss",
+    "water heater"
+   ],
+   "B": [
+    "fades and hot towel shaves",
+    "barbershops",
+    "a catering job's",
+    "Yes, it won't drain",
+    "Adding a faucet check?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "can clear the drain",
+    "The $179 drain needs none.",
+    "tapping a neighbor's water line without asking",
+    "a leaking pipe under my sink",
+    "My sink won't drain",
+    "water damage under the sink this morning",
+    "a leak under the sink, today",
+    "It's my kitchen.",
+    "cut hair;",
+    "like a haircut at the shop or at home",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Entry statement: I live here, or may let the pro in",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "CANT START no proof Alex may have this work done",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "Every plumbing job, and electrical jobs",
+    "like a permit it needed that isn't in",
+    "Written estimate and terms",
+    "At my home.",
+    "At my home",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Rental 1",
+    "Rental 2",
+    "Say Alex asks for a water heater flush every year.",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Yearly water heater flush plan",
+    "Mon–Fri 7:30am–5:30pm",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Today's estimate visit",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing books a 2-hour window.",
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "One of the shop's barbers does house calls.",
+    "Alex's home in Springfield is inside it.",
+    "Is the report ready on time?",
+    "LATE camera report Mon Oct 26",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "The state's license lookup is down, so Reese K.'s license isn't checked yet.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Casey's license is checked again when the lookup answers.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Sam bills the warranty company the business's own way.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Jordan priced a water heater replacement for Alex M.",
+    "Your drain is under warranty, so this visit is free.",
+    "House calls only where the state's rules allow them.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Your water heater price is with Lee Home Services.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Lee Home Services: your share of today's repair.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Alex's home warranty covers part of the repair.",
+    "Can you flush my water heater every year, too?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan only, until others are licensed there",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "BEFORE old water stain on the cabinet floor",
+    "A license for the shop and for each barber.",
+    "Can Jordan also look at a dripping faucet?",
+    "Contract · Water heater replacement · $640",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Drain clearings already booked keep $179.",
+    "Haircut, fade and beard trim at the shop.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "My gas water heater got wet in a flood.",
+    "Jordan finds mold behind the sink wall.",
+    "The shop's chair is in the other flow.",
+    "Can I skip next week's drain cleaning?",
+    "Old pipes: bring the camera next time.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Willow Home Warranty, the basic plan.",
+    "Jordan finds corroded shutoff valves.",
+    "It's under the 1-year labor warranty.",
+    "Riley also does color and house calls",
+    "Which home warranty plan should pay?",
+    "I'll be home 30 minutes late, sorry!",
+    "The repair price is good for 7 days.",
+    "The drain clogs again 2 weeks later.",
+    "Give this code to Casey at the door.",
+    "Riley: barber, color and house calls",
+    "Say Alex books for a parent's home.",
+    "You can look for a roofer near you.",
+    "Your home warranty covers the rest.",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan left a mess under the sink.",
+    "Here's the price to fix it today.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The job should be done by 10am.",
+    "No. It doesn't smell like gas.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "There's no counter at a home.",
+    "My kitchen drain is clogged.",
+    "Texts the camera report link",
+    "plumbing and electrical jobs",
+    "Is it safe to turn back on?",
+    "Replace both shutoff valves",
+    "$89, credited to the repair",
+    "NOTE grease clog 12 ft in.",
+    "Mold behind the sink wall",
+    "Casey · license not found",
+    "Video and Jordan's notes",
+    "The service call is $89.",
+    "Drains have a set price.",
+    "A plan or warranty pays",
+    "Priced from your photos",
+    "Jordan found more work.",
+    "Casey · license expired",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Jordan found the leak.",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "Shutoff valve · $165",
+    "No. No huele a gas.",
+    "Sewer camera report",
+    "the shutoff valves",
+    "Supply line · $80",
+    "the kitchen drain",
+    "Book the repair",
+    "Book a free fix",
+    "Arrival windows",
+    "License renewal",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "Panel upgrade",
+    "Avery: barber",
+    "Add photos",
+    "Yard drain",
+    "EC22871",
+    "BS20981",
+    "leehomeservices.com",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "plumbing and electrical work",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "electrical prices",
+    "electrical jobs",
+    "Electrical",
+    "electrical",
+    "plumbing license",
+    "Plumbing license",
+    "Plumbing",
+    "plumbing",
+    "a plumber",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "a barbershop",
+    "barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "Barber",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "Price board",
+    "at the chair",
+    "shops",
+    "A drain clearing with",
+    "a drain clearing",
+    "A drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "service call",
+    "Service call",
+    "Labor",
+    "arriving 8–10am",
+    "arriving 10am–12pm",
+    "arriving 12–2pm",
+    "arriving 2–4pm",
+    "new arrival time",
+    "Water heater",
+    "water heater",
+    "I'm home",
+    "Alex is home",
+    "they're home",
+    "you're home",
+    "late-cancel or nobody-home fee",
+    "Nobody home",
+    "nobody home",
+    "wasn't home",
+    "was home",
+    "replaces water heaters",
+    "like a burst pipe or a lockout",
+    "travel fee",
+    "The $160 valve quote",
+    "shutoff valve",
+    "supply line",
+    "The repair price",
+    "Electric.",
+    "yard drain",
+    "drain clearings",
+    "Drain clearings",
+    "water heater",
+    "Kitchen",
+    "kitchen",
+    "cabinet"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-96": "d540b91653",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "S2-21": "bf6617b6d3",
+   "A8-44": "4410a4860c",
+   "A4-65": "fa7ec0389d",
+   "A8-03": "7accda6f86",
+   "A7-70": "da4cede3e2",
+   "A10-42": "4f28189298",
+   "S13-05": "ffcae1a1b0"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-38": "867fe1ab7c",
+   "B7-93": "4d6f89e473",
+   "B9-19": "b97bfbf0d2",
+   "B4-01": "15f683e6cb",
+   "B4-32": "fcfe092e37",
+   "B4-43": "fc9855955a",
+   "B7-05": "e28a131872",
+   "S11-23": "c837829c29",
+   "B4-38": "9539521dc7",
+   "S2-21": "bf6617b6d3",
+   "S11-58": "3461928783",
+   "S13-05": "164ce06368",
+   "B10-05": "a326ea3c0b"
+  }
+ }
+}

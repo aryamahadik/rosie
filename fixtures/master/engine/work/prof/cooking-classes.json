@@ -1,0 +1,3412 @@
+{
+ "id": "cooking-classes",
+ "name": "Cooking classes",
+ "style": "Class",
+ "pattern": "class",
+ "from": "dance",
+ "plugin": {
+  "pf.license": {
+   "need": "none for a cooking school or a cook in most places; where the state's form names a license or registration, the owner adds it as an optional item. Rosie checks no license, certificate, insurance or background check",
+   "who": "the business, for any registration, certificate or insurance it chooses to add",
+   "ask": "optional: any registration number, certificate or insurance the owner wants shown on the listing",
+   "check": "none: Rosie shows what the owner adds, as the owner's word, and never says it was checked",
+   "training": "a teacher's culinary training or teaching certificate is what the school says; shown as the school's word, never as a license",
+   "background": "optional: the owner may say each teacher who works with children has a background check; shown as the owner's word, never checked by Rosie",
+   "blocks": "a job the owner says needs a license the business doesn't have is not booked (the owner's own word, not a check)",
+   "renewals": "none: Rosie keeps no expiry clock for any item the owner adds",
+   "insurance": "optional: liability insurance the owner adds, shown as the owner's word; a host (a school, a library, a company) may ask for proof, and the owner answers it"
+  },
+  "pf.services": {
+   "shape": "class: a seat in a set class time by cooking, age group and level, with a set number of seats, a few trial seats and a waitlist; each learner booked is checked in on their own. Private lessons book one teacher, at the school, at a home, or by video. A class at a host's place (a school, a company office, a library) books a teacher's time for a group",
+   "examples": "the example school's own prices (Lee Kitchen and Lee Home Kitchen), not a standard",
+   "list": [
+    {
+     "name": "Trial cooking class (once per cook)",
+     "price": "$35",
+     "kind": "one price",
+     "length": "2 hours",
+     "where": "at the kitchen",
+     "before": "paid in full when booking (the school can pick instead: nothing taken, paid at the front desk)",
+     "after": "nothing more (or at the front desk)",
+     "capacity": "2 trial seats in each class",
+     "note": "a parent or guardian books and signs the waiver for a child; ingredients are in the price"
+    },
+    {
+     "name": "Kids cooking class by level (ages 8 to 12)",
+     "price": "$25 a class",
+     "kind": "one price a class",
+     "length": "90 min, once a week",
+     "where": "at the kitchen",
+     "capacity": "up to 8 cooks",
+     "note": "Little Chefs (ages 4 to 7) and pasta for kids (ages 8 to 12) are placed by age and skill; the cook OKs the level"
+    },
+    {
+     "name": "Adult cooking class by level (18 and over)",
+     "price": "$40 a class",
+     "kind": "one price a class",
+     "length": "2 hours, once a week",
+     "where": "at the kitchen",
+     "capacity": "up to 8 cooks",
+     "note": "Thai for adults and baking for teens (ages 13 to 17) are placed by the cook at the first class"
+    },
+    {
+     "name": "Term course, 4 weeks",
+     "price": "$140",
+     "kind": "one price for the term",
+     "length": "4 weeks",
+     "where": "at the kitchen",
+     "before": "paid in full when enrolling",
+     "after": "nothing more",
+     "note": "enrolling is the cook's own yes on the secure page, with the term's terms shown first; a term is never charged again"
+    },
+    {
+     "name": "Private cooking lesson at the kitchen",
+     "price": "$55",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the kitchen",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "the cook OKs each private lesson first"
+    },
+    {
+     "name": "Adult dinner club (drop-in)",
+     "price": "$20",
+     "kind": "one price",
+     "length": "2 hours",
+     "where": "at the kitchen",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "no trial needed; adults sign their own waiver; no alcohol is served or sold"
+    },
+    {
+     "name": "Private cooking lesson at home",
+     "price": "$150",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the learner's home",
+     "before": "a card saved for the $40 fee (or paid in full when booking: the owner's pick)",
+     "after": "the saved card charged at DONE (or nothing more)",
+     "note": "the learner's own kitchen; groceries are bought in the price"
+    },
+    {
+     "name": "Group cooking class at a host's place (a school, an office, a library)",
+     "price": "$150",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the host's place",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "up to 8 cooks",
+     "note": "with children, the host's own staff stay in the room for the whole class"
+    },
+    {
+     "name": "Visit fee",
+     "price": "$40",
+     "kind": "one price",
+     "length": "for a lesson away from the kitchen",
+     "where": "at the learner's place",
+     "before": "a card saved for it",
+     "after": "charged only for a late cancel or nobody home, if the owner confirms"
+    }
+   ],
+   "trial": "one trial class per cook, in a class that fits the cook's age and skill; 2 trial seats per class; checked by the parent's mobile and the child's first name",
+   "placement": "a learner who already cooks at home is placed by the teacher by level, at the first lesson; a short skills check on the secure page is optional and never a booking step",
+   "packs": "no class cards or plans are sold through Rosie; the school's own bundles, if it has any, are the owner's setting",
+   "capacity": "seats per class, set by the room (10 for a group class); trial seats per class; each seat is one learner with their own check-in code; a private lesson is one teacher",
+   "waitlist": "a full class keeps a waitlist in order; a freed seat is offered by text inside text hours, to one person at a time, for 30 minutes",
+   "minimum": "a class runs only with its minimum (the owner's setting, like 4 learners), checked a set time before (like 24 hours); the owner decides",
+   "skills": "knife skills, pasta, bread, Thai and baking; menu planning; children's classes only for cooks the owner OKs for children",
+   "online": "cooking is in person only: no video classes; a demo by video is not a booking",
+   "nobodyHome": "never: the learner must be there; a child's lesson at home needs a parent or guardian home the whole time"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "who is learning: the adult themselves, or the parent's child (the age sets the class)",
+    "which cooking, and the level: never studied, some before, or a fluent speaker who wants a refresher",
+    "the goal: travel, school, work, or fun",
+    "at the school, by video, or at home",
+    "for a class at a host's place: how many learners, their ages, and the place"
+   ],
+   "afterTime": [
+    "anything the teacher should know, like shyness, a first class, or a need for a quiet room (on the secure page)",
+    "for a home lesson: the address, and a quiet room with a table and two chairs",
+    "for a video lesson: a laptop or tablet with a camera and microphone, in a quiet room"
+   ],
+   "securePage": [
+    "the parent or guardian's yes that they may book for the child, and the waiver signed for the child",
+    "the child's first name and age, any learning or health notes or allergies, and an emergency contact",
+    "the pick-up list: the adults who may take the child home",
+    "a yes or no for photos or video of the child in class",
+    "adults: their own waiver"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or legal guardian for anyone under 18, who books, signs and gets every text; a teen gets a link to send to a parent"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone hurt right now: a deep cut, a bad burn or scald, fainting, a child choking, chest pain, trouble breathing",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "an injury that's healing, or a health condition",
+     "what": "the booking goes on; the note goes on the secure page for the teacher; Rosie gives no health advice"
+    },
+    {
+     "words": "a child who is shy or new to cooking",
+     "what": "the booking goes on; the note goes to the teacher on the secure page, who keeps a trial learner close"
+    }
+   ],
+   "children": "a child is never alone with one adult behind a closed door; at a host's place, the host's staff stay in the room; any worry about a child's safety goes to Sam at once, and Sam reports it where the state's rules require",
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Waiver and the child's details",
+     "when": "before the first lesson, signed on the secure page while booking",
+     "who": "a parent or guardian signs for anyone under 18; adults sign their own",
+     "goodFor": "the term (1 year), or until the school changes it",
+     "result": "signed: the booking goes on; not signed in 10 minutes: nothing is booked"
+    },
+    {
+     "name": "The pick-up list and the photo yes or no",
+     "when": "on the secure page while booking; the parent can change them any time",
+     "result": "only adults on the list take the child home; no answer to photos counts as no"
+    },
+    {
+     "name": "Placement for a learner who knows some of the cooking",
+     "when": "at the first lesson, by the teacher",
+     "result": "the teacher places the learner by level; the trial books once the owner OKs it"
+    }
+   ],
+   "prep": "for the reminder: come 10 minutes early to check in; a notebook and a pen; for a video lesson, a quiet room, the camera on, and the link 5 minutes early; for a home lesson, a quiet table and two chairs"
+  },
+  "pf.visit": {
+   "checkIn": "at the school: the parent gives the child's check-in code at the desk, or the desk ticks names on the class roster; at a home: the code at the door; at a host's place: the host's contact gives the code; by video: the code is read out at the start",
+   "children": "a child goes home only with an adult on the pick-up list; anyone else waits with staff while the parent is asked; for a first class or a child under 6, a parent stays in the building (the school's setting)",
+   "viewing": "parents watch through the lobby window; nobody else watches a kids' class without the school's OK; photos or video of a child only with the parent's yes (a switch, on by default)",
+   "lateEntry": "up to 10 minutes late: the learner joins after a short warm-up; later: the learner watches, and a trial moves to another day at no charge",
+   "changes": "a teacher change is texted to every learner booked; a longer private lesson is priced and OK'd first",
+   "done": "the check-in code or the roster tick; for a lesson away from the school, the code or DONE from the teacher",
+   "note": "after a trial, the teacher writes a short note on the secure page: what the learner tried, how it went, and which class fits next; the parent gets a private link"
+  },
+  "pf.money": {
+   "before": "a trial class, a private lesson or a dinner club at the school: paid in full when booking (or a YES books it and it's paid at the desk: the owner's pick); a term course: paid in full when enrolling; a lesson at a home: a card saved, charged at DONE; a class at a host's place: paid in full when booking",
+   "tuition": "a term is paid in full when enrolling and never charged again; no monthly plan is charged through Rosie",
+   "caps": "how far ahead a term may be paid, and any deposit kept apart for money paid ahead: from the state's form",
+   "cancel": "free to cancel a class until 24 hours before; a lesson at a home until 7am on the lesson's day (the example owner's settings; the owner can set longer); a longer right to cancel from the state's form wins",
+   "fees": "a missed trial or a late cancel: the $20 may be kept only with the school's OK, and no answer in 24 hours means a full refund; a home lesson cancelled late or nobody home: the $40 fee, only if the owner confirms",
+   "refunds": "a full refund, or a new time if the learner picks one, whenever the school cancels or changes a class (a closed day, a teacher out, too few learners); never kept as a credit without a yes",
+   "tips": "no tips line",
+   "tax": "no tax line, unless the owner sets one",
+   "fee2": "pays Rosfield's $2 for each confirmed booking"
+  },
+  "pf.messages": {
+   "never": "a child's last name, age, allergies, food restrictions or health notes, pick-up list or photos never go in a text; texts to the parent may use the child's first name only; texts to Sam or the staff carry no child details at all: they name the parent and the class, and link to the secure page",
+   "to": "texts go only to the parent's phone, never to the child",
+   "languages": "English and Spanish",
+   "minors": "a teen under 18 gets a link to send to a parent; Rosie never texts the parent first",
+   "photos": "photos or video of a child are shared only with the parent's yes, and never by text"
+  },
+  "pf.staff": {
+   "skills": "knife skills, pasta, bread, Thai and baking; menu planning; children's classes only for cooks the owner OKs for children",
+   "checks": "any teacher's background check is the owner's word (optional, never checked by Rosie); a sub teaches a kids' class only when the owner says so",
+   "supervision": "a child is never alone with one adult behind a closed door; two adults in the building for kids' classes (a teacher and the front desk: the school's setting)",
+   "ratio": "up to 10 learners per teacher in a kids' class (the school's setting; a ratio from the state's form wins)",
+   "whoOKs": "Sam places learners and OKs private lessons; Pat may OK them too",
+   "license": "no person license for teaching cooking unless the state's form names one; the owner may add a teacher's certificate as its own word"
+  },
+  "pf.rules": {
+   "items": [
+    "selling a term ahead: any deposit, account kept apart, written contract, cancel right, or limit on how far ahead money is taken comes from the state's form",
+    "a waiver is a risk notice and consent; where the state's rules limit what a parent may sign for a child, the state's form sets the words",
+    "background checks for people who work with children: the owner's word, optional, never checked by Rosie",
+    "a worry about a child's safety: Sam reports it where the state's rules require",
+    "records kept 7 years",
+    "food safety: any food-handler card the owner adds is the owner's word, optional, never checked by Rosie",
+    "no alcohol is served, sold or booked through Rosie: a tasting hour is coffee and tea only"
+   ],
+   "photos": "photos or video of a child: only with the parent's yes (on by default)"
+  },
+  "pf.edges": {
+   "applies": [
+    "the school closes a day (a power cut, a storm, a building problem): every learner told at once, with a new time or a full refund",
+    "a teacher is out: a sub the owner OKs, and learners told",
+    "a class too small to run by its cutoff: Sam runs it, or cancels with full refunds",
+    "a full class or no trial seat left: the waitlist, or another class that fits",
+    "a learner who knows some of the cooking: the teacher places them by level at the first lesson",
+    "a child upset at a trial: sees the parent, then rejoins, with no pressure",
+    "a child hurt in class: first aid, the parent brought in, 911 if serious; an incident note to Sam on the secure page",
+    "someone not on the pick-up list: the child stays with staff while the parent is asked",
+    "arriving late: joins after a warm-up up to 10 minutes; later, watches, and a trial moves free",
+    "a question about a term's books or materials: the teacher's answer, passed on as written"
+   ],
+   "generic": "all others handled the generic way"
+  },
+  "pf.facts": [
+   "classes",
+   "children",
+   "waitlist",
+   "groups",
+   "forms"
+  ]
+ },
+ "cast": {
+  "A": {
+   "staff": "Ines (cook and teacher) and the front desk",
+   "cust": "Alex M. (a parent, for Alex's son Mia, 9) · other parents and cooks"
+  },
+  "B": {
+   "staff": "Tomas (a cook who travels)",
+   "cust": "Alex M. (an adult cook) · other customers",
+   "other": "Others (a school, a company office, a library)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Ines"
+  },
+  "B": {
+   "staff": "Tomas"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you have a class on Saturday? I'd like to sign up."
+   ],
+   [
+    "Sale agua del calentador.",
+    "Huele raro en la cocina."
+   ],
+   [
+    "Salga de la casa y llame al 911 si huele a gas.",
+    "Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Leave the home and call 911 if you smell gas.",
+    "If you smell gas, get out and call 911."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A home-visit example: a gas smell gets 'leave and call 911'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to leave the home and call 911 if there's a gas smell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If you smell gas, get out and call 911."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a class on Saturday."
+   ],
+   [
+    "Then the travel area, jobs sent now, the phone line and bills Rosie sends.",
+    "Then the travel area, the phone line and bills Rosie sends."
+   ],
+   [
+    "Jobs sent now: who takes them (a solo owner: Sam, in open hours).",
+    "Lessons: a set time, booked ahead."
+   ],
+   [
+    "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+    "Nothing is sent now, so no set-out check is needed."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "No work here takes jobs sent now."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No lesson is sent now. The business takes none."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood cooking school on Maple Ave. Classic lessons, group classes and a tea break."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a gymnastics class, which the school doesn't run."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: sits near the front, speaks slowly, likes short drills"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The board marker ruined my shirt collar."
+   ],
+   [
+    "{{alex.staff:Alex M.}} says the cape clip ripped a shirt collar today.",
+    "{{alex.staff:Alex M.}} says a board marker ruined a shirt today."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books two drop-in lessons"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A cooking school books a seat in a class, or a teacher's time for a private lesson."
+   ],
+   [
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Oct 24 · 11:00am · Pasta 1 · Ines · 4 seats left"
+   ],
+   [
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "Sat Nov 21 · 11:00am · Pasta 1 · Ines · 8 seats left"
+   ],
+   [
+    "Barbering workshop",
+    "Pasta 1 group class"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Private lesson"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "private lesson"
+   ],
+   [
+    "$40 for the Groom's package",
+    "$140 for the term course"
+   ],
+   [
+    "Haircuts and beard trims",
+    "Trial classes and dinner clubs"
+   ],
+   [
+    "haircuts and beard trims",
+    "trial classes and dinner clubs"
+   ],
+   [
+    "Water heater replacement",
+    "Team event"
+   ],
+   [
+    "water heater replacement",
+    "team event"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home cooking and kids' cooking"
+   ],
+   [
+    "plumbing and electrical",
+    "home cooking and kids' cooking"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' class (ages 7 to 12)"
+   ],
+   [
+    "kids cut (12 and under)",
+    "kids' class (ages 7 to 12)"
+   ],
+   [
+    "Sewer camera inspection",
+    "Follow-up lesson at home"
+   ],
+   [
+    "sewer camera inspection",
+    "follow-up lesson at home"
+   ],
+   [
+    "Signature cut and shave",
+    "Private lesson"
+   ],
+   [
+    "signature cut and shave",
+    "private lesson"
+   ],
+   [
+    "$40 for the Term course",
+    "$140 for the term course"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Private lesson at home"
+   ],
+   [
+    "kitchen drain clearing",
+    "private lesson at home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Kitchen LLC"
+   ],
+   [
+    "lee Home Services LLC",
+    "lee Home Kitchen LLC"
+   ],
+   [
+    "Plumbing + electrical",
+    "Home cooking + kids' cooking"
+   ],
+   [
+    "plumbing + electrical",
+    "home cooking + kids' cooking"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Kitchen LLC"
+   ],
+   [
+    "lee's Barbershop LLC",
+    "lee Kitchen LLC"
+   ],
+   [
+    "Water heater flushes",
+    "Group classes at a school"
+   ],
+   [
+    "water heater flushes",
+    "group classes at a school"
+   ],
+   [
+    "leehomeservices.com",
+    "leekitchen.example"
+   ],
+   [
+    "Leehomeservices.com",
+    "Leekitchen.example"
+   ],
+   [
+    "chairs side by side",
+    "seats side by side"
+   ],
+   [
+    "Chairs side by side",
+    "Seats side by side"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the lesson"
+   ],
+   [
+    "priced at the chair",
+    "priced at the lesson"
+   ],
+   [
+    "Yard drain clearing",
+    "Backyard lesson"
+   ],
+   [
+    "yard drain clearing",
+    "backyard lesson"
+   ],
+   [
+    "Sewer camera report",
+    "Follow-up notes"
+   ],
+   [
+    "sewer camera report",
+    "follow-up notes"
+   ],
+   [
+    "heating and cooling",
+    "a tasting hour"
+   ],
+   [
+    "Heating and cooling",
+    "A tasting hour"
+   ],
+   [
+    "the group's chairs",
+    "the group's seats"
+   ],
+   [
+    "The group's chairs",
+    "The group's seats"
+   ],
+   [
+    "A color correction",
+    "A skills lesson"
+   ],
+   [
+    "a color correction",
+    "a skills lesson"
+   ],
+   [
+    "Barbering workshop",
+    "Pasta 1 group class"
+   ],
+   [
+    "barbering workshop",
+    "pasta 1 group class"
+   ],
+   [
+    "Water heater flush",
+    "Group class at a school"
+   ],
+   [
+    "water heater flush",
+    "group class at a school"
+   ],
+   [
+    "water heater quote",
+    "group class quote"
+   ],
+   [
+    "Water heater quote",
+    "Group class quote"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Kitchen"
+   ],
+   [
+    "lee Home Services",
+    "lee Home Kitchen"
+   ],
+   [
+    "sets at the chair",
+    "sets at the lesson"
+   ],
+   [
+    "Sets at the chair",
+    "Sets at the lesson"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Kitchen"
+   ],
+   [
+    "lee's Barbershop",
+    "lee Kitchen"
+   ],
+   [
+    "set at the chair",
+    "set at the lesson"
+   ],
+   [
+    "Set at the chair",
+    "Set at the lesson"
+   ],
+   [
+    "Groom's packages",
+    "Term courses"
+   ],
+   [
+    "groom's packages",
+    "term courses"
+   ],
+   [
+    "Color correction",
+    "Skills lesson"
+   ],
+   [
+    "color correction",
+    "skills lesson"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "service-call fee",
+    "visit fee"
+   ],
+   [
+    "Service-call fee",
+    "Visit fee"
+   ],
+   [
+    "Groom's package",
+    "Term course"
+   ],
+   [
+    "groom's package",
+    "term course"
+   ],
+   [
+    "A color and cut",
+    "A private lesson"
+   ],
+   [
+    "a color and cut",
+    "a private lesson"
+   ],
+   [
+    "Gloss to finish",
+    "Recipe booklet to finish"
+   ],
+   [
+    "gloss to finish",
+    "recipe booklet to finish"
+   ],
+   [
+    "Drain clearings",
+    "Private lessons"
+   ],
+   [
+    "drain clearings",
+    "private lessons"
+   ],
+   [
+    "Haircut at home",
+    "Home lesson"
+   ],
+   [
+    "haircut at home",
+    "home lesson"
+   ],
+   [
+    "an electrician",
+    "a cook"
+   ],
+   [
+    "An electrician",
+    "A cook"
+   ],
+   [
+    "Color touch-up",
+    "Taste check"
+   ],
+   [
+    "color touch-up",
+    "taste check"
+   ],
+   [
+    "Drain clearing",
+    "Private lesson"
+   ],
+   [
+    "drain clearing",
+    "private lesson"
+   ],
+   [
+    "Color and cut",
+    "Private lesson"
+   ],
+   [
+    "color and cut",
+    "private lesson"
+   ],
+   [
+    "A leak repair",
+    "A skills check"
+   ],
+   [
+    "a leak repair",
+    "a skills check"
+   ],
+   [
+    "Signature cut",
+    "Private lesson"
+   ],
+   [
+    "signature cut",
+    "private lesson"
+   ],
+   [
+    "water heaters",
+    "classes"
+   ],
+   [
+    "Water heaters",
+    "Classes"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Home Cooking"
+   ],
+   [
+    "lee Plumbing",
+    "lee Home Cooking"
+   ],
+   [
+    "Lee Electric",
+    "Lee Kids' Cooking"
+   ],
+   [
+    "lee Electric",
+    "lee Kids' Cooking"
+   ],
+   [
+    "electricians",
+    "cooks"
+   ],
+   [
+    "Electricians",
+    "Cooks"
+   ],
+   [
+    "1200 Main St",
+    "300 Cedar Ave"
+   ],
+   [
+    "barber chair",
+    "teaching seat"
+   ],
+   [
+    "Barber chair",
+    "Teaching seat"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "haircut plan",
+    "class plan"
+   ],
+   [
+    "Haircut plan",
+    "Class plan"
+   ],
+   [
+    "A beard trim",
+    "A dinner club"
+   ],
+   [
+    "a beard trim",
+    "a dinner club"
+   ],
+   [
+    "color quotes",
+    "lesson quotes"
+   ],
+   [
+    "Color quotes",
+    "Lesson quotes"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "water heater",
+    "class"
+   ],
+   [
+    "Water heater",
+    "Class"
+   ],
+   [
+    "Jordan Price",
+    "Tomas Price"
+   ],
+   [
+    "jordan Price",
+    "tomas Price"
+   ],
+   [
+    "service-call",
+    "visit"
+   ],
+   [
+    "Service-call",
+    "Visit"
+   ],
+   [
+    "lesson plans",
+    "lessons on a term"
+   ],
+   [
+    "Lesson plans",
+    "Lessons on a term"
+   ],
+   [
+    "$140 an hour",
+    "$150 a lesson"
+   ],
+   [
+    "Casey Moore",
+    "Remy Moore"
+   ],
+   [
+    "casey Moore",
+    "remy Moore"
+   ],
+   [
+    "electrician",
+    "cook"
+   ],
+   [
+    "Electrician",
+    "Cook"
+   ],
+   [
+    "barbershops",
+    "cooking schools"
+   ],
+   [
+    "Barbershops",
+    "Cooking schools"
+   ],
+   [
+    "beard trims",
+    "dinner clubs"
+   ],
+   [
+    "Beard trims",
+    "Dinner clubs"
+   ],
+   [
+    "color quote",
+    "lesson quote"
+   ],
+   [
+    "Color quote",
+    "Lesson quote"
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "House calls",
+    "Home lessons"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Leak repair",
+    "Skills check"
+   ],
+   [
+    "leak repair",
+    "skills check"
+   ],
+   [
+    "A plan goes",
+    "A term goes"
+   ],
+   [
+    "a plan goes",
+    "a term goes"
+   ],
+   [
+    "$25 consult",
+    "$20 assessment"
+   ],
+   [
+    "Riley Chen",
+    "Ines Ruiz"
+   ],
+   [
+    "riley Chen",
+    "ines Ruiz"
+   ],
+   [
+    "Avery Diaz",
+    "Clara Diaz"
+   ],
+   [
+    "avery Diaz",
+    "clara Diaz"
+   ],
+   [
+    "Electrical",
+    "Kids' cooking"
+   ],
+   [
+    "electrical",
+    "kids' cooking"
+   ],
+   [
+    "barbershop",
+    "cooking school"
+   ],
+   [
+    "Barbershop",
+    "Cooking school"
+   ],
+   [
+    "beard trim",
+    "dinner club"
+   ],
+   [
+    "Beard trim",
+    "Dinner club"
+   ],
+   [
+    "Color plan",
+    "Menu plan"
+   ],
+   [
+    "color plan",
+    "menu plan"
+   ],
+   [
+    "patch test",
+    "skills check"
+   ],
+   [
+    "Patch test",
+    "Skills check"
+   ],
+   [
+    "house call",
+    "home lesson"
+   ],
+   [
+    "House call",
+    "Home lesson"
+   ],
+   [
+    "dishwasher",
+    "laptop"
+   ],
+   [
+    "Dishwasher",
+    "Laptop"
+   ],
+   [
+    "skin fades",
+    "group classes"
+   ],
+   [
+    "Skin fades",
+    "Group classes"
+   ],
+   [
+    "88 Elm St",
+    "12 Maple Ave"
+   ],
+   [
+    "42 Oak St",
+    "19 Harbor Rd"
+   ],
+   [
+    "barbering",
+    "cooking classes"
+   ],
+   [
+    "Barbering",
+    "Cooking classes"
+   ],
+   [
+    "kids cuts",
+    "kids' classes"
+   ],
+   [
+    "Kids cuts",
+    "Kids' classes"
+   ],
+   [
+    "hot towel",
+    "tasting"
+   ],
+   [
+    "Hot towel",
+    "Tasting"
+   ],
+   [
+    "Skin fade",
+    "Group class"
+   ],
+   [
+    "skin fade",
+    "group class"
+   ],
+   [
+    "cape clip",
+    "board marker"
+   ],
+   [
+    "Cape clip",
+    "Board marker"
+   ],
+   [
+    "plan ends",
+    "term ends"
+   ],
+   [
+    "Plan ends",
+    "Term ends"
+   ],
+   [
+    "Plumbing",
+    "Home cooking"
+   ],
+   [
+    "plumbing",
+    "home cooking"
+   ],
+   [
+    "plumbers",
+    "cooks"
+   ],
+   [
+    "Plumbers",
+    "Cooks"
+   ],
+   [
+    "Haircuts",
+    "Trial classes"
+   ],
+   [
+    "haircuts",
+    "trial classes"
+   ],
+   [
+    "Kids cut",
+    "Kids' class"
+   ],
+   [
+    "kids cut",
+    "kids' class"
+   ],
+   [
+    "cut hair",
+    "teach"
+   ],
+   [
+    "Cut hair",
+    "Teach"
+   ],
+   [
+    "plans go",
+    "terms go"
+   ],
+   [
+    "Plans go",
+    "Terms go"
+   ],
+   [
+    "plumber",
+    "cook"
+   ],
+   [
+    "Plumber",
+    "Cook"
+   ],
+   [
+    "Main St",
+    "Cedar Ave"
+   ],
+   [
+    "main St",
+    "cedar Ave"
+   ],
+   [
+    "Barbers",
+    "Teachers"
+   ],
+   [
+    "barbers",
+    "teachers"
+   ],
+   [
+    "Haircut",
+    "Trial class"
+   ],
+   [
+    "haircut",
+    "trial class"
+   ],
+   [
+    "massage",
+    "tasting session"
+   ],
+   [
+    "Massage",
+    "Tasting session"
+   ],
+   [
+    "cabinet",
+    "bookshelf"
+   ],
+   [
+    "Cabinet",
+    "Bookshelf"
+   ],
+   [
+    "Elm St",
+    "Maple Ave"
+   ],
+   [
+    "elm St",
+    "maple Ave"
+   ],
+   [
+    "Oak St",
+    "Harbor Rd"
+   ],
+   [
+    "oak St",
+    "harbor Rd"
+   ],
+   [
+    "Barber",
+    "Teacher"
+   ],
+   [
+    "barber",
+    "teacher"
+   ],
+   [
+    "Repipe",
+    "Term program"
+   ],
+   [
+    "repipe",
+    "term program"
+   ],
+   [
+    "facial",
+    "tasting circle"
+   ],
+   [
+    "Facial",
+    "Tasting circle"
+   ],
+   [
+    "heater",
+    "class"
+   ],
+   [
+    "Heater",
+    "Class"
+   ],
+   [
+    "faucet",
+    "projector"
+   ],
+   [
+    "Faucet",
+    "Projector"
+   ],
+   [
+    "toilet",
+    "whiteboard"
+   ],
+   [
+    "Toilet",
+    "Whiteboard"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "jordan",
+    "tomas"
+   ],
+   [
+    "a perm",
+    "a gymnastics class"
+   ],
+   [
+    "A perm",
+    "A gymnastics class"
+   ],
+   [
+    "Riley",
+    "Ines"
+   ],
+   [
+    "riley",
+    "ines"
+   ],
+   [
+    "Avery",
+    "Clara"
+   ],
+   [
+    "avery",
+    "clara"
+   ],
+   [
+    "Casey",
+    "Remy"
+   ],
+   [
+    "casey",
+    "remy"
+   ],
+   [
+    "Shops",
+    "Schools"
+   ],
+   [
+    "shops",
+    "schools"
+   ],
+   [
+    "chair",
+    "seat"
+   ],
+   [
+    "Chair",
+    "Seat"
+   ],
+   [
+    "gloss",
+    "recipe booklet"
+   ],
+   [
+    "Gloss",
+    "Recipe booklet"
+   ],
+   [
+    "drain",
+    "class"
+   ],
+   [
+    "Drain",
+    "Class"
+   ],
+   [
+    "flush",
+    "class"
+   ],
+   [
+    "Flush",
+    "Class"
+   ],
+   [
+    "valve",
+    "book"
+   ],
+   [
+    "Valve",
+    "Book"
+   ],
+   [
+    "sewer",
+    "class"
+   ],
+   [
+    "Sewer",
+    "Class"
+   ],
+   [
+    "Color",
+    "Level"
+   ],
+   [
+    "color",
+    "level"
+   ],
+   [
+    "shave",
+    "class"
+   ],
+   [
+    "Shave",
+    "Class"
+   ],
+   [
+    "perms",
+    "gymnastics classes"
+   ],
+   [
+    "Perms",
+    "Gymnastics classes"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "leak",
+    "problem"
+   ],
+   [
+    "Leak",
+    "Problem"
+   ],
+   [
+    "clog",
+    "delay"
+   ],
+   [
+    "Clog",
+    "Delay"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "sink",
+    "desk"
+   ],
+   [
+    "Sink",
+    "Desk"
+   ],
+   [
+    "perm",
+    "gymnastics class"
+   ],
+   [
+    "Perm",
+    "Gymnastics class"
+   ],
+   [
+    "$125",
+    "$70"
+   ],
+   [
+    "$130",
+    "$70"
+   ],
+   [
+    "$100",
+    "$95"
+   ],
+   [
+    "$110",
+    "$60"
+   ],
+   [
+    "$220",
+    "$140"
+   ],
+   [
+    "$75",
+    "$150"
+   ],
+   [
+    "$85",
+    "$60"
+   ],
+   [
+    "$90",
+    "$65"
+   ],
+   [
+    "$80",
+    "$60"
+   ],
+   [
+    "$89",
+    "$40"
+   ]
+  ],
+  "B": [
+   [
+    "Sale agua del calentador.",
+    "Huele raro en la cocina."
+   ],
+   [
+    "Salga de la casa y llame al 911 si huele a gas.",
+    "Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Leave the home and call 911 if you smell gas.",
+    "If you smell gas, get out and call 911."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A home-visit example: a gas smell gets 'leave and call 911'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to leave the home and call 911 if there's a gas smell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If you smell gas, get out and call 911."
+   ],
+   [
+    "Then the travel area, jobs sent now, the phone line and bills Rosie sends.",
+    "Then the travel area, the phone line and bills Rosie sends."
+   ],
+   [
+    "Jobs sent now: who takes them (a solo owner: Sam, in open hours).",
+    "Lessons: a set time, booked ahead."
+   ],
+   [
+    "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+    "Nothing is sent now, so no set-out check is needed."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "No work here takes jobs sent now."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No lesson is sent now. The business takes none."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A private lesson with Lee Home Kitchen is $150, not $130."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a private lesson at $130, an old price."
+   ],
+   [
+    "A private lesson with Lee Home Services is $179, not $150.",
+    "A private lesson with Lee Home Kitchen is $150, not $130."
+   ],
+   [
+    "Ivy's AI asks for a private lesson at $150, an old price.",
+    "Ivy's AI asks for a private lesson at $130, an old price."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood cooking company on Elm St. Classic lessons, group classes and a tea break."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like sharing a neighbor's Wi-Fi without asking."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: sits near the front, speaks slowly, likes short drills"
+   ],
+   [
+    "Rosie answers with the real price, $179.",
+    "Rosie answers with the real price, $150."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Kitchen can teach at the school for $35, or at your home for $150."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books two drop-in lessons"
+   ],
+   [
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Oct 24 · 11:00am · Pasta 1 · Ines · 4 seats left"
+   ],
+   [
+    "Barbering workshop",
+    "Pasta 1 group class"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like sharing a neighbor's Wi-Fi without asking."
+   ],
+   [
+    "like tapping a neighbor's water line without asking.",
+    "like sharing a neighbor's Wi-Fi without asking."
+   ],
+   [
+    "$20 payment through Rosie was charged twice",
+    "$40 payment through Rosie was charged twice"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Term course, 10 weeks"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "term course, 10 weeks"
+   ],
+   [
+    "replacing both shutoff valves",
+    "30 more minutes"
+   ],
+   [
+    "Replacing both shutoff valves",
+    "30 more minutes"
+   ],
+   [
+    "replace both shutoff valves",
+    "30 more minutes"
+   ],
+   [
+    "Replace both shutoff valves",
+    "30 more minutes"
+   ],
+   [
+    "Haircuts and beard trims",
+    "Trial classes and dinner clubs"
+   ],
+   [
+    "haircuts and beard trims",
+    "trial classes and dinner clubs"
+   ],
+   [
+    "Water heater replacement",
+    "Team event"
+   ],
+   [
+    "water heater replacement",
+    "team event"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home cooking and kids' cooking"
+   ],
+   [
+    "plumbing and electrical",
+    "home cooking and kids' cooking"
+   ],
+   [
+    "Signature cut and shave",
+    "Term course"
+   ],
+   [
+    "signature cut and shave",
+    "term course"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' class (ages 7 to 12)"
+   ],
+   [
+    "kids cut (12 and under)",
+    "kids' class (ages 7 to 12)"
+   ],
+   [
+    "Sewer camera inspection",
+    "Follow-up lesson at home"
+   ],
+   [
+    "sewer camera inspection",
+    "follow-up lesson at home"
+   ],
+   [
+    "corroded shutoff valves",
+    "more practice"
+   ],
+   [
+    "Corroded shutoff valves",
+    "More practice"
+   ],
+   [
+    "sink is now overflowing",
+    "class is now full"
+   ],
+   [
+    "Sink is now overflowing",
+    "Class is now full"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Private lesson at home"
+   ],
+   [
+    "kitchen drain clearing",
+    "private lesson at home"
+   ],
+   [
+    "replaces water heaters",
+    "teaches the classes"
+   ],
+   [
+    "Replaces water heaters",
+    "Teaches the classes"
+   ],
+   [
+    "credited to the repair",
+    "counted toward the lesson"
+   ],
+   [
+    "Credited to the repair",
+    "Counted toward the lesson"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Kitchen LLC"
+   ],
+   [
+    "lee Home Services LLC",
+    "lee Home Kitchen LLC"
+   ],
+   [
+    "Plumbing + electrical",
+    "Home cooking + kids' cooking"
+   ],
+   [
+    "plumbing + electrical",
+    "home cooking + kids' cooking"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Kitchen LLC"
+   ],
+   [
+    "lee's Barbershop LLC",
+    "lee Kitchen LLC"
+   ],
+   [
+    "Water heater flushes",
+    "Group classes at a host's place"
+   ],
+   [
+    "water heater flushes",
+    "group classes at a host's place"
+   ],
+   [
+    "leehomeservices.com",
+    "leekitchen.example"
+   ],
+   [
+    "Leehomeservices.com",
+    "Leekitchen.example"
+   ],
+   [
+    "chairs side by side",
+    "seats side by side"
+   ],
+   [
+    "Chairs side by side",
+    "Seats side by side"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the lesson"
+   ],
+   [
+    "priced at the chair",
+    "priced at the lesson"
+   ],
+   [
+    "Yard drain clearing",
+    "Backyard lesson"
+   ],
+   [
+    "yard drain clearing",
+    "backyard lesson"
+   ],
+   [
+    "Sewer camera report",
+    "Follow-up notes"
+   ],
+   [
+    "sewer camera report",
+    "follow-up notes"
+   ],
+   [
+    "heating and cooling",
+    "a tasting hour"
+   ],
+   [
+    "Heating and cooling",
+    "A tasting hour"
+   ],
+   [
+    "the group's chairs",
+    "the group's seats"
+   ],
+   [
+    "The group's chairs",
+    "The group's seats"
+   ],
+   [
+    "A color correction",
+    "A skills lesson"
+   ],
+   [
+    "a color correction",
+    "a skills lesson"
+   ],
+   [
+    "Barbering workshop",
+    "Pasta 1 group class"
+   ],
+   [
+    "barbering workshop",
+    "pasta 1 group class"
+   ],
+   [
+    "Water heater flush",
+    "Group class at a host's place"
+   ],
+   [
+    "water heater flush",
+    "group class at a host's place"
+   ],
+   [
+    "water heater quote",
+    "group class quote"
+   ],
+   [
+    "Water heater quote",
+    "Group class quote"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Kitchen"
+   ],
+   [
+    "lee Home Services",
+    "lee Home Kitchen"
+   ],
+   [
+    "sets at the chair",
+    "sets at the lesson"
+   ],
+   [
+    "Sets at the chair",
+    "Sets at the lesson"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Kitchen"
+   ],
+   [
+    "lee's Barbershop",
+    "lee Kitchen"
+   ],
+   [
+    "set at the chair",
+    "set at the lesson"
+   ],
+   [
+    "Set at the chair",
+    "Set at the lesson"
+   ],
+   [
+    "Groom's packages",
+    "Term courses"
+   ],
+   [
+    "groom's packages",
+    "term courses"
+   ],
+   [
+    "Color correction",
+    "Skills lesson"
+   ],
+   [
+    "color correction",
+    "skills lesson"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "service-call fee",
+    "visit fee"
+   ],
+   [
+    "Service-call fee",
+    "Visit fee"
+   ],
+   [
+    "Groom's package",
+    "Term course"
+   ],
+   [
+    "groom's package",
+    "term course"
+   ],
+   [
+    "A color and cut",
+    "A private lesson"
+   ],
+   [
+    "a color and cut",
+    "a private lesson"
+   ],
+   [
+    "Gloss to finish",
+    "Recipe booklet to finish"
+   ],
+   [
+    "gloss to finish",
+    "recipe booklet to finish"
+   ],
+   [
+    "Drain clearings",
+    "Private lessons"
+   ],
+   [
+    "drain clearings",
+    "private lessons"
+   ],
+   [
+    "clear the drain",
+    "teach the lesson"
+   ],
+   [
+    "Clear the drain",
+    "Teach the lesson"
+   ],
+   [
+    "an electrician",
+    "a cook"
+   ],
+   [
+    "An electrician",
+    "A cook"
+   ],
+   [
+    "Color touch-up",
+    "Taste check"
+   ],
+   [
+    "color touch-up",
+    "taste check"
+   ],
+   [
+    "Drain clearing",
+    "Private lesson"
+   ],
+   [
+    "drain clearing",
+    "private lesson"
+   ],
+   [
+    "shutoff valves",
+    "more practice"
+   ],
+   [
+    "Shutoff valves",
+    "More practice"
+   ],
+   [
+    "$20 fee you OK",
+    "$40 fee you OK"
+   ],
+   [
+    "Signature cut",
+    "Term course"
+   ],
+   [
+    "signature cut",
+    "term course"
+   ],
+   [
+    "Color and cut",
+    "Private lesson"
+   ],
+   [
+    "color and cut",
+    "private lesson"
+   ],
+   [
+    "A leak repair",
+    "A skills check"
+   ],
+   [
+    "a leak repair",
+    "a skills check"
+   ],
+   [
+    "water heaters",
+    "classes"
+   ],
+   [
+    "Water heaters",
+    "Classes"
+   ],
+   [
+    "Jordan Price",
+    "Tomas Price"
+   ],
+   [
+    "jordan Price",
+    "tomas Price"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Home Cooking"
+   ],
+   [
+    "lee Plumbing",
+    "lee Home Cooking"
+   ],
+   [
+    "Lee Electric",
+    "Lee Kids' Cooking"
+   ],
+   [
+    "lee Electric",
+    "lee Kids' Cooking"
+   ],
+   [
+    "electricians",
+    "cooks"
+   ],
+   [
+    "Electricians",
+    "Cooks"
+   ],
+   [
+    "1200 Main St",
+    "300 Cedar Ave"
+   ],
+   [
+    "barber chair",
+    "teaching seat"
+   ],
+   [
+    "Barber chair",
+    "Teaching seat"
+   ],
+   [
+    "At the chair",
+    "At the lesson"
+   ],
+   [
+    "at the chair",
+    "at the lesson"
+   ],
+   [
+    "haircut plan",
+    "class plan"
+   ],
+   [
+    "Haircut plan",
+    "Class plan"
+   ],
+   [
+    "A beard trim",
+    "A dinner club"
+   ],
+   [
+    "a beard trim",
+    "a dinner club"
+   ],
+   [
+    "color quotes",
+    "lesson quotes"
+   ],
+   [
+    "Color quotes",
+    "Lesson quotes"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "water heater",
+    "team event"
+   ],
+   [
+    "Water heater",
+    "Team event"
+   ],
+   [
+    "service-call",
+    "visit"
+   ],
+   [
+    "Service-call",
+    "Visit"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $40"
+   ],
+   [
+    "refund · $20",
+    "refund · $40"
+   ],
+   [
+    "lesson plans",
+    "lessons on a term"
+   ],
+   [
+    "Lesson plans",
+    "Lessons on a term"
+   ],
+   [
+    "$140 an hour",
+    "$150 a lesson"
+   ],
+   [
+    "Casey Moore",
+    "Remy Moore"
+   ],
+   [
+    "casey Moore",
+    "remy Moore"
+   ],
+   [
+    "electrician",
+    "cook"
+   ],
+   [
+    "Electrician",
+    "Cook"
+   ],
+   [
+    "barbershops",
+    "cooking schools"
+   ],
+   [
+    "Barbershops",
+    "Cooking schools"
+   ],
+   [
+    "beard trims",
+    "dinner clubs"
+   ],
+   [
+    "Beard trims",
+    "Dinner clubs"
+   ],
+   [
+    "color quote",
+    "lesson quote"
+   ],
+   [
+    "Color quote",
+    "Lesson quote"
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "House calls",
+    "Home lessons"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Leak repair",
+    "Skills check"
+   ],
+   [
+    "leak repair",
+    "skills check"
+   ],
+   [
+    "overflowing",
+    "full"
+   ],
+   [
+    "Overflowing",
+    "Full"
+   ],
+   [
+    "clogs again",
+    "repeats"
+   ],
+   [
+    "Clogs again",
+    "Repeats"
+   ],
+   [
+    "valve quote",
+    "quote"
+   ],
+   [
+    "Valve quote",
+    "Quote"
+   ],
+   [
+    "A plan goes",
+    "A term goes"
+   ],
+   [
+    "a plan goes",
+    "a term goes"
+   ],
+   [
+    "Riley Chen",
+    "Ines Ruiz"
+   ],
+   [
+    "riley Chen",
+    "ines Ruiz"
+   ],
+   [
+    "Avery Diaz",
+    "Clara Diaz"
+   ],
+   [
+    "avery Diaz",
+    "clara Diaz"
+   ],
+   [
+    "Electrical",
+    "Kids' cooking"
+   ],
+   [
+    "electrical",
+    "kids' cooking"
+   ],
+   [
+    "barbershop",
+    "cooking school"
+   ],
+   [
+    "Barbershop",
+    "Cooking school"
+   ],
+   [
+    "beard trim",
+    "dinner club"
+   ],
+   [
+    "Beard trim",
+    "Dinner club"
+   ],
+   [
+    "Color plan",
+    "Menu plan"
+   ],
+   [
+    "color plan",
+    "menu plan"
+   ],
+   [
+    "patch test",
+    "skills check"
+   ],
+   [
+    "Patch test",
+    "Skills check"
+   ],
+   [
+    "house call",
+    "home lesson"
+   ],
+   [
+    "House call",
+    "Home lesson"
+   ],
+   [
+    "dishwasher",
+    "laptop"
+   ],
+   [
+    "Dishwasher",
+    "Laptop"
+   ],
+   [
+    "book quote",
+    "quote"
+   ],
+   [
+    "Book quote",
+    "Quote"
+   ],
+   [
+    "skin fades",
+    "group classes"
+   ],
+   [
+    "Skin fades",
+    "Group classes"
+   ],
+   [
+    "88 Elm St",
+    "12 Maple Ave"
+   ],
+   [
+    "42 Oak St",
+    "19 Harbor Rd"
+   ],
+   [
+    "barbering",
+    "cooking classes"
+   ],
+   [
+    "Barbering",
+    "Cooking classes"
+   ],
+   [
+    "kids cuts",
+    "kids' classes"
+   ],
+   [
+    "Kids cuts",
+    "Kids' classes"
+   ],
+   [
+    "hot towel",
+    "tasting"
+   ],
+   [
+    "Hot towel",
+    "Tasting"
+   ],
+   [
+    "Skin fade",
+    "Group class"
+   ],
+   [
+    "skin fade",
+    "group class"
+   ],
+   [
+    "Old pipes",
+    "Old notes"
+   ],
+   [
+    "old pipes",
+    "old notes"
+   ],
+   [
+    "plan ends",
+    "term ends"
+   ],
+   [
+    "Plan ends",
+    "Term ends"
+   ],
+   [
+    "Plumbing",
+    "Home cooking"
+   ],
+   [
+    "plumbing",
+    "home cooking"
+   ],
+   [
+    "plumbers",
+    "cooks"
+   ],
+   [
+    "Plumbers",
+    "Cooks"
+   ],
+   [
+    "Haircuts",
+    "Trial classes"
+   ],
+   [
+    "haircuts",
+    "trial classes"
+   ],
+   [
+    "Kids cut",
+    "Kids' class"
+   ],
+   [
+    "kids cut",
+    "kids' class"
+   ],
+   [
+    "cut hair",
+    "teach"
+   ],
+   [
+    "Cut hair",
+    "Teach"
+   ],
+   [
+    "plans go",
+    "terms go"
+   ],
+   [
+    "Plans go",
+    "Terms go"
+   ],
+   [
+    "plumber",
+    "cook"
+   ],
+   [
+    "Plumber",
+    "Cook"
+   ],
+   [
+    "Main St",
+    "Cedar Ave"
+   ],
+   [
+    "main St",
+    "cedar Ave"
+   ],
+   [
+    "Barbers",
+    "Teachers"
+   ],
+   [
+    "barbers",
+    "teachers"
+   ],
+   [
+    "Haircut",
+    "Trial class"
+   ],
+   [
+    "haircut",
+    "trial class"
+   ],
+   [
+    "massage",
+    "tasting session"
+   ],
+   [
+    "Massage",
+    "Tasting session"
+   ],
+   [
+    "cabinet",
+    "bookshelf"
+   ],
+   [
+    "Cabinet",
+    "Bookshelf"
+   ],
+   [
+    "an hour",
+    "a lesson"
+   ],
+   [
+    "An hour",
+    "A lesson"
+   ],
+   [
+    "Nora S.",
+    "Paola S."
+   ],
+   [
+    "nora S.",
+    "paola S."
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "jordan",
+    "tomas"
+   ],
+   [
+    "Elm St",
+    "Maple Ave"
+   ],
+   [
+    "elm St",
+    "maple Ave"
+   ],
+   [
+    "Oak St",
+    "Harbor Rd"
+   ],
+   [
+    "oak St",
+    "harbor Rd"
+   ],
+   [
+    "Barber",
+    "Teacher"
+   ],
+   [
+    "barber",
+    "teacher"
+   ],
+   [
+    "Repipe",
+    "Term program"
+   ],
+   [
+    "repipe",
+    "term program"
+   ],
+   [
+    "facial",
+    "tasting circle"
+   ],
+   [
+    "Facial",
+    "Tasting circle"
+   ],
+   [
+    "heater",
+    "class"
+   ],
+   [
+    "Heater",
+    "Class"
+   ],
+   [
+    "faucet",
+    "projector"
+   ],
+   [
+    "Faucet",
+    "Projector"
+   ],
+   [
+    "toilet",
+    "whiteboard"
+   ],
+   [
+    "Toilet",
+    "Whiteboard"
+   ],
+   [
+    "$2,400",
+    "$1,500"
+   ],
+   [
+    "Riley",
+    "Ines"
+   ],
+   [
+    "riley",
+    "ines"
+   ],
+   [
+    "Avery",
+    "Clara"
+   ],
+   [
+    "avery",
+    "clara"
+   ],
+   [
+    "Casey",
+    "Remy"
+   ],
+   [
+    "casey",
+    "remy"
+   ],
+   [
+    "Shops",
+    "Companies"
+   ],
+   [
+    "shops",
+    "companies"
+   ],
+   [
+    "chair",
+    "seat"
+   ],
+   [
+    "Chair",
+    "Seat"
+   ],
+   [
+    "gloss",
+    "recipe booklet"
+   ],
+   [
+    "Gloss",
+    "Recipe booklet"
+   ],
+   [
+    "drain",
+    "class"
+   ],
+   [
+    "Drain",
+    "Class"
+   ],
+   [
+    "flush",
+    "class"
+   ],
+   [
+    "Flush",
+    "Class"
+   ],
+   [
+    "valve",
+    "book"
+   ],
+   [
+    "Valve",
+    "Book"
+   ],
+   [
+    "sewer",
+    "class"
+   ],
+   [
+    "Sewer",
+    "Class"
+   ],
+   [
+    "Color",
+    "Level"
+   ],
+   [
+    "color",
+    "level"
+   ],
+   [
+    "shave",
+    "class"
+   ],
+   [
+    "Shave",
+    "Class"
+   ],
+   [
+    "Shop",
+    "Company"
+   ],
+   [
+    "shop",
+    "company"
+   ],
+   [
+    "leak",
+    "problem"
+   ],
+   [
+    "Leak",
+    "Problem"
+   ],
+   [
+    "clog",
+    "delay"
+   ],
+   [
+    "Clog",
+    "Delay"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "sink",
+    "desk"
+   ],
+   [
+    "Sink",
+    "Desk"
+   ],
+   [
+    "Nora",
+    "Paola"
+   ],
+   [
+    "nora",
+    "paola"
+   ],
+   [
+    "$179",
+    "$150"
+   ],
+   [
+    "$199",
+    "$165"
+   ],
+   [
+    "$160",
+    "$60"
+   ],
+   [
+    "$245",
+    "$90"
+   ],
+   [
+    "$358",
+    "$300"
+   ],
+   [
+    "$800",
+    "$500"
+   ],
+   [
+    "$169",
+    "$150"
+   ],
+   [
+    "$120",
+    "$150"
+   ],
+   [
+    "$140",
+    "$150"
+   ],
+   [
+    "$640",
+    "$650"
+   ],
+   [
+    "$620",
+    "$600"
+   ],
+   [
+    "$89",
+    "$40"
+   ],
+   [
+    "$80",
+    "$60"
+   ],
+   [
+    "$75",
+    "$60"
+   ]
+  ]
+ },
+ "keep": [
+  "teacher",
+  "visit fee",
+  "private lesson",
+  "trial class",
+  "kids' cooking"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a $35 trial class for Alex's son Mia, 9, at Lee Kitchen: Ines's Pasta 1 (ages 7 to 10), Sat Oct 24 at 11:00am, with 12 seats and 2 trial seats. Alex signs the waiver for Mia and sets the pick-up list on the secure page. Any allergy note goes on the secure page only. After the class, Ines's note comes by private link. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a private cooking lesson at home, 19 Harbor Rd, for Alex, an adult cook. Tomas comes Thu Oct 22 at 8:00am for 90 minutes. Alex signs the waiver on the secure page. Pick a money choice at the top: the saved card charged when Tomas texts DONE, or the lesson paid in full when booking."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: Mia's $35 trial class in Ines's Pasta 1, Sat Oct 24 at 11:00am (12 seats, 2 trial seats), paid in full when booking. A private cooking lesson at the kitchen ($55), an adult dinner club ($20) and the 4-week term ($140) are paid this way too.",
+    "list|none|counter": "The same $35 trial at a kitchen that takes nothing online: a YES books Mia's seat, and Alex pays at the front desk. Adult dinner clubs can work this way too."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Trial class"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Trial class"
+    },
+    "list|full|*": {
+     "price": "$35",
+     "paid": "$35",
+     "name": "Trial class"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $150 private cooking lesson (90 minutes) at Alex's home with Tomas. A card is saved for the $40 fee, and the $150 is charged when Tomas texts DONE.",
+    "list|full|none": "The same $150 lesson, paid in full when booking, as some cooks ask. A $150 group class at a host's place is paid in full this way too."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Private lesson at home"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "name": "Private lesson at home"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Private lesson at home"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Teaching cooking needs no state license, so the school gives its registration only (S1-61), and the owner may add any certificate or insurance as its own word. Where the state's form names one, this branch comes back."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Cooking schools and cooks pay the $2 too."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A school books class seats and teachers' time, never rooms on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The school runs classes on a timetable (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No teacher holds a state license. Any certificate or background check is the owner's word, shown as the owner's word (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No cooking lesson is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A cooking school bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The school books class seats and teachers' time, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A class or a lesson is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A lesson needs nothing brought except a notebook; the waiver is signed while booking."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "A learner hurt or unwell is 'Someone is hurt or feels sick' (A8-38)."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the school."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A cooking school bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Trial classes, classes and private lessons are rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "After a trial, a learner's next class comes with enrolling in the term (A10-x02). An adult books the next drop-in like any booking."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The school sends no proposals: the term's terms are on the note page, and enrolling is the learner's own choice."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing from a class comes back later. The teacher's note comes the same day (A10-x01)."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the school for work."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "The school books new learners: the trial class is how they start."
+   },
+   {
+    "op": "after",
+    "at": "A10-01",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.8"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Sat Oct 24, 12:30pm",
+      "title": "Sends Ines's trial note by private link",
+      "does": "Ines's note goes to Alex by private link: what Mia cooked, how it went, and which class fits next. The text itself carries none of it, and any allergy note stays on the secure page.",
+      "more": [
+       "The note page also shows the term's class and its terms, plainly, once.",
+       "No deadline, no discount for deciding fast, and no reminder. Alex decides with no rush.",
+       "A learner's notes and allergy details stay on the secure page, never in a text."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for bringing Mia to Lee Kitchen today. Ines wrote a short note about her first class.",
+        {
+         "card": {
+          "title": "Ines's note · Mia's trial",
+          "lines": [
+           "Pasta 1 · Sat Oct 24",
+           "Opens on the secure page"
+          ],
+          "button": "Read the note"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.messages"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Teaching cooking needs no state license, so the company gives its registration only (S1-61), and the owner may add any certificate or insurance as its own word. Where the state's form names one, this branch comes back."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Cooking schools and cooks pay the $2 too."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A cook books lesson time and class seats, never rooms on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The company runs classes on a timetable (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No cook holds a state license. Any certificate or background check is the owner's word, shown as the owner's word (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No cooking lesson is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A lesson is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A class at a host's place is booked for the group, not seat by seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Language lessons take no jobs sent now (S2-31), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A lesson or a single class needs no contract: the waiver is the form signed on the secure page (B4-86)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for cooking lessons (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No cooking lesson is sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No cooking lesson is sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A lesson always needs the learner there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A lesson always needs the learner there."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left alone with the cook at home: a parent or guardian stays home the whole lesson (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A lesson is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A lesson needs no proposal: the next lesson is booked like any other (B10-18)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Extra time already given has no cancel period (B8-24); only something sold at the home and not given yet can have one."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after a lesson, as in flow A."
+   }
+  ]
+ },
+ "notes": "Built from dance (refitted), not kept as it was: the dance plug-in, its words ops, plan and recital money, and its own steps were replaced; the class pattern's off ops, splits kept (A4-66, A7-15, A7-68, A8-67) and the $2 line are the same.\nFacts: classes, children, waitlist, groups, video (a video lesson counts as flow A), forms. No plans, packs, photos or extra work: those steps stay hidden for this work (their gates are off).\nLicenses (D96): none is needed for this work in most places; the owner may add any registration, certificate or insurance as its own word; Rosie checks none and never says it was checked. S1-60 and S2-28 license branches are off; the live master's license lines are the D96 editor's job.\nsensitive is off, as in dance: a child's details stay out of texts through pf.messages (texts to a parent use the child's first name only; staff texts carry no child details).\nMoney (both flows): A trial $35 paid in full, or paid at the desk; the fee is $20 (the most kept on a late cancel or no-show, only with the owner's OK); B private lesson at home $150, a card saved for the $40 visit fee and charged at DONE, or paid in full when booking; group class at a host's place $150; visit fee $40; extra 30 minutes $60.\nSign-up: Sam Lee's two companies are a studio (flow A) and a home service (flow B); staff in the examples are the example business's own people; the addresses are examples.\nParent words: knife skills, pasta, bread, Thai and baking; a term is 4 weeks, $140, paid in full when enrolling; the adult dinner club is a $20 drop-in.\nAllergies, food restrictions and health notes never go in a text: they stay on the secure page (pf.messages.never); the danger screen covers a deep cut, a bad burn or scald, and choking: 911 and no booking.\nNo alcohol is served, sold or booked through Rosie; a tasting hour is coffee and tea only. A food-handler card is the owner's word, optional, never checked.\nOwn step: A10-x01 (the cook's trial note by private link, with any allergy note kept on the secure page), after A10-01.\nWords: 'Lee Kitchen' (flow A), 'Lee Home Kitchen' (flow B), 'Lee Home Cooking' and 'Lee Kids' Cooking'.",
+ "splitsKept": {
+  "A": [
+   "A4-66",
+   "A7-15",
+   "A7-68",
+   "A8-67"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "I'd like a cut on Saturday.",
+    "Then the travel area, jobs sent now, the phone line and bills Rosie sends.",
+    "Jobs sent now: who takes them (a solo owner: Sam, in open hours).",
+    "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cape clip ripped my shirt collar.",
+    "Books a haircut and a beard trim",
+    "A barbershop books a person's time.",
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "Barbering workshop",
+    "Signature cut and hot towel shave",
+    "$40 for the Groom's package",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Kids cut (12 and under)",
+    "Signature cut and shave",
+    "Lee's Barbershop LLC",
+    "chairs side by side",
+    "Priced at the chair",
+    "priced at the chair",
+    "A color correction",
+    "a color correction",
+    "Barbering workshop",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "set at the chair",
+    "Color correction",
+    "color correction",
+    "service-call fee",
+    "Groom's package",
+    "a color and cut",
+    "Gloss to finish",
+    "Haircut at home",
+    "Color touch-up",
+    "color touch-up",
+    "Drain clearing",
+    "Color and cut",
+    "color and cut",
+    "Signature cut",
+    "signature cut",
+    "water heaters",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "At the chair",
+    "at the chair",
+    "haircut plan",
+    "Haircut plan",
+    "A beard trim",
+    "a beard trim",
+    "Color quotes",
+    "water heater",
+    "Jordan Price",
+    "service-call",
+    "$140 an hour",
+    "Casey Moore",
+    "barbershops",
+    "color quote",
+    "Color quote",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "A plan goes",
+    "$25 consult",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "beard trim",
+    "Beard trim",
+    "Color plan",
+    "color plan",
+    "patch test",
+    "house call",
+    "House call",
+    "skin fades",
+    "88 Elm St",
+    "Barbering",
+    "kids cuts",
+    "hot towel",
+    "Skin fade",
+    "skin fade",
+    "cape clip",
+    "plan ends",
+    "Plumbing",
+    "plumbing",
+    "Haircuts",
+    "haircuts",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "plans go",
+    "plumber",
+    "Plumber",
+    "Main St",
+    "Barbers",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "massage",
+    "Massage",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "heater",
+    "Jordan",
+    "a perm",
+    "A perm",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "chair",
+    "gloss",
+    "Gloss",
+    "Drain",
+    "valve",
+    "Color",
+    "color",
+    "shave",
+    "perms",
+    "Shop",
+    "shop",
+    "leak",
+    "Leak",
+    "pipe",
+    "perm",
+    "$125",
+    "$130",
+    "$100",
+    "$110",
+    "$75",
+    "$85",
+    "$90",
+    "$80",
+    "$89"
+   ],
+   "B": [
+    "Sale agua del calentador.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Then the travel area, jobs sent now, the phone line and bills Rosie sends.",
+    "Jobs sent now: who takes them (a solo owner: Sam, in open hours).",
+    "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Like tapping a neighbor's water line without asking.",
+    "Rosie answers with the real price, $179.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Like tapping a neighbor's water line without asking.",
+    "$20 payment through Rosie was charged twice",
+    "replacing both shutoff valves",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "Water heater replacement",
+    "water heater replacement",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "corroded shutoff valves",
+    "sink is now overflowing",
+    "Kitchen drain clearing",
+    "replaces water heaters",
+    "credited to the repair",
+    "Lee Home Services LLC",
+    "leehomeservices.com",
+    "Sewer camera report",
+    "sewer camera report",
+    "heating and cooling",
+    "Heating and cooling",
+    "Water heater flush",
+    "water heater flush",
+    "water heater quote",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "service call fee",
+    "Service call fee",
+    "service-call fee",
+    "Drain clearings",
+    "drain clearings",
+    "clear the drain",
+    "Drain clearing",
+    "drain clearing",
+    "shutoff valves",
+    "$20 fee you OK",
+    "A leak repair",
+    "a leak repair",
+    "water heaters",
+    "Jordan Price",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "service call",
+    "Service call",
+    "water heater",
+    "Water heater",
+    "service-call",
+    "Refund · $20",
+    "$140 an hour",
+    "Casey Moore",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "Price board",
+    "Leak repair",
+    "leak repair",
+    "overflowing",
+    "Overflowing",
+    "clogs again",
+    "valve quote",
+    "A plan goes",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "beard trim",
+    "house call",
+    "House call",
+    "dishwasher",
+    "88 Elm St",
+    "42 Oak St",
+    "hot towel",
+    "Old pipes",
+    "old pipes",
+    "plan ends",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "plans go",
+    "plumber",
+    "Plumber",
+    "Main St",
+    "Barbers",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "cabinet",
+    "Cabinet",
+    "an hour",
+    "Nora S.",
+    "Jordan",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "Repipe",
+    "repipe",
+    "heater",
+    "faucet",
+    "$2,400",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "chair",
+    "drain",
+    "Drain",
+    "flush",
+    "valve",
+    "sewer",
+    "Sewer",
+    "color",
+    "shave",
+    "Shop",
+    "shop",
+    "leak",
+    "Leak",
+    "clog",
+    "pipe",
+    "sink",
+    "Nora",
+    "$179",
+    "$199",
+    "$160",
+    "$245",
+    "$358",
+    "$800",
+    "$169",
+    "$120",
+    "$140",
+    "$640",
+    "$620",
+    "$89",
+    "$80",
+    "$75"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-29": "fb61245096",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A8-02": "15f418fec4",
+   "A8-86": "c989a99e52",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A4-43": "c17d56f766",
+   "A10-01": "77ff9c7550"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-29": "592bd8f1a2",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255"
+  }
+ }
+}

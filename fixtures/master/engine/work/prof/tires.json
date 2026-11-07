@@ -1,0 +1,5825 @@
+{
+ "id": "tires",
+ "name": "Tire shop",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "auto-repair",
+ "plugin": {
+  "pf.license": {
+   "need": "if: no state license for selling and fitting tires by default; a repair-shop registration where the state's rules require one for alignments or repairs; a scrap-tire hauler registration where the state requires one to haul old tires",
+   "ask": [
+    "The business registration number, where the state gave one",
+    "The repair-shop registration number, where the state's rules require one",
+    "The scrap-tire hauler or storage registration, where the state requires one"
+   ],
+   "who": "the business; each tire tech needs no license of their own unless the state's form says so",
+   "check": "the state's business or registration lookup; where there's none, a person on Rosie's team checks within 1 business day",
+   "blocks": "a registration the state requires that the owner says the business lacks keeps that kind of work offline",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "garage liability and coverage for customers' cars, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'"
+  },
+  "pf.services": {
+   "pattern": "a bay booked by time slot at the shop: the customer waits about an hour, or leaves the car; the van comes to a home or office for mobile work",
+   "list": [
+    {
+     "name": "New tires, installed",
+     "price": "per tire from the tire list for the car's size, installed: the tire, mount and balance, a valve or sensor kit and disposal, multiplied out for the set; any state tire fee and tax added where the state has them",
+     "length": "about 1 hour for 4",
+     "place": "at the shop; also at a home or office by the van",
+     "before": "tires on the rack: nothing taken; tires ordered in: a deposit, taken once the owner OKs the order (nothing is charged while the OK is pending)",
+     "after": "at the counter, or the bill Rosie texts when it's ready"
+    },
+    {
+     "name": "Mount and balance, the customer's own tires",
+     "price": "per tire, from the shop's board",
+     "length": "about 1 hour for 4",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Flat repair (plug and patch)",
+     "price": "one price; free with road-hazard protection",
+     "length": "30 minutes",
+     "place": "at the shop; at a home or office by the van, with the trip fee",
+     "before": "nothing taken at the shop; a card saved for the trip fee for the van",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Tire rotation, valve stems, TPMS sensor reset",
+     "price": "one price each, from the board",
+     "length": "15 to 30 minutes",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Seasonal swap, tires on their own wheels",
+     "price": "one price for 4",
+     "length": "30 minutes at the shop, about 45 at a home",
+     "place": "at the shop, or at a home or office by the van",
+     "before": "nothing taken at the shop; a card saved for the trip fee for the van",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Wheel alignment",
+     "price": "one price, offered after a look at the tire wear",
+     "length": "about 1 hour",
+     "place": "at the shop only (it needs the alignment rack)",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "TPMS sensor, replaced and programmed",
+     "price": "per sensor, only with the customer's yes",
+     "place": "found on the lift, or at the van"
+    },
+    {
+     "name": "Road-hazard protection",
+     "price": "per tire for a set term, optional, sold with new tires",
+     "place": "kept with the car; a claim books a free repair, or a free replacement if the tire can't be repaired"
+    },
+    {
+     "name": "Lug-nut re-check",
+     "price": "free, about 50 miles after any job that takes the wheels off",
+     "length": "10 minutes",
+     "place": "at the shop"
+    },
+    {
+     "name": "Re-balance",
+     "price": "free within 30 days of any job the shop or the van balanced (the example shop's own promise)",
+     "length": "30 minutes",
+     "place": "at the shop, or by the van"
+    },
+    {
+     "name": "Fleet lot visit",
+     "price": "per hour, with a 1-hour minimum (the example: $120 an hour)",
+     "place": "the van at a business's lot"
+    },
+    {
+     "name": "Trip fee for the van",
+     "price": "one fee, part of each mobile job's price",
+     "place": "at a home or office"
+    }
+   ],
+   "tire_list": "brand, model, size, load and speed rating, on the rack, held for a booking, on order and due; the owner or a tech texts arrivals ('IN 4 AltiMAX')",
+   "ordered_tires": "times start after the distributor's promised arrival (the example: next weekday by 10am if ordered by 3pm), plus a buffer the owner sets; the owner OKs each order before it's placed",
+   "capacity": "a set number of bays with set start times (the example shop: 3 bays, starts at 8:00am, 11:00am, 2:00pm and 3:00pm); one tech per bay; the alignment rack is saved like equipment",
+   "booked_as": "a bay's time, not a person: the customer picks a time, and the shop names the tech and the bay",
+   "wait_or_leave": "both: wait in the waiting room, or leave the car and get READY",
+   "van": "one tech per van, in a 2-hour arrival window; the van carries a tire machine and a balancer",
+   "nobody_home": "a seasonal swap or a flat repair on a parked car can be done with nobody there: the car is left where agreed, with the keys and any wheel-lock key as agreed, and DONE comes with a photo",
+   "online": "no"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Year, make, model and wheel size, to find the tire size",
+    "What kind of tire: all-season, all-weather, winter or performance",
+    "How many tires",
+    "Wait at the shop, or leave the car?",
+    "For the van: a home or an office, and the town"
+   ],
+   "after_time": [
+    "Is the tire-pressure light on? Yes, no, or only when it's cold",
+    "Locking lug nuts? Where's the key?",
+    "Road-hazard protection? Yes or no, with its price",
+    "Old tires: left for recycling, or taken back?",
+    "For the van: where the car is parked, and if there's room around it"
+   ],
+   "secure_page_only": [
+    "A photo of the size on the tire's sidewall, to confirm it",
+    "The plate or the VIN",
+    "A gate or garage code, and where the keys are left"
+   ],
+   "size_check": "the sidewall photo must match the size found from the car; a different size stops the booking, nothing is taken, and the AI looks again for the right size",
+   "who_may_book": "an adult: the car's owner, or someone the owner lets bring it in; for a teen's car, a parent books and says yes to prices"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "a blowout or a crash",
+    "a car stopped in traffic",
+    "someone hurt",
+    "a fire or smoke from a wheel"
+   ],
+   "stop_action": "'Get off the road if you can, hazard lights on, stay away from traffic, and call 911 if anyone is hurt'; no booking",
+   "dont_drive_words": [
+    "a bulge in a tire",
+    "cords or wire showing",
+    "a tire that keeps losing air",
+    "a flat",
+    "a wheel that shakes or wobbles",
+    "lug nuts that are loose"
+   ],
+   "dont_drive_action": "Rosie says: don't drive on it; put on the spare or call roadside help. The booking goes on for the soonest time, or the van comes to the car.",
+   "mobile_stops": "a car on a slope, on soft ground or on a busy street, or no safe place to jack it: the tech stops, and the job moves to the shop",
+   "can_continue": "yes, after the don't-drive steps"
+  },
+  "pf.first_steps": {
+   "required": "none; the tire size is confirmed from the sidewall photo on the secure page before booking",
+   "prep_for_reminder": [
+    "Bring or leave the wheel-lock key, if the car has locking lug nuts",
+    "For a seasonal swap: bring the other set, or have it ready by the car",
+    "For the van: park on flat, hard ground with room around the car"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "at the shop: the check-in code at the counter, with the keys; a car left after hours goes in the key box, and the tech texts IN; the van: the code at the car, as at any door",
+   "intake": "the keys, the odometer, the wheel-lock key, the tire size and tread depth, and photos of the wheels before the work",
+   "required_items": "the wheel-lock key on a car with locking lug nuts: without it the wheel can't come off, so the work doesn't start",
+   "the_work": "old tires off; wear, wheels and every TPMS sensor checked before mounting; new valve kits; mount and balance; sensors relearned; lug nuts torqued to the carmaker's spec",
+   "added_work": "an alignment for uneven wear or a dead TPMS sensor is shown with its price and the new total, and done only after the customer's own yes, logged with the time; a no is noted on the invoice",
+   "status_words": [
+    "IN",
+    "ON THE LIFT",
+    "WAITING ON A YES",
+    "READY"
+   ],
+   "ready": "READY tells the customer the total, the pick-up hours and the lug-nut re-check",
+   "done_proof": "the check-in code at the counter, or IN for a car left; READY and the pick-up close a car left; DONE closes a van job",
+   "late": "more than 15 minutes late: the next open bay",
+   "aftercare": "a free lug-nut re-check about 50 miles later; a free re-balance within 30 days (the example shop's promise); road-hazard plans and tire registrations kept with the car"
+  },
+  "pf.money": {
+   "before": "nothing taken for tires on the rack and for services; tires ordered in take a deposit (the example shop: $100), taken once the owner OKs the order, credited to the bill",
+   "after": "at the counter, the shop's own way; or the bill Rosie texts when the car is ready, if the owner turns it on",
+   "mobile": "a card saved for the trip fee; the bill after DONE",
+   "deposit": "deposit cap: from the state form; never more than the price known before the visit",
+   "fees": "at the shop, no cancel or no-show fee, except a restocking fee for tires ordered in (the example: $50 of the deposit) after free cancel ends; the van: the trip fee on the saved card (the example: $89), only with the owner's yes, for a late cancel or a car that isn't there; the owner confirms every fee",
+   "price_shown": "the installed price, with every charge that always comes with the tires; any state tire fee and the tax: from the state form",
+   "tips": "no tip line",
+   "tax": "the state's sales tax on tires, parts and labor, where the state has one",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies; a free re-check or a road-hazard repair already paid for adds none"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "The VIN or the plate",
+    "A gate, garage or key-box code"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a teen's car go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "tire fitting and balancing",
+    "flat repair",
+    "TPMS service",
+    "wheel alignment",
+    "the van's mobile jobs",
+    "wheel repair"
+   ],
+   "licenses": "none for each tech unless the state's form says so; where a state certifies alignment or repair work, only a certified tech does it",
+   "who_oks": "the owner OKs tire orders, added work over the booked price and every fee",
+   "stand_in": "any tech with the skill; an alignment only by a tech who does alignments"
+  },
+  "pf.rules": {
+   "tire_registration": "switch: the tires' ID numbers registered with the maker for recall notices, or the registration form given to the buyer, where the rules require it",
+   "repair_estimate": "switch: a written estimate before repair work above an amount, and an itemized invoice: from the state form",
+   "added_work": "Rosie's rule: nothing is added without the customer's own yes and the new total first",
+   "scrap_tires": "switch: the state's scrap-tire fee, and who may haul or store old tires: from the state form",
+   "road_hazard_plans": "switch: whether the state treats road-hazard protection as a service contract with its own rules: from the state form",
+   "recall_check": "switch: an open-recall check during tire work, where the state's form has one",
+   "show_number": "switch: any state registration number on invoices: from the state form",
+   "home_sale_cancel": "switch: work sold at the customer's home gets the state's cancel period; work sold at the shop doesn't",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "The sidewall shows another size: nothing taken, and the AI looks again",
+    "Ordered tires come late or short",
+    "A late cancel after ordered tires arrive: the restocking fee, if the owner confirms",
+    "A no-show: ordered tires are held 7 days, then the owner decides the restocking fee",
+    "A tire gets worse before the visit: the don't-drive steps",
+    "The wheel-lock key is missing",
+    "More work found on the lift: an alignment or a sensor",
+    "A car left and not picked up",
+    "A road-hazard claim: a nail, a cut",
+    "The lug-nut re-check",
+    "No safe place for the van to work"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork",
+   "aftercare",
+   "sentnow",
+   "spaces"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": {
+     "window": 2
+    }
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Leo and Grace (tire techs)",
+   "other": "Others (a bank, a parent, the tire distributor)"
+  },
+  "B": {
+   "staff": "Diego and Malik (tire techs)",
+   "other": "Others (a bank, a building manager, the tire distributor)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Leo"
+  },
+  "B": {
+   "staff": "Diego"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A tire's example: 'Tires ordered in need your tire size first. It's on the tire's sidewall.'"
+   ],
+   [
+    "house calls",
+    "van visits"
+   ],
+   [
+    "house call",
+    "van visit"
+   ],
+   [
+    "House calls",
+    "Van visits"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A flat repair for Alex's car and a sensor reset for a second car work the same way."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most tire shops set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood tire shop on Depot St. New tires, flat repairs and seasonal swaps, in 3 bays."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Alignment check"
+   ],
+   [
+    "Signature cut and shave",
+    "Alignment check"
+   ],
+   [
+    "Kids cut",
+    "TPMS sensor reset"
+   ],
+   [
+    "kids cut",
+    "TPMS sensor reset"
+   ],
+   [
+    "the Groom's package",
+    "the mount and balance package"
+   ],
+   [
+    "The Groom's package",
+    "The mount and balance package"
+   ],
+   [
+    "Groom's package",
+    "Mount and balance package"
+   ],
+   [
+    "Color and cut",
+    "Wheel and tire set"
+   ],
+   [
+    "color and cut",
+    "wheel and tire set"
+   ],
+   [
+    "Color correction",
+    "Bent rim check"
+   ],
+   [
+    "color correction",
+    "bent rim check"
+   ],
+   [
+    "Ben T. books a skin fade",
+    "Ben T. books a tire rotation"
+   ],
+   [
+    "skin fades",
+    "tire rotations"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A tire shop takes drop-offs: the car is left and picked up when it's ready."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds brake service to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW brake service"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Brake service for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a seasonal swap at the shop or at home"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tire's"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only to their shop."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens on the lift?"
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the shop's list"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A flat repair could mean a tire shop or a bike shop."
+   ],
+   [
+    "I'd like a cut on Saturday",
+    "I need new tires for Saturday"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Leo finds a dead sensor"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Necesito llantas nuevas para el sábado."
+   ],
+   [
+    "Books the groom's party together",
+    "Books 3 work trucks together"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books new tires and an alignment"
+   ],
+   [
+    "step-free door on Elm St",
+    "step-free door on Depot St"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Step-free door on Depot St · parking by the door"
+   ],
+   [
+    "11:00am with Riley",
+    "11:00am in Bay 2"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am · Bay 2"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm · Bay 1"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm · Bay 3"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Haircuts",
+    "Flat repairs"
+   ],
+   [
+    "haircuts",
+    "flat repairs"
+   ],
+   [
+    "Haircut",
+    "Flat repair"
+   ],
+   [
+    "haircut",
+    "flat repair"
+   ],
+   [
+    "Skin fade",
+    "Tire rotation"
+   ],
+   [
+    "skin fade",
+    "tire rotation"
+   ],
+   [
+    "Beard trim",
+    "Valve stem"
+   ],
+   [
+    "beard trim",
+    "valve stem"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Tire Shop LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Tire Van and Lee Wheel Repair"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Tire Shop"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tire"
+   ],
+   [
+    "88 Elm St",
+    "60 Depot St"
+   ],
+   [
+    "1200 Main St",
+    "75 Canal St"
+   ],
+   [
+    "Riley",
+    "Leo"
+   ],
+   [
+    "Avery",
+    "Grace"
+   ],
+   [
+    "Jordan",
+    "Diego"
+   ],
+   [
+    "Casey",
+    "Malik"
+   ],
+   [
+    "barbershop's",
+    "tire shop's"
+   ],
+   [
+    "barbershop",
+    "tire shop"
+   ],
+   [
+    "Barbershop",
+    "Tire shop"
+   ],
+   [
+    "barbers",
+    "tire techs"
+   ],
+   [
+    "barber",
+    "tire tech"
+   ],
+   [
+    "Barber",
+    "Tire tech"
+   ],
+   [
+    "plumbing's",
+    "mobile tire service's"
+   ],
+   [
+    "plumbing",
+    "mobile tire service"
+   ],
+   [
+    "Plumbing",
+    "Mobile tire service"
+   ],
+   [
+    "plumber",
+    "tire tech"
+   ],
+   [
+    "Plumber",
+    "Tire tech"
+   ],
+   [
+    "electrical",
+    "wheel repair"
+   ],
+   [
+    "Electrical",
+    "Wheel repair"
+   ]
+  ],
+  "B": [
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is the car on level ground?'"
+   ],
+   [
+    "house calls",
+    "van visits"
+   ],
+   [
+    "House calls",
+    "Van visits"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Seasonal swap"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Flat tire in the driveway"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like work on someone else's car, unasked."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Lug nuts: after 50 miles, reply here for a free re-check."
+   ],
+   [
+    "Every plumbing service",
+    "Every van job"
+   ],
+   [
+    "Leak repair",
+    "Wheel check"
+   ],
+   [
+    "Water heater replacement",
+    "Wheel and tire set"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Rotate and balance · $199"
+   ],
+   [
+    "like a haircut at the shop or at home.",
+    "like a flat repair at the shop or at home."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Tires fitted and swapped at your home or office in Springfield: seasonal swaps, new tires and flats, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A swap in a driveway"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 wheel and tire set is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the wheel and tire quote before booking."
+   ],
+   [
+    "Work like towing or a lockout is sent now (B4-16)",
+    "Work like a flat tire or a lockout is sent now (B4-16)"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about swapping to my winter tires. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My winter tires need to go on' fits a seasonal swap."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please leave the car where the van can park next to it, with the winter tires nearby."
+   ],
+   [
+    "Water heater fix",
+    "Flat check"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds a cracked wheel. The plug-in says a tire tech stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD cracked wheel, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Cracked wheel"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a cracked wheel and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a cracked front wheel"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the tire on that wheel"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a lug nut loose this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan rotate my other car's tires next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a tire rotation."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a flat tire, today,"
+   ],
+   [
+    "accept the leak repair for today,",
+    "accept the flat repair for today,"
+   ],
+   [
+    "Accepted: the leak repair today,",
+    "Accepted: the flat repair today,"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Two new valve stems and sensors · $160"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to two new valve stems and sensors for $160."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also rotate and balance them?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about a tire-pressure light. Both jobs go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also look at my tire-pressure light?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The light is a sensor check, priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds brake service to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW brake service"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Brake service for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the tire size, the car, and whether the tires are on their own wheels."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A flat could mean a tire shop or a roadside service."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee's Tire Shop for a flat repair instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a rotation? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Mobile Tire asks: is the car at a home, an office or somewhere else? And what size are the tires, and are they on their own wheels?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. 225/65R17, on their own wheels."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a van swap my tires this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa swap Thu 12-2 Casey"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 swap needs none."
+   ],
+   [
+    "Kitchen drain",
+    "Seasonal swap"
+   ],
+   [
+    "Yard drain",
+    "Flat repair"
+   ],
+   [
+    "kitchen drain",
+    "seasonal swap"
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Say Kim L.'s flat repair needs nobody home."
+   ],
+   [
+    "Jordan lets himself in the agreed way, with no check-in code.",
+    "Jordan works on the car in the driveway, with no check-in code."
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tire's"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only to their shop."
+   ],
+   [
+    "Drain clearings",
+    "Seasonal swaps"
+   ],
+   [
+    "drain clearings",
+    "seasonal swaps"
+   ],
+   [
+    "Drain clearing",
+    "Seasonal swap"
+   ],
+   [
+    "drain clearing",
+    "seasonal swap"
+   ],
+   [
+    "clear the drain",
+    "swap the tires"
+   ],
+   [
+    "Water heater flush",
+    "Flat repair at the car"
+   ],
+   [
+    "water heater flush",
+    "flat repair at the car"
+   ],
+   [
+    "Sewer camera inspection",
+    "Rotate and balance"
+   ],
+   [
+    "sewer camera inspection",
+    "rotate and balance"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "the $89 service call",
+    "the $89 trip fee"
+   ],
+   [
+    "The $89 service call",
+    "The $89 trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "at the door",
+    "at the car"
+   ],
+   [
+    "plumbing visit",
+    "tire visit"
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "Diego is the one who uses the heavy jack"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Tire LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Tire Van and Lee Wheel Repair"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Tire Shop"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tire"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobiletire.com"
+   ],
+   [
+    "88 Elm St",
+    "60 Depot St"
+   ],
+   [
+    "42 Oak St",
+    "58 Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "75 Canal St"
+   ],
+   [
+    "Riley",
+    "Leo"
+   ],
+   [
+    "Avery",
+    "Grace"
+   ],
+   [
+    "Jordan",
+    "Diego"
+   ],
+   [
+    "Casey",
+    "Malik"
+   ],
+   [
+    "barbershop's",
+    "tire shop's"
+   ],
+   [
+    "barbershop",
+    "tire shop"
+   ],
+   [
+    "Barbershop",
+    "Tire shop"
+   ],
+   [
+    "barbers",
+    "tire techs"
+   ],
+   [
+    "barber",
+    "tire tech"
+   ],
+   [
+    "Barber",
+    "Tire tech"
+   ],
+   [
+    "plumbing's",
+    "mobile tire service's"
+   ],
+   [
+    "plumbing",
+    "mobile tire service"
+   ],
+   [
+    "Plumbing",
+    "Mobile tire service"
+   ],
+   [
+    "plumber",
+    "tire tech"
+   ],
+   [
+    "Plumber",
+    "Tire tech"
+   ],
+   [
+    "electrical",
+    "wheel repair"
+   ],
+   [
+    "Electrical",
+    "Wheel repair"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books 4 new tires at Lee's Tire Shop for Sat Oct 24 at 11:00am. The tires are ordered by size, a $100 deposit is taken once Sam OKs the order, Alex waits about an hour, and comes back for a free lug-nut check. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Tire's van at home, 58 Cedar Ave, and Diego comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: a seasonal swap in the driveway, or 4 new tires ordered in."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|none|counter",
+    "list|none|bill",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: 4 new tires for Alex's size, ordered in: $868 installed, with road-hazard protection. A $100 deposit is taken once Sam OKs and orders them, credited to the bill. Alex waits about an hour and pays the $768 rest at the counter.",
+    "list|none|counter": "A $35 flat repair, or tires already on the rack: nothing is taken, and a YES books the bay. Alex waits and pays at the counter.",
+    "list|none|bill": "The $35 flat repair with the car left at the shop. Rosie texts the bill with READY, so Alex can pay before pick-up.",
+    "list|deposit|bill": "The 4 ordered tires, with the car left at the shop. The $768 rest is on the bill Rosie texts with READY."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50",
+     "name": "Flat repair"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Flat repair"
+    },
+    "list|deposit|*": {
+     "price": "$868",
+     "deposit": "$100",
+     "rest": "$768",
+     "fee": "$50",
+     "name": "4 new tires, installed"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 seasonal swap in Alex's driveway. The winter tires, already on their own wheels, go on. A card is saved for the $89 trip fee, and Rosie texts the bill after Diego texts DONE.",
+    "list|deposit|bill": "4 new tires ordered in for Alex's size and fitted at home: $885 with the trip fee. A $100 deposit is taken once Sam OKs the order; the rest is on the bill after DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Seasonal tire swap"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Seasonal tire swap"
+    },
+    "list|deposit|*": {
+     "price": "$885",
+     "deposit": "$100",
+     "rest": "$785",
+     "fee": "$89",
+     "name": "4 new tires, fitted at home"
+    }
+   }
+  }
+ },
+ "keep": [
+  "tire rotation",
+  "trip fee",
+  "valve",
+  "leak",
+  "color"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Mobile tire work and wheel repair need no state license by default. The company gives its registration, and a repair-shop registration only where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The tire shop's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Tire work runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Tire techs need no license of their own unless the state's form says so."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "A flat at a home or an office can be sent now: Sam sets who's on call (S2-27)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the shop's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Flat repair (plug and patch)",
+          "$35 · 30 min"
+         ],
+         [
+          "Tire rotation",
+          "$40 · 30 min"
+         ],
+         [
+          "Valve stem, each",
+          "$20"
+         ],
+         [
+          "TPMS sensor reset",
+          "$25"
+         ],
+         [
+          "Seasonal swap, tires on wheels",
+          "$55 · 30 min"
+         ],
+         [
+          "Mount and balance, your own 4",
+          "$140 · 1 hour"
+         ],
+         [
+          "New tires, installed",
+          "From the tire list, by size · 1 hour for 4"
+         ],
+         [
+          "Wheel alignment",
+          "$110 · 1 hour, after a look"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "does": "The same as the van: Sam sends a photo and checks what Rosie read. Nothing is typed from scratch."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "Each kind of work has its own plug-in. The tire shop's says the state licenses neither the shop nor its tire techs, by default."
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "Even with the photo, the registration can't be confirmed. Mobile tire service waits, saved, and the other kinds of work can still go live.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We still can't confirm registration 2019-0451, so mobile tire service stays offline.",
+      {
+       "card": {
+        "title": "Mobile tire service · offline, saved",
+        "lines": [
+         "Everything is saved",
+         "Wheel repair and the tire shop can still go live",
+         "I'll remind you once in 3 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Mobile tire service goes live at 2:16pm, and Sam can be booked now.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile tire service is live! AI assistants can book you now.",
+      {
+       "card": {
+        "title": "Mobile tire service · live now",
+        "lines": [
+         "You can be booked now",
+         "Your people come next, once the rest is set up",
+         "Next, wheel repair: about 5 minutes"
+        ]
+       },
+       "buttons": [
+        "Start now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Mobile Tire is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The van's door"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Mobile Tire is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Mobile tire service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Mobile tire price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most mobile tire services start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Mobile Tire, to start",
+        "lines": [
+         "Every van job",
+         "Where: at the customer's home or office",
+         "When they book: a card saved for the $89 trip fee",
+         "After the job: Rosie sends the bill"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules mobile tire services often set. Your call: keep them, or change any. They become its own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Mobile Tire: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Mobile Tire will look to customers and AI assistants. I drafted it from your website and Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Tires fitted and swapped at your home or office in Springfield: seasonal swaps, new tires and flats, within 25 miles."
+        ]
+       },
+       "photos": [
+        "The van",
+        "The team",
+        "A swap in a driveway"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Mobile Tire the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Mobile Tire · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s01"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ],
+     [
+      "san",
+      "owner",
+      "Wheel repair next: same company, so only what's new. It needs no state license where you work, so I've set it like mobile tire service. Send only what's different.",
+      {
+       "card": {
+        "title": "Wheel repair, set like mobile tire service",
+        "lines": [
+         "At the customer's place, money as for mobile tire service",
+         "A bent rim straightened: priced from photos",
+         "It goes live once the team member who repairs wheels joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "Where the city's rules don't allow car work at a home, Rosie won't set the swap at a customer's home. It stays at the shop, at $55.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where your shop is, the city's rules don't allow car work at a customer's home. So the seasonal swap stays at the shop only.",
+      {
+       "card": {
+        "title": "Seasonal swap · at the shop only",
+        "lines": [
+         "$55, paid at the counter",
+         "Van visits stay off"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "more": [
+     "Nobody on the shop's team is asked for a license either, unless the plug-in says so.",
+     "Where the state's rules require a repair-shop registration for alignments, its number is asked here and checked the same way."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-62",
+    "does": "The shop is its own company, with its own plug-in. Tire work pays the $2, so the shop gets its own monthly bill."
+   },
+   {
+    "op": "words",
+    "at": "S1-29",
+    "does": "The shop has its own $49 cap per person, and its own monthly bill from Rosie. Sam keeps the card added for the van."
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The shop's registration 2020-1187 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way wheel repair was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile tire service",
+          "Now"
+         ],
+         [
+          "Wheel repair",
+          "Once your wheel tech joins and you say yes"
+         ],
+         [
+          "Lee's Tire Shop",
+          "Its registration is on file as given, not checked. It shows once a tire tech joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on van and wheel repair jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the van team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Diego Price and Malik Moore run the van. Diego does wheel repair too. Leo Chen and Grace Diaz work the shop's bays. Leo also does alignments and van swaps"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Diego Price: the van and wheel repair",
+         "Malik Moore: the van",
+         "Leo Chen: the shop, alignments and van swaps",
+         "Grace Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Malik Moore"
+     ],
+     [
+      "Company",
+      "Lee Mobile Tire"
+     ],
+     [
+      "Kinds of work",
+      "Mobile tire service"
+     ],
+     [
+      "Jobs",
+      "Seasonal swaps, flat repairs, new tires"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7:30am–5:30pm"
+     ],
+     [
+      "Malik agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Quinn S. to Lee's Tire Shop. Quinn gets one invite, and replies YES. Where the plug-in says a license is needed. It's optional and not checked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Tire Shop. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-80",
+    "does": "Some work is booked by the space, not the person: a table, a court, a room or a bay. The plug-in says so, and the owner lists the spaces with the team."
+   },
+   {
+    "op": "words",
+    "at": "S1-81",
+    "does": "Sam lists the shop's 3 bays and which services use each one. Customers then pick a bay's time, never a person.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The shop is booked by the bay. List each one, and which services use it.",
+      {
+       "card": {
+        "title": "Your bays",
+        "lines": [
+         "Its name, like Bay 1",
+         "How many cars it fits",
+         "Which services use it",
+         "Its hours"
+        ]
+       },
+       "buttons": [
+        "List them now",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1 Bay 1 and Bay 2, any tire job. Bay 3 has the alignment rack. All the shop's hours"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "list": {
+        "head": [
+         "Bay",
+         "Services",
+         "Hours"
+        ],
+        "rows": [
+         [
+          "Bay 1",
+          "Every tire job",
+          "The shop's hours"
+         ],
+         [
+          "Bay 2",
+          "Every tire job",
+          "The shop's hours"
+         ],
+         [
+          "Bay 3",
+          "Every tire job, and alignments",
+          "The shop's hours"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Tire Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Leo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Tire. Sam Lee added you to the team for van and wheel repair jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Diego"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Leo replies YES, then checks what Sam set. One reply covers everything Leo does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Leo Chen · my profile",
+        "lines": [
+         "Every shop service, alignments and van swaps",
+         "The shop's hours"
+        ]
+       },
+       "as": "Leo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Leo"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the shop and van swaps, so Leo is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Leo picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Grace, Diego and Malik set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Say Sam had picked 2: fleet time is $140 an hour with Diego, and $120 with anyone else. Customers see the price of whoever comes.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Fleet lot visit",
+          "Diego",
+          "$140 an hour"
+         ],
+         [
+          "Fleet lot visit",
+          "Anyone else",
+          "$120 an hour"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-30",
+    "does": "Some work takes urgent jobs sent now, like a flat or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call."
+   },
+   {
+    "op": "words",
+    "at": "S2-27",
+    "does": "The van takes flats sent now, at a home or an office. Sam names who takes them in open hours and who's on call while closed. Each has a backup.",
+    "more": [
+     "A job sent now goes to the person on call first. They have 5 minutes to take it by reply.",
+     "In open hours, it goes to whoever Sam names: here, the nearest free tire tech cleared for it.",
+     "No reply: it goes to the backup, for 5 more minutes.",
+     "Nobody takes it: anything held is released, and the customer is told right away.",
+     "It goes only to someone cleared for that service. If the person on call isn't, the backup gets it first.",
+     "Hours with nobody on call: jobs sent now aren't offered then.",
+     "Each person sees their on-call times in their day list. Sam changes them by text or on the Team page.",
+     "The shop takes no jobs sent now, so nobody there is on call."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The van takes flats sent now. Who takes them in open hours, who's on call when you're closed, and who backs them up?"
+     ],
+     [
+      "owner",
+      "san",
+      "Open hours: whoever's nearest and free. Diego weeknights. Malik weekends and holidays. Each backs up the other"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. A flat sent now goes to the person on call first, then the backup.",
+      {
+       "card": {
+        "title": "On call · the van",
+        "lines": [
+         "Open hours · the nearest free tire tech, then the other",
+         "Weeknights, 5:30pm to 7:30am · Diego · backup Malik",
+         "Weekends and holidays · Malik · backup Diego",
+         "5 minutes each to take a job",
+         "Nobody takes it: the customer is told at once"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Tire",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Diego Price",
+       "Lee Mobile Tire",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Malik Moore",
+       "Lee Mobile Tire",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Tire",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Leo Chen",
+       "Lee's Tire Shop",
+       "At the shop, and van swaps",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Grace Diaz",
+       "Lee's Tire Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Diego: the van and wheel repair",
+         "Malik: the van",
+         "Leo: the shop, alignments and van swaps",
+         "Grace: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, wheel repair and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Grace at the shop, Malik for the van.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Tire Shop can book you from now on, at the shop and for van swaps. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Leo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Tire Shop can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Grace"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Tire can book you for the van and wheel repair from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Diego"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Wheel repair and Lee's Tire Shop now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-66",
+    "more": [
+     "The tire shop and the van both pay it, so both of Sam's businesses take the first branch."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-11",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your tire quote is with the shop's owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-19",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Yesterday, nobody answered for Lee's Tire Shop.",
+      {
+       "list": {
+        "plain": true,
+        "rows": [
+         [
+          "2 requests",
+          "Declined at 4 hours"
+         ],
+         [
+          "1 special-order quote",
+          "Still waiting on you"
+         ]
+        ]
+       },
+       "buttons": [
+        "See them",
+        "Set up AWAY"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-20",
+    "say": [
+     [
+      "owner",
+      "san",
+      "raise flat repair to 40"
+     ],
+     [
+      "san",
+      "owner",
+      "Prices change in the portal, so nothing changes by mistake.",
+      {
+       "card": {
+        "title": "Prices",
+        "lines": [
+         "Booked customers keep the price they were shown"
+        ],
+        "button": "Open the portal",
+        "link": "rosfield.com/s/l"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no license; the owner says when one lapses. Here, Sam says the shop's repair-shop registration is lapsed, so its alignments pause at once.",
+    "more": [
+     "Every 30 days by default, and again before each expiry.",
+     "Expired, suspended or revoked all pause new bookings for that work.",
+     "Tire jobs that need no registration carry on.",
+     "Rosie's team reviews the bookings already made within 1 business day.",
+     "Customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says the shop's repair-shop registration is lapsed.",
+      {
+       "card": {
+        "title": "Alignments · new bookings paused",
+        "lines": [
+         "Other tire jobs carry on",
+         "Bookings already made: Rosie's team reviews them",
+         "Customers aren't told why"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-01",
+    "does": "Claude asks for Ben T., and Gemini for Dee W. Both want Sat Oct 31, 2:00pm in Bay 2, 0.4 seconds apart. Claude asked first, so Ben's time is saved for 10 minutes."
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Rosie checks registrations on the state's own lookup. While it's down, no new kind of work goes live until its registration is checked. Work already checked stays bookable.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's lookup is down, so the brake service's registration isn't checked yet. It isn't offered until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-05",
+    "say": [
+     [
+      "agent",
+      "san",
+      "Hi, I'm an automated assistant from Google, calling for a customer, Alex. Can Lee's Tire Shop do a flat repair on Saturday morning? What does it cost?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-19",
+    "does": "Alex asks Sam in person about Saturday. Sam, a tire tech or the desk can book for a customer by text or on the portal.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BOOK Alex M. flat repair Sat 11am"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Alex M. called at 7:15pm to book for Saturday.",
+      {
+       "card": {
+        "title": "Call · Alex M. · 4 min",
+        "lines": [
+         "Wants Saturday morning",
+         "Booked · Sat Oct 24, 11:00am · flat repair, Bay 2",
+         "English · recorded"
+        ],
+        "button": "Hear the call",
+        "link": "rosfield.com/k/a1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-31",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee's Tire Shop. Our call dropped, so here's what we agreed. You can finish on this link.",
+      {
+       "card": {
+        "title": "Lee's Tire Shop · your visit",
+        "lines": [
+         "Sat Oct 24 · 11:00am · Bay 2",
+         "Your answers so far are kept",
+         "The time is saved for 10 minutes"
+        ],
+        "button": "Finish booking",
+        "link": "rosfield.com/c/r2"
+       },
+       "stop": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "When a bay is about to open, Omar gets a text with the check-in code. Leo is told who's next."
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the search goes on, marked urgent, for the soonest bay.",
+    "more": [
+     "A tire that keeps losing air, a bulge or cords showing can fail on the road.",
+     "The van can also come to the car, in the other flow."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "A tire with a bulge, cords showing, or one that keeps losing air can fail on the road. Don't drive on it: put on the spare or call roadside help. The search goes on for the soonest time."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "more": [
+     "A blowout or a crash adds: get off the road, hazard lights on, and stay away from traffic."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the shop's tire techs. They can go over it at your visit. For anything sooner, call Lee's Tire Shop at (555) 010-0177. If a tire isn't safe to drive on, don't drive it."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Which tire has the screw, and is it still holding air?"
+     ],
+     [
+      "cust",
+      "agent",
+      "The front left. It's holding air fine."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-85",
+    "does": "Alex asks for a windshield repair, which the shop doesn't do. Rosie says so plainly, and the AI can look for another business.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee's Tire Shop doesn't do windshield repairs. Other businesses nearby may."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a bay time. Bay times name no tech: the shop names the tech who does the work."
+   },
+   {
+    "op": "words",
+    "at": "A4-18",
+    "does": "Alex wants 8:00am, which another customer is saving right now. Alex goes next in line for it, and takes 11:00am meanwhile.",
+    "more": [
+     "If the other customer's saved time runs out, 8:00am is offered to Alex at once.",
+     "If they book it, Alex keeps 11:00am, and the AI says 8:00am is gone."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-19",
+    "does": "No bay is free that week. Rosie says so plainly, with the next open day. It never squeezes in a time that isn't free."
+   },
+   {
+    "op": "words",
+    "at": "A4-60",
+    "does": "Ben cancels Sat 8:00am, so the first person on the list gets a text. They have 30 minutes to take it. Then the next person gets it.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "A spot opened at Lee's Tire Shop. It's yours if you want it.",
+      {
+       "card": {
+        "title": "Sat Oct 24 · 8:00am · Bay 1",
+        "lines": [
+         "Take it within 30 minutes",
+         "Within 24 hours of the visit: no free cancel",
+         "After that, it goes to the next person"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-21",
+    "does": "Back to Alex's pick: Sat 11:00am in Bay 2. Nobody else is offered it while Alex finishes. Rosie checks again before it writes the booking."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "does": "Questions that don't change the time or price. Each answer is checked for danger, then saved for the tire tech.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Two quick questions.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way",
+        "May the shop show photos of your car? Yes / No"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-80",
+    "does": "The plug-in says if this work books for a minor, from what age, and who must say yes. A tire shop books a teen's car with a parent."
+   },
+   {
+    "op": "words",
+    "at": "A4-25",
+    "does": "Alex's son, 17, drives the car in. Alex is the parent, so Alex books, says yes to prices and gets the texts.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "The car is your teen's, who's 17. Are you their parent or guardian?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Yes, I'm their parent."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-26",
+    "does": "Alex books the work on an adult brother's car, and pays for it. The code goes to whoever brings the car in."
+   },
+   {
+    "op": "words",
+    "at": "A4-55",
+    "does": "A what-if: Alex's employer pays for the work truck's tires. Alex forwards the payer a link. The payer pays on the secure page, and gives their own OK to texts there."
+   },
+   {
+    "op": "words",
+    "at": "A4-83",
+    "does": "Alex uses a wheelchair. The AI shares the shop's own access details: the entrance, the waiting room and the parking. Leo is told what helps.",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I use a wheelchair. Is the waiting room easy to get into?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee's Tire Shop has a step-free door on Depot St, and parking by the door."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says if this work needs a first step: a consult, a form or a waiver. Rosie checks before the secure link, so the page knows what to ask."
+   },
+   {
+    "op": "after",
+    "at": "A4-65",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex checks the tire size on the page",
+      "q": "Are new tires being sold?",
+      "does": "New tires must fit. So the secure page asks for a photo of the size printed on one tire's sidewall, before anything is taken.",
+      "more": [
+       "The size was found from the car and the wheel size. The photo confirms it.",
+       "A flat repair or a service sells no tire, so nothing is asked here.",
+       "Tires on the rack get the same photo check, with nothing taken."
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "branches": [
+       {
+        "label": "New tires: check the size",
+        "when": {
+         "before": [
+          "deposit"
+         ]
+        },
+        "steps": [
+         {
+          "id": "A4-x02",
+          "type": "split",
+          "line": [
+           "4.7"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Matches the photo to the size",
+          "q": "Does the sidewall match?",
+          "does": "Alex's photo shows 225/65R17, the size found from the car. The booking goes on to the deposit.",
+          "more": [
+           "The photo stays with the booking, on the secure page. It never goes in a text."
+          ],
+          "form": [
+           [
+            "Photo of one tire's sidewall",
+            "Shows 225/65R17"
+           ],
+           [
+            "Size from the car",
+            "225/65R17 on 17-inch wheels"
+           ]
+          ],
+          "needs": [
+           "pf.questions"
+          ],
+          "branches": [
+           {
+            "label": "Yes: 225/65R17",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "Another size",
+            "end": "end",
+            "endText": "Wrong size: nothing taken, and the AI looks again for the right size.",
+            "steps": [
+             {
+              "id": "A4-x03",
+              "line": [
+               "4.7",
+               "4.15"
+              ],
+              "who": "san",
+              "to": "cust",
+              "via": "msg",
+              "title": "Stops: the size doesn't match",
+              "does": "Say the sidewall showed 225/60R18. These tires won't fit, so nothing is held, and the saved time is let go. Alex's AI can look again.",
+              "more": [
+               "Sam isn't asked, since nothing was booked."
+              ],
+              "say": [
+               [
+                "san",
+                "cust",
+                "Your sidewall shows 225/60R18, not 225/65R17, so these tires won't fit. Nothing was taken. Your assistant can look again for 225/60R18."
+               ]
+              ],
+              "tells": [
+               "cust"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No tire sold: nothing to check",
+        "when": {
+         "before": [
+          "none",
+          "card",
+          "full"
+         ]
+        },
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Sat 3pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. Sat Oct 24 at 3:00pm in Bay 3?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Do I need an alignment too?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Do I need an alignment too?",
+      {
+       "buttons": [
+        "Check it at the visit",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Leo will check your old tires' wear on the lift Saturday, and tell you then. Nothing is added without your OK."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 20"
+     ],
+     [
+      "san",
+      "cust",
+      "The shop is running about 20 minutes late, so your 11:00am starts about 11:20am.",
+      {
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-70",
+    "does": "Each kind of work handles a late customer its own way. The shop holds a bay 15 minutes, then the car goes to the next open bay, so it takes the last branch."
+   },
+   {
+    "op": "words",
+    "at": "A8-07",
+    "more": [
+     "At the shop, Alex is already at the counter, so there's no door check.",
+     "Sam can look into it on the portal."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-47",
+    "does": "A what-if: Leo did the work, but entered no code and no DONE. The next morning, Rosie asks Alex one question, never a chase."
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex at the counter, Sat 11:00am. The plug-in asks Leo to note what's there before any work: the old tires, the wheels and the miles.",
+    "more": [
+     "For a car left at the shop, before photos of the wheels are the record.",
+     "It's kept with the booking, and Alex can see it on the secure page.",
+     "A damage claim or a later complaint is checked against it."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Before the work: 61,250 miles. Old tires at 3/32, worn evenly. A curb scuff on the front right wheel.",
+      {
+       "photos": [
+        "Front right wheel, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-37",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Alex M. had to leave before the balance on the 4th tire."
+     ],
+     [
+      "san",
+      "staff",
+      "Noted. Text PART and the price of what was done. It's read back like a bill."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-39",
+    "say": [
+     [
+      "cust",
+      "san",
+      "There's a new scratch on my front left wheel."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says the front left wheel got a new scratch today.",
+      {
+       "card": {
+        "title": "Damage report · Alex M.",
+        "lines": [
+         "Sat Oct 24 · Bay 2 · with Leo",
+         "Before record and photos saved"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/d/a10"
+       },
+       "buttons": [
+        "Pay for it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks for telling us. We've passed it to the owner, who will reply."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-67",
+    "does": "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays, or a teen drives the car in, so nothing more happens."
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Leo plugs and patches the front left tire from the inside, and balances it. Leo torques the lug nuts to the carmaker's spec.",
+    "more": [
+     "About 30 minutes.",
+     "Next: the walk-through, then Alex pays at the counter."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-53",
+    "does": "A car left at the shop gets READY and the pick-up once the work is done. Alex waits at the shop here, so the shop takes the first branch."
+   },
+   {
+    "op": "words",
+    "at": "A8-11",
+    "more": [
+     "For a car, the status words are IN, ON THE LIFT, WAITING ON A YES and READY.",
+     "A moved ready time is always sent, with the new time.",
+     "A reply from the customer goes to staff, like any question.",
+     "More work found on the lift is texted with its price first. Nothing extra is done until the customer says yes.",
+     "No reply to more work in 2 hours: one reminder. Still none: Sam is asked to call, or it isn't done."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "Before Alex pays, Leo walks Alex around the car: the work, the tire pressures and the lug nuts. A fix Alex asks for now is done before paying.",
+    "more": [
+     "Leo shows the old tires too, before they go for recycling.",
+     "A fix at the walk-through costs nothing extra.",
+     "Anything new needs Alex's yes and its price first.",
+     "At a pick-up, the car is shown at the counter before the keys go back."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "more": [
+     "A stand-in sees them too.",
+     "They never go in a text to Alex.",
+     "Alex can get a copy, as with any record.",
+     "The plug-in names what's worth keeping, like the tire size and the miles."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: plug and patch, front left. 61,250 miles. Lock key in the glovebox."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A tire job is paid in one go, never in stages."
+   },
+   {
+    "op": "words",
+    "at": "A10-34",
+    "does": "Where the plug-in says the work is named only, no rating is asked. A tire job is rated, so the shop takes the first branch."
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for visiting Lee's Tire Shop! How was your visit?",
+      {
+       "card": {
+        "title": "Rate your visit",
+        "lines": [
+         "Leo · Sat Oct 24",
+         "1 to 5 stars, one tap on the page"
+        ],
+        "button": "Rate it",
+        "link": "rosfield.com/r/a2"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "Tires sold at the shop have no cancel period. Only a contract or extra work the state's rules cover gets one, like a road-hazard plan some states treat as a contract."
+   },
+   {
+    "op": "words",
+    "at": "A10-26",
+    "does": "Say Alex's state treats the road-hazard plan as a service contract, with a cancel period. Rosie sends the right to cancel in writing."
+   },
+   {
+    "op": "after",
+    "at": "A10-05",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.14",
+       "10.10"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Mon Oct 26, 9:00am",
+      "title": "Books the free lug-nut re-check",
+      "does": "Lug nuts can settle after a wheel comes off, so the shop checks them again for free, about 50 miles later. Two days after the job, Rosie texts Alex once to pick a time.",
+      "more": [
+       "It's a 10-minute stop at the counter, with its own check-in code.",
+       "It's a second visit on Saturday's booking: no fee, and no second $2 for Rosie.",
+       "No reply: nothing is booked. The re-check stays free, any time in the first 100 miles.",
+       "It's the job's own aftercare, not a sale."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee's Tire Shop: time for your free lug-nut re-check, about 50 miles after Saturday. It takes 10 minutes. Pick a time:",
+        {
+         "times": [
+          "Tue Oct 27 · 8:00am · Bay 1",
+          "Wed Oct 28 · 8:00am · Bay 1"
+         ]
+        }
+       ],
+       [
+        "cust",
+        "san",
+        "A"
+       ],
+       [
+        "san",
+        "cust",
+        "Booked: your free lug-nut re-check. Give this code at the counter.",
+        {
+         "card": {
+          "title": "Lee's Tire Shop · Lug-nut re-check",
+          "lines": [
+           "Tue Oct 27 · 8:00am · Bay 1 · 10 minutes",
+           "Free: part of Saturday's job"
+          ]
+         },
+         "code": "3907"
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-33",
+    "does": "Alex signs on the secure page. The alignment is booked like any booking, with its own money choices and confirmation.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Signed, thanks! Pick a time for your alignment:",
+      {
+       "times": [
+        "Sat Nov 14 · 11:00am · Bay 3",
+        "Sat Nov 21 · 11:00am · Bay 3"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-14",
+    "say": [
+     [
+      "cust",
+      "san",
+      "I waited 25 minutes past my time."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. has a complaint about Saturday's visit: \"I waited 25 minutes past my time.\"",
+      {
+       "buttons": [
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks for telling us. We've passed it to the owner."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-20",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Do you do winter tires too?"
+     ],
+     [
+      "san",
+      "cust",
+      "Yes. Winter tires come from the tire list for your size, installed. Want prices and a time?",
+      {
+       "buttons": [
+        "Yes, show me",
+        "Not now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-42",
+    "does": "The plug-in's aftercare goes out after the visit. New tires grip less for the first 50 miles. The pressures are worth a check each month.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Care for your new tires, from Lee's Tire Shop.",
+      {
+       "card": {
+        "title": "Aftercare",
+        "lines": [
+         "Easy on hard stops for the first 50 miles",
+         "Check the pressures once a month"
+        ],
+        "button": "Read it",
+        "link": "rosfield.com/a/a14"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Tires are fitted on the car. Nothing is done by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "Lee's Tire Shop books a bay's time, not a person: the shop names the tech and the bay (the space branch)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee's Tire Shop books a bay's time, not a seat."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Tire work has no stays."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Bay times name no tech. A wish for one goes in the notes."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "No form is signed first for tire work."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child is never left at a tire shop: a parent stays, or a teen drives in."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A tire job is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No insurance or plan pays for tires. A road-hazard plan is a claim after the visit."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for tires."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Tire work has no results that come later."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The shop sells no plan of repeat visits. A reminder goes out instead, for the lug-nut re-check."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The shop sells no plan of repeat visits."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The shop sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The shop sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The shop sells no plan of repeat visits."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The shop sells no plan of repeat visits."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The shop sells no plan of repeat visits."
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say a front tire starts losing air before the visit. That's on the plug-in's danger list, so the don't-drive steps come first. Then Leo is asked if the visit can go ahead.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "My front tire keeps going soft. Can I still drive in Saturday?"
+     ],
+     [
+      "san",
+      "cust",
+      "A tire that keeps losing air can fail on the road. Please don't drive on it: put on the spare, or call roadside help. I've asked the shop about your visit."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. (Sat 11:00am) says a front tire keeps going soft. Can the visit go ahead?",
+      {
+       "buttons": [
+        "Yes, on the spare",
+        "Move it sooner",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Leo says come in Saturday as booked, on your spare. All 4 new tires go on then."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Leo finds a cracked wheel, which the plug-in says stops the work on it. A new tire can't go on it.",
+    "more": [
+     "The note says what was found, what wasn't done, and why.",
+     "It names the kind of shop to see, like a wheel specialist, never a named one."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Stopped work on Alex M.'s front right: the wheel is cracked. Note and photo on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Leo left you a note about today's visit.",
+      {
+       "card": {
+        "title": "A note from Lee's Tire Shop",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Leo stopped work on Alex M.'s front right wheel. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-12",
+    "more": [
+     "New tires come from the tire list: each tire's installed price for the car's size, times the number of tires.",
+     "The installed price has the tire, mounting, balancing, a valve kit and disposal in it.",
+     "The long services show how much time they take, so the bay is saved for all of it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-60",
+    "more": [
+     "Mobile tire service and wheel repair need no state license where Sam works, so Sam gives the registration.",
+     "Where a state's rules require a repair-shop registration, its number is asked here and checked the same way."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-33",
+    "more": [
+     "Mobile tire service stays offline until it matches."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-43",
+    "more": [
+     "If a customer asks for a van visit, Rosie offers a time at the shop instead."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-70",
+    "more": [
+     "The plug-in says what each person needs, like their own license.",
+     "With several kinds of work, each person gets the ones they do.",
+     "A mobile already on the team isn't added twice."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-48",
+    "more": [
+     "Quinn can be booked once Quinn joins and Sam says yes.",
+     "Tire work needs no license of its own where Sam works, so nothing is checked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-80",
+    "more": [
+     "The tire shop books its 3 bays, not a person: the shop names the tech for each car.",
+     "The van's work and wheel repair book people, so they list no spaces."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-81",
+    "more": [
+     "A bay has its own hours, and can be closed for a day, like a person's time off.",
+     "Bays show on the Team page, next to the people.",
+     "Tire techs still work each bay, but times never name them.",
+     "Rosfield's $2 for a bay counts toward the tech who checks the car in.",
+     "Bay 3 has the alignment rack, so alignments book only there."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-28",
+    "more": [
+     "Tire work licenses nobody where Sam works, so nobody is checked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "At the shop, prices are the same whichever tech does the work.",
+     "A person can have their own price list, their own hourly rate, or a different price for one service."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-30",
+    "more": [
+     "The van takes flats sent now. The shop takes none."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S12-19",
+    "more": [
+     "A renewal receipt counts while the lookup catches up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "For a car, the counter takes the keys, the odometer and any wheel-lock key.",
+     "READY is texted when it's done, with the pick-up hours and anything due."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-22",
+    "more": [
+     "The general check looks for danger to life, fire, gas, a medical emergency or self-harm.",
+     "Every answer later in the booking is checked the same way.",
+     "On a call, the voice AI says any safety words out loud.",
+     "A tire shop's plug-in adds its own: a bulge, cords showing, a tire that keeps losing air, or a blowout."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-26",
+    "more": [
+     "Sam set this line at sign-up: the number customers call for what only a tire tech should answer.",
+     "The plug-in lists which words go to this line. Sam can add more.",
+     "Where the plug-in says those words stop a booking, nothing is booked. Otherwise Alex can go on."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-15",
+    "more": [
+     "A wish for one tech goes in the notes.",
+     "Where the plug-in says this work is named only, Rosie books only the person Alex names. It never suggests, ranks or rates anyone."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-25",
+    "more": [
+     "The plug-in says who may book for a teen's car, and that the parent OKs any added work.",
+     "Texts go only to the parent's phone.",
+     "The teen can bring the car in with the parent's check-in code."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Tire work needs none: the tire size is checked from a sidewall photo on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-37",
+    "more": [
+     "A price under the booked one needs no OK. A higher one follows Sam's price-OK rule.",
+     "No OK in 30 minutes: the bill or the charge waits, as at DONE.",
+     "Nothing more is done without Alex's yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-13",
+    "more": [
+     "A sign of danger gets the safety message first, like 'call 911' for a crash.",
+     "Here, the visit stays: Alex comes in on the spare.",
+     "A question only a pro should answer gets the shop's line, (555) 010-0177."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Mobile tire work and wheel repair need no state license by default. The company gives its registration, and a repair-shop registration only where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The tire shop's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Tire work runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Tire techs need no license of their own unless the state's form says so."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "A flat at a home or an office can be sent now: Sam sets who's on call (S2-27)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your mobile tire services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Mobile tire prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Mobile tire price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trip fee",
+          "$89, part of each job's price"
+         ],
+         [
+          "Seasonal swap, 4 on their wheels",
+          "$179"
+         ],
+         [
+          "Flat repair at the car",
+          "$150"
+         ],
+         [
+          "TPMS sensor",
+          "$65 each, only with your OK"
+         ],
+         [
+          "New tires, fitted where you park",
+          "From the tire list, plus the trip fee"
+         ],
+         [
+          "Rotate and balance, 4 tires",
+          "$199"
+         ],
+         [
+          "Fleet lot visit",
+          "$120 an hour, 1-hour minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "Even with the photo, the registration can't be confirmed. Mobile tire service waits, saved, and the other kinds of work can still go live.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We still can't confirm registration 2019-0451, so mobile tire service stays offline.",
+      {
+       "card": {
+        "title": "Mobile tire service · offline, saved",
+        "lines": [
+         "Everything is saved",
+         "Wheel repair and the tire shop can still go live",
+         "I'll remind you once in 3 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Mobile tire service goes live at 2:16pm, and Sam can be booked now.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile tire service is live! AI assistants can book you now.",
+      {
+       "card": {
+        "title": "Mobile tire service · live now",
+        "lines": [
+         "You can be booked now",
+         "Your people come next, once the rest is set up",
+         "Next, wheel repair: about 5 minutes"
+        ]
+       },
+       "buttons": [
+        "Start now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Wheel repair next: same company, so only what's new. It needs no state license where you work. Send your wheel repair prices."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Wheel repair price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like mobile tire service. Send only what's different.",
+      {
+       "card": {
+        "title": "Wheel repair, set like mobile tire service",
+        "lines": [
+         "At the customer's place, money as for mobile tire service",
+         "A bent rim straightened: priced from photos",
+         "It goes live once the team member who repairs wheels joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee's Tire Shop is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Shop front"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the shop is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. A tire shop needs no state license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most tire shops start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee's Tire Shop, to start",
+        "lines": [
+         "Every shop service",
+         "At your shop, paid at the counter, your own way",
+         "When they book: nothing taken; tires ordered in, a $100 deposit"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules tire shops often set. Your call: keep them, or change any. They become the shop's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for the shop, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee's Tire Shop will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "A neighborhood tire shop on Elm St. New tires, flat repairs and seasonal swaps, in 3 bays."
+        ]
+       },
+       "photos": [
+        "The shop front",
+        "The bays",
+        "A car on the lift"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee's Tire Shop the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee's Tire Shop · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "Where the city's rules don't allow car work at a home, Rosie won't set the swap at a customer's home. It stays at the shop, at $55.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where your shop is, the city's rules don't allow car work at a customer's home. So the seasonal swap stays at the shop only.",
+      {
+       "card": {
+        "title": "Seasonal swap · at the shop only",
+        "lines": [
+         "$55, paid at the counter",
+         "Van visits stay off"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-29",
+    "does": "The shop has its own $49 cap per person, and its own monthly bill from Rosie. Sam keeps the card added for the van."
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The shop's registration 2020-1187 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way wheel repair was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile tire service",
+          "Now"
+         ],
+         [
+          "Wheel repair",
+          "Once your wheel tech joins and you say yes"
+         ],
+         [
+          "Lee's Tire Shop",
+          "Its registration is on file as given, not checked. It shows once a tire tech joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on van and wheel repair jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the van team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Diego Price and Malik Moore run the van. Diego does wheel repair too. Leo Chen and Grace Diaz work the shop's bays. Leo also does alignments and van swaps"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Diego Price: the van and wheel repair",
+         "Malik Moore: the van",
+         "Leo Chen: the shop, alignments and van swaps",
+         "Grace Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Malik Moore"
+     ],
+     [
+      "Company",
+      "Lee Mobile Tire"
+     ],
+     [
+      "Kinds of work",
+      "Mobile tire service"
+     ],
+     [
+      "Jobs",
+      "Seasonal swaps, flat repairs, new tires"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7:30am–5:30pm"
+     ],
+     [
+      "Malik agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Mobile Tire. Reese gets one invite, and replies YES. Where the plug-in says a license is needed. It's optional and not checked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Tire. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-80",
+    "does": "Some work is booked by the space, not the person: a table, a court, a room or a bay. The plug-in says so, and the owner lists the spaces with the team."
+   },
+   {
+    "op": "words",
+    "at": "S1-81",
+    "does": "Sam lists the shop's 3 bays and which services use each one. Customers then pick a bay's time, never a person.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The shop is booked by the bay. List each one, and which services use it.",
+      {
+       "card": {
+        "title": "Your bays",
+        "lines": [
+         "Its name, like Bay 1",
+         "How many cars it fits",
+         "Which services use it",
+         "Its hours"
+        ]
+       },
+       "buttons": [
+        "List them now",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1 Bay 1 and Bay 2, any tire job. Bay 3 has the alignment rack. All the shop's hours"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "list": {
+        "head": [
+         "Bay",
+         "Services",
+         "Hours"
+        ],
+        "rows": [
+         [
+          "Bay 1",
+          "Every tire job",
+          "The shop's hours"
+         ],
+         [
+          "Bay 2",
+          "Every tire job",
+          "The shop's hours"
+         ],
+         [
+          "Bay 3",
+          "Every tire job, and alignments",
+          "The shop's hours"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Tire Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Leo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Tire. Sam Lee added you to the team for van and wheel repair jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Diego"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Leo replies YES, then checks what Sam set. One reply covers everything Leo does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Leo Chen · my profile",
+        "lines": [
+         "Every shop service, alignments and van swaps",
+         "The shop's hours"
+        ]
+       },
+       "as": "Leo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Leo"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the shop and van swaps, so Leo is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Leo picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Grace, Diego and Malik set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Say Sam had picked 2: fleet time is $140 an hour with Diego, and $120 with anyone else. Customers see the price of whoever comes.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Fleet lot visit",
+          "Diego",
+          "$140 an hour"
+         ],
+         [
+          "Fleet lot visit",
+          "Anyone else",
+          "$120 an hour"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-30",
+    "does": "Some work takes urgent jobs sent now, like a flat or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call."
+   },
+   {
+    "op": "words",
+    "at": "S2-27",
+    "does": "The van takes flats sent now, at a home or an office. Sam names who takes them in open hours and who's on call while closed. Each has a backup.",
+    "more": [
+     "A job sent now goes to the person on call first. They have 5 minutes to take it by reply.",
+     "In open hours, it goes to whoever Sam names: here, the nearest free tire tech cleared for it.",
+     "No reply: it goes to the backup, for 5 more minutes.",
+     "Nobody takes it: anything held is released, and the customer is told right away.",
+     "It goes only to someone cleared for that service. If the person on call isn't, the backup gets it first.",
+     "Hours with nobody on call: jobs sent now aren't offered then.",
+     "Each person sees their on-call times in their day list. Sam changes them by text or on the Team page.",
+     "The shop takes no jobs sent now, so nobody there is on call."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The van takes flats sent now. Who takes them in open hours, who's on call when you're closed, and who backs them up?"
+     ],
+     [
+      "owner",
+      "san",
+      "Open hours: whoever's nearest and free. Diego weeknights. Malik weekends and holidays. Each backs up the other"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. A flat sent now goes to the person on call first, then the backup.",
+      {
+       "card": {
+        "title": "On call · the van",
+        "lines": [
+         "Open hours · the nearest free tire tech, then the other",
+         "Weeknights, 5:30pm to 7:30am · Diego · backup Malik",
+         "Weekends and holidays · Malik · backup Diego",
+         "5 minutes each to take a job",
+         "Nobody takes it: the customer is told at once"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Tire",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Diego Price",
+       "Lee Mobile Tire",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Malik Moore",
+       "Lee Mobile Tire",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Tire",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Leo Chen",
+       "Lee's Tire Shop",
+       "At the shop, and van swaps",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Grace Diaz",
+       "Lee's Tire Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Diego: the van and wheel repair",
+         "Malik: the van",
+         "Leo: the shop, alignments and van swaps",
+         "Grace: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, wheel repair and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Grace at the shop, Malik for the van.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Tire Shop can book you from now on, at the shop and for van swaps. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Leo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Tire Shop can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Grace"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Tire can book you for the van and wheel repair from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Diego"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Wheel repair and Lee's Tire Shop now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-66",
+    "more": [
+     "The tire shop and the van both pay it, so both of Sam's businesses take the first branch."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-01",
+    "more": [
+     "Lee Mobile Tire is live on Rosie, with its phone calendars and its own Stripe linked.",
+     "The other ways in are what-ifs. Each one rejoins the same steps.",
+     "A phone call has its own steps: the caller's language, relay calls, a person, recording, and Sam's summary."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "My winter tires need to go on. They're already on their own wheels. Can someone swap them at my house Thursday morning? I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Tengo una llanta ponchada.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I have a flat tire.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Mobile Tire. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Mobile Tire. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "more": [
+     "A tire tech's example: a flat or a bulge gets 'don't drive on it'.",
+     "Rosa's car is in her driveway, so she's told not to drive on the flat, and the soonest time is found."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay alguien herido? ¿Está el carro en la calle?",
+      {
+       "lang": "es",
+       "en": "First: is anyone hurt? Is the car on the road?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Está en la entrada de mi casa.",
+      {
+       "lang": "es",
+       "en": "No. It's in my driveway.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "No maneje con esa llanta. Ponga la de repuesto, o le mandamos la camioneta.",
+      {
+       "lang": "es",
+       "en": "Don't drive on that tire. Put on the spare, or we can send the van.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Tire. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Mobile Tire · Flat tire",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa, in Spanish. A flat tire in her driveway, and she isn't driving on it.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "A flat tire at home · don't-drive steps given",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Tire. We got your voicemail about a tire rotation. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Mobile Tire · Rotate and balance",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about a rotation and balance at work. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants it done at the office this week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For tire work, a blowout on the road, a crash, or a car stopped in traffic stops the booking.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. Get the car off the road if you can, hazard lights on, and stay away from traffic. If anyone is hurt, call 911 now."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their car is stopped on the highway after a blowout. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A blowout on the highway",
+         "Told to get off the road, then call 911"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "My car sat in a flood. Are the tires safe to drive on?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't answer safety questions about a car. If a tire looks damaged, don't drive on it. To talk to a tire tech, call Lee Mobile Tire at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "does": "The request turns out to be for work Lee Mobile Tire doesn't do, like a windshield repair. Rosie says so plainly, and the AI can look for another business.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Mobile Tire does tires and wheel repair, not windshields. Nothing was saved. You can look for an auto glass shop near you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "does": "A plug-in holds what one kind of work needs. The steps around it stay the same. Here, Rosie uses the mobile tire plug-in's booking parts.",
+    "more": [
+     "Its questions: the car, the wheel size and the kind of tire, and where the car is parked.",
+     "Its danger words: a bulge, cords showing, a tire that keeps losing air, or a blowout.",
+     "Its first steps: none. New tires are sized from the car, then from a sidewall photo.",
+     "Who can stand in for whom, and how the visit is checked in: the code at the car.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Mobile Tire asks: what car is it, and are your winter tires already on their own wheels?"
+     ],
+     [
+      "cust",
+      "agent",
+      "A 2019 Subaru Outback. Yes, they're on wheels."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a tire job. Lee Mobile Tire's own road-hazard plan is a free fix after the visit."
+   },
+   {
+    "op": "words",
+    "at": "B4-91",
+    "does": "Say a tire goes flat in the driveway at 6:40pm. The plug-in marks it urgent, and Sam has a tire tech on call tonight. So the AI offers to send someone now, with an arrival estimate.",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "A tire just went flat in my driveway. Can someone come tonight?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Lee Mobile Tire has a tire tech on call tonight. Sent now, they'd arrive in about 60 to 90 minutes. Please don't drive on the flat.",
+      {
+       "buttons": [
+        "Send someone now",
+        "See the soonest times"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-46",
+    "does": "Say a property manager books swaps for 4 cars at one building. It's one booking with one code, given by whoever meets the tire tech.",
+    "more": [
+     "The plug-in sets the group's size limits and its price.",
+     "Each car's notes go to the tire tech, one line each."
+    ],
+    "say": [
+     [
+      "san",
+      "other",
+      "Alex M. added you to a tire visit with Lee Mobile Tire.",
+      {
+       "form": [
+        "Text me about this visit? Yes / No"
+       ],
+       "as": "Jamie"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Where will the car be parked, and is there room to work all around it?"
+     ],
+     [
+      "cust",
+      "agent",
+      "In the driveway. Yes, there's room."
+     ]
+    ],
+    "does": "Alex adds where the car is parked and anything Diego should know. A gate or garage code shows to Diego only on the day of the visit.",
+    "form": [
+     [
+      "Parking",
+      "In the driveway, room all around"
+     ],
+     [
+      "Plate or VIN",
+      "Typed here only, never in a text"
+     ],
+     [
+      "Gate or garage code",
+      "None"
+     ],
+     [
+      "Wheel-lock key",
+      "In the glovebox"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-27",
+    "more": [
+     "Rosie texts the parent only on Alex's word that they agreed to texts.",
+     "At an office, it's the day-of contact, or the car is left with the keys as agreed.",
+     "The plug-in says when nobody needs to be there, like a swap on a car in a lot."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B4-69",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex checks the tire size on the page",
+      "q": "Are new tires being sold?",
+      "does": "New tires must fit. So the secure page asks for a photo of the size printed on one tire's sidewall, before anything is taken.",
+      "more": [
+       "The size was found from the car and the wheel size. The photo confirms it.",
+       "A swap or a flat repair sells no tire, so nothing is asked here."
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "branches": [
+       {
+        "label": "New tires: check the size",
+        "when": {
+         "before": [
+          "deposit"
+         ]
+        },
+        "steps": [
+         {
+          "id": "B4-x02",
+          "type": "split",
+          "line": [
+           "4.7"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Matches the photo to the size",
+          "q": "Does the sidewall match?",
+          "does": "Alex's photo shows 225/65R17, the size found from the car. The booking goes on to the deposit.",
+          "more": [
+           "The photo stays with the booking, on the secure page. It never goes in a text."
+          ],
+          "form": [
+           [
+            "Photo of one tire's sidewall",
+            "Shows 225/65R17"
+           ],
+           [
+            "Size from the car",
+            "225/65R17 on 17-inch wheels"
+           ]
+          ],
+          "needs": [
+           "pf.questions"
+          ],
+          "branches": [
+           {
+            "label": "Yes: 225/65R17",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "Another size",
+            "end": "end",
+            "endText": "Wrong size: nothing taken, and the AI looks again for the right size.",
+            "steps": [
+             {
+              "id": "B4-x03",
+              "line": [
+               "4.7",
+               "4.15"
+              ],
+              "who": "san",
+              "to": "cust",
+              "via": "msg",
+              "title": "Stops: the size doesn't match",
+              "does": "Say the sidewall showed 225/60R18. These tires won't fit, so nothing is held, and the saved time is let go. Alex's AI can look again.",
+              "more": [
+               "Sam isn't asked, since nothing was booked."
+              ],
+              "say": [
+               [
+                "san",
+                "cust",
+                "Your sidewall shows 225/60R18, not 225/65R17, so these tires won't fit. Nothing was taken. Your assistant can look again for 225/60R18."
+               ]
+              ],
+              "tells": [
+               "cust"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No tire sold: nothing to check",
+        "when": {
+         "before": [
+          "none",
+          "card",
+          "full"
+         ]
+        },
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "does": "Sam says yes with one change, like another tire tech or another tire. Rosie reads it back, and nothing goes to Alex until Sam says send it."
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Should I take the hubcaps off first?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Should I take the hubcaps off first?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Diego says no need, and will take care of it."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that a front tire now looks low. Rosie runs the plug-in's danger check again, then offers an earlier time if one is free.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "One of my tires looks low this morning."
+     ],
+     [
+      "san",
+      "cust",
+      "If it keeps losing air, please don't drive on it. Malik can come sooner, at the same price.",
+      {
+       "times": [
+        "Wed Oct 21 · arriving 2–4pm · Malik"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep Thursday"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "Some work needs a written notice before it starts, where the state's rules require it. Rosie sends it on a secure page to read and sign.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Before Diego starts, please read and sign the notice for work sold at your home.",
+      {
+       "card": {
+        "title": "Notice · work sold at home",
+        "lines": [
+         "Where the rules require it",
+         "Read it, then sign on the page"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/n/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-32",
+    "does": "Morgan has a swap plan for two work vans, each spring and fall. Morgan can skip one visit, pause the plan, or end it.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I skip next week's swap?"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. What would you like to do with your plan?",
+      {
+       "buttons": [
+        "Skip this one",
+        "Pause the plan",
+        "End the plan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-09",
+    "does": "Only a teen is home. Diego doesn't start until an adult on the booking is there."
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before any work, Diego photographs the wheels and notes what's already wrong. The photos stay with the job.",
+    "more": [
+     "The plug-in names the checks, like the tread, the wheels and the miles.",
+     "Alex can see them on the secure page.",
+     "A damage claim later is checked against them.",
+     "When nobody is there, these photos are the record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE summer tires at 5/32. Curb scuff on the front right wheel. 61,250 miles.",
+      {
+       "photos": [
+        "Front right wheel, before",
+        "Tread, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s job."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-19",
+    "does": "Most jobs have a price before the visit. A tire job from the list does: only work priced at the visit waits for it."
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "does": "A what-if: a lug nut is seized, so Diego takes it off with a nut splitter and puts on a new one. Any change in price goes to Alex first.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CHANGE seized lug nut, split and replaced, same price"
+     ],
+     [
+      "san",
+      "cust",
+      "One lug nut was seized, so Diego replaced it with a new one. Your price doesn't change."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "does": "Diego needs a valve stem from the shop. Rosie tells Alex in the business's name, inside text hours, with the new finish time.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE getting a valve stem, back 9:30"
+     ],
+     [
+      "san",
+      "cust",
+      "Diego went to get a part and will be back about 9:30am. The job should be done by 10am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-35",
+    "does": "A what-if: Diego scratches a wheel and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DAMAGE scratched the front left wheel",
+      {
+       "photos": [
+        "Front left wheel, scratched"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Diego scratched the front left wheel on Alex M.'s car. The before photo shows no scratch.",
+      {
+       "photos": [
+        "Before",
+        "After"
+       ],
+       "buttons": [
+        "Fix it, no charge",
+        "Take money off",
+        "I'll call Alex"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "does": "A what-if: Diego takes a bent wheel to the shop to straighten it, and puts on the spare meanwhile. Alex signs for what was taken, and the return visit is booked.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "TAKEN bent wheel to the shop, back Mon",
+      {
+       "photos": [
+        "Wheel, as taken"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Diego took your bent wheel to the shop to straighten it. Your spare is on for now. Please check the photo and sign for it.",
+      {
+       "card": {
+        "title": "Taken to the shop · Wheel",
+        "lines": [
+         "Back Mon Oct 26 · arriving 8–10am · Diego"
+        ],
+        "button": "Sign for it",
+        "link": "rosfield.com/s/r4f"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Diego and Alex walk around the car. They check the pressures and the lug nuts, and the summer set goes in the garage. Anything wrong is fixed first.",
+    "more": [
+     "The plug-in names what's checked. Here: every lug nut torqued to spec, and the pressures set.",
+     "After photos are taken from the same angles as the before photos."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 9:05am",
+    "does": "The winter tires are on. Diego texts DONE with the total and its lines, so Rosie can text the bill.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 179 swap"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE summer set stacked in the garage. Lock key in the glovebox. Lug-nut re-check due."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-19",
+    "does": "Before the bill goes out: each branch is one more thing a bill can carry. Each shows only for the money choices that use it."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A tire job is paid in one go, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance or plan pays for a tire job."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for a tire job, so no bill goes to one."
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 11:00am"
+   },
+   {
+    "op": "words",
+    "at": "B10-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry to hear that. What went wrong?"
+     ],
+     [
+      "cust",
+      "san",
+      "Diego was late and rushed."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. rated the visit 2 stars: \"Diego was late and rushed.\"",
+      {
+       "card": {
+        "title": "Rating · 2 of 5",
+        "lines": [
+         "Thu Oct 22 visit with Diego",
+         "Only you see this"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "Extra work sold at the home can be cancelled in the cancel period the state's rules set. Here, that's until 11:59pm Mon Oct 26. The booked work can't."
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "does": "The steering wheel shakes at highway speed a week later. The danger check runs first. It's inside the 30-day re-balance, so Sam OKs a free return visit.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "My steering wheel shakes a bit at highway speed since the swap."
+     ],
+     [
+      "san",
+      "cust",
+      "If a wheel wobbles or feels loose, please don't drive on it. I've asked the shop about a free re-balance."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says the steering wheel shakes at highway speed since Thu's swap. It's inside the 30-day re-balance.",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry about that. Your re-balance is free.",
+      {
+       "times": [
+        "Thu Oct 29 · arriving 8–10am · Diego",
+        "Fri Oct 30 · arriving 8–10am · Diego"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-13",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Diego left my summer tires in the driveway, not the garage."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. isn't happy with the Thu Oct 22 visit: \"Diego left my summer tires in the driveway, not the garage.\"",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call Alex"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Diego to come back in the spring to swap the summer tires back on. Diego texts NEXT. It's past the 60 days Sam books ahead, so Rosie saves it as a reminder.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: swap back, spring"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Mobile Tire books up to 60 days ahead. We'll text you times for your spring swap in early Mar 2027.",
+      {
+       "buttons": [
+        "Sounds good",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Tire work has no report that comes later."
+   },
+   {
+    "op": "words",
+    "at": "B10-35",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Tips for your winter tires: check the pressures once a month as it gets colder. If the steering shakes or a tire looks low, reply here."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-12",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your tire quote is with the owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no license; the owner says when one lapses. Here, Sam says Lee Mobile Tire's registration is lapsed, so its new bookings pause at once.",
+    "more": [
+     "Every 30 days by default, and again before each expiry.",
+     "Expired, suspended or revoked all pause new bookings for that work.",
+     "Rosie's team reviews the bookings already made within 1 business day.",
+     "Customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Mobile Tire's business registration is lapsed.",
+      {
+       "card": {
+        "title": "Lee Mobile Tire · new bookings paused",
+        "lines": [
+         "Bookings already made: Rosie's team reviews them",
+         "Customers aren't told why"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-77",
+    "does": "Sam fills in the second state's form on the portal: any registration for work there, and that state's job rules. Rosie shows it as given and doesn't check it.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Mobile Tire's registration is on file as given.",
+      {
+       "card": {
+        "title": "Second state · now offered",
+        "lines": [
+         "Addresses there, inside your 25 miles",
+         "The state's job rules are on file"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Rosie checks registrations on the state's own lookup. While it's down, no new kind of work goes live until its registration is checked. Work already checked stays bookable.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's lookup is down, so the brake service's registration isn't checked yet. It isn't offered until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Tires are fitted where the car is parked. Nothing is done by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "The van arrives in a 2-hour window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "The van arrives in a 2-hour window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "The van arrives in a 2-hour window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "No form is signed first for tire work."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "Tire jobs need no signed contract: the price is from the list, shown before the yes."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A tire tech never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "The van's plans are paid visit by visit, or on one monthly bill (B9-22), never charged to a saved card."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each van job is rated."
+   },
+   {
+    "op": "more",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per tire, or set by the customer's answers.",
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Extras can be added: a travel fee, an after-hours price, parts at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "New tires have no one price. Each set comes from the tire list for the car's size, installed."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-60",
+    "more": [
+     "Mobile tire service and wheel repair need no state license where Sam works, so Sam gives the registration.",
+     "Where a state's rules require a repair-shop registration, its number is asked here and checked the same way."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-33",
+    "more": [
+     "Mobile tire service stays offline until it matches."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-43",
+    "more": [
+     "If a customer asks for a van visit, Rosie offers a time at the shop instead."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-70",
+    "more": [
+     "The plug-in says what each person needs, like their own license.",
+     "With several kinds of work, each person gets the ones they do.",
+     "A mobile already on the team isn't added twice."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-48",
+    "more": [
+     "Reese can be booked once Reese joins and Sam says yes.",
+     "Tire work needs no license of its own where Sam works, so nothing is checked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-80",
+    "more": [
+     "The tire shop books its 3 bays, not a person: the shop names the tech for each car.",
+     "The van's work and wheel repair book people, so they list no spaces."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-81",
+    "more": [
+     "A bay has its own hours, and can be closed for a day, like a person's time off.",
+     "Bays show on the Team page, next to the people.",
+     "Tire techs still work each bay, but times never name them.",
+     "Rosfield's $2 for a bay counts toward the tech who checks the car in.",
+     "Bay 3 has the alignment rack, so alignments book only there."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-28",
+    "more": [
+     "Tire work licenses nobody where Sam works, so nobody is checked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "At the shop, prices are the same whichever tech does the work.",
+     "A person can have their own price list, their own hourly rate, or a different price for one service."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-30",
+    "more": [
+     "The van takes flats sent now. The shop takes none."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "The general check looks for danger to life, fire, gas, a medical emergency or self-harm.",
+     "A tire plug-in adds its own: a bulge, cords showing, a tire that keeps losing air, or a blowout.",
+     "Answers are checked too, all through the booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-01",
+    "more": [
+     "A seasonal swap happens at the customer's place for Lee Mobile Tire, so nothing is asked.",
+     "A service offered in both places shows each place's price first. The customer picks."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-03",
+    "more": [
+     "Rosie never hands a customer to a business on its own. The AI looks again, ranked fairly.",
+     "The plug-in can name the kind of work to suggest, like auto glass for a windshield."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-77",
+    "more": [
+     "The plug-in names the kinds of place: a home, an office, a parking lot, or where a car is parked.",
+     "Lee Mobile Tire goes 25 miles from 75 Canal St. Alex's home in Springfield is inside it.",
+     "A parked car's spot is shared on the secure page, never through the AI.",
+     "The kind of place decides what's asked later, like who meets the pro there."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "Building rules, like a homeowners' group's rules on car work, go to Sam to check.",
+     "The plug-in adds its own questions, like where the wheel-lock key is."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-17",
+    "more": [
+     "Real danger, like a tire that keeps losing air, gets the don't-drive steps first.",
+     "If anyone is at risk, the text says to call 911.",
+     "An earlier time shows its price first. No reply: the visit stays as booked.",
+     "If Alex picks the earlier time, Diego and Malik are told."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "The plug-in names which notices: a cancel notice for a sale made at home, or a written estimate.",
+     "Not signed by the visit: the visit waits.",
+     "A copy stays with the job for 7 years."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-08",
+    "more": [
+     "A wheel that wobbles gets the don't-drive steps first.",
+     "A free fix adds no new price.",
+     "Rosie never argues and never offers money on its own."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-18",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the customer asks.",
+     "In early Mar 2027, once it's inside the 60 days, Alex gets times to pick, or skips.",
+     "It's booked with the same money rules as any visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S12-19",
+    "more": [
+     "A renewal receipt counts while the lookup catches up."
+    ]
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-80",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-80",
+   "B4-81",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "B8-72"
+  ]
+ },
+ "notes": "Started from auto-repair, not hair. A tire job is car work: the keys and the wheel-lock key at the counter, the car on a lift, extra work found there that needs a yes and a new total, tires ordered from a distributor before the visit, and a car left at the shop that gets READY. What hair adds is kept too: the shop's 3 bays book by time (S2-25, S2-26, A4-66 'A space'), and the customer may wait about an hour or leave the car (A8-53 keeps both branches).\nTwo companies: Lee's Tire Shop (flow A, 60 Depot St) and Lee Mobile Tire (the van, flow B, 75 Canal St). Sign-up's kinds of work: the barbershop became the tire shop, plumbing became mobile tire service, electrical became wheel repair (Lee Plumbing and Lee Electric became Lee Tire Van and Lee Wheel Repair). The same pairs run in both flows.\nLicenses: selling and fitting tires needs no state license, so sign-up asks for the business registration only. A repair-shop registration (for alignments and repairs) or a scrap-tire hauler registration is asked only where the state's form requires it (pf.license). S1-60, S1-63 and S2-28's license branches are off; S11-50 renews the van's insurance instead.\nPeople: the master's Riley and Avery became Leo and Grace (the shop's techs), Jordan and Casey became Diego and Malik (the van). Jamie, Kai and Rosa are already other people in the master, so no tech uses those names. Alex lives at 58 Cedar Ave (the pilot's 17 Birch Ln is a leftover word).\nPrices are the example shop's own, not a standard: flat repair $35, rotation $40, valve stem $20, TPMS reset $25, seasonal swap $55, mount and balance $140, alignment $110, a TPMS sensor $65 (found on the lift), road-hazard protection $18 a tire, new tires from the tire list (4 AltiMAX 225/65R17: $796 installed). The van: seasonal swap $179, flat repair $150, the $89 trip fee held, the same 4 tires $885 with the trip.\nFlow A's money paths: list|deposit|counter is the main story (4 tires ordered in, a $100 deposit held while Sam OKs the order and taken once he orders, $868 with road hazard, the $768 rest at the counter). list|none|counter is a $35 flat repair or tires on the rack, nothing taken. The two after:bill paths are a car left at the shop, with the bill texted with READY. No visit price, saved card or full prepay: a tire shop prices from its board or the tire list and is paid at the counter.\nFlow B's money paths: list|hold|bill is the master's own (a $179 seasonal swap in Alex's driveway, the $89 trip fee held, the bill after DONE), and list|deposit|bill is 4 tires ordered in and fitted at home ($885, $100 deposit, the $785 rest on the bill). The master's sign-up example of a card saved for a fee is not a path here.\nThe only fee: $50 of the $100 deposit to restock ordered tires, after free cancel ends, at a no-show, or when the wheel-lock key is missing. Sam confirms each one; he's reminded once, and no answer 24 hours after the ask means a full refund. With nothing taken, there's no cancel or no-show fee.\nSign-up (S1-41 to S1-47) is rewritten to how tire work is really priced and paid: a photo of the price board, new tires from the tire list by size, nothing taken except the deposit for tires ordered in, paid at the counter, no tip line, and Sam's OK on every tire order.\nOrdered tires: times start after the distributor's promised arrival (the example: next weekday by 10am if ordered by 3pm). Sam OKs each order first (A6-02, B6-04) while the deposit is held, and the tech texts IN when they come (A7-01). Ending Sam's wait at the supplier's cutoff and showing the arrival on the booking are gaps.\nOwn steps: A4-x01 to A4-x03 and B4-x01 to B4-x03 check the size on the sidewall photo before money is taken. Only paths that order tires (before:deposit) show it; the other paths pass 'No tire sold: nothing to check'. A10-x01 books the free lug-nut re-check about 50 miles later (Tue Oct 27, 8:00am, Bay 1). The van's receipt (B10-01) points to the same re-check, at the shop.\nA danger check: pf.safety's stop words (a blowout, a crash, a car stopped in traffic) end with 911 words and no booking; the don't-drive words (a bulge, cords showing, a flat) go on to the soonest time. The main stories open with neither.\nPlug-in splits kept with both branches: S2-25 (the shop books bays, the van books people), A8-02 (a missing wheel-lock key stops the work), A8-53 (wait at the shop, or leave the car), B4-81 with B7-55 and B8-58 (a flat at a home may be sent now; ordered tires never are), B8-69 and B8-70 (a swap on a parked car can be done with nobody home; other jobs need someone), B8-72 (a bent wheel may go to Lee Wheel Repair).\nOff in flow A: walk-ins by seat, table or 'no walk-ins' (A3-32), video (A4-01), a person's time, a seat, a drop-off slot and a stay (A4-66: the shop books a bay's time), asking for a tech by name (A4-15), first steps and forms (A4-43, A7-02), plans, packages, insurance and series (A4-28, A4-54, A5-01, A7-02, A9-15), a held item (A5-24), crew, fixed dates and minimums (A7-62, A7-63, A7-67, A7-70), a child left (A8-67), rented items and results later (A10-06), named-only work (A10-34, S11-87, S11-90).\nOff in flow B: video (B4-01), start times, stays, seats and no person (B4-83: the van comes in a 2-hour window), first steps and forms (B4-38, B4-43, B7-05), plans, warranties and series that pay (B4-43, B4-63, B7-05), contracts and own-or-rent (B4-57, B4-78), a damage hold (B5-26), fixed dates, crews and group minimums (B7-56, B7-64), the landlord (B8-22, B9-06), an outside check (B8-65), a child in the pro's care (B8-67), delivered items (B8-71), tips, stages and insurance (B9-19), reports, rented fans and permits (B10-07).\nA seasonal swap plan stays in flow B (B7-32, B7-51, B9-22, B10-31): fleets and some homes book a swap each spring and fall. Flow A has no repeat plans; road-hazard protection is sold per tire with the tires and claimed as a free fix (A10-08).\nKeep words: 'tire rotation', 'trip fee' and 'valve' are the pilot's words, but they are real tire terms and stay.\nClocks: every listed path runs forward from section 3 to section 10. The only times that go back are the master's own restarts in the shared sections (S2-01 'Back to Monday', S11-01, S12-01, S11-54's 'from Mon Nov 2'), left for the master's phase 3. B9-22's what-if has no time, so the bill path stays in order; A8-54 has no time on the car-left paths.\nThe old flowchart (Merrimack Tire Co., NH) is all at the shop, so flow B comes from the plug-in and the master. Its outside software (Shopmonkey, a size lookup) and other states' laws (CA, CT) are OUTDATED in the coverage file; each state's rule is a pf.rules switch from its form.\nWhat-ifs in sections 11 and 12 use their own customers: a $904 special-order quote (Nia K.) and Ben T.'s missed visit at the shop; Morgan P.'s $1,040 truck tires and Lin W.'s missed visit for the van. Each keeps the $100 deposit and the $50 restocking rule.\nB9-23's parts what-if adds $16 of lug nuts, not valve stems, since new tires' installed price already has a valve kit.\nReview (Oct 23): fixed A8-33's bill-path total ($933), A7-31's title, the bay times in S11-03, S11-05, S11-14 and Ben's 11:00 (S11-23 to S11-35), B's S11-41, B4-34's screen, B6-11, B7-34 (Morgan's tires on the swap path), B10-16, B10-18's date, S12-26's customers, the own steps' words; B7-05 'A plan charge is next' is off; the plug-in now has the 30-day re-balance, the fleet lot visit and the van's trip fee.\nOct 27 refit: kept 'leak' (S12-29 / S13-xx: a privacy leak) and 'color' (S13-40: race, color, religion or sex; the paint color of a car elsewhere).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "house calls",
+    "house call",
+    "House calls",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Kids cut",
+    "kids cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Ben T. books a skin fade",
+    "skin fades",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "like a haircut at the shop or at home",
+    "rents a chair",
+    "Lee Home Services'",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "What happens at the chair?",
+    "Takes the price from the shop's board",
+    "A haircut could mean a salon or a barbershop.",
+    "I'd like a cut on Saturday",
+    "Alex adds a beard trim",
+    "Quiero un corte el sábado.",
+    "Books the groom's party together",
+    "Books a haircut and a beard trim",
+    "step-free door on Elm St",
+    "Step-free door on Elm St · parking in the back",
+    "11:00am with Riley",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "at the chair",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Lee's Barbershop LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "88 Elm St",
+    "1200 Main St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershop's",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical"
+   ],
+   "B": [
+    "like 'Is the sink still full of water?'",
+    "house calls",
+    "House calls",
+    "Kitchen drain clearing",
+    "Overflowing kitchen drain",
+    "Like tapping a neighbor's water line without asking.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Every plumbing service",
+    "Leak repair",
+    "Water heater replacement",
+    "Sewer camera inspection · $199",
+    "like a haircut at the shop or at home.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "would like to talk about the water heater quote before booking.",
+    "Work like towing or a lockout is sent now (B4-16)",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "Water heater fix",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today,",
+    "Accepted: the leak repair today,",
+    "Replace both shutoff valves · $160",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "A haircut could mean a salon or a barbershop.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The $179 drain needs none.",
+    "Kitchen drain",
+    "Yard drain",
+    "kitchen drain",
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Jordan lets himself in the agreed way, with no check-in code.",
+    "rents a chair",
+    "Lee Home Services'",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "Water heater flush",
+    "water heater flush",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call fee",
+    "service call fee",
+    "the $89 service call",
+    "The $89 service call",
+    "service call",
+    "Service call",
+    "at the door",
+    "plumbing visit",
+    "he's the one who replaces water heaters",
+    "Lee Home Services LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "88 Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershop's",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "41b86c1e72",
+   "S1-33": "eeaadba298",
+   "S1-35": "39adfc0799",
+   "S1-38": "b50b0bd4e8",
+   "S1-43": "e16d5048f3",
+   "S1-61": "7421d186d5",
+   "S1-50": "3167049ceb",
+   "S1-70": "3961b1f903",
+   "S2-02": "b2094081ee",
+   "S11-48": "03f824b27b",
+   "S1-80": "1d7be919fe",
+   "S1-81": "c286d15ba2",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-15": "4a64408afc",
+   "S2-27": "8b55fcf700",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S11-66": "0cbb81421b",
+   "A4-11": "2983f72b69",
+   "S11-19": "65910a6777",
+   "S11-20": "fc11b36970",
+   "S11-50": "c4536a448c",
+   "S12-01": "ba13bd1023",
+   "S12-19": "07db0515b2",
+   "A3-05": "ec1662d32f",
+   "A3-19": "85065db5d4",
+   "A3-13": "1717178183",
+   "A3-31": "1e97c77c46",
+   "A3-20": "b8251d2535",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A3-26": "9e3630dc0b",
+   "A4-50": "6f43775326",
+   "A4-85": "f164e7b264",
+   "A4-15": "db5792db95",
+   "A4-18": "2626f9aa17",
+   "A4-19": "75ef5c2fd9",
+   "A4-60": "7f7f0f1e66",
+   "A4-21": "5929c47e48",
+   "A4-65": "fa7ec0389d",
+   "A4-80": "624ec2e303",
+   "A4-25": "e9a8fd4868",
+   "A4-26": "add3e44476",
+   "A4-55": "c4555e49e7",
+   "A4-83": "1650b2dafd",
+   "A4-43": "c17d56f766",
+   "A6-04": "fe10e3d360",
+   "A7-12": "05f64179a4",
+   "A7-14": "6a57738a17",
+   "A7-70": "da4cede3e2",
+   "A8-07": "f5c27acdfa",
+   "A8-47": "7fc94278bf",
+   "A8-23": "e3a35f7f9e",
+   "A8-37": "0a30466995",
+   "A8-39": "c64da36bdb",
+   "A8-67": "e9fd748fc5",
+   "A8-43": "7b0f73c701",
+   "A8-53": "33f4da69f5",
+   "A8-11": "d5522790d9",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-02": "c9223be948",
+   "A10-05": "63c3536c7a",
+   "A10-26": "2a3edf9a4c",
+   "A10-33": "9db84a576a",
+   "A10-14": "b60c13af2d",
+   "A10-20": "f082cec9f8",
+   "A10-42": "4f28189298",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-28": "c8e677520c",
+   "A10-45": "855be6050a",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A7-13": "e41528a397",
+   "A8-35": "a67e890a5b",
+   "A3-22": "0057d8fc9f"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "0bea92643b",
+   "S1-33": "2b5d1fa4ab",
+   "S1-35": "1b680a4c71",
+   "S1-38": "6301c86637",
+   "S1-43": "dd3ae2a1a9",
+   "S1-50": "daa9091585",
+   "S1-70": "34e952eac5",
+   "S2-02": "b2094081ee",
+   "S11-48": "6fd1c7b7b9",
+   "S1-80": "1d7be919fe",
+   "S1-81": "c286d15ba2",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-15": "4a64408afc",
+   "S2-27": "8b55fcf700",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "S11-66": "e19a8ed665",
+   "B3-01": "06b59bb8f3",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-25": "4413e58bcb",
+   "B3-22": "19f64ba1ba",
+   "B3-04": "31447caa31",
+   "B3-19": "2f53161fb2",
+   "B3-21": "ad48326ac5",
+   "B4-03": "1126d68737",
+   "B4-04": "df3ea4b2f5",
+   "B4-05": "fb3a9061c8",
+   "B4-43": "fc9855955a",
+   "B4-91": "eb948968a8",
+   "B4-46": "cac59291a3",
+   "B4-34": "74ff52d83d",
+   "B4-27": "4b45128d2c",
+   "B4-69": "350fbaf90a",
+   "B6-06": "1d676278da",
+   "B7-16": "3177c3701b",
+   "B7-17": "ac1fd212f3",
+   "B7-61": "342b55fd9b",
+   "B7-32": "0ca33c9fa6",
+   "B8-09": "8fdb7abf3f",
+   "B8-18": "530038d2b8",
+   "B8-19": "11e79a26d8",
+   "B8-23": "dd780a2ec8",
+   "B8-32": "1cfd4f7afa",
+   "B8-35": "93207824c7",
+   "B8-37": "3ce85cf051",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-02": "eaf53a5e74",
+   "B10-04": "b25044fa47",
+   "B10-05": "a326ea3c0b",
+   "B10-08": "01bac94fd8",
+   "B10-13": "584c827fda",
+   "B10-18": "3d7ba16539",
+   "B10-38": "867fe1ab7c",
+   "B10-35": "5ed99b23b3",
+   "B4-12": "e6d956ac70",
+   "S11-50": "b9d718f51a",
+   "S11-77": "b61a23f148",
+   "S12-19": "176d3d2beb",
+   "B4-01": "15f683e6cb",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B8-67": "b66ffbd04d",
+   "B7-91": "7132851ec1",
+   "B10-32": "7713bff255",
+   "B3-17": "3eb7d7f259",
+   "B4-77": "67ff953065"
+  }
+ }
+}

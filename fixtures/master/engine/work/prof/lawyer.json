@@ -1,0 +1,2859 @@
+{
+ "id": "lawyer",
+ "name": "Lawyer",
+ "style": "Consult",
+ "pattern": "consult",
+ "plugin": {
+  "pf.license": {
+   "need": "Always: each lawyer's own license to practice, active and in good standing, in the state of the customer's matter. The firm: a registration where the state's rules require one. Each notary: their own commission.",
+   "ask": "Each lawyer's bar number at sign-up or in their invite reply. The firm's registration where the state form asks. Each notary's commission number and end date.",
+   "who holds it": "Each lawyer; the firm where the state's rules require it; each notary.",
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "Checked on each renewal date from the state form; a lapsed license pauses that lawyer's bookings, and Sam is told.",
+   "insurance": "Malpractice insurance on file, or shown to customers, where the state's rules require it; the amount comes from the state form.",
+   "background check": "None beyond the license check."
+  },
+  "pf.services": {
+   "pattern": "Consult: a meeting with a licensed lawyer. In the office, or by video or phone (flow A). At the customer's home, a hospital or a care home (flow B). Every new matter waits for the firm's conflict check before it books.",
+   "at the business (the example firm's own prices)": [
+    {
+     "name": "Consult",
+     "length": "30 minutes",
+     "price": "$35",
+     "where": "the office, or by video or phone",
+     "before": "nothing taken",
+     "after": "paid at the front desk; video or phone: Rosie texts the bill, or the saved card is charged at DONE"
+    },
+    {
+     "name": "Follow-up consult (same matter)",
+     "length": "30 minutes",
+     "price": "$40",
+     "before": "nothing taken",
+     "after": "paid at the front desk",
+     "note": "the conflict check carries over"
+    },
+    {
+     "name": "Full consult",
+     "length": "60 minutes",
+     "price": "$55",
+     "before": "nothing taken",
+     "after": "paid at the front desk"
+    },
+    {
+     "name": "Teen consult (13 to 17)",
+     "length": "30 minutes",
+     "price": "$25",
+     "who books": "a parent"
+    },
+    {
+     "name": "Document review, added at a consult",
+     "price": "$20",
+     "rule": "priced and OK'd before it's done"
+    },
+    {
+     "name": "Will planning session",
+     "length": "2½ hours",
+     "price": "$140",
+     "before": "nothing taken, a card saved, or the $40 missed-session fee held (it runs over 2 hours), for a fee the firm sets",
+     "after": "paid at the front desk"
+    },
+    {
+     "name": "Contract review",
+     "price": "$90 from the list",
+     "rule": "no papers or photos before the conflict check clears"
+    },
+    {
+     "name": "Case review",
+     "price": "quoted at the consult; only the $25 consult fee is promised"
+    },
+    {
+     "name": "Free first consult (some firms)",
+     "price": "free",
+     "before": "nothing",
+     "after": "nothing"
+    }
+   ],
+   "at the customer's place (the example firm's own prices)": [
+    {
+     "name": "Home will signing",
+     "length": "about 1 hour",
+     "price": "$179",
+     "before": "the $89 travel fee held",
+     "after": "Rosie texts the bill, or the firm bills its own way",
+     "needs": "the lawyer, two witnesses, and a notary where the state's rules require one"
+    },
+    {
+     "name": "Hospital or care home signing",
+     "price": "$179",
+     "before": "the $89 travel fee held, or a card saved",
+     "after": "the saved card charged at DONE, or the bill",
+     "rule": "inside the place's visiting hours and rules"
+    },
+    {
+     "name": "Power of attorney signing",
+     "price": "$150",
+     "before": "nothing, or the travel fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Living trust",
+     "price": "$640, set in the firm's engagement letter",
+     "after": "billed the firm's own way"
+    },
+    {
+     "name": "Paperwork review at home",
+     "price": "quoted at the visit; only the $89 travel fee is promised"
+    }
+   ],
+   "the case itself": "Never booked or priced in Rosie. Hourly rates, flat fees and retainers go in the firm's own engagement letter.",
+   "travel area": "The firm's setting (the example: 25 miles).",
+   "capacity": "One lawyer per booking. A signing also needs two witnesses from the firm's staff, and a notary where the state's rules require one.",
+   "online": "Video and phone consults count as at the office, only with a lawyer licensed in the state the customer is in that day. Signing or notarizing by video only where the state's rules allow it.",
+   "booking window": "Up to 3 weeks ahead; no same-day consults unless the firm allows them (the firm's settings).",
+   "blocked times": "Court days and hearings block consult times, from the lawyer's calendar or a BLOCK text."
+  },
+  "pf.questions": {
+   "before times": [
+    "Which lawyer or firm? The customer or their AI names one. Rosie never searches or suggests.",
+    "What kind of matter: family, a will or trust, a contract, papers you were served, or something else. Only the kind, no details.",
+    "In the office, by video or by phone? For video or phone: which state will you be in?",
+    "A visit at your place: a home, a hospital or a care home?"
+   ],
+   "after a time is picked": [
+    "Anything that helps the visit, like an interpreter or a step-free way in. No case details.",
+    "For a signing: is the draft the firm sent ready, and can you meet the lawyer alone?"
+   ],
+   "only on the secure page": [
+    "Full name, and any other names used",
+    "Names only of the other people in the matter, like a spouse, the other side, or family (for the conflict check)",
+    "Is it safe to text and email you? If not, how should the firm reach you?",
+    "18 or older",
+    "A tick: Rosie isn't a law firm, and the lawyer isn't yours until they agree in writing",
+    "A tick: the consult fee, and how it's paid",
+    "Only after the check clears: questions for the lawyer (optional)"
+   ],
+   "who may book": "An adult books for themselves. Another adult may book for a parent or a spouse, but the person the matter is about gives their own names and yes on the secure page, and meets the lawyer alone. A teen's consult: a parent books."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "someone is hurting or threatening the customer right now",
+    "a medical emergency",
+    "crisis words (the 988 line first)"
+   ],
+   "words that go on with safety steps": [
+    "abuse, or fear of a partner, a family member or a caregiver",
+    "being pushed to sign or change a will"
+   ],
+   "what Rosie says": {
+    "in danger right now": "Call 911 now. Nothing is booked.",
+    "abuse or fear": "If you're in danger, call 911. The National Domestic Violence Hotline is 1-800-799-7233, any time. The booking goes on, and Rosie asks how it's safe to reach the customer.",
+    "pushed to sign": "The lawyer meets you alone first. The booking goes on."
+   },
+   "legal questions": "Never answered: they wait for the lawyer at the consult. In danger, 911 comes first."
+  },
+  "pf.first_steps": {
+   "required": [
+    "The conflict check, before every new matter books: Priya, the paralegal, or the lawyer named checks the names on the secure page against the firm's records (clients, past would-be clients and other sides), and replies Clear, Conflict or Need more.",
+    "The time stays saved for the check, up to 1 business day (the firm's setting). No answer by then: the request ends, and nothing is owed.",
+    "A moved booking, or a follow-up on the same matter, keeps its check: same people, same matter.",
+    "A home or hospital signing: the papers are drafted first, after a consult, and two witnesses and any notary are booked with the lawyer."
+   ],
+   "prep for the reminder": [
+    "Bring any court papers you got, and a short list of questions.",
+    "A signing: have a photo ID and the draft the firm sent, and be ready to meet the lawyer alone."
+   ]
+  },
+  "pf.visit": {
+   "check-in": "At the office: the code at the front desk. Video or phone: the lawyer asks for the code at the start. At a home or hospital: the code at the door, then the lawyer checks the signer's photo ID.",
+   "at check-in": "The customer signs the firm's own consult form: what they say is private, and the lawyer isn't theirs until they agree in writing.",
+   "work changes": "Extra time or a document review is priced before it's done. A second consult is its own visit. The case itself is never booked in Rosie.",
+   "a conflict found at the consult": "The lawyer stops, charges nothing, and adds the name to the firm's conflict records. The customer is told they need another lawyer, with no name suggested.",
+   "a signing": "The lawyer meets the signer alone first, and checks they understand and want it. If someone presses them, that part stops and the lawyer sets another time to meet alone.",
+   "what proves it's done": "The code, or DONE. A signing's DONE comes once every page is signed, witnessed and notarized.",
+   "after the consult": "The firm decides, from its own tools: an engagement letter, nothing while the customer thinks it over, or a letter saying it won't take the case.",
+   "originals": "A signed original will can stay in the firm's safe; the customer gets copies."
+  },
+  "pf.money": {
+   "before": "Nothing taken is the starting answer. A card saved only for a missed-consult fee the firm sets. Home and hospital visits: the $89 travel fee held, or a card saved.",
+   "never before": "No deposit and no full price through Rosie. Money paid before the work is an advance fee, which belongs in the firm's trust account, and Rosie never touches trust money.",
+   "after": "At the office: paid at the front desk, the firm's own way. Video or phone: Rosie texts the bill, or charges the saved card at DONE. Visits: Rosie texts the bill, charges the saved card, or the firm bills its own way.",
+   "retainers": "Only through the firm's own trust account tools, never through Rosie. Card fees never come out of trust.",
+   "fees": "Missed-consult or late-cancel fee: none by default. A firm may set one; it's shown before booking, and Sam confirms each.",
+   "free consults": "A free first consult takes nothing before and nothing after.",
+   "tips": "None.",
+   "tax": "None by default; where the state's rules tax legal services, the rate comes from the state form.",
+   "deposit cap": "Not used: no deposits through Rosie.",
+   "rosfield": "the $2 per booking applies to law work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes, not a share of what the firm charges; a booking the firm puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe. A lawyer reviews the fee terms before launch"
+  },
+  "pf.messages": {
+   "never in a text": [
+    "what the matter is about, beyond the kind picked",
+    "the other people's names",
+    "why a conflict check didn't clear",
+    "any legal advice"
+   ],
+   "safe to text": "If the customer says texts or email aren't safe, Rosie uses only the way they pick: the secure page, an email, or a call from the firm. Any text then names only the firm's plain name and the time.",
+   "a conflict": "Never explained. No other lawyer is suggested, and Rosie never contacts the other side.",
+   "no nudges": "No follow-up texts about hiring the lawyer.",
+   "case notes": "The lawyer's notes go in the firm's own file, never in Rosie. Rosie keeps only the time, the kind of matter and the outcome.",
+   "languages": "English and Spanish.",
+   "minors": "A parent books a teen's consult, and the texts go to the parent."
+  },
+  "pf.staff": {
+   "licenses": "Each lawyer's active license in each state they take matters in. A video or phone consult is offered only with a lawyer licensed in the state the customer is in that day.",
+   "skills": [
+    "Family law",
+    "Wills, trusts and estates",
+    "Contracts",
+    "Notary work: a notary's own commission"
+   ],
+   "supervision": "A paralegal or office manager may run the desk and the conflict check, but never gives legal advice and never holds a consult.",
+   "witnesses": "Adults on the firm's staff who aren't named in the papers.",
+   "who OKs what": "The conflict check: Priya, the paralegal, or the lawyer named. Sam OKs prices made for one customer. Sam's answer wins.",
+   "stand-ins": "Only another lawyer at the same firm, offered by the firm and picked by the customer by name. Rosie never suggests one."
+  },
+  "pf.rules": {
+   "named only": "Rosie's rule for lawyers: it books only a lawyer or firm the customer names. It never suggests, matches, ranks or rates lawyers, and sends no rating request.",
+   "notice at booking": "Rosie isn't a law firm and gives no legal advice. The lawyer isn't yours until they agree in writing. Before the check, share only names and the kind of matter.",
+   "written fee agreement": "The engagement letter, from the firm's own tools, in writing where the state's rules require it.",
+   "listing facts": "Any fact the state's rules require on a lawyer's listing, like an office address or a responsible lawyer's name, from the state form.",
+   "before launch": "A state on the before-launch list goes live only after counsel's written OK.",
+   "agreement": "The firm signs a confidentiality agreement before going live: Rosie keeps client details private and uses them only for booking.",
+   "records": "Booking records 7 years. Case files stay in the firm's own system, never in Rosie.",
+   "right to cancel": "Legal work sold at the home comes with a written right to cancel, where the state's rules require it.",
+   "remote signing": "Signing or notarizing by video only where the state's rules allow it.",
+   "status": "Draft: finalized once the state forms are filled in."
+  },
+  "pf.edges": {
+   "matter most": {
+    "no lawyer named": "No search. Rosie books only a lawyer or firm the customer names.",
+    "a conflict": "Told without the reason; nothing owed; no other lawyer suggested.",
+    "need more for the check": "One question on the secure page, with a deadline; no answer by then: the request ends, nothing owed.",
+    "a conflict found at the consult": "The lawyer stops; nothing is charged.",
+    "a case question by text or chat": "Never answered; it waits for the lawyer.",
+    "texts aren't safe": "Only the way the customer picks; plain texts with no matter.",
+    "a family member books for a parent": "The parent gives their own yes and meets the lawyer alone.",
+    "a video consult from another state": "Only a lawyer licensed there.",
+    "the lawyer is called to court": "New times with the same lawyer, or a free cancel; the check carries over.",
+    "a no-show": "No fee, unless the firm set one and the customer agreed to it.",
+    "thinking it over": "No follow-up nudges.",
+    "a hospital's rules": "The visit fits the visiting hours; a ward that says no moves it, with no fee."
+   },
+   "the rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "forms",
+   "firststeps",
+   "video"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "It takes no cut of card payments",
+    "It keeps none of card payments"
+   ],
+   [
+    "Rosie's price, Stripe and the terms come once, just before the first kind of work goes live.",
+    "Stripe and the terms come once, just before the first kind of work goes live."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una consulta el sábado."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The letter from Saturday has my name spelled wrong."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do teen consults? My son is 15."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a teen consult (13 to 17) is $25."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Mediation for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds mediation to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW mediation"
+   ],
+   [
+    "Health details stay on the secure page, never in a text.",
+    "Private details stay on the secure page, never in a text."
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither firm takes jobs sent now: law work is booked ahead."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video consult"
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "Here: the conflict form, for every new matter."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "Law work is named only, so the office takes the second branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a consult leads to more consults, like Riley's color plan."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your office, paid at the front desk, your own way"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the front desk"
+   ],
+   [
+    "pays at the chair",
+    "pays at the front desk"
+   ],
+   [
+    "code at the chair",
+    "code at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the consult"
+   ],
+   [
+    "At the chair",
+    "At the consult"
+   ],
+   [
+    "the chair",
+    "the front desk"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Law PLLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Law"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Estate Law"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Wills"
+   ],
+   [
+    "Lee Electric",
+    "Lee Notary"
+   ],
+   [
+    "88 Elm St",
+    "310 Court St"
+   ],
+   [
+    "Elm St",
+    "Court St"
+   ],
+   [
+    "1200 Main St",
+    "600 Main St"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "electrical jobs",
+    "notary jobs"
+   ],
+   [
+    "electrical license",
+    "notary license"
+   ],
+   [
+    "Electrical",
+    "Notary work"
+   ],
+   [
+    "electrical",
+    "notary work"
+   ],
+   [
+    "plumbing jobs",
+    "estate planning jobs"
+   ],
+   [
+    "plumber",
+    "lawyer"
+   ],
+   [
+    "Plumber",
+    "Lawyer"
+   ],
+   [
+    "plumbing",
+    "estate planning"
+   ],
+   [
+    "Plumbing",
+    "Estate planning"
+   ],
+   [
+    "barbershops",
+    "law offices"
+   ],
+   [
+    "barbershop",
+    "law office"
+   ],
+   [
+    "Barbershop",
+    "Law office"
+   ],
+   [
+    "barbers",
+    "lawyers"
+   ],
+   [
+    "barber",
+    "lawyer"
+   ],
+   [
+    "Barber",
+    "Lawyer"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Full consult"
+   ],
+   [
+    "Signature cut and shave",
+    "Full consult"
+   ],
+   [
+    "signature cut",
+    "full consult"
+   ],
+   [
+    "Groom's package",
+    "Planning Session"
+   ],
+   [
+    "Color and cut",
+    "Contract review"
+   ],
+   [
+    "color and cut",
+    "contract review"
+   ],
+   [
+    "Color correction",
+    "Case review"
+   ],
+   [
+    "color correction",
+    "case review"
+   ],
+   [
+    "Skin fade",
+    "Follow-up consult"
+   ],
+   [
+    "skin fade",
+    "follow-up consult"
+   ],
+   [
+    "Beard trim",
+    "Document review"
+   ],
+   [
+    "beard trim",
+    "document review"
+   ],
+   [
+    "Kids cut",
+    "Teen consult"
+   ],
+   [
+    "kids cut",
+    "teen consult"
+   ],
+   [
+    "Haircuts",
+    "Consults"
+   ],
+   [
+    "haircuts",
+    "consults"
+   ],
+   [
+    "Haircut",
+    "Consult"
+   ],
+   [
+    "haircut",
+    "consult"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "patch test",
+    "intake call"
+   ],
+   [
+    "Drain clearing",
+    "Will signing"
+   ],
+   [
+    "Water heater flush",
+    "Power of attorney"
+   ],
+   [
+    "water heaters",
+    "living trusts"
+   ],
+   [
+    "water heater",
+    "living trust"
+   ],
+   [
+    "Color quotes",
+    "Contract quotes"
+   ],
+   [
+    "color quote",
+    "contract quote"
+   ],
+   [
+    "Color",
+    "Contract work"
+   ],
+   [
+    "color",
+    "contract work"
+   ],
+   [
+    "cut hair",
+    "meet clients"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "Riley",
+    "Ethan"
+   ],
+   [
+    "Avery",
+    "Grace"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey",
+    "Lucia"
+   ],
+   [
+    "Book me a consult at Lee Law on Saturday.",
+    "Book me a consult with Ethan Chen at Lee Law on Saturday."
+   ],
+   [
+    "A consult could mean a salon or a law office.",
+    "A consult could mean a lawyer or a tax preparer."
+   ],
+   [
+    "Lee Law prices a case review at the consult, once Ethan sees the hair.",
+    "Lee Law prices a case review at the consult, once Ethan sees the papers."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's consults together"
+   ],
+   [
+    "A groom books consults for himself and four friends on one morning. Rosie finds chairs side by side across Ethan and Grace.",
+    "Three siblings book consults about their parent's will on one morning. Rosie finds back-to-back times across Ethan and Grace."
+   ],
+   [
+    "A law office takes no drop-offs. A repair office, a tailor or a groomer does.",
+    "A law office takes no drop-offs. A repair shop, a tailor or a groomer does."
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free fix to a typo in a letter."
+   ],
+   [
+    "A law office's plug-in adds no danger words of its own.",
+    "Each plug-in can add danger words of its own."
+   ],
+   [
+    "If the plug-in asks for something to bring, the desk checks it first. A consult needs nothing.",
+    "If the plug-in asks for something to bring, the desk checks it first. A consult asks only for any papers Alex was given."
+   ],
+   [
+    "Ethan finishes the work",
+    "Ethan finishes the consult"
+   ],
+   [
+    "Drains have a set price.",
+    "Will signings have a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Paperwork reviews are priced at the visit."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone in danger right now stops the booking."
+   ],
+   [
+    "Consult, fade and document review at the office.",
+    "Consults and document reviews at the office."
+   ],
+   [
+    "Panel upgrade",
+    "Business papers notarized"
+   ],
+   [
+    "Why: many lawyers, salons and groomers are licensed to their office.",
+    "Why: some kinds of work, like salons and groomers, are licensed to one place."
+   ],
+   [
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "E nothing before. A at their home too, 75, paid after the visit"
+   ],
+   [
+    "a intake call",
+    "an intake call"
+   ],
+   [
+    "Lee Estate Law'",
+    "Lee Estate Law's"
+   ],
+   [
+    "photos of your hair",
+    "a short note on your matter"
+   ],
+   [
+    "15 gloss",
+    "15 follow-up letter"
+   ],
+   [
+    "gloss $15",
+    "follow-up letter $15"
+   ],
+   [
+    "Gloss to finish",
+    "Follow-up letter"
+   ],
+   [
+    "No gloss today",
+    "No letter today"
+   ],
+   [
+    "A neighborhood law office on Court St. Classic consults, fades and hot towel shaves.",
+    "A neighborhood law office on Court St. Wills, trusts and consults."
+   ],
+   [
+    "The chairs",
+    "The waiting room"
+   ],
+   [
+    "A chair, ready",
+    "A meeting room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a lawyer who rents an office here,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents an office here, with their own clients."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "A lawyer's example: water near outlets gets 'shut off the main valve'.",
+    "A lawyer's example: fear of someone at home gets the hotline first."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the office's list.",
+    "Alex asks for a tax return, which isn't on the office's list."
+   ],
+   [
+    "Lee Law doesn't do perms.",
+    "Lee Law doesn't do tax returns."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free entrance:"
+   ],
+   [
+    "You told us the teen consult is for your son, and that you're his parent. His details go on the secure page.",
+    "You told us the teen consult is for your child, and that you're their parent. Their details go on the secure page."
+   ],
+   [
+    "like 'How would you like it on top?'",
+    "like 'Do you need an interpreter?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Do you need an interpreter? (optional)"
+   ],
+   [
+    "Could Ethan use a toner instead of the gloss?",
+    "Could Ethan also look at my lease?"
+   ],
+   [
+    "A.M. asks for a toner instead of the gloss. What's the new price?",
+    "A.M. asks to add a second question. What's the new price?"
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: prefers a video consult next time"
+   ],
+   [
+    "A chair renter asked for by name:",
+    "An office renter asked for by name:"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A chair in the waiting room ripped my coat."
+   ],
+   [
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "A.M. says a waiting room chair ripped a coat today."
+   ],
+   [
+    "May the office show a short note on your matter? Yes / No",
+    "May the office leave a voicemail? Yes / No"
+   ]
+  ],
+  "B": [
+   [
+    "It takes no cut of card payments",
+    "It keeps none of card payments"
+   ],
+   [
+    "Rosie's price, Stripe and the terms come once, just before the first kind of work goes live.",
+    "Stripe and the terms come once, just before the first kind of work goes live."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Elder law for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds elder law to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW elder law"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a will review every year."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly will review plan"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say a care home's manager books will signings for 4 residents at one address. It's one booking with one code, given by whoever lets the lawyer in."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each resident's notes go to the lawyer, one line each. Each one meets the lawyer alone."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan slips on the front steps and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped on the steps, need to stop"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no photo ID for the signing"
+   ],
+   [
+    "Video and Jordan's notes",
+    "The county's copy and Jordan's notes"
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Marcus does the review today, $165. The $80 new deed stays good until Thu Oct 29."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I'm back in the hospital. Can a lawyer come tonight?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither firm takes jobs sent now: law work is booked ahead."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 living trust is over the amount: a fee agreement to sign."
+   ],
+   [
+    "like a move-out day",
+    "like a signing before surgery"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said someone is hurting them. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "Someone hurting the customer now"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to get somewhere safe and call 911"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a health care directive Jordan suggested"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a health care directive, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Health care directive"
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the recorded deed back on time?"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE recorded deed Mon Oct 26"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your office, paid at the front desk, your own way"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the consult"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Estate Law PLLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Law"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Estate Law"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Wills"
+   ],
+   [
+    "Lee Electric",
+    "Lee Notary"
+   ],
+   [
+    "88 Elm St",
+    "310 Court St"
+   ],
+   [
+    "Elm St",
+    "Court St"
+   ],
+   [
+    "1200 Main St",
+    "600 Main St"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "plumbing and electrical work",
+    "estate planning and notary work"
+   ],
+   [
+    "electrical jobs",
+    "notary jobs"
+   ],
+   [
+    "electrical license",
+    "notary license"
+   ],
+   [
+    "Electrical license",
+    "Notary license"
+   ],
+   [
+    "electrical prices",
+    "notary prices"
+   ],
+   [
+    "Electrical",
+    "Notary work"
+   ],
+   [
+    "electrical",
+    "notary work"
+   ],
+   [
+    "plumbing license",
+    "law license"
+   ],
+   [
+    "Plumbing license",
+    "Law license"
+   ],
+   [
+    "plumbing jobs",
+    "estate planning jobs"
+   ],
+   [
+    "plumber",
+    "lawyer"
+   ],
+   [
+    "Plumber",
+    "Lawyer"
+   ],
+   [
+    "plumbing",
+    "estate planning"
+   ],
+   [
+    "Plumbing",
+    "Estate planning"
+   ],
+   [
+    "barbershops",
+    "law offices"
+   ],
+   [
+    "barbershop",
+    "law office"
+   ],
+   [
+    "Barbershop",
+    "Law office"
+   ],
+   [
+    "barbers",
+    "lawyers"
+   ],
+   [
+    "barber",
+    "lawyer"
+   ],
+   [
+    "Barber",
+    "Lawyer"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Full consult"
+   ],
+   [
+    "Beard trim",
+    "Document review"
+   ],
+   [
+    "beard trim",
+    "document review"
+   ],
+   [
+    "Haircut",
+    "Consult"
+   ],
+   [
+    "haircut",
+    "consult"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home will signing"
+   ],
+   [
+    "Drain clearings",
+    "Will signings"
+   ],
+   [
+    "Drain clearing",
+    "Will signing"
+   ],
+   [
+    "drain clearing",
+    "will signing"
+   ],
+   [
+    "Water heater replacement",
+    "Living trust"
+   ],
+   [
+    "water heater replacement",
+    "living trust"
+   ],
+   [
+    "Water heater flush",
+    "Power of attorney"
+   ],
+   [
+    "water heater flush",
+    "power of attorney"
+   ],
+   [
+    "water heaters",
+    "living trusts"
+   ],
+   [
+    "Water heater",
+    "Living trust"
+   ],
+   [
+    "water heater",
+    "living trust"
+   ],
+   [
+    "Leak repair",
+    "Paperwork review"
+   ],
+   [
+    "leak repair",
+    "paperwork review"
+   ],
+   [
+    "service call",
+    "travel fee"
+   ],
+   [
+    "Service call",
+    "Travel fee"
+   ],
+   [
+    "color",
+    "contract work"
+   ],
+   [
+    "cut hair",
+    "meet clients"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "Riley",
+    "Ethan"
+   ],
+   [
+    "Avery",
+    "Grace"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey",
+    "Lucia"
+   ],
+   [
+    "My kitchen drain is clogged. Can a lawyer come Thursday morning? I'm in Springfield.",
+    "I'm home after surgery. Can Marcus Price from Lee Estate Law come Thursday morning to sign my will? I'm in Springfield."
+   ],
+   [
+    "Can a lawyer clear a yard drain this Thursday? What does it cost?",
+    "Can Lucia Moore from Lee Estate Law come to a farm this Thursday to sign a will? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Lucia",
+    "BOOK Tessa will signing Thu 12-2 Lucia"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the living trust.",
+    "Hello, do you speak Spanish? My son is pushing me to change my will."
+   ],
+   [
+    "For estate planning, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For law work, someone hurting the customer right now stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurting you or in danger, get somewhere safe and call 911 now."
+   ],
+   [
+    "Lee Estate Law does estate planning and notary work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Estate Law does estate planning and notary work, not criminal cases. Nothing was saved. You can look for another kind of lawyer yourself."
+   ],
+   [
+    "The request turns out to be for work Lee Estate Law doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Estate Law doesn't do, like a criminal case."
+   ],
+   [
+    "A plan or warranty pays",
+    "A legal plan pays"
+   ],
+   [
+    "Can you flush my living trust every year, too?",
+    "Can you review my will every year, too?"
+   ],
+   [
+    "Yes. Lee Estate Law has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Estate Law has a yearly will review plan, $150 a visit."
+   ],
+   [
+    "Can Marcus also look at a dripping faucet?",
+    "Can Marcus also do my health care directive?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a health care directive."
+   ],
+   [
+    "Yes. The faucet is a paperwork review, quoted at the visit.",
+    "Yes. The directive is a paperwork review, quoted at the visit."
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which legal plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Legal Plan, through my job."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a medical emergency, gets 911 first."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Lucia can come sooner, at the same price.",
+    "If it's an emergency, call 911. Lucia can come to the hospital sooner, at the same price."
+   ],
+   [
+    "Can Marcus also run a camera down my sewer line?",
+    "Can Marcus also bring a deed for me to sign?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's notary visit?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a notary visit at two rentals every 3 months."
+   ],
+   [
+    "Marcus finds the leak and texts the price with its lines.",
+    "Marcus looks over the papers and texts the price with its lines."
+   ],
+   [
+    "Marcus found the leak. Here's the price to fix it today.",
+    "Marcus looked over your papers. Here's the price to finish them today."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 review 165 new deed 80"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Review · $165"
+   ],
+   [
+    "Supply line · $80",
+    "New deed · $80"
+   ],
+   [
+    "Shutoff valve",
+    "Review"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 deed to put the house in the trust"
+   ],
+   [
+    "Marcus finds corroded shutoff valves.",
+    "Marcus finds Alex's house isn't in the trust yet."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Deed into the trust · $160"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Deed into the trust"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 deed quote is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the deed into the trust for $160."
+   ],
+   [
+    "Marcus needs a part from the supply house.",
+    "Marcus needs a fixed page printed at the office."
+   ],
+   [
+    "Marcus went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Marcus went to print a fixed page and will be back about 9:30am. The signing should be done by 10am."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE printing a fixed page, back 9:30"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 will signing"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE will signed. Original to the office safe."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A page of my will wasn't signed."
+   ],
+   [
+    "kitchen drain",
+    "will signing"
+   ],
+   [
+    "the shutoff valves",
+    "the deed into the trust"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your estate plan"
+   ],
+   [
+    "Alex's home warranty covers part of the repair. Sam bills the warranty company the business's own way.",
+    "Alex's legal plan covers part of the work. Sam bills the plan the business's own way."
+   ],
+   [
+    "Lee Estate Law: your share of today's repair. Your home warranty covers the rest.",
+    "Lee Estate Law: your share of today's visit. Your legal plan covers the rest."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It was our miss, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "For law work, the firm fixes its own misses for free."
+   ],
+   [
+    "Marcus left a mess under the sink.",
+    "Marcus came late and rushed me."
+   ],
+   [
+    "Can Marcus look at my bathroom sink next week?",
+    "Can Marcus come back next week to sign a change to my will?"
+   ],
+   [
+    "Sure. Here are Marcus's next times for a bathroom drain.",
+    "Sure. Here are Marcus's next times for a will change."
+   ],
+   [
+    "Sewer camera report",
+    "Recorded deed"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the recorded deed link"
+   ],
+   [
+    "Lee Law can consult your hair at the office for $35, or at your home for $75.",
+    "Lee Law can meet you at the office for a $35 consult, or at your home for $75."
+   ],
+   [
+    "The office's chair is in the other flow.",
+    "The office visit is in the other flow."
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my daughter sit with me during the signing?"
+   ],
+   [
+    "Marcus says no. Please wait until the job is done.",
+    "Marcus will meet you alone first. Then your daughter can join you."
+   ],
+   [
+    "Sewer camera inspection",
+    "Deed signing"
+   ],
+   [
+    "sewer camera inspection",
+    "deed signing"
+   ],
+   [
+    "Drains have a set price.",
+    "Will signings have a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Paperwork reviews are priced at the visit."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone in danger right now stops the booking."
+   ],
+   [
+    "Consult, fade and document review at the office.",
+    "Consults and document reviews at the office."
+   ],
+   [
+    "Panel upgrade",
+    "Business papers notarized"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, taken off the visit"
+   ],
+   [
+    "Why: many lawyers, salons and groomers are licensed to their office.",
+    "Why: some kinds of work, like salons and groomers, are licensed to one place."
+   ],
+   [
+    "replaces living trusts",
+    "drafts living trusts"
+   ],
+   [
+    "Labor",
+    "Hourly rate"
+   ],
+   [
+    "after the job",
+    "after the visit"
+   ],
+   [
+    "Lee Estate Law' own",
+    "Lee Estate Law's own"
+   ],
+   [
+    "Lee Estate Law'",
+    "Lee Estate Law's"
+   ],
+   [
+    "travel fee fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee fee",
+    "Travel fee"
+   ],
+   [
+    "A neighborhood law office on Court St. Classic consults, fades and hot towel shaves.",
+    "A neighborhood law office on Court St. Wills, trusts and consults."
+   ],
+   [
+    "The chairs",
+    "The waiting room"
+   ],
+   [
+    "A chair, ready",
+    "A meeting room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a lawyer who rents an office here,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents an office here, with their own clients."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "A lawyer's example: water near outlets gets 'shut off the main valve'.",
+    "A lawyer's example: fear of someone at home gets the hotline first."
+   ],
+   [
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Add a free will review, checked from the papers, free. E nothing before. C paid after"
+   ],
+   [
+    "Warranty fix",
+    "Free will review"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about signing my will at home. A text back is fine."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if she's in danger, and given the local adult protective services line."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If you're in danger, call 911. You can also call adult protective services where you live."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿está usted en peligro ahora?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Estoy a salvo."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si está en peligro, llame al 911. También puede llamar a los servicios de protección para adultos."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi hijo me presiona para cambiar mi testamento."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which lawyer, and whether the firm already drafted the papers."
+   ],
+   [
+    "'My sink won't drain' fits a will signing.",
+    "'I need to sign my will at home' fits a will signing."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a will for someone who hasn't agreed to it."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my own will."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "The will is drafted already, so the first open times are this week."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a power of attorney signing? Say so.'"
+   ],
+   [
+    "Lee Estate Law asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Estate Law asks: is the signing at a home, a hospital or somewhere else? And are the papers the firm drafted ready?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Yes, the will Ethan drafted."
+   ],
+   [
+    "Lee Estate Law can clear the drain:",
+    "Lee Estate Law can come for the signing:"
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is there a table to sign at?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a table to sign at?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, the kitchen table"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 will signing needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a photo ID ready, and a quiet room to meet alone."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the signing is now urgent."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The signing is urgent now. Can someone come sooner?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stain on the rug by the table"
+   ],
+   [
+    "Under the sink, before",
+    "Signing table, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Rug, before"
+   ],
+   [
+    "Review and wall pipe · $540",
+    "Trust review and deed transfer · $540"
+   ],
+   [
+    "A.M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "A.M. OK'd the first document only, $165. Leave the second."
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: one more document, $160. Sent to Alex."
+   ],
+   [
+    "Marcus finds mold behind the sink wall. The plug-in says a lawyer stops there, so Alex gets a written note and the photo.",
+    "Marcus finds the signing can't go ahead safely today. The plug-in says a lawyer stops there, so Alex gets a written note."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD signing can't go ahead today, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The signing room"
+   ],
+   [
+    "Marcus found mold behind the wall under your sink and stopped that part of the work.",
+    "Marcus stopped today's signing. The note is on your page."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the signing couldn't go ahead today"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the will signing"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call the office to set a new time"
+   ],
+   [
+    "Say Marcus cracks the cabinet floor and texts a photo.",
+    "Say Marcus spills coffee on a rug and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE coffee spilled on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Coffee stain on the rug"
+   ],
+   [
+    "Marcus cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "Marcus spilled coffee on a rug at A.M.'s. The before photo shows no stain."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A question about the papers? Call the office."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Two weeks later, Alex finds a typo in the signed papers. Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M.'s papers from Thu Oct 22 need a fix. It's on the firm."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a coffee stain on the rug this morning."
+   ],
+   [
+    "It's a leak under the sink, today, arriving 3–5pm, with Marcus.",
+    "It's a will signing, today, arriving 3–5pm, with Marcus."
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two law firms by text. Then Alex M. asks his AI to book a consult with Ethan Chen at Lee Law, Sat Oct 24 at 11:00am. The firm's conflict check clears first, the consult is in the office or by video, and the $35 is paid at the front desk after. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two law firms by text. Then Alex M., home after surgery, books Lee Estate Law to sign his will at 9 Willow Ct. Marcus Price comes Thu Oct 22 between 8 and 10am with two witnesses, meets Alex alone first, and Rosie texts the bill after. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|none|bill",
+    "list|card|card",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 consult with Ethan. Nothing is taken, and a YES books it once the conflict check clears. Alex pays at the front desk after.",
+    "list|card|counter": "A $35 consult at a firm that set a $20 missed-consult fee. A card is saved for it, and nothing is taken. Alex pays at the front desk.",
+    "list|none|bill": "A $35 video consult. There's no front desk, so Rosie texts the bill when Ethan texts DONE.",
+    "list|card|card": "A $35 phone consult. A card is saved, and the $35 is charged when Ethan texts DONE.",
+    "visit|none|counter": "A case review, priced at the consult. Only the $25 consult fee is promised, and Alex pays at the front desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Consult"
+    },
+    "visit|*|*": {
+     "fee": "$25",
+     "name": "Case review"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "list|card|own",
+    "list|none|own",
+    "visit|card|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 home will signing. A card is saved for the $89 travel fee, kept only for a late cancel or a no-show. Rosie texts the bill after the signing.",
+    "list|none|bill": "A $179 home will signing with nothing taken. Rosie texts the bill after.",
+    "list|card|card": "A $179 hospital signing. A card is saved, and $179 is charged when Marcus texts DONE.",
+    "list|card|own": "A signing that's part of an estate plan: a card is saved for the $89 travel fee, and Sam bills it with the plan, the firm's own way.",
+    "list|none|own": "A signing for a client the firm already bills: nothing is taken, and it goes on the firm's own invoice.",
+    "visit|card|bill": "A paperwork review at home, priced at the visit. Only the $89 travel fee is promised; a card is saved for it. Rosie texts the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Home will signing"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Home will signing"
+    },
+    "visit|*|*": {
+     "name": "Paperwork review at home"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-13",
+    "more": [
+     "A law firm's plug-in takes no deposit and no full price. Money paid before legal work belongs in the firm's trust account."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "A law firm's plug-in: each lawyer's own license, the conflict check, named lawyers only, and no money before the work."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "A law firm signs a confidentiality agreement here. Rosie keeps client details private, and uses them only for booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "At a law firm, a paralegal like Priya may run the desk and the conflict check. Only a lawyer holds a consult or gives advice."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "A law office's example: 'Will I get to keep the house?' gets 'That's a question for your lawyer at the consult.'"
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-07",
+    "more": [
+     "Lawyers are never ranked or suggested. Rosie books only a lawyer or firm the customer names."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-20",
+    "more": [
+     "Law work is named only. A request like 'a good divorce lawyer' gets that one reply: name a lawyer or a firm first.",
+     "Naming only the firm is fine. Its lawyers' times then show in the same order for everyone."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-22",
+    "more": [
+     "A law office's plug-in adds words about abuse, or fear of someone at home. They get the safety steps, then the booking goes on.",
+     "Someone hurting Alex right now gets 911, and no booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "A law office's first step is the conflict form: names only, on the secure page.",
+     "Priya reads it before it books: a new matter waits for the firm's OK (A6-02)."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted from photos first",
+    "why": "A law office takes no photos or papers before the conflict check clears: only names and the kind of matter."
+   },
+   {
+    "op": "after",
+    "at": "A6-14",
+    "steps": [
+     {
+      "id": "A6-x10",
+      "line": [
+       "4.7",
+       "13.5"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "page",
+      "title": "Opens the questions box",
+      "does": "Now that the check is clear, the secure page opens a box for questions for Ethan. It's optional, and only the firm sees it.",
+      "more": [
+       "Before the check, Rosfield takes only names and the kind of matter.",
+       "Texts name only the consult, the lawyer and the time, never the matter."
+      ],
+      "needs": [],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-12",
+    "more": [
+     "A law office: a question about the case itself is never answered by text. Alex is asked not to send case details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-14",
+    "more": [
+     "A lawyer is often late from court. Alex can keep the time, or move it with no fee."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-15",
+    "more": [
+     "A law office: Sam may offer another lawyer at the firm, and Alex picks by name. Rosie never suggests one."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-31",
+    "more": [
+     "A law office: a switch to video needs a lawyer licensed in the state Alex will be in. The firm sends its own video link."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-03",
+    "more": [
+     "At a law office, Alex also signs the firm's own consult form at the desk.",
+     "It says what Alex shares is private, and Ethan isn't Alex's lawyer yet."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-51",
+    "more": [
+     "For law work, it's often a conflict found as the consult starts: a name Alex gives matches another client. That's the firm's side.",
+     "The text then says only that it had to stop, never why, and names no other lawyer.",
+     "Ethan adds the name to the firm's conflict records. A conflict can't be fixed, so Alex needs a different lawyer."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays for a teen's consult, as the plug-in's who-may-book says."
+   },
+   {
+    "op": "more",
+    "at": "A8-33",
+    "more": [
+     "Taking the case is never booked here. The firm sends its own engagement letter after the consult."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-01",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "type": "split",
+      "line": [
+       "8.7",
+       "10.8"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "The firm's next step with Alex",
+      "q": "Does Alex hire Ethan?",
+      "does": "After the consult, Ethan and Alex decide what comes next. Taking the case is never booked or paid through Rosie.",
+      "more": [
+       "The engagement letter and any retainer come from the firm's own tools.",
+       "Rosie records only the outcome: hired, thinking it over, or declined."
+      ],
+      "needs": [],
+      "gives": [],
+      "branches": [
+       {
+        "label": "Alex hires the firm",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A10-x02",
+          "line": [
+           "8.7"
+          ],
+          "who": "owner",
+          "to": "cust",
+          "via": "email",
+          "title": "The firm sends its engagement letter",
+          "does": "Ethan sends the firm's engagement letter from its own tools: the work, the fee and any retainer. Alex signs it there.",
+          "more": [
+           "A retainer goes into the firm's trust account, never through Rosie.",
+           "Rosie marks the consult 'hired', with no amount.",
+           "From here, the case runs in the firm's own system."
+          ],
+          "needs": [],
+          "gives": []
+         }
+        ]
+       },
+       {
+        "label": "Alex wants to think",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A10-x03",
+          "line": [
+           "10.8",
+           "13.2"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Leaves the next step to Alex",
+          "does": "Alex wants to think it over. Rosie sends no follow-up nudges, and Alex can text or book again any time.",
+          "more": [
+           "Booking texts never sell, and law work gets no reminders to hire."
+          ],
+          "needs": [],
+          "gives": []
+         }
+        ]
+       },
+       {
+        "label": "The firm declines the case",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A10-x04",
+          "line": [
+           "8.7"
+          ],
+          "who": "owner",
+          "to": "cust",
+          "via": "email",
+          "title": "The firm says no, in writing",
+          "does": "Ethan decides not to take the case. The firm sends its own letter saying so, so Alex isn't left waiting.",
+          "more": [
+           "Rosie suggests this letter, but the firm sends it outside Rosie.",
+           "No other lawyer is named.",
+           "Rosie marks the consult 'declined'."
+          ],
+          "needs": [],
+          "gives": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A signing in the hospital is booked for the soonest time a lawyer is free, never sent now."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-62",
+    "more": [
+     "A law firm pays the $2 like every kind of work (D97). The no-$2 way stays off, for a later legal decision."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Law work is always licensed: the firm and each lawyer, by the state's bar, and the notary by the state."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Law work is always licensed: the firm and each lawyer, by the state's bar, and the notary by the state."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Law work books lawyers by name, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Law work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Law work is never sent now, so nobody is on call."
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "A law office's form: any other names Alex has used, and the names of the others in the matter. Names only, no story.",
+     "Alex ticks that Rosie isn't a law firm, and that Ethan isn't Alex's lawyer yet.",
+     "It's due now, within the 10 minutes the time is saved. It stays on file for the same matter."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A law office books a lawyer's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A law office books a lawyer's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at a law office is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every matter has a conflict check: a new one signs the conflict form, and the same matter has it on file."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex is at the consult; nothing is left with the office."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Law work is named only, so no rating request goes out (the master's rule S13-20)."
+   },
+   {
+    "op": "more",
+    "at": "A10-32",
+    "more": [
+     "A lawyer's engagement letter and any retainer stay in the firm's own tools (A10-x02), never in a proposal here."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: in many places, the rules limit what a lawyer may pay per client sent to them. Rosfield's lawyer confirms it before launch."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-13",
+    "more": [
+     "A law firm's plug-in takes no deposit and no full price. Money paid before legal work belongs in the firm's trust account."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "A law firm's plug-in: each lawyer's own license, the conflict check, named lawyers only, and no money before the work."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "A law firm signs a confidentiality agreement here. Rosie keeps client details private, and uses them only for booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "At a law firm, a paralegal like Priya may run the desk and the conflict check. Only a lawyer holds a consult or gives advice."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "A law office's example: 'Will I get to keep the house?' gets 'That's a question for your lawyer at the consult.'"
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-07",
+    "more": [
+     "Lawyers are never ranked or suggested. Rosie books only a lawyer or firm the customer names."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-20",
+    "more": [
+     "Law work is named only. A request like 'a will lawyer who comes to the house' gets that one reply: name a lawyer or a firm first.",
+     "Naming only the firm is fine. Its lawyers' times then show in the same order for everyone."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "A law firm's plug-in adds words about abuse, fear at home, or being pushed to sign.",
+     "Safety steps come first, then the booking goes on."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-26",
+    "more": [
+     "A law firm: say Alex books for Alex's mother in a care home. She gives her own names and yes on the secure page, and meets Marcus alone."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-69",
+    "why": "A law firm shows no clients' photos, so the page asks nothing about photos."
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "A law firm: a new matter signs the conflict form. The same matter has it on file, like Alex's will from the office consult.",
+     "A signing also needs its papers drafted first, after a consult: a first step Alex books first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-28",
+    "more": [
+     "A law firm's notice: Rosie isn't a law firm, and gives no legal advice.",
+     "Marcus isn't Alex's lawyer for anything new until they agree in writing."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "A law firm's example: a will signing needs two of the firm's staff free as witnesses.",
+     "It needs a notary too, where the state's rules require one."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-06",
+    "label": "Quoted from photos first",
+    "why": "A law firm takes no photos or papers before the conflict check clears: only names and the kind of matter."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Law work is never sent now, and nobody is on call (S2-27)."
+   },
+   {
+    "op": "more",
+    "at": "B7-01",
+    "more": [
+     "The plug-in's prep line: have a photo ID and the draft the firm sent, and be ready to meet Marcus alone."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-16",
+    "more": [
+     "A law firm: a question about the papers themselves is never answered by text. It waits for Marcus at the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-19",
+    "more": [
+     "A law firm: Sam may offer another lawyer at the firm, and Alex picks by name. Rosie never suggests one."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-02",
+    "more": [
+     "A law firm: Marcus comes with two witnesses from the firm, and a notary where the state's rules require one."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-02",
+    "why": "Law work is named only, so no rating request goes out (the master's rule S13-20)."
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A signing in the hospital is booked for the soonest time a lawyer is free, never sent now."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-62",
+    "more": [
+     "A law firm pays the $2 like every kind of work (D97). The no-$2 way stays off, for a later legal decision."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Law work is always licensed: the firm and each lawyer, by the state's bar, and the notary by the state."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Law work is always licensed: the firm and each lawyer, by the state's bar, and the notary by the state."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Law work books lawyers by name, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Law work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Law work is never sent now, so nobody is on call."
+   },
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "A law firm's example: Alex is back in the hospital and needs to sign fast. Nobody comes tonight."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "A law firm's form: any other names used, and the names of the others in the matter. Names only, no story.",
+     "It's due now, within the 10 minutes the time is saved. It stays on file for the same matter."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Law work is never sent now (B4-81), so the button never shows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "A home or hospital signing keeps a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in law work is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A law firm sells no seats in a session: each visit names its lawyer."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "No",
+    "why": "Every matter has a conflict check: a new one signs the conflict form, and the same matter has it on file."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A bigger matter's engagement letter is signed in the firm's own tools (A10-x02), never as Rosie's contract step."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Law work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Law work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "A bigger matter is an engagement in the firm's own tools, with any retainer in its trust account (A10-x02), never a staged job through Rosie."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A bigger matter runs in the firm's own tools (A10-x02), so nothing is billed in stages through Rosie."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the lawyer's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: in many places, the rules limit what a lawyer may pay per client sent to them. Rosfield's lawyer confirms it before launch."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Legal work is sensitive and named only: no rating request (S13-22, S13-20)."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A signing needs the signer there, met alone first."
+   },
+   {
+    "op": "off",
+    "at": "B8-68",
+    "why": "No child or person in care is left in the lawyer's care."
+   }
+  ]
+ },
+ "keep": [
+  "leak",
+  "color",
+  "warranty"
+ ],
+ "notes": "Refit Oct 27 (REDESIGN 2 master): old words ops and ops on removed steps dropped; the law firm's own `more` lines kept (licenses, the conflict check and form, named lawyers only, no advice, abuse and pressure-to-sign words, witnesses and notary, the engagement letter in the firm's own tools) and its own steps A6-x10 and A10-x01; facts forms, firststeps, video; switch sensitive (legal work, S13-22); no $2 (S1-62); settings arrive A setstart, B window, cutoff 24 hours before; amounts per path with name; the deposit and full-price branches stay on (the fixtures walk them; the combos never list them); B9-06 \"Someone else pays\" back on (its old reason was the landlord); rename pairs re-pointed to today's words.\nCast: Sam Lee's two firms. Lee Law PLLC (flow A, 310 Court St; lawyers Ethan Chen and Grace Diaz) takes the master's second-company place. Lee Estate Law PLLC (flow B, 600 Main St; estate planning, plus notary work as its second kind of work; lawyers Marcus Price and Lucia Moore) takes the main company's place.\nPriya is the firms' paralegal on the staff lane (shown with 'as'). She runs the conflict check; Pat stays the office manager. Alex M. is the customer in both flows.\nThe master's numbers are kept as the example firm's own prices: the $35 haircut is a 30-minute consult, the $55 signature cut a full 60-minute consult, the $140 Groom's package a will planning session, the $20 beard trim a document review, the $25 kids cut a teen consult. In flow B, the $179 drain clearing is a home will signing, the $89 service call the travel fee, the $150 flush a power of attorney signing, the $640 water heater a living trust, the leak repair a paperwork review.\nMoney: nothing paid before the work through Rosie. Money paid before legal work is an advance fee for the firm's trust account, which Rosie never touches. So the deposit, full-price and rest-on-a-set-day branches are off in both flows, and retainers stay with the firm's own trust tools (A10-x02).\nHolds and saved cards stay allowed: nothing is taken, and a fee the owner confirms is earned, not an advance. Flow B's main path holds the $89 travel fee, like the master's.\nThe photos path is off in both flows: no papers or photos before the conflict check clears, only names and the kind of matter. The quote-at-the-visit path stays (a case review, a paperwork review) but isn't one of the listed combinations.\nThe conflict check is the master's own in v1.2: the conflict form on the secure page (A4-43's form branch, A4-72; B4-38, B4-86), then the expert's decision (A6-16, B6-15: OK, No, Need more, no answer), with Priya as the expert. The lawyer's words and more ops carry the detail; the own steps A4-x03, A6-x01 to A6-x09 and B6-x01 to B6-x0n are gone.\nFlow A's main story waits for the check (a new matter). Flow B's main story books right away: Alex's check from his office consult carries over (same people, same matter); a new matter takes the expert branch.\nNamed lawyers only is the master's rule now (S13-20, G21): the own steps A4-x01/B4-x01 are dropped, with detail lines on S13-20. No rating is asked: A10-34 takes 'No: named-only work' in flow A, and B10-02 stays off in flow B (it has no rating split).\nThe engagement letter, the 'thinking it over' path with no nudges, and the letter declining the case are drawn after the receipt in flow A (A10-x01). In flow B the main story is a signing for an existing client, so it has no new engagement.\nA conflict found during the consult ends the visit with nothing charged: the master's A8-51 (G11), with the lawyer's detail lines; the own branch A8-x01 is dropped. The master's 'stops part of the work' branch becomes part of a matter that needs another kind of lawyer (A8-35).\nRosfield's $2 (template fix, Oct 22: Rosie's decision): like the dentist, a law firm pays no $2 by default, since rules in many places limit what a lawyer may pay for each client sent to them; Rosfield's lawyer must confirm it before launch. S1-62 and S1-65 take the master's no-$2 branch at sign-up (S1-26: no monthly bill, no card for it), S11-92 and S11-94 their no-$2 branches (S11-93: no monthly bill, no last bill); the four left splitsKept. A9-21 and B9-18 have words ops (nothing counted, the reason). Every other $2 sentence of the master has a rename pair, first in both lists, on the master's own words: money lands 'less Stripe's card fee', a cancel or a no-show says 'Rosfield takes nothing for law work'.\nFlow B keeps the master's arrival window (8 to 10am) for the home visit, since the master's dates and times run through every step.\nVideo and phone consults are flow A: A4-01's third place, A4-36. The master offers only lawyers licensed for the state the customer is in that day, so the lawyer's own line there is dropped.\nThe questions box that opens only after the check (A6-x10) stays an own step, since the master's confirmation carries its words in money variants that a 'more' op can't reach.\nSign-up's money readbacks (S1-13, S1-16, S1-42) are rewritten for the combinations the lawyer uses, so Sam never sets a deposit or a full price. Their other money variants keep the master's words.\nA7-13 'the problem gets worse' becomes new court papers with a date on them: the lawyer offers a sooner time. B7-17 becomes Alex back in the hospital, wanting to sign sooner.\nFlow B's plumbing what-ifs map to a law firm's: extra work at the visit is a health care directive or a deed into the trust (with the right to cancel a sale at home), a bigger job is a living trust, the hazard is someone pressing Alex to sign (B8-30), a part taken to the shop is the original will going to the office safe, parts at cost are recording fees, the warranty return is a page the firm forgot to have signed.\nNot sure: whether a hold on the travel fee fits every firm (kept as the master's main path); a Saturday consult (the master's date); the free first consult has no money combination of its own (it runs nothing before and nothing due at the desk).\nRe-fit to master v1.1 (Oct 22): the master took the lawyer's gaps G2 (need more, the expert's answers), G10 (a safe way to reach), G11 (the visit stops) and G21 (named only). Log: work/review/fix-overlay-lawyer.md.\nG10: the safe-to-text question is the master's A4-65 (words: texts and email, no photo question) and B4-67/B4-68; A4-x03 and B4-29 keep only the conflict check. B4-69 (photo use) is off: a law firm shows no clients' photos.\nSent now: law work is never sent now. S2-30 takes 'No: never sent now' (S2-31, with the hospital-signing line), B4-81 takes 'Never sent now: soonest first' (B4-82, with the lawyer's example), and B6-03's, B7-55's and B8-58's sent-now branches are off. Also off: B7-56's crew and no-person branches, B8-65's outside check and B10-29's permit inspection.\nThe master's visit-and-deposit paths (G26) are never used: law work takes no deposit, so no combination is added.\nNot sure: D23 (round 3) may reword A8-51 and B8-54; the lawyer's lines on A8-51 are a 'more' op, so they carry over.\nMaster v1.2 (D24): at every plug-in split the lawyer keeps its own branch and turns the others off. Both flows: always licensed (the bar and the notary), a confidentiality agreement signed before going live, people not spaces, no classes, never sent now, every booking by name; the $2 splits (S1-62, S1-65, S11-92, S11-94) take their no-$2 branches (template fix, Oct 22). Flow A: no walk-ins (a new matter needs its conflict check first); a lawyer's time; a teen's consult booked by a parent; every matter has a conflict check (A4-43's 'No' is off); no damage hold, crew or minimum; a date can't move before a surgery or a court date; late means a shorter consult or a later time; nothing is left; named only.\nFlow B: soonest first; arrival windows; own or rent never asked, so the landlord branches (B8-20, B8-22, B9-06) are off too; a consult first or the conflict form, or the form on file for the same matter; no damage hold; one lawyer by name, or a date that can't move (a signing before surgery); no group minimum, outside check, permit, staged job (B8-20's estimate-becomes-a-job, B9-19's stages) or late form. A proposal is only more work like a health care directive; an engagement letter stays in the firm's own tools (A10-x01).\nFinal (Oct 22): splitsKept A: A7-61 (contract work is Ethan's only), A7-63 (a signing before surgery can't move), A8-02 (a conflict found at the start stops the consult, A8-51); B: B8-69 and B8-70 (signed copies can be left with nobody home; a signing needs Alex), B8-71 (a trust binder is handed over and signed for), B8-72 (the original will goes to the office safe). Off: A8-67's child left (a parent stays), B4-16's 'Send someone now' (never sent now), B4-83's seats and no-person times, B4-57's contract step (the engagement letter is the firm's own), B8-67's child in the pro's care.\nReview (Oct 22, evening): leftover barbershop and plumbing words renamed (the Spanish 'corte', a perm, the cape clip, an uneven cut, 'no cut of them', 'in the chair', a kid's age, short on the sides, brassy, an interview, the color order and patch test, an apprentice, massage and heating as Sam's new kinds of work, the old heater, the van, a water heater flush plan, 4 units, a fleet manager, the rating plate, proof of the right to the work, a permit, a cut hand, the sewer video); B8-28's quote no longer asks a 25% deposit (no money before law work); B4-50's plan is billed by the firm; the tip branch (B9-19) and the loaned lockbox (B10-07) are off; A7-01's prep line is no longer said twice.\nReview (Oct 22, evening): money paths added so they match pf.services: A visit|none|counter (the case review, $25 consult fee) and list|hold|counter (the planning session, $40 held, as S1-42 says); B visit|hold|bill (the paperwork review at home, $89 travel fee held). All walk.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "It takes no cut of card payments",
+    "Rosie's price, Stripe and the terms come once, just before the first kind of work goes live.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "The cut is uneven on one side.",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Health details stay on the secure page, never in a text.",
+    "price board",
+    "Price board",
+    "shop's board",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "like a 15-minute style consult",
+    "A barbershop's plug-in has none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "At your shop, paid at the chair, your own way",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "code at the chair",
+    "at the chair",
+    "At the chair",
+    "the chair",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop front",
+    "Shop",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Oak St",
+    "electrical jobs",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumbing jobs",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "patch test",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Color quotes",
+    "color quote",
+    "Color",
+    "color",
+    "cut hair",
+    "cuts",
+    "cut",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Books the groom's party together",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Panel upgrade",
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "photos of your hair",
+    "15 gloss",
+    "gloss $15",
+    "Gloss to finish",
+    "No gloss today",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "We'd share only where they're working, only after a missed check.",
+    "Access, like a step-free chair:",
+    "like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "A.M. asks for a toner instead of the gloss. What's the new price?",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "A chair renter asked for by name:",
+    "The cape clip ripped my shirt collar.",
+    "A.M. says the cape clip ripped a shirt collar today."
+   ],
+   "B": [
+    "It takes no cut of card payments",
+    "Rosie's price, Stripe and the terms come once, just before the first kind of work goes live.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "CANT START no proof Alex may have this work done",
+    "Video and Jordan's notes",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "like a burst pipe or a lockout",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "like a move-out day",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "Is the report ready on time?",
+    "LATE camera report Mon Oct 26",
+    "at the shop",
+    "At the shop",
+    "the shop's",
+    "the shop",
+    "At your shop, paid at the chair, your own way",
+    "paid at the chair",
+    "at the chair",
+    "The shop's",
+    "The shop",
+    "shop",
+    "Shop front",
+    "Lee Home Services LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "plumbing and electrical work",
+    "electrical jobs",
+    "electrical license",
+    "Electrical license",
+    "electrical prices",
+    "Electrical",
+    "electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumbing jobs",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Leak repair",
+    "leak repair",
+    "service call",
+    "Service call",
+    "color",
+    "cut hair",
+    "cuts",
+    "cut",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "A plan or warranty pays",
+    "Say Alex also asks about a dripping faucet.",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Can I skip next week's drain cleaning?",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "Shutoff valve",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "UPDATE getting a part, back 9:30",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The kitchen drain is clogged again.",
+    "kitchen drain",
+    "the shutoff valves",
+    "stage 2 of your repipe",
+    "Alex's home warranty covers part of the repair. Sam bills the warranty company the business's own way.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Book the repair",
+    "The repair price is good for 7 days.",
+    "Can I run the dishwasher before you come?",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Panel upgrade",
+    "$89, credited to the repair",
+    "Labor",
+    "after the job",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "We'd share only where they're working, only after a missed check.",
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Warranty fix",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "No. No huele a gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Like tapping a neighbor's water line without asking.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "A.M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "I found water damage under the sink this morning."
+   ]
+  },
+  "A": {
+   "S1-13": "eca22651fd",
+   "S1-11": "99370bb016",
+   "S1-29": "ed36650e05",
+   "S2-15": "4a64408afc",
+   "S13-04": "91031a684a",
+   "S13-07": "0a8193b948",
+   "S13-20": "65427ec02d",
+   "A3-22": "0057d8fc9f",
+   "A4-43": "c17d56f766",
+   "A4-05": "8b3e838019",
+   "A6-14": "b17b52115e",
+   "A7-12": "05f64179a4",
+   "A7-14": "6a57738a17",
+   "A7-15": "7ca3e4c467",
+   "A7-31": "65a8abd6c4",
+   "A8-03": "7accda6f86",
+   "A8-51": "71142aa1fa",
+   "A8-67": "e9fd748fc5",
+   "A8-33": "561bc291a5",
+   "A10-01": "77ff9c7550",
+   "S2-31": "320ac5e4cb",
+   "S1-62": "c4f497de12",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A10-32": "9f84638bce",
+   "S1-26": "155e1542cc"
+  },
+  "B": {
+   "S1-13": "6964bfbe60",
+   "S1-11": "d11de5da2e",
+   "S1-29": "69d8f12a68",
+   "S2-15": "4a64408afc",
+   "S13-04": "13e60b9248",
+   "S13-07": "e15883c2dc",
+   "S13-20": "52c28ee28a",
+   "B3-17": "3eb7d7f259",
+   "B4-26": "912686f788",
+   "B4-69": "350fbaf90a",
+   "B4-38": "9539521dc7",
+   "B4-28": "506d267aaf",
+   "B4-15": "f13240b9c6",
+   "B4-06": "223e119ea0",
+   "B6-03": "dcc1eb310c",
+   "B7-01": "f7a5523875",
+   "B7-16": "3177c3701b",
+   "B7-19": "59d20c8e66",
+   "B8-02": "024afae342",
+   "B10-02": "eaf53a5e74",
+   "S2-31": "320ac5e4cb",
+   "S1-62": "c4f497de12",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B4-83": "a7473a80ea",
+   "B5-34": "917f89b62f",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-93": "c1406fd6bc",
+   "B9-19": "b97bfbf0d2",
+   "B8-67": "b66ffbd04d",
+   "S1-26": "155e1542cc",
+   "B10-32": "7713bff255",
+   "B8-03": "ac9d404766",
+   "B8-68": "8ede790b60"
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A7-63",
+   "A8-02"
+  ],
+  "B": [
+   "B8-69",
+   "B8-71",
+   "B8-72"
+  ]
+ }
+}

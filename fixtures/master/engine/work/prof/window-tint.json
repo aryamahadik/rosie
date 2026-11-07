@@ -1,0 +1,4181 @@
+{
+ "id": "window-tint",
+ "name": "Window tinting",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "tires",
+ "plugin": {
+  "pf.license": {
+   "need": "if: no state license for installing window film by default; the business registration; an installer registration only where the state's rules require one. Film darkness limits are a rule for every window (pf.rules), not a license.",
+   "ask": [
+    "The business registration number, where the state gave one",
+    "An installer registration number, only where the state's rules require one"
+   ],
+   "who": "the business; each installer needs no license of their own unless the state's form says so",
+   "check": "the state's business or registration lookup; where there's none, a person on Rosie's team checks within 1 business day",
+   "blocks": "a registration the state requires that the owner says the business lacks keeps that kind of work offline",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "garage liability and coverage for customers' cars while they are at the shop, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'"
+  },
+  "pf.services": {
+   "pattern": "a bay booked by time slot at the shop: the customer waits at the shop or leaves the car and picks it up when it is READY; the van comes to a home or an office for mobile work",
+   "list": [
+    {
+     "name": "Sides and rear windows, carbon film",
+     "price": "one price by the car's body; the example shop's own price: $249 at the shop, $338 by the van (the $89 trip fee is in it)",
+     "length": "about 1.5 hours",
+     "place": "at the shop; at a home or office by the van",
+     "before": "nothing taken at the shop; a card saved for the trip fee for the van",
+     "after": "at the counter, or the bill Rosie texts when the car is ready"
+    },
+    {
+     "name": "Sides and rear windows, dyed film",
+     "price": "the entry film: $110 in the example, at the shop",
+     "length": "about 1.5 hours",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Full-car ceramic film (all side and rear windows)",
+     "price": "one price by the car's body, film cut and ordered for the car: $449 at the shop in the example, $538 by the van (the $89 trip fee is in it), with a $100 deposit at booking",
+     "length": "about 3 hours",
+     "place": "at the shop; at a home or office by the van",
+     "before": "a deposit (the example: $100), credited to the bill",
+     "after": "the rest at the counter, or the bill"
+    },
+    {
+     "name": "Front two windows",
+     "price": "one price, to match the film on the rest: $90 in the example (by the van: $179, the $89 trip fee in it)",
+     "length": "about 45 minutes",
+     "place": "at the shop; at a home or office by the van",
+     "before": "nothing taken at the shop; a card saved for the trip fee for the van",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Windshield sun strip",
+     "price": "one price: $20 in the example at the shop, $109 by the van (the $89 trip fee is in it)",
+     "length": "15 minutes",
+     "place": "at the shop; at a home or office by the van",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Clear heat-block film for the windshield",
+     "price": "one price: $149 in the example, only where the state's rules allow a clear film there",
+     "length": "about 1 hour",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Old film removal, per window",
+     "price": "one price a window: $40 in the example, added only with the customer's yes when old film is found",
+     "place": "at the shop, or at the van"
+    },
+    {
+     "name": "Home or office window film",
+     "price": "priced at the visit by the square foot after measuring (the example: from $12 a square foot); only the trip fee is promised",
+     "length": "2 to 4 hours, by the number of windows",
+     "place": "at the customer's home or office, by the van",
+     "before": "a card saved for the trip fee",
+     "after": "the bill Rosie texts after DONE"
+    },
+    {
+     "name": "Storefront window film",
+     "price": "priced at the visit, by the square foot after measuring (the example: from $12 a square foot); only the trip fee is promised",
+     "length": "half a day or more",
+     "place": "at the customer's business, by the van",
+     "before": "a card saved for the trip fee",
+     "after": "the bill Rosie texts after DONE"
+    },
+    {
+     "name": "Old film removal, extra windows by the van",
+     "price": "$40 a window, added only with the customer's yes",
+     "place": "by the van"
+    },
+    {
+     "name": "Tint meter check",
+     "price": "free, 10 minutes: a meter reading of a window's film against the state's limit",
+     "place": "at the shop"
+    },
+    {
+     "name": "Free re-check",
+     "price": "free, within 30 days of any job: bubbles that don't dry, edges that lift (the example shop's own promise)",
+     "length": "15 minutes",
+     "place": "at the shop"
+    },
+    {
+     "name": "Trip fee for the van",
+     "price": "one fee, part of each mobile job's price (the example: $89)",
+     "place": "at a home or office"
+    }
+   ],
+   "film_list": "film types (carbon, ceramic, clear heat-block), the darkness of each in percent of light let through, and the maker's warranty; the owner lists them on the shop's board",
+   "capacity": "the shop's 2 bays book by time; one car per booking; the van does one car at a time and needs a garage or shade, dry air and little dust",
+   "booked_as": "a bay's time at the shop, not a person: the shop names the installer; the van books a person",
+   "wait_or_leave": "the customer waits at the shop, or leaves the car and picks it up when READY",
+   "van": "a car at a home or office, or home and office windows; the first branch of the arrival window",
+   "nobody_home": "no: an adult on the booking hands over the keys and meets the installer",
+   "online": "no: film goes on the car in person"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Year, make, model and body (sedan, coupe, SUV, truck)",
+    "Which windows: the front two, sides and rear, every window, the windshield strip",
+    "How dark: the film's percent, or 'the darkest that is legal'",
+    "Is there old film on the windows now? Is it peeling or bubbling?",
+    "Wait at the shop, or leave the car?",
+    "For the van: a home or an office, and the town"
+   ],
+   "after_time": [
+    "Is any window cracked or chipped?",
+    "Does the rear window have defroster lines? (They are never scraped.)",
+    "Old film removal: yes or no, with its price",
+    "For the van: where the car is parked, and if there is a garage or shade"
+   ],
+   "secure_page_only": [
+    "The plate or the VIN",
+    "A medical exemption paper for darker film, where the state allows one: shown at the counter or on the secure page",
+    "A gate or garage code, and where the keys are left"
+   ],
+   "limit_check": "each window's film must be within the state's darkness limit for that window, or the car must carry the state's exemption paper, shown at the counter; a darker film is not booked for that window, nothing is taken, and the AI offers the darkest film that is allowed",
+   "who_may_book": "an adult: the car's owner, or someone the owner lets bring it in; for a teen's car, a parent books and says yes to prices"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "someone hurt, or a crash that just happened",
+    "a fire, or smoke from the car",
+    "a child or a pet shut inside a hot car"
+   ],
+   "stop_action": "'If anyone is hurt, or a child or pet is shut in a hot car, call 911 now'; no booking",
+   "dont_drive_words": [
+    "glass that is cracked and spreading in the driver's view"
+   ],
+   "dont_drive_action": "Rosie says: get that glass looked at before driving much more. Film is never put on cracked glass; the booking goes on for the other windows, or after the glass is fixed.",
+   "mobile_stops": "rain, strong wind or dust, a car with no garage or shade, or no clean, safe place to work: the installer stops, and offers a new time (no fee) or the shop",
+   "can_continue": "yes, after the don't-drive steps"
+  },
+  "pf.first_steps": {
+   "required": "none before booking; the exemption paper, if the car has one, is shown at the counter",
+   "prep_for_reminder": [
+    "Take your valuables and anything loose out of the car",
+    "Leave the windows up and bring the key",
+    "Bring the exemption paper, if the car has one",
+    "For the van: park in the garage or in shade, with room to walk around the car"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "at the shop: the check-in code at the counter; at a home or office: the code at the car, as at any door",
+   "intake": "a walk-around, window by window: cracks or chips, old film, the defroster lines, and the darkness read with the meter; photos of each window as the before record",
+   "required_items": "the key; a car with cracked glass has that window left out",
+   "the_work": "the film is cut for the car, applied in a clean bay, squeegeed and checked; 15 minutes to about 3 hours by the job",
+   "added_work": "old film removal or anything else found is priced and texted; nothing extra is done without the customer's yes",
+   "status_words": [
+    "IN",
+    "READY"
+   ],
+   "ready": "READY texts what was done, anything due, the pick-up hours and the care notes: windows stay up for 3 days, and no cleaning inside for a week",
+   "done_proof": "the code at the counter, then READY; at a home or office, the code at the car, then DONE with a photo of each window",
+   "late": "a late car keeps its bay 15 minutes; then it moves to the next open time",
+   "aftercare": "a free re-check within 30 days for bubbles that don't dry and edges that lift; the film maker's warranty is on the receipt"
+  },
+  "pf.money": {
+   "before": "nothing taken for film on the shop's board; full-car ceramic film is cut and ordered for the car, so it takes a deposit (the example shop: $100), taken at booking and credited to the bill",
+   "after": "at the counter, the shop's own way; or the bill Rosie texts when the car is ready, if the owner turns it on",
+   "mobile": "a card saved for the trip fee; the bill after DONE",
+   "deposit": "deposit cap: from the state form; never more than the price known before the visit",
+   "fees": "at the shop, no cancel or no-show fee, except on full-car ceramic film: $50 of the $100 deposit after free cancel ends (the example), because the film is cut to the car; the van: the trip fee on the saved card (the example: $89), only with the owner's yes, for a late cancel or a car that isn't there; the owner confirms every fee",
+   "price_shown": "the installed price for the windows chosen, with every charge that always comes with it; film removal is added only with the customer's yes; the tax from the state form",
+   "tips": "no tip line",
+   "tax": "the state's sales tax on film and labor, where the state has one",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies; a free re-check adds none"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "The plate or the VIN",
+    "A medical exemption paper, or why a car has one",
+    "A gate or garage code, or where the keys are left"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a teen's car go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "car window film, flat and curved glass",
+    "old film removal",
+    "home and office window film",
+    "mobile work in the van"
+   ],
+   "licenses": "none by default; an installer registration only where the state's rules require one",
+   "who_oks": "the owner OKs full-car ceramic orders and any film removal quote over $100",
+   "stand_in": "only someone with the skill; a full-car job waits for an installer who has done them"
+  },
+  "pf.rules": {
+   "tint_limit": "switch: the darkness limit for each window, and which film is allowed on the windshield: from the state form; the shop applies only film within the limit, unless the car carries the state's exemption paper",
+   "exemption_paper": "switch: where the state allows darker film for a medical need, the paper's rules and who keeps a copy: from the state form; the paper is shown at the counter and is never put in a text",
+   "label_sticker": "switch: a compliance label on each window, where the state requires one: from the state form",
+   "show_number": "switch: the shop's state number on the receipt: from the state form",
+   "home_sale_cancel": "switch: a written cancel period for work sold at the customer's place: from the state form",
+   "film_warranty": "the film maker's warranty and the shop's labor promise are on the receipt",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A window asked darker than the limit: not booked for that window, nothing taken, the AI offers the darkest allowed film",
+    "Cracked or chipped glass: that window is left out; the others go on",
+    "Old film found: removal is priced and added only with the customer's yes",
+    "A late cancel of full-car ceramic film after it is cut: the $50 of the deposit, only if the owner confirms",
+    "A no-show at the shop on a nothing-taken booking: no fee",
+    "A car that is not clean enough inside: the installer cleans the edges, or the job moves",
+    "Rain, wind or dust at the van: a new time, no fee",
+    "Bubbles or lifting edges: the free re-check within 30 days",
+    "A car left and not picked up"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork",
+   "aftercare",
+   "spaces"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": {
+     "window": 2
+    }
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Rudy and Ines (tint installers)",
+   "other": "Others (a bank, a parent, the film supplier)"
+  },
+  "B": {
+   "staff": "Troy and Lucia (tint installers)",
+   "other": "Others (a bank, a building manager, the film supplier)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Rudy"
+  },
+  "B": {
+   "staff": "Troy"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books sides and rear window tint at Lee's Tint Shop for Sat Oct 24 at 11:00am. Nothing is taken: the customer's YES books the bay. Alex waits or leaves the car, and pays at the counter when it is ready. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Tint's van at home, 33 Linden Way, and Troy comes Thu Oct 22 between 8 and 10am. A card is saved for the trip fee, and Rosie texts the bill after DONE. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|none|bill",
+    "list|deposit|counter",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: sides and rear window tint (carbon film) for Alex's car, $249 from the shop's board. Nothing is taken: a YES books the bay, and Alex pays at the counter.",
+    "list|none|bill": "The same $249 tint with the car left at the shop. Rosie texts the bill with READY, so Alex can pay before pick-up.",
+    "list|deposit|counter": "Full-car ceramic film, $449 in all: film cut and ordered for the car, so a $100 deposit is taken at booking and credited to the bill. Alex pays the $349 rest at the counter.",
+    "list|deposit|bill": "The same full-car ceramic film with the car left at the shop. The $349 rest is on the bill Rosie texts with READY."
+   },
+   "amounts": {
+    "*": {
+     "fee": "free",
+     "name": "Sides and rear tint"
+    },
+    "list|*|*": {
+     "price": "$249",
+     "name": "Sides and rear tint"
+    },
+    "list|deposit|*": {
+     "price": "$449",
+     "deposit": "$100",
+     "rest": "$349",
+     "fee": "$50",
+     "name": "Full-car ceramic tint"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "visit|card|bill",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: sides and rear tint (carbon film) at Alex's home, $338 with the $89 trip fee in it. A card is saved for the trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after Troy texts DONE.",
+    "visit|card|bill": "Home window film, priced at the visit after measuring. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE.",
+    "list|deposit|bill": "Full-car ceramic film fitted at home: $538 with the trip fee. A $100 deposit orders the film at booking; the $438 rest is on the bill after DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Sides and rear tint"
+    },
+    "list|*|*": {
+     "price": "$338",
+     "name": "Sides and rear tint"
+    },
+    "list|deposit|*": {
+     "price": "$538",
+     "deposit": "$100",
+     "rest": "$438",
+     "fee": "$89",
+     "name": "Full-car ceramic tint"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Home window film"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "color",
+  "trip fee",
+  "Grace",
+  "valve",
+  "tire rotation"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-80",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-80",
+   "B8-69",
+   "B8-72"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken; full-car ceramic film, a $100 deposit"
+   ],
+   [
+    "Every plumbing service",
+    "Every van job"
+   ],
+   [
+    "A water heater job",
+    "A full-car tint at home"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Window tint fitted at your home or office in Springfield: car windows and home window film, within 25 miles."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a tow or a lockout. The plug-in says which services. Window tint is never sent now, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Window tint takes no jobs sent now: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Does any window tint job get sent now? No: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A tint installer's example: glass cracked in the driver's view gets 'get it looked at before driving much more'."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a full car wrap, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do full car wraps."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The film left a bubble on my rear window."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the film left a bubble on the rear window today"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: wants the front two windows lighter next time."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you tint only the front two windows? My car is a coupe."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: front two windows are $90. Want a time?"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a tint for a son's car before the times, so the times fit it."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "You told us the tint is for your son's car, and that you're his parent."
+   ],
+   [
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "Its money card is set the way most mobile tint services start. Is it right? Send only what's different."
+   ],
+   [
+    "Thanks. The state licenses the shop and each barber. What's the shop's license number?",
+    "Thanks. Window tint needs no state license where you work, so I'll check the business registration. What's the shop's registration number?"
+   ],
+   [
+    "BS20981",
+    "REG-20981"
+   ],
+   [
+    "EC22871",
+    "REG-22871"
+   ],
+   [
+    "MP045210",
+    "REG-45210"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Jordan and Casey do mobile tint; Jordan does home window film too. Riley and Avery tint cars in the shop; Riley also does film removal and van visits. Pat is my office manager, for prices over $500. Jules rents a bay, with their own customers."
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: mobile tint and home window film"
+   ],
+   [
+    "color and house calls",
+    "film removal and van visits"
+   ],
+   [
+    "color, house calls",
+    "film removal, van visits"
+   ],
+   [
+    "does color",
+    "does film removal"
+   ],
+   [
+    "Color always stays",
+    "Film removal always stays"
+   ],
+   [
+    "cut hair",
+    "tint cars"
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The car key is missing."
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Say Alex M. left the car at Lee's Tint Shop. Staff text READY when the work is done. Alex hears what was done, the pick-up hours, and anything due."
+   ],
+   [
+    "READY Sofia G. Photo added.",
+    "READY Alex M."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your car is ready for pick-up at Lee's Tint Shop."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Mon to Sat, 8am to 5pm"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a person hurt or a fire, gets the safety steps first."
+   ],
+   [
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A barbershop books a person's time.",
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A tint shop books a bay's time: a space."
+   ],
+   [
+    "A what-if: for a table, a court or a room, the times show the space and its size, never a person. A space shows only if it's free and big enough for the group.",
+    "A what-if: for a bay, the times show the bay, never a person. A bay shows only if it's free and long enough for the job."
+   ],
+   [
+    "Sat Oct 24 · 6:00pm · Table for 4",
+    "Sat Oct 24 · 11:00am · Bay 1"
+   ],
+   [
+    "Sat Oct 24 · 7:30pm · Table for 6",
+    "Sat Oct 24 · 2:00pm · Bay 2"
+   ],
+   [
+    "A table for six has one code, not six.",
+    "A car has one code, not one per window."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Alex wants it at home: a van visit, $338, with a card saved for the $89 trip fee. From here it's the other flow, where the business goes to the customer."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The full-car ceramic tint can take a $100 deposit when booked. The other $349 is paid at the counter."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The full-car ceramic tint can take a $100 deposit when booked. The other $349 is on the bill after the visit."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The full-car ceramic tint can take a $100 deposit when booked. The other $349 is on the bill after the visit."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the full-car ceramic tint takes a $100 deposit; the $349 rest is paid after the visit."
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: the $50 of the $100 deposit for the full-car ceramic tint, only if you say yes. Nothing taken, no fee"
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $249 sides and rear tint can work this way."
+   ],
+   [
+    "Haircut · $35",
+    "Sides and rear tint · $249"
+   ],
+   [
+    "Skin fade · $40",
+    "Old film removal, per window · $40"
+   ],
+   [
+    "Beard trim · $20",
+    "Windshield sun strip · $20"
+   ],
+   [
+    "Haircut at home · $75",
+    "Sides and rear tint at home · $338"
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Heat-block windshield film · $149"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Full-car ceramic tint · $100 deposit"
+   ],
+   [
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "A windshield sun strip is on the price board: $20. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a windshield sun strip. Rosie finds one time long enough for both, with one installer, and adds the prices: $249 and $20."
+   ],
+   [
+    "'Adding a beard trim, +$20? Say so.'",
+    "'Adding a windshield sun strip, +$20? Say so.'"
+   ],
+   [
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "One request waits for Lee's Barbershop. It's a windshield sun strip today at 2:00pm with Avery, for a new customer. It's $20. Accept it?"
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Reading it back: accept a windshield sun strip today at 2:00pm with Avery. Say yes to go ahead."
+   ],
+   [
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Accepted: the windshield sun strip today at 2:00pm with Avery."
+   ],
+   [
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the sides and rear tint goes to $259 for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the sides and rear tint to $259 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Sides and rear tints already booked keep $249, even after Nov 2."
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $259 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $249."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: sides and rear tint $259 for visits from Mon Nov 2. Sides and rear tints already booked keep $249. Sides and rear tint plans go to $259 from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Sides and rear tint $249 ($259 from Nov 2) · Old film removal, per window $40 · Windshield sun strip $20"
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the sides and rear tint from nothing taken to a $50 deposit. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "Nothing taken when they book · paid after the visit"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a film removal at $30, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A film removal at Lee's Barbershop is $40, not $30. Here are the open times at $40."
+   ],
+   [
+    "Refund · $20",
+    "Refund · $100"
+   ],
+   [
+    "Dee W.'s $20 payment through Rosie was charged twice.",
+    "Dee W.'s $100 deposit was charged twice."
+   ],
+   [
+    "Haircut (pack)",
+    "Sides and rear tint (pack)"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Quotes for a full car come to you first. Board prices never need one"
+   ],
+   [
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Someone with their own customers, like an installer, gets their own sign-up link instead."
+   ],
+   [
+    "Access, like a step-free chair: only times and places that fit show.",
+    "Access, like a step-free entrance: only times and places that fit show."
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's employer for a staff car. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this tint."
+   ],
+   [
+    "The plug-in's plain questions are optional, like 'How would you like it on top?'",
+    "The plug-in's plain questions are optional, like 'Which windows should be the darkest?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Which windows should be the darkest? (optional)"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of your car? Yes / No"
+   ],
+   [
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it a fade' goes back to the times.",
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it darker' goes back to the times."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Riley can do a shorter job in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter job."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during the tint?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the key and a clean car on Saturday."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please bring the key and a clean car."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the shop, the customer is already at the counter, so there's no door check."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s job."
+   ],
+   [
+    "stopped Alex M.'s cut.",
+    "stopped Alex M.'s job."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Riley shows the work, like the finished windows in the light. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A job is rated, so the shop takes the first branch."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The film has a bubble on one side."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the film has a bubble on one side"
+   ],
+   [
+    "1 color quote",
+    "1 quote"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'Dark back windows' fits a sides and rear tint."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $449 ceramic tint quote. Sam taps Call, and the call goes out from the shop's number."
+   ],
+   [
+    "{{name.staff:Nia K.}} would like to talk about the color quote before booking.",
+    "{{name.staff:Nia K.}} would like to talk about the quote before booking."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A tint's example: 'Tint here needs to know which windows and how dark. Is there old film on them now?'"
+   ],
+   [
+    "house calls",
+    "van visits"
+   ],
+   [
+    "house call",
+    "van visit"
+   ],
+   [
+    "House calls",
+    "Van visits"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Sides and rear tint for Alex's car and a sun strip for a second car work the same way."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most tint shops set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood tint shop on Foundry St. Car window tint, in 2 bays."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Heat-block windshield film"
+   ],
+   [
+    "Signature cut and shave",
+    "Heat-block windshield film"
+   ],
+   [
+    "Kids cut",
+    "Front two windows"
+   ],
+   [
+    "kids cut",
+    "front two windows"
+   ],
+   [
+    "the Groom's package",
+    "the full-car ceramic tint"
+   ],
+   [
+    "The Groom's package",
+    "The full-car ceramic tint"
+   ],
+   [
+    "Groom's package",
+    "Full-car ceramic tint"
+   ],
+   [
+    "Color and cut",
+    "Re-tint, old film removed"
+   ],
+   [
+    "color and cut",
+    "re-tint, old film removed"
+   ],
+   [
+    "Color correction",
+    "Film removal and re-tint"
+   ],
+   [
+    "color correction",
+    "film removal and re-tint"
+   ],
+   [
+    "Ben T. books a skin fade",
+    "Ben T. books a front-window tint"
+   ],
+   [
+    "skin fades",
+    "front-window tints"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A tint shop takes drop-offs: the car is left and picked up when it's ready."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds paint protection film to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW paint protection film"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Paint protection film for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a front-window tint at the shop or at home"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tint's"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only to their shop."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens on the lift?"
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the shop's list"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A tint could mean a car shop or a home-window installer."
+   ],
+   [
+    "I'd like a cut on Saturday",
+    "I'd like my car windows tinted on Saturday"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex adds a windshield sun strip"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero polarizar los vidrios de mi carro el sábado."
+   ],
+   [
+    "Books the groom's party together",
+    "Books 3 company cars together"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books sides and rear tint and a sun strip"
+   ],
+   [
+    "step-free door on Elm St",
+    "step-free door on Foundry St"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Step-free door on Foundry St · parking by the door"
+   ],
+   [
+    "11:00am with Riley",
+    "11:00am in Bay 2"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am · Bay 2"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm · Bay 1"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm · Bay 1"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Haircuts",
+    "Sides and rear tints"
+   ],
+   [
+    "haircuts",
+    "sides and rear tints"
+   ],
+   [
+    "Haircut",
+    "Sides and rear tint"
+   ],
+   [
+    "haircut",
+    "sides and rear tint"
+   ],
+   [
+    "Skin fade",
+    "Old film removal, per window"
+   ],
+   [
+    "skin fade",
+    "old film removal"
+   ],
+   [
+    "Beard trim",
+    "Windshield sun strip"
+   ],
+   [
+    "beard trim",
+    "windshield sun strip"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Tint Shop LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Car Tint and Lee Home Film"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Tint Shop"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tint"
+   ],
+   [
+    "88 Elm St",
+    "212 Foundry St"
+   ],
+   [
+    "1200 Main St",
+    "90 Pier Ave"
+   ],
+   [
+    "Riley",
+    "Rudy"
+   ],
+   [
+    "Avery",
+    "Ines"
+   ],
+   [
+    "Jordan",
+    "Troy"
+   ],
+   [
+    "Casey",
+    "Lucia"
+   ],
+   [
+    "barbershop's",
+    "tint shop's"
+   ],
+   [
+    "barbershop",
+    "tint shop"
+   ],
+   [
+    "Barbershop",
+    "Tint shop"
+   ],
+   [
+    "barbers",
+    "tint installers"
+   ],
+   [
+    "barber",
+    "tint installer"
+   ],
+   [
+    "Barber",
+    "Tint installer"
+   ],
+   [
+    "plumbing's",
+    "mobile tint service's"
+   ],
+   [
+    "plumbing",
+    "mobile tint service"
+   ],
+   [
+    "Plumbing",
+    "Mobile tint service"
+   ],
+   [
+    "plumber",
+    "tint installer"
+   ],
+   [
+    "Plumber",
+    "Tint installer"
+   ],
+   [
+    "electrical",
+    "home window film"
+   ],
+   [
+    "Electrical",
+    "Home window film"
+   ],
+   [
+    "$40 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$100 rest",
+    "$349 rest"
+   ],
+   [
+    "$140",
+    "$449"
+   ],
+   [
+    "$35",
+    "$249"
+   ],
+   [
+    "$75",
+    "$338"
+   ],
+   [
+    "$55",
+    "$149"
+   ],
+   [
+    "$25",
+    "$90"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Style consult",
+    "Tint meter check"
+   ],
+   [
+    "style consult",
+    "tint meter check"
+   ],
+   [
+    "Elm St",
+    "Foundry St"
+   ]
+  ],
+  "B": [
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a tow or a lockout. The plug-in says which services. Window tint is never sent now, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Window tint takes no jobs sent now: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Does any window tint job get sent now? No: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A tint installer's example: glass cracked in the driver's view gets 'get it looked at before driving much more'."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero polarizar mi carro, y el parabrisas tiene una grieta que crece."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I want my car tinted, and the windshield has a crack that is spreading."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to get the cracked windshield looked at before driving much more, and to call 911 if anyone is hurt."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay un menor o una mascota encerrado en el carro?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is a child or pet shut in the car?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está herido."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is hurt."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Haga revisar el parabrisas antes de manejar mucho más. Si alguien está herido, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Get the windshield looked at before driving much more. If anyone is hurt, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For window tint, someone hurt, a fire, or a child or pet shut in a hot car stops the booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hurt, a fire, or a child or pet shut in a hot car."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurt, or a child or pet is shut in a hot car, call 911 now."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can film go over my cracked windshield to hold it together?"
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the car in a garage or in shade?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the car in a garage or in shade?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, in the garage"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I clean the windows before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that the windshield crack is spreading. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The crack in my windshield is spreading now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Get the windshield looked at before driving much more. Casey can come sooner, at the same price."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE 2 bubbles in the old film, rear window"
+   ],
+   [
+    "Under the sink, before",
+    "Rear window, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Side windows, before"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 living room 165 hallway 80"
+   ],
+   [
+    "shutoff valve only",
+    "living room windows only"
+   ],
+   [
+    "fixes the shutoff valve today",
+    "films the living room windows today"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan measures the windows and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak.",
+    "Jordan measured the windows."
+   ],
+   [
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Jordan finds old film on the other windows. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 remove old film, all windows"
+   ],
+   [
+    "Extra for {{alex.staff}}: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for {{alex.staff}}: remove old film, all windows, $160. Sent to Alex."
+   ],
+   [
+    "$160 valve quote",
+    "$160 film removal quote"
+   ],
+   [
+    "$160 valve work",
+    "$160 film removal"
+   ],
+   [
+    "replace both shutoff valves",
+    "remove old film, all windows"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Remove old film, all windows"
+   ],
+   [
+    "replacing both shutoff valves",
+    "removing the old film on all windows"
+   ],
+   [
+    "the shutoff valves",
+    "the old film"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Jordan scratches the rear window glass and texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the rear window"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched rear window"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan scratched the rear window on Alex M.'s car. The before photo shows no scratch."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 338 sides and rear tint"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE old glue on the rear window. Use more heat next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A bubble shows in the film 10 days later."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s tint, done Thu Oct 22, shows a bubble."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your tint is inside the free re-check"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left glue marks on the door panel."
+   ],
+   [
+    "Reading it back: accept the leak repair for today,",
+    "Reading it back: accept the window film for today,"
+   ],
+   [
+    "A leak repair from $89, priced at the visit. The $89 service call is paid up front as the deposit, counted toward the bill.",
+    "Home window film, priced at the visit. A card is saved for the $89 trip fee, counted toward the bill."
+   ],
+   [
+    "A leak repair, priced at the visit. Only the $89 service call is promised, and a card is saved for it.",
+    "Home window film, priced at the visit. Only the $89 trip fee is promised, and a card is saved for it."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. Home window film is priced at the visit: only the $89 trip fee was promised."
+   ],
+   [
+    "The work is priced at the visit, like a leak repair. Only the {{fee}} service call is promised now. Jordan quotes it there, and Alex says yes before any work.",
+    "The work is priced at the visit, like home window film. Only the {{fee}} trip fee is promised now. Jordan quotes it there, and Alex says yes before any work."
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most tint shops start. Is it right? Send only what's different."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules tint shops often set. Your call: keep them, or change any. They become the shop's own rules."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood tint shop on Foundry St. Car window tint, in 2 bays."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most tint shops set it."
+   ],
+   [
+    "BS20981",
+    "REG-20981"
+   ],
+   [
+    "EC22871",
+    "REG-22871"
+   ],
+   [
+    "MP045210",
+    "REG-45210"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Jordan and Casey do mobile tint; Jordan does home window film too. Riley and Avery tint cars in the shop; Riley also does film removal and van visits. Pat is my office manager, for prices over $500. Jules rents a bay, with their own customers."
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: mobile tint and home window film"
+   ],
+   [
+    "color and house calls",
+    "film removal and van visits"
+   ],
+   [
+    "color, house calls",
+    "film removal, van visits"
+   ],
+   [
+    "does color",
+    "does film removal"
+   ],
+   [
+    "Color always stays",
+    "Film removal always stays"
+   ],
+   [
+    "cut hair",
+    "tint cars"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I want the sides and rear windows of my car tinted."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "There's a bubble in the film again."
+   ],
+   [
+    "a roof leak",
+    "a full car wrap"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 home window film job is quoted at the visit and OK'd there; no document is signed first."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a person hurt or a fire, gets the safety steps first."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, no document is signed first: the price is from the list, or quoted at the visit and OK'd there."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can do your sides and rear tint at the shop for $249, or at your home for $338. Where would you like it?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Windshield sun strip · $109"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said a child is shut in a hot car."
+   ],
+   [
+    "A gas smell at the home",
+    "A child shut in a hot car"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Someone with their own customers, like an installer, gets their own sign-up link instead."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. The shop's counter is in the other flow."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's counter is in the other flow."
+   ],
+   [
+    "house calls",
+    "van visits"
+   ],
+   [
+    "House calls",
+    "Van visits"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Sides and rear tint"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Cracked window glass"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like tinting a car that isn't yours, unasked."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Free re-check for 30 days: bubbles or lifting edges, reply here."
+   ],
+   [
+    "Every plumbing service",
+    "Every van job"
+   ],
+   [
+    "Leak repair",
+    "Home window film"
+   ],
+   [
+    "Water heater replacement",
+    "Storefront window film"
+   ],
+   [
+    "like a haircut at the shop or at home.",
+    "like a front-window tint at the shop or at home."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Window tint fitted at your home or office in Springfield: car windows and home window film, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A full-car tint at home"
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the window film quote before booking."
+   ],
+   [
+    "Work like towing or a lockout is sent now (B4-16)",
+    "No work is sent now (B4-16): every van job is booked ahead"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about tinting the windows on my car. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I want my back windows tinted' fits sides and rear tint."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please park the car in the garage or in shade, with the keys handy."
+   ],
+   [
+    "Water heater fix",
+    "Window film check"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds a cracked rear window. The plug-in says a tint installer leaves cracked glass out, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD cracked rear window, left out"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Cracked rear window"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a crack in your rear window and left that window out."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a crack in the rear window"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: film on the rear window"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack in my rear window this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan tint my other car's front windows next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a front-window tint."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a tint job, today,"
+   ],
+   [
+    "accept the leak repair for today,",
+    "accept the tint job for today,"
+   ],
+   [
+    "Accepted: the leak repair today,",
+    "Accepted: the tint job today,"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also tint the windshield sun strip?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about a windshield sun strip. Both jobs go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also add a sun strip?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The sun strip is a small job, priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds paint protection film to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW paint protection film"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Paint protection film for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which windows, how dark, and whether there is old film on them."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A tint could mean a car shop or a home-window installer."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee's Barbershop for a front-window tint instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a sun strip? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services asks: is the car at a home, an office or somewhere else? And which windows, and is there a garage or shade?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Sides and rear, in the garage."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a van tint my car windows this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa tint Thu 12-2 Casey"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 tint needs none."
+   ],
+   [
+    "Kitchen drain",
+    "Sides and rear tint"
+   ],
+   [
+    "Yard drain",
+    "Front two windows"
+   ],
+   [
+    "kitchen drain",
+    "sides and rear tint"
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Say Kim L.'s front-window tint needs nobody home."
+   ],
+   [
+    "Jordan lets himself in the agreed way, with no check-in code.",
+    "Jordan works on the car in the driveway, with no check-in code."
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tint's"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only to their shop."
+   ],
+   [
+    "Drain clearings",
+    "Sides and rear tints"
+   ],
+   [
+    "drain clearings",
+    "sides and rear tints"
+   ],
+   [
+    "Drain clearing",
+    "Sides and rear tint"
+   ],
+   [
+    "drain clearing",
+    "sides and rear tint"
+   ],
+   [
+    "clear the drain",
+    "tint the car"
+   ],
+   [
+    "Water heater flush",
+    "Full-car ceramic tint, at the car"
+   ],
+   [
+    "water heater flush",
+    "full-car ceramic tint, at the car"
+   ],
+   [
+    "Sewer camera inspection",
+    "Windshield sun strip"
+   ],
+   [
+    "sewer camera inspection",
+    "windshield sun strip"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "the $89 service call",
+    "the $89 trip fee"
+   ],
+   [
+    "The $89 service call",
+    "The $89 trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "at the door",
+    "at the car"
+   ],
+   [
+    "plumbing visit",
+    "tint visit"
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "Troy is the one who does full-car ceramic film"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Tint LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Car Tint and Lee Home Film"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Tint Shop"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tint"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobiletint.com"
+   ],
+   [
+    "88 Elm St",
+    "212 Foundry St"
+   ],
+   [
+    "42 Oak St",
+    "33 Linden Way"
+   ],
+   [
+    "1200 Main St",
+    "90 Pier Ave"
+   ],
+   [
+    "Riley",
+    "Rudy"
+   ],
+   [
+    "Avery",
+    "Ines"
+   ],
+   [
+    "Jordan",
+    "Troy"
+   ],
+   [
+    "Casey",
+    "Lucia"
+   ],
+   [
+    "barbershop's",
+    "tint shop's"
+   ],
+   [
+    "barbershop",
+    "tint shop"
+   ],
+   [
+    "Barbershop",
+    "Tint shop"
+   ],
+   [
+    "barbers",
+    "tint installers"
+   ],
+   [
+    "barber",
+    "tint installer"
+   ],
+   [
+    "Barber",
+    "Tint installer"
+   ],
+   [
+    "plumbing's",
+    "mobile tint service's"
+   ],
+   [
+    "plumbing",
+    "mobile tint service"
+   ],
+   [
+    "Plumbing",
+    "Mobile tint service"
+   ],
+   [
+    "plumber",
+    "tint installer"
+   ],
+   [
+    "Plumber",
+    "Tint installer"
+   ],
+   [
+    "electrical",
+    "home window film"
+   ],
+   [
+    "Electrical",
+    "Home window film"
+   ],
+   [
+    "1-year labor warranty",
+    "free 30-day re-check"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Living room and hallway windows"
+   ],
+   [
+    "Shutoff valve",
+    "Living room windows"
+   ],
+   [
+    "shutoff valve",
+    "living room windows"
+   ],
+   [
+    "Supply line",
+    "Hallway window"
+   ],
+   [
+    "supply line",
+    "hallway window"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "leak repair",
+    "home window film"
+   ],
+   [
+    "$120 an hour",
+    "$40 a window"
+   ],
+   [
+    "Priced from photos",
+    "Priced at the visit"
+   ],
+   [
+    "service-call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Labor",
+    "Old film removal, extra windows"
+   ],
+   [
+    "Water pressure check",
+    "Tint meter check"
+   ],
+   [
+    "$179",
+    "$338"
+   ],
+   [
+    "$40 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$110 rest",
+    "$438 rest"
+   ],
+   [
+    "$150",
+    "$538"
+   ],
+   [
+    "$199",
+    "$109"
+   ],
+   [
+    "Elm St",
+    "Foundry St"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Window tint needs no state license by default. The company gives its registration, and an installer registration only where the state's rules require one.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Both companies pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The tint shop's plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Window tint runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Tint installers need no license of their own unless the state's form says so.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Every tint job is booked ahead: nothing is sent now.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "A tint job is paid in one go, never in stages.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "No insurance pays for window tint.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "Each tint job is billed on its own.",
+    "label": "One bill for many visits"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "Film goes on the car. Nothing is done by video or phone.",
+    "label": "By video or phone"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Lee's Tint Shop books a bay's time, not a person: the shop names the installer (the space branch).",
+    "label": "A person's time"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Lee's Tint Shop books a bay's time, not a seat.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Window tint has no stays.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "Bay times name no installer. A wish for one goes in the notes.",
+    "label": "Asks for one person by name"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "No form is signed first for window tint.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A child is never left at a tint shop: a parent stays, or a teen drives in.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "A tint job is rated like any visit.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No insurance or plan pays for window tint.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "Window tint has no results that come later.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The shop sells no packages or memberships.",
+    "label": "A package or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The shop sells no packages or memberships.",
+    "label": "Buys a pack or membership"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Mobile Tint is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The van's door"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Mobile Tint is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Mobile tint service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Mobile tint price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most mobile tint services start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Mobile Tint, to start",
+        "lines": [
+         "Every van job",
+         "Where: at the customer's home or office",
+         "When they book: a card saved for the $89 trip fee",
+         "After the job: Rosie sends the bill"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules mobile tint services often set. Your call: keep them, or change any. They become its own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Mobile Tint: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Mobile Tint will look to customers and AI assistants. I drafted it from your website and Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Window tint fitted at your home or office in Springfield: car windows and home window film, within 25 miles."
+        ]
+       },
+       "photos": [
+        "The van",
+        "The team",
+        "A tint job in a driveway"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Mobile Tint the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Mobile Tint · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s01"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ],
+     [
+      "san",
+      "owner",
+      "Home window film next: same company, so only what's new. It needs no state license where you work, so I've set it like mobile tint service. Send only what's different.",
+      {
+       "card": {
+        "title": "Home window film, set like mobile tint service",
+        "lines": [
+         "At the customer's place, money as for mobile tint service",
+         "Measured at the visit, then priced; only the $89 trip fee is promised",
+         "It goes live once the team member who fits home film joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the van team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Troy Price and Lucia Moore run the van. Troy does home window film too. Rudy Chen and Ines Diaz work the shop's bays. Rudy also does van visits"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Troy Price: the van and home window film",
+         "Lucia Moore: the van",
+         "Rudy Chen: the shop, van visits",
+         "Ines Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Tint Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Rudy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Tint. Sam Lee added you to the team for van and home window film jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Troy"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Rudy replies YES, then checks what Sam set. One reply covers everything Rudy does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Rudy Chen · my profile",
+        "lines": [
+         "Every shop service, van visits",
+         "The shop's hours"
+        ]
+       },
+       "as": "Rudy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Rudy"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the shop and van visits, so Rudy is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Rudy picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Ines, Troy and Lucia set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Tint",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Troy Price",
+       "Lee Mobile Tint",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Lucia Moore",
+       "Lee Mobile Tint",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Tint",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Rudy Chen",
+       "Lee's Tint Shop",
+       "At the shop, and van visits",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Ines Diaz",
+       "Lee's Tint Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Troy: the van and home window film",
+         "Lucia: the van",
+         "Rudy: the shop, van visits",
+         "Ines: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, home window film and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Ines at the shop, Lucia for the van.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Tint Shop can book you from now on, at the shop and for van visits. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Rudy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Tint Shop can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Ines"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Tint can book you for the van and home window film from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Troy"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Home window film and Lee's Tint Shop now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on van and home window film jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The shop's registration EX-1187 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way home window film was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile tint service",
+          "Now"
+         ],
+         [
+          "Home window film",
+          "Once your film installer joins and you say yes"
+         ],
+         [
+          "Lee's Tint Shop",
+          "Its registration is on file as given, not checked. It shows once a tint installer joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "Even with the photo, the registration can't be confirmed. Mobile tint service waits, saved, and the other kinds of work can still go live.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We still can't confirm registration EX-0451, so mobile tint service stays offline.",
+      {
+       "card": {
+        "title": "Mobile tint service · offline, saved",
+        "lines": [
+         "Everything is saved",
+         "Home window film and the tint shop can still go live",
+         "I'll remind you once in 3 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Mobile tint service goes live at 2:16pm, and Sam can be booked now.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile tint service is live! AI assistants can book you now.",
+      {
+       "card": {
+        "title": "Mobile tint service · live now",
+        "lines": [
+         "You can be booked now",
+         "Your people come next, once the rest is set up",
+         "Next, home window film: about 5 minutes"
+        ]
+       },
+       "buttons": [
+        "Start now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Sam sends a photo of the shop's price board and checks what Rosie read. Nothing is typed from scratch.",
+    "more": [
+     "The installed price is for the windows named. Old film removal is added only with the customer's yes, at the bay.",
+     "Full-car ceramic film is cut and ordered for the car, so it shows a deposit. The other services take nothing when they book.",
+     "A film's darkness is the shop's own list. Each window is checked against the state's limit before a booking (A4-x01)."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the shop's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Sides and rear, carbon film",
+          "$249 · 90 min"
+         ],
+         [
+          "Sides and rear, dyed film",
+          "$110 · 90 min"
+         ],
+         [
+          "Front two windows",
+          "$90 · 45 min"
+         ],
+         [
+          "Windshield sun strip",
+          "$20 · 15 min"
+         ],
+         [
+          "Clear heat-block film, windshield",
+          "$149 · 1 hour"
+         ],
+         [
+          "Full-car ceramic film",
+          "$449 · 3 hours · $100 deposit"
+         ],
+         [
+          "Old film removal, per window",
+          "$40"
+         ],
+         [
+          "Tint meter check",
+          "Free · 10 min"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-81",
+    "does": "Sam lists the shop's 2 bays and which services use each one. Customers then pick a bay's time, never a person.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The shop is booked by the bay. List each one, and which services use it.",
+      {
+       "card": {
+        "title": "Your bays",
+        "lines": [
+         "Its name, like Bay 1",
+         "How many cars it fits",
+         "Which services use it",
+         "Its hours"
+        ]
+       },
+       "buttons": [
+        "List them now",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1 Bay 1 and Bay 2, any tint job. All the shop's hours"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "list": {
+        "head": [
+         "Bay",
+         "Services",
+         "Hours"
+        ],
+        "rows": [
+         [
+          "Bay 1",
+          "Every tint job",
+          "The shop's hours"
+         ],
+         [
+          "Bay 2",
+          "Every tint job",
+          "The shop's hours"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-65",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex says which windows, and how dark",
+      "q": "Is every window within the legal limit?",
+      "does": "The secure page asks which windows and how dark a film. Before anything is taken, Rosie checks each window against the darkness limit the shop's state form sets for that window.",
+      "more": [
+       "A window asked darker than the limit is not booked for that window. The rest of the car can still be booked.",
+       "A car that carries the state's exemption paper is checked at the counter, never in a text.",
+       "The film's darkness stays on the secure page. A text says only 'your windows'."
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "branches": [
+       {
+        "label": "Within the limit: go on",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Darker than the limit",
+        "end": "end",
+        "endText": "Not booked for that window: nothing taken, and the AI offers the darkest film that is allowed.",
+        "steps": [
+         {
+          "id": "A4-x02",
+          "line": [
+           "4.7",
+           "4.15"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Offers the darkest film that is allowed",
+          "does": "Say Alex asked for a very dark film on the front side windows. The shop's state form sets a lighter limit there (35% in this example), so Rosie says so plainly. Nothing is taken, and Alex's AI can ask again.",
+          "more": [
+           "The rear windows can go darker where the limit allows it.",
+           "Sam isn't asked, since nothing was booked."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The front side windows can't go darker than 35% here. Nothing was taken. Your assistant can ask again for 35% on the front, and a darker film on the rear windows."
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-05",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.14",
+       "10.10"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Mon Oct 26, 9:00am",
+      "title": "Books the free 30-day re-check",
+      "does": "New film can show small water bubbles for a week or two, and an edge can lift. Two days after the job, Rosie texts Alex once: if anything stays, pick a time for the free re-check.",
+      "more": [
+       "It's a 15-minute stop at the shop, with its own check-in code.",
+       "It's a second visit on Saturday's booking: no fee, and no second $2 for Rosie.",
+       "No reply: nothing is booked. The re-check stays free for 30 days.",
+       "It's the job's own aftercare, not a sale."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee's Tint Shop: if any bubble or lifting edge is still there, your free re-check is open for 30 days. It takes 15 minutes. Pick a time:",
+        {
+         "times": [
+          "Tue Nov 3 · 8:00am · Bay 1",
+          "Wed Nov 4 · 8:00am · Bay 1"
+         ]
+        }
+       ],
+       [
+        "cust",
+        "san",
+        "A"
+       ],
+       [
+        "san",
+        "cust",
+        "Booked: your free re-check. Give this code at the counter.",
+        {
+         "card": {
+          "title": "Lee's Tint Shop · Free re-check",
+          "lines": [
+           "Tue Nov 3 · 8:00am · Bay 1 · 15 minutes",
+           "Free: part of Saturday's job"
+          ]
+         },
+         "code": "3907"
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Window tint needs no state license by default. The company gives its registration, and an installer registration only where the state's rules require one.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Both companies pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The tint shop's plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Window tint runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Tint installers need no license of their own unless the state's form says so.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Every tint job is booked ahead: nothing is sent now.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "Film goes on the car or the windows in person. Nothing is done by video or phone.",
+    "label": "A video or phone session"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Every tint job is booked ahead: nothing is sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Every tint job is booked ahead: nothing is sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "No form is signed first for window tint.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "Window tint needs no signed contract: the price is from the list, or quoted at the visit and OK'd there.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "An installer never minds a child: an adult on the booking must be there.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No plan or warranty pays for window tint. The film maker's warranty is a claim after the visit.",
+    "label": "A plan or warranty pays"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "A tint job is paid in one go, never in stages.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "No insurance or plan pays for window tint.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "No landlord pays for window tint, so no bill goes to one.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "Window tint has no report that comes later.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "The van sells no plan of repeat visits.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Each van job is rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Home window film next: same company, so only what's new. It needs no state license where you work. Send your home window film prices."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Home window film price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like mobile tint service. Send only what's different.",
+      {
+       "card": {
+        "title": "Home window film, set like mobile tint service",
+        "lines": [
+         "At the customer's place, money as for mobile tint service",
+         "Measured at the visit, then priced; only the $89 trip fee is promised",
+         "It goes live once the team member who fits home film joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee's Tint Shop is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Shop front"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the shop is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. A tint shop needs no state license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most tint shops start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee's Tint Shop, to start",
+        "lines": [
+         "Every shop service",
+         "At your shop, paid at the counter, your own way",
+         "When they book: nothing taken; full-car ceramic film, a $100 deposit"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules tint shops often set. Your call: keep them, or change any. They become the shop's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for the shop, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee's Tint Shop will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "A neighborhood tint shop on Foundry St. Car window tint, in 2 bays."
+        ]
+       },
+       "photos": [
+        "The shop front",
+        "The bays",
+        "A car in the bay"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee's Tint Shop the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee's Tint Shop · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the van team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Troy Price and Lucia Moore run the van. Troy does home window film too. Rudy Chen and Ines Diaz work the shop's bays. Rudy also does van visits"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Troy Price: the van and home window film",
+         "Lucia Moore: the van",
+         "Rudy Chen: the shop, van visits",
+         "Ines Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Tint Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Rudy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Tint. Sam Lee added you to the team for van and home window film jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Troy"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Rudy replies YES, then checks what Sam set. One reply covers everything Rudy does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Rudy Chen · my profile",
+        "lines": [
+         "Every shop service, van visits",
+         "The shop's hours"
+        ]
+       },
+       "as": "Rudy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Rudy"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the shop and van visits, so Rudy is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Rudy picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Ines, Troy and Lucia set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Tint",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Troy Price",
+       "Lee Mobile Tint",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Lucia Moore",
+       "Lee Mobile Tint",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Tint",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Rudy Chen",
+       "Lee's Tint Shop",
+       "At the shop, and van visits",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Ines Diaz",
+       "Lee's Tint Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Troy: the van and home window film",
+         "Lucia: the van",
+         "Rudy: the shop, van visits",
+         "Ines: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, home window film and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Ines at the shop, Lucia for the van.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Tint Shop can book you from now on, at the shop and for van visits. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Rudy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Tint Shop can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Ines"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Tint can book you for the van and home window film from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Troy"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Home window film and Lee's Tint Shop now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on van and home window film jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The shop's registration EX-1187 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way home window film was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile tint service",
+          "Now"
+         ],
+         [
+          "Home window film",
+          "Once your film installer joins and you say yes"
+         ],
+         [
+          "Lee's Tint Shop",
+          "Its registration is on file as given, not checked. It shows once a tint installer joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "Even with the photo, the registration can't be confirmed. Mobile tint service waits, saved, and the other kinds of work can still go live.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We still can't confirm registration EX-0451, so mobile tint service stays offline.",
+      {
+       "card": {
+        "title": "Mobile tint service · offline, saved",
+        "lines": [
+         "Everything is saved",
+         "Home window film and the tint shop can still go live",
+         "I'll remind you once in 3 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Mobile tint service goes live at 2:16pm, and Sam can be booked now.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile tint service is live! AI assistants can book you now.",
+      {
+       "card": {
+        "title": "Mobile tint service · live now",
+        "lines": [
+         "You can be booked now",
+         "Your people come next, once the rest is set up",
+         "Next, home window film: about 5 minutes"
+        ]
+       },
+       "buttons": [
+        "Start now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Sam sends a photo of the van's price list and checks what Rosie read. Nothing is typed from scratch.",
+    "more": [
+     "Each van price has the $89 trip fee in it. Home and office window film is measured at the visit, then priced.",
+     "Full-car ceramic film is cut and ordered for the car, so it shows a deposit."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the van's price list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Van price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Sides and rear, carbon film, at your place",
+          "$338 · 2 hours"
+         ],
+         [
+          "Front two windows, at your place",
+          "$179 · 1 hour"
+         ],
+         [
+          "Windshield sun strip, at your place",
+          "$109 · 30 min"
+         ],
+         [
+          "Full-car ceramic film, at your place",
+          "$538 · 3.5 hours · $100 deposit"
+         ],
+         [
+          "Home or office window film",
+          "Measured at the visit, then priced · $89 trip fee"
+         ],
+         [
+          "Old film removal, per window",
+          "$40"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-81",
+    "does": "The van books people, not bays, so Sam lists no spaces for Lee Mobile Tint. The shop's 2 bays are listed in the other flow."
+   },
+   {
+    "op": "after",
+    "at": "B4-69",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex says which windows, and how dark",
+      "q": "Is every window within the legal limit?",
+      "does": "The secure page asks which windows and how dark a film. Before anything is taken, Rosie checks each window against the darkness limit the shop's state form sets for that window.",
+      "more": [
+       "A window asked darker than the limit is not booked for that window. The rest of the car can still be booked.",
+       "A car that carries the state's exemption paper is checked at the counter, never in a text.",
+       "The film's darkness stays on the secure page. A text says only 'your windows'."
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "branches": [
+       {
+        "label": "Within the limit: go on",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Darker than the limit",
+        "end": "end",
+        "endText": "Not booked for that window: nothing taken, and the AI offers the darkest film that is allowed.",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.7",
+           "4.15"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Offers the darkest film that is allowed",
+          "does": "Say Alex asked for a very dark film on the front side windows. The shop's state form sets a lighter limit there (35% in this example), so Rosie says so plainly. Nothing is taken, and Alex's AI can ask again.",
+          "more": [
+           "The rear windows can go darker where the limit allows it.",
+           "Sam isn't asked, since nothing was booked."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The front side windows can't go darker than 35% here. Nothing was taken. Your assistant can ask again for 35% on the front, and a darker film on the rear windows."
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "The receipt says the free 30-day re-check is at the shop: bubbles that don't dry and edges that lift."
+    ]
+   }
+  ]
+ },
+ "notes": "Built on the REDESIGN 2 master (Tue Oct 27, batch D4). Parent: the refitted tires overlay (a chair-style bay booked by time; a car waited on or left; a van that comes to the customer); not edited. No old flowchart existed (a new profession), so the plug-in is the trade's norm and says 'example' for every price.\nTwo companies: Lee's Tint Shop (flow A, 212 Foundry St, 2 bays) and Lee Mobile Tint (flow B, the van; kinds of work: Lee Car Tint and Lee Home Film). Staff: Rudy and Ines (shop), Troy and Lucia (van). Alex lives at 33 Linden Way.\nMoney A: list|none|counter (main: sides and rear carbon film $249, nothing taken), list|none|bill (car left, bill with READY), list|deposit|counter and list|deposit|bill (full-car ceramic film $449: film cut and ordered for the car, $100 deposit at booking, $349 rest; $50 of the deposit kept only if Sam confirms a late cancel). Money B: list|card|bill (main: $338 sides and rear tint at home, the $89 trip fee in it, a card saved for that fee, charged only for a late cancel or a no-show and only on Sam's yes), visit|card|bill (home or office window film, measured and priced at the visit), list|deposit|bill (full-car ceramic at home $538, $100 deposit, $438 rest, fee $89). No hold, no full price, no photos path.\nThe master's numbers are kept in flow B where they fit ($89 trip fee, $245 visit quote with $165 + $80, $160 extra work), and the A prices re-pointed by pairs (the main list price, the package, the deposit and rest).\nLegal limit: pf.questions.limit_check and pf.rules.tint_limit: each window's film must be within the state's limit for that window (the state form's number), or the car carries the state's exemption paper, shown at the counter and never put in a text; a darker film is not booked for that window (own step A4-x01 / B4-x01). Nothing names a state.\nSafety: stop words are someone hurt or a crash, a fire or smoke, a child or pet shut in a hot car (911, no booking); glass cracked and spreading in the driver's view is a don't-drive word (film is never put on cracked glass; the booking goes on for the other windows). None of these is used as an everyday booking example.\nNever sent now: S2-30's 'Yes' branch is off; B7-55 and B8-58 sent-now branches are off; the on-call lines say no job is sent now. Nobody-home work is kept (B8-69) only as the master's split; the plug-in says an adult hands over the keys.\nOff as work this trade never has: video or phone, a person's time, seats and stays, forms and contracts, plans, packs and memberships, insurance and stage payments, a child left, named-only work, results later, rentals.\nAftercare: the free 30-day re-check (own step A10-x01; B10-01 says it too); windows stay up 3 days and no inside cleaning for a week, in READY.\nNot sure (for the verifier): the 35% front-window limit in the own step is an example number; the 30-day re-check, $50 kept of the $100 deposit and the prices are the example shop's own; the S1-13 and S1-14 money cards still show the master's example lines (paid in full, a $20 fee card) that no overlay can change without money words per path (MASTER line in the log).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "When they book: a card saved, for a $20 fee you OK",
+    "Every plumbing service",
+    "A water heater job",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "BS20981",
+    "EC22871",
+    "MP045210",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "color and house calls",
+    "color, house calls",
+    "does color",
+    "Color always stays",
+    "cut hair",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "READY Sofia G. Photo added.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A barbershop books a person's time.",
+    "A what-if: for a table, a court or a room, the times show the space and its size, never a person. A space shows only if it's free and big enough for the group.",
+    "Sat Oct 24 · 6:00pm · Table for 4",
+    "Sat Oct 24 · 7:30pm · Table for 6",
+    "A table for six has one code, not six.",
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Haircut · $35",
+    "Skin fade · $40",
+    "Beard trim · $20",
+    "Haircut at home · $75",
+    "Signature cut and hot towel shave · $55",
+    "Groom's package · $40 deposit",
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "'Adding a beard trim, +$20? Say so.'",
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "A card saved for the $20 fee · paid after the visit",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Refund · $20",
+    "Dee W.'s $20 payment through Rosie was charged twice.",
+    "Color quotes come to you first. Board prices never need one",
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Access, like a step-free chair: only times and places that fit show.",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "My employer pays for this cut.",
+    "The plug-in's plain questions are optional, like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "May the shop show photos of your hair? Yes / No",
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it a fade' goes back to the times.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Stopped Alex M.'s cut.",
+    "stopped Alex M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "1 color quote",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "house calls",
+    "house call",
+    "House calls",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Kids cut",
+    "kids cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Ben T. books a skin fade",
+    "skin fades",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "like a haircut at the shop or at home",
+    "rents a chair",
+    "Lee Home Services'",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "What happens at the chair?",
+    "Takes the price from the shop's board",
+    "A haircut could mean a salon or a barbershop.",
+    "I'd like a cut on Saturday",
+    "Alex adds a beard trim",
+    "Quiero un corte el sábado.",
+    "Books the groom's party together",
+    "Books a haircut and a beard trim",
+    "step-free door on Elm St",
+    "Step-free door on Elm St · parking in the back",
+    "11:00am with Riley",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "at the chair",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Lee's Barbershop LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "88 Elm St",
+    "1200 Main St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershop's",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "$40 deposit",
+    "$100 rest",
+    "$140",
+    "$35",
+    "$75",
+    "$55",
+    "$25",
+    "At the chair",
+    "Style consult",
+    "style consult",
+    "Elm St"
+   ],
+   "B": [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "QUOTE 245 valve 165 supply line 80",
+    "shutoff valve only",
+    "fixes the shutoff valve today",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak.",
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "$160 valve quote",
+    "$160 valve work",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "the shutoff valves",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Jordan left a mess under the sink.",
+    "Reading it back: accept the leak repair for today,",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "The work is priced at the visit, like a leak repair. Only the {{fee}} service call is promised now. Jordan quotes it there, and Alex says yes before any work.",
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "BS20981",
+    "EC22871",
+    "MP045210",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "color and house calls",
+    "color, house calls",
+    "does color",
+    "cut hair",
+    "My kitchen drain is clogged.",
+    "The kitchen drain is clogged again.",
+    "a roof leak",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Sewer camera inspection · $199",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "The shop's chair is in the other flow.",
+    "house calls",
+    "House calls",
+    "Kitchen drain clearing",
+    "Overflowing kitchen drain",
+    "Like tapping a neighbor's water line without asking.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Every plumbing service",
+    "Leak repair",
+    "Water heater replacement",
+    "like a haircut at the shop or at home.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "would like to talk about the water heater quote before booking.",
+    "Work like towing or a lockout is sent now (B4-16)",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "Water heater fix",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today,",
+    "Accepted: the leak repair today,",
+    "Can Jordan also run a camera down my sewer line?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "A haircut could mean a salon or a barbershop.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The $179 drain needs none.",
+    "Kitchen drain",
+    "Yard drain",
+    "kitchen drain",
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Jordan lets himself in the agreed way, with no check-in code.",
+    "rents a chair",
+    "Lee Home Services'",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "Water heater flush",
+    "water heater flush",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call fee",
+    "service call fee",
+    "the $89 service call",
+    "The $89 service call",
+    "service call",
+    "Service call",
+    "at the door",
+    "plumbing visit",
+    "he's the one who replaces water heaters",
+    "Lee Home Services LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "88 Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershop's",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "1-year labor warranty",
+    "Shutoff valve and wall pipe",
+    "Shutoff valve",
+    "shutoff valve",
+    "Supply line",
+    "supply line",
+    "leak repair",
+    "$120 an hour",
+    "Priced from photos",
+    "service-call fee",
+    "service call",
+    "Labor",
+    "Water pressure check",
+    "$179",
+    "$40 deposit",
+    "$110 rest",
+    "$150",
+    "$199",
+    "Elm St"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A9-15": "bd2a17c3c5",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A10-45": "855be6050a",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "S1-38": "b50b0bd4e8",
+   "S2-02": "b2094081ee",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S1-70": "3961b1f903",
+   "S1-50": "3167049ceb",
+   "S1-33": "eeaadba298",
+   "S1-35": "39adfc0799",
+   "S1-12": "41b86c1e72",
+   "S1-81": "c286d15ba2",
+   "A4-65": "fa7ec0389d",
+   "A10-05": "63c3536c7a"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B8-67": "b66ffbd04d",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-38": "867fe1ab7c",
+   "B7-91": "7132851ec1",
+   "B10-32": "7713bff255",
+   "S1-38": "6301c86637",
+   "S2-02": "b2094081ee",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "S1-70": "34e952eac5",
+   "S1-50": "daa9091585",
+   "S1-33": "2b5d1fa4ab",
+   "S1-35": "1b680a4c71",
+   "S1-12": "0bea92643b",
+   "S1-81": "c286d15ba2",
+   "B4-69": "350fbaf90a",
+   "B10-01": "814aa1fde7"
+  }
+ }
+}

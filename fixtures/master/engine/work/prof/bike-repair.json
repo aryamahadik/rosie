@@ -1,0 +1,3351 @@
+{
+ "id": "bike-repair",
+ "name": "Bike repair",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "repair-shop",
+ "plugin": {
+  "pf.license": {
+   "business": "No trade license for bike repair. Business registration where the state's form asks for it; identity checked; 'license: what the business says'.",
+   "person": "None. E-bike motor and battery work only by staff with the maker's service training (a skill set at S2-15, not a license).",
+   "insurance": "The business's own liability insurance; Rosie doesn't check it."
+  },
+  "pf.services": [
+   {
+    "name": "Flat fix",
+    "price": "list",
+    "example": "$20 plus the tube (the example shop's own price)",
+    "length": "30 minutes; drop-off ready the same day",
+    "where": "A: drop-off at the shop, or wait at the counter. B: at the customer's place",
+    "money": "A: nothing up front, paid at pick-up. B: card saved, charged at DONE"
+   },
+   {
+    "name": "Basic tune-up",
+    "price": "list",
+    "example": "$89 at the shop, $119 by the van",
+    "length": "A: drop-off, ready in 2 to 3 days. B: about 1 hour at the van",
+    "where": "A or B",
+    "money": "A: nothing up front, paid at pick-up. B: card saved, charged at DONE"
+   },
+   {
+    "name": "Repair priced after a look (brakes, gears, wheel true, e-bike check)",
+    "price": "visit",
+    "example": "labor and parts quoted after the mechanic looks; nothing done before the customer's yes",
+    "length": "A: drop-off, ready date given with the quote. B: on the spot when the van carries the parts",
+    "where": "A or B",
+    "money": "A: nothing up front, paid at pick-up. B: card saved, charged at DONE"
+   },
+   {
+    "name": "Wheel build or special-order part",
+    "price": "list",
+    "example": "$380, with the $180 parts cost paid up front as the deposit and $200 at pick-up",
+    "length": "drop-off, ready about 7 to 10 days after the part comes",
+    "where": "A only",
+    "money": "A: deposit when booking (the parts cost), the rest at pick-up"
+   },
+   {
+    "name": "Bike fit",
+    "price": "list",
+    "example": "$175, 90 minutes with the named fitter, the rider stays",
+    "length": "90 minutes",
+    "where": "A only (the fit studio)",
+    "money": "A: card saved for a $50 late-cancel fee inside 24 hours, paid at the counter"
+   },
+   {
+    "name": "New bike assembly",
+    "price": "list",
+    "example": "$120",
+    "length": "drop-off, ready in 2 to 3 days",
+    "where": "A only",
+    "money": "A: nothing up front, paid at pick-up"
+   }
+  ],
+  "pf.questions": {
+   "before_times": "The kind of bike (road, mountain, kids', e-bike, cargo); what's wrong, in a few words (picks the service and the time); for an e-bike, the motor's maker (who may work on it). Flow B: where the bike will be (a driveway, garage or office lot) and where the van can park.",
+   "after_time": "Name and mobile. Nothing else.",
+   "secure_page_only": "Nothing (no health or money details are asked).",
+   "who_may_book": "An adult. A parent or guardian books for a child's bike."
+  },
+  "pf.safety": {
+   "stop_words": "An e-bike battery that is swollen, hot, smoking, hissing, smells of burning, or was in water or a fire. Brakes that don't work, or a cracked frame or fork. A crash with someone hurt.",
+   "what_rosie_says": "Battery: 'Don't charge it or bring it inside. Keep it outside, away from anything that burns. If it's smoking or on fire, call 911.' Brakes or frame: 'Please don't ride it. Walk it in or bring it by car.' Someone hurt: 911 first.",
+   "booking_goes_on": "Yes after the battery or brakes steps (safety steps, then go on); no booking during a fire or an injury (911)."
+  },
+  "pf.first_steps": {
+   "required": "None.",
+   "prep": "Bring the bike clean enough to work on. E-bikes: bring the battery key and the charger. Take off bags, lights or child seats you want to keep."
+  },
+  "pf.visit": {
+   "A": "Drop-off at the counter: the code checks the bike in; the mechanic notes the bike's state (scratches, missing parts) in front of the customer; a repair is quoted before any work. Extra parts found during the work (a worn chain, a cracked tire) are quoted first and done only on the customer's own yes. A READY text with the pick-up hours; pick-up with the code or an ID; paid at pick-up. A bike fit: the rider stays; the code at the desk.",
+   "B": "The van parks at the customer's place at a set arrival window; the customer, or someone they name, hands over the bike; the tech works in the van; extra parts quoted first; DONE when the bike is handed back; the saved card is charged then.",
+   "done_proof": "A: the pick-up (code or ID). B: DONE from the tech."
+  },
+  "pf.money": {
+   "ways": "Most work: nothing up front, paid at pick-up. Special-order parts: the parts cost as a deposit. Bike fit: a card saved for the late-cancel fee. Mobile van: a card saved, charged at DONE.",
+   "fees": "Bike fit: $50 inside 24 hours. Van visit: a $35 trip fee inside 24 hours or nobody there. Drop-off repairs: no fee.",
+   "tips": "No tip line.",
+   "tax": "Tax on parts where the state's rules require it (the business's own setting).",
+   "rosfield": "$2 per booking (not a health practice or a law firm)."
+  },
+  "pf.messages": {
+   "never_in_text": "Nothing beyond the master's rules (no health or money details).",
+   "languages": "English and Spanish."
+  },
+  "pf.staff": {
+   "skills": "Any mechanic does standard work; e-bike motor and battery work only by trained staff; fits only by the named fitter; the van tech works alone (an emergency contact is required).",
+   "who_oks": "The owner OKs quotes over the shop's limit.",
+   "stand_in": "Drop-off work: any mechanic with the skill (the customer books the shop, not a person). A bike fit names the fitter: never moved to someone else on silence."
+  },
+  "pf.rules": {
+   "unclaimed": "The owner's not-picked-up rule, as plain text (example: a storage fee from 14 days after READY; after the period the state's rules set for unclaimed items, the shop follows those rules).",
+   "records": "Work orders kept as the master keeps records."
+  },
+  "pf.edges": {
+   "e-bike battery danger": "safety steps first (A3-22 / B3-17)",
+   "extra parts found": "quoted first; the customer's own yes (A8-85 / B8-96)",
+   "a part on back-order after drop-off": "the ready date moves; the customer is told (A8-11)",
+   "bike not picked up": "the owner's not-picked-up rule (A10-23)",
+   "a child's bike": "a parent or guardian books (A4-24)",
+   "damage found at check-in": "noted before the work (A8-23)"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Mike and Jo (mechanics)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Dan and Kim (van techs)",
+   "other": "Others (a bank, an office manager)"
+  }
+ },
+ "keep": [
+  "repair shop"
+ ],
+ "rename": {
+  "A": [
+   [
+    "Lee's Bike Shop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Bike Shop can tune up your bike at the shop for $89, or by the van for $119."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The $20 flat fix is paid at pick-up. So is a van tune-up, $119, charged at DONE."
+   ],
+   [
+    "The $140 Groom's package. A $40 deposit now, and $100 at the chair.",
+    "The $380 wheel build. A $180 parts deposit now, and $200 at pick-up."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "E-bike motor work for Lee Bike Van: is it the same company?"
+   ],
+   [
+    "Say Dan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Dan's estimate visit at Harper J.'s is for a $640 frame rebuild."
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "can tune up your bike at the shop for $89, or by the van for $119"
+   ],
+   [
+    "The $55 signature cut and shave, paid in full when booking.",
+    "The $20 flat fix, paid at pick-up."
+   ],
+   [
+    "the $25 consult is taken at booking, toward the final price",
+    "the look is paid at booking, toward the final price"
+   ],
+   [
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Pat: office manager, OKs Lee Bike Van prices over $500"
+   ],
+   [
+    "Harper J.'s $2,400 repipe is billed in three stages",
+    "Harper J.'s $640 frame rebuild is billed in two stages"
+   ],
+   [
+    "water near outlets gets 'shut off the main valve'",
+    "a loose wheel gets 'stop riding it'"
+   ],
+   [
+    "The $800 start payment is taken as the deposit",
+    "The $180 deposit is taken"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A tune-up could mean a bike shop or a van visit."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a look first; priced at the counter"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Dan: bike and e-bike work, $75 an hour"
+   ],
+   [
+    "A at their home too, 75, paid when they book",
+    "A by the van too, $119, charged at DONE"
+   ],
+   [
+    "a house call, $75, paid in full when booking",
+    "a van tune-up, $119, charged at DONE"
+   ],
+   [
+    "$100 is charged to the saved card at the end",
+    "$200 is charged to the saved card at DONE"
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour",
+    "Dan does e-bike too, at $75 an hour"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Tune-ups, flat fixes and wheel trues."
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Tune-up, flat fix and brake check at the shop."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, gears and van visits"
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Saturday's wheel is out of true on one side"
+   ],
+   [
+    "a card saved for the $89 service-call fee",
+    "a card saved for the $50 late-cancel fee"
+   ],
+   [
+    "Alex wants it at home: a house call, $75",
+    "Alex wants it by the van: a van tune-up, $119"
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "My e-bike battery got wet in a flood."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Flat fix · $20"
+   ],
+   [
+    "Card saved for the $89 service-call fee",
+    "Card saved for the $50 late-cancel fee"
+   ],
+   [
+    "the Groom's package takes a $40 deposit",
+    "the wheel build takes a $180 deposit"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Bike repair CC-10552 · e-bike SC-10417"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kids' fix (12 and under) is $20 plus the tube."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's booth is in the other flow."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Mike also does gears and van visits"
+   ],
+   [
+    "A neighborhood barbershop on Elm St.",
+    "A neighborhood bike shop on Hill Rd."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Mike: mechanic, gears and van visits"
+   ],
+   [
+    "Dan does e-bike too, at $140 an hour",
+    "Dan does e-bike too, at $75 an hour"
+   ],
+   [
+    "$100 is on the bill after the visit",
+    "$200 is on the bill after the visit"
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "The 1-year labor warranty covers the rest."
+   ],
+   [
+    "Adding a brake check, +$20? Say so.",
+    "Adding a brake repair? It's priced after a look."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Bike Shop doesn't do car repair."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a flat tire, today,"
+   ],
+   [
+    "Adding a beard trim, +$20? Say so.",
+    "Adding a brake repair? It's priced after a look."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Tune-up and wheel true"
+   ],
+   [
+    "Only the $25 consult is promised.",
+    "Only a look is promised."
+   ],
+   [
+    "A barbershop takes no drop-offs.",
+    "A bike shop takes drop-offs."
+   ],
+   [
+    "Chain cleaning and water heaters",
+    "Brake repair and wheel true"
+   ],
+   [
+    "A $35 haircut can work this way.",
+    "A $89 tune-up can work this way."
+   ],
+   [
+    "Color quotes come to you first.",
+    "Quotes over your limit come to you first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Gears always stay with Mike."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The wheel is out of true on one side."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Wheels and Lee E-Bike"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "wheel build · $180 deposit"
+   ],
+   [
+    "plumbing and electrical work",
+    "bike and e-bike work"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "bike and e-bike jobs"
+   ],
+   [
+    "a card saved for the $20 fee",
+    "a card saved for a late-cancel fee"
+   ],
+   [
+    "Late or no-show: the $20 fee",
+    "Late or no-show: the $50 fee"
+   ],
+   [
+    "$110 wheel true and $15 tire",
+    "$110 wheel true and $15 tire"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 640 frame rebuild, 2 stages"
+   ],
+   [
+    "the $20 fee, if you confirm",
+    "the $50 fee, if you confirm"
+   ],
+   [
+    "Card saved for the $20 fee",
+    "Card saved for a late-cancel fee"
+   ],
+   [
+    "Avery · license not found",
+    "Avery · license not on file"
+   ],
+   [
+    "Casey · license not found",
+    "Casey · license not on file"
+   ],
+   [
+    "The $80 supply line stays",
+    "The $80 chain stays"
+   ],
+   [
+    "$100 is paid at the chair",
+    "$200 is paid at pick-up"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "The $140 Groom's package",
+    "The $380 wheel build"
+   ],
+   [
+    "The service call is $89.",
+    "The van trip fee is $35."
+   ],
+   [
+    "Water heater replacement",
+    "Wheel replacement"
+   ],
+   [
+    "water heater replacement",
+    "wheel replacement"
+   ],
+   [
+    "$20 taken when they book",
+    "$180 taken when they book"
+   ],
+   [
+    "$40 taken when they book",
+    "$180 taken when they book"
+   ],
+   [
+    "$25 taken when they book",
+    "$180 taken when they book"
+   ],
+   [
+    "Promises the $25 consult",
+    "Promises a look first"
+   ],
+   [
+    "the $25 consult included",
+    "the look included"
+   ],
+   [
+    "The $25 consult included",
+    "The look included"
+   ],
+   [
+    "Plumbing and electrical",
+    "Bike tune-ups and e-bike work"
+   ],
+   [
+    "plumbing and electrical",
+    "bike tune-ups and e-bike work"
+   ],
+   [
+    "Avery · license expired",
+    "Avery · license on file"
+   ],
+   [
+    "Casey · license expired",
+    "Casey · license on file"
+   ],
+   [
+    "Sewer camera inspection",
+    "Frame inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "frame inspection"
+   ],
+   [
+    "Signature cut and shave",
+    "Tune-up and wheel true"
+   ],
+   [
+    "signature cut and shave",
+    "tune-up and wheel true"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' fix (12 and under)"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW e-bike motor work"
+   ],
+   [
+    "like a skin-test result",
+    "like a fit measurement"
+   ],
+   [
+    "[photo: A chair, ready]",
+    "[photo: A booth, ready]"
+   ],
+   [
+    "[photo: The shop front]",
+    "[photo: The shop front]"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Front wheel check"
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so no late-cancel fee"
+   ],
+   [
+    "The $800 start payment",
+    "The $180 deposit"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Bike Van LLC"
+   ],
+   [
+    "Haircut at home · $75",
+    "Tune-up by the van · $119"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Bike Shop LLC"
+   ],
+   [
+    "for a $20 fee you OK",
+    "for a late-cancel fee you OK"
+   ],
+   [
+    "$100 after the visit",
+    "$200 at pick-up"
+   ],
+   [
+    "Sewer camera report",
+    "Frame check report"
+   ],
+   [
+    "the Groom's package",
+    "the wheel build package"
+   ],
+   [
+    "The Groom's package",
+    "The wheel build package"
+   ],
+   [
+    "photos of your hair",
+    "photos of your bike"
+   ],
+   [
+    "heating and cooling",
+    "e-bike motor work"
+   ],
+   [
+    "Heating and cooling",
+    "E-bike motor work"
+   ],
+   [
+    "Insurance pays part",
+    "A payer pays part"
+   ],
+   [
+    "the shop's own line",
+    "the company's own line"
+   ],
+   [
+    "[photo: The chairs]",
+    "[photo: The booths]"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Bike Shop's"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Bike Van'"
+   ],
+   [
+    "electrical license",
+    "e-bike training"
+   ],
+   [
+    "Water heater flush",
+    "Brake repair"
+   ],
+   [
+    "water heater flush",
+    "brake repair"
+   ],
+   [
+    "Riley's color plan",
+    "Mike's gear plan"
+   ],
+   [
+    "the shop's $20 fee",
+    "a late-cancel fee"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Bike Van"
+   ],
+   [
+    "Plumbing MP045210",
+    "Bike repair CC-10552"
+   ],
+   [
+    "a dripping faucet",
+    "clicking gears"
+   ],
+   [
+    "$100 at the chair",
+    "$200 at pick-up"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Bike Shop"
+   ],
+   [
+    "plumbing license",
+    "repair registration"
+   ],
+   [
+    "Plumbing license",
+    "Repair registration"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "color correction",
+    "wheel true"
+   ],
+   [
+    "Color correction",
+    "Wheel true"
+   ],
+   [
+    "garbage disposal",
+    "rear derailleur"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "Repipe · $2,400",
+    "Frame rebuild · $640"
+   ],
+   [
+    "Groom's package",
+    "wheel build package"
+   ],
+   [
+    "Gloss to finish",
+    "Tire to finish"
+   ],
+   [
+    "dripping faucet",
+    "clicking gears"
+   ],
+   [
+    "Drain clearing",
+    "Brake repair"
+   ],
+   [
+    "drain clearing",
+    "brake repair"
+   ],
+   [
+    "Under the sink",
+    "By the bike rack"
+   ],
+   [
+    "under the sink",
+    "by the bike rack"
+   ],
+   [
+    "shutoff valves",
+    "brake pads"
+   ],
+   [
+    "low beard line",
+    "soft front brake"
+   ],
+   [
+    "a chair, ready",
+    "a booth, ready"
+   ],
+   [
+    "Signature cut",
+    "Tune-up"
+   ],
+   [
+    "signature cut",
+    "tune-up"
+   ],
+   [
+    "groom's party",
+    "group ride"
+   ],
+   [
+    "Color and cut",
+    "Tune-up and wheel true"
+   ],
+   [
+    "color and cut",
+    "tune-up and wheel true"
+   ],
+   [
+    "sees the hair",
+    "sees the bike"
+   ],
+   [
+    "Kitchen drain",
+    "Front wheel"
+   ],
+   [
+    "kitchen drain",
+    "front wheel"
+   ],
+   [
+    "bathroom sink",
+    "bike rack"
+   ],
+   [
+    "the sink wall",
+    "the bike rack"
+   ],
+   [
+    "shutoff valve",
+    "brake pad"
+   ],
+   [
+    "Shutoff valve",
+    "Brake pad"
+   ],
+   [
+    "cabinet floor",
+    "shop floor"
+   ],
+   [
+    "Cabinet floor",
+    "Shop floor"
+   ],
+   [
+    "water heaters",
+    "wheels"
+   ],
+   [
+    "Water heaters",
+    "Wheels"
+   ],
+   [
+    "A $35 haircut",
+    "A $89 tune-up"
+   ],
+   [
+    "a $35 haircut",
+    "a $89 tune-up"
+   ],
+   [
+    "Haircut · $35",
+    "Tune-up · $89"
+   ],
+   [
+    "the $100 rest",
+    "the $200 rest"
+   ],
+   [
+    "$2,400 repipe",
+    "$640 frame rebuild"
+   ],
+   [
+    "rents a chair",
+    "rents a booth"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Wheels"
+   ],
+   [
+    "Lee Electric",
+    "Lee E-Bike"
+   ],
+   [
+    "Jordan Price",
+    "Dan Price"
+   ],
+   [
+    "1200 Main St",
+    "15 Lake Rd"
+   ],
+   [
+    "Water heater",
+    "Wheel"
+   ],
+   [
+    "water heater",
+    "wheel"
+   ],
+   [
+    "A beard trim",
+    "A brake check"
+   ],
+   [
+    "a beard trim",
+    "a brake check"
+   ],
+   [
+    "a barbershop",
+    "a bike shop"
+   ],
+   [
+    "A barbershop",
+    "A bike shop"
+   ],
+   [
+    "barber chair",
+    "repair stand"
+   ],
+   [
+    "service call",
+    "van visit"
+   ],
+   [
+    "Service call",
+    "Van visit"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "chair renter",
+    "booth renter"
+   ],
+   [
+    "Casey Moore",
+    "Kim Moore"
+   ],
+   [
+    "house calls",
+    "van visits"
+   ],
+   [
+    "House calls",
+    "Van visits"
+   ],
+   [
+    "A skin fade",
+    "A flat fix"
+   ],
+   [
+    "Barbershops",
+    "Bike shops"
+   ],
+   [
+    "barbershops",
+    "bike shops"
+   ],
+   [
+    "electrician",
+    "e-bike tech"
+   ],
+   [
+    "leak repair",
+    "brake repair"
+   ],
+   [
+    "Leak repair",
+    "Brake repair"
+   ],
+   [
+    "supply line",
+    "chain"
+   ],
+   [
+    "Supply line",
+    "Chain"
+   ],
+   [
+    "overflowing",
+    "grinding badly"
+   ],
+   [
+    "$35 haircut",
+    "$89 tune-up"
+   ],
+   [
+    "$20 deposit",
+    "$180 deposit"
+   ],
+   [
+    "$40 deposit",
+    "$180 deposit"
+   ],
+   [
+    "$25 deposit",
+    "$180 deposit"
+   ],
+   [
+    "$25 consult",
+    "look"
+   ],
+   [
+    "Riley Chen",
+    "Mike Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Jo Diaz"
+   ],
+   [
+    "Color plan",
+    "Gear plan"
+   ],
+   [
+    "color plan",
+    "gear plan"
+   ],
+   [
+    "patch test",
+    "test ride"
+   ],
+   [
+    "Patch test",
+    "Test ride"
+   ],
+   [
+    "house call",
+    "van visit"
+   ],
+   [
+    "House call",
+    "Van visit"
+   ],
+   [
+    "Beard trim",
+    "Brake check"
+   ],
+   [
+    "beard trim",
+    "brake check"
+   ],
+   [
+    "Barbershop",
+    "Bike shop"
+   ],
+   [
+    "barbershop",
+    "bike shop"
+   ],
+   [
+    "Yard drain",
+    "Rear wheel"
+   ],
+   [
+    "yard drain",
+    "rear wheel"
+   ],
+   [
+    "electrical",
+    "e-bike"
+   ],
+   [
+    "Electrical",
+    "E-bike"
+   ],
+   [
+    "dishwasher",
+    "pedals"
+   ],
+   [
+    "water line",
+    "chain line"
+   ],
+   [
+    "Water line",
+    "Chain line"
+   ],
+   [
+    "skin fades",
+    "flat fixes"
+   ],
+   [
+    "Skin fades",
+    "Flat fixes"
+   ],
+   [
+    "The chairs",
+    "The booths"
+   ],
+   [
+    "88 Elm St",
+    "27 Hill Rd"
+   ],
+   [
+    "42 Oak St",
+    "320 Bell St"
+   ],
+   [
+    "Skin fade",
+    "Flat fix"
+   ],
+   [
+    "skin fade",
+    "flat fix"
+   ],
+   [
+    "Electric.",
+    "E-bike."
+   ],
+   [
+    "sink wall",
+    "bike rack"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "kids cuts",
+    "kids' fixes"
+   ],
+   [
+    "Kids cuts",
+    "Kids' fixes"
+   ],
+   [
+    "Kids cut",
+    "Kids' fix"
+   ],
+   [
+    "kids cut",
+    "kids' fix"
+   ],
+   [
+    "cut hair",
+    "service the bike"
+   ],
+   [
+    "Cut hair",
+    "Service the bike"
+   ],
+   [
+    "Haircuts",
+    "Tune-ups"
+   ],
+   [
+    "haircuts",
+    "tune-ups"
+   ],
+   [
+    "a barber",
+    "a mechanic"
+   ],
+   [
+    "A barber",
+    "A mechanic"
+   ],
+   [
+    "plumbers",
+    "mechanics"
+   ],
+   [
+    "plumbing",
+    "bike repair"
+   ],
+   [
+    "Plumbing",
+    "Bike repair"
+   ],
+   [
+    "the sink",
+    "the bike rack"
+   ],
+   [
+    "Main St",
+    "Lake Rd"
+   ],
+   [
+    "Haircut",
+    "Tune-up"
+   ],
+   [
+    "haircut",
+    "tune-up"
+   ],
+   [
+    "barbers",
+    "mechanics"
+   ],
+   [
+    "Barbers",
+    "Mechanics"
+   ],
+   [
+    "massage",
+    "e-bike check"
+   ],
+   [
+    "Massage",
+    "E-bike check"
+   ],
+   [
+    "plumber",
+    "mechanic"
+   ],
+   [
+    "Plumber",
+    "Mechanic"
+   ],
+   [
+    "shutoff",
+    "brake"
+   ],
+   [
+    "Shutoff",
+    "Brake"
+   ],
+   [
+    "clogged",
+    "skipping"
+   ],
+   [
+    "cabinet",
+    "shop wall"
+   ],
+   [
+    "Cabinet",
+    "Shop wall"
+   ],
+   [
+    "steamer",
+    "pump"
+   ],
+   [
+    "line-up",
+    "wheel true"
+   ],
+   [
+    "Elm St",
+    "Hill Rd"
+   ],
+   [
+    "Oak St",
+    "Bell St"
+   ],
+   [
+    "Barber",
+    "Mechanic"
+   ],
+   [
+    "barber",
+    "mechanic"
+   ],
+   [
+    "toilet",
+    "saddle"
+   ],
+   [
+    "heater",
+    "motor"
+   ],
+   [
+    "Heater",
+    "Motor"
+   ],
+   [
+    "faucet",
+    "derailleur"
+   ],
+   [
+    "Faucet",
+    "Derailleur"
+   ],
+   [
+    "brassy",
+    "squeaky"
+   ],
+   [
+    "facial",
+    "wheel"
+   ],
+   [
+    "Jordan",
+    "Dan"
+   ],
+   [
+    "valves",
+    "tire stems"
+   ],
+   [
+    "repipe",
+    "frame rebuild"
+   ],
+   [
+    "Repipe",
+    "Frame rebuild"
+   ],
+   [
+    "$2,400",
+    "$640"
+   ],
+   [
+    "chairs",
+    "booths"
+   ],
+   [
+    "perms",
+    "car repairs"
+   ],
+   [
+    "gloss",
+    "tire"
+   ],
+   [
+    "drain",
+    "chain"
+   ],
+   [
+    "Drain",
+    "Chain"
+   ],
+   [
+    "pipes",
+    "cables"
+   ],
+   [
+    "clogs",
+    "skips"
+   ],
+   [
+    "drips",
+    "clicks"
+   ],
+   [
+    "valve",
+    "tire stem"
+   ],
+   [
+    "flush",
+    "clean"
+   ],
+   [
+    "Flush",
+    "Clean"
+   ],
+   [
+    "sewer",
+    "frame"
+   ],
+   [
+    "Sewer",
+    "Frame"
+   ],
+   [
+    "shave",
+    "brake check"
+   ],
+   [
+    "Shave",
+    "Brake check"
+   ],
+   [
+    "Riley",
+    "Mike"
+   ],
+   [
+    "Avery",
+    "Jo"
+   ],
+   [
+    "Casey",
+    "Kim"
+   ],
+   [
+    "beard",
+    "brake"
+   ],
+   [
+    "Beard",
+    "Brake"
+   ],
+   [
+    "Color",
+    "Gear"
+   ],
+   [
+    "color",
+    "gear"
+   ],
+   [
+    "perm",
+    "car repair"
+   ],
+   [
+    "sink",
+    "bike rack"
+   ],
+   [
+    "Sink",
+    "Bike rack"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "clog",
+    "skip"
+   ],
+   [
+    "leak",
+    "flat"
+   ],
+   [
+    "Leak",
+    "Flat"
+   ],
+   [
+    "cape",
+    "bike cover"
+   ],
+   [
+    "Cape",
+    "Bike cover"
+   ],
+   [
+    "$800",
+    "$320"
+   ],
+   [
+    "dye",
+    "grease"
+   ]
+  ],
+  "B": [
+   [
+    "Lee's Bike Shop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Bike Shop can tune up your bike at the shop for $89, or by the van for $119."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The $20 flat fix is paid at pick-up. So is a van tune-up, $119, charged at DONE."
+   ],
+   [
+    "The $140 Groom's package. A $40 deposit now, and $100 at the chair.",
+    "The $380 wheel build. A $180 parts deposit now, and $200 at pick-up."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "E-bike motor work for Lee Bike Van: is it the same company?"
+   ],
+   [
+    "Say Dan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Dan's estimate visit at Harper J.'s is for a $640 frame rebuild."
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "can tune up your bike at the shop for $89, or by the van for $119"
+   ],
+   [
+    "The $55 signature cut and shave, paid in full when booking.",
+    "The $20 flat fix, paid at pick-up."
+   ],
+   [
+    "the $25 consult is taken at booking, toward the final price",
+    "the look is paid at booking, toward the final price"
+   ],
+   [
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Pat: office manager, OKs Lee Bike Van prices over $500"
+   ],
+   [
+    "Harper J.'s $2,400 repipe is billed in three stages",
+    "Harper J.'s $640 frame rebuild is billed in two stages"
+   ],
+   [
+    "water near outlets gets 'shut off the main valve'",
+    "a loose wheel gets 'stop riding it'"
+   ],
+   [
+    "The $800 start payment is taken as the deposit",
+    "The $180 deposit is taken"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A tune-up could mean a bike shop or a van visit."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a look first; priced at the counter"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Dan: bike and e-bike work, $75 an hour"
+   ],
+   [
+    "A at their home too, 75, paid when they book",
+    "A by the van too, $119, charged at DONE"
+   ],
+   [
+    "a house call, $75, paid in full when booking",
+    "a van tune-up, $119, charged at DONE"
+   ],
+   [
+    "$100 is charged to the saved card at the end",
+    "$200 is charged to the saved card at DONE"
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour",
+    "Dan does e-bike too, at $75 an hour"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Tune-ups, flat fixes and wheel trues."
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Tune-up, flat fix and brake check at the shop."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, gears and van visits"
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Saturday's wheel is out of true on one side"
+   ],
+   [
+    "a card saved for the $89 service-call fee",
+    "a card saved for the $50 late-cancel fee"
+   ],
+   [
+    "Alex wants it at home: a house call, $75",
+    "Alex wants it by the van: a van tune-up, $119"
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "My e-bike battery got wet in a flood."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Flat fix · $20"
+   ],
+   [
+    "Card saved for the $89 service-call fee",
+    "Card saved for the $50 late-cancel fee"
+   ],
+   [
+    "the Groom's package takes a $40 deposit",
+    "the wheel build takes a $180 deposit"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Bike repair CC-10552 · e-bike SC-10417"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kids' fix (12 and under) is $20 plus the tube."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's booth is in the other flow."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Mike also does gears and van visits"
+   ],
+   [
+    "A neighborhood barbershop on Elm St.",
+    "A neighborhood bike shop on Hill Rd."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Mike: mechanic, gears and van visits"
+   ],
+   [
+    "Dan does e-bike too, at $140 an hour",
+    "Dan does e-bike too, at $75 an hour"
+   ],
+   [
+    "$100 is on the bill after the visit",
+    "$200 is on the bill after the visit"
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "The 1-year labor warranty covers the rest."
+   ],
+   [
+    "Adding a brake check, +$20? Say so.",
+    "Adding a brake repair? It's priced after a look."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Bike Shop doesn't do car repair."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a flat tire, today,"
+   ],
+   [
+    "Adding a beard trim, +$20? Say so.",
+    "Adding a brake repair? It's priced after a look."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Tune-up and wheel true"
+   ],
+   [
+    "Only the $25 consult is promised.",
+    "Only a look is promised."
+   ],
+   [
+    "A barbershop takes no drop-offs.",
+    "A bike shop takes drop-offs."
+   ],
+   [
+    "Chain cleaning and water heaters",
+    "Brake repair and wheel true"
+   ],
+   [
+    "A $35 haircut can work this way.",
+    "A $89 tune-up can work this way."
+   ],
+   [
+    "Color quotes come to you first.",
+    "Quotes over your limit come to you first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Gears always stay with Mike."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The wheel is out of true on one side."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Wheels and Lee E-Bike"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "wheel build · $180 deposit"
+   ],
+   [
+    "plumbing and electrical work",
+    "bike and e-bike work"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "bike and e-bike jobs"
+   ],
+   [
+    "a card saved for the $20 fee",
+    "a card saved for a late-cancel fee"
+   ],
+   [
+    "Late or no-show: the $20 fee",
+    "Late or no-show: the $50 fee"
+   ],
+   [
+    "$110 wheel true and $15 tire",
+    "$110 wheel true and $15 tire"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 640 frame rebuild, 2 stages"
+   ],
+   [
+    "the $20 fee, if you confirm",
+    "the $50 fee, if you confirm"
+   ],
+   [
+    "Card saved for the $20 fee",
+    "Card saved for a late-cancel fee"
+   ],
+   [
+    "Avery · license not found",
+    "Avery · license not on file"
+   ],
+   [
+    "Casey · license not found",
+    "Casey · license not on file"
+   ],
+   [
+    "The $80 supply line stays",
+    "The $80 chain stays"
+   ],
+   [
+    "$100 is paid at the chair",
+    "$200 is paid at pick-up"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "The $140 Groom's package",
+    "The $380 wheel build"
+   ],
+   [
+    "The service call is $89.",
+    "The van trip fee is $35."
+   ],
+   [
+    "Water heater replacement",
+    "Wheel replacement"
+   ],
+   [
+    "water heater replacement",
+    "wheel replacement"
+   ],
+   [
+    "$20 taken when they book",
+    "$180 taken when they book"
+   ],
+   [
+    "$40 taken when they book",
+    "$180 taken when they book"
+   ],
+   [
+    "$25 taken when they book",
+    "$180 taken when they book"
+   ],
+   [
+    "Promises the $25 consult",
+    "Promises a look first"
+   ],
+   [
+    "the $25 consult included",
+    "the look included"
+   ],
+   [
+    "The $25 consult included",
+    "The look included"
+   ],
+   [
+    "Plumbing and electrical",
+    "Bike tune-ups and e-bike work"
+   ],
+   [
+    "plumbing and electrical",
+    "bike tune-ups and e-bike work"
+   ],
+   [
+    "Avery · license expired",
+    "Avery · license on file"
+   ],
+   [
+    "Casey · license expired",
+    "Casey · license on file"
+   ],
+   [
+    "Sewer camera inspection",
+    "Frame inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "frame inspection"
+   ],
+   [
+    "Signature cut and shave",
+    "Tune-up and wheel true"
+   ],
+   [
+    "signature cut and shave",
+    "tune-up and wheel true"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' fix (12 and under)"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW e-bike motor work"
+   ],
+   [
+    "like a skin-test result",
+    "like a fit measurement"
+   ],
+   [
+    "[photo: A chair, ready]",
+    "[photo: A booth, ready]"
+   ],
+   [
+    "[photo: The shop front]",
+    "[photo: The shop front]"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Front wheel check"
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so no late-cancel fee"
+   ],
+   [
+    "The $800 start payment",
+    "The $180 deposit"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Bike Van LLC"
+   ],
+   [
+    "Haircut at home · $75",
+    "Tune-up by the van · $119"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Bike Shop LLC"
+   ],
+   [
+    "for a $20 fee you OK",
+    "for a late-cancel fee you OK"
+   ],
+   [
+    "$100 after the visit",
+    "$200 at pick-up"
+   ],
+   [
+    "Sewer camera report",
+    "Frame check report"
+   ],
+   [
+    "the Groom's package",
+    "the wheel build package"
+   ],
+   [
+    "The Groom's package",
+    "The wheel build package"
+   ],
+   [
+    "photos of your hair",
+    "photos of your bike"
+   ],
+   [
+    "heating and cooling",
+    "e-bike motor work"
+   ],
+   [
+    "Heating and cooling",
+    "E-bike motor work"
+   ],
+   [
+    "Insurance pays part",
+    "A payer pays part"
+   ],
+   [
+    "the shop's own line",
+    "the company's own line"
+   ],
+   [
+    "[photo: The chairs]",
+    "[photo: The booths]"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Bike Shop's"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Bike Van'"
+   ],
+   [
+    "electrical license",
+    "e-bike training"
+   ],
+   [
+    "Water heater flush",
+    "Brake repair"
+   ],
+   [
+    "water heater flush",
+    "brake repair"
+   ],
+   [
+    "Riley's color plan",
+    "Mike's gear plan"
+   ],
+   [
+    "the shop's $20 fee",
+    "a late-cancel fee"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Bike Van"
+   ],
+   [
+    "Plumbing MP045210",
+    "Bike repair CC-10552"
+   ],
+   [
+    "a dripping faucet",
+    "clicking gears"
+   ],
+   [
+    "$100 at the chair",
+    "$200 at pick-up"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Bike Shop"
+   ],
+   [
+    "plumbing license",
+    "repair registration"
+   ],
+   [
+    "Plumbing license",
+    "Repair registration"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "color correction",
+    "wheel true"
+   ],
+   [
+    "Color correction",
+    "Wheel true"
+   ],
+   [
+    "garbage disposal",
+    "rear derailleur"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "Repipe · $2,400",
+    "Frame rebuild · $640"
+   ],
+   [
+    "Groom's package",
+    "wheel build package"
+   ],
+   [
+    "Gloss to finish",
+    "Tire to finish"
+   ],
+   [
+    "dripping faucet",
+    "clicking gears"
+   ],
+   [
+    "Drain clearing",
+    "Brake repair"
+   ],
+   [
+    "drain clearing",
+    "brake repair"
+   ],
+   [
+    "Under the sink",
+    "By the bike rack"
+   ],
+   [
+    "under the sink",
+    "by the bike rack"
+   ],
+   [
+    "shutoff valves",
+    "brake pads"
+   ],
+   [
+    "low beard line",
+    "soft front brake"
+   ],
+   [
+    "a chair, ready",
+    "a booth, ready"
+   ],
+   [
+    "Signature cut",
+    "Tune-up"
+   ],
+   [
+    "signature cut",
+    "tune-up"
+   ],
+   [
+    "groom's party",
+    "group ride"
+   ],
+   [
+    "Color and cut",
+    "Tune-up and wheel true"
+   ],
+   [
+    "color and cut",
+    "tune-up and wheel true"
+   ],
+   [
+    "sees the hair",
+    "sees the bike"
+   ],
+   [
+    "Kitchen drain",
+    "Front wheel"
+   ],
+   [
+    "kitchen drain",
+    "front wheel"
+   ],
+   [
+    "bathroom sink",
+    "bike rack"
+   ],
+   [
+    "the sink wall",
+    "the bike rack"
+   ],
+   [
+    "shutoff valve",
+    "brake pad"
+   ],
+   [
+    "Shutoff valve",
+    "Brake pad"
+   ],
+   [
+    "cabinet floor",
+    "shop floor"
+   ],
+   [
+    "Cabinet floor",
+    "Shop floor"
+   ],
+   [
+    "water heaters",
+    "wheels"
+   ],
+   [
+    "Water heaters",
+    "Wheels"
+   ],
+   [
+    "A $35 haircut",
+    "A $89 tune-up"
+   ],
+   [
+    "a $35 haircut",
+    "a $89 tune-up"
+   ],
+   [
+    "Haircut · $35",
+    "Tune-up · $89"
+   ],
+   [
+    "the $100 rest",
+    "the $200 rest"
+   ],
+   [
+    "$2,400 repipe",
+    "$640 frame rebuild"
+   ],
+   [
+    "rents a chair",
+    "rents a booth"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Wheels"
+   ],
+   [
+    "Lee Electric",
+    "Lee E-Bike"
+   ],
+   [
+    "Jordan Price",
+    "Dan Price"
+   ],
+   [
+    "1200 Main St",
+    "15 Lake Rd"
+   ],
+   [
+    "Water heater",
+    "Wheel"
+   ],
+   [
+    "water heater",
+    "wheel"
+   ],
+   [
+    "A beard trim",
+    "A brake check"
+   ],
+   [
+    "a beard trim",
+    "a brake check"
+   ],
+   [
+    "a barbershop",
+    "a bike shop"
+   ],
+   [
+    "A barbershop",
+    "A bike shop"
+   ],
+   [
+    "barber chair",
+    "repair stand"
+   ],
+   [
+    "service call",
+    "van visit"
+   ],
+   [
+    "Service call",
+    "Van visit"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "chair renter",
+    "booth renter"
+   ],
+   [
+    "Casey Moore",
+    "Kim Moore"
+   ],
+   [
+    "house calls",
+    "van visits"
+   ],
+   [
+    "House calls",
+    "Van visits"
+   ],
+   [
+    "A skin fade",
+    "A flat fix"
+   ],
+   [
+    "Barbershops",
+    "Bike shops"
+   ],
+   [
+    "barbershops",
+    "bike shops"
+   ],
+   [
+    "electrician",
+    "e-bike tech"
+   ],
+   [
+    "leak repair",
+    "brake repair"
+   ],
+   [
+    "Leak repair",
+    "Brake repair"
+   ],
+   [
+    "supply line",
+    "chain"
+   ],
+   [
+    "Supply line",
+    "Chain"
+   ],
+   [
+    "overflowing",
+    "grinding badly"
+   ],
+   [
+    "$35 haircut",
+    "$89 tune-up"
+   ],
+   [
+    "$20 deposit",
+    "$180 deposit"
+   ],
+   [
+    "$40 deposit",
+    "$180 deposit"
+   ],
+   [
+    "$25 deposit",
+    "$180 deposit"
+   ],
+   [
+    "$25 consult",
+    "look"
+   ],
+   [
+    "Riley Chen",
+    "Mike Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Jo Diaz"
+   ],
+   [
+    "Color plan",
+    "Gear plan"
+   ],
+   [
+    "color plan",
+    "gear plan"
+   ],
+   [
+    "patch test",
+    "test ride"
+   ],
+   [
+    "Patch test",
+    "Test ride"
+   ],
+   [
+    "house call",
+    "van visit"
+   ],
+   [
+    "House call",
+    "Van visit"
+   ],
+   [
+    "Beard trim",
+    "Brake check"
+   ],
+   [
+    "beard trim",
+    "brake check"
+   ],
+   [
+    "Barbershop",
+    "Bike shop"
+   ],
+   [
+    "barbershop",
+    "bike shop"
+   ],
+   [
+    "Yard drain",
+    "Rear wheel"
+   ],
+   [
+    "yard drain",
+    "rear wheel"
+   ],
+   [
+    "electrical",
+    "e-bike"
+   ],
+   [
+    "Electrical",
+    "E-bike"
+   ],
+   [
+    "dishwasher",
+    "pedals"
+   ],
+   [
+    "water line",
+    "chain line"
+   ],
+   [
+    "Water line",
+    "Chain line"
+   ],
+   [
+    "skin fades",
+    "flat fixes"
+   ],
+   [
+    "Skin fades",
+    "Flat fixes"
+   ],
+   [
+    "The chairs",
+    "The booths"
+   ],
+   [
+    "88 Elm St",
+    "27 Hill Rd"
+   ],
+   [
+    "42 Oak St",
+    "320 Bell St"
+   ],
+   [
+    "Skin fade",
+    "Flat fix"
+   ],
+   [
+    "skin fade",
+    "flat fix"
+   ],
+   [
+    "Electric.",
+    "E-bike."
+   ],
+   [
+    "sink wall",
+    "bike rack"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "kids cuts",
+    "kids' fixes"
+   ],
+   [
+    "Kids cuts",
+    "Kids' fixes"
+   ],
+   [
+    "Kids cut",
+    "Kids' fix"
+   ],
+   [
+    "kids cut",
+    "kids' fix"
+   ],
+   [
+    "cut hair",
+    "service the bike"
+   ],
+   [
+    "Cut hair",
+    "Service the bike"
+   ],
+   [
+    "Haircuts",
+    "Tune-ups"
+   ],
+   [
+    "haircuts",
+    "tune-ups"
+   ],
+   [
+    "a barber",
+    "a mechanic"
+   ],
+   [
+    "A barber",
+    "A mechanic"
+   ],
+   [
+    "plumbers",
+    "mechanics"
+   ],
+   [
+    "plumbing",
+    "bike repair"
+   ],
+   [
+    "Plumbing",
+    "Bike repair"
+   ],
+   [
+    "the sink",
+    "the bike rack"
+   ],
+   [
+    "Main St",
+    "Lake Rd"
+   ],
+   [
+    "Haircut",
+    "Tune-up"
+   ],
+   [
+    "haircut",
+    "tune-up"
+   ],
+   [
+    "barbers",
+    "mechanics"
+   ],
+   [
+    "Barbers",
+    "Mechanics"
+   ],
+   [
+    "massage",
+    "e-bike check"
+   ],
+   [
+    "Massage",
+    "E-bike check"
+   ],
+   [
+    "plumber",
+    "mechanic"
+   ],
+   [
+    "Plumber",
+    "Mechanic"
+   ],
+   [
+    "shutoff",
+    "brake"
+   ],
+   [
+    "Shutoff",
+    "Brake"
+   ],
+   [
+    "clogged",
+    "skipping"
+   ],
+   [
+    "cabinet",
+    "shop wall"
+   ],
+   [
+    "Cabinet",
+    "Shop wall"
+   ],
+   [
+    "steamer",
+    "pump"
+   ],
+   [
+    "line-up",
+    "wheel true"
+   ],
+   [
+    "Elm St",
+    "Hill Rd"
+   ],
+   [
+    "Oak St",
+    "Bell St"
+   ],
+   [
+    "Barber",
+    "Mechanic"
+   ],
+   [
+    "barber",
+    "mechanic"
+   ],
+   [
+    "toilet",
+    "saddle"
+   ],
+   [
+    "heater",
+    "motor"
+   ],
+   [
+    "Heater",
+    "Motor"
+   ],
+   [
+    "faucet",
+    "derailleur"
+   ],
+   [
+    "Faucet",
+    "Derailleur"
+   ],
+   [
+    "brassy",
+    "squeaky"
+   ],
+   [
+    "facial",
+    "wheel"
+   ],
+   [
+    "Jordan",
+    "Dan"
+   ],
+   [
+    "valves",
+    "tire stems"
+   ],
+   [
+    "repipe",
+    "frame rebuild"
+   ],
+   [
+    "Repipe",
+    "Frame rebuild"
+   ],
+   [
+    "$2,400",
+    "$640"
+   ],
+   [
+    "chairs",
+    "booths"
+   ],
+   [
+    "perms",
+    "car repairs"
+   ],
+   [
+    "gloss",
+    "tire"
+   ],
+   [
+    "drain",
+    "chain"
+   ],
+   [
+    "Drain",
+    "Chain"
+   ],
+   [
+    "pipes",
+    "cables"
+   ],
+   [
+    "clogs",
+    "skips"
+   ],
+   [
+    "drips",
+    "clicks"
+   ],
+   [
+    "valve",
+    "tire stem"
+   ],
+   [
+    "flush",
+    "clean"
+   ],
+   [
+    "Flush",
+    "Clean"
+   ],
+   [
+    "sewer",
+    "frame"
+   ],
+   [
+    "Sewer",
+    "Frame"
+   ],
+   [
+    "shave",
+    "brake check"
+   ],
+   [
+    "Shave",
+    "Brake check"
+   ],
+   [
+    "Riley",
+    "Mike"
+   ],
+   [
+    "Avery",
+    "Jo"
+   ],
+   [
+    "Casey",
+    "Kim"
+   ],
+   [
+    "beard",
+    "brake"
+   ],
+   [
+    "Beard",
+    "Brake"
+   ],
+   [
+    "Color",
+    "Gear"
+   ],
+   [
+    "color",
+    "gear"
+   ],
+   [
+    "perm",
+    "car repair"
+   ],
+   [
+    "sink",
+    "bike rack"
+   ],
+   [
+    "Sink",
+    "Bike rack"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "clog",
+    "skip"
+   ],
+   [
+    "leak",
+    "flat"
+   ],
+   [
+    "Leak",
+    "Flat"
+   ],
+   [
+    "cape",
+    "bike cover"
+   ],
+   [
+    "Cape",
+    "Bike cover"
+   ],
+   [
+    "$800",
+    "$320"
+   ],
+   [
+    "dye",
+    "grease"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Alex books a tune-up drop-off at the bike shop, brings the bike in with the code, gets a READY text two days later and pays at pick-up.",
+  "B": "Alex books the mobile bike van for a tune-up at home; the card is saved, the tech fixes the bike in the van and the card is charged at DONE."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "visit|none|counter",
+    "list|deposit|counter",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|counter": "A $89 tune-up dropped off. Nothing is taken; Alex pays at pick-up.",
+    "visit|none|counter": "A brake and gear repair, priced after the mechanic looks at drop-off. Nothing taken; paid at pick-up.",
+    "list|deposit|counter": "A $380 wheel build: the $180 parts cost now, $200 at pick-up.",
+    "list|card|counter": "A $175 bike fit with the named fitter; a card saved for the $50 late-cancel fee; paid at the counter."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50",
+     "name": "Basic tune-up"
+    },
+    "list|*|*": {
+     "price": "$89",
+     "name": "Basic tune-up"
+    },
+    "list|deposit|*": {
+     "price": "$380",
+     "deposit": "$180",
+     "rest": "$200",
+     "fee": "$180",
+     "name": "Wheel build"
+    },
+    "list|card|*": {
+     "price": "$175",
+     "fee": "$50",
+     "name": "Bike fit"
+    },
+    "visit|*|*": {
+     "name": "Brake and gear repair"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "visit|card|card"
+   ],
+   "examples": {
+    "list|card|card": "A $119 tune-up by the van at Alex's home; the card is saved and charged at DONE.",
+    "visit|card|card": "A brake repair priced on the spot by the van tech; the card is charged at DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$35",
+     "name": "Tune-up by the van"
+    },
+    "list|*|*": {
+     "price": "$119",
+     "fee": "$35",
+     "name": "Tune-up by the van"
+    },
+    "visit|*|*": {
+     "fee": "$35",
+     "name": "Brake repair"
+    }
+   },
+   "booking": {
+    "times": [
+     "window"
+    ],
+    "timing": [
+     "settime"
+    ]
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Bike repair needs no trade license; registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The shop books people's time (drop-off slots), not rooms or things."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes through booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Not a health practice or a law firm: the $2 applies."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for bike repair."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A drop-off is a time to bring the bike in (A4-66's own line), never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at a bike shop."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A repair is rated (one rating)."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A device is fixed in hand. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The shop sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The shop bills no plan or insurance. A customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee's Device Repair books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee's Device Repair books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A device waits in its drop-off slot, so a technician running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A repair is paid once: at pick-up, or by the bill."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "A repair shop books no next visit at pick-up: each repair is booked when it's needed."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A repair at the shop needs no contract before booking: the data consent is signed at drop-off, and the written estimate comes before any work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "The shop sells no plans: each repair is paid at its own pick-up, or by its own bill."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The shop sells no plans or contracts, so nothing signed at the shop has a cancel period."
+   },
+   {
+    "op": "off",
+    "at": "A5-22",
+    "why": "Bike shop sells no pack or membership on the page."
+   },
+   {
+    "op": "off",
+    "at": "A5-21",
+    "why": "Bike shop sells no plan: nothing to agree to."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Bike repair needs no trade license; registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People's time only."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "The van never comes 'now'."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "The van comes in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "The van tech never takes care of a child; an adult hands over the bike."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A repair is rated."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty is billed: a customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "On-site repair needs no first step."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Device repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone must be there to hand over, unlock and test the device."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for a device repair."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Device repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Device repair is never sent now (S2-30), so there's no such button."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Someone must be there to hand over, unlock and test the device."
+   },
+   {
+    "op": "off",
+    "at": "B4-44",
+    "why": "Bike shop sells no yearly plan: repeat visits are booked one at a time."
+   },
+   {
+    "op": "off",
+    "at": "B5-21",
+    "why": "Bike shop sells no plan: nothing to agree to."
+   },
+   {
+    "op": "off",
+    "at": "B5-32",
+    "why": "Bike shop sells no pack or membership on the page."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": []
+ },
+ "notes": "New build (H3, Tue Oct 27 2026) on the frozen master: from repair-shop (refitted), base plug-in = the verified test-drive work/testdrive/bike-repair.md (facts, services, prices, rules and the decided fixes kept).\nFlow A, the shop: drop-off tune-up $89 (nothing taken, paid at pick-up); flat fix $20 plus the tube; a repair priced after a look (nothing done before the customer's yes); wheel build $380 with the $180 parts deposit, $200 at pick-up; bike fit $175 with the named fitter, a card saved for the $50 late-cancel fee.\nFlow B, the mobile van: tune-up $119 or a repair priced on the spot, card saved and charged at DONE; $35 trip fee inside 24 hours.\nFacts: dropoff, extrawork. Switches: none ($2 applies, D97). Settings: A set start, B 2-hour window, B cutoff 24 hours before.\nNo trade license (D96): registration only, nothing is looked up. E-bike motor and battery work only by trained staff (a skill).\nPlans, packs, memberships, insurance, staged bills and sent-now are off: a bike shop sells none of them.\nRenames: names, addresses, the shop and van names, and every example price and service in the master text moved to bike words. Chain cleaning is not a service here.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "the $25 consult is taken at booking, toward the final price",
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "water near outlets gets 'shut off the main valve'",
+    "A haircut could mean a salon or a barbershop.",
+    "Promises the $25 consult; priced at the chair",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "A at their home too, 75, paid when they book",
+    "a house call, $75, paid in full when booking",
+    "$100 is charged to the saved card at the end",
+    "Jordan does electrical too, at $140 an hour",
+    "Classic cuts, fades and hot towel shaves.",
+    "Haircut, fade and beard trim at the shop.",
+    "Every shop service, color and house calls",
+    "says Saturday's cut is uneven on one side",
+    "a card saved for the $89 service-call fee",
+    "Alex wants it at home: a house call, $75",
+    "Signature cut and hot towel shave · $55",
+    "the Groom's package takes a $40 deposit",
+    "Plumbing JP031552 · electrical JE30417",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Riley also does color and house calls",
+    "A neighborhood barbershop on Elm St.",
+    "Riley: barber, color and house calls",
+    "$100 is on the bill after the visit",
+    "Lee's Barbershop doesn't do perms.",
+    "Adding a beard trim, +$20? Say so.",
+    "Signature cut and hot towel shave",
+    "Only the $25 consult is promised.",
+    "A barbershop takes no drop-offs.",
+    "A $35 haircut can work this way.",
+    "Color quotes come to you first.",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Lee Plumbing and Lee Electric",
+    "Groom's package · $40 deposit",
+    "plumbing and electrical jobs",
+    "a card saved for the $20 fee",
+    "Late or no-show: the $20 fee",
+    "the $20 fee, if you confirm",
+    "Card saved for the $20 fee",
+    "Avery · license not found",
+    "$100 is paid at the chair",
+    "Gives the shop's own line",
+    "$20 taken when they book",
+    "$40 taken when they book",
+    "$25 taken when they book",
+    "Promises the $25 consult",
+    "the $25 consult included",
+    "The $25 consult included",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Avery · license expired",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "like a skin-test result",
+    "No card, so no $20 fee",
+    "Haircut at home · $75",
+    "Lee's Barbershop LLC",
+    "for a $20 fee you OK",
+    "$100 after the visit",
+    "the Groom's package",
+    "The Groom's package",
+    "photos of your hair",
+    "Insurance pays part",
+    "the shop's own line",
+    "Lee's Barbershop's",
+    "Lee Home Services'",
+    "electrical license",
+    "Riley's color plan",
+    "the shop's $20 fee",
+    "Lee Home Services",
+    "Plumbing MP045210",
+    "Lee's Barbershop",
+    "color correction",
+    "Color correction",
+    "the shop's board",
+    "Groom's package",
+    "Gloss to finish",
+    "Drain clearing",
+    "low beard line",
+    "Signature cut",
+    "signature cut",
+    "groom's party",
+    "Color and cut",
+    "color and cut",
+    "sees the hair",
+    "water heaters",
+    "A $35 haircut",
+    "Haircut · $35",
+    "the $100 rest",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "water heater",
+    "A beard trim",
+    "a beard trim",
+    "a barbershop",
+    "A barbershop",
+    "At the chair",
+    "at the chair",
+    "chair renter",
+    "Casey Moore",
+    "house calls",
+    "House calls",
+    "A skin fade",
+    "barbershops",
+    "$35 haircut",
+    "$20 deposit",
+    "$40 deposit",
+    "$25 deposit",
+    "$25 consult",
+    "Riley Chen",
+    "Avery Diaz",
+    "Color plan",
+    "color plan",
+    "patch test",
+    "house call",
+    "House call",
+    "Beard trim",
+    "beard trim",
+    "Barbershop",
+    "barbershop",
+    "electrical",
+    "Electrical",
+    "skin fades",
+    "The chairs",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "Electric.",
+    "the chair",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "Haircuts",
+    "haircuts",
+    "a barber",
+    "A barber",
+    "plumbing",
+    "Plumbing",
+    "Main St",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "Barbers",
+    "massage",
+    "Massage",
+    "plumber",
+    "Plumber",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "heater",
+    "Jordan",
+    "chairs",
+    "perms",
+    "gloss",
+    "Drain",
+    "valve",
+    "shave",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "Beard",
+    "Color",
+    "color",
+    "perm",
+    "pipe",
+    "leak",
+    "Leak",
+    "cape"
+   ],
+   "B": [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Harper J.'s $2,400 repipe is billed in three stages",
+    "water near outlets gets 'shut off the main valve'",
+    "The $800 start payment is taken as the deposit",
+    "A haircut could mean a salon or a barbershop.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan does electrical too, at $140 an hour",
+    "Classic cuts, fades and hot towel shaves.",
+    "Haircut, fade and beard trim at the shop.",
+    "a card saved for the $89 service-call fee",
+    "My gas water heater got wet in a flood.",
+    "Plumbing JP031552 · electrical JE30417",
+    "The shop's chair is in the other flow.",
+    "Riley also does color and house calls",
+    "A neighborhood barbershop on Elm St.",
+    "Riley: barber, color and house calls",
+    "Your home warranty covers the rest.",
+    "It's a leak under the sink, today,",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical work",
+    "plumbing and electrical jobs",
+    "QUOTE 2400 repipe, 3 stages",
+    "Casey · license not found",
+    "The $80 supply line stays",
+    "Gives the shop's own line",
+    "The service call is $89.",
+    "Water heater replacement",
+    "water heater replacement",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Casey · license expired",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "NEW heating and cooling",
+    "Kitchen drain clearing",
+    "The $800 start payment",
+    "Lee Home Services LLC",
+    "for a $20 fee you OK",
+    "Sewer camera report",
+    "heating and cooling",
+    "Heating and cooling",
+    "Insurance pays part",
+    "the shop's own line",
+    "Lee Home Services'",
+    "electrical license",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services",
+    "Plumbing MP045210",
+    "a dripping faucet",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "service call fee",
+    "Service call fee",
+    "Repipe · $2,400",
+    "dripping faucet",
+    "Drain clearing",
+    "drain clearing",
+    "Under the sink",
+    "under the sink",
+    "shutoff valves",
+    "Kitchen drain",
+    "kitchen drain",
+    "bathroom sink",
+    "the sink wall",
+    "shutoff valve",
+    "Shutoff valve",
+    "cabinet floor",
+    "Cabinet floor",
+    "water heaters",
+    "$2,400 repipe",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "Water heater",
+    "water heater",
+    "a barbershop",
+    "service call",
+    "Service call",
+    "at the chair",
+    "chair renter",
+    "Casey Moore",
+    "house calls",
+    "House calls",
+    "barbershops",
+    "leak repair",
+    "Leak repair",
+    "supply line",
+    "Supply line",
+    "overflowing",
+    "$40 deposit",
+    "Riley Chen",
+    "Avery Diaz",
+    "house call",
+    "House call",
+    "beard trim",
+    "Barbershop",
+    "barbershop",
+    "Yard drain",
+    "yard drain",
+    "electrical",
+    "Electrical",
+    "dishwasher",
+    "water line",
+    "The chairs",
+    "88 Elm St",
+    "42 Oak St",
+    "Electric.",
+    "sink wall",
+    "the chair",
+    "cut hair",
+    "a barber",
+    "plumbing",
+    "Plumbing",
+    "the sink",
+    "Main St",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "Barbers",
+    "plumber",
+    "Plumber",
+    "shutoff",
+    "Shutoff",
+    "clogged",
+    "cabinet",
+    "Cabinet",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "heater",
+    "faucet",
+    "Jordan",
+    "valves",
+    "repipe",
+    "Repipe",
+    "$2,400",
+    "chairs",
+    "drain",
+    "Drain",
+    "pipes",
+    "clogs",
+    "valve",
+    "flush",
+    "sewer",
+    "Sewer",
+    "shave",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "color",
+    "perm",
+    "sink",
+    "pipe",
+    "clog",
+    "leak",
+    "Leak",
+    "$800"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A5-19": "5d5db6f3c1",
+   "A10-05": "63c3536c7a",
+   "A5-22": "7576898f14",
+   "A5-21": "15fe900660"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "B4-43": "fc9855955a",
+   "B4-38": "9539521dc7",
+   "B7-90": "a5b8b2fe42",
+   "B8-69": "5d0e4c0045",
+   "B9-06": "f091432f2d",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B8-03": "ac9d404766",
+   "B4-44": "514c8ab30c",
+   "B5-21": "925b7342ed",
+   "B5-32": "4109673a42"
+  }
+ }
+}

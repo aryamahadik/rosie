@@ -1,0 +1,2925 @@
+{
+ "id": "trampoline-park",
+ "name": "Trampoline park and indoor playground",
+ "style": "Table",
+ "pattern": "table",
+ "from": "restaurant",
+ "plugin": {
+  "pf.license": {
+   "need": "if: where the state's amusement-ride or trampoline court rules apply, the park holds the state's permit or registration and passes its inspections; elsewhere the business registration only; a mobile inflatable party follows the same state rules where they cover inflatables",
+   "who": "the business",
+   "ask": "the business registration; any state amusement or trampoline permit, with its last inspection date; the liability insurance certificate",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "goes live on identity and the registration; where the state requires a permit, only once it's on file",
+   "renewals": "permits, inspections and insurance reminded 30 and 7 days before; a lapse pauses new bookings",
+   "insurance": "liability insurance, as the state or the landlord asks",
+   "staff": "court monitors trained by the park, with first aid and CPR cards (certificates, not state licenses)",
+   "background": "background checks for party hosts and staff who work with children, where the park or the rules require them"
+  },
+  "pf.services": {
+   "shape": "table: timed jump sessions with a set number of jumpers per start time (a seat in a session), and party rooms booked for a set time (a space)",
+   "examples": "the example park's own prices (Lee Jump Park), not a standard",
+   "list": [
+    {
+     "name": "Open jump, 60 minutes",
+     "price": "$35 a jumper",
+     "kind": "one price per jumper",
+     "length": "60 min",
+     "where": "at the park",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "120 jumpers per start time, every 30 minutes"
+    },
+    {
+     "name": "Open jump, 90 minutes",
+     "price": "$55 a jumper",
+     "kind": "one price per jumper",
+     "length": "90 min",
+     "where": "at the park",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "120 jumpers per start time"
+    },
+    {
+     "name": "Toddler time (12 and under, with a parent)",
+     "price": "$25 a child; the parent jumps free",
+     "kind": "one price per child",
+     "length": "60 min, weekday mornings",
+     "where": "at the park",
+     "before": "paid in full",
+     "after": "nothing more",
+     "capacity": "40 children"
+    },
+    {
+     "name": "Teen night (13 to 17)",
+     "price": "$25",
+     "kind": "one price per jumper",
+     "length": "2 hours, Fridays 8 to 10pm",
+     "where": "at the park",
+     "before": "paid in full",
+     "after": "nothing more",
+     "capacity": "100 jumpers"
+    },
+    {
+     "name": "Birthday party package",
+     "price": "$140 for 10 jumpers, $10 each extra, up to 30",
+     "kind": "one price per party, with a minimum",
+     "length": "2 hours: 90 minutes of jump time, then 30 minutes in a party room",
+     "where": "at the park",
+     "before": "a $40 deposit when booking",
+     "after": "the $100 rest paid at the front desk on the day, for the final count"
+    },
+    {
+     "name": "Field trip (school or camp group)",
+     "price": "$14 a jumper",
+     "kind": "one price per jumper",
+     "before": "nothing taken",
+     "after": "one bill to the school or camp after"
+    },
+    {
+     "name": "Party for 30 or more, quoted from the number of guests",
+     "price": "$600 quoted; over $500, so Sam OKs it first",
+     "kind": "one price, quoted before booking",
+     "where": "at the customer's place",
+     "before": "a $120 deposit once the written estimate is signed",
+     "after": "the $480 rest charged to the saved card when the team texts DONE"
+    },
+    {
+     "name": "Mobile play party",
+     "price": "$150 for 2 hours, with 2 hosts",
+     "kind": "one price per party",
+     "where": "at the customer's place",
+     "before": "a $40 deposit",
+     "after": "the $110 rest charged to the saved card when the team texts DONE"
+    }
+   ],
+   "capacity": "jumpers per start time, set by the court count and the park's safety limit; party rooms are spaces, one party at a time",
+   "zones": "a toddler area for 5 and under; the main courts for 6 and up; dodgeball and the foam pit by age and height",
+   "skills": "court monitor, party host, mobile party attendant (setup, anchoring, wind checks)",
+   "online": "no",
+   "nobodyHome": "never",
+   "notBookings": "grip socks, the snack bar, arcade cards and food bought at the desk stay outside Rosie"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which session or party, and the date and time",
+    "how many jumpers, and each one's age group (toddler, 6 to 12, teen, adult)",
+    "for a party: the expected number of jumpers",
+    "for a mobile party: the kind of place (a yard, a school, a park) and the town"
+   ],
+   "afterTime": [
+    "the birthday child's first name for the party host, if the parent wants it used",
+    "anything staff should know to help, like a child who needs extra help or a hearing need"
+   ],
+   "securePage": [
+    "a waiver for every jumper: an adult signs their own; a parent or legal guardian signs for each child",
+    "the waiver's health check: people who are pregnant, or have heart, back, neck or bone problems, or a recent surgery or injury, shouldn't jump",
+    "the parent's OK for a 13 to 17 year old to come and leave on their own",
+    "the party's guest list (first names only), and an emergency contact",
+    "for a mobile party: the street address and where the power outlet is"
+   ],
+   "whoMayBook": "an adult; a parent or guardian books for children; only a child's own parent or legal guardian signs that child's waiver",
+   "told": "everyone on the courts wears the park's grip socks (bought at the desk if they have none); children 12 and under need a parent or an adult 18+ in the park; arrive 15 minutes early to check in"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone hurt or unwell right now: a head or neck injury, a broken bone, trouble breathing, not waking up",
+     "say": "Call 911 now. Don't move someone with a head, neck or back injury.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "pregnant, a heart condition, a back or neck problem, a recent surgery or injury",
+     "what": "the booking can go on for the others; the waiver says who shouldn't jump; the person decides, and Rosie gives no health advice"
+    }
+   ],
+   "atThePark": "a jumper hurt on the courts: the monitor stops that court, gives first aid, calls 911 when needed, and calls the parent at once if the parent isn't with them; an incident report goes on the secure page the same day; Sam is told",
+   "turnAway": "anyone who seems drunk or high doesn't jump; a jumper who keeps breaking the court rules after a warning leaves the courts",
+   "weather": "indoors: no weather limit; a mobile party outdoors stops the inflatable in winds over 20 mph, in lightning, or in rain"
+  },
+  "pf.first_steps": {
+   "steps": [
+    "a waiver for every jumper, signed on the secure page before the visit, good for 12 months; a party's guests' parents sign on a link the host forwards",
+    "the party's final headcount by 3 days before (it sets the food and the rest due)",
+    "a field trip: the chaperone list and each child's waiver the day before",
+    "a mobile party: the customer confirms the flat area, the power outlet and any permission the place needs (a school's or a park's) 3 days before, and marks sprinkler and underground lines before setup"
+   ],
+   "prep": "grip socks (from an earlier visit, or bought at the desk); comfortable clothes; empty pockets; arrive 15 minutes early"
+  },
+  "pf.visit": {
+   "checkIn": "at the front desk: the booker's code for the group; the desk sees which jumpers have a waiver on file, and each gets a wristband; the party host checks the party in",
+   "lateEntry": "jump time ends at the session's set end; a late jumper gets the time left",
+   "missing": "a jumper without a waiver signs on the desk tablet (a parent for a child) before jumping; a jumper without grip socks buys them at the desk; only that jumper waits",
+   "changes": "extra party jumpers on the day are added at the per-jumper price if the room fits; the parent says yes first",
+   "children": "children 12 and under need a parent or an adult 18+ in the park; 13 to 17 may come and leave on their own with the parent's OK on the waiver",
+   "done": "the desk's check-in confirms the visit; the party host texts DONE at the party's end; the mobile team texts DONE after takedown"
+  },
+  "pf.money": {
+   "before": "jump passes paid in full when booking; a party's $40 deposit; field trips nothing before; a mobile party's $40 deposit",
+   "after": "a party's $100 rest at the front desk for the final count; a field trip's one bill after; a mobile party's $110 rest charged to the saved card at DONE",
+   "cancel": "jump passes: a full refund if moved or cancelled 2 hours or more before; a late cancel or no-show keeps $20. A party: free to cancel up to 7 days before; later the $40 deposit may be kept, only with Sam's yes. A mobile party keeps its $40 deposit on a late cancel, with Sam's yes.",
+   "membership": "none: no monthly membership is sold through Rosie",
+   "caps": "the state's general limits",
+   "tips": "a tip for the party host on the desk's own reader, the business's own way; Rosie never asks",
+   "tax": "where the state taxes admissions",
+   "fee2": "Rosfield's $2 per confirmed booking applies: one $2 per booking, however many jumpers",
+   "noSale": "socks, food and arcade sales are outside Rosie"
+  },
+  "pf.messages": {
+   "never": "children's names, ages and health answers, and injury details: only on the secure page",
+   "staffTexts": "the party host's day list shows the booker's name and the number of jumpers; the guest list opens on the secure page",
+   "languages": "English and Spanish",
+   "minors": "texts go to the parent who booked, never to a child"
+  },
+  "pf.staff": {
+   "licenses": "none from the state; first aid and CPR cards for court monitors, tracked by the park",
+   "skills": "court monitor, party host, mobile party attendant",
+   "ratio": "monitors per court as the park's safety plan sets; a mobile party always has 2 attendants",
+   "standIn": "any trained host or monitor; nobody is booked by name",
+   "oks": "Sam OKs refunds, party changes and field trips"
+  },
+  "pf.rules": {
+   "waiver": "no jumper on the courts without a signed waiver; a child's waiver signed only by their parent or legal guardian",
+   "courts": "one jumper per trampoline square; similar-size jumpers together on the dodgeball court; each court's weight limit as its maker sets",
+   "kids": "12 and under with a parent or an adult 18+ in the park; toddler time for 5 and under with a parent",
+   "inspections": "the park's daily court checks; the state's inspections where its rules require them",
+   "inflatables": "outdoor inflatables anchored as the maker says and stopped in winds over 20 mph, lightning or rain, with an attendant always there",
+   "records": "waivers kept as long as the park's insurer requires, and with the booking for 7 years; incident reports kept with the booking",
+   "cancelRight": "no cancel period for jump or party time already given",
+   "reviews": "a rating once after the visit, never after an injury"
+  },
+  "pf.edges": {
+   "headcount": "the party's final headcount 3 days before sets the food and the rest; more on the day are added if the room fits; fewer than 10 still pay for 10",
+   "injury": "a jumper hurt: first aid, 911 if needed, the parent called at once, an incident report the same day; no rating asked after it",
+   "noWaiver": "a jumper without a waiver signs at the desk before jumping; only that jumper waits",
+   "impaired": "a jumper who seems drunk or high doesn't jump; the rest of the group jumps; no refund for that person",
+   "teenAlone": "13 to 17 may come and leave on their own with the parent's OK on the waiver",
+   "closed": "a power cut or a court problem closes the park: new times or a full refund",
+   "wind": "a mobile party: the attendants stop the inflatable in winds over 20 mph, lightning or rain; time lost to weather comes back as a partial refund or a new date",
+   "membership": "a membership renews each month on its date; a declined charge gets one pay link; frozen or ended with 30 days' notice",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "groups",
+   "children",
+   "forms",
+   "spaces",
+   "capacitycheck",
+   "extrawork"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for an open jump at its old price. Rosie answers with the real price: $35."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "An open jump at Lee Jump Park is $35 a jumper. Here are the open times at $35."
+   ],
+   [
+    "So is a house call, $75.",
+    "So is a toddler play at home, $75."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking.",
+    "Alex wants it at home: a toddler play, $75, paid in full when booking."
+   ],
+   [
+    "Shop's",
+    "Park's"
+   ],
+   [
+    "Color quotes",
+    "Party quotes"
+   ],
+   [
+    "Color quote",
+    "Party quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "Clogs",
+    "Jams"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Jump Park LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Jump Park"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Play"
+   ],
+   [
+    "Lee Catering LLC",
+    "Lee Mobile Play LLC"
+   ],
+   [
+    "Lee Catering",
+    "Lee Mobile Play"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Party Rooms"
+   ],
+   [
+    "Lee Electric",
+    "Lee Play Events"
+   ],
+   [
+    "Riley Chen",
+    "Bea Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Theo Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Pim Price"
+   ],
+   [
+    "Casey Moore",
+    "Joss Moore"
+   ],
+   [
+    "Riley",
+    "Bea"
+   ],
+   [
+    "Avery",
+    "Theo"
+   ],
+   [
+    "Jordan",
+    "Pim"
+   ],
+   [
+    "Casey",
+    "Joss"
+   ],
+   [
+    "barbershops",
+    "jump parks"
+   ],
+   [
+    "barbershop",
+    "jump park"
+   ],
+   [
+    "Barbershop",
+    "Jump park"
+   ],
+   [
+    "barbers",
+    "hosts"
+   ],
+   [
+    "barber chair",
+    "bench"
+   ],
+   [
+    "barber",
+    "host"
+   ],
+   [
+    "Barber",
+    "Host"
+   ],
+   [
+    "the shop's",
+    "the park's"
+   ],
+   [
+    "The shop's",
+    "The park's"
+   ],
+   [
+    "shop's",
+    "park's"
+   ],
+   [
+    "the shop",
+    "the park"
+   ],
+   [
+    "The shop",
+    "The park"
+   ],
+   [
+    "shops",
+    "parks"
+   ],
+   [
+    "shop",
+    "park"
+   ],
+   [
+    "Shop",
+    "Park"
+   ],
+   [
+    "Haircuts",
+    "Jump passes"
+   ],
+   [
+    "haircuts",
+    "jump passes"
+   ],
+   [
+    "Haircut",
+    "Jump pass"
+   ],
+   [
+    "haircut",
+    "jump pass"
+   ],
+   [
+    "Beard trim",
+    "Extra 30 minutes"
+   ],
+   [
+    "beard trim",
+    "extra 30 minutes"
+   ],
+   [
+    "beard line",
+    "sock line"
+   ],
+   [
+    "beard",
+    "sock"
+   ],
+   [
+    "Skin fades",
+    "Open jumps"
+   ],
+   [
+    "skin fades",
+    "open jumps"
+   ],
+   [
+    "Skin fade",
+    "Open jump"
+   ],
+   [
+    "skin fade",
+    "open jump"
+   ],
+   [
+    "Kids cuts",
+    "Toddler times"
+   ],
+   [
+    "kids cuts",
+    "toddler times"
+   ],
+   [
+    "Kids cut",
+    "Toddler time"
+   ],
+   [
+    "kids cut",
+    "toddler time"
+   ],
+   [
+    "Color and cut",
+    "Birthday party package"
+   ],
+   [
+    "color and cut",
+    "birthday party package"
+   ],
+   [
+    "Color correction",
+    "Party room"
+   ],
+   [
+    "color correction",
+    "party room"
+   ],
+   [
+    "color quotes",
+    "party quotes"
+   ],
+   [
+    "color quote",
+    "party quote"
+   ],
+   [
+    "Color touch-up",
+    "Extra jump time"
+   ],
+   [
+    "color touch-up",
+    "extra jump time"
+   ],
+   [
+    "color plan",
+    "party plan"
+   ],
+   [
+    "Color plan",
+    "Party plan"
+   ],
+   [
+    "patch test",
+    "safety check"
+   ],
+   [
+    "cut hair",
+    "jump"
+   ],
+   [
+    "Color",
+    "Party"
+   ],
+   [
+    "color",
+    "party"
+   ],
+   [
+    "Groom's package",
+    "Party package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Birthday party package"
+   ],
+   [
+    "Signature cut and shave",
+    "Birthday party package"
+   ],
+   [
+    "hot towel shaves",
+    "foam-pit nights"
+   ],
+   [
+    "hot towel",
+    "foam pit"
+   ],
+   [
+    "shaves",
+    "jumps"
+   ],
+   [
+    "shave",
+    "jump"
+   ],
+   [
+    "perms",
+    "bounce houses"
+   ],
+   [
+    "perm",
+    "bounce house"
+   ],
+   [
+    "water heaters",
+    "trampolines"
+   ],
+   [
+    "Water heaters",
+    "Trampolines"
+   ],
+   [
+    "catering",
+    "party"
+   ],
+   [
+    "Catering",
+    "Party"
+   ],
+   [
+    "cape clip",
+    "foam pad"
+   ],
+   [
+    "cape",
+    "pad"
+   ],
+   [
+    "massage",
+    "party room"
+   ],
+   [
+    "Massage",
+    "Party room"
+   ],
+   [
+    "brassy",
+    "scuffed"
+   ],
+   [
+    "steamer",
+    "fan"
+   ],
+   [
+    "gloss",
+    "shine"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "face paint"
+   ],
+   [
+    "house calls",
+    "mobile parties"
+   ],
+   [
+    "house call",
+    "mobile party"
+   ],
+   [
+    "House calls",
+    "Mobile parties"
+   ],
+   [
+    "House call",
+    "Mobile party"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Plumbing and electrical",
+    "Party rooms and mobile play"
+   ],
+   [
+    "plumbing and electrical",
+    "party rooms and mobile play"
+   ],
+   [
+    "plumber",
+    "host"
+   ],
+   [
+    "Plumber",
+    "Host"
+   ],
+   [
+    "plumbing",
+    "party"
+   ],
+   [
+    "Plumbing",
+    "Party"
+   ],
+   [
+    "electrician",
+    "technician"
+   ],
+   [
+    "electrical",
+    "party room"
+   ],
+   [
+    "Electrical",
+    "Party room"
+   ],
+   [
+    "Drain clearing",
+    "Party room"
+   ],
+   [
+    "drain clearing",
+    "party room"
+   ],
+   [
+    "clogged drain",
+    "jammed door"
+   ],
+   [
+    "drain",
+    "room"
+   ],
+   [
+    "Drain",
+    "Room"
+   ],
+   [
+    "water heater flush",
+    "toddler time"
+   ],
+   [
+    "Water heater flush",
+    "Toddler time"
+   ],
+   [
+    "water heater",
+    "party"
+   ],
+   [
+    "Water heater",
+    "Party"
+   ],
+   [
+    "heater",
+    "frame"
+   ],
+   [
+    "flush",
+    "session"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "faucet",
+    "wall pad"
+   ],
+   [
+    "dishwasher",
+    "snack table"
+   ],
+   [
+    "garbage disposal",
+    "ball pit"
+   ],
+   [
+    "sewer",
+    "ball pit"
+   ],
+   [
+    "toilet",
+    "restroom"
+   ],
+   [
+    "overflowing",
+    "overfilled"
+   ],
+   [
+    "sink",
+    "bench"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "pipes",
+    "rails"
+   ],
+   [
+    "pipe",
+    "rail"
+   ],
+   [
+    "valve",
+    "switch"
+   ],
+   [
+    "shutoff",
+    "emergency stop"
+   ],
+   [
+    "repipe",
+    "party build"
+   ],
+   [
+    "supply line",
+    "air line"
+   ],
+   [
+    "water line",
+    "air line"
+   ],
+   [
+    "heating and cooling",
+    "air and heat"
+   ],
+   [
+    "drips",
+    "dripping"
+   ],
+   [
+    "cabinet",
+    "storage room"
+   ],
+   [
+    "leak",
+    "tear"
+   ],
+   [
+    "leaks",
+    "tears"
+   ],
+   [
+    "Short on the sides",
+    "Short jump times"
+   ],
+   [
+    "travel fee",
+    "mobile fee"
+   ],
+   [
+    "Travel fee",
+    "Mobile fee"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "emergency stop valves",
+    "extra time"
+   ],
+   [
+    "valves",
+    "switches"
+   ],
+   [
+    "Valves",
+    "Switches"
+   ],
+   [
+    "Room clearings",
+    "Toddler parties"
+   ],
+   [
+    "Room clearing",
+    "Toddler party"
+   ],
+   [
+    "room clearings",
+    "toddler parties"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "300 Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "310 Harbor Rd"
+   ],
+   [
+    "42 Oak St",
+    "14 Cedar Ln"
+   ],
+   [
+    "Elm St",
+    "Cedar Ave"
+   ],
+   [
+    "Oak St",
+    "Grove St"
+   ],
+   [
+    "Main St",
+    "Harbor Rd"
+   ],
+   [
+    "Barbershops",
+    "Jump parks"
+   ],
+   [
+    "Barbers",
+    "Hosts"
+   ],
+   [
+    "Barber chair",
+    "Bench"
+   ],
+   [
+    "Shops",
+    "Parks"
+   ],
+   [
+    "Beard line",
+    "Sock line"
+   ],
+   [
+    "Beard",
+    "Sock"
+   ],
+   [
+    "Patch test",
+    "Safety check"
+   ],
+   [
+    "Cut hair",
+    "Jump"
+   ],
+   [
+    "Hot towel shaves",
+    "Foam-pit nights"
+   ],
+   [
+    "Hot towel",
+    "Foam pit"
+   ],
+   [
+    "Shaves",
+    "Jumps"
+   ],
+   [
+    "Shave",
+    "Jump"
+   ],
+   [
+    "Perms",
+    "Bounce houses"
+   ],
+   [
+    "Perm",
+    "Bounce house"
+   ],
+   [
+    "Cape clip",
+    "Foam pad"
+   ],
+   [
+    "Cape",
+    "Pad"
+   ],
+   [
+    "Brassy",
+    "Scuffed"
+   ],
+   [
+    "Steamer",
+    "Fan"
+   ],
+   [
+    "Gloss",
+    "Shine"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Face paint"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Technician"
+   ],
+   [
+    "Clogged drain",
+    "Jammed door"
+   ],
+   [
+    "Heater",
+    "Frame"
+   ],
+   [
+    "Flush",
+    "Session"
+   ],
+   [
+    "Faucet",
+    "Wall pad"
+   ],
+   [
+    "Dishwasher",
+    "Snack table"
+   ],
+   [
+    "Garbage disposal",
+    "Ball pit"
+   ],
+   [
+    "Sewer",
+    "Ball pit"
+   ],
+   [
+    "Toilet",
+    "Restroom"
+   ],
+   [
+    "Overflowing",
+    "Overfilled"
+   ],
+   [
+    "Sink",
+    "Bench"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "Pipes",
+    "Rails"
+   ],
+   [
+    "Pipe",
+    "Rail"
+   ],
+   [
+    "Valve",
+    "Switch"
+   ],
+   [
+    "Shutoff",
+    "Emergency stop"
+   ],
+   [
+    "Repipe",
+    "Party build"
+   ],
+   [
+    "Supply line",
+    "Air line"
+   ],
+   [
+    "Water line",
+    "Air line"
+   ],
+   [
+    "Heating and cooling",
+    "Air and heat"
+   ],
+   [
+    "Drips",
+    "Dripping"
+   ],
+   [
+    "Cabinet",
+    "Storage room"
+   ],
+   [
+    "Leak",
+    "Tear"
+   ],
+   [
+    "Leaks",
+    "Tears"
+   ],
+   [
+    "Emergency stop valves",
+    "Extra time"
+   ],
+   [
+    "$20",
+    "@@0@@"
+   ],
+   [
+    "$70",
+    "@@1@@"
+   ],
+   [
+    "$90",
+    "@@2@@"
+   ],
+   [
+    "$110",
+    "@@3@@"
+   ],
+   [
+    "$125",
+    "@@4@@"
+   ],
+   [
+    "@@0@@",
+    "$40"
+   ],
+   [
+    "@@1@@",
+    "$100"
+   ],
+   [
+    "@@2@@",
+    "$140"
+   ],
+   [
+    "@@3@@",
+    "$140"
+   ],
+   [
+    "@@4@@",
+    "$140"
+   ]
+  ],
+  "B": [
+   [
+    "Replace both shutoff valves · $160",
+    "Add 30 minutes · $89"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "add 30 minutes, $89"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Add 30 minutes"
+   ],
+   [
+    "replace both shutoff valves",
+    "add 30 minutes"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $89 extra time is good for 7 days."
+   ],
+   [
+    "the extra work now, for $160.",
+    "the extra work now, for $89."
+   ],
+   [
+    "$160 for today's extra work.",
+    "$89 for today's extra work."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A toddler party at home with Lee Mobile Play is $179. Here are the open times at $179."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Ivy's AI asks for a toddler party at its old price. Rosie answers with the real price: $179."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "An open jump at the park is $35 a jumper; a toddler play at your home is $75. Where would you like it?"
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "replacing both shutoff valves for $160.",
+    "adding 30 minutes for $89."
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $1,200 party build."
+   ],
+   [
+    "Shop's",
+    "Park's"
+   ],
+   [
+    "Color quotes",
+    "Party quotes"
+   ],
+   [
+    "Color quote",
+    "Party quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "Clogs",
+    "Jams"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Jump Park LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Jump Park"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Play"
+   ],
+   [
+    "Lee Catering LLC",
+    "Lee Mobile Play LLC"
+   ],
+   [
+    "Lee Catering",
+    "Lee Mobile Play"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Party Rooms"
+   ],
+   [
+    "Lee Electric",
+    "Lee Play Events"
+   ],
+   [
+    "Riley Chen",
+    "Bea Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Theo Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Pim Price"
+   ],
+   [
+    "Casey Moore",
+    "Joss Moore"
+   ],
+   [
+    "Riley",
+    "Bea"
+   ],
+   [
+    "Avery",
+    "Theo"
+   ],
+   [
+    "Jordan",
+    "Pim"
+   ],
+   [
+    "Casey",
+    "Joss"
+   ],
+   [
+    "barbershops",
+    "jump parks"
+   ],
+   [
+    "barbershop",
+    "jump park"
+   ],
+   [
+    "Barbershop",
+    "Jump park"
+   ],
+   [
+    "barbers",
+    "hosts"
+   ],
+   [
+    "barber chair",
+    "bench"
+   ],
+   [
+    "barber",
+    "host"
+   ],
+   [
+    "Barber",
+    "Host"
+   ],
+   [
+    "the shop's",
+    "the park's"
+   ],
+   [
+    "The shop's",
+    "The park's"
+   ],
+   [
+    "shop's",
+    "park's"
+   ],
+   [
+    "the shop",
+    "the park"
+   ],
+   [
+    "The shop",
+    "The park"
+   ],
+   [
+    "shops",
+    "parks"
+   ],
+   [
+    "shop",
+    "park"
+   ],
+   [
+    "Shop",
+    "Park"
+   ],
+   [
+    "Haircuts",
+    "Jump passes"
+   ],
+   [
+    "haircuts",
+    "jump passes"
+   ],
+   [
+    "Haircut",
+    "Jump pass"
+   ],
+   [
+    "haircut",
+    "jump pass"
+   ],
+   [
+    "Beard trim",
+    "Extra 30 minutes"
+   ],
+   [
+    "beard trim",
+    "extra 30 minutes"
+   ],
+   [
+    "beard line",
+    "sock line"
+   ],
+   [
+    "beard",
+    "sock"
+   ],
+   [
+    "Skin fades",
+    "Open jumps"
+   ],
+   [
+    "skin fades",
+    "open jumps"
+   ],
+   [
+    "Skin fade",
+    "Open jump"
+   ],
+   [
+    "skin fade",
+    "open jump"
+   ],
+   [
+    "Kids cuts",
+    "Toddler times"
+   ],
+   [
+    "kids cuts",
+    "toddler times"
+   ],
+   [
+    "Kids cut",
+    "Toddler time"
+   ],
+   [
+    "kids cut",
+    "toddler time"
+   ],
+   [
+    "Color and cut",
+    "Birthday party package"
+   ],
+   [
+    "color and cut",
+    "birthday party package"
+   ],
+   [
+    "Color correction",
+    "Party room"
+   ],
+   [
+    "color correction",
+    "party room"
+   ],
+   [
+    "color quotes",
+    "party quotes"
+   ],
+   [
+    "color quote",
+    "party quote"
+   ],
+   [
+    "Color touch-up",
+    "Extra jump time"
+   ],
+   [
+    "color touch-up",
+    "extra jump time"
+   ],
+   [
+    "color plan",
+    "party plan"
+   ],
+   [
+    "Color plan",
+    "Party plan"
+   ],
+   [
+    "patch test",
+    "safety check"
+   ],
+   [
+    "cut hair",
+    "jump"
+   ],
+   [
+    "Color",
+    "Party"
+   ],
+   [
+    "color",
+    "party"
+   ],
+   [
+    "Groom's package",
+    "Party package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Birthday party package"
+   ],
+   [
+    "Signature cut and shave",
+    "Birthday party package"
+   ],
+   [
+    "hot towel shaves",
+    "foam-pit nights"
+   ],
+   [
+    "hot towel",
+    "foam pit"
+   ],
+   [
+    "shaves",
+    "jumps"
+   ],
+   [
+    "shave",
+    "jump"
+   ],
+   [
+    "perms",
+    "bounce houses"
+   ],
+   [
+    "perm",
+    "bounce house"
+   ],
+   [
+    "water heaters",
+    "trampolines"
+   ],
+   [
+    "Water heaters",
+    "Trampolines"
+   ],
+   [
+    "catering",
+    "party"
+   ],
+   [
+    "Catering",
+    "Party"
+   ],
+   [
+    "cape clip",
+    "foam pad"
+   ],
+   [
+    "cape",
+    "pad"
+   ],
+   [
+    "massage",
+    "party room"
+   ],
+   [
+    "Massage",
+    "Party room"
+   ],
+   [
+    "brassy",
+    "scuffed"
+   ],
+   [
+    "steamer",
+    "fan"
+   ],
+   [
+    "gloss",
+    "shine"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "face paint"
+   ],
+   [
+    "house calls",
+    "mobile parties"
+   ],
+   [
+    "house call",
+    "mobile party"
+   ],
+   [
+    "House calls",
+    "Mobile parties"
+   ],
+   [
+    "House call",
+    "Mobile party"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Plumbing and electrical",
+    "Party rooms and mobile play"
+   ],
+   [
+    "plumbing and electrical",
+    "party rooms and mobile play"
+   ],
+   [
+    "plumber",
+    "host"
+   ],
+   [
+    "Plumber",
+    "Host"
+   ],
+   [
+    "plumbing",
+    "party"
+   ],
+   [
+    "Plumbing",
+    "Party"
+   ],
+   [
+    "electrician",
+    "technician"
+   ],
+   [
+    "electrical",
+    "party room"
+   ],
+   [
+    "Electrical",
+    "Party room"
+   ],
+   [
+    "Drain clearing",
+    "Party room"
+   ],
+   [
+    "drain clearing",
+    "party room"
+   ],
+   [
+    "clogged drain",
+    "jammed door"
+   ],
+   [
+    "drain",
+    "room"
+   ],
+   [
+    "Drain",
+    "Room"
+   ],
+   [
+    "water heater flush",
+    "toddler time"
+   ],
+   [
+    "Water heater flush",
+    "Toddler time"
+   ],
+   [
+    "water heater",
+    "party"
+   ],
+   [
+    "Water heater",
+    "Party"
+   ],
+   [
+    "heater",
+    "frame"
+   ],
+   [
+    "flush",
+    "session"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "faucet",
+    "wall pad"
+   ],
+   [
+    "dishwasher",
+    "snack table"
+   ],
+   [
+    "garbage disposal",
+    "ball pit"
+   ],
+   [
+    "sewer",
+    "ball pit"
+   ],
+   [
+    "toilet",
+    "restroom"
+   ],
+   [
+    "overflowing",
+    "overfilled"
+   ],
+   [
+    "sink",
+    "bench"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "pipes",
+    "rails"
+   ],
+   [
+    "pipe",
+    "rail"
+   ],
+   [
+    "valve",
+    "switch"
+   ],
+   [
+    "shutoff",
+    "emergency stop"
+   ],
+   [
+    "repipe",
+    "party build"
+   ],
+   [
+    "supply line",
+    "air line"
+   ],
+   [
+    "water line",
+    "air line"
+   ],
+   [
+    "heating and cooling",
+    "air and heat"
+   ],
+   [
+    "drips",
+    "dripping"
+   ],
+   [
+    "cabinet",
+    "storage room"
+   ],
+   [
+    "leak",
+    "tear"
+   ],
+   [
+    "leaks",
+    "tears"
+   ],
+   [
+    "Short on the sides",
+    "Short jump times"
+   ],
+   [
+    "travel fee",
+    "mobile fee"
+   ],
+   [
+    "Travel fee",
+    "Mobile fee"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "emergency stop valves",
+    "extra time"
+   ],
+   [
+    "valves",
+    "switches"
+   ],
+   [
+    "Valves",
+    "Switches"
+   ],
+   [
+    "Room clearings",
+    "Toddler parties"
+   ],
+   [
+    "Room clearing",
+    "Toddler party"
+   ],
+   [
+    "room clearings",
+    "toddler parties"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "300 Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "310 Harbor Rd"
+   ],
+   [
+    "42 Oak St",
+    "14 Cedar Ln"
+   ],
+   [
+    "Elm St",
+    "Cedar Ave"
+   ],
+   [
+    "Oak St",
+    "Grove St"
+   ],
+   [
+    "Main St",
+    "Harbor Rd"
+   ],
+   [
+    "Barbershops",
+    "Jump parks"
+   ],
+   [
+    "Barbers",
+    "Hosts"
+   ],
+   [
+    "Barber chair",
+    "Bench"
+   ],
+   [
+    "Shops",
+    "Parks"
+   ],
+   [
+    "Beard line",
+    "Sock line"
+   ],
+   [
+    "Beard",
+    "Sock"
+   ],
+   [
+    "Patch test",
+    "Safety check"
+   ],
+   [
+    "Cut hair",
+    "Jump"
+   ],
+   [
+    "Hot towel shaves",
+    "Foam-pit nights"
+   ],
+   [
+    "Hot towel",
+    "Foam pit"
+   ],
+   [
+    "Shaves",
+    "Jumps"
+   ],
+   [
+    "Shave",
+    "Jump"
+   ],
+   [
+    "Perms",
+    "Bounce houses"
+   ],
+   [
+    "Perm",
+    "Bounce house"
+   ],
+   [
+    "Cape clip",
+    "Foam pad"
+   ],
+   [
+    "Cape",
+    "Pad"
+   ],
+   [
+    "Brassy",
+    "Scuffed"
+   ],
+   [
+    "Steamer",
+    "Fan"
+   ],
+   [
+    "Gloss",
+    "Shine"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Face paint"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Technician"
+   ],
+   [
+    "Clogged drain",
+    "Jammed door"
+   ],
+   [
+    "Heater",
+    "Frame"
+   ],
+   [
+    "Flush",
+    "Session"
+   ],
+   [
+    "Faucet",
+    "Wall pad"
+   ],
+   [
+    "Dishwasher",
+    "Snack table"
+   ],
+   [
+    "Garbage disposal",
+    "Ball pit"
+   ],
+   [
+    "Sewer",
+    "Ball pit"
+   ],
+   [
+    "Toilet",
+    "Restroom"
+   ],
+   [
+    "Overflowing",
+    "Overfilled"
+   ],
+   [
+    "Sink",
+    "Bench"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "Pipes",
+    "Rails"
+   ],
+   [
+    "Pipe",
+    "Rail"
+   ],
+   [
+    "Valve",
+    "Switch"
+   ],
+   [
+    "Shutoff",
+    "Emergency stop"
+   ],
+   [
+    "Repipe",
+    "Party build"
+   ],
+   [
+    "Supply line",
+    "Air line"
+   ],
+   [
+    "Water line",
+    "Air line"
+   ],
+   [
+    "Heating and cooling",
+    "Air and heat"
+   ],
+   [
+    "Drips",
+    "Dripping"
+   ],
+   [
+    "Cabinet",
+    "Storage room"
+   ],
+   [
+    "Leak",
+    "Tear"
+   ],
+   [
+    "Leaks",
+    "Tears"
+   ],
+   [
+    "Emergency stop valves",
+    "Extra time"
+   ],
+   [
+    "$640",
+    "@@0@@"
+   ],
+   [
+    "$160",
+    "@@1@@"
+   ],
+   [
+    "$480",
+    "@@2@@"
+   ],
+   [
+    "$245",
+    "@@3@@"
+   ],
+   [
+    "$199",
+    "@@4@@"
+   ],
+   [
+    "$120",
+    "@@5@@"
+   ],
+   [
+    "$156",
+    "@@6@@"
+   ],
+   [
+    "$169",
+    "@@7@@"
+   ],
+   [
+    "$358",
+    "@@8@@"
+   ],
+   [
+    "$800",
+    "@@9@@"
+   ],
+   [
+    "$2,400",
+    "@@10@@"
+   ],
+   [
+    "$140",
+    "@@11@@"
+   ],
+   [
+    "$165",
+    "@@12@@"
+   ],
+   [
+    "$620",
+    "@@13@@"
+   ],
+   [
+    "$540",
+    "@@14@@"
+   ],
+   [
+    "$700",
+    "@@15@@"
+   ],
+   [
+    "$55",
+    "@@16@@"
+   ],
+   [
+    "$80",
+    "@@17@@"
+   ],
+   [
+    "$20",
+    "@@18@@"
+   ],
+   [
+    "@@0@@",
+    "$600"
+   ],
+   [
+    "@@1@@",
+    "$120"
+   ],
+   [
+    "@@2@@",
+    "$480"
+   ],
+   [
+    "@@3@@",
+    "$140"
+   ],
+   [
+    "@@4@@",
+    "$179"
+   ],
+   [
+    "@@5@@",
+    "$89"
+   ],
+   [
+    "@@6@@",
+    "$150"
+   ],
+   [
+    "@@7@@",
+    "$150"
+   ],
+   [
+    "@@8@@",
+    "$300"
+   ],
+   [
+    "@@9@@",
+    "$300"
+   ],
+   [
+    "@@10@@",
+    "$1,200"
+   ],
+   [
+    "@@11@@",
+    "$150"
+   ],
+   [
+    "@@12@@",
+    "$150"
+   ],
+   [
+    "@@13@@",
+    "$600"
+   ],
+   [
+    "@@14@@",
+    "$480"
+   ],
+   [
+    "@@15@@",
+    "$600"
+   ],
+   [
+    "@@16@@",
+    "$75"
+   ],
+   [
+    "@@17@@",
+    "$75"
+   ],
+   [
+    "@@18@@",
+    "$40"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books 4 open-jump passes at Lee Jump Park for Sat Oct 24 at 11:00am, for a sister's birthday. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Mobile Play for a backyard party at 14 Cedar Ln: an inflatable play set and two hosts for 3 hours. Pim and Joss set up Thu Oct 22 at 2:00pm and pack up after the party."
+ },
+ "cast": {
+  "A": {
+   "staff": "Bea and Theo (front desk)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a school, a party's parents)"
+  },
+  "B": {
+   "staff": "Pim and Joss (party hosts)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a parent, a school)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Bea"
+  },
+  "B": {
+   "staff": "Pim"
+  }
+ },
+ "keep": [
+  "host",
+  "Host"
+ ],
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|deposit|counter",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|full|none": "The main story: 4 open-jump passes, 60 minutes, $88 paid in full when booking.",
+    "list|deposit|counter": "A birthday party package for 10 jumpers: a $100 deposit when booking, the $229 rest at the front desk on the day.",
+    "list|none|bill": "A school field trip for 20 jumpers: nothing before, one bill to the school after."
+   },
+   "amounts": {
+    "list|full|*": {
+     "price": "$140",
+     "paid": "$140",
+     "fee": "$20",
+     "name": "Open jump, 60 minutes, 4 jumpers"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Birthday party package, 10 jumpers"
+    },
+    "list|none|*": {
+     "price": "$280",
+     "name": "Field trip, 20 jumpers"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra 30 minutes",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Open jump, 90 minutes, 2 jumpers",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$110",
+      "paid": "$110",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Jump pass pack (10 jumps)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|card|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: a mobile play party for 2 hours: $150, a $40 deposit, the $110 rest charged to the saved card when the team texts DONE.",
+    "list|card|bill": "A toddler party at home: $179, a card saved for the $89 fee; Rosie texts the bill after the party.",
+    "list|full|none": "A 1-hour toddler play at home, paid in full when booking: $75."
+   },
+   "amounts": {
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Mobile play party, 2 hours"
+    },
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Toddler party at home, 1 hour"
+    },
+    "list|full|*": {
+     "price": "$75",
+     "paid": "$75",
+     "fee": "$40",
+     "name": "Toddler play at home, paid in full"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra 30 minutes at the party",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$89",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Toddler play, 1 hour, at home",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$75",
+      "paid": "$75",
+      "fee": "$40"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Party room pack (5 visits)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-80",
+   "S1-29",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "S1-29",
+   "S1-80"
+  ]
+ },
+ "notes": "Trampoline park: a table-style place to book (jump passes, a party room, a school trip, a mobile play party), from the restaurant pilot, with the verified sample plug-in as the base (work/testdrive/trampoline-park.md). Refit to the rebuilt master (N4, Oct 27): the sample's own money words are gone; money is the amounts rows. Flow A (the family comes to Lee Jump Park): open jump, 60 minutes, 4 jumpers, $140 paid in full, a $20 fee on a late cancel or no-show; a birthday party package for 10, $140: $40 deposit when booking, $100 rest at the front desk, $40 kept on a late cancel; a school field trip, $14 a jumper ($280), nothing taken, one bill to the school after. Flow B (Lee Mobile Play comes to the customer): a mobile play party, 2 hours, $150: $40 deposit, the $110 rest on the saved card at DONE, $40 fee; a toddler party at home, $179, a card saved for the $89 fee, the bill texted after; a 1-hour toddler play at home, $75, paid in full. Services with no row of their own are left out. The master's example prices are used only where they are this work's price for the same role (for example $140 with a $40 deposit and a $100 rest); each shown amount is one of the amounts rows, and the master's price-change, plan and bank-transfer examples are reworded or turned off. Names: Lee Jump Park (300 Cedar Ave), Lee Mobile Play (310 Harbor Rd), front desk Bea and Theo, hosts Pim and Joss; Alex M. is the customer. Facts: groups, children, forms (waivers), spaces (party rooms), capacitycheck (jumpers per start time), extrawork (extra time). No plans, packs, memberships, stages or bank transfer (the membership service is removed). Waivers stay on: a parent signs for each child on the secure page (A4-43, A8-02 kept). Licenses: the owner's own papers, shown as given, never checked (D96): the license lookups are off (S1-60 '1 A license', S2-28 '1 Yes, each one'). $2 applies to every booking (D97). Sensitive is off: children's details are covered by the children fact and stay on the secure page. Settings: set start times in both flows; cutoff 24 hours before (A), 2 days before (B). The verified gaps (work/gaps/trampoline-park.json) stand; the membership gap no longer applies to this work.",
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted from photos first",
+    "why": "A table is never quoted: the menu shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted at the visit",
+    "why": "A table is never quoted: the menu shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A8-24",
+    "label": "Priced at the visit",
+    "why": "A table is never quoted: the menu shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "The bill is paid at the table, the restaurant's own way, as the plug-in sets."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "The bill is paid at the table, the restaurant's own way, as the plug-in sets."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a meal."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a meal."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A table checks in with one code for the whole party."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at a restaurant; takeout isn't a booking."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A meal has no results that come later."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked table and chef's visit pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable: a cooking class at home is booked like any chef's visit."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Neither company takes jobs sent now: a table is booked ahead or walked in, and a chef shops and preps first."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A meal is never served by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "The restaurant books a table or a space, never a person's time (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The restaurant books a table or a space, never a person's time (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at a restaurant: the party is at the table."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A meal is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "A standing table is paid at the table, so no plan charge goes on a saved card (pf.money)."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child stays with the party at the table."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for a park (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for hosts or monitors (D96): the park's own first-aid cards only."
+   },
+   {
+    "op": "off",
+    "at": "A7-55",
+    "why": "No plans at a park: the plan price-change step never shows."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B4-06",
+    "label": "Quoted at the visit",
+    "why": "Cooking for a customer is priced before the visit: from the menu, or quoted from the customer's answers and photos."
+   },
+   {
+    "op": "off",
+    "at": "B8-19",
+    "label": "Priced at the visit",
+    "why": "Cooking for a customer is priced before the visit: from the menu, or quoted from the customer's answers and photos."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a meal."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a meal."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A meal has no report that comes later."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Catering is never sent now: a chef shops and preps first, so B4-19 shows the soonest times."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Catering is never sent now, so no chef is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Catering is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked table and chef's visit pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable: a cooking class at home is booked like any chef's visit."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Neither company takes jobs sent now: a table is booked ahead or walked in, and a chef shops and preps first."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A meal is never served by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Catering books a chef in a 2-hour arrival window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Catering books a chef in a 2-hour arrival window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "No form comes first: an event agreement is the contract (B4-57)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Catering is never sent now, so the day list and OMW always come first."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Catering books a chef in a 2-hour arrival window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A chef never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A meal is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "B8-68",
+    "why": "No child is left in the chef's care."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for a park (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for hosts (D96)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No plans at a park: no plan charge goes on a saved card."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A party is not paid in stages (the stages fact is not listed)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No party is billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Bank transfer is for big jobs the park never takes (no bank-transfer fact)."
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "So is a house call, $75.",
+    "Alex wants it at home: a house call, $75, paid in full when booking.",
+    "Shop's",
+    "Color quotes",
+    "Color quote",
+    "At the chair",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "beard",
+    "skin fades",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "Color touch-up",
+    "color touch-up",
+    "color plan",
+    "Color plan",
+    "patch test",
+    "cut hair",
+    "Color",
+    "color",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perms",
+    "perm",
+    "water heaters",
+    "catering",
+    "cape clip",
+    "cape",
+    "massage",
+    "Massage",
+    "gloss",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain clearing",
+    "Drain",
+    "water heater",
+    "heater",
+    "pipe",
+    "valve",
+    "leak",
+    "travel fee",
+    "Springfield",
+    "2020-1187",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Main St",
+    "Barbers",
+    "Beard",
+    "Gloss",
+    "Leak",
+    "Leaks",
+    "$20",
+    "$70",
+    "$90",
+    "$110",
+    "$125"
+   ],
+   "B": [
+    "Replace both shutoff valves · $160",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves",
+    "replace both shutoff valves",
+    "The $160 valve quote is good for 7 days.",
+    "the extra work now, for $160.",
+    "$160 for today's extra work.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "replacing both shutoff valves for $160.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "clogs",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircut",
+    "haircut",
+    "beard trim",
+    "beard",
+    "cut hair",
+    "color",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perm",
+    "water heaters",
+    "catering",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain clearing",
+    "drain clearing",
+    "drain",
+    "Drain",
+    "water heater flush",
+    "Water heater flush",
+    "water heater",
+    "Water heater",
+    "heater",
+    "flush",
+    "service call",
+    "Service call",
+    "faucet",
+    "dishwasher",
+    "sewer",
+    "overflowing",
+    "sink",
+    "clog",
+    "pipes",
+    "pipe",
+    "valve",
+    "shutoff",
+    "repipe",
+    "supply line",
+    "water line",
+    "heating and cooling",
+    "cabinet",
+    "leak",
+    "travel fee",
+    "Springfield",
+    "valves",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Main St",
+    "Barbers",
+    "Sewer",
+    "Overflowing",
+    "Shutoff",
+    "Repipe",
+    "Supply line",
+    "Heating and cooling",
+    "Cabinet",
+    "Leak",
+    "Leaks",
+    "$640",
+    "$160",
+    "$480",
+    "$245",
+    "$199",
+    "$120",
+    "$156",
+    "$169",
+    "$358",
+    "$800",
+    "$2,400",
+    "$140",
+    "$165",
+    "$620",
+    "$540",
+    "$700",
+    "$80",
+    "$20"
+   ]
+  },
+  "A": {
+   "A4-05": "8b3e838019",
+   "A8-24": "c802ca35ab",
+   "A9-15": "bd2a17c3c5",
+   "A4-28": "c8e677520c",
+   "A8-03": "7fe61cccf5",
+   "A10-45": "855be6050a",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "9d65299834",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7",
+   "A7-55": "6f2143030d"
+  },
+  "B": {
+   "B4-06": "223e119ea0",
+   "B8-19": "11e79a26d8",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "826f4058c2",
+   "B4-83": "93095f28e5",
+   "B4-38": "9539521dc7",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "B8-68": "8ede790b60",
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "B7-91": "7132851ec1",
+   "B9-06": "f091432f2d"
+  }
+ }
+}

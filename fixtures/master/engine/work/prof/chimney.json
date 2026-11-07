@@ -1,0 +1,3088 @@
+{
+ "id": "chimney",
+ "name": "Chimney sweep",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "plumber",
+ "plugin": {
+  "pf.license": {
+   "need": "Sweeping and inspecting a chimney has no state license in most places. Where a state or city licenses chimney or home repair work, its form asks for it. Repairs (caps, crowns, liners, rebuilds) can need a contractor license or registration where the state or city requires one. Gas stove and insert work needs a gas fitter's license where the state licenses gas work. The hearth shop's counter: business registration only.",
+   "who holds it": "The company: its contractor license or registration, where the state's form asks. Each stove installer: a gas fitter's license, where the state licenses people. Sweeps and counter techs need none unless the state's form says so.",
+   "what to ask": [
+    "The company's contractor license or registration number, where the state asks for one",
+    "Each stove installer's gas fitter's license number, in their invite reply",
+    "Proof of liability insurance, where the state's form asks for it"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "private certificates": "A sweep's certificate from a trade group is not a state license. It shows in the business's own words, never as checked by Rosie.",
+   "lead-safe work": "Repairs that disturb paint in a home built before 1978 need a lead-safe certified firm, where the rules require it.",
+   "renewals": "Reminders before each expiry, on the dates the owner picks. A lapsed license pauses new bookings for that work or person.",
+   "insurance or bond": "From the state's form.",
+   "background checks": "Only where the state's form asks.",
+   "local rules": "Some cities need a permit for a liner, a rebuild or a new stove: the form for that place applies, by the customer's address."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Lee Chimney Sweeps' own list)": [
+    {
+     "service": "Trip fee (find the problem)",
+     "price kind": "one price",
+     "price": "$89, taken off the work",
+     "place": "at the customer's place",
+     "note": "Goes on the jobs below; not booked alone. The late-cancel and nobody-home fee."
+    },
+    {
+     "service": "Chimney sweep and inspection (Level 1)",
+     "price kind": "per unit: per flue, set by the customer's answers",
+     "price": "$179 for the first flue, $79 for each extra flue",
+     "length": "2 hours, 30 minutes more for each extra flue",
+     "place": "at the customer's place",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Wood stove sweep and inspection",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "90 min",
+     "place": "at the customer's place",
+     "before": "the $89 trip fee held; in the fall season, a $40 deposit if the owner sets one",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Level 2 camera inspection, with the sweep",
+     "price kind": "set by the customer's answers",
+     "price": "$199 (the example), by person: $249 when the owner goes",
+     "length": "2½ hours",
+     "place": "at the customer's place",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill",
+     "note": "Set by the answers: a home sale, a new stove or fuel, or signs of a chimney fire. Booked for one of those, the owner OKs it first; added to a booked sweep, it's a list price. The camera report link comes later."
+    },
+    {
+     "service": "Chimney leak repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 trip fee is promised",
+     "length": "90 min",
+     "place": "at the customer's place",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Rain cap, put on after a sweep",
+     "price kind": "one price, quoted with the sweep's findings",
+     "price": "$160 (the example)",
+     "place": "at the customer's place",
+     "note": "Put on the same day only if the customer says yes to the quote"
+    },
+    {
+     "service": "Chimney cap install, on its own",
+     "price kind": "one price",
+     "price": "$179 (the example)",
+     "length": "2 hours",
+     "place": "at the customer's place",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill",
+     "note": "Done from the roof: nobody needs to be home, and DONE comes with a photo. A weather limit: dry, and not windy."
+    },
+    {
+     "service": "Crown repair",
+     "price kind": "quoted from the customer's photos, or from the sweep's photos",
+     "price": "the quote (the example: $640)",
+     "length": "half a day",
+     "place": "at the customer's place",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill",
+     "note": "The owner OKs any quote over $500. A signed contract above the plug-in's amount."
+    },
+    {
+     "service": "Stainless liner, or a chimney rebuild",
+     "price kind": "a free estimate visit, then a written quote",
+     "price": "the quote (the example: $2,400, paid in stages)",
+     "length": "1 to 3 days",
+     "place": "at the customer's place",
+     "note": "A permit where the local rules require one. A crew of two."
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum",
+     "place": "at the customer's place",
+     "note": "Goes on quoted jobs; not booked alone"
+    },
+    {
+     "service": "Yearly sweep plan",
+     "price kind": "each visit at the sweep's list price",
+     "note": "Its own yes on the secure page. Each August, a text to pick a September time. Each visit is booked and paid like a single one. Ends with one tap."
+    },
+    {
+     "service": "Stove work (the second kind of work): gas stove serviced $149, stovepipe installed $189, an insert install by free estimate",
+     "note": "Gas work only by a stove installer with a gas fitter's license, where the state requires one"
+    }
+   ],
+   "at the business (the example: Lee Hearth Shop's counter board)": [
+    {
+     "service": "Door gasket refit (bring the stove door)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "both: at the shop, or at the customer's home as a $75 home visit paid in full",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Stove glass, cut and fitted",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "New door handle",
+     "price kind": "one price",
+     "price": "$20",
+     "place": "at the shop",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Ash pan repair",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the shop"
+    },
+    {
+     "service": "Cap fitting: a stainless cap sized to the flue, with its screen, picked up at the counter",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the shop",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Stove door rebuild (gasket, glass and latch)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours, or a drop-off",
+     "place": "at the shop",
+     "before": "the $40 fee held (over 2 hours), or a $40 deposit",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Custom cap (an odd-size or multi-flue top)",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $90)",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Only Rory makes them, at the welding bench. The owner OKs each quote."
+    },
+    {
+     "service": "Casting repair (a cracked stove part)",
+     "price kind": "quoted at the visit",
+     "price": "only the $25 look is promised",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Video check of a stove part or a chimney top",
+     "price kind": "the owner's own price",
+     "place": "at the business (a video session)",
+     "note": "Only where the owner offers it"
+    }
+   ],
+   "capacity": "One sweep per booking. A liner or a rebuild needs a crew of two. Custom caps need the shop's one welding bench.",
+   "skills each needs": "Level 2 inspections need the flue camera. Gas stove work needs a gas fitter. Masonry repairs need the masonry skill. Custom caps and casting repairs need Rory.",
+   "nobody home": "A cap or crown job done from the roof: nobody needs to be home, and DONE comes with a photo. A sweep needs an adult home, since the fireplace is inside.",
+   "online": "A video check only, where the owner offers it. No sweep or repair by video.",
+   "season": "Fall books up weeks ahead. The owner can set a fall deposit and a list for sooner times (see the gaps).",
+   "extras": "Travel inside the service area only (the example: 25 miles). Parts at the owner's list. No tax line unless the owner sets a rate."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What the chimney serves: a fireplace, a wood stove, an insert or a furnace",
+    "The fuel: wood, gas, pellet or oil",
+    "How many flues",
+    "Any signs of an old chimney fire: puffy black flakes, a warped damper, cracked tiles",
+    "A home sale, a new stove or a new fuel (these make it a Level 2)",
+    "Any animals heard in the chimney",
+    "At the counter: which stove, and its maker if known"
+   ],
+   "after a time is picked": [
+    "Who will be there: the customer, or someone else (their name and mobile go on the secure page)",
+    "Which side the ladder goes on, the roof's height, and how steep it is",
+    "Pets, and where they'll be",
+    "Own or rent: the landlord's OK for repairs",
+    "When the last fire was",
+    "The year the home was built: only for repairs that may disturb paint"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "Gate or lock codes",
+    "The landlord's name and mobile",
+    "Photos inside the home",
+    "The card"
+   ],
+   "who may book": "An adult who owns the home, or someone the owner allows. A renter books, and the landlord OKs repairs."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A chimney fire now: a loud roar, flames or sparks from the top, smoke filling the house",
+     "says": "Get everyone out of the house now, then call 911 from outside. Don't go back in.",
+     "booking": "No booking. A sweep can be booked once the fire department clears it."
+    },
+    {
+     "words": "A carbon monoxide alarm, or a gas smell",
+     "says": "Get everyone outside now, then call 911 and the gas company.",
+     "booking": "No booking until it's safe."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "Signs of an old chimney fire: puffy black flakes, a warped damper, cracked tiles",
+     "says": "Don't light the fireplace until it's inspected. The booking goes on as a Level 2, with the owner's OK."
+    },
+    {
+     "words": "Smoke coming into the room from the fireplace or stove",
+     "says": "Let the fire burn out, open a window, and don't light another. If the chimney roars, get out and call 911."
+    },
+    {
+     "words": "Animals in the chimney",
+     "says": "Keep the damper and the fireplace doors shut, and don't light a fire."
+    }
+   ],
+   "at the visit": "A hazard found, like cracked flue tiles: a written no-use notice at once, whatever the customer decides about the repair.",
+   "at the counter": "A gas valve or gas control isn't worked on at the counter. The customer is offered a home visit by a licensed stove installer.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The owner's OK",
+     "for": "A Level 2 for a home sale, a new stove or signs of an old fire; repairs over the owner's limit; same-day jobs",
+     "timing": "Before the booking is confirmed"
+    },
+    {
+     "step": "A free estimate visit, or photos first",
+     "for": "Crown repairs, liners and rebuilds",
+     "timing": "Before the quote; the owner picks which"
+    },
+    {
+     "step": "A permit",
+     "for": "Liners, rebuilds and new stoves, where the local rules require one",
+     "timing": "Pulled by the business before the work (a to-do for the owner)"
+    },
+    {
+     "step": "A wildlife company first",
+     "for": "Live animals in the chimney (licensed where the state requires one). Protected birds nesting or roosting: no sweep, cap or nest removal until they leave.",
+     "timing": "Before the sweep; the booking can move with no fee"
+    },
+    {
+     "step": "A lead-safe work notice",
+     "for": "Repairs that disturb paint in an older home",
+     "timing": "Signed on the secure page before the visit, where the rules require it"
+    },
+    {
+     "step": "A size check (the old cap or the flue's size brought in)",
+     "for": "A custom cap at the counter",
+     "timing": "At least 2 days before; good for 3 months"
+    }
+   ],
+   "prep for the reminder": [
+    "No fire for 24 hours before, so the ashes are cold",
+    "Clear about 6 feet in front of the fireplace; the crew brings drop cloths",
+    "Keep the ladder side of the house clear, and pets in another room",
+    "At the counter: bring the stove door with all its parts"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code at the door. The on-my-way text names the sweep, with a photo.",
+   "check-in at the counter": "The code at the counter. A drop-off gets its code when the door is left, and READY when it's done.",
+   "roof": "Roof work only when it's dry and not windy. Otherwise the sweep works from the firebox, and checks the crown and cap from the ladder with a camera pole. If that isn't enough, a roof check is booked again for free.",
+   "what a Level 1 covers": "The firebox, damper, smoke chamber, the flue that can be seen, the crown and the cap. Drop cloths and a hearth vacuum, and photos before and after.",
+   "quotes at the visit": "A leak is quoted with its lines before any work. The customer may OK part of it. The quote stays good 7 days.",
+   "findings": "Nothing is repaired at a sweep unless it's quoted and OK'd. A rain cap can go on the same day if the customer says yes. Bigger repairs get a written quote with photos, and their own day. Over the owner's limit (the example: $500), the owner OKs it first.",
+   "a hazard found": "Like cracked flue tiles: a written no-use notice at once (no fires until it's repaired), kept with the photo report.",
+   "work sold at the home": "A written right to cancel, where the rules require it.",
+   "proof it's done": "DONE with the bill's lines and the after photos. The photo report goes with the receipt. A Level 2's camera report comes later, by the date given."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's place: the $89 trip fee held, and Rosie texts the bill after the work",
+    "Fall season: the owner may take a $40 deposit instead, taken off the bill (the old example's own choice)",
+    "Off-season: the owner may take nothing before; a YES books it",
+    "Repairs quoted from photos: a 25% deposit once the quote is OK'd; the rest on the bill",
+    "At the counter: a card saved for the $20 fee, paid at the counter. Over 2 hours: the $40 fee held, or a $40 deposit. A cap fitting is paid in full when booked. An owner may also take nothing before at the counter."
+   ],
+   "limits": [
+    "Work quoted at the visit: nothing more than the trip fee is taken before",
+    "Deposit cap: from the state form",
+    "Late cancel or nobody home: the $89 fee, or the deposit, only if the owner confirms. No answer, no fee.",
+    "Emergency prices: where the state's rules limit prices in a declared emergency, those limits apply"
+   ],
+   "insurance and plans": "A home insurance claim after a chimney fire: the customer pays, and gets the receipt and the photo report for the claim.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "parts": "Caps, dampers and parts at the owner's list price.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Gate or lock codes, card details, and photos from inside the home. The photo report opens on the secure page.",
+   "languages": "English and Spanish.",
+   "danger words": "Fire, smoke and carbon monoxide words always get the safety message first, before anything else."
+  },
+  "pf.staff": {
+   "skills": [
+    "Sweeping and Level 1 inspections",
+    "Level 2 camera inspections",
+    "Caps, crowns and masonry repairs",
+    "Liners and rebuilds (a crew of two)",
+    "Gas stove and insert work (a gas fitter, where the state licenses one)",
+    "Counter work, custom caps and casting repairs"
+   ],
+   "licenses": "Each person's own license only where the state licenses that work (gas fitting). A trade group's sweep certificate shows only as the person gave it, not checked.",
+   "supervision": "Where the state's form asks for it. By default, nobody needs a supervisor.",
+   "who OKs what": "The owner OKs fees, a Level 2 booked for a sale, a new stove or fire signs, repairs over the limit and same-day jobs. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "Another sweep with the same skill, at the same window and price."
+  },
+  "pf.rules": {
+   "written estimate": "A written estimate before repair work above an amount: from the state form.",
+   "right to cancel": "A written right to cancel for work sold at the home: where the rules require it.",
+   "deposit cap": "A cap on deposits for home repairs: from the state form.",
+   "permits": "Pulled by the business where the local rules require one (liners, rebuilds, new stoves); the inspection follows.",
+   "lead-safe work": "Lead-safe work rules for older homes: where the rules require it.",
+   "protected birds": "Birds the law protects, nesting or roosting in a chimney: no sweep, cap or nest removal until they've left.",
+   "live animals": "The business doesn't remove live animals. A wildlife company does it first, licensed where the state requires one.",
+   "license on papers": "The license number on quotes and bills: from the state form.",
+   "declared emergency": "Price limits in a declared emergency: where the state's rules require it.",
+   "warranty": "The owner's own, shown on the receipt.",
+   "records": "7 years, as for every kind of work."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for chimney work:",
+   "chimney": [
+    "A chimney fire or a CO alarm at any point: get out and call 911 first; the owner is told",
+    "Signs of an old chimney fire: no fires until a Level 2, with the owner's OK",
+    "Animals or nesting birds in the chimney: a wildlife company first; the sweep can move with no fee",
+    "Wet or windy on the day: worked from the firebox and the ladder; a roof check booked again for free",
+    "Cracked flue tiles found: a written no-use notice, then a quote for a liner",
+    "A bigger repair found (a cracked crown, no cap): its own written quote, OK'd by the owner over the limit, on another day",
+    "Fall rush: openings weeks out; a freed time goes to people who asked for a sooner one",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "At the counter: a door that can't be refit, a gas part, or a drop-off nobody picks up"
+   ]
+  },
+  "pf.facts": [
+   "plans",
+   "firststeps",
+   "dropoff",
+   "photos",
+   "documents",
+   "waitlist",
+   "stages",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Rory and Shay (counter techs at the hearth shop)"
+  },
+  "B": {
+   "staff": "Wes and Dale (chimney sweeps)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Rory"
+  },
+  "B": {
+   "staff": "Wes"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "My employer pays for this cut.",
+    "My landlord pays for this refit."
+   ],
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's landlord for a stove in a rental."
+   ],
+   [
+    "like the cut in the mirror.",
+    "like the door's new seal."
+   ],
+   [
+    "Color quotes come to you first.",
+    "Custom cap quotes come to you first."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A custom cap's example: 'A custom cap here needs a size check first."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most hearth shops set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Door gaskets, stove glass and chimney caps."
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'My stove door leaks smoke' fits a gasket refit."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a gas fireplace install, which isn't on the shop's list."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't install gas fireplaces."
+   ],
+   [
+    "would like to see your hair before pricing it.",
+    "would like to see your stove door before pricing it."
+   ],
+   [
+    "How would you like it on top?",
+    "What stove model is it?"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, and add new glass'"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am keeps the shorter time."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the old gasket on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring the old gasket."
+   ],
+   [
+    "two skin fades",
+    "two gasket refits"
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like Rory's stove restoration plan after a look, or a lawyer's engagement letter."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two stove doors from one home work the same way. Both are asked before the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Rory can still fit the gasket in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A stove door rebuild can be a drop-off: Alex leaves the door, and picks it up when it's ready."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sweep's example: signs of an old chimney fire get 'don't light the fireplace until it's inspected'."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A landlord brings in the doors from four rental stoves, on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 3/4 inch rope gasket, high-heat cement, latch tightened"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a door check plan with Rory, every fall."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your door check is part of a plan with Rory, every fall."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The hearth shop's plug-in adds its own: smoke in the house, or a carbon monoxide alarm."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the bench clamp scratched a stove door's glass today."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Grill repair for Lee Hearth Shop: is it the same company?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Chimney work takes no jobs sent now, and the shop takes none."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for a stove that smokes: let the fire go out before bringing the door in."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of the work? Yes / No"
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the bench clamp scratched a stove door's glass today"
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "The door's latch this refit needs isn't here."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 look; priced at the counter"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A door gasket could mean a hearth shop or a stove maker"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop the door off and come back later?"
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a care pack of three refits at the shop."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Gas fitter GF30417"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench clamp scratched my stove door's glass."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds grill repair to Lee Hearth Shop."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Rory also makes custom caps and does home visits"
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's door still leaks smoke at one corner"
+   ],
+   [
+    "Not bookable until it shows renewed",
+    "No stove work until it shows renewed"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a door gasket check every fall."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Cap fitting"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you repair ash pans too?"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a landlord's stove doors together"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "an ash pan repair is $25"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a stove part"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The door still leaks smoke at one corner."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Custom caps always stay with Rory."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Door check every fall · Rory"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Gasket refits, stove glass and door handles"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Door check plan · every fall"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like my stove door's gasket fixed on Saturday."
+   ],
+   [
+    "Saturdays · 11:00am · Riley",
+    "A Saturday each fall · 11:00am · Rory"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero cambiar el empaque de la puerta de mi estufa el sábado."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: a Saturday next fall · 10:00am"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a door check every fall"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A gasket refit needs the stove door, with its latch and glass."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Rory sees the part"
+   ],
+   [
+    "plumbing and electrical",
+    "chimney sweeping and stove work"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Ash pan repair"
+   ],
+   [
+    "Signature cut and shave",
+    "Cap fitting"
+   ],
+   [
+    "like a skin-test result",
+    "like a flue size"
+   ],
+   [
+    "color and house calls",
+    "custom caps and home visits"
+   ],
+   [
+    "Plumbing price list",
+    "Chimney price list"
+   ],
+   [
+    "the Groom's package",
+    "the stove door rebuild"
+   ],
+   [
+    "The Groom's package",
+    "The stove door rebuild"
+   ],
+   [
+    "photos of your hair",
+    "photos of your chimney top"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Chimney Sweeps'"
+   ],
+   [
+    "Water heater flush",
+    "Wood stove sweep"
+   ],
+   [
+    "color, house calls",
+    "custom caps, home visits"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Chimney Sweeps"
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't repair furnaces."
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Hearth Shop"
+   ],
+   [
+    "Color correction",
+    "Casting repair"
+   ],
+   [
+    "color correction",
+    "casting repair"
+   ],
+   [
+    "Groom's package",
+    "Stove door rebuild"
+   ],
+   [
+    "Gloss to finish",
+    "Paint touch-up"
+   ],
+   [
+    "No gloss today.",
+    "No paint touch-up today."
+   ],
+   [
+    "Shorter is fine",
+    "Quick is fine"
+   ],
+   [
+    "Drain clearing",
+    "Chimney sweep"
+   ],
+   [
+    "plumbing jobs",
+    "chimney jobs"
+   ],
+   [
+    "Panel upgrade",
+    "Insert install"
+   ],
+   [
+    "Signature cut",
+    "Cap fitting"
+   ],
+   [
+    "signature cut",
+    "cap fitting"
+   ],
+   [
+    "Color and cut",
+    "Custom cap"
+   ],
+   [
+    "color and cut",
+    "custom cap"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s refit"
+   ],
+   [
+    "sees the hair",
+    "sees the part"
+   ],
+   [
+    "water heaters",
+    "crowns"
+   ],
+   [
+    "Haircut plans",
+    "Door check plans"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Chimney"
+   ],
+   [
+    "Lee Electric",
+    "Lee Stoves"
+   ],
+   [
+    "Jordan Price",
+    "Wes Carter"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "plumbing job",
+    "chimney job"
+   ],
+   [
+    "a beard trim",
+    "a new door handle"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Consult only",
+    "Look only"
+   ],
+   [
+    "consult only",
+    "look only"
+   ],
+   [
+    "Water heater",
+    "Crown"
+   ],
+   [
+    "water heater",
+    "crown"
+   ],
+   [
+    "Haircut plan",
+    "Door check plan"
+   ],
+   [
+    "haircut plan",
+    "door check plan"
+   ],
+   [
+    "Casey Moore",
+    "Dale Ortiz"
+   ],
+   [
+    "a skin fade",
+    "new stove glass"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "NEW massage",
+    "NEW grill repair"
+   ],
+   [
+    "color quote",
+    "cap quote"
+   ],
+   [
+    "Color quote",
+    "Cap quote"
+   ],
+   [
+    "$25 consult",
+    "$25 look"
+   ],
+   [
+    "the consult",
+    "the look"
+   ],
+   [
+    "Riley Chen",
+    "Rory Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Shay Diaz"
+   ],
+   [
+    "Electrical",
+    "Stove work"
+   ],
+   [
+    "electrical",
+    "stove work"
+   ],
+   [
+    "barbershop",
+    "hearth shop"
+   ],
+   [
+    "Barbershop",
+    "Hearth shop"
+   ],
+   [
+    "Beard trim",
+    "New door handle"
+   ],
+   [
+    "beard trim",
+    "new door handle"
+   ],
+   [
+    "patch test",
+    "size check"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "does color",
+    "makes custom caps"
+   ],
+   [
+    "color plan",
+    "stove restoration plan"
+   ],
+   [
+    "Color plan",
+    "Stove restoration plan"
+   ],
+   [
+    "88 Elm St",
+    "310 Grove St"
+   ],
+   [
+    "Barbering",
+    "Hearth shop work"
+   ],
+   [
+    "Skin fade",
+    "Stove glass"
+   ],
+   [
+    "skin fade",
+    "stove glass"
+   ],
+   [
+    "kids cuts",
+    "ash pan repairs"
+   ],
+   [
+    "Electric.",
+    "Most nights in winter."
+   ],
+   [
+    "MP045210",
+    "CR045210"
+   ],
+   [
+    "plumbing",
+    "chimney sweeping"
+   ],
+   [
+    "Plumbing",
+    "Chimney sweeping"
+   ],
+   [
+    "Haircuts",
+    "Gasket refits"
+   ],
+   [
+    "haircuts",
+    "gasket refits"
+   ],
+   [
+    "Kids cut",
+    "Ash pan repair"
+   ],
+   [
+    "kids cut",
+    "ash pan repair"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "EC22871",
+    "GS22871"
+   ],
+   [
+    "JE30417",
+    "GF30417"
+   ],
+   [
+    "BS20981",
+    "2020-1187"
+   ],
+   [
+    "plumber",
+    "sweep"
+   ],
+   [
+    "Plumber",
+    "Sweep"
+   ],
+   [
+    "barbers",
+    "counter techs"
+   ],
+   [
+    "Haircut",
+    "Gasket refit"
+   ],
+   [
+    "haircut",
+    "gasket refit"
+   ],
+   [
+    "the cut",
+    "the refit"
+   ],
+   [
+    "Jordan",
+    "Wes"
+   ],
+   [
+    "Elm St",
+    "Grove St"
+   ],
+   [
+    "barber",
+    "counter tech"
+   ],
+   [
+    "Barber",
+    "Counter tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Faucet",
+    "Stove door"
+   ],
+   [
+    "Casey",
+    "Dale"
+   ],
+   [
+    "Riley",
+    "Rory"
+   ],
+   [
+    "Avery",
+    "Shay"
+   ],
+   [
+    "gloss",
+    "paint touch-up"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "a cut",
+    "a refit"
+   ],
+   [
+    "A cut",
+    "A refit"
+   ],
+   [
+    "Drain",
+    "Chimney"
+   ],
+   [
+    "flush",
+    "stove sweep"
+   ],
+   [
+    "cuts",
+    "refits"
+   ],
+   [
+    "Style consult",
+    "Stove check"
+   ],
+   [
+    "style consult",
+    "stove check"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ]
+  ],
+  "B": [
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most hearth shops start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules hearth shops often set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood hearth shop on Grove St. Door gaskets, stove glass and chimney caps."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a chimney sweep before winter."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My fireplace smokes' fits a chimney sweep."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like capping a neighbor's chimney without their OK."
+   ],
+   [
+    "like new pipes put in one day and finished another.",
+    "like a new liner put in one day and finished another."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Crown rebuild, cracked · $540"
+   ],
+   [
+    "your new pipes are in.",
+    "your new liner is in."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found soot on the hearth rug this morning."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the wood stove sweep from a card saved for the $89 fee to a $40 fall deposit."
+   ],
+   [
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "The lookup shows Wes's gas license as expired. Wes still sweeps, and takes stove work again once it shows renewed."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the chimney serves, the fuel, how many flues, and any signs of an old fire."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s chimney, swept Thu Oct 22, smokes again. It's under the 30-day sweep guarantee."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Let the fire burn out, open a window, and don't light another. If the chimney roars, get out and call 911."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a roaring chimney or smoke that won't clear, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty",
+    "The fireplace smokes again 2 weeks later. It's inside the 30-day sweep guarantee"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a chimney sweep at two rentals every 6 months."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sweep's example: signs of an old chimney fire get 'don't light the fireplace until it's inspected'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? We saw black flakes near the chimney."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Our gas fireplace got wet in a flood. Is it safe to turn back on?"
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good",
+    "puts on the new flashing today, $165. The $80 crown seal stays good"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a chimney fire, smoke in the house, or a carbon monoxide alarm."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your chimney's crown, and a sweep will price the job."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Dryer vent cleaning for Lee Chimney Sweeps: is it the same company?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE heavy creosote in the smoke chamber. Crown cracked: bring the camera next time."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "what does the chimney serve, and how many flues? Any signs of an old chimney fire?"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the liner is in, $800 at the finish"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the new flashing only, $165. Leave the crown seal."
+   ],
+   [
+    "Casey's license is checked again when the lookup answers.",
+    "Wes's gas license is checked again when the lookup answers."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The damper is a repair quoted at the visit."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160",
+    "you said yes to a rain cap for $160"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes",
+    "sent you a proposal for a crown repair, from Wes's notes"
+   ],
+   [
+    "The plug-in says a water heater is priced from photos",
+    "The plug-in says a crown repair is priced from photos"
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your sweep is under its guarantee, so this visit is free."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Wes's next times for a wood stove sweep."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds dryer vent cleaning to Lee Chimney Sweeps."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Chimney work takes no jobs sent now, and the shop takes none."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Wes also run a camera up my chimney?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Vimos escamas negras cerca de la chimenea."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a sweep put a cap on a chimney this Thursday?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 rain cap, none on the chimney"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Wes look at my wood stove next week?"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you sweep my wood stove every year, too?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A door gasket could mean a hearth shop or a stove maker"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that smoke is coming into the room from the fireplace."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "We'd like a fire this weekend. Can someone come sooner?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a stuck damper."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "We lit a fire, and smoke is coming into the room now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE heavy creosote in the smoke chamber"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your crown repair this time"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Wes also look at a stuck damper?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can we light a fire tonight?"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the crown repair Wes noted"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please don't light a fire tonight, so the ashes are cold."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's chimney sweep?"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Gas fitter GF30417"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Rory also makes custom caps and does home visits"
+   ],
+   [
+    "can cut your hair at the shop for $35",
+    "can refit your stove door's gasket at the shop for $35"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The fireplace smokes again."
+   ],
+   [
+    "Not bookable until it shows renewed",
+    "No stove work until it shows renewed"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 flashing 165 crown seal 80"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Stainless rain cap · $160"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Wes left soot on the hearth."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Cap fitting"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "a stainless rain cap, $160"
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a chimney leak, today"
+   ],
+   [
+    "Is the sink still full of water?",
+    "When was your last fire?"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Crown repair"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no chip."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa sweep Thu 12-2 Dale"
+   ],
+   [
+    "Your water heater price is with",
+    "Your crown repair price is with"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "The $80 supply line stays good",
+    "The $80 crown seal stays good"
+   ],
+   [
+    "finds corroded shutoff valves",
+    "finds the chimney has no rain cap"
+   ],
+   [
+    "cancelled the $160 valve work",
+    "cancelled the $160 rain cap"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Gasket refits, stove glass and door handles"
+   ],
+   [
+    "plumbing and electrical work",
+    "chimney and stove work"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "Our fireplace hasn't been swept in two years."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 stainless liner, 3 stages"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Stainless rain cap"
+   ],
+   [
+    "cracked the cabinet floor",
+    "chipped a hearth tile"
+   ],
+   [
+    "Casey · license not found",
+    "Wes · gas license not found"
+   ],
+   [
+    "Water heater replacement",
+    "Crown repair"
+   ],
+   [
+    "water heater replacement",
+    "crown repair"
+   ],
+   [
+    "cracks the cabinet floor",
+    "chips a hearth tile"
+   ],
+   [
+    "plumbing and electrical",
+    "chimney sweeping and stove work"
+   ],
+   [
+    "Sewer camera inspection",
+    "Level 2 camera inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "Level 2 camera inspection"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW dryer vent cleaning"
+   ],
+   [
+    "Casey · license expired",
+    "Wes · gas license expired"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Chimney sweep and inspection"
+   ],
+   [
+    "Just the kitchen sink.",
+    "A wood fireplace, one flue. No signs of a fire."
+   ],
+   [
+    "replaces water heaters",
+    "repairs crowns"
+   ],
+   [
+    "Under the sink, before",
+    "Firebox, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your liner"
+   ],
+   [
+    "the water heater quote",
+    "the crown repair quote"
+   ],
+   [
+    "color and house calls",
+    "custom caps and home visits"
+   ],
+   [
+    "water heater contract",
+    "crown repair contract"
+   ],
+   [
+    "Cabinet floor, before",
+    "Smoke chamber, before"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your liner"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Chipped hearth tile"
+   ],
+   [
+    "The $89 service call",
+    "The $89 trip fee"
+   ],
+   [
+    "the $89 service call",
+    "the $89 trip fee"
+   ],
+   [
+    "Shutoff valve · $165",
+    "New flashing · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 rain cap quote"
+   ],
+   [
+    "Drain clearing plans",
+    "Chimney sweep plans"
+   ],
+   [
+    "leehomeservices.com",
+    "leechimney.com"
+   ],
+   [
+    "Plumbing price list",
+    "Chimney price list"
+   ],
+   [
+    "Sewer camera report",
+    "Level 2 camera report"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Chimney Sweeps'"
+   ],
+   [
+    "Water heater flush",
+    "Wood stove sweep"
+   ],
+   [
+    "water heater flush",
+    "wood stove sweep"
+   ],
+   [
+    "color, house calls",
+    "custom caps, home visits"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Chimney Sweeps"
+   ],
+   [
+    "the kitchen drain",
+    "the chimney sweep"
+   ],
+   [
+    "$640 water heater",
+    "$640 crown repair"
+   ],
+   [
+    "Supply line · $80",
+    "Crown seal · $80"
+   ],
+   [
+    "the shutoff valve",
+    "the new flashing"
+   ],
+   [
+    "your water heater",
+    "your crown"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Hearth Shop"
+   ],
+   [
+    "plumbing license",
+    "contractor license"
+   ],
+   [
+    "Plumbing license",
+    "Contractor license"
+   ],
+   [
+    "plumbing plug-in",
+    "chimney plug-in"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "the water heater",
+    "the crown"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Repipe · $2,400",
+    "Stainless liner · $2,400"
+   ],
+   [
+    "Drain clearings",
+    "Chimney sweeps"
+   ],
+   [
+    "Drain clearing",
+    "Chimney sweep"
+   ],
+   [
+    "drain clearing",
+    "chimney sweep"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 sweep"
+   ],
+   [
+    "plumbing visit",
+    "chimney sweep"
+   ],
+   [
+    "plumbing jobs",
+    "chimney jobs"
+   ],
+   [
+    "Panel upgrade",
+    "Insert install"
+   ],
+   [
+    "Kitchen drain",
+    "Chimney sweep"
+   ],
+   [
+    "kitchen drain",
+    "chimney sweep"
+   ],
+   [
+    "Signature cut",
+    "Cap fitting"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 stainless liner"
+   ],
+   [
+    "water heaters",
+    "crowns"
+   ],
+   [
+    "shutoff valve",
+    "new flashing"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Chimney"
+   ],
+   [
+    "Lee Electric",
+    "Lee Stoves"
+   ],
+   [
+    "Jordan Price",
+    "Wes Carter"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "plumbing job",
+    "chimney job"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "sewer camera",
+    "flue camera"
+   ],
+   [
+    "Water heater",
+    "Crown"
+   ],
+   [
+    "water heater",
+    "crown"
+   ],
+   [
+    "Casey Moore",
+    "Dale Ortiz"
+   ],
+   [
+    "leak repair",
+    "chimney leak repair"
+   ],
+   [
+    "Leak repair",
+    "Chimney leak repair"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "cuts a hand",
+    "hurts a hand"
+   ],
+   [
+    "Riley Chen",
+    "Rory Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Shay Diaz"
+   ],
+   [
+    "Electrical",
+    "Stove work"
+   ],
+   [
+    "electrical",
+    "stove work"
+   ],
+   [
+    "barbershop",
+    "hearth shop"
+   ],
+   [
+    "Barbershop",
+    "Hearth shop"
+   ],
+   [
+    "$179 drain",
+    "$179 sweep"
+   ],
+   [
+    "flush plan",
+    "sweep plan"
+   ],
+   [
+    "Beard trim",
+    "New door handle"
+   ],
+   [
+    "beard trim",
+    "new door handle"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "does color",
+    "makes custom caps"
+   ],
+   [
+    "yard drain",
+    "chimney cap"
+   ],
+   [
+    "Yard drain",
+    "Chimney cap"
+   ],
+   [
+    "88 Elm St",
+    "310 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "9 Cedar Ln"
+   ],
+   [
+    "Electric.",
+    "Most nights in winter."
+   ],
+   [
+    "MP045210",
+    "CR045210"
+   ],
+   [
+    "plumbing",
+    "chimney sweeping"
+   ],
+   [
+    "Plumbing",
+    "Chimney sweeping"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "EC22871",
+    "GS22871"
+   ],
+   [
+    "JE30417",
+    "GF30417"
+   ],
+   [
+    "BS20981",
+    "2020-1187"
+   ],
+   [
+    "plumber",
+    "sweep"
+   ],
+   [
+    "Plumber",
+    "Sweep"
+   ],
+   [
+    "barbers",
+    "counter techs"
+   ],
+   [
+    "Haircut",
+    "Gasket refit"
+   ],
+   [
+    "haircut",
+    "gasket refit"
+   ],
+   [
+    "the cut",
+    "the refit"
+   ],
+   [
+    "Jordan",
+    "Wes"
+   ],
+   [
+    "Elm St",
+    "Grove St"
+   ],
+   [
+    "barber",
+    "counter tech"
+   ],
+   [
+    "Barber",
+    "Counter tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "faucet",
+    "stove door"
+   ],
+   [
+    "Faucet",
+    "Stove door"
+   ],
+   [
+    "Casey",
+    "Dale"
+   ],
+   [
+    "Riley",
+    "Rory"
+   ],
+   [
+    "Avery",
+    "Shay"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "drain",
+    "chimney"
+   ],
+   [
+    "Drain",
+    "Chimney"
+   ],
+   [
+    "flush",
+    "stove sweep"
+   ],
+   [
+    "cuts",
+    "refits"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · liner"
+   ],
+   [
+    "the shutoff valves",
+    "the damper repair"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 rain cap"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings a wood stove's door to the counter at Lee Hearth Shop, Sam's stove and chimney parts shop, and Rory fits a new door gasket on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Chimney Sweeps for a fireplace at 9 Cedar Ln, and Wes sweeps and inspects the chimney Thu Oct 22, arriving between 8 and 10am. Repairs he finds are quoted after. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 door gasket refit at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+    "list|none|counter": "A $35 door gasket refit. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|deposit|counter": "The $140 stove door rebuild. A $40 deposit now, and $100 at the counter.",
+    "list|full|none": "A $55 cap fitting: a stainless cap sized to Alex's flue, paid in full when booking and picked up at the counter.",
+    "photos|card|counter": "A custom cap for an odd-size flue, priced from Alex's photos at $90. Booked once Sam OKs it.",
+    "visit|card|counter": "A cracked stove casting, priced at the counter. Only the $25 look is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Door gasket refit"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Door gasket refit"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Stove door rebuild"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Cap fitting"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Custom cap"
+    },
+    "visit|*|*": {
+     "name": "Stove casting repair"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Door handle",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Cap fitting",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Yearly door check (plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|deposit|bill",
+    "list|none|bill",
+    "visit|card|bill",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 chimney sweep and inspection, one flue. A card is saved for the $89 trip fee (a late cancel or nobody home). Rosie texts the bill after the sweep.",
+    "list|deposit|bill": "Fall season: a $150 wood stove sweep. A $40 deposit now, and the $110 rest on the bill after.",
+    "list|none|bill": "Off-season: a $179 chimney sweep. Nothing is taken. Rosie texts the bill after.",
+    "visit|card|bill": "A chimney leak, priced at the visit. A card is saved for the $89 trip fee.",
+    "photos|deposit|bill": "A crown repair, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Chimney sweep and inspection"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Chimney sweep and inspection"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Wood stove sweep"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Crown repair"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Crown repair"
+    },
+    "visit|*|*": {
+     "name": "Chimney leak repair"
+    },
+    "list|deposit|bill": {
+     "fee": "$40"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Damper repair",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$95",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Wood stove sweep",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Yearly stove sweep (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "drips",
+  "color"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Chimney work, stove work and the hearth shop all pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Chimney work books sweeps, and the shop books counter techs: never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Chimney work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Chimney work is booked ahead and never sent now, so nobody is on call (S2-31). A fire now is a 911 call, not a booking."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at a hearth shop counter is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The counter's plug-in names no form to sign. Its first steps are a size check, or a paper the shop gets, like a stove maker's warranty claim number."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Counter work is rated, like every refit."
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "Pick-up comes once it's READY, in the pick-up hours.",
+     "At the counter, a stove door left for a rebuild is a drop-off."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say Alex's stove smokes into the room before the counter visit. The plug-in's danger words are checked first. Then Rory is asked if the visit can go ahead.",
+    "more": [
+     "A sign of danger gets the safety message first, like 'let the fire burn out' or 'get out and call 911'.",
+     "A stove that smokes needs a sweep at the home. That's a new booking with Lee Chimney Sweeps.",
+     "Rory asked for the move, so there's no fee.",
+     "A question only a pro should answer gets the shop's line, (555) 010-0177, and the visit stays booked."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Our stove smoked into the room last night. Can I still bring the door in Saturday?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. (Sat 11:00am) sent an update before the visit. It's on the secure page. Can the visit go ahead?",
+      {
+       "card": {
+        "title": "Alex M.'s update",
+        "lines": [
+         "On the secure page"
+        ]
+       },
+       "buttons": [
+        "Yes, come in",
+        "Better to move it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Rory suggests a sweep at home first: smoke in the room can mean a blocked chimney. Don't light the stove until then. Your visit here can move, with no fee. Pick a new time:",
+      {
+       "times": [
+        "Sat Oct 31 · 11:00am · Rory",
+        "Tue Nov 3 · 11:00am · Rory"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Lee Hearth Shop bills no plan or insurance: the customer pays at the counter. A home insurance claim after a chimney fire is the customer's own (pf.money)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "Lee Hearth Shop bills no plan or insurance: the customer pays at the counter. A home insurance claim after a chimney fire is the customer's own (pf.money)."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at a hearth shop counter."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A hearth shop counter visit is never booked for a child."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Chimney work, stove work and the hearth shop all pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Chimney work books sweeps, and the shop books counter techs: never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Chimney work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Chimney work is booked ahead and never sent now, so nobody is on call (S2-31). A fire now is a 911 call, not a booking."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Chimney work is never sent now, so 'Send someone now' is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for chimney work, so no job is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Every chimney visit has a set time, so it gets the reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Every chimney visit has a set time, so it gets the day list and the on-my-way text."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Chimney work books a sweep in a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in chimney work is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Chimney work books a sweep in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A sweep never looks after a child: the sweep waits for an adult on the booking."
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent: here, as a Level 2 with Sam's OK. It's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A sweep's example: signs of an old chimney fire get 'don't light the fireplace until it's inspected'.",
+     "Rosa is told not to light the fireplace. If the chimney roars or smoke fills the house, she gets out and calls 911."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay fuego o humo ahora en la casa?",
+      {
+       "lang": "es",
+       "en": "First: is there fire or smoke in the house now?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. No hay fuego ahora.",
+      {
+       "lang": "es",
+       "en": "No. There's no fire now.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "No encienda la chimenea hasta la inspección. Si ruge o hay humo, salga y llame al 911.",
+      {
+       "lang": "es",
+       "en": "Don't light the fireplace until the inspection. If it roars or there's smoke, get out and call 911.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For chimney work, a chimney fire now, smoke filling the house or a carbon monoxide alarm stops the booking.",
+    "more": [
+     "The message is the plug-in's for that danger, or the general one: get to safety and call 911.",
+     "On a call, the caller hears it, and Sam gets the call summary.",
+     "A sweep can be booked once the fire department clears the chimney."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like a chimney fire. Get everyone out of the house now, then call 911 from outside. Don't go back in."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their chimney is roaring and smoke is in the house. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A chimney fire at the home",
+         "Told to get out, then call 911"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-05",
+    "more": [
+     "The plug-in's questions here: what the chimney serves, the fuel, how many flues, and any signs of an old fire.",
+     "A home sale, a new stove or fuel, or signs of an old fire make it a Level 2 camera inspection.",
+     "Animals heard in the chimney get the plug-in's animal steps first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "A sweep is priced per flue: $179 for the first, and $79 for each one after. Alex has one flue.",
+     "A Level 2 camera inspection is $199 more. Booked for a home sale, a new stove or signs of an old fire, Sam OKs it first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-44",
+    "more": [
+     "Here, each August, Alex gets a text to pick a September time. One tap on the plan's link ends it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B5-21",
+    "more": [
+     "Each August, Alex gets a text to pick a September time for the next sweep."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-03",
+    "more": [
+     "Here, a Level 2 for a home sale, a new stove or signs of an old fire asks Sam first. A sweep with a Level 1 books right away."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B7-93",
+    "branch": {
+     "label": "Animals in the chimney",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.5",
+        "7.6"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Tue Oct 20, 7:40pm",
+       "title": "Sends the steps for animals in the chimney",
+       "does": "Alex texts about scratching in the chimney. Rosie checks it for danger, then sends the plug-in's steps: keep it shut, no fire, and a wildlife company first.",
+       "more": [
+        "Lee Chimney Sweeps doesn't remove live animals. A wildlife company does, licensed where the state requires one.",
+        "Birds the law protects, nesting or roosting in a chimney, stay until they leave. No sweep or cap until then.",
+        "Sam is told, with Alex's words.",
+        "Thursday stays booked. If the chimney isn't clear by then, Sam moves it with no fee."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "We hear scratching and chirping in the chimney."
+        ],
+        [
+         "san",
+         "cust",
+         "Please keep the damper and the fireplace doors shut, and don't light a fire. Lee Chimney Sweeps doesn't remove live animals. A wildlife company needs to get them out first. Your Thursday sweep stays booked."
+        ],
+        [
+         "san",
+         "owner",
+         "Alex M. hears animals in the chimney before Thursday's sweep. Alex got the steps.",
+         {
+          "card": {
+           "title": "Animals in the chimney · Alex M.",
+           "lines": [
+            "Thu Oct 22 · arriving 8–10am · Wes",
+            "Told: damper shut, no fire, a wildlife company first"
+           ]
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.safety",
+        "pf.first_steps"
+       ],
+       "tells": [
+        "cust",
+        "owner"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "B7-17",
+    "more": [
+     "A chimney fire before the sweep: 911 first, and Sam is told. No fire until a Level 2, so Sam calls Alex."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Drop cloths go down first, and a vacuum runs at the hearth.",
+     "Too wet or windy for the roof: Wes sweeps from the firebox and checks the top from a ladder. A roof check comes back free if needed."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Wes finds cracked tiles in the flue. The plug-in says no fires until it's repaired, so Alex gets a written no-use note and the photo.",
+    "more": [
+     "The note says what was found, that the fireplace must not be used, and what fixes it.",
+     "It goes out whatever Alex decides about the repair, and stays with the photo report.",
+     "Sam is told. A camera look and a liner quote follow, on their own day.",
+     "If Alex says no to the repair, the note stays on Alex's record and the secure page."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD cracked flue tiles, no fires",
+      {
+       "photos": [
+        "Cracked flue tiles"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Wes found cracked tiles in your chimney's flue. Please don't use the fireplace until it's repaired.",
+      {
+       "card": {
+        "title": "Safety note · 9 Cedar Ln",
+        "lines": [
+         "Found: cracked flue tiles",
+         "Don't use: the fireplace, until it's repaired",
+         "Next: a camera look and a liner quote"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "The sweep's photo report opens on the secure page: what Wes saw in each part, with before and after photos."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Chimney work bills no warranty plan or insurance: the customer pays, and gets the receipt and photo report for any claim."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Chimney work bills no insurance: the customer pays, and a claim is the customer's own, with the receipt and photos."
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:15am"
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 10:17am"
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 10:20am"
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE getting a part, back 10:00"
+     ],
+     [
+      "san",
+      "cust",
+      "Wes went to get a part and will be back about 10:00am. The job should be done by 10:45am."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A sweep is rated, like most home services."
+   }
+  ]
+ },
+ "notes": "Pilot: plumber (from). A sweep's home visit runs like the plumber's: 2-hour arrival windows, the trip fee held, list prices set by the answers (per flue, the inspection level), findings quoted at the visit or as their own job, and a counter at the shop. The cleaner (the service pilot) was weighed: its set price and plan fit, but its rug drop-off and crew-of-two cleans don't, and inspection-then-repair is the plumber's quote path.\nFlow B is the usual side: Lee Chimney Sweeps, Sam's main company: chimney sweeping (sweeps, Level 1 and Level 2 inspections, caps, crowns, leaks, liners), and stove work as the second kind of work (the master's electrical): gas stove and insert work, licensed where the state licenses gas work. Wes Carter (sweep and gas fitter) and Dale Ortiz (sweep) are the master's Jordan and Casey. 75 Mill Rd; Alex's home is 9 Cedar Ln.\nFlow A is the less usual side: Lee Hearth Shop, Sam's second company (the master's Lee's Barbershop), a stove and chimney parts counter. Customers bring a stove door for a new gasket or glass, pick up a stainless cap sized to their flue (the cap fitting, paid in full), or leave a door for a rebuild. Rory Chen (custom caps, home visits) and Shay Diaz are the master's Riley and Avery. 310 Grove St.\nExample prices are the example businesses' own and keep the master's amounts, so sums add up. B: $89 trip fee (held; the late-cancel and nobody-home fee), $179 sweep and Level 1 (first flue; $79 each extra flue), $150 wood stove sweep, $640 crown repair from photos ($160 deposit), a leak priced at the visit ($245: flashing $165, crown seal $80), a $199/$249 Level 2 by person, a $160 rain cap and a $95 damper repair as extra work, a $900 crown rebuild, a $2,400 liner in stages.\nA: $35 gasket refit ($75 at home), $40 stove glass, $20 door handle, $25 ash pan repair, $55 cap fitting (paid in full), $140 stove door rebuild (2½ hours; the $40 fee held, or a $40 deposit), a $90 custom cap from photos, a casting repair after a $25 look.\nMoney B: the main path is list|hold|bill, the plug-in's starting answer. The old example took a $50 fall deposit only because card holds expired; with day-before holds, the fall deposit is the owner's season choice: list|deposit|bill ($40 on the $150 stove sweep; B5-11 words say it's the fall one). list|none|bill is the off-season. visit|hold|bill is a chimney leak priced at the visit; photos|deposit|bill a crown repair from photos. No card-only or charge-at-DONE path: the old flowchart was paid on completion by card on the sweep's phone, a link or a check, which is Rosfield's bill.\nMoney A: the plumber pilot's counter set: list|card|counter (main), none, hold, deposit, full (the cap fitting picked up), photos (a custom cap), visit (a casting repair).\nChimney work is never sent now: a fire now is a 911 call, never a booking (S2-30, B4-81, B4-16, B6-03, B7-55, B8-58 off).\nLevel 2: one booked for a home sale, a new stove or fuel, or signs of an old fire asks Sam first (B6-03 more; the old 'Greta confirms these herself'). A Level 2 added to a booked sweep (B7-31) is a list price with no OK.\nLicense: no state is named. S1-60 and S2-28 keep both branches: chimney repair is licensed where the state or city licenses it (the example: the company's contractor license CR045210), gas stove work licenses the company and each installer (GS22871; Wes's GF30417), and sweeps and counter techs need none. The hearth shop gives its registration (S1-63's license branch off). Rename pairs carry this into S1-23, S1-39, S1-49, S1-50 and S2-05 to S2-28.\nA trade group's sweep certificate isn't a state license: it shows only as checked (S13-11; pf.license).\nOwn steps: B7-x01 (animals in the chimney: damper shut, no fire, a wildlife company first; protected nesting birds stay until they leave) and A8-x01 (a warped door that can't be refit: a new door, or a sweep at home). Words: B3-18 and B3-19 (signs of an old fire; a fire now), B8-30 (cracked flue tiles: a written no-use note), B8-31 (a wet roof: swept from the firebox, the top checked from the ladder), B5-11 (the fall deposit), and the pilot's A4-29, A4-67, A7-13, A7-60, reworded. More: B4-05, B4-07, B4-44, B5-21, B6-03, B7-17, B8-18, B10-01, B10-24, A4-36.\nOff in B as well: a plan or warranty that pays, and insurance (B4-43, B4-63, B7-05, B9-19: the customer pays, and a claim after a chimney fire is the customer's own, with the receipt and photo report), a rented fan (B10-07), an outside check partway (B8-65). Flow A's plan and insurance what-ifs are off too (review, Oct 22): the hearth shop bills none.\nPlug-in splits kept whole (splitsKept): S1-60 and S2-28 in both flows (state by state). A: A7-59, S11-87, S11-90 (a drop-off names no counter tech), A7-61 (custom caps are Rory's alone), A8-02 (a refit needs the stove door), A8-53 (at the counter, or a drop-off). B: B4-57 (a written estimate above the plug-in's amount), B8-69 and B8-70 (a cap or crown from the roof with nobody home; a sweep needs someone home), B8-71 (a new wood stove delivered and set up, stove work), B8-72 (a stove door to the shop), B10-29 (a permit inspection for a liner, a rebuild or a new stove).\nTimes read as 2-hour arrival windows (B4-83 '1'); the old flowchart's set visit times (8, 10, 1, 3) fit them. A crew of two stays for liners and rebuilds (B7-56).\nPlans: the master's yearly flush plan is a yearly wood stove sweep plan ($150, as the master's form says). The old flowchart's August text to pick a September time is a more line on B4-44 and B5-21; picking each visit when it comes up is a gap. Flow A's plan is a yearly door check (the master's every-4-weeks haircut plan).\nkeep: 'leak' is chimney work's own word (a chimney leak repair, a leak by the chimney).\nSentence pairs rename the master's plumbing and barbershop examples where words alone would read wrong (the questions that set the price, the reminder's prep line, the quote lines, the notes, the receipts, the warranty claims). The receipt's warranty is the example's own: a 30-day sweep guarantee, and 1 year on repairs.\nUnsure: walk-in drop-offs at the hearth shop are kept, like the plumber's counter; the second kind of work could as well be dryer vent cleaning (no license), which would need words ops on S1-39 instead of renames.\nReview (Oct 22): flow A's plan, insurance, rental and later-result branches are off (the counter bills no plan, rents nothing, and has no later result). B's S11-56 now moves the wood stove sweep from the $89 hold to the $40 fall deposit (the plug-in's own choice), not from a full price it never takes. A sweep takes 2 hours, so DONE, the bill and the receipt come after 10am (B8-41, B9-06, B10-01, B8-32's part run). Rename pairs: '2½-hour stove door rebuild' (A3-02) and 'Only Wes repairs crowns' (B8-34, photos path).\nReview (Oct 22): side branches the work never has are off too, where their own step said so: the live line (B3-01), seats at a host's place (B4-43), an expert's read (B6-03, A6-01), weather at the counter (A7-02), a class roster (A8-03), a counter visit over several days (A8-32). The plug-in now names nothing taken at the counter (A list|none|counter), which the money paths already listed.\nReview, round 2 (Oct 22): the permit-inspection what-if uses a new stainless liner, work the plug-in says needs a permit (B10-29, B10-24), and Dale's skills read 'chimney and stove sweeps and leak repairs' (B4-17, B7-17, B7-19, B7-54).\ntouch-up 4 (Oct 23): keep 'drips': water that drips by a chimney when it rains, and checking for drips after a crown repair, are real chimney words.",
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-15",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28",
+   "B5-34",
+   "B8-69"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "My employer pays for this cut.",
+    "like Alex's employer for a staff cut.",
+    "like the cut in the mirror.",
+    "Color quotes come to you first.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "doesn't do perms.",
+    "would like to see your hair before pricing it.",
+    "How would you like it on top?",
+    "'Yes, make it a fade'",
+    "No reply by 11:00am means the shorter cut.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "two skin fades",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A barbershop has none, so nothing is sent here.",
+    "May the shop show photos of your hair? Yes / No",
+    "says the cape clip ripped a shirt collar today",
+    "The signed form this service needs is missing.",
+    "Promises the $25 consult; priced at the chair",
+    "A haircut could mean a salon or a barbershop",
+    "Can my son wait in the shop during my cut?",
+    "Alex bought a package of cuts at the shop.",
+    "Plumbing JP031552 · electrical JE30417",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Riley also does color and house calls",
+    "Saturday's cut is uneven on one side",
+    "Not bookable until it shows renewed",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Do you do kids cuts? My son is 8.",
+    "Books the groom's party together",
+    "a Kids cut (12 and under) is $25",
+    "like a 15-minute style consult",
+    "The cut is uneven on one side.",
+    "Color always stays with Riley.",
+    "like a burst pipe or a lockout",
+    "Haircut every 4 weeks · Riley",
+    "Haircut, fade and beard trim",
+    "Haircut plan · every 4 weeks",
+    "I'd like a cut on Saturday.",
+    "Saturdays · 11:00am · Riley",
+    "Quiero un corte el sábado.",
+    "Next: Sat Nov 28 · 10:00am",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "once Riley sees the hair",
+    "plumbing and electrical",
+    "Kids cut (12 and under)",
+    "Signature cut and shave",
+    "like a skin-test result",
+    "color and house calls",
+    "Plumbing price list",
+    "the Groom's package",
+    "The Groom's package",
+    "photos of your hair",
+    "Lee Home Services'",
+    "color, house calls",
+    "Lee Home Services",
+    "doesn't do perms.",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Groom's package",
+    "Gloss to finish",
+    "No gloss today.",
+    "Shorter is fine",
+    "Drain clearing",
+    "plumbing jobs",
+    "Panel upgrade",
+    "Signature cut",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "rents a chair",
+    "Alex M.'s cut",
+    "sees the hair",
+    "water heaters",
+    "Haircut plans",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "plumbing job",
+    "a beard trim",
+    "in the chair",
+    "Consult only",
+    "consult only",
+    "water heater",
+    "Haircut plan",
+    "haircut plan",
+    "Casey Moore",
+    "a skin fade",
+    "house calls",
+    "House calls",
+    "NEW massage",
+    "color quote",
+    "Color quote",
+    "$25 consult",
+    "the consult",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "house call",
+    "does color",
+    "color plan",
+    "Color plan",
+    "88 Elm St",
+    "Barbering",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Electric.",
+    "MP045210",
+    "plumbing",
+    "Plumbing",
+    "Haircuts",
+    "haircuts",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Jordan",
+    "Elm St",
+    "barber",
+    "Barber",
+    "chairs",
+    "Casey",
+    "Riley",
+    "Avery",
+    "gloss",
+    "chair",
+    "a cut",
+    "A cut",
+    "Drain",
+    "cuts",
+    "Style consult",
+    "style consult"
+   ],
+   "B": [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "like new pipes put in one day and finished another.",
+    "Shutoff valve and wall pipe · $540",
+    "your new pipes are in.",
+    "I found water damage under the sink this morning.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "many barbers, salons and groomers are licensed to their shop",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Casey's license is checked again when the lookup answers.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "you said yes to replacing both shutoff valves for $160",
+    "sent you a proposal for new pipes, from Jordan's notes",
+    "The plug-in says a water heater is priced from photos",
+    "Your drain is under warranty, so this visit is free.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can Jordan look at my bathroom sink next week?",
+    "Can you flush my water heater every year, too?",
+    "A haircut could mean a salon or a barbershop",
+    "Alex texts that the sink is now overflowing.",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "couldn't price your water heater this time",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "like replacing the old pipes Jordan noted",
+    "Please clear the cabinet under the sink.",
+    "Can I skip next week's drain cleaning?",
+    "Plumbing JP031552 · electrical JE30417",
+    "Riley also does color and house calls",
+    "can cut your hair at the shop for $35",
+    "The kitchen drain is clogged again.",
+    "Not bookable until it shows renewed",
+    "QUOTE 245 valve 165 supply line 80",
+    "Replace both shutoff valves · $160",
+    "Jordan left a mess under the sink.",
+    "replace both shutoff valves, $160",
+    "It's a leak under the sink, today",
+    "Is the sink still full of water?",
+    "Proposal · Replace the old pipes",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Your water heater price is with",
+    "like a burst pipe or a lockout",
+    "The $80 supply line stays good",
+    "finds corroded shutoff valves",
+    "cancelled the $160 valve work",
+    "Haircut, fade and beard trim",
+    "plumbing and electrical work",
+    "My kitchen drain is clogged.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Replace both shutoff valves",
+    "cracked the cabinet floor",
+    "Casey · license not found",
+    "Water heater replacement",
+    "water heater replacement",
+    "cracks the cabinet floor",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "NEW heating and cooling",
+    "Casey · license expired",
+    "Kitchen drain clearing",
+    "Just the kitchen sink.",
+    "replaces water heaters",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "the water heater quote",
+    "color and house calls",
+    "water heater contract",
+    "Cabinet floor, before",
+    "quote for your repipe",
+    "Cracked cabinet floor",
+    "The $89 service call",
+    "the $89 service call",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "Drain clearing plans",
+    "leehomeservices.com",
+    "Plumbing price list",
+    "Sewer camera report",
+    "Lee Home Services'",
+    "Water heater flush",
+    "water heater flush",
+    "color, house calls",
+    "Lee Home Services",
+    "the kitchen drain",
+    "$640 water heater",
+    "Supply line · $80",
+    "the shutoff valve",
+    "your water heater",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "plumbing plug-in",
+    "service call fee",
+    "the water heater",
+    "Service call fee",
+    "Repipe · $2,400",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "plumbing visit",
+    "plumbing jobs",
+    "Panel upgrade",
+    "Kitchen drain",
+    "kitchen drain",
+    "rents a chair",
+    "$2,400 repipe",
+    "water heaters",
+    "shutoff valve",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "plumbing job",
+    "service call",
+    "Service call",
+    "sewer camera",
+    "Water heater",
+    "water heater",
+    "Casey Moore",
+    "leak repair",
+    "Leak repair",
+    "house calls",
+    "House calls",
+    "cuts a hand",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "$179 drain",
+    "flush plan",
+    "beard trim",
+    "house call",
+    "does color",
+    "yard drain",
+    "Yard drain",
+    "88 Elm St",
+    "42 Oak St",
+    "Electric.",
+    "MP045210",
+    "plumbing",
+    "Plumbing",
+    "cut hair",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Jordan",
+    "Elm St",
+    "barber",
+    "Barber",
+    "chairs",
+    "faucet",
+    "Casey",
+    "Riley",
+    "Avery",
+    "chair",
+    "drain",
+    "Drain",
+    "flush",
+    "cuts",
+    "Right to cancel · repipe",
+    "the shutoff valves",
+    "the $160 valve work",
+    "Rental 1",
+    "Rental 2"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3",
+   "A4-14": "95c7ffcfab",
+   "A7-13": "e41528a397",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5",
+   "A4-24": "0a292df05b"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B4-05": "fb3a9061c8",
+   "B4-07": "9d0dbc90ad",
+   "B4-44": "514c8ab30c",
+   "B5-21": "925b7342ed",
+   "B7-93": "4d6f89e473",
+   "B7-17": "ac1fd212f3",
+   "B8-18": "530038d2b8",
+   "B8-30": "a1ef4983e4",
+   "B10-01": "814aa1fde7",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B8-41": "6e8e9825b2",
+   "B9-06": "f091432f2d",
+   "B8-32": "1cfd4f7afa",
+   "B10-32": "7713bff255"
+  }
+ }
+}

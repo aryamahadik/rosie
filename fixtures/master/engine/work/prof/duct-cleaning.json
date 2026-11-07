@@ -1,0 +1,3898 @@
+{
+ "id": "duct-cleaning",
+ "name": "Air duct and dryer vent cleaning",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "chimney",
+ "plugin": {
+  "pf.license": {
+   "need": "Cleaning air ducts and dryer vents needs no state license in most places. Where a state or city licenses home improvement or HVAC work, its form asks for it. Cutting, sealing or repairing ducts, replacing a dryer vent, and gas or electric work can need an HVAC or contractor license, or a gas fitter's license, where the state requires one; this business cleans only. Asbestos removal and mold removal over the state's size cutoff are separate licensed trades and are not offered. The vent shop's counter: business registration only.",
+   "ask": "The company's business registration, or its contractor or HVAC license, where the state's form asks for one.",
+   "who_holds": "The business. Crew members and shop techs need no license of their own unless the state's form says so.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "insurance_bond": "General liability and workers' comp are common. 'Insured' is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Crews work inside homes: the business's own word that they are checked, or a check Rosie holds where the state's rules require one. It is shown as given by the business, not checked by Rosie.",
+   "trade_certificates": "A trade group's certificate for duct or dryer vent cleaning is not a state license. It shows in the business's own words, never as checked by Rosie.",
+   "not_this_work": "Asbestos removal, mold removal over the state's size cutoff, pest and animal removal, and furnace or dryer repair are licensed or separate trades. They aren't duct or vent cleaning."
+  },
+  "pf.services": {
+   "pattern": "Set service: a fixed service at the customer's place, priced by the answers, often repeating once a year.",
+   "list": [
+    {
+     "name": "Air duct cleaning",
+     "price_kind": "set by the customer's answers (heating and cooling systems, vents, returns, square feet)",
+     "example": "one system, up to 8 vents: $179 (the example business's own price); more vents or systems add to it",
+     "length": "about 3 hours for a crew of two",
+     "where": "at the customer's place",
+     "money": "card saved at booking for the late-cancel and lockout fee; the saved card is charged when the crew texts DONE; or nothing taken and Rosie texts the bill"
+    },
+    {
+     "name": "Dryer vent cleaning",
+     "price_kind": "set by the customer's answers (length of the run, floors, wall or roof exit)",
+     "example": "$150 for a short run (the example business's own price); a long run or a roof exit adds to it",
+     "length": "about 1 hour for one technician",
+     "where": "at the customer's place",
+     "money": "nothing taken, or the full price when booking, Sam's choice (the sign-up example pays it in full); otherwise a card saved and charged at DONE"
+    },
+    {
+     "name": "Duct camera inspection",
+     "price_kind": "from the list",
+     "example": "$199 (the example business's own price), with the video",
+     "length": "about 1 hour",
+     "where": "at the customer's place",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Post-remodel duct cleaning",
+     "price_kind": "quoted from the customer's photos first",
+     "example": "$640 for a house after a remodel (construction dust in the ducts)",
+     "length": "half a day",
+     "where": "at the customer's place",
+     "money": "a deposit where the state's caps allow ($160 in the example); the rest charged to the saved card at DONE"
+    },
+    {
+     "name": "Multi-unit or whole-building duct cleaning",
+     "price_kind": "quoted at a walkthrough, before any work",
+     "example": "only the $89 fee is promised",
+     "where": "at the customer's place",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Free estimate",
+     "price_kind": "free",
+     "example": "about 30 minutes: a lead counts the vents and looks at the dryer vent run",
+     "where": "at the customer's place",
+     "money": "nothing taken, nothing after"
+    },
+    {
+     "name": "By the hour",
+     "price_kind": "per hour",
+     "example": "$120 an hour for a crew of two, 1-hour minimum",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Add-ons",
+     "price_kind": "one price each, added only when the customer asks",
+     "example": "blower wheel cleaning $160; dryer vent cleaning added to a duct job $150; vent cover wash $20"
+    },
+    {
+     "name": "Yearly dryer vent plan",
+     "price_kind": "each visit at the dryer vent cleaning's list price",
+     "example": "$150 a visit, every 12 months",
+     "where": "at the customer's place",
+     "money": "its own yes on the secure page; each visit is booked and paid like a single one; ends with one tap"
+    },
+    {
+     "name": "Late-cancel fee",
+     "price_kind": "one price",
+     "example": "$89: only for a late cancel or nobody home that the owner confirms, or owed when a walkthrough job isn't done",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Filter, register and vent cover washing at the business (Lee Vent Shop)",
+     "price_kind": "one price by item, from photos, or at the counter",
+     "example": "hood filter degrease $35, register and grille wash $40, vent cover wash $20, lint trap screen wash $25, washable furnace filter clean $55, hood filter set $140, exhaust fan clean from photos $90, a heavy grease set priced at the counter after a $25 look",
+     "where": "dropped off at the shop; nothing is washed at the customer's place",
+     "money": "nothing taken; paid at the counter at pick-up"
+    }
+   ],
+   "capacity": "A whole-home duct cleaning takes a crew of two with a truck-mounted or portable vacuum. A dryer vent takes one technician. A shop drop-off needs one person at the counter.",
+   "nobody_home": "No. An adult must be home: vents are opened, the system is off during the work, and the customer signs off at the end. Roof-exit work is done from the roof or the ground with the adult home.",
+   "online": "No. A camera video of the ducts is sent after the visit, not a video visit.",
+   "not_offered": "Furnace, air conditioner and dryer repair, duct sealing or replacement, mold or asbestos removal, animal removal, chimney work.",
+   "drop_off_slots": "Filters, registers and vent covers are booked into drop-off slots by the shop's daily number, with no washer named; the items go to a shop tech with the skill once they're in."
+  },
+  "pf.questions": {
+   "before_times": [
+    "What needs cleaning: the air ducts, the dryer vent, or both",
+    "Air ducts: how many heating and cooling systems, how many vents and returns, and about how many square feet",
+    "Dryer vent: electric or gas dryer, how long the run is, how many floors, and whether it exits through the wall or the roof",
+    "When the ducts or the dryer vent were last cleaned",
+    "Signs of trouble: clothes taking two cycles to dry, a very hot laundry room, lint outside, dust blowing from the vents",
+    "A home built before 1980, or ducts wrapped in old insulation (an asbestos check comes first)",
+    "Any animals heard in the ducts or the vent",
+    "At the counter: which items, and what they're made of"
+   ],
+   "after_a_time": [
+    "Who will be home: the customer, or someone else (their name and mobile go on the secure page)",
+    "Where the furnace or air handler is, and the attic or crawl space access",
+    "Pets, and where they'll be",
+    "Where the dryer vent comes out, and parking",
+    "Own or rent: the landlord's OK for anything beyond cleaning"
+   ],
+   "secure_page_only": [
+    "The street address",
+    "Gate or lock codes",
+    "The landlord's name and mobile",
+    "Photos inside the home",
+    "The card"
+   ],
+   "who_may_book": "An adult who owns or rents the home, or someone the owner allows. A renter books cleaning; the landlord's OK is needed for anything beyond cleaning."
+  },
+  "pf.safety": {
+   "words": [
+    "smoke or flames from a dryer, a vent, a furnace or the ducts",
+    "a gas smell or a carbon monoxide alarm",
+    "sewage or a sewage backup",
+    "suspected asbestos on ducts or pipes",
+    "a mold patch over the state's size cutoff",
+    "dead animals or heavy droppings in the ducts",
+    "sparking or exposed wiring",
+    "an attic or crawl space floor that isn't safe"
+   ],
+   "what_happens": [
+    "Smoke or flames now: get everyone out of the house, then call 911 from outside. Rosie never places the call. No booking until the fire department clears it.",
+    "A gas smell or a carbon monoxide alarm: get everyone outside now, then call 911 and the gas company. No booking until it's safe.",
+    "Signs of a clogged dryer vent (clothes damp after a full cycle, a very hot dryer or laundry room, lint at the outside vent) are not an emergency: stop using the dryer until the vent is cleaned. The booking goes on.",
+    "Suspected asbestos, mold over the cutoff, droppings, sewage: Rosie says a duct cleaner can't take that part on and points to a specialist. The rest of the home can still be booked with that part left out.",
+    "Sparking wires or an unsafe attic floor: stay out of the area; no booking for it until it's fixed.",
+    "Animals heard in the ducts or the vent: a wildlife company first. Protected birds nesting in an outside vent stay until they leave; no cleaning or cap removal until then."
+   ],
+   "booking_goes_on": "Yes, with the part left out (asbestos, mold, droppings, sewage, wiring, a floor), and for signs of a clogged dryer vent. No, for smoke or flames now, a gas smell or a carbon monoxide alarm."
+  },
+  "pf.first_steps": {
+   "first_clean": "Before the main visit: an asbestos check for ducts wrapped in old insulation in an older home; a free walkthrough for a multi-unit or whole-building job; photos first for a post-remodel cleaning.",
+   "wildlife": "Live animals in the ducts or vent: a wildlife company first, licensed where the state requires one. The booking can move with no fee.",
+   "plan": "A yearly dryer vent plan starts after the first visit. It has its own yes, apart from the booking, and the terms are texted back.",
+   "prep_for_reminder": [
+    "Clear about 3 feet around the vents, the furnace and the dryer",
+    "Move small items and rugs off the floor vents",
+    "Keep pets in another room",
+    "At the counter: bring the filters dry, with their frames"
+   ],
+   "size_check": "A heavy grease set at the counter: a short look first, so the price is set before any work (the example: a $25 look)."
+  },
+  "pf.visit": {
+   "check_in": "The check-in code at the door, entered by the crew lead. The on-my-way text names the crew lead, with a photo.",
+   "counter": "At Lee Vent Shop: the code is given at the counter when the items are left. Status words IN, DRYING, READY. READY comes with a photo. Pick-up only by the customer or someone they name.",
+   "how_it_works": "Vents are covered or opened, the system is turned off, and the ducts are cleaned with a brush and a vacuum under negative pressure. The dryer vent is cleaned from the dryer to the outside. Before and after photos, or a camera video of the ducts, are kept with the job.",
+   "weather": "A roof exit is worked only when it's dry and not windy. Otherwise the vent is cleaned from inside and from the ground, and a roof check is booked again for free if needed.",
+   "findings": "Nothing is sealed, repaired or replaced at a cleaning unless it's quoted and OK'd. A broken vent cover or a crushed vent hose is quoted with its lines before any work. Over the owner's limit (the example: $500), the owner OKs it first.",
+   "a_hazard_found": "Suspected asbestos wrap, mold, droppings or a crushed gas line: that part stops at once, and a written note goes to the customer, kept with the photos.",
+   "work_sold_at_the_home": "A right to cancel only where the state's rules give one.",
+   "proof_done": "DONE with the bill's lines and the after photos or the camera video. The report goes with the receipt."
+  },
+  "pf.money": {
+   "start": "At the customer's place: a card saved at booking for the late-cancel and nobody-home fee, and the saved card is charged when the crew texts DONE; or nothing taken and Rosie texts the bill. Counter drop-offs: nothing taken, paid at the counter at pick-up.",
+   "deposits": "None by default. Sam can set a deposit or the full price per service, within the state's caps (the example: a dryer vent cleaning paid in full when booking). Deposit cap: from the state form.",
+   "fees": "Late cancel and nobody home: the business's own fee (the example: $89), never more than what was paid now when money was paid now. Needs a saved card. The owner confirms each one; no answer, no fee. No card saved, no fee.",
+   "plans": "A yearly dryer vent plan: its own yes first, each visit booked and paid like a single one, a text each September to pick a time, and one tap ends it. Rosfield's $2 counts once for each booked visit.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "insurance_claims": "A home insurance claim for duct or vent work is the customer's own; the customer gets the receipt and the photo report.",
+   "rosfield_fee": "The usual $2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate or lock codes, and where a key is kept",
+    "Card details",
+    "Photos from inside the home. The photo report and camera video open on the secure page.",
+    "Health reasons, like an allergy behind a product to avoid"
+   ],
+   "languages": "English and Spanish.",
+   "danger_words": "Smoke, flames, gas and carbon monoxide words always get the safety message first, before anything else.",
+   "minors": "Nobody under 18 books."
+  },
+  "pf.staff": {
+   "skills": [
+    "Air duct cleaning with negative pressure (a crew of two)",
+    "Dryer vent cleaning, including roof exits",
+    "Duct camera inspections",
+    "Counter work: degreasing filters, registers, vent covers and lint trap screens"
+   ],
+   "crews": "Two per whole-home duct job: a lead, who holds the entry code and texts DONE, and a helper. A person who works alone (a dryer vent technician) adds an emergency contact, and a missed safety check gives that contact the job's address only.",
+   "licenses": "None per person unless the state's form says so. A trade group's certificate shows only as the person gave it, not checked.",
+   "new_person_ok": "A crew member the customer hasn't booked is offered by text first, never sent without an OK.",
+   "who_oks": "The owner OKs fees, walkthrough quotes, repairs over the limit and same-day jobs. The office manager may OK prices if the owner sets it.",
+   "stand_ins": "Another crew lead with the same skill, at the same window and price."
+  },
+  "pf.rules": {
+   "plans": [
+    "The plan's terms show before any card is asked: how often, the price a visit, when it's charged, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking, and the terms are texted back.",
+    "One tap ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask."
+   ],
+   "written_estimate": "A written estimate before work above an amount: from the state form.",
+   "add_on_at_home": "A right to cancel only where the state's rules give one for work sold at the home.",
+   "landlord": "A renter books cleaning; the landlord's OK is needed for anything beyond cleaning.",
+   "protected_birds": "Birds the law protects, nesting in an outside vent: no cleaning or cap removal until they've left.",
+   "live_animals": "The business doesn't remove live animals. A wildlife company does it first, licensed where the state requires one.",
+   "warranty": "The owner's own guarantee, shown on the receipt (the example: a missed vent is re-cleaned free within 30 days).",
+   "records": "7 years, with the before and after photos and the camera video."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "Smoke or flames at any point: get out and call 911 first; the owner is told",
+    "Signs of a clogged dryer vent: stop using the dryer until it's cleaned; the booking goes on",
+    "Suspected asbestos wrap, mold, droppings or sewage found: that part stops with a written note; the rest can go on",
+    "Animals or nesting birds in the ducts or vent: a wildlife company first; the visit can move with no fee",
+    "Wet or windy on a roof-exit day: worked from inside and the ground; a roof check booked again for free",
+    "An attic or crawl space that is blocked or unsafe: that part is skipped and noted, never forced",
+    "A missed vent: tell the business within 30 days; a free return visit (a redo, never money from Rosie)",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "A crew member is out: a new person is offered first; no answer, the visit moves with no fee",
+    "Items at the counter that nobody picks up: reminders; after the free days, a storage fee only if the owner starts it, after written notice"
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "firststeps",
+   "dropoff",
+   "photos",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Noor and Kofi (shop techs at the vent shop)"
+  },
+  "B": {
+   "staff": "Marek and Nadia (duct cleaners)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Noor"
+  },
+  "B": {
+   "staff": "Marek"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off slot at Lee Vent Shop, Sat Oct 24, leaves a set of hood filters at the counter, and picks them up clean a few days later. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Duct Care for the house at 38 Alder Ct: air duct cleaning, Thu Oct 22, arriving between 8 and 10am with Marek, then a dryer vent cleaning every year. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|full|none",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|none|counter": "The main story: a $35 hood filter degrease. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+    "list|card|counter": "A $35 hood filter degrease. A card is saved for the shop's $20 fee. Alex pays at the counter at pick-up.",
+    "list|full|none": "A washable furnace filter clean, $55, paid in full when booking.",
+    "photos|none|counter": "An exhaust fan clean, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+    "visit|none|counter": "A heavy grease filter set, priced at the counter. Only the $25 look is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Filter wash"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Filter wash"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Furnace filter clean"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Exhaust fan clean"
+    },
+    "visit|*|*": {
+     "name": "Heavy grease filter clean"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Vent cover wash",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Furnace filter clean",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Filter wash (plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "photos|deposit|card",
+    "visit|card|card"
+   ],
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: a $179 air duct cleaning, then a yearly dryer vent plan. A card is saved for the $89 late-cancel fee and charged $179 when Marek texts DONE.",
+    "list|none|bill": "A $179 air duct cleaning. Nothing is taken. Rosie texts the bill after the visit.",
+    "photos|deposit|card": "A post-remodel duct cleaning, priced from photos at $640. Sam OKs it. A $160 deposit now, and the $480 rest is charged to the card at DONE.",
+    "visit|card|card": "A whole-building duct cleaning, priced at the walkthrough before any work. A card is saved for the $89 fee."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Air duct cleaning"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Air duct cleaning"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Post-remodel duct cleaning"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Post-remodel duct cleaning"
+    },
+    "visit|*|*": {
+     "name": "Whole-building duct cleaning"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Dryer vent cleaning",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Duct camera inspection",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$199",
+      "paid": "$199",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Dryer vent cleaning (yearly plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "color",
+  "visit fee",
+  "Visit fee"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "This work takes no jobs sent now."
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "Water pressure check",
+    "Free estimate"
+   ],
+   [
+    "Labor",
+    "By the hour"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, only if you OK it"
+   ],
+   [
+    "A nothing before, and at their home too, 75, paid when they book.",
+    "A nothing before, and D paid when they book too."
+   ],
+   [
+    "A at their home too, 75, paid when they book",
+    "D paid when they book too"
+   ],
+   [
+    "Set. For a haircut, the customer picks the place and sees both prices first. The rest stays as on the card.",
+    "Set. Here's what changed for the vent shop. The rest stays as on the card."
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Only at your shop: no work at a customer's place"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the shop"
+   ],
+   [
+    "a house call, $75",
+    "a lint trap screen wash, $25"
+   ],
+   [
+    "Haircut at their home",
+    "Lint trap screen wash"
+   ],
+   [
+    "Haircut at home · $75",
+    "Lint trap screen wash · $25"
+   ],
+   [
+    "Haircut at the shop",
+    "Filter wash"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules runs their own crew, with their own customers."
+   ],
+   [
+    "The chairs",
+    "The wash area"
+   ],
+   [
+    "A chair, ready",
+    "A filter, washed"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of the fan"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything the shop tech should know?"
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Vent Shop · drop-off"
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your filters are clean and ready for pick-up."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A vent shop books a drop-off slot."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. filter wash Sat 11am"
+   ],
+   [
+    "After the job: Rosie sends the bill",
+    "After the visit: the saved card is charged at DONE"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24 · 11:00am drop-off · filter wash"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved for the $89 late-cancel fee"
+   ],
+   [
+    "Alex M. says a stain is still there after Saturday's wash.",
+    "Alex M. says grease is still there after Saturday's wash."
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds slots side by side, within the day's drop-off number."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no shop tech. A day shows only if a shop tech with the skill is in."
+   ],
+   [
+    "Alex picked Riley",
+    "Alex picked Noor"
+   ],
+   [
+    "It's on file under Jordan Price, a license holder. Now send your electrical prices.",
+    "Thanks. Now send your dryer vent cleaning prices."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Air duct and dryer vent cleaning for homes in Springfield, within 25 miles."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Both go in one drop-off slot, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My property manager pays for this filter wash."
+   ],
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's property manager for filters from a rental."
+   ],
+   [
+    "like the cut in the mirror.",
+    "like the filters laid out at the counter."
+   ],
+   [
+    "Color quotes come to you first.",
+    "Heavy grease quotes come to you first."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A heavy grease job's example: 'A grease-caked set here needs a quick look first."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most vent shops set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Degreasing for hood filters, registers, vent covers and lint trap screens."
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'My hood filter is greasy' or 'a dusty register' fits a filter wash."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a ceiling fan to be cleaned, which isn't on the shop's list."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't clean ceiling fans."
+   ],
+   [
+    "would like to see your hair before pricing it.",
+    "would like to see your filters before pricing it."
+   ],
+   [
+    "How would you like it on top?",
+    "Any heavy grease or rust to point out?"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, and add the registers'"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am keeps your drop-off."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the filters dry on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring the filters dry."
+   ],
+   [
+    "two skin fades",
+    "two register washes"
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like Noor's grease plan after a look, or a lawyer's engagement letter."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two sets of filters from one kitchen work the same way. Both are asked before the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Noor can still take the filters in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Lee Vent Shop's visits are drop-offs. A repair shop, a tailor or a groomer works the same way."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A duct cleaner's example: signs of a clogged dryer vent get 'stop using the dryer until the vent is cleaned'."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A property manager drops off filters from five units on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: metal mesh filters, 16x20, soak twice, light rust"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a filter plan with Noor, every 3 months."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your filter wash is part of a plan, every 3 months."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The shop's plug-in adds its own danger words: smoke from a vent, or a carbon monoxide alarm."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the bench clamp bent a register's slats today."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Grill cleaning for Lee Vent Shop: is it the same company?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither duct cleaning nor the vent shop takes jobs sent now."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for filters from a grease fire: they stay outside until the fire department clears the kitchen."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of the work? Yes / No"
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the bench clamp bent a register's slats"
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "The filter frames this wash needs are missing."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 look; priced at the counter"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A filter wash could mean a vent shop or a laundry"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop the filters off and come back later?"
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a care pack of three washes at the shop."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Duct cleaning · dryer vent cleaning"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench clamp bent my register's slats."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds grill cleaning to Lee Vent Shop."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Noor also does heavy grease and registers"
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's wash left grease on one corner"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for the hood filters degreased every 3 months."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Washable furnace filter clean"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you clean lint trap screens too?"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a property manager's filters together"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a lint trap screen wash is $25"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a filter"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "There is grease left on one corner."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Heavy grease work always stays with Noor."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Filter wash every 3 months · Noor"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Filter wash, register wash and vent cover wash"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Filter plan · every 3 months"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like my hood filters degreased on Saturday."
+   ],
+   [
+    "Saturdays · 11:00am · Riley",
+    "Saturdays · 11:00am drop-off"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero limpiar mis filtros de campana el sábado."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Jan 23 · 10:00am"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a filter wash every 3 months"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A filter wash needs only the filters, dry."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Noor sees the filters"
+   ],
+   [
+    "plumbing and electrical",
+    "duct cleaning and dryer vent cleaning"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Lint trap screen wash"
+   ],
+   [
+    "Signature cut and shave",
+    "Washable furnace filter clean"
+   ],
+   [
+    "like a skin-test result",
+    "like a filter size"
+   ],
+   [
+    "color and house calls",
+    "heavy grease and registers"
+   ],
+   [
+    "Plumbing price list",
+    "Duct cleaning price list"
+   ],
+   [
+    "the Groom's package",
+    "the hood filter set"
+   ],
+   [
+    "The Groom's package",
+    "The hood filter set"
+   ],
+   [
+    "photos of your hair",
+    "photos of your fan"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Duct Care's"
+   ],
+   [
+    "Water heater flush",
+    "Dryer vent cleaning"
+   ],
+   [
+    "color, house calls",
+    "heavy grease, registers"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Duct Care"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Vent Shop"
+   ],
+   [
+    "Color correction",
+    "Heavy grease filter clean"
+   ],
+   [
+    "color correction",
+    "heavy grease filter clean"
+   ],
+   [
+    "Groom's package",
+    "Hood filter set"
+   ],
+   [
+    "Gloss to finish",
+    "Rust treatment"
+   ],
+   [
+    "No gloss today.",
+    "No rust treatment today."
+   ],
+   [
+    "Shorter is fine",
+    "Quick is fine"
+   ],
+   [
+    "Drain clearing",
+    "Air duct cleaning"
+   ],
+   [
+    "plumbing jobs",
+    "duct jobs"
+   ],
+   [
+    "Panel upgrade",
+    "Whole-building duct work"
+   ],
+   [
+    "Signature cut",
+    "Furnace filter clean"
+   ],
+   [
+    "signature cut",
+    "furnace filter clean"
+   ],
+   [
+    "Color and cut",
+    "Exhaust fan clean"
+   ],
+   [
+    "color and cut",
+    "exhaust fan clean"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s wash"
+   ],
+   [
+    "sees the hair",
+    "sees the filters"
+   ],
+   [
+    "water heaters",
+    "dryer vents"
+   ],
+   [
+    "Haircut plans",
+    "Filter plans"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Ducts"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dryer Vents"
+   ],
+   [
+    "Jordan Price",
+    "Marek Novak"
+   ],
+   [
+    "1200 Main St",
+    "120 Quarry Rd"
+   ],
+   [
+    "plumbing job",
+    "duct job"
+   ],
+   [
+    "a beard trim",
+    "a vent cover wash"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Consult only",
+    "Look only"
+   ],
+   [
+    "consult only",
+    "look only"
+   ],
+   [
+    "Water heater",
+    "Dryer vent"
+   ],
+   [
+    "water heater",
+    "dryer vent"
+   ],
+   [
+    "Haircut plan",
+    "Filter plan"
+   ],
+   [
+    "haircut plan",
+    "filter plan"
+   ],
+   [
+    "Casey Moore",
+    "Nadia Costa"
+   ],
+   [
+    "a skin fade",
+    "a register wash"
+   ],
+   [
+    "house calls",
+    "visits at the customer's place"
+   ],
+   [
+    "House calls",
+    "Visits at the customer's place"
+   ],
+   [
+    "NEW massage",
+    "NEW grill cleaning"
+   ],
+   [
+    "color quote",
+    "grease quote"
+   ],
+   [
+    "Color quote",
+    "Grease quote"
+   ],
+   [
+    "$25 consult",
+    "$25 look"
+   ],
+   [
+    "the consult",
+    "the look"
+   ],
+   [
+    "Riley Chen",
+    "Noor Haddad"
+   ],
+   [
+    "Avery Diaz",
+    "Kofi Mensah"
+   ],
+   [
+    "Electrical",
+    "Dryer vent cleaning"
+   ],
+   [
+    "electrical",
+    "dryer vent cleaning"
+   ],
+   [
+    "barbershop",
+    "vent shop"
+   ],
+   [
+    "Barbershop",
+    "Vent shop"
+   ],
+   [
+    "Beard trim",
+    "Vent cover wash"
+   ],
+   [
+    "beard trim",
+    "vent cover wash"
+   ],
+   [
+    "patch test",
+    "size check"
+   ],
+   [
+    "house call",
+    "visit at the customer's place"
+   ],
+   [
+    "does color",
+    "does heavy grease"
+   ],
+   [
+    "color plan",
+    "grease plan"
+   ],
+   [
+    "Color plan",
+    "Grease plan"
+   ],
+   [
+    "88 Elm St",
+    "22 Foundry St"
+   ],
+   [
+    "Barbering",
+    "Vent shop work"
+   ],
+   [
+    "Skin fade",
+    "Register and grille wash"
+   ],
+   [
+    "skin fade",
+    "register wash"
+   ],
+   [
+    "kids cuts",
+    "lint trap screen washes"
+   ],
+   [
+    "Electric.",
+    "Dryer vents."
+   ],
+   [
+    "MP045210",
+    "REG-0612"
+   ],
+   [
+    "plumbing",
+    "duct cleaning"
+   ],
+   [
+    "Plumbing for homes in Springfield.",
+    "Air duct and dryer vent cleaning for homes in Springfield."
+   ],
+   [
+    "Plumbing",
+    "Duct cleaning"
+   ],
+   [
+    "Haircuts",
+    "Filter washes"
+   ],
+   [
+    "haircuts",
+    "filter washes"
+   ],
+   [
+    "Kids cut",
+    "Lint trap screen wash"
+   ],
+   [
+    "kids cut",
+    "lint trap screen wash"
+   ],
+   [
+    "cut hair",
+    "wash filters"
+   ],
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "JE30417",
+    "DC-10417"
+   ],
+   [
+    "BS20981",
+    "REG-0733"
+   ],
+   [
+    "plumber",
+    "duct cleaner"
+   ],
+   [
+    "Plumber",
+    "Duct cleaner"
+   ],
+   [
+    "barbers",
+    "shop techs"
+   ],
+   [
+    "Haircut",
+    "Filter wash"
+   ],
+   [
+    "haircut",
+    "filter wash"
+   ],
+   [
+    "the cut",
+    "the wash"
+   ],
+   [
+    "Jordan",
+    "Marek"
+   ],
+   [
+    "Elm St",
+    "Foundry St"
+   ],
+   [
+    "barber",
+    "shop tech"
+   ],
+   [
+    "Barber",
+    "Shop tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Faucet",
+    "Register"
+   ],
+   [
+    "Casey",
+    "Nadia"
+   ],
+   [
+    "Riley",
+    "Noor"
+   ],
+   [
+    "Avery",
+    "Kofi"
+   ],
+   [
+    "gloss",
+    "rust treatment"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "a cut",
+    "a wash"
+   ],
+   [
+    "A cut",
+    "A wash"
+   ],
+   [
+    "Drain",
+    "Duct"
+   ],
+   [
+    "flush",
+    "vent cleaning"
+   ],
+   [
+    "cuts",
+    "washes"
+   ],
+   [
+    "Style consult",
+    "Filter check"
+   ],
+   [
+    "style consult",
+    "filter check"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "service-call",
+    "late-cancel"
+   ],
+   [
+    "$75",
+    "$25"
+   ],
+   [
+    "house calls",
+    "visits at the customer's place"
+   ],
+   [
+    "House calls",
+    "Visits at the customer's place"
+   ],
+   [
+    "house call",
+    "visit at the customer's place"
+   ],
+   [
+    "House call",
+    "Visit at the customer's place"
+   ]
+  ],
+  "B": [
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "This work takes no jobs sent now."
+   ],
+   [
+    "Free until 7am on the visit day",
+    "Free until 24 hours before the visit"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "Card link, or the saved card"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, only if you OK it"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Water pressure check",
+    "Free estimate"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules runs their own crew, with their own customers."
+   ],
+   [
+    "The chairs",
+    "The wash area"
+   ],
+   [
+    "A chair, ready",
+    "A filter, washed"
+   ],
+   [
+    "today's repair",
+    "today's cleaning"
+   ],
+   [
+    "Book the repair",
+    "Book the cleaning"
+   ],
+   [
+    "home warranty plan",
+    "home plan"
+   ],
+   [
+    "warranty plan",
+    "home plan"
+   ],
+   [
+    "home warranty",
+    "home plan"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay humo ahora."
+   ],
+   [
+    "the warranty company",
+    "the home plan company"
+   ],
+   [
+    "can clear the drain:",
+    "can clean the air ducts:"
+   ],
+   [
+    "credited to the repair",
+    "credited to the cleaning"
+   ],
+   [
+    "to the repair",
+    "to the cleaning"
+   ],
+   [
+    "Jordan found more work.",
+    "Marek found the blower wheel caked with dust."
+   ],
+   [
+    "The repair price is good",
+    "The price is good"
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the cleaning"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wrap that may be asbestos"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no smoke now."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT my hand is hurt, need to stop"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting a longer brush, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE dented a vent cover"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: wrap that may be asbestos"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding the dryer vent? Say so.'"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the wrapped section of duct"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Marek hurts a hand and texts HURT."
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Home Plan, the basic plan."
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "the one who cleans dryer vents"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with the dryer off until the vent is cleaned."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is there smoke now?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD suspected asbestos wrap on a duct, stopped"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay humo ahora?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Marek dented a vent cover at Alex M.'s."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Marek went to get a longer brush and will be back about 9:30am."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Marek has walked the building. Here's the price to clean it today."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Marek walks the building and texts the price with its lines."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Marek finds what looks like asbestos wrap on a duct. The plug-in says a crew stops there"
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For duct cleaning, smoke or flames, a gas smell or a carbon monoxide alarm stops the booking. Asbestos, mold or droppings are left out."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Duct Care doesn't do, like a furnace repair."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stop using the dryer until the vent is cleaned. If there's smoke or a gas smell, get out and call 911."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Marek found what looks like asbestos wrap on a duct and stopped that part of the work."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Can someone clean my air ducts Thursday morning? One system, 8 vents. I'm in Springfield."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Air duct and dryer vent cleaning for homes in Springfield, within 25 miles."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No use la secadora hasta que se limpie el conducto. Si hay humo o huele a gas, salga y llame al 911."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to stop using the dryer. For smoke or a gas smell, she is told to get out and call 911."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs an asbestos check first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Duct Care cleans air ducts and dryer vents. It doesn't repair furnaces or remove mold. Nothing was saved. You can look for a specialist near you."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Filters, registers and vent covers are dropped off at the shop and picked up when ready. The shop does no work at a customer's place."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Cleanings are priced by the vents or the run. Dryer vent plans repeat every year. Smoke or a gas smell stops the booking. Asbestos or mold is left out."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most vent shops start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules vent shops often set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood vent shop on Foundry St. Degreasing for hood filters, registers, vent covers and lint trap screens."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about cleaning the ducts in my house."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My dryer takes two cycles' fits a dryer vent cleaning."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like cleaning a neighbor's vent without their OK."
+   ],
+   [
+    "like new pipes put in one day and finished another.",
+    "like a big job started one day and finished another."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Supply and return ducts, heavy dust · $540"
+   ],
+   [
+    "your new pipes are in.",
+    "your ducts are done."
+   ],
+   [
+    "your new pipes are in",
+    "your ducts are done"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found dust on the vent covers this morning."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the dryer vent cleaning from a card saved for the $89 fee to a $40 deposit."
+   ],
+   [
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "The lookup shows Marek's business registration as expired. Marek stays on the team, and can be booked again once it shows renewed."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: ducts or a dryer vent, how many vents, when last cleaned, and any signs of trouble."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s second return vent was missed in the Thu Oct 22 cleaning. It's under the 30-day guarantee."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stop using the dryer until the vent is cleaned. If there's smoke, get out and call 911."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like smoke from a vent or a gas smell, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty",
+    "A vent was missed, and Alex tells Sam 2 weeks later. It's inside the 30-day guarantee"
+   ],
+   [
+    "1-year labor warranty",
+    "30-day guarantee"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a dryer vent cleaning at two rentals every year."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A duct cleaner's example: signs of a clogged dryer vent get 'stop using the dryer until the vent is cleaned'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Our dryer takes two cycles and gets very hot."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is your cleaning safe for the pets in the house?"
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good",
+    "cleans the supply ducts today, $165. The $80 return ducts stay good"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, a carbon monoxide alarm, or smoke or flames from a dryer or vent."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your vents, and a duct cleaner will price the job."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Gutter cleaning for Lee Duct Care: is it the same company?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE dryer vent 22 ft, roof exit. Lint packed at the elbow: bring the long brush next time."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "is it ducts, a dryer vent or both? And how many vents?"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the supply side is done, $800 at the finish"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the supply ducts only, $165. Leave the return ducts."
+   ],
+   [
+    "Casey's license is checked again when the lookup answers.",
+    "Marek's registration is checked again when the lookup answers."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. A dryer vent cleaning is $150, from the list."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160",
+    "you said yes to blower wheel cleaning for $160"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes",
+    "sent you a proposal for sealing the leaky ducts, from Marek's notes"
+   ],
+   [
+    "The plug-in says a water heater is priced from photos",
+    "The plug-in says a post-remodel duct cleaning is priced from photos"
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "That's under our guarantee, so the return visit is free."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Marek's next times for a dryer vent cleaning."
+   ],
+   [
+    "for a bathroom drain",
+    "for a dryer vent cleaning"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds gutter cleaning to Lee Duct Care."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither duct cleaning nor the vent shop takes jobs sent now."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Marek also run a camera through my ducts?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? La secadora tarda dos ciclos y se calienta mucho."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a crew clean a dryer vent this Thursday?"
+   ],
+   [
+    "clear a yard drain",
+    "clean a dryer vent"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 blower wheel cleaning, caked with dust"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marek look at my dryer vent next week?"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you clean my dryer vent every year, too?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A filter wash could mean a vent shop or a laundry"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that smoke is coming from the dryer vent now."
+   ],
+   [
+    "the sink is now overflowing",
+    "smoke is now coming from the dryer vent"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "We'd like it done before guests come. Can someone come sooner?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a noisy blower."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Smoke is coming from the dryer vent now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE heavy dust at the supply vents"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your post-remodel duct cleaning this time"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Marek also look at a noisy blower?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I run the furnace before you come?"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the duct sealing Marek noted"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the space around the vents and the dryer."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip this year's dryer vent cleaning?"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's dryer vent cleaning"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Duct cleaning · dryer vent cleaning"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Noor also does heavy grease and registers"
+   ],
+   [
+    "can cut your hair at the shop for $35",
+    "can degrease your hood filters at the shop for $35"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "One of the return vents wasn't cleaned."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 supply ducts 165 return ducts 80"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Blower wheel cleaning · $160"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Marek left dust on the floor."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Washable furnace filter clean"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "blower wheel cleaning, $160"
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a dryer that won't dry, today"
+   ],
+   [
+    "Is the sink still full of water?",
+    "When were the ducts last cleaned?"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Duct sealing"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no dent."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa dryer vent Thu 12-2 Nadia"
+   ],
+   [
+    "Your water heater price is with",
+    "Your post-remodel duct price is with"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "The $80 supply line stays good",
+    "The $80 return ducts stay good"
+   ],
+   [
+    "finds corroded shutoff valves",
+    "finds the blower wheel caked with dust"
+   ],
+   [
+    "cancelled the $160 valve work",
+    "cancelled the $160 blower wheel cleaning"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Filter wash, register wash and vent cover wash"
+   ],
+   [
+    "plumbing and electrical work",
+    "duct and dryer vent work"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "Our dryer takes two cycles to dry a load, and we've never had the ducts cleaned."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 whole-building ducts, 3 stages"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Blower wheel cleaning"
+   ],
+   [
+    "cracked the cabinet floor",
+    "dented a vent cover"
+   ],
+   [
+    "Casey · license not found",
+    "Marek · registration not found"
+   ],
+   [
+    "Water heater replacement",
+    "Post-remodel duct cleaning"
+   ],
+   [
+    "water heater replacement",
+    "post-remodel duct cleaning"
+   ],
+   [
+    "cracks the cabinet floor",
+    "dents a vent cover"
+   ],
+   [
+    "plumbing and electrical",
+    "air duct and dryer vent cleaning"
+   ],
+   [
+    "Sewer camera inspection",
+    "Duct camera inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "duct camera inspection"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW gutter cleaning"
+   ],
+   [
+    "Casey · license expired",
+    "Marek · registration expired"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Air duct cleaning"
+   ],
+   [
+    "Just the kitchen sink.",
+    "One system, 8 vents. The dryer is electric."
+   ],
+   [
+    "replaces water heaters",
+    "cleans dryer vents"
+   ],
+   [
+    "Under the sink, before",
+    "Supply vent, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your duct cleaning"
+   ],
+   [
+    "the water heater quote",
+    "the post-remodel duct quote"
+   ],
+   [
+    "color and house calls",
+    "heavy grease and registers"
+   ],
+   [
+    "water heater contract",
+    "post-remodel duct contract"
+   ],
+   [
+    "Cabinet floor, before",
+    "Return vent, before"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your duct cleaning"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Dented vent cover"
+   ],
+   [
+    "The $89 service call",
+    "The $89 late-cancel fee"
+   ],
+   [
+    "the $89 service call",
+    "the $89 late-cancel fee"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Supply ducts · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 blower wheel quote"
+   ],
+   [
+    "Drain clearing plans",
+    "Dryer vent plans"
+   ],
+   [
+    "leehomeservices.com",
+    "leeductcare.com"
+   ],
+   [
+    "Plumbing price list",
+    "Duct cleaning price list"
+   ],
+   [
+    "Sewer camera report",
+    "Duct camera report"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Duct Care's"
+   ],
+   [
+    "Water heater flush",
+    "Dryer vent cleaning"
+   ],
+   [
+    "water heater flush",
+    "dryer vent cleaning"
+   ],
+   [
+    "color, house calls",
+    "heavy grease, registers"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Duct Care"
+   ],
+   [
+    "the kitchen drain",
+    "the air duct cleaning"
+   ],
+   [
+    "$640 water heater",
+    "$640 post-remodel duct cleaning"
+   ],
+   [
+    "Supply line · $80",
+    "Return ducts · $80"
+   ],
+   [
+    "the shutoff valve",
+    "the supply ducts"
+   ],
+   [
+    "your water heater",
+    "your post-remodel ducts"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Vent Shop"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "plumbing plug-in",
+    "duct cleaning plug-in"
+   ],
+   [
+    "the water heater",
+    "the post-remodel ducts"
+   ],
+   [
+    "Repipe · $2,400",
+    "Whole-building ducts · $2,400"
+   ],
+   [
+    "Drain clearings",
+    "Air duct cleanings"
+   ],
+   [
+    "Drain clearing",
+    "Air duct cleaning"
+   ],
+   [
+    "drain clearing",
+    "air duct cleaning"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 air duct cleaning"
+   ],
+   [
+    "plumbing visit",
+    "duct cleaning"
+   ],
+   [
+    "plumbing jobs",
+    "duct jobs"
+   ],
+   [
+    "Panel upgrade",
+    "Whole-building duct work"
+   ],
+   [
+    "Kitchen drain",
+    "Air duct cleaning"
+   ],
+   [
+    "kitchen drain",
+    "air duct cleaning"
+   ],
+   [
+    "Signature cut",
+    "Furnace filter clean"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 whole-building duct cleaning"
+   ],
+   [
+    "water heaters",
+    "dryer vents"
+   ],
+   [
+    "shutoff valve",
+    "supply ducts"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Ducts"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dryer Vents"
+   ],
+   [
+    "Jordan Price",
+    "Marek Novak"
+   ],
+   [
+    "1200 Main St",
+    "120 Quarry Rd"
+   ],
+   [
+    "plumbing job",
+    "duct job"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "sewer camera",
+    "duct camera"
+   ],
+   [
+    "Water heater",
+    "Dryer vent"
+   ],
+   [
+    "water heater",
+    "dryer vent"
+   ],
+   [
+    "Casey Moore",
+    "Nadia Costa"
+   ],
+   [
+    "leak repair",
+    "duct sealing"
+   ],
+   [
+    "Leak repair",
+    "Duct sealing"
+   ],
+   [
+    "house calls",
+    "visits at the customer's place"
+   ],
+   [
+    "House calls",
+    "Visits at the customer's place"
+   ],
+   [
+    "cuts a hand",
+    "hurts a hand"
+   ],
+   [
+    "Riley Chen",
+    "Noor Haddad"
+   ],
+   [
+    "Avery Diaz",
+    "Kofi Mensah"
+   ],
+   [
+    "Electrical",
+    "Dryer vent cleaning"
+   ],
+   [
+    "electrical",
+    "dryer vent cleaning"
+   ],
+   [
+    "barbershop",
+    "vent shop"
+   ],
+   [
+    "Barbershop",
+    "Vent shop"
+   ],
+   [
+    "$179 drain",
+    "$179 duct cleaning"
+   ],
+   [
+    "flush plan",
+    "dryer vent plan"
+   ],
+   [
+    "Beard trim",
+    "Vent cover wash"
+   ],
+   [
+    "beard trim",
+    "vent cover wash"
+   ],
+   [
+    "house call",
+    "visit at the customer's place"
+   ],
+   [
+    "does color",
+    "does heavy grease"
+   ],
+   [
+    "yard drain",
+    "dryer vent"
+   ],
+   [
+    "Yard drain",
+    "Dryer vent"
+   ],
+   [
+    "88 Elm St",
+    "22 Foundry St"
+   ],
+   [
+    "42 Oak St",
+    "38 Alder Ct"
+   ],
+   [
+    "Electric.",
+    "Dryer vents."
+   ],
+   [
+    "MP045210",
+    "REG-0612"
+   ],
+   [
+    "plumbing",
+    "duct cleaning"
+   ],
+   [
+    "Plumbing for homes in Springfield.",
+    "Air duct and dryer vent cleaning for homes in Springfield."
+   ],
+   [
+    "Plumbing",
+    "Duct cleaning"
+   ],
+   [
+    "cut hair",
+    "wash filters"
+   ],
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "JE30417",
+    "DC-10417"
+   ],
+   [
+    "BS20981",
+    "REG-0733"
+   ],
+   [
+    "plumber",
+    "duct cleaner"
+   ],
+   [
+    "Plumber",
+    "Duct cleaner"
+   ],
+   [
+    "barbers",
+    "shop techs"
+   ],
+   [
+    "Haircut",
+    "Filter wash"
+   ],
+   [
+    "haircut",
+    "filter wash"
+   ],
+   [
+    "the cut",
+    "the wash"
+   ],
+   [
+    "Jordan",
+    "Marek"
+   ],
+   [
+    "Elm St",
+    "Foundry St"
+   ],
+   [
+    "barber",
+    "shop tech"
+   ],
+   [
+    "Barber",
+    "Shop tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "faucet",
+    "register"
+   ],
+   [
+    "Faucet",
+    "Register"
+   ],
+   [
+    "Casey",
+    "Nadia"
+   ],
+   [
+    "Riley",
+    "Noor"
+   ],
+   [
+    "Avery",
+    "Kofi"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "drain",
+    "duct"
+   ],
+   [
+    "Drain",
+    "Duct"
+   ],
+   [
+    "flush",
+    "vent cleaning"
+   ],
+   [
+    "cuts",
+    "washes"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · duct cleaning"
+   ],
+   [
+    "the shutoff valves",
+    "the blower wheel"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 blower wheel cleaning"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "service-call",
+    "late-cancel"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a license or registration to clean ducts, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Vent washing is done at the shop only: Lee Vent Shop takes no work at a customer's place.",
+     "Duct and dryer vent cleaning are done at the customer's place.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Marek: air duct and dryer vent cleaning",
+         "Nadia: air duct and dryer vent cleaning",
+         "Noor: vent shop and heavy grease",
+         "Kofi: vent shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Noor replies YES, then checks what Sam set. One reply covers everything Noor does for the shop.",
+    "more": [
+     "No license number is asked: vent washing needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Kofi, Marek and Nadia join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Noor"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Vent Shop! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Noor Haddad · Lee Vent Shop",
+        "lines": [
+         "Every shop service and heavy grease",
+         "Hours: the shop's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Noor"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Noor"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: what the items are and how many. A greasy set takes longer to soak.",
+     "Heavy grease or rust is asked here too, since it changes the price.",
+     "Questions that only add detail come later, once a time is saved."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "How many filters, and what are they made of?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Four metal mesh filters from the range hood."
+     ]
+    ],
+    "vary": {
+     "price:list+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "How many filters? A greasy set takes longer to soak."
+       ],
+       [
+        "cust",
+        "agent",
+        "Eight, from a restaurant hood."
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What size is the furnace filter?"
+       ],
+       [
+        "cust",
+        "agent",
+        "16 by 20, washable."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What is the fan, and how dirty is it?"
+       ],
+       [
+        "cust",
+        "agent",
+        "A bathroom exhaust fan, with a thick layer of dust."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "How many filters, and how thick is the grease?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Twelve filters. The grease is thick and hard."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "At Lee Vent Shop, a time is a drop-off time. Once the items are in, the shop gives them to a shop tech with the skill.",
+     "Heavy grease work shows only the days Noor works.",
+     "Pick-up comes once it's READY, in the pick-up hours."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No shop tech is named: once the items are in, the shop gives them to a shop tech with the skill.",
+    "more": [
+     "A wish for one shop tech goes in the notes, and the shop follows it where it can."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "The times came by text on this path, so Alex replies to Rosie's text with a drop-off time.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "A"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex brings the filters to the counter. Alex reads the code from the confirmation or the reminder, and Noor texts it in.",
+    "more": [
+     "At Lee Vent Shop, the visit is a drop-off: the code is given when the filters are left.",
+     "The desk can type the code on the portal's Today page instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M., Sat 11:00am. Four hood filters, metal mesh."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "Lee Vent Shop's main path above is the drop-off. This branch is a mail-in: filters shipped to the shop have no code, so DONE comes when they arrive.",
+    "more": [
+     "At pick-up, the filters go only to the customer or someone they name.",
+     "Next come the before notes, the price or the OK, and the wash. READY and the pick-up come after the work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Noor soaks, scrubs and dries the filters over a few days: what was booked, and anything Alex said yes to.",
+    "more": [
+     "Noor texts IN, DRYING and READY as it goes.",
+     "Next, Alex hears they're ready and picks them up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "At Lee Vent Shop, Alex pays when picking up the filters."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Duct cleaning, dryer vent cleaning and vent washing need no state license where Sam works (pf.license); the company gives its registration (S1-61).",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Crew members and shop techs need no license of their own unless the state's form says so (pf.staff).",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Duct cleaning and the vent shop both pay Rosfield's $2, so the bill branch applies.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "No agreement to sign, so none can be left unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Crews and shop techs are booked, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "No classes: cleanings, washes and drop-offs.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Duct and vent cleaning is booked ahead; nobody is on call and nothing is sent now. A fire now is a 911 call, not a booking.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Lee Vent Shop books drop-off slots, set by how many items it takes in a day.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "The shop's plug-in names no form to sign.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "A filter wash is rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "Lee Vent Shop bills no plan or insurance: the customer pays at the counter.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "Lee Vent Shop bills no plan or insurance: the customer pays at the counter.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "No child is left at a vent shop counter.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "why": "A vent shop drop-off is never booked for a child.",
+    "label": "A child"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "Drop-off slots name no shop tech. A wish for one goes in the notes (A4-15).",
+    "label": "Asks for one person by name"
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "why": "Items wait in their drop-off slot, so a shop tech running late moves only the ready time, never Alex's drop-off.",
+    "label": "The pro runs late"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "The filters are left at the shop: READY and the pick-up follow the wash.",
+    "label": "No: the customer stays"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "Lee Vent Shop works at the shop only; the 'Only at the shop' branch is the one used.",
+    "label": "1 At the shop"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "Lee Vent Shop takes no work at a customer's place.",
+    "label": "2 At my home"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "Lee Vent Shop has no other place to offer.",
+    "label": "Wants the other place"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a license or registration to clean ducts, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Duct and dryer vent cleaning are done at the customer's place.",
+     "Vent washing is done at the shop only.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-38",
+    "more": [
+     "Where a state licenses a kind of cleaning, its form asks for the license here instead.",
+     "Each crew lead can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Marek: air duct and dryer vent cleaning",
+         "Nadia: air duct and dryer vent cleaning",
+         "Noor: vent shop and heavy grease",
+         "Kofi: vent shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Marek replies YES, then checks what Sam set. One reply covers every kind of work Marek does.",
+    "more": [
+     "No license number is asked: this work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Nadia, Noor and Kofi join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Marek"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Duct Care! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Marek Novak · Lee Duct Care",
+        "lines": [
+         "Every air duct and dryer vent job",
+         "Crew lead: sees entry codes on visit days",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Marek"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Marek"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, with the dryer off until the vent is cleaned. It's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A duct cleaner's example: signs of a clogged dryer vent get 'stop using the dryer'.",
+     "Rosa is told to stop using the dryer. If there's smoke, she gets out and calls 911."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay humo o fuego ahora en la casa?",
+      {
+       "lang": "es",
+       "en": "First: is there smoke or fire in the house now?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. No hay humo ahora.",
+      {
+       "lang": "es",
+       "en": "No. There's no smoke now.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "No use la secadora hasta que se limpie el conducto. Si hay humo o llamas, salga y llame al 911.",
+      {
+       "lang": "es",
+       "en": "Don't use the dryer until the vent is cleaned. If there's smoke or flames, get out and call 911.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For duct and vent work, smoke or flames, a gas smell or a carbon monoxide alarm stops the booking.",
+    "more": [
+     "The message is the plug-in's for that danger, or the general one: get to safety and call 911.",
+     "On a call, the caller hears it, and Sam gets the call summary.",
+     "A cleaning can be booked once the fire department clears the house."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like a fire. Get everyone out of the house now, then call 911 from outside. Don't go back in."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said smoke is coming from their dryer vent. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "Smoke from a dryer vent at the home",
+         "Told to get out, then call 911"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-05",
+    "more": [
+     "The plug-in's questions here: ducts or the dryer vent, how many vents, and when it was last cleaned.",
+     "A home built before 1980 with wrapped ducts gets an asbestos check first.",
+     "Animals heard in the ducts or the vent get the plug-in's animal steps first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "An air duct cleaning is priced by the systems and the vents: $179 for one system with up to 8 vents.",
+     "A dryer vent cleaning is $150 for a short run. A long run or a roof exit costs more."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Alex wants the dryer vent cleaned every year. Lee Duct Care offers a yearly dryer vent plan, so the AI shows the terms.",
+    "more": [
+     "The AI never offers a plan the customer didn't ask for.",
+     "Here, each September, Alex gets a text to pick an October time. One tap on the plan's link ends it.",
+     "Each visit is booked and paid like a single one."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can you also clean my dryer vent every year?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee Duct Care's plan is a dryer vent cleaning every 12 months, $150 a visit, with the same crew where it can. It runs until you end it. Want it?",
+      {
+       "buttons": [
+        "Yes, every year",
+        "Just the air ducts"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B5-21",
+    "more": [
+     "Each September, Alex gets a text to pick an October time for the next dryer vent cleaning."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B7-93",
+    "branch": {
+     "label": "Animals in the ducts or the vent",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.5",
+        "7.6"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Tue Oct 20, 7:40pm",
+       "title": "Sends the steps for animals in a vent",
+       "does": "Alex texts about scratching in a vent. Rosie checks it for danger, then sends the plug-in's steps: keep the area shut, and a wildlife company first.",
+       "more": [
+        "Lee Duct Care doesn't remove live animals. A wildlife company does, licensed where the state requires one.",
+        "Birds the law protects, nesting in an outside vent, stay until they leave. No cleaning or cap removal until then.",
+        "Sam is told, with Alex's words.",
+        "Thursday stays booked. If the animals aren't gone by then, Sam moves it with no fee."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "We hear scratching and chirping in the dryer vent."
+        ],
+        [
+         "san",
+         "cust",
+         "Please keep the dryer off, and don't open the vent. Lee Duct Care doesn't remove live animals. A wildlife company needs to get them out first. Your Thursday visit stays booked."
+        ],
+        [
+         "san",
+         "owner",
+         "Alex M. hears animals in the dryer vent before Thursday's visit. Alex got the steps.",
+         {
+          "card": {
+           "title": "Animals in the vent · Alex M.",
+           "lines": [
+            "Thu Oct 22 · arriving 8–10am · Marek",
+            "Told: dryer off, vent shut, a wildlife company first"
+           ]
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.safety",
+        "pf.first_steps"
+       ],
+       "tells": [
+        "cust",
+        "owner"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "B7-17",
+    "more": [
+     "Smoke from a vent before the visit: 911 first, and Sam is told. No dryer until the vent is cleaned."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Vents are covered and the system is turned off first. Photos or a camera video of the ducts are taken before and after.",
+     "Too wet or windy for the roof exit: Marek cleans from inside and from the ground. A roof check comes back free if needed."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Marek finds wrap on a duct that may be asbestos. The plug-in says that part stops, so Alex gets a written note and the photo.",
+    "more": [
+     "The note says what was found, that the section must not be disturbed, and who can test it.",
+     "It goes out whatever Alex decides, and stays with the photos.",
+     "Sam is told. The rest of the ducts can still be cleaned.",
+     "A licensed asbestos company comes first for the wrapped part."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD suspected asbestos wrap on a duct, stopped",
+      {
+       "photos": [
+        "Wrapped duct"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Marek found wrap on a duct that may be asbestos and left that part alone.",
+      {
+       "card": {
+        "title": "Safety note · 38 Alder Ct",
+        "lines": [
+         "Found: wrap that may be asbestos",
+         "Not done: the wrapped section of duct",
+         "Call a licensed asbestos company first"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "The report opens on the secure page: before and after photos, or the camera video of the ducts."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 12:20pm"
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 12:22pm"
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 12:25pm"
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE getting a longer brush, back 10:00"
+     ],
+     [
+      "san",
+      "cust",
+      "Marek went to get a longer brush and will be back about 10:00am. The job should be done by 12:15pm."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Duct cleaning, dryer vent cleaning and vent washing need no state license where Sam works (pf.license); the company gives its registration (S1-61).",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Crew members and shop techs need no license of their own unless the state's form says so (pf.staff).",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Duct cleaning and the vent shop both pay Rosfield's $2, so the bill branch applies.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "No agreement to sign, so none can be left unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Crews and shop techs are booked, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "No classes: cleanings, washes and drop-offs.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Duct and vent cleaning is booked ahead; nobody is on call and nothing is sent now. A fire now is a 911 call, not a booking.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Duct and vent cleaning books a 2-hour arrival window.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Nothing here is booked as a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Cleanings book a crew's time, never a seat.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A crew never looks after a child: it waits for an adult on the booking.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "Duct and vent cleaning bills no warranty plan or insurance: the customer pays, and gets the receipt and photo report for any claim.",
+    "label": "A plan or warranty pays"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "Duct and vent cleaning bills no insurance: the customer pays, and a claim is the customer's own.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "A cleaning is rated, like most home services.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "Duct and dryer vent cleaning are done at the customer's place only; the shop (Lee Vent Shop) is the other flow.",
+    "label": "Both places: the customer picks"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Lee Duct Care has no shop to offer.",
+    "label": "Wants the other place"
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Parking",
+      "In the driveway"
+     ],
+     [
+      "Pets",
+      "A dog, kept in another room"
+     ],
+     [
+      "Furnace or air handler",
+      "In the garage"
+     ],
+     [
+      "Attic or crawl space access",
+      "A hatch in the hallway ceiling"
+     ],
+     [
+      "Gate or lock code",
+      "None"
+     ],
+     [
+      "Anything that helps at the visit?",
+      "Optional"
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "Pilot: chimney (from), refitted Oct 27. Duct and dryer vent cleaning runs like a set service at a home: a 2-hour arrival window, a crew lead who holds the entry code, an adult at home, findings quoted and OK'd, a yearly plan for the dryer vent, and a counter at the shop. The chimney's shape fits (per-flue pricing becomes per-system and per-run pricing); what it lacks is added: the asbestos check for old wrapped ducts, mold and droppings that are left out, animals and nesting birds in a vent, a roof exit worked only when dry, and before and after photos or a camera video.\nFlow B is the usual side: Lee Duct Care (air duct cleaning, plus dryer vent cleaning as its second kind of work). Flow A is the less usual side: Lee Vent Shop, Sam's second company, where a customer drops off range hood filters, furnace filters, registers, vent covers and lint trap screens to be degreased and picks them up clean (the cleaner's drop-off, re-themed). Vent washing is done at the shop only: the both-places and other-place branches are off in both flows.\nMoney (B): main list|card|card (card saved for the $89 late-cancel and nobody-home fee, charged $179 when the crew texts DONE). Also list|none|bill (nothing taken, Rosie texts the bill), photos|deposit|card (post-remodel duct cleaning $640 from photos: $160 now, $480 at DONE), visit|card|card (whole-building cleaning priced at the walkthrough). The only deposit is on the post-remodel cleaning; list-price cleanings are paid on completion. Money (A): list|none|counter (main), list|card|counter, list|full|none, photos|none|counter, visit|none|counter. A fee is never more than what was paid now. An added service is paid at the visit. Nothing is charged without a yes; no hold.\nThe sign-up money card (S1-13) keeps the master's example reply (some services paid in full): the dryer vent cleaning is the one the example pays in full. It is an example, the owner decides.\nNever sent now: duct and vent cleaning is booked ahead. S2-30 branch 1 is off and the booking choices are limited (B: a set time in a window; A: a set start); the rows and lines that said 'takes jobs sent now' (S2-30, S1-21) are re-worded.\nPlan: a yearly dryer vent plan, $150 a visit, every 12 months, with its own yes (B5-20, B5-21: the master's own example is the same yearly plan); each September a text to pick an October time; one tap ends it. The first plan visit is a year after the first cleaning, so no plan date runs backward.\nDanger: smoke or flames from a dryer, vent or furnace, a gas smell or a carbon monoxide alarm stop the booking (911, no booking). Signs of a clogged dryer vent (clothes damp after a full cycle, a very hot dryer, lint outside) are not an emergency: stop using the dryer, the booking goes on. Suspected asbestos wrap, mold over the cutoff, droppings and sewage: that part is left out and a specialist is named. The danger examples in B3-11 and B3-18 use the clogged-vent signs; B3-19 uses smoke; everyday examples use none of the stop words.\nOwn steps: B7-x01 (animals or nesting birds in the ducts or the vent: a wildlife company first, no fee to move).\nNo tips, stages, documents, waitlist or monthlybill facts. Facts: plans, firststeps, dropoff, photos, extrawork. Switches: none (cancelright off: add-ons are done at the visit). Settings: arrive A setstart / B window; cutoff A 24 hours before, B 24 hours before.\nLicenses: duct and dryer vent cleaning need none in most places; the form asks where the state or city requires a registration or an HVAC or contractor license. Furnace and dryer repair, duct sealing, mold and asbestos removal and animal removal are not offered. A trade group's certificate shows only as checked.\nNames: crew leads Marek and Nadia (flow B), shop techs Noor and Kofi (flow A). Addresses: 38 Alder Ct (the home), 22 Foundry St (the vent shop), 120 Quarry Rd (the travel area). Registration numbers use the REG-0612 format. The example times (8 to 10am windows) are the master's; Sam sets the real hours.\nKept words: 'leak' (the privacy leak in the shared rules), 'color' (race, color), 'visit fee' (the master's own words for a fee owed after a no to a price).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "A nothing before, and at their home too, 75, paid when they book.",
+    "A at their home too, 75, paid when they book",
+    "Set. For a haircut, the customer picks the place and sees both prices first. The rest stays as on the card.",
+    "House calls: allowed where you are, for those cleared",
+    "at the shop and for house calls",
+    "a house call, $75",
+    "Haircut at their home",
+    "Haircut at home · $75",
+    "Haircut at the shop",
+    "Jules rents a chair, with their own customers.",
+    "The chairs",
+    "A chair, ready",
+    "3:00pm · Riley",
+    "2:00pm · Riley",
+    "12:30pm · Avery",
+    "10:00am · Riley",
+    "Add photos of your hair",
+    "One question cuts the most",
+    "Anything Riley should know?",
+    "Lee's Barbershop · with Riley",
+    "Your item is ready for pick-up.",
+    "Wants Saturday morning, with Riley",
+    "A barbershop books a person's time.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "After the job: Rosie sends the bill",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "When they book: a card saved for the $89 service-call fee",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "My employer pays for this cut.",
+    "like Alex's employer for a staff cut.",
+    "like the cut in the mirror.",
+    "Color quotes come to you first.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "doesn't do perms.",
+    "would like to see your hair before pricing it.",
+    "How would you like it on top?",
+    "'Yes, make it a fade'",
+    "No reply by 11:00am means the shorter cut.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "two skin fades",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A barbershop has none, so nothing is sent here.",
+    "May the shop show photos of your hair? Yes / No",
+    "says the cape clip ripped a shirt collar today",
+    "The signed form this service needs is missing.",
+    "Promises the $25 consult; priced at the chair",
+    "A haircut could mean a salon or a barbershop",
+    "Can my son wait in the shop during my cut?",
+    "Alex bought a package of cuts at the shop.",
+    "Plumbing JP031552 · electrical JE30417",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Riley also does color and house calls",
+    "Saturday's cut is uneven on one side",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Do you do kids cuts? My son is 8.",
+    "Books the groom's party together",
+    "a Kids cut (12 and under) is $25",
+    "like a 15-minute style consult",
+    "The cut is uneven on one side.",
+    "Color always stays with Riley.",
+    "like a burst pipe or a lockout",
+    "Haircut every 4 weeks · Riley",
+    "Haircut, fade and beard trim",
+    "Haircut plan · every 4 weeks",
+    "I'd like a cut on Saturday.",
+    "Saturdays · 11:00am · Riley",
+    "11:00am · Riley",
+    "Quiero un corte el sábado.",
+    "Next: Sat Nov 28 · 10:00am",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "once Riley sees the hair",
+    "plumbing and electrical",
+    "Kids cut (12 and under)",
+    "Signature cut and shave",
+    "like a skin-test result",
+    "color and house calls",
+    "Plumbing price list",
+    "the Groom's package",
+    "The Groom's package",
+    "photos of your hair",
+    "Lee Home Services'",
+    "color, house calls",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Groom's package",
+    "Gloss to finish",
+    "No gloss today.",
+    "Shorter is fine",
+    "Drain clearing",
+    "plumbing jobs",
+    "Panel upgrade",
+    "Signature cut",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "rents a chair",
+    "Alex M.'s cut",
+    "sees the hair",
+    "water heaters",
+    "Haircut plans",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "plumbing job",
+    "a beard trim",
+    "in the chair",
+    "Consult only",
+    "consult only",
+    "water heater",
+    "Haircut plan",
+    "haircut plan",
+    "Casey Moore",
+    "a skin fade",
+    "house calls",
+    "House calls",
+    "NEW massage",
+    "color quote",
+    "Color quote",
+    "$25 consult",
+    "the consult",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "house call",
+    "does color",
+    "color plan",
+    "Color plan",
+    "88 Elm St",
+    "Barbering",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Electric.",
+    "MP045210",
+    "plumbing",
+    "Plumbing for homes in Springfield.",
+    "Plumbing",
+    "Haircuts",
+    "haircuts",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Jordan",
+    "Elm St",
+    "barber",
+    "Barber",
+    "chairs",
+    "Casey",
+    "Riley",
+    "Avery",
+    "gloss",
+    "chair",
+    "a cut",
+    "A cut",
+    "Drain",
+    "cuts",
+    "Style consult",
+    "style consult",
+    "service-call",
+    "$75",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call"
+   ],
+   "B": [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Free until 7am on the visit day",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "$89, credited to the repair",
+    "Service call fee",
+    "service call fee",
+    "Water pressure check",
+    "Jules rents a chair, with their own customers.",
+    "The chairs",
+    "A chair, ready",
+    "today's repair",
+    "Book the repair",
+    "home warranty plan",
+    "warranty plan",
+    "home warranty",
+    "No. No huele a gas.",
+    "the warranty company",
+    "can clear the drain:",
+    "credited to the repair",
+    "to the repair",
+    "Jordan found more work.",
+    "The repair price is good",
+    "covers part of the repair",
+    "Mold behind the sink wall",
+    "One question cuts the most",
+    "No. It doesn't smell like gas.",
+    "HURT cut my hand, need to stop",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Found: mold behind the sink wall",
+    "'Adding a faucet check? Say so.'",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Willow Home Warranty, the basic plan.",
+    "he's the one who replaces water heaters",
+    "Then the booking goes on, marked urgent.",
+    "First: is anyone hurt? Do you smell gas?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "like new pipes put in one day and finished another.",
+    "Shutoff valve and wall pipe · $540",
+    "your new pipes are in.",
+    "your new pipes are in",
+    "I found water damage under the sink this morning.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty",
+    "1-year labor warranty",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "many barbers, salons and groomers are licensed to their shop",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Casey's license is checked again when the lookup answers.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "you said yes to replacing both shutoff valves for $160",
+    "sent you a proposal for new pipes, from Jordan's notes",
+    "The plug-in says a water heater is priced from photos",
+    "Your drain is under warranty, so this visit is free.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "for a bathroom drain",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "clear a yard drain",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can Jordan look at my bathroom sink next week?",
+    "Can you flush my water heater every year, too?",
+    "A haircut could mean a salon or a barbershop",
+    "Alex texts that the sink is now overflowing.",
+    "the sink is now overflowing",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "couldn't price your water heater this time",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "like replacing the old pipes Jordan noted",
+    "Please clear the cabinet under the sink.",
+    "Can I skip next week's drain cleaning?",
+    "next week's drain cleaning",
+    "Plumbing JP031552 · electrical JE30417",
+    "Riley also does color and house calls",
+    "can cut your hair at the shop for $35",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Replace both shutoff valves · $160",
+    "Jordan left a mess under the sink.",
+    "replace both shutoff valves, $160",
+    "It's a leak under the sink, today",
+    "Is the sink still full of water?",
+    "Proposal · Replace the old pipes",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Your water heater price is with",
+    "like a burst pipe or a lockout",
+    "The $80 supply line stays good",
+    "finds corroded shutoff valves",
+    "cancelled the $160 valve work",
+    "Haircut, fade and beard trim",
+    "plumbing and electrical work",
+    "My kitchen drain is clogged.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Replace both shutoff valves",
+    "cracked the cabinet floor",
+    "Casey · license not found",
+    "Water heater replacement",
+    "water heater replacement",
+    "cracks the cabinet floor",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "NEW heating and cooling",
+    "Casey · license expired",
+    "Kitchen drain clearing",
+    "Just the kitchen sink.",
+    "replaces water heaters",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "the water heater quote",
+    "color and house calls",
+    "water heater contract",
+    "Cabinet floor, before",
+    "quote for your repipe",
+    "Cracked cabinet floor",
+    "The $89 service call",
+    "the $89 service call",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "Drain clearing plans",
+    "leehomeservices.com",
+    "Plumbing price list",
+    "Sewer camera report",
+    "Lee Home Services'",
+    "Water heater flush",
+    "water heater flush",
+    "color, house calls",
+    "Lee Home Services",
+    "the kitchen drain",
+    "$640 water heater",
+    "Supply line · $80",
+    "the shutoff valve",
+    "your water heater",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "plumbing plug-in",
+    "the water heater",
+    "Repipe · $2,400",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "plumbing visit",
+    "plumbing jobs",
+    "Panel upgrade",
+    "Kitchen drain",
+    "kitchen drain",
+    "rents a chair",
+    "$2,400 repipe",
+    "water heaters",
+    "shutoff valve",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "plumbing job",
+    "service call",
+    "Service call",
+    "sewer camera",
+    "Water heater",
+    "water heater",
+    "Casey Moore",
+    "leak repair",
+    "Leak repair",
+    "house calls",
+    "House calls",
+    "cuts a hand",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "$179 drain",
+    "flush plan",
+    "beard trim",
+    "house call",
+    "does color",
+    "yard drain",
+    "Yard drain",
+    "88 Elm St",
+    "42 Oak St",
+    "Electric.",
+    "MP045210",
+    "plumbing",
+    "Plumbing for homes in Springfield.",
+    "Plumbing",
+    "cut hair",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Jordan",
+    "Elm St",
+    "barber",
+    "Barber",
+    "chairs",
+    "faucet",
+    "Casey",
+    "Riley",
+    "Avery",
+    "chair",
+    "drain",
+    "Drain",
+    "flush",
+    "cuts",
+    "Right to cancel · repipe",
+    "the shutoff valves",
+    "the $160 valve work",
+    "Rental 1",
+    "Rental 2",
+    "service-call"
+   ]
+  },
+  "A": {
+   "S1-61": "7421d186d5",
+   "S1-43": "e16d5048f3",
+   "S2-22": "6fe11c094c",
+   "S2-06": "6b01a08c94",
+   "A4-50": "6f43775326",
+   "A4-14": "95c7ffcfab",
+   "A4-15": "db5792db95",
+   "A8-03": "7accda6f86",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-43": "7b0f73c701",
+   "A9-03": "219c966588",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5",
+   "A4-24": "0a292df05b",
+   "A7-93": "46cca94e45",
+   "A8-53": "33f4da69f5",
+   "A4-01": "7e7a61082c"
+  },
+  "B": {
+   "S1-61": "e30e71f65d",
+   "S1-43": "dd3ae2a1a9",
+   "S1-38": "6301c86637",
+   "S2-22": "6fe11c094c",
+   "S2-06": "b78d25d6e2",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B4-05": "fb3a9061c8",
+   "B4-07": "9d0dbc90ad",
+   "B4-44": "514c8ab30c",
+   "B5-21": "925b7342ed",
+   "B7-93": "4d6f89e473",
+   "B7-17": "ac1fd212f3",
+   "B8-18": "530038d2b8",
+   "B8-30": "a1ef4983e4",
+   "B10-01": "814aa1fde7",
+   "B8-41": "6e8e9825b2",
+   "B9-06": "f091432f2d",
+   "B8-32": "1cfd4f7afa",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255",
+   "B4-01": "15f683e6cb",
+   "B4-16": "37cd99137d",
+   "B4-34": "74ff52d83d"
+  }
+ }
+}

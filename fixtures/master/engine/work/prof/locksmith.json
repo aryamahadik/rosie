@@ -1,0 +1,6339 @@
+{
+ "id": "locksmith",
+ "name": "Locksmith",
+ "style": "Urgent",
+ "pattern": "urgent",
+ "plugin": {
+  "pf.license": {
+   "need": "Where the state's rules require it: a locksmith license for the business, and one for each locksmith sent out. Where none is required: identity checked, and 'license: what the business says'.",
+   "ask": "The business's license number at sign-up. Each person's own number comes with their invite reply.",
+   "who holds it": "The business and each person, as the state's form says.",
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "No business license on file where the state's rules require one: locksmith work stays offline. A person whose license doesn't check out is never sent.",
+   "renewals": "Reminded 30 days before it runs out; a lapsed license pauses new bookings for that person.",
+   "insurance or bond": "Asked where the state's form needs it.",
+   "background check": "Where the state's form needs one, it's on file before the person is offered.",
+   "second kind of work": "Alarm work has its own state form: the business's alarm license and each alarm tech's own."
+  },
+  "pf.services": {
+   "pattern": "Urgent dispatch for lockouts (sent now, to the locksmith on call after hours); 2-hour windows for rekeys and lock changes; a counter at the shop.",
+   "at the customer's place": [
+    {
+     "name": "Home lockout",
+     "price": "$159 by day (Mon to Sat, 8am to 6pm); $199 after hours and Sundays ($89 trip + $110 opening)",
+     "length": "about 30 minutes",
+     "time": "sent now, to the on-call locksmith",
+     "before": "the a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Car lockout",
+     "price": "$139 by day; $179 after hours and Sundays",
+     "length": "about 30 minutes",
+     "time": "sent now",
+     "before": "the a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill",
+     "secure page": "the car's VIN or plate"
+    },
+    {
+     "name": "Whole-home rekey (up to 4 locks)",
+     "price": "$179",
+     "length": "1 hour",
+     "time": "2-hour arrival window",
+     "before": "the a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Smart lock install (the customer's lock)",
+     "price": "$150",
+     "length": "1 hour",
+     "time": "2-hour arrival window",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Lock repair",
+     "price": "quoted at the visit; only the $89 trip fee is promised",
+     "before": "the a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "High-security lock install",
+     "price": "priced from photos (the example: $640 for two deadbolts)",
+     "before": "25% deposit, once the written estimate is signed",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Drilling, only if picking fails",
+     "price": "$60 more, plus a new lock from $45",
+     "rule": "quoted at the door, done only after the customer's yes"
+    },
+    {
+     "name": "Lock audit (a written report on every lock)",
+     "price": "$199",
+     "before": "the a card saved for the $89 trip fee"
+    },
+    {
+     "name": "Labor",
+     "price": "$120 an hour, 1-hour minimum",
+     "rule": "never booked alone"
+    }
+   ],
+   "at the shop counter": [
+    {
+     "name": "Rekey (up to 2 locks brought in)",
+     "price": "$35",
+     "length": "30 minutes",
+     "before": "nothing taken",
+     "after": "paid at the counter",
+     "both places": "or at the customer's home as a house call, $75, paid in full when booking"
+    },
+    {
+     "name": "Car key copy",
+     "price": "$40",
+     "length": "30 minutes",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "bring": "photo ID and the car's registration"
+    },
+    {
+     "name": "Key set (4 copies)",
+     "price": "$20",
+     "length": "15 minutes"
+    },
+    {
+     "name": "Mailbox lock rekey",
+     "price": "$25",
+     "length": "20 minutes"
+    },
+    {
+     "name": "High-security key copy",
+     "price": "$55",
+     "length": "60 minutes",
+     "before": "paid in full when booking (the blank is ordered)",
+     "bring": "the key card and a photo ID"
+    },
+    {
+     "name": "Master key set (up to 6 locks brought in)",
+     "price": "$140",
+     "length": "2½ hours",
+     "before": "$40 deposit for the blanks",
+     "after": "the rest at the counter"
+    },
+    {
+     "name": "Antique lock repair",
+     "price": "priced from photos (the example: $90)"
+    },
+    {
+     "name": "Lock repair at the bench",
+     "price": "quoted at the counter; only the $25 bench check is promised"
+    }
+   ],
+   "fees": "The shop's fee for a missed bench time: $20 ($40 for a master key set). At the customer's place: the $89 trip fee.",
+   "capacity": "One locksmith per booking; a master key set uses the shop's one key machine.",
+   "nobody home": "Never for a lockout or a rekey: an adult with ID and proof must be there.",
+   "online": "No: the work needs the lock in hand."
+  },
+  "pf.questions": {
+   "before times": [
+    "Home, car or business?",
+    "Is anyone locked inside, like a child, a pet or an at-risk adult, or in danger? (Yes: 911 first, no booking)",
+    "What kind of lock: regular, smart, high-security, or don't know?",
+    "How many locks?",
+    "Do you own or rent? Is your name on the deed, lease or registration?",
+    "Does anyone object to you going in, like an ex, a roommate or a landlord?",
+    "Do you have a photo ID with you?",
+    "Car: make, model and year."
+   ],
+   "after a time is picked": [
+    "Is there a key that works in each lock?",
+    "Anything to know at the door, like parking or a gate?"
+   ],
+   "only on the secure page": [
+    "The street address (for a lockout, where you are now)",
+    "The car's VIN or plate",
+    "The entry statement, signed",
+    "The landlord's name and mobile, when a renter needs the landlord's OK"
+   ],
+   "who may book": "An adult (18 or older) who lives there, owns the car or business, or has the owner's written OK. A parent books for a teen. A property manager books with the owner's written OK."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "a child, a pet or an at-risk adult locked inside a car or a home",
+    "a car running in a closed garage",
+    "smoke, gas, or someone hurt",
+    "someone breaking in right now",
+    "someone who objects to the entry: an ex, a roommate or a landlord"
+   ],
+   "what Rosie says": {
+    "someone locked inside, or in danger": "Call 911 now. Nothing is booked, and Sam is told.",
+    "smoke, gas or someone hurt": "Get out, then call 911. Nothing is booked.",
+    "a break-in now": "Call 911. A booking can follow once it's safe.",
+    "someone objects": "The fixed reply: Rosie can't book entry when someone objects; call the business. Nothing is booked."
+   },
+   "safety steps, then go on": "A car lockout by a busy road: wait somewhere safe, away from traffic.",
+   "always on": "The general screen: danger to life, fire, gas or a medical emergency means call 911, and no booking."
+  },
+  "pf.first_steps": {
+   "required": [
+    "Any work that gets someone in (a lockout, a rekey, new locks): the entry statement, a form signed on the secure page while the time is saved (10 minutes). It's kept with that job only.",
+    "A high-security key copy: a key card check (the key's card and a photo ID) at least 2 days before, so the blank can be ordered.",
+    "High-security locks priced from photos: a written estimate, signed where the state's rules set an amount."
+   ],
+   "prep for the reminder": [
+    "Have a photo ID and proof of address ready: a lease, a deed, a utility bill or the car's registration.",
+    "At the counter: bring the locks, and a working key if you have one.",
+    "Locked out: wait somewhere safe, and keep your phone on."
+   ]
+  },
+  "pf.visit": {
+   "check-in": "The check-in code at the door, or at the counter. Then, before any lock is opened or changed, the locksmith checks a photo ID against proof of the right to enter, in the same name.",
+   "door rule": "No proof, or someone at the door objects: no lock is touched, and the locksmith leaves. That's the customer's side: the $89 trip fee Alex agreed to only if Sam confirms; no answer, no fee. Alex can book again with proof.",
+   "work changes": "Picking first. Drilling or a new lock is quoted at the door and done only after the customer's yes, on their phone or on the locksmith's phone when theirs is locked inside. Other work is quoted for another day.",
+   "record": "Where the state's rules require it, an opening record on a secure page: the name, the address or car, the kind of ID and proof shown, the time and how it was opened. Kept apart from job notes; only the owner opens it.",
+   "proves it's done": "The code, then DONE; the opening record is finished before DONE where required.",
+   "at the counter": "A car key needs a photo ID and the registration in the same name; a high-security key needs its key card."
+  },
+  "pf.money": {
+   "before": "At the customer's place: the a card saved for the $89 trip fee at booking (a lockout is within the hour, so it's held at once). At the counter: nothing, or a card saved for the $20 fee.",
+   "after": "Rosie texts the bill when the locksmith texts DONE with the lines; the card on the locksmith's phone, or cash, also work.",
+   "after-hours price": "Lockouts at night and on Sundays have an after-hours price, shown in full before anyone is sent.",
+   "cancel": "Lockouts: free until the locksmith heads out; after that, the $89 trip fee, only if Sam confirms. Set-window jobs: free until the free-cancel time.",
+   "no proof at the door": "The customer's side: the $89 trip fee Alex agreed to may come from the hold, only if Sam confirms. No answer in 24 hours: released, no fee.",
+   "deposit cap": "from the state's form",
+   "emergency prices": "Where the state's rules limit prices in a declared emergency, those limits apply.",
+   "written estimate": "above the amount in the state's form",
+   "tips": "no tips line",
+   "tax": "on parts, where the state's form says so",
+   "Rosfield's $2": "applies"
+  },
+  "pf.messages": {
+   "never in a text": [
+    "key codes and key cuts",
+    "door, gate, alarm and smart lock codes",
+    "ID numbers or photos of an ID",
+    "the opening record"
+   ],
+   "where they go": "Only on the secure page, or on the locksmith's signed-in phone on the day.",
+   "languages": "English and Spanish",
+   "minors": "A teen can't book entry; a parent books."
+  },
+  "pf.staff": {
+   "licenses": "Each locksmith's own license, where the state's rules require one. An apprentice works only with a licensed locksmith on the job.",
+   "skills": [
+    "Lockouts: home and car",
+    "Rekeys and lock changes",
+    "High-security and smart locks",
+    "Car keys",
+    "Antique locks (the shop)",
+    "Alarm work: only people with the alarm license"
+   ],
+   "on call": "Sam sets who takes sent-now jobs in open hours and who's on call at night, on weekends and holidays, each with a backup. The one on call gets urgent texts at any hour and takes a lockout by reply within 5 minutes; then the backup.",
+   "stand-ins": "A stand-in must hold the same license and skill. A new person at the door is offered first, never assumed.",
+   "who OKs what": "Sam OKs prices over $500 made for one customer. Pat may OK them too; Sam's answer wins."
+  },
+  "pf.rules": {
+   "records": "Opening records kept for the state's period, where its rules require them; a delete request can't remove them early.",
+   "license number": "Shown on the listing, quotes, the confirmation and receipts, where the state's rules require it.",
+   "written estimate": "For work above an amount, where the state's rules set one.",
+   "right to cancel": "Work sold at the home comes with a written right to cancel, for the period the state's rules set.",
+   "lockout limit": "One lockout a day per phone and per address, across every business on Rosie.",
+   "disputed entry": "Never booked; the fixed reply.",
+   "status": "Draft: finalized once the state forms are filled in."
+  },
+  "pf.edges": {
+   "matter most": {
+    "a second lockout the same day": "Not booked: the customer is asked to call, and Sam sees a flag.",
+    "no phone at the door": "The customer says yes or pays on the locksmith's phone; the receipt goes to their own mobile.",
+    "someone objects at the door": "No lock is touched; the fixed reply. Sam decides the agreed trip fee; no answer, no fee.",
+    "no proof at the door": "No lock is touched. The agreed $89 trip fee only if Sam confirms; no answer, no fee. Alex can book again with proof.",
+    "a spare key turns up": "Free to cancel until the locksmith heads out.",
+    "the person at the door isn't the locksmith sent": "The door stays shut, and Sam calls.",
+    "a request at night": "Lockouts go to the on-call locksmith at any hour; other work waits for the morning.",
+    "a renter wants a rekey or new locks": "The landlord's OK on the page first.",
+    "a declared emergency": "The state's price limits apply."
+   },
+   "the rest": "Handled the general way."
+  },
+  "pf.facts": [
+   "documents",
+   "dropoff",
+   "extrawork",
+   "forms",
+   "photos",
+   "sentnow"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Marco and Lena (locksmiths at the counter)"
+  },
+  "B": {
+   "staff": "Tomás and Andre (locksmiths; one is on call each night)",
+   "other": "Others (a bank, a landlord, a roommate)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Marco"
+  },
+  "B": {
+   "staff": "Tomás"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Why: a price the owner can plan for.",
+    "Why: a price the owner can plan."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds safe repair to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Safe repair for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW safe repair"
+   ],
+   [
+    "JP031552",
+    "LS031552"
+   ],
+   [
+    "MP045210",
+    "LK045210"
+   ],
+   [
+    "BS20981",
+    "KS20981"
+   ],
+   [
+    "EC22871",
+    "AL22871"
+   ],
+   [
+    "JE30417",
+    "AT30417"
+   ],
+   [
+    "BR41862",
+    "LS41862"
+   ],
+   [
+    "takes no cut of",
+    "takes no share of"
+   ],
+   [
+    "leehomeservices.com",
+    "leelockandkey.com"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero cambiar la combinación de unas cerraduras el sábado."
+   ],
+   [
+    "Alex asks for a perm, which the shop doesn't do.",
+    "Alex asks for a security camera install, which the shop doesn't do."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't install cameras."
+   ],
+   [
+    "Gloss to finish",
+    "Lock cleaning"
+   ],
+   [
+    "gloss",
+    "lock cleaning"
+   ],
+   [
+    "Alex is already in the chair",
+    "Alex is already at the counter"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The vise scratched my lock's finish."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the vise scratched a lock's finish today."
+   ],
+   [
+    "If it's urgent, see a doctor or call 911.",
+    "If anyone is in danger, call 911."
+   ],
+   [
+    "It went brassy last time.",
+    "It sticks in the cold."
+   ],
+   [
+    "like a doctor's note",
+    "like a building's OK for a restricted key"
+   ],
+   [
+    "get the doctor's note before the visit",
+    "get the building's OK for Alex's restricted key before the visit"
+   ],
+   [
+    "if it needs the steamer",
+    "if it needs the key machine"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you rekey mailbox locks too?"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a mailbox lock rekey is $25"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The new key sticks in one lock."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's new key sticks in one lock"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A rekey and a mailbox lock rekey work the same way."
+   ],
+   [
+    "Alex needs a cut within the hour, for an interview.",
+    "Alex needs a rekey within the hour, before a new tenant moves in."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks",
+    "Alex manages rentals, and asks for a rekey slot every 4 weeks"
+   ],
+   [
+    "Alex had a patch test 6 weeks ago, for a color and cut.",
+    "Alex had a key card check 6 weeks ago, for a high-security key copy."
+   ],
+   [
+    "booked a color and cut for Sat Oct 31 with Riley. It needs a patch test first,",
+    "booked a rekey with high-security keys for Sat Oct 31 with Riley. The keys need a key card check first,"
+   ],
+   [
+    "Your Sat Oct 31 color and cut needs a patch test",
+    "Your Sat Oct 31 visit needs a key card check"
+   ],
+   [
+    "Alex's to bring, like a form",
+    "Alex's to bring, like the locks"
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "The locks to rekey weren't brought in."
+   ],
+   [
+    "the signed form Alex was to bring is missing",
+    "the locks Alex was to bring weren't brought in"
+   ],
+   [
+    "the signed form it needs is missing",
+    "the locks to rekey weren't brought in"
+   ],
+   [
+    "since the signed form was missing",
+    "since the locks to rekey weren't brought in"
+   ],
+   [
+    "Once you have the form, you can book again",
+    "Once you have the locks, you can book again"
+   ],
+   [
+    "fee for the missing form",
+    "fee for the missing locks"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of the work, never of a key? Yes / No"
+   ],
+   [
+    "Add photos of your hair, and a barber will price it",
+    "Add photos of your lock and key, and a locksmith will price it"
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut",
+    "Add photos of your lock and key, and a locksmith will price your antique lock repair"
+   ],
+   [
+    "photos of your hair",
+    "photos of the lock"
+   ],
+   [
+    "when the pipes are in",
+    "when the locks are in"
+   ],
+   [
+    "replacing the old pipes",
+    "replacing the worn locks"
+   ],
+   [
+    "Replace the old pipes",
+    "Replace the worn locks"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 bench check; priced at the bench"
+   ],
+   [
+    "A barbershop books kids cuts with a parent.",
+    "A key shop books adults only."
+   ],
+   [
+    "Plumbing, electrical and barbering need one, so Sam's three take the license step.",
+    "Locksmithing, alarm work and key work need one where the state licenses them. There, Sam's three take the license step."
+   ],
+   [
+    "Plumbing, electrical and barbering license each person, so Sam's four are checked.",
+    "Locksmithing, alarm work and key work license each person where the state does. There, Sam's four are checked."
+   ],
+   [
+    "Barbering pays the $2",
+    "Key work pays the $2"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a home or car lockout"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute security review"
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else, like antique locks"
+   ],
+   [
+    "Alex stays in the chair",
+    "Alex stays at the counter"
+   ],
+   [
+    "Plumbing has none here.",
+    "Locksmith work at a home or car always has one: the entry statement."
+   ],
+   [
+    "Say Alex's visit were a color, which only Riley does at the shop.",
+    "Say Alex's visit were antique lock work, which only Riley does at the shop."
+   ],
+   [
+    "A clogged drain that's overflowing may be.",
+    "A home lockout may be."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I'm locked out. Can someone come tonight?"
+   ],
+   [
+    "like an overflowing drain",
+    "like a home lockout"
+   ],
+   [
+    "the old heater hauled away Fri?",
+    "the spare keys ready Fri?"
+   ],
+   [
+    "Haircuts and beard trims",
+    "Rekeys and key copies"
+   ],
+   [
+    "like a burst pipe",
+    "like a lockout"
+   ],
+   [
+    "where barbering outside a shop is allowed",
+    "where lock work outside the shop is allowed"
+   ],
+   [
+    "Any scalp trouble Riley should know about?",
+    "Are both locks the same brand?"
+   ],
+   [
+    "Lee Home Services · Water heater leak",
+    "Lee Lock & Key · Car lockout"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Home lockout"
+   ],
+   [
+    "Old heater hauled away Fri, not Thu",
+    "Spare keys ready Fri, not Thu"
+   ],
+   [
+    "The old heater is hauled away Fri, not Thu",
+    "Your spare keys are ready Fri, not Thu"
+   ],
+   [
+    "Can you reach the water shut-off valve?",
+    "Are any of the locks smart locks?"
+   ],
+   [
+    "Is water backing up into the sink?",
+    "Do all the locks take the same key now?"
+   ],
+   [
+    "the shutoff valves",
+    "the back deadbolt"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me quedé fuera de mi carro."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'm locked out of my car."
+   ],
+   [
+    "Call summary: Rosa, in Spanish. Water is leaking from the water heater, and the valve is shut.",
+    "Call summary: Rosa, in Spanish. She's locked out of her car by a busy road, and she's safe."
+   ],
+   [
+    "Leak at the gas water heater · safety steps given",
+    "Car lockout by the road · safety steps given"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A locksmith's example: a car lockout by a busy road gets 'wait somewhere safe, away from traffic'."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I just moved in, and the old owners may still have keys. Can a locksmith rekey my locks Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Can a plumber flush my water heater Thursday morning? I'm in Springfield.",
+    "Can a locksmith put in my new smart lock Thursday morning? I'm in Springfield."
+   ],
+   [
+    "My water heater is old and rusty. Can a plumber replace it this week? I'm in Springfield.",
+    "My front door locks are old and loose. Can a locksmith put in high-security locks this week? I'm in Springfield."
+   ],
+   [
+    "There's a leak under my bathroom sink. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My back door lock sticks. Can a locksmith come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Lee Home Services asks: which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services asks: how many locks, and is each one a deadbolt or a knob lock?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Four: a deadbolt and a knob lock on the front and back doors."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric, and is it leaking?",
+    "Lee Home Services asks: how many doors, and what locks are on them now?"
+   ],
+   [
+    "Gas. It's rusty, but it isn't leaking.",
+    "Two doors. Old brass deadbolts, and one is loose."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric?",
+    "Lee Home Services asks: is the smart lock already bought, and is there Wi-Fi at the door?"
+   ],
+   [
+    "Electric.",
+    "Yes, a keypad deadbolt. Wi-Fi works there."
+   ],
+   [
+    "Lee Home Services asks: where is the leak, and is water still coming?",
+    "Lee Home Services asks: which lock sticks, and does the door still lock?"
+   ],
+   [
+    "Under the bathroom sink. I shut the valve.",
+    "The back door. It locks, but the key barely turns."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Do you have a working key for every lock?"
+   ],
+   [
+    "Yes, it won't drain at all.",
+    "Yes, one key for each door."
+   ],
+   [
+    "Where is the water heater: a garage, a closet or a basement?",
+    "Which doors get the new locks: the front, the back or the garage?"
+   ],
+   [
+    "In the garage.",
+    "The front door."
+   ],
+   [
+    "Is the pipe under the sink easy to reach?",
+    "Is the sticking lock on a wood door, with no glass next to it?"
+   ],
+   [
+    "Yes, the cabinet is empty.",
+    "Yes, it's a solid wood door."
+   ],
+   [
+    "The plug-in adds its own questions, like where the main water shut-off is.",
+    "The plug-in adds its own questions, like which doors have a lock to match."
+   ],
+   [
+    "like a new water heater",
+    "like a rekey or new locks"
+   ],
+   [
+    "A drain clearing needs no landlord's OK.",
+    "A lockout opening needs no landlord's OK, only proof Alex lives there."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I take the old locks off before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Please leave the locks on the doors."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the back door won't lock at all now."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone trying to get in, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The back door won't lock at all now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Block the back door shut from inside, and call 911 if anyone tries to get in."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor.",
+    "Alex texts that the front deadbolt won't lock at all now."
+   ],
+   [
+    "The water heater is leaking onto the floor now.",
+    "The front deadbolt won't lock at all now."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches.",
+    "Block the front door shut from inside, and call 911 if anyone tries to get in."
+   ],
+   [
+    "Nobody who does replacements is free sooner",
+    "Nobody who does high-security installs is free sooner"
+   ],
+   [
+    "Casey does drains, leaks and flushes, so he isn't offered for a replacement.",
+    "Casey does rekeys, repairs and smart locks, so he isn't offered for a high-security install."
+   ],
+   [
+    "Alex texts that the leak under the sink is worse.",
+    "Alex texts that the back door lock is worse."
+   ],
+   [
+    "The leak under the sink is much worse now.",
+    "The back door lock barely turns now."
+   ],
+   [
+    "Turn off the valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep the back door blocked shut from inside, and call 911 if anyone tries to get in."
+   ],
+   [
+    "the water jetter for Kim's yard drain is in for repair until Monday",
+    "the key machine for Kim's mailbox lock is in for repair until Monday"
+   ],
+   [
+    "Jetter in the shop until Mon",
+    "Key machine in for repair until Mon"
+   ],
+   [
+    "The plug-in names the checks, like the pipes under the sink and the cabinet floor.",
+    "The plug-in names the checks, like the door, its frame and the strike plate."
+   ],
+   [
+    "Under the sink, before",
+    "Back door, before"
+   ],
+   [
+    "BEFORE rust at the base of the water heater",
+    "BEFORE old deadbolts, worn and loose"
+   ],
+   [
+    "Water heater, before",
+    "Front door, before"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan finds why the lock sticks and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan found why the lock sticks. Here's the price to fix it today."
+   ],
+   [
+    "Jordan sees the water heater leaking at the base.",
+    "Jordan sees the front door frame split at the lock."
+   ],
+   [
+    "QUOTE 640 water heater leaking at the base, replace",
+    "QUOTE 640 high-security locks, frame split at the lock"
+   ],
+   [
+    "Old heater, leaking at the base",
+    "Split frame at the lock"
+   ],
+   [
+    "Its rating plate",
+    "The old lock"
+   ],
+   [
+    "Jordan quotes a new water heater for Alex M. from his photos",
+    "Jordan quotes high-security locks for Alex M. from his photos"
+   ],
+   [
+    "Jordan finds the main water line cracked.",
+    "Jordan finds the back door frame split."
+   ],
+   [
+    "QUOTE 900 main water line cracked, repair",
+    "QUOTE 900 back door frame split, repair"
+   ],
+   [
+    "Jordan quotes a main water line repair for Alex M.",
+    "Jordan quotes a door frame repair for Alex M."
+   ],
+   [
+    "Main water line repair · $900",
+    "Door frame repair · $900"
+   ],
+   [
+    "Found at Thu's water heater visit",
+    "Found at Thu's lock visit"
+   ],
+   [
+    "Jordan found that your water heater is leaking. Here's the price for a new one",
+    "Jordan found that your door frame is split at the lock. Here's the price for new locks"
+   ],
+   [
+    "Jordan found that your main water line is cracked.",
+    "Jordan found that your back door frame is split."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds loose wiring behind an old door alarm."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD loose wiring behind the door alarm, stopped"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found loose wiring behind your old door alarm and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: loose wiring behind the door alarm"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Loose wiring behind the door alarm"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the side door lock next to it"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call an electric contractor first"
+   ],
+   [
+    "a new water heater is delivered and set up",
+    "a new safe is delivered and set up"
+   ],
+   [
+    "DELIVERED water heater set up",
+    "DELIVERED safe set up"
+   ],
+   [
+    "New water heater, set up",
+    "New safe, set up"
+   ],
+   [
+    "Your new water heater is in. Please check it and sign for it.",
+    "Your new safe is in. Please check it and sign for it."
+   ],
+   [
+    "Delivery · Water heater",
+    "Delivery · Safe"
+   ],
+   [
+    "Before DONE, Jordan runs the water with Alex and checks for drips.",
+    "Before DONE, Jordan tries each new key with Alex, in every lock."
+   ],
+   [
+    "Here: the drain runs clear, and nothing drips.",
+    "Here: every key turns smoothly, and each door locks."
+   ],
+   [
+    "Jordan and Alex check the water heater together.",
+    "Jordan and Alex check the new locks together."
+   ],
+   [
+    "Here: the heater runs, the hot water is hot, and nothing drips.",
+    "Here: each key turns smoothly, and each door locks."
+   ],
+   [
+    "Here: the water runs, and nothing drips under the sink.",
+    "Here: the back door locks, and the key turns smoothly."
+   ],
+   [
+    "The drain runs clear.",
+    "Every new key works."
+   ],
+   [
+    "The leak is fixed.",
+    "The back door lock is fixed."
+   ],
+   [
+    "DONE 640 water heater",
+    "DONE 640 high-security locks"
+   ],
+   [
+    "NOTE heavy sediment in the tank. Flush again in 12 months.",
+    "NOTE smart lock battery at 80%. Check again in 12 months."
+   ],
+   [
+    "NOTE new 50-gallon heater in the garage. Old one hauled away.",
+    "NOTE new high-security deadbolts, front and back. Old ones taken away."
+   ],
+   [
+    "NOTE new shutoff valve and supply line under the kitchen sink.",
+    "NOTE new deadbolt and strike plate on the back door."
+   ],
+   [
+    "DONE 179 drain, parts 38 trap",
+    "DONE 179 rekey, parts 38 pins"
+   ],
+   [
+    "Alex M.: $179 drain + $38 parts",
+    "Alex M.: $179 rekey + $38 parts"
+   ],
+   [
+    "DONE 150 water heater flush, parts 12 drain valve",
+    "DONE 150 smart lock install, parts 12 batteries"
+   ],
+   [
+    "DONE 640 water heater, parts 45 expansion tank",
+    "DONE 640 high-security locks, parts 45 strike plates"
+   ],
+   [
+    "Alex M.: $640 water heater + $45 parts",
+    "Alex M.: $640 high-security locks + $45 parts"
+   ],
+   [
+    "DONE 245 leak, parts 18 fittings",
+    "DONE 245 lock repair, parts 18 pins"
+   ],
+   [
+    "valve work",
+    "deadbolt work"
+   ],
+   [
+    "the $160 for the shutoff valves is refunded",
+    "the $160 for the deadbolt is refunded"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A rekeyed lock sticks 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My front door lock sticks again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s rekey, done Thu Oct 22, sticks again."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your rekey is under warranty"
+   ],
+   [
+    "The new water heater drips at a fitting 2 weeks later.",
+    "A new deadbolt sticks 2 weeks later."
+   ],
+   [
+    "My new water heater is dripping at a fitting.",
+    "My new deadbolt sticks."
+   ],
+   [
+    "Alex M.'s new water heater, put in Thu Oct 22, is dripping at a fitting.",
+    "Alex M.'s new deadbolt, put in Thu Oct 22, sticks."
+   ],
+   [
+    "Your water heater is under warranty",
+    "Your new lock is under warranty"
+   ],
+   [
+    "The heater's drain valve drips 2 weeks after the flush.",
+    "The smart lock drops off the Wi-Fi 2 weeks after the install."
+   ],
+   [
+    "My water heater's drain valve is dripping since the flush.",
+    "My smart lock keeps dropping off the Wi-Fi."
+   ],
+   [
+    "Alex M.'s water heater, flushed Thu Oct 22, is dripping at the drain valve.",
+    "Alex M.'s smart lock, put in Thu Oct 22, keeps dropping off the Wi-Fi."
+   ],
+   [
+    "The leak comes back 2 weeks later.",
+    "The back door lock sticks again 2 weeks later."
+   ],
+   [
+    "The leak under my sink is back.",
+    "My back door lock sticks again."
+   ],
+   [
+    "Alex M.'s leak repair from Thu Oct 22 is dripping again.",
+    "Alex M.'s lock repair from Thu Oct 22 sticks again."
+   ],
+   [
+    "Checks the fan; releases the hold",
+    "Checks the lockbox; releases the hold"
+   ],
+   [
+    "Jordan left a drying fan after a leak.",
+    "Jordan left a loaner lockbox with spare keys after the rekey."
+   ],
+   [
+    "A fan left at the visit: Jordan asks first.",
+    "A lockbox left at the visit: Jordan asks first."
+   ],
+   [
+    "or the fan isn't left",
+    "or the lockbox isn't left"
+   ],
+   [
+    "Tips for your drain: run hot water for a minute after washing dishes, and skip store-bought drain cleaners. If it slows again, reply here.",
+    "Tips for your new keys: try each one this week. If a lock feels stiff, use graphite, not oil. If one sticks, reply here."
+   ],
+   [
+    "Tips for your water heater: keep the space around it clear, and check for drips this week. If you see water or lose hot water, reply here.",
+    "Tips for your new locks: keep the spare keys somewhere safe, and test each door this week. If a lock sticks, reply here."
+   ],
+   [
+    "Tips after your leak repair: check under the sink for drips tomorrow, and don't store heavy things on the pipes. If it drips again, reply here.",
+    "Tips after your lock repair: lock and unlock the back door a few times tomorrow. If it sticks again, reply here."
+   ],
+   [
+    "It's a leak under the sink, today 3 to 5pm with Jordan.",
+    "It's a back door lock that sticks, today 3 to 5pm with Jordan."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Rekeys, repairs, smart lock installs"
+   ],
+   [
+    "Outlet or switch replaced",
+    "Door sensor added"
+   ],
+   [
+    "panel upgrade",
+    "alarm panel upgrade"
+   ],
+   [
+    "Panel upgrade",
+    "Alarm panel upgrade"
+   ],
+   [
+    "The Groom's package at Lee's Barbershop is $140",
+    "The master key set is $140"
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Master key set (up to 6 locks)"
+   ],
+   [
+    "the Groom's package",
+    "the master key set"
+   ],
+   [
+    "1:00 Groom's package",
+    "1:00 master key set"
+   ],
+   [
+    "2½-hour Groom's package",
+    "2½-hour master key set"
+   ],
+   [
+    "2:00pm Groom's package",
+    "2:00pm master key set"
+   ],
+   [
+    "Your Groom's package",
+    "Your master key set"
+   ],
+   [
+    "Sat Oct 31 Groom's package",
+    "Sat Oct 31 master key set"
+   ],
+   [
+    "a Kids cut",
+    "a mailbox lock rekey"
+   ],
+   [
+    "The Groom's package",
+    "The master key set"
+   ],
+   [
+    "a Groom's package",
+    "a master key set"
+   ],
+   [
+    "11:00am Groom's package",
+    "11:00am master key set"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 master key set"
+   ],
+   [
+    "tomorrow's Groom's package",
+    "tomorrow's master key set"
+   ],
+   [
+    "today's Groom's package",
+    "today's master key set"
+   ],
+   [
+    "your Groom's package",
+    "your master key set"
+   ],
+   [
+    "Deposit, Groom's package",
+    "Deposit, master key set"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many trades are licensed to work only at their own shop"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A rekey could mean the key shop's counter or a locksmith at home."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Riley sees the lock"
+   ],
+   [
+    "Riley looks at Alex's hair and texts a price",
+    "Riley looks at Alex's lock and texts a price"
+   ],
+   [
+    "can cut your hair at the shop",
+    "can rekey your locks at the shop"
+   ],
+   [
+    "Here: a beard trim too, or just the cut? Long hair can take longer.",
+    "Here: how many locks, and if spare keys are wanted too. More locks take longer."
+   ],
+   [
+    "If it's for a child, the kids cut is picked here, so the times fit it.",
+    "If it's a mailbox lock, that's picked here, so the times fit it."
+   ],
+   [
+    "Just the haircut, or a beard trim too?",
+    "How many locks, and do you want spare keys too?"
+   ],
+   [
+    "Just the haircut.",
+    "Two locks. No spare keys."
+   ],
+   [
+    "How long is your beard now? A long beard takes longer.",
+    "How many doors are in the building? More locks take longer."
+   ],
+   [
+    "About an inch.",
+    "Six doors."
+   ],
+   [
+    "Is your beard longer than an inch? A long beard takes longer.",
+    "Is the key's card with you? A key with no card takes longer."
+   ],
+   [
+    "No, it's short.",
+    "Yes, I have it here."
+   ],
+   [
+    "Is your hair past your shoulders? Longer hair takes more time.",
+    "Do you have the lock's key? A lock with no key takes more time."
+   ],
+   [
+    "Was the color done at a salon, or at home?",
+    "Has anyone taken the lock apart before?"
+   ],
+   [
+    "At home.",
+    "No, never."
+   ],
+   [
+    "Just a trim on top.",
+    "Two front-door locks. Please key them alike."
+   ],
+   [
+    "Keep the beard short.",
+    "Six office doors, one master key."
+   ],
+   [
+    "Short on the sides.",
+    "The key card is with me."
+   ],
+   [
+    "Like the color in my photos.",
+    "Like the brass finish in my photos."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a landlord's units together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across",
+    "A landlord books rekeys for five units on one morning. Rosie finds bench time side by side across"
+   ],
+   [
+    "Here, the color for a color and cut.",
+    "Here, the brass parts for an antique lock repair."
+   ],
+   [
+    "A patch test is a small skin test for a reaction to hair dye.",
+    "A key card check: Alex shows the key's card and a photo ID before a restricted key is ordered."
+   ],
+   [
+    "a color needs its patch test",
+    "a restricted key needs its key card check"
+   ],
+   [
+    "Say Alex has a scalp rash that gets worse before the visit.",
+    "Say the front door lock jams before the visit, and the door won't lock."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My front door won't lock now. Can I still come in Saturday?"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Riley suggests moving your visit, with no fee. For tonight, call the shop about a house call."
+   ],
+   [
+    "For a cut, that's the skin and scalp.",
+    "For a rekey, that's each lock's finish and how its key turns."
+   ],
+   [
+    "Before the cut: an old scar on Alex's crown, left side.",
+    "Before the rekey: scratches on the front lock's face."
+   ],
+   [
+    "Crown, before the cut",
+    "Front lock, before"
+   ],
+   [
+    "A skin problem stops the work",
+    "A worn lock stops the work"
+   ],
+   [
+    "It names the kind of pro to see, like a doctor, never a named one.",
+    "It names the kind of pro to see, like a door installer, never a named one."
+   ],
+   [
+    "Before Alex pays, Riley shows the cut in the mirror.",
+    "Before Alex pays, Riley tries each new key in its lock with Alex."
+   ],
+   [
+    "like a skin-test result",
+    "like a key code, which stays private"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 2 front-door locks, keyed alike, 4 keys made"
+   ],
+   [
+    "DONE 140 grooms package",
+    "DONE 140 master key set"
+   ],
+   [
+    "Sends aftercare; hears any reaction",
+    "Sends care tips; hears of any problem"
+   ],
+   [
+    "The plug-in's aftercare notes go out after the visit. A reaction Alex reports is checked for danger first.",
+    "The plug-in's care tips go out after the visit. A problem Alex reports is checked for danger first."
+   ],
+   [
+    "Aftercare for today's visit",
+    "Care tips for today's visit"
+   ],
+   [
+    "How to care for your skin and hair",
+    "How to care for your new keys and locks"
+   ],
+   [
+    "Aftercare and reactions",
+    "Care tips and problems"
+   ],
+   [
+    "It adds any way to get ready from the plug-in. A barbershop has none.",
+    "It adds any way to get ready from the plug-in: bring the locks, and a working key."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "At the shop's counter they're rare. Most come with lockouts, in the other flow."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A key shop's plug-in adds one: a child or a pet locked in a car means 911 first."
+   ],
+   [
+    "A haircut needs nothing.",
+    "A rekey needs the locks, and a working key if Alex has one."
+   ],
+   [
+    "Color is priced for each customer, so Sam OKs each color quote, like Riley's $90 color and cut from photos.",
+    "Old locks are priced one by one, so Sam OKs each quote, like Riley's $90 antique lock repair from photos."
+   ],
+   [
+    "Color is priced for each customer, so Sam OKs each color quote, like the color correction price Riley sets at the chair.",
+    "Old locks are priced one by one, so Sam OKs each quote, like the lock repair price Riley sets at the chair."
+   ],
+   [
+    "Color is priced for each customer",
+    "Antique lock work is priced for each customer"
+   ],
+   [
+    "A color quote",
+    "An antique lock quote"
+   ],
+   [
+    "color quotes",
+    "antique lock quotes"
+   ],
+   [
+    "color quote",
+    "antique lock quote"
+   ],
+   [
+    "Color services",
+    "Antique lock services"
+   ],
+   [
+    "color services",
+    "antique lock services"
+   ],
+   [
+    "color and house calls",
+    "antique locks and house calls"
+   ],
+   [
+    "service, color, house calls",
+    "service, antique locks, house calls"
+   ],
+   [
+    "but color",
+    "but antique locks"
+   ],
+   [
+    "does color",
+    "does antique locks"
+   ],
+   [
+    "for a color,",
+    "for an antique lock repair,"
+   ],
+   [
+    "the color Riley can't do",
+    "the antique lock work Riley can't do"
+   ],
+   [
+    "suggests a different color",
+    "suggests a different repair"
+   ],
+   [
+    "Your new color plan",
+    "Your new repair plan"
+   ],
+   [
+    "your Sat Oct 31 color.",
+    "your Sat Oct 31 repair."
+   ],
+   [
+    "The color ordered for Dana's visit is late.",
+    "The parts ordered for Dana's visit are late."
+   ],
+   [
+    "The color I ordered for Dana R. comes Mon Nov 2",
+    "The parts I ordered for Dana R. come Mon Nov 2"
+   ],
+   [
+    "The color Riley ordered for your Sat Oct 31 visit arrives Mon Nov 2.",
+    "The parts Riley ordered for your Sat Oct 31 visit arrive Mon Nov 2."
+   ],
+   [
+    "color-correction session",
+    "lock repair visit"
+   ],
+   [
+    "leave before the color",
+    "leave before the repair"
+   ],
+   [
+    "the color costs more since then",
+    "the brass parts cost more since then"
+   ],
+   [
+    "Supplier invoice: color +$20",
+    "Supplier invoice: brass parts +$20"
+   ],
+   [
+    "Color always stays with",
+    "Antique lock work always stays with"
+   ],
+   [
+    "a color and cut",
+    "an antique lock repair"
+   ],
+   [
+    "A color and cut",
+    "An antique lock repair"
+   ],
+   [
+    "patch tests",
+    "key card checks"
+   ],
+   [
+    "patch test",
+    "key card check"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Lock & Key's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Lock & Key"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Key Shop"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Locks"
+   ],
+   [
+    "Lee Electric",
+    "Lee Alarms"
+   ],
+   [
+    "1200 Main St",
+    "510 Main St"
+   ],
+   [
+    "88 Elm St",
+    "64 Elm St"
+   ],
+   [
+    "42 Oak St",
+    "27 Oak St"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Locksmithing, Alarms, Key shop"
+   ],
+   [
+    "plumbing and electrical work",
+    "locksmithing and alarm work"
+   ],
+   [
+    "plumbing and electrical",
+    "locksmithing and alarm work"
+   ],
+   [
+    "Plumbing and electrical work",
+    "Locksmithing and alarm work"
+   ],
+   [
+    "Plumbing and electrical",
+    "Locksmithing and alarm work"
+   ],
+   [
+    "plumbing + electrical",
+    "locksmithing + alarm work"
+   ],
+   [
+    "Plumbing + electrical",
+    "Locksmithing + alarm work"
+   ],
+   [
+    "Reads back plumbing's money, service by service",
+    "Reads back locksmith money, service by service"
+   ],
+   [
+    "plumbing visit",
+    "locksmith visit"
+   ],
+   [
+    "Plumbing visit",
+    "Locksmith visit"
+   ],
+   [
+    "plumbing service",
+    "locksmith service"
+   ],
+   [
+    "Plumbing service",
+    "Locksmith service"
+   ],
+   [
+    "plumbing job",
+    "locksmith job"
+   ],
+   [
+    "Plumbing job",
+    "Locksmith job"
+   ],
+   [
+    "plumbing license",
+    "locksmith license"
+   ],
+   [
+    "Plumbing license",
+    "Locksmith license"
+   ],
+   [
+    "plumbing plug-in",
+    "locksmith plug-in"
+   ],
+   [
+    "Plumbing plug-in",
+    "Locksmith plug-in"
+   ],
+   [
+    "plumbing price list",
+    "locksmith price list"
+   ],
+   [
+    "Plumbing price list",
+    "Locksmith price list"
+   ],
+   [
+    "plumbing prices",
+    "locksmith prices"
+   ],
+   [
+    "Plumbing prices",
+    "Locksmith prices"
+   ],
+   [
+    "plumbing",
+    "locksmithing"
+   ],
+   [
+    "Plumbing",
+    "Locksmithing"
+   ],
+   [
+    "plumbers",
+    "locksmiths"
+   ],
+   [
+    "Plumbers",
+    "Locksmiths"
+   ],
+   [
+    "plumber",
+    "locksmith"
+   ],
+   [
+    "Plumber",
+    "Locksmith"
+   ],
+   [
+    "electricians",
+    "alarm techs"
+   ],
+   [
+    "Electricians",
+    "Alarm techs"
+   ],
+   [
+    "electrician",
+    "alarm tech"
+   ],
+   [
+    "Electrician",
+    "Alarm tech"
+   ],
+   [
+    "electrical license",
+    "alarm license"
+   ],
+   [
+    "Electrical license",
+    "Alarm license"
+   ],
+   [
+    "electrical form",
+    "alarm form"
+   ],
+   [
+    "Electrical form",
+    "Alarm form"
+   ],
+   [
+    "electrical",
+    "alarm work"
+   ],
+   [
+    "Electrical",
+    "Alarm work"
+   ],
+   [
+    "barbershop",
+    "key shop"
+   ],
+   [
+    "Barbershop",
+    "Key shop"
+   ],
+   [
+    "barbers",
+    "locksmiths"
+   ],
+   [
+    "Barbers",
+    "Locksmiths"
+   ],
+   [
+    "whichever barber cuts",
+    "whichever locksmith works"
+   ],
+   [
+    "barber",
+    "locksmith"
+   ],
+   [
+    "Barber",
+    "Locksmith"
+   ],
+   [
+    "kitchen drain clearing",
+    "whole-home rekey"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Whole-home rekey"
+   ],
+   [
+    "kitchen drain cleared",
+    "whole home rekeyed"
+   ],
+   [
+    "Kitchen drain cleared",
+    "Whole home rekeyed"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE back door strike is out of line. Bring a new strike plate next time."
+   ],
+   [
+    "the kitchen drain",
+    "the home's locks"
+   ],
+   [
+    "The kitchen drain",
+    "The home's locks"
+   ],
+   [
+    "my kitchen drain is clogged",
+    "I just moved in and need my locks rekeyed"
+   ],
+   [
+    "My kitchen drain is clogged",
+    "I just moved in and need my locks rekeyed"
+   ],
+   [
+    "yard drain clearing",
+    "mailbox lock rekey"
+   ],
+   [
+    "Yard drain clearing",
+    "Mailbox lock rekey"
+   ],
+   [
+    "kitchen drain",
+    "whole-home rekey"
+   ],
+   [
+    "Kitchen drain",
+    "Whole-home rekey"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 office lock system"
+   ],
+   [
+    "A $2,400 repipe",
+    "A $2,400 office lock system"
+   ],
+   [
+    "repipe",
+    "office lock system"
+   ],
+   [
+    "Repipe",
+    "Office lock system"
+   ],
+   [
+    "cleared yard drain",
+    "rekeyed mailbox lock"
+   ],
+   [
+    "Cleared yard drain",
+    "Rekeyed mailbox lock"
+   ],
+   [
+    "yard drain",
+    "mailbox lock"
+   ],
+   [
+    "Yard drain",
+    "Mailbox lock"
+   ],
+   [
+    "drain clearing",
+    "whole-home rekey"
+   ],
+   [
+    "Drain clearing",
+    "Whole-home rekey"
+   ],
+   [
+    "clear the drain",
+    "rekey the locks"
+   ],
+   [
+    "Clear the drain",
+    "Rekey the locks"
+   ],
+   [
+    "does drains",
+    "does rekeys"
+   ],
+   [
+    "Does drains",
+    "Does rekeys"
+   ],
+   [
+    "Note: the sink is full and won't drain.",
+    "Note: front and back doors, keyed alike."
+   ],
+   [
+    "the sink is full and won't drain",
+    "front and back doors, keyed alike"
+   ],
+   [
+    "The sink is full and won't drain",
+    "Front and back doors, keyed alike"
+   ],
+   [
+    "drain trap",
+    "door closer"
+   ],
+   [
+    "Drain trap",
+    "Door closer"
+   ],
+   [
+    "drain valve",
+    "battery cover"
+   ],
+   [
+    "Drain valve",
+    "Battery cover"
+   ],
+   [
+    "drain snake and a camera",
+    "pinning kit and key blanks"
+   ],
+   [
+    "Drain snake and a camera",
+    "Pinning kit and key blanks"
+   ],
+   [
+    "a clogged drain",
+    "a rekey"
+   ],
+   [
+    "A clogged drain",
+    "A rekey"
+   ],
+   [
+    "drain is clogged again",
+    "lock sticks again"
+   ],
+   [
+    "Drain is clogged again",
+    "Lock sticks again"
+   ],
+   [
+    "drain is clogged",
+    "lock is jammed"
+   ],
+   [
+    "Drain is clogged",
+    "Lock is jammed"
+   ],
+   [
+    "drain clogs again",
+    "lock sticks again"
+   ],
+   [
+    "Drain clogs again",
+    "Lock sticks again"
+   ],
+   [
+    "drains",
+    "rekeys"
+   ],
+   [
+    "Drains",
+    "Rekeys"
+   ],
+   [
+    "drain",
+    "rekey"
+   ],
+   [
+    "Drain",
+    "Rekey"
+   ],
+   [
+    "$89 service call fee",
+    "$89 trip fee"
+   ],
+   [
+    "$89 service call",
+    "$89 trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service calls",
+    "trip fees"
+   ],
+   [
+    "Service calls",
+    "Trip fees"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "Gas water heater, in the garage.",
+    "Two high-security deadbolts, front and back."
+   ],
+   [
+    "Electric water heater, in the garage.",
+    "Smart lock for the front door. Wi-Fi works there."
+   ],
+   [
+    "water heater replacement",
+    "high-security lock install"
+   ],
+   [
+    "Water heater replacement",
+    "High-security lock install"
+   ],
+   [
+    "water heater flushes",
+    "smart lock installs"
+   ],
+   [
+    "Water heater flushes",
+    "Smart lock installs"
+   ],
+   [
+    "water heater flush",
+    "smart lock install"
+   ],
+   [
+    "Water heater flush",
+    "Smart lock install"
+   ],
+   [
+    "flush your water heater",
+    "install your smart lock"
+   ],
+   [
+    "Flush your water heater",
+    "Install your smart lock"
+   ],
+   [
+    "flush my water heater",
+    "install my smart lock"
+   ],
+   [
+    "Flush my water heater",
+    "Install my smart lock"
+   ],
+   [
+    "replaces water heaters",
+    "installs high-security locks"
+   ],
+   [
+    "Replaces water heaters",
+    "Installs high-security locks"
+   ],
+   [
+    "replace your water heater",
+    "put in high-security locks"
+   ],
+   [
+    "Replace your water heater",
+    "Put in high-security locks"
+   ],
+   [
+    "a new water heater",
+    "new locks"
+   ],
+   [
+    "A new water heater",
+    "New locks"
+   ],
+   [
+    "new water heater is in",
+    "new locks are in"
+   ],
+   [
+    "New water heater is in",
+    "New locks are in"
+   ],
+   [
+    "the new water heater",
+    "the new locks"
+   ],
+   [
+    "The new water heater",
+    "The new locks"
+   ],
+   [
+    "new water heater",
+    "new locks"
+   ],
+   [
+    "New water heater",
+    "New locks"
+   ],
+   [
+    "water heaters",
+    "high-security locks"
+   ],
+   [
+    "Water heaters",
+    "High-security locks"
+   ],
+   [
+    "my water heater is old",
+    "my front door locks are old"
+   ],
+   [
+    "My water heater is old",
+    "My front door locks are old"
+   ],
+   [
+    "water heater",
+    "lock"
+   ],
+   [
+    "Water heater",
+    "Lock"
+   ],
+   [
+    "flush plan",
+    "lock check plan"
+   ],
+   [
+    "Flush plan",
+    "Lock check plan"
+   ],
+   [
+    "flush again in",
+    "check again in"
+   ],
+   [
+    "Flush again in",
+    "Check again in"
+   ],
+   [
+    "leaks and flushes",
+    "repairs and installs"
+   ],
+   [
+    "Leaks and flushes",
+    "Repairs and installs"
+   ],
+   [
+    "flushed",
+    "installed"
+   ],
+   [
+    "Flushed",
+    "Installed"
+   ],
+   [
+    "flushes",
+    "installs"
+   ],
+   [
+    "Flushes",
+    "Installs"
+   ],
+   [
+    "flush",
+    "install"
+   ],
+   [
+    "Flush",
+    "Install"
+   ],
+   [
+    "sewer camera inspection",
+    "lock audit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Lock audit"
+   ],
+   [
+    "sewer camera report",
+    "lock audit report"
+   ],
+   [
+    "Sewer camera report",
+    "Lock audit report"
+   ],
+   [
+    "ran a sewer camera at the visit, like the $199 inspection",
+    "ran a lock audit at the visit, like the $199 audit"
+   ],
+   [
+    "Ran a sewer camera at the visit, like the $199 inspection",
+    "Ran a lock audit at the visit, like the $199 audit"
+   ],
+   [
+    "run a camera down my sewer line?",
+    "check every lock and window latch too?"
+   ],
+   [
+    "Run a camera down my sewer line?",
+    "Check every lock and window latch too?"
+   ],
+   [
+    "camera report",
+    "lock audit report"
+   ],
+   [
+    "Camera report",
+    "Lock audit report"
+   ],
+   [
+    "camera inspections",
+    "lock audits"
+   ],
+   [
+    "Camera inspections",
+    "Lock audits"
+   ],
+   [
+    "camera inspection",
+    "lock audit"
+   ],
+   [
+    "Camera inspection",
+    "Lock audit"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Tomás's notes"
+   ],
+   [
+    "bring the camera next time",
+    "bring a new strike plate next time"
+   ],
+   [
+    "Bring the camera next time",
+    "Bring a new strike plate next time"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes:",
+    "NOTE back door strike is out of line."
+   ],
+   [
+    "Note: Leak under the bathroom sink. The valve is shut.",
+    "Note: the back door lock sticks. The key won't turn."
+   ],
+   [
+    "Leak under the bathroom sink. The valve is shut.",
+    "The back door lock sticks. The key won't turn."
+   ],
+   [
+    "there's a leak under my bathroom sink",
+    "my back door lock sticks"
+   ],
+   [
+    "There's a leak under my bathroom sink",
+    "My back door lock sticks"
+   ],
+   [
+    "a roof leak",
+    "a roof repair"
+   ],
+   [
+    "A roof leak",
+    "A roof repair"
+   ],
+   [
+    "leak repair",
+    "lock repair"
+   ],
+   [
+    "Leak repair",
+    "Lock repair"
+   ],
+   [
+    "if anything leaks",
+    "if anything sticks"
+   ],
+   [
+    "If anything leaks",
+    "If anything sticks"
+   ],
+   [
+    "if it leaks again",
+    "if it sticks again"
+   ],
+   [
+    "If it leaks again",
+    "If it sticks again"
+   ],
+   [
+    "is it leaking",
+    "is it stuck"
+   ],
+   [
+    "Is it leaking",
+    "Is it stuck"
+   ],
+   [
+    "it isn't leaking",
+    "it isn't stuck"
+   ],
+   [
+    "It isn't leaking",
+    "It isn't stuck"
+   ],
+   [
+    "the leak",
+    "the stuck lock"
+   ],
+   [
+    "The leak",
+    "The stuck lock"
+   ],
+   [
+    "a leak",
+    "a stuck lock"
+   ],
+   [
+    "A leak",
+    "A stuck lock"
+   ],
+   [
+    "leaking",
+    "sticking"
+   ],
+   [
+    "Leaking",
+    "Sticking"
+   ],
+   [
+    "leaks",
+    "lock problems"
+   ],
+   [
+    "Leaks",
+    "Lock problems"
+   ],
+   [
+    "leak",
+    "lock problem"
+   ],
+   [
+    "Leak",
+    "Lock problem"
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "replace the back deadbolt, too worn to rekey"
+   ],
+   [
+    "Replace both shutoff valves, corroded",
+    "Replace the back deadbolt, too worn to rekey"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the back deadbolt"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the back deadbolt"
+   ],
+   [
+    "finds corroded shutoff valves",
+    "finds the back deadbolt too worn to rekey"
+   ],
+   [
+    "Finds corroded shutoff valves",
+    "Finds the back deadbolt too worn to rekey"
+   ],
+   [
+    "both shutoff valves",
+    "the back deadbolt"
+   ],
+   [
+    "Both shutoff valves",
+    "The back deadbolt"
+   ],
+   [
+    "two shutoff valves",
+    "the back deadbolt"
+   ],
+   [
+    "Two shutoff valves",
+    "The back deadbolt"
+   ],
+   [
+    "shutoff valve",
+    "new deadbolt"
+   ],
+   [
+    "Shutoff valve",
+    "New deadbolt"
+   ],
+   [
+    "valve quote",
+    "deadbolt quote"
+   ],
+   [
+    "Valve quote",
+    "Deadbolt quote"
+   ],
+   [
+    "valve 165 supply line 80",
+    "deadbolt 165 strike plate 80"
+   ],
+   [
+    "Valve 165 supply line 80",
+    "Deadbolt 165 strike plate 80"
+   ],
+   [
+    "supply line",
+    "strike plate"
+   ],
+   [
+    "Supply line",
+    "Strike plate"
+   ],
+   [
+    "the cold-water valve",
+    "the door"
+   ],
+   [
+    "The cold-water valve",
+    "The door"
+   ],
+   [
+    "valves",
+    "locks"
+   ],
+   [
+    "Valves",
+    "Locks"
+   ],
+   [
+    "valve",
+    "lock"
+   ],
+   [
+    "Valve",
+    "Lock"
+   ],
+   [
+    "clear the cabinet under the sink",
+    "have your photo ID and proof of address ready"
+   ],
+   [
+    "Clear the cabinet under the sink",
+    "Have your photo ID and proof of address ready"
+   ],
+   [
+    "clearing the cabinet under the sink",
+    "having a photo ID and proof of address ready"
+   ],
+   [
+    "Clearing the cabinet under the sink",
+    "Having a photo ID and proof of address ready"
+   ],
+   [
+    "old water stain on the cabinet floor",
+    "old scratches on the door frame"
+   ],
+   [
+    "Old water stain on the cabinet floor",
+    "Old scratches on the door frame"
+   ],
+   [
+    "cabinet floor",
+    "door frame"
+   ],
+   [
+    "Cabinet floor",
+    "Door frame"
+   ],
+   [
+    "under the sink",
+    "at the back door"
+   ],
+   [
+    "Under the sink",
+    "At the back door"
+   ],
+   [
+    "the bathroom sink",
+    "the back door"
+   ],
+   [
+    "The bathroom sink",
+    "The back door"
+   ],
+   [
+    "my bathroom sink",
+    "my back door lock"
+   ],
+   [
+    "My bathroom sink",
+    "My back door lock"
+   ],
+   [
+    "the kitchen sink",
+    "the front door"
+   ],
+   [
+    "The kitchen sink",
+    "The front door"
+   ],
+   [
+    "dripping kitchen faucet",
+    "worn back door lock"
+   ],
+   [
+    "Dripping kitchen faucet",
+    "Worn back door lock"
+   ],
+   [
+    "a dripping faucet",
+    "a worn lock"
+   ],
+   [
+    "A dripping faucet",
+    "A worn lock"
+   ],
+   [
+    "faucet",
+    "lock cylinder"
+   ],
+   [
+    "Faucet",
+    "Lock cylinder"
+   ],
+   [
+    "a drying fan",
+    "a loaner lockbox"
+   ],
+   [
+    "A drying fan",
+    "A loaner lockbox"
+   ],
+   [
+    "drying fan",
+    "loaner lockbox"
+   ],
+   [
+    "Drying fan",
+    "Loaner lockbox"
+   ],
+   [
+    "rented fan",
+    "loaner lockbox"
+   ],
+   [
+    "Rented fan",
+    "Loaner lockbox"
+   ],
+   [
+    "ceiling fan installed",
+    "door alarm installed"
+   ],
+   [
+    "Ceiling fan installed",
+    "Door alarm installed"
+   ],
+   [
+    "the fan",
+    "the lockbox"
+   ],
+   [
+    "The fan",
+    "The lockbox"
+   ],
+   [
+    "vent pipe",
+    "strike plate"
+   ],
+   [
+    "Vent pipe",
+    "Strike plate"
+   ],
+   [
+    "new pipes",
+    "new locks"
+   ],
+   [
+    "New pipes",
+    "New locks"
+   ],
+   [
+    "expansion tank",
+    "door closer"
+   ],
+   [
+    "Expansion tank",
+    "Door closer"
+   ],
+   [
+    "clogs again",
+    "sticks again"
+   ],
+   [
+    "Clogs again",
+    "Sticks again"
+   ],
+   [
+    "clogged",
+    "stuck"
+   ],
+   [
+    "Clogged",
+    "Stuck"
+   ],
+   [
+    "kids cut (12 and under)",
+    "mailbox lock rekey"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Mailbox lock rekey"
+   ],
+   [
+    "kids cuts",
+    "mailbox lock rekeys"
+   ],
+   [
+    "Kids cuts",
+    "Mailbox lock rekeys"
+   ],
+   [
+    "kids cut",
+    "mailbox lock rekey"
+   ],
+   [
+    "Kids cut",
+    "Mailbox lock rekey"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "high-security key copy"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "High-security key copy"
+   ],
+   [
+    "signature cut and shave",
+    "high-security key copy"
+   ],
+   [
+    "Signature cut and shave",
+    "High-security key copy"
+   ],
+   [
+    "signature cut",
+    "high-security key copy"
+   ],
+   [
+    "Signature cut",
+    "High-security key copy"
+   ],
+   [
+    "the hot towel shave",
+    "the key card check"
+   ],
+   [
+    "The hot towel shave",
+    "The key card check"
+   ],
+   [
+    "the hot towel part of",
+    "the key card part of"
+   ],
+   [
+    "The hot towel part of",
+    "The key card part of"
+   ],
+   [
+    "hot towel shave",
+    "high-security key copy"
+   ],
+   [
+    "Hot towel shave",
+    "High-security key copy"
+   ],
+   [
+    "towel steamer",
+    "key machine"
+   ],
+   [
+    "Towel steamer",
+    "Key machine"
+   ],
+   [
+    "groom's packages",
+    "master key sets"
+   ],
+   [
+    "Groom's packages",
+    "Master key sets"
+   ],
+   [
+    "groom's package (cut, shave, facial; 2½ hours)",
+    "master key set (2½ hours)"
+   ],
+   [
+    "Groom's package (cut, shave, facial; 2½ hours)",
+    "Master key set (2½ hours)"
+   ],
+   [
+    "groom's package",
+    "master key set"
+   ],
+   [
+    "Groom's package",
+    "Master key set"
+   ],
+   [
+    "groom's party",
+    "landlord's units"
+   ],
+   [
+    "Groom's party",
+    "Landlord's units"
+   ],
+   [
+    "before the facial",
+    "before the master key"
+   ],
+   [
+    "Before the facial",
+    "Before the master key"
+   ],
+   [
+    "color and cut",
+    "antique lock repair"
+   ],
+   [
+    "Color and cut",
+    "Antique lock repair"
+   ],
+   [
+    "color correction",
+    "lock repair"
+   ],
+   [
+    "Color correction",
+    "Lock repair"
+   ],
+   [
+    "color station",
+    "key machine"
+   ],
+   [
+    "Color station",
+    "Key machine"
+   ],
+   [
+    "color",
+    "antique lock work"
+   ],
+   [
+    "Color",
+    "Antique lock work"
+   ],
+   [
+    "$25 consult",
+    "$25 bench check"
+   ],
+   [
+    "consults",
+    "bench checks"
+   ],
+   [
+    "Consults",
+    "Bench checks"
+   ],
+   [
+    "consult",
+    "bench check"
+   ],
+   [
+    "Consult",
+    "Bench check"
+   ],
+   [
+    "beard oil",
+    "key ring"
+   ],
+   [
+    "Beard oil",
+    "Key ring"
+   ],
+   [
+    "beard trim",
+    "key set"
+   ],
+   [
+    "Beard trim",
+    "Key set"
+   ],
+   [
+    "skin fade",
+    "car key copy"
+   ],
+   [
+    "Skin fade",
+    "Car key copy"
+   ],
+   [
+    "haircuts",
+    "rekeys"
+   ],
+   [
+    "Haircuts",
+    "Rekeys"
+   ],
+   [
+    "haircut",
+    "rekey"
+   ],
+   [
+    "Haircut",
+    "Rekey"
+   ],
+   [
+    "cut hair",
+    "make keys"
+   ],
+   [
+    "Cut hair",
+    "Make keys"
+   ],
+   [
+    "cuts hair",
+    "makes keys"
+   ],
+   [
+    "Cuts hair",
+    "Makes keys"
+   ],
+   [
+    "Whichever barber cuts",
+    "Whichever locksmith works"
+   ],
+   [
+    "a power cut",
+    "a power outage"
+   ],
+   [
+    "A power cut",
+    "A power outage"
+   ],
+   [
+    "shorter cut",
+    "shorter job"
+   ],
+   [
+    "Shorter cut",
+    "Shorter job"
+   ],
+   [
+    "had cuts",
+    "had keys made"
+   ],
+   [
+    "Had cuts",
+    "Had keys made"
+   ],
+   [
+    "cuts",
+    "rekeys"
+   ],
+   [
+    "Cuts",
+    "Rekeys"
+   ],
+   [
+    "cut",
+    "rekey"
+   ],
+   [
+    "Cut",
+    "Rekey"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "the chair is saved",
+    "the counter slot is saved"
+   ],
+   [
+    "The chair is saved",
+    "The counter slot is saved"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "Rents a chair",
+    "Rents a bench"
+   ],
+   [
+    "the group's chairs",
+    "the group's bench time"
+   ],
+   [
+    "The group's chairs",
+    "The group's bench time"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Chairs",
+    "Counter spots"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "Chair",
+    "Counter"
+   ],
+   [
+    "Jordan",
+    "Tomás"
+   ],
+   [
+    "Casey",
+    "Andre"
+   ],
+   [
+    "Riley",
+    "Marco"
+   ],
+   [
+    "Avery",
+    "Lena"
+   ],
+   [
+    "barbershops",
+    "lock shops"
+   ],
+   [
+    "barbershop",
+    "lock shop"
+   ],
+   [
+    "Barbershop",
+    "Lock shop"
+   ],
+   [
+    "hot towel shaves",
+    "rekeys"
+   ],
+   [
+    "hot towel",
+    "rekey"
+   ],
+   [
+    "shaves",
+    "rekeys"
+   ],
+   [
+    "shave",
+    "rekey"
+   ],
+   [
+    "Shave",
+    "Rekey"
+   ],
+   [
+    "perms",
+    "rekeys"
+   ],
+   [
+    "perm",
+    "rekey"
+   ],
+   [
+    "skin fades",
+    "key copies"
+   ],
+   [
+    "skin fade",
+    "key copy"
+   ],
+   [
+    "Skin fade",
+    "Key copy"
+   ]
+  ],
+  "B": [
+   [
+    "Why: a price the owner can plan for.",
+    "Why: a price the owner can plan."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds safe opening and repair to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Safe opening and repair for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW safe opening and repair"
+   ],
+   [
+    "Some jobs need a part on hand, like a new garbage disposal.",
+    "Some jobs need a part on hand, like a new high-security lock."
+   ],
+   [
+    "A customer wants a garbage disposal put in. Is one in stock?",
+    "A customer wants a high-security lock put in. Is one in stock?"
+   ],
+   [
+    "JP031552",
+    "LS031552"
+   ],
+   [
+    "MP045210",
+    "LK045210"
+   ],
+   [
+    "BS20981",
+    "KS20981"
+   ],
+   [
+    "EC22871",
+    "AL22871"
+   ],
+   [
+    "JE30417",
+    "AT30417"
+   ],
+   [
+    "BR41862",
+    "LS41862"
+   ],
+   [
+    "takes no cut of",
+    "takes no share of"
+   ],
+   [
+    "leehomeservices.com",
+    "leelockandkey.com"
+   ],
+   [
+    "photos of your hair",
+    "photos of the lock"
+   ],
+   [
+    "when the pipes are in",
+    "when the locks are in"
+   ],
+   [
+    "replacing the old pipes",
+    "replacing the worn locks"
+   ],
+   [
+    "Replace the old pipes",
+    "Replace the worn locks"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 bench check; priced at the bench"
+   ],
+   [
+    "A barbershop books kids cuts with a parent.",
+    "A key shop books adults only."
+   ],
+   [
+    "Plumbing, electrical and barbering need one, so Sam's three take the license step.",
+    "Locksmithing, alarm work and key work need one where the state licenses them. There, Sam's three take the license step."
+   ],
+   [
+    "Plumbing, electrical and barbering license each person, so Sam's four are checked.",
+    "Locksmithing, alarm work and key work license each person where the state does. There, Sam's four are checked."
+   ],
+   [
+    "Barbering pays the $2",
+    "Key work pays the $2"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a home or car lockout"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute security review"
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else, like antique locks"
+   ],
+   [
+    "Alex stays in the chair",
+    "Alex stays at the counter"
+   ],
+   [
+    "Plumbing has none here.",
+    "Locksmith work at a home or car always has one: the entry statement."
+   ],
+   [
+    "Say Alex's visit were a color, which only Riley does at the shop.",
+    "Say Alex's visit were antique lock work, which only Riley does at the shop."
+   ],
+   [
+    "A clogged drain that's overflowing may be.",
+    "A home lockout may be."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I'm locked out. Can someone come tonight?"
+   ],
+   [
+    "like an overflowing drain",
+    "like a home lockout"
+   ],
+   [
+    "the old heater hauled away Fri?",
+    "the spare keys ready Fri?"
+   ],
+   [
+    "like a burst pipe",
+    "like a lockout"
+   ],
+   [
+    "where barbering outside a shop is allowed",
+    "where lock work outside the shop is allowed"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of the work, never of a key? Yes / No"
+   ],
+   [
+    "Any scalp trouble Riley should know about?",
+    "Are both locks the same brand?"
+   ],
+   [
+    "Lee Home Services · Water heater leak",
+    "Lee Lock & Key · Car lockout"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Home lockout"
+   ],
+   [
+    "Old heater hauled away Fri, not Thu",
+    "Spare keys ready Fri, not Thu"
+   ],
+   [
+    "The old heater is hauled away Fri, not Thu",
+    "Your spare keys are ready Fri, not Thu"
+   ],
+   [
+    "Can you reach the water shut-off valve?",
+    "Are any of the locks smart locks?"
+   ],
+   [
+    "Is water backing up into the sink?",
+    "Do all the locks take the same key now?"
+   ],
+   [
+    "the $160 for the shutoff valves is refunded",
+    "the $160 for the deadbolt is refunded"
+   ],
+   [
+    "the shutoff valves",
+    "the back deadbolt"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me quedé fuera de mi carro."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'm locked out of my car."
+   ],
+   [
+    "Call summary: Rosa, in Spanish. Water is leaking from the water heater, and the valve is shut.",
+    "Call summary: Rosa, in Spanish. She's locked out of her car by a busy road, and she's safe."
+   ],
+   [
+    "Leak at the gas water heater · safety steps given",
+    "Car lockout by the road · safety steps given"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A locksmith's example: a car lockout by a busy road gets 'wait somewhere safe, away from traffic'."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I just moved in, and the old owners may still have keys. Can a locksmith rekey my locks Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Can a plumber flush my water heater Thursday morning? I'm in Springfield.",
+    "Can a locksmith put in my new smart lock Thursday morning? I'm in Springfield."
+   ],
+   [
+    "My water heater is old and rusty. Can a plumber replace it this week? I'm in Springfield.",
+    "My front door locks are old and loose. Can a locksmith put in high-security locks this week? I'm in Springfield."
+   ],
+   [
+    "There's a leak under my bathroom sink. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My back door lock sticks. Can a locksmith come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Lee Home Services asks: which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services asks: how many locks, and is each one a deadbolt or a knob lock?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Four: a deadbolt and a knob lock on the front and back doors."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric, and is it leaking?",
+    "Lee Home Services asks: how many doors, and what locks are on them now?"
+   ],
+   [
+    "Gas. It's rusty, but it isn't leaking.",
+    "Two doors. Old brass deadbolts, and one is loose."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric?",
+    "Lee Home Services asks: is the smart lock already bought, and is there Wi-Fi at the door?"
+   ],
+   [
+    "Electric.",
+    "Yes, a keypad deadbolt. Wi-Fi works there."
+   ],
+   [
+    "Lee Home Services asks: where is the leak, and is water still coming?",
+    "Lee Home Services asks: which lock sticks, and does the door still lock?"
+   ],
+   [
+    "Under the bathroom sink. I shut the valve.",
+    "The back door. It locks, but the key barely turns."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Do you have a working key for every lock?"
+   ],
+   [
+    "Yes, it won't drain at all.",
+    "Yes, one key for each door."
+   ],
+   [
+    "Where is the water heater: a garage, a closet or a basement?",
+    "Which doors get the new locks: the front, the back or the garage?"
+   ],
+   [
+    "In the garage.",
+    "The front door."
+   ],
+   [
+    "Is the pipe under the sink easy to reach?",
+    "Is the sticking lock on a wood door, with no glass next to it?"
+   ],
+   [
+    "Yes, the cabinet is empty.",
+    "Yes, it's a solid wood door."
+   ],
+   [
+    "The plug-in adds its own questions, like where the main water shut-off is.",
+    "The plug-in adds its own questions, like which doors have a lock to match."
+   ],
+   [
+    "like a new water heater",
+    "like a rekey or new locks"
+   ],
+   [
+    "A drain clearing needs no landlord's OK.",
+    "A lockout opening needs no landlord's OK, only proof Alex lives there."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I take the old locks off before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Please leave the locks on the doors."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the back door won't lock at all now."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone trying to get in, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The back door won't lock at all now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Block the back door shut from inside, and call 911 if anyone tries to get in."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor.",
+    "Alex texts that the front deadbolt won't lock at all now."
+   ],
+   [
+    "The water heater is leaking onto the floor now.",
+    "The front deadbolt won't lock at all now."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches.",
+    "Block the front door shut from inside, and call 911 if anyone tries to get in."
+   ],
+   [
+    "Nobody who does replacements is free sooner",
+    "Nobody who does high-security installs is free sooner"
+   ],
+   [
+    "Casey does drains, leaks and flushes, so he isn't offered for a replacement.",
+    "Casey does rekeys, repairs and smart locks, so he isn't offered for a high-security install."
+   ],
+   [
+    "Alex texts that the leak under the sink is worse.",
+    "Alex texts that the back door lock is worse."
+   ],
+   [
+    "The leak under the sink is much worse now.",
+    "The back door lock barely turns now."
+   ],
+   [
+    "Turn off the valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep the back door blocked shut from inside, and call 911 if anyone tries to get in."
+   ],
+   [
+    "the water jetter for Kim's yard drain is in for repair until Monday",
+    "the key machine for Kim's mailbox lock is in for repair until Monday"
+   ],
+   [
+    "Jetter in the shop until Mon",
+    "Key machine in for repair until Mon"
+   ],
+   [
+    "The plug-in names the checks, like the pipes under the sink and the cabinet floor.",
+    "The plug-in names the checks, like the door, its frame and the strike plate."
+   ],
+   [
+    "Under the sink, before",
+    "Back door, before"
+   ],
+   [
+    "BEFORE rust at the base of the water heater",
+    "BEFORE old deadbolts, worn and loose"
+   ],
+   [
+    "Water heater, before",
+    "Front door, before"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan finds why the lock sticks and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan found why the lock sticks. Here's the price to fix it today."
+   ],
+   [
+    "Jordan sees the water heater leaking at the base.",
+    "Jordan sees the front door frame split at the lock."
+   ],
+   [
+    "QUOTE 640 water heater leaking at the base, replace",
+    "QUOTE 640 high-security locks, frame split at the lock"
+   ],
+   [
+    "Old heater, leaking at the base",
+    "Split frame at the lock"
+   ],
+   [
+    "Its rating plate",
+    "The old lock"
+   ],
+   [
+    "Jordan quotes a new water heater for Alex M. from his photos",
+    "Jordan quotes high-security locks for Alex M. from his photos"
+   ],
+   [
+    "Jordan finds the main water line cracked.",
+    "Jordan finds the back door frame split."
+   ],
+   [
+    "QUOTE 900 main water line cracked, repair",
+    "QUOTE 900 back door frame split, repair"
+   ],
+   [
+    "Jordan quotes a main water line repair for Alex M.",
+    "Jordan quotes a door frame repair for Alex M."
+   ],
+   [
+    "Main water line repair · $900",
+    "Door frame repair · $900"
+   ],
+   [
+    "Found at Thu's water heater visit",
+    "Found at Thu's lock visit"
+   ],
+   [
+    "Jordan found that your water heater is leaking. Here's the price for a new one",
+    "Jordan found that your door frame is split at the lock. Here's the price for new locks"
+   ],
+   [
+    "Jordan found that your main water line is cracked.",
+    "Jordan found that your back door frame is split."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds loose wiring behind an old door alarm."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD loose wiring behind the door alarm, stopped"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found loose wiring behind your old door alarm and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: loose wiring behind the door alarm"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Loose wiring behind the door alarm"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the side door lock next to it"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call an electric contractor first"
+   ],
+   [
+    "a new water heater is delivered and set up",
+    "a new safe is delivered and set up"
+   ],
+   [
+    "DELIVERED water heater set up",
+    "DELIVERED safe set up"
+   ],
+   [
+    "New water heater, set up",
+    "New safe, set up"
+   ],
+   [
+    "Your new water heater is in. Please check it and sign for it.",
+    "Your new safe is in. Please check it and sign for it."
+   ],
+   [
+    "Delivery · Water heater",
+    "Delivery · Safe"
+   ],
+   [
+    "Before DONE, Jordan runs the water with Alex and checks for drips.",
+    "Before DONE, Jordan tries each new key with Alex, in every lock."
+   ],
+   [
+    "Here: the drain runs clear, and nothing drips.",
+    "Here: every key turns smoothly, and each door locks."
+   ],
+   [
+    "Jordan and Alex check the water heater together.",
+    "Jordan and Alex check the new locks together."
+   ],
+   [
+    "Here: the heater runs, the hot water is hot, and nothing drips.",
+    "Here: each key turns smoothly, and each door locks."
+   ],
+   [
+    "Here: the water runs, and nothing drips under the sink.",
+    "Here: the back door locks, and the key turns smoothly."
+   ],
+   [
+    "The drain runs clear.",
+    "Every new key works."
+   ],
+   [
+    "The leak is fixed.",
+    "The back door lock is fixed."
+   ],
+   [
+    "DONE 640 water heater, parts 45 expansion tank",
+    "DONE 640 high-security locks, parts 45 strike plates"
+   ],
+   [
+    "DONE 640 water heater",
+    "DONE 640 high-security locks"
+   ],
+   [
+    "NOTE heavy sediment in the tank. Flush again in 12 months.",
+    "NOTE smart lock battery at 80%. Check again in 12 months."
+   ],
+   [
+    "NOTE new 50-gallon heater in the garage. Old one hauled away.",
+    "NOTE new high-security deadbolts, front and back. Old ones taken away."
+   ],
+   [
+    "NOTE new shutoff valve and supply line under the kitchen sink.",
+    "NOTE new deadbolt and strike plate on the back door."
+   ],
+   [
+    "DONE 179 drain, parts 38 trap",
+    "DONE 179 rekey, parts 38 pins"
+   ],
+   [
+    "Alex M.: $179 drain + $38 parts",
+    "Alex M.: $179 rekey + $38 parts"
+   ],
+   [
+    "DONE 150 water heater flush, parts 12 drain valve",
+    "DONE 150 smart lock install, parts 12 batteries"
+   ],
+   [
+    "Alex M.: $640 water heater + $45 parts",
+    "Alex M.: $640 high-security locks + $45 parts"
+   ],
+   [
+    "DONE 245 leak, parts 18 fittings",
+    "DONE 245 lock repair, parts 18 pins"
+   ],
+   [
+    "valve work",
+    "deadbolt work"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A rekeyed lock sticks 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My front door lock sticks again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s rekey, done Thu Oct 22, sticks again."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your rekey is under warranty"
+   ],
+   [
+    "The new water heater drips at a fitting 2 weeks later.",
+    "A new deadbolt sticks 2 weeks later."
+   ],
+   [
+    "My new water heater is dripping at a fitting.",
+    "My new deadbolt sticks."
+   ],
+   [
+    "Alex M.'s new water heater, put in Thu Oct 22, is dripping at a fitting.",
+    "Alex M.'s new deadbolt, put in Thu Oct 22, sticks."
+   ],
+   [
+    "Your water heater is under warranty",
+    "Your new lock is under warranty"
+   ],
+   [
+    "The heater's drain valve drips 2 weeks after the flush.",
+    "The smart lock drops off the Wi-Fi 2 weeks after the install."
+   ],
+   [
+    "My water heater's drain valve is dripping since the flush.",
+    "My smart lock keeps dropping off the Wi-Fi."
+   ],
+   [
+    "Alex M.'s water heater, flushed Thu Oct 22, is dripping at the drain valve.",
+    "Alex M.'s smart lock, put in Thu Oct 22, keeps dropping off the Wi-Fi."
+   ],
+   [
+    "The leak comes back 2 weeks later.",
+    "The back door lock sticks again 2 weeks later."
+   ],
+   [
+    "The leak under my sink is back.",
+    "My back door lock sticks again."
+   ],
+   [
+    "Alex M.'s leak repair from Thu Oct 22 is dripping again.",
+    "Alex M.'s lock repair from Thu Oct 22 sticks again."
+   ],
+   [
+    "Checks the fan; releases the hold",
+    "Checks the lockbox; releases the hold"
+   ],
+   [
+    "Jordan left a drying fan after a leak.",
+    "Jordan left a loaner lockbox with spare keys after the rekey."
+   ],
+   [
+    "A fan left at the visit: Jordan asks first.",
+    "A lockbox left at the visit: Jordan asks first."
+   ],
+   [
+    "or the fan isn't left",
+    "or the lockbox isn't left"
+   ],
+   [
+    "Tips for your drain: run hot water for a minute after washing dishes, and skip store-bought drain cleaners. If it slows again, reply here.",
+    "Tips for your new keys: try each one this week. If a lock feels stiff, use graphite, not oil. If one sticks, reply here."
+   ],
+   [
+    "Tips for your water heater: keep the space around it clear, and check for drips this week. If you see water or lose hot water, reply here.",
+    "Tips for your new locks: keep the spare keys somewhere safe, and test each door this week. If a lock sticks, reply here."
+   ],
+   [
+    "Tips after your leak repair: check under the sink for drips tomorrow, and don't store heavy things on the pipes. If it drips again, reply here.",
+    "Tips after your lock repair: lock and unlock the back door a few times tomorrow. If it sticks again, reply here."
+   ],
+   [
+    "It's a leak under the sink, today 3 to 5pm with Jordan.",
+    "It's a back door lock that sticks, today 3 to 5pm with Jordan."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Rekeys, repairs, smart lock installs"
+   ],
+   [
+    "Outlet or switch replaced",
+    "Door sensor added"
+   ],
+   [
+    "panel upgrade",
+    "alarm panel upgrade"
+   ],
+   [
+    "Panel upgrade",
+    "Alarm panel upgrade"
+   ],
+   [
+    "The Groom's package at Lee's Barbershop is $140",
+    "The master key set is $140"
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Master key set (up to 6 locks)"
+   ],
+   [
+    "the Groom's package",
+    "the master key set"
+   ],
+   [
+    "1:00 Groom's package",
+    "1:00 master key set"
+   ],
+   [
+    "2½-hour Groom's package",
+    "2½-hour master key set"
+   ],
+   [
+    "2:00pm Groom's package",
+    "2:00pm master key set"
+   ],
+   [
+    "Your Groom's package",
+    "Your master key set"
+   ],
+   [
+    "Sat Oct 31 Groom's package",
+    "Sat Oct 31 master key set"
+   ],
+   [
+    "a Kids cut",
+    "a mailbox lock rekey"
+   ],
+   [
+    "The Groom's package",
+    "The master key set"
+   ],
+   [
+    "a Groom's package",
+    "a master key set"
+   ],
+   [
+    "11:00am Groom's package",
+    "11:00am master key set"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 master key set"
+   ],
+   [
+    "tomorrow's Groom's package",
+    "tomorrow's master key set"
+   ],
+   [
+    "today's Groom's package",
+    "today's master key set"
+   ],
+   [
+    "your Groom's package",
+    "your master key set"
+   ],
+   [
+    "Deposit, Groom's package",
+    "Deposit, master key set"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many trades are licensed to work only at their own shop"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A rekey could mean the key shop's counter or a locksmith at home."
+   ],
+   [
+    "Add photos of your hair, and a barber will price it",
+    "Add photos of your lock and key, and a locksmith will price it"
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut",
+    "Add photos of your lock and key, and a locksmith will price your antique lock repair"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Riley sees the lock"
+   ],
+   [
+    "Riley looks at Alex's hair and texts a price",
+    "Riley looks at Alex's lock and texts a price"
+   ],
+   [
+    "can cut your hair at the shop",
+    "can rekey your locks at the shop"
+   ],
+   [
+    "Here: a beard trim too, or just the cut? Long hair can take longer.",
+    "Here: how many locks, and if spare keys are wanted too. More locks take longer."
+   ],
+   [
+    "If it's for a child, the kids cut is picked here, so the times fit it.",
+    "If it's a mailbox lock, that's picked here, so the times fit it."
+   ],
+   [
+    "Just the haircut, or a beard trim too?",
+    "How many locks, and do you want spare keys too?"
+   ],
+   [
+    "Just the haircut.",
+    "Two locks. No spare keys."
+   ],
+   [
+    "How long is your beard now? A long beard takes longer.",
+    "How many doors are in the building? More locks take longer."
+   ],
+   [
+    "About an inch.",
+    "Six doors."
+   ],
+   [
+    "Is your beard longer than an inch? A long beard takes longer.",
+    "Is the key's card with you? A key with no card takes longer."
+   ],
+   [
+    "No, it's short.",
+    "Yes, I have it here."
+   ],
+   [
+    "Is your hair past your shoulders? Longer hair takes more time.",
+    "Do you have the lock's key? A lock with no key takes more time."
+   ],
+   [
+    "Was the color done at a salon, or at home?",
+    "Has anyone taken the lock apart before?"
+   ],
+   [
+    "At home.",
+    "No, never."
+   ],
+   [
+    "Just a trim on top.",
+    "Two front-door locks. Please key them alike."
+   ],
+   [
+    "Keep the beard short.",
+    "Six office doors, one master key."
+   ],
+   [
+    "Short on the sides.",
+    "The key card is with me."
+   ],
+   [
+    "Like the color in my photos.",
+    "Like the brass finish in my photos."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a landlord's units together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across",
+    "A landlord books rekeys for five units on one morning. Rosie finds bench time side by side across"
+   ],
+   [
+    "Here, the color for a color and cut.",
+    "Here, the brass parts for an antique lock repair."
+   ],
+   [
+    "A patch test is a small skin test for a reaction to hair dye.",
+    "A key card check: Alex shows the key's card and a photo ID before a restricted key is ordered."
+   ],
+   [
+    "a color needs its patch test",
+    "a restricted key needs its key card check"
+   ],
+   [
+    "Say Alex has a scalp rash that gets worse before the visit.",
+    "Say the front door lock jams before the visit, and the door won't lock."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My front door won't lock now. Can I still come in Saturday?"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Riley suggests moving your visit, with no fee. For tonight, call the shop about a house call."
+   ],
+   [
+    "For a cut, that's the skin and scalp.",
+    "For a rekey, that's each lock's finish and how its key turns."
+   ],
+   [
+    "Before the cut: an old scar on Alex's crown, left side.",
+    "Before the rekey: scratches on the front lock's face."
+   ],
+   [
+    "Crown, before the cut",
+    "Front lock, before"
+   ],
+   [
+    "A skin problem stops the work",
+    "A worn lock stops the work"
+   ],
+   [
+    "It names the kind of pro to see, like a doctor, never a named one.",
+    "It names the kind of pro to see, like a door installer, never a named one."
+   ],
+   [
+    "Before Alex pays, Riley shows the cut in the mirror.",
+    "Before Alex pays, Riley tries each new key in its lock with Alex."
+   ],
+   [
+    "like a skin-test result",
+    "like a key code, which stays private"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 2 front-door locks, keyed alike, 4 keys made"
+   ],
+   [
+    "DONE 140 grooms package",
+    "DONE 140 master key set"
+   ],
+   [
+    "Sends aftercare; hears any reaction",
+    "Sends care tips; hears of any problem"
+   ],
+   [
+    "The plug-in's aftercare notes go out after the visit. A reaction Alex reports is checked for danger first.",
+    "The plug-in's care tips go out after the visit. A problem Alex reports is checked for danger first."
+   ],
+   [
+    "Aftercare for today's visit",
+    "Care tips for today's visit"
+   ],
+   [
+    "How to care for your skin and hair",
+    "How to care for your new keys and locks"
+   ],
+   [
+    "Aftercare and reactions",
+    "Care tips and problems"
+   ],
+   [
+    "It adds any way to get ready from the plug-in. A barbershop has none.",
+    "It adds any way to get ready from the plug-in: bring the locks, and a working key."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "At the shop's counter they're rare. Most come with lockouts, in the other flow."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A key shop's plug-in adds one: a child or a pet locked in a car means 911 first."
+   ],
+   [
+    "A haircut needs nothing.",
+    "A rekey needs the locks, and a working key if Alex has one."
+   ],
+   [
+    "Color is priced for each customer, so Sam OKs each color quote, like Riley's $90 color and cut from photos.",
+    "Old locks are priced one by one, so Sam OKs each quote, like Riley's $90 antique lock repair from photos."
+   ],
+   [
+    "Color is priced for each customer, so Sam OKs each color quote, like the color correction price Riley sets at the chair.",
+    "Old locks are priced one by one, so Sam OKs each quote, like the lock repair price Riley sets at the chair."
+   ],
+   [
+    "Color is priced for each customer",
+    "Antique lock work is priced for each customer"
+   ],
+   [
+    "A color quote",
+    "An antique lock quote"
+   ],
+   [
+    "color quotes",
+    "antique lock quotes"
+   ],
+   [
+    "color quote",
+    "antique lock quote"
+   ],
+   [
+    "Color services",
+    "Antique lock services"
+   ],
+   [
+    "color services",
+    "antique lock services"
+   ],
+   [
+    "color and house calls",
+    "antique locks and house calls"
+   ],
+   [
+    "service, color, house calls",
+    "service, antique locks, house calls"
+   ],
+   [
+    "but color",
+    "but antique locks"
+   ],
+   [
+    "does color",
+    "does antique locks"
+   ],
+   [
+    "for a color,",
+    "for an antique lock repair,"
+   ],
+   [
+    "the color Riley can't do",
+    "the antique lock work Riley can't do"
+   ],
+   [
+    "suggests a different color",
+    "suggests a different repair"
+   ],
+   [
+    "Your new color plan",
+    "Your new repair plan"
+   ],
+   [
+    "your Sat Oct 31 color.",
+    "your Sat Oct 31 repair."
+   ],
+   [
+    "The color ordered for Dana's visit is late.",
+    "The parts ordered for Dana's visit are late."
+   ],
+   [
+    "The color I ordered for Dana R. comes Mon Nov 2",
+    "The parts I ordered for Dana R. come Mon Nov 2"
+   ],
+   [
+    "The color Riley ordered for your Sat Oct 31 visit arrives Mon Nov 2.",
+    "The parts Riley ordered for your Sat Oct 31 visit arrive Mon Nov 2."
+   ],
+   [
+    "color-correction session",
+    "lock repair visit"
+   ],
+   [
+    "leave before the color",
+    "leave before the repair"
+   ],
+   [
+    "the color costs more since then",
+    "the brass parts cost more since then"
+   ],
+   [
+    "Supplier invoice: color +$20",
+    "Supplier invoice: brass parts +$20"
+   ],
+   [
+    "Color always stays with",
+    "Antique lock work always stays with"
+   ],
+   [
+    "a color and cut",
+    "an antique lock repair"
+   ],
+   [
+    "A color and cut",
+    "An antique lock repair"
+   ],
+   [
+    "patch tests",
+    "key card checks"
+   ],
+   [
+    "patch test",
+    "key card check"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Lock & Key's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Lock & Key"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Key Shop"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Locks"
+   ],
+   [
+    "Lee Electric",
+    "Lee Alarms"
+   ],
+   [
+    "1200 Main St",
+    "510 Main St"
+   ],
+   [
+    "88 Elm St",
+    "64 Elm St"
+   ],
+   [
+    "42 Oak St",
+    "27 Oak St"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Locksmithing, Alarms, Key shop"
+   ],
+   [
+    "plumbing and electrical work",
+    "locksmithing and alarm work"
+   ],
+   [
+    "plumbing and electrical",
+    "locksmithing and alarm work"
+   ],
+   [
+    "Plumbing and electrical work",
+    "Locksmithing and alarm work"
+   ],
+   [
+    "Plumbing and electrical",
+    "Locksmithing and alarm work"
+   ],
+   [
+    "plumbing + electrical",
+    "locksmithing + alarm work"
+   ],
+   [
+    "Plumbing + electrical",
+    "Locksmithing + alarm work"
+   ],
+   [
+    "Reads back plumbing's money, service by service",
+    "Reads back locksmith money, service by service"
+   ],
+   [
+    "plumbing visit",
+    "locksmith visit"
+   ],
+   [
+    "Plumbing visit",
+    "Locksmith visit"
+   ],
+   [
+    "plumbing service",
+    "locksmith service"
+   ],
+   [
+    "Plumbing service",
+    "Locksmith service"
+   ],
+   [
+    "plumbing job",
+    "locksmith job"
+   ],
+   [
+    "Plumbing job",
+    "Locksmith job"
+   ],
+   [
+    "plumbing license",
+    "locksmith license"
+   ],
+   [
+    "Plumbing license",
+    "Locksmith license"
+   ],
+   [
+    "plumbing plug-in",
+    "locksmith plug-in"
+   ],
+   [
+    "Plumbing plug-in",
+    "Locksmith plug-in"
+   ],
+   [
+    "plumbing price list",
+    "locksmith price list"
+   ],
+   [
+    "Plumbing price list",
+    "Locksmith price list"
+   ],
+   [
+    "plumbing prices",
+    "locksmith prices"
+   ],
+   [
+    "Plumbing prices",
+    "Locksmith prices"
+   ],
+   [
+    "plumbing",
+    "locksmithing"
+   ],
+   [
+    "Plumbing",
+    "Locksmithing"
+   ],
+   [
+    "plumbers",
+    "locksmiths"
+   ],
+   [
+    "Plumbers",
+    "Locksmiths"
+   ],
+   [
+    "plumber",
+    "locksmith"
+   ],
+   [
+    "Plumber",
+    "Locksmith"
+   ],
+   [
+    "electricians",
+    "alarm techs"
+   ],
+   [
+    "Electricians",
+    "Alarm techs"
+   ],
+   [
+    "electrician",
+    "alarm tech"
+   ],
+   [
+    "Electrician",
+    "Alarm tech"
+   ],
+   [
+    "electrical license",
+    "alarm license"
+   ],
+   [
+    "Electrical license",
+    "Alarm license"
+   ],
+   [
+    "electrical form",
+    "alarm form"
+   ],
+   [
+    "Electrical form",
+    "Alarm form"
+   ],
+   [
+    "electrical",
+    "alarm work"
+   ],
+   [
+    "Electrical",
+    "Alarm work"
+   ],
+   [
+    "barbershop",
+    "key shop"
+   ],
+   [
+    "Barbershop",
+    "Key shop"
+   ],
+   [
+    "barbers",
+    "locksmiths"
+   ],
+   [
+    "Barbers",
+    "Locksmiths"
+   ],
+   [
+    "whichever barber cuts",
+    "whichever locksmith works"
+   ],
+   [
+    "barber",
+    "locksmith"
+   ],
+   [
+    "Barber",
+    "Locksmith"
+   ],
+   [
+    "kitchen drain clearing",
+    "whole-home rekey"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Whole-home rekey"
+   ],
+   [
+    "kitchen drain cleared",
+    "whole home rekeyed"
+   ],
+   [
+    "Kitchen drain cleared",
+    "Whole home rekeyed"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE back door strike is out of line. Bring a new strike plate next time."
+   ],
+   [
+    "the kitchen drain",
+    "the home's locks"
+   ],
+   [
+    "The kitchen drain",
+    "The home's locks"
+   ],
+   [
+    "my kitchen drain is clogged",
+    "I just moved in and need my locks rekeyed"
+   ],
+   [
+    "My kitchen drain is clogged",
+    "I just moved in and need my locks rekeyed"
+   ],
+   [
+    "yard drain clearing",
+    "mailbox lock rekey"
+   ],
+   [
+    "Yard drain clearing",
+    "Mailbox lock rekey"
+   ],
+   [
+    "kitchen drain",
+    "whole-home rekey"
+   ],
+   [
+    "Kitchen drain",
+    "Whole-home rekey"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 office lock system"
+   ],
+   [
+    "A $2,400 repipe",
+    "A $2,400 office lock system"
+   ],
+   [
+    "repipe",
+    "office lock system"
+   ],
+   [
+    "Repipe",
+    "Office lock system"
+   ],
+   [
+    "cleared yard drain",
+    "rekeyed mailbox lock"
+   ],
+   [
+    "Cleared yard drain",
+    "Rekeyed mailbox lock"
+   ],
+   [
+    "yard drain",
+    "mailbox lock"
+   ],
+   [
+    "Yard drain",
+    "Mailbox lock"
+   ],
+   [
+    "drain clearing",
+    "whole-home rekey"
+   ],
+   [
+    "Drain clearing",
+    "Whole-home rekey"
+   ],
+   [
+    "clear the drain",
+    "rekey the locks"
+   ],
+   [
+    "Clear the drain",
+    "Rekey the locks"
+   ],
+   [
+    "does drains",
+    "does rekeys"
+   ],
+   [
+    "Does drains",
+    "Does rekeys"
+   ],
+   [
+    "Note: the sink is full and won't drain.",
+    "Note: front and back doors, keyed alike."
+   ],
+   [
+    "the sink is full and won't drain",
+    "front and back doors, keyed alike"
+   ],
+   [
+    "The sink is full and won't drain",
+    "Front and back doors, keyed alike"
+   ],
+   [
+    "drain trap",
+    "door closer"
+   ],
+   [
+    "Drain trap",
+    "Door closer"
+   ],
+   [
+    "drain valve",
+    "battery cover"
+   ],
+   [
+    "Drain valve",
+    "Battery cover"
+   ],
+   [
+    "drain snake and a camera",
+    "pinning kit and key blanks"
+   ],
+   [
+    "Drain snake and a camera",
+    "Pinning kit and key blanks"
+   ],
+   [
+    "a clogged drain",
+    "a rekey"
+   ],
+   [
+    "A clogged drain",
+    "A rekey"
+   ],
+   [
+    "drain is clogged again",
+    "lock sticks again"
+   ],
+   [
+    "Drain is clogged again",
+    "Lock sticks again"
+   ],
+   [
+    "drain is clogged",
+    "lock is jammed"
+   ],
+   [
+    "Drain is clogged",
+    "Lock is jammed"
+   ],
+   [
+    "drain clogs again",
+    "lock sticks again"
+   ],
+   [
+    "Drain clogs again",
+    "Lock sticks again"
+   ],
+   [
+    "drains",
+    "rekeys"
+   ],
+   [
+    "Drains",
+    "Rekeys"
+   ],
+   [
+    "drain",
+    "rekey"
+   ],
+   [
+    "Drain",
+    "Rekey"
+   ],
+   [
+    "$89 service call fee",
+    "$89 trip fee"
+   ],
+   [
+    "$89 service call",
+    "$89 trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service calls",
+    "trip fees"
+   ],
+   [
+    "Service calls",
+    "Trip fees"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "Gas water heater, in the garage.",
+    "Two high-security deadbolts, front and back."
+   ],
+   [
+    "Electric water heater, in the garage.",
+    "Smart lock for the front door. Wi-Fi works there."
+   ],
+   [
+    "water heater replacement",
+    "high-security lock install"
+   ],
+   [
+    "Water heater replacement",
+    "High-security lock install"
+   ],
+   [
+    "water heater flushes",
+    "smart lock installs"
+   ],
+   [
+    "Water heater flushes",
+    "Smart lock installs"
+   ],
+   [
+    "water heater flush",
+    "smart lock install"
+   ],
+   [
+    "Water heater flush",
+    "Smart lock install"
+   ],
+   [
+    "flush your water heater",
+    "install your smart lock"
+   ],
+   [
+    "Flush your water heater",
+    "Install your smart lock"
+   ],
+   [
+    "flush my water heater",
+    "install my smart lock"
+   ],
+   [
+    "Flush my water heater",
+    "Install my smart lock"
+   ],
+   [
+    "replaces water heaters",
+    "installs high-security locks"
+   ],
+   [
+    "Replaces water heaters",
+    "Installs high-security locks"
+   ],
+   [
+    "replace your water heater",
+    "put in high-security locks"
+   ],
+   [
+    "Replace your water heater",
+    "Put in high-security locks"
+   ],
+   [
+    "a new water heater",
+    "new locks"
+   ],
+   [
+    "A new water heater",
+    "New locks"
+   ],
+   [
+    "new water heater is in",
+    "new locks are in"
+   ],
+   [
+    "New water heater is in",
+    "New locks are in"
+   ],
+   [
+    "the new water heater",
+    "the new locks"
+   ],
+   [
+    "The new water heater",
+    "The new locks"
+   ],
+   [
+    "new water heater",
+    "new locks"
+   ],
+   [
+    "New water heater",
+    "New locks"
+   ],
+   [
+    "water heaters",
+    "high-security locks"
+   ],
+   [
+    "Water heaters",
+    "High-security locks"
+   ],
+   [
+    "my water heater is old",
+    "my front door locks are old"
+   ],
+   [
+    "My water heater is old",
+    "My front door locks are old"
+   ],
+   [
+    "water heater",
+    "lock"
+   ],
+   [
+    "Water heater",
+    "Lock"
+   ],
+   [
+    "flush plan",
+    "lock check plan"
+   ],
+   [
+    "Flush plan",
+    "Lock check plan"
+   ],
+   [
+    "flush again in",
+    "check again in"
+   ],
+   [
+    "Flush again in",
+    "Check again in"
+   ],
+   [
+    "leaks and flushes",
+    "repairs and installs"
+   ],
+   [
+    "Leaks and flushes",
+    "Repairs and installs"
+   ],
+   [
+    "flushed",
+    "installed"
+   ],
+   [
+    "Flushed",
+    "Installed"
+   ],
+   [
+    "flushes",
+    "installs"
+   ],
+   [
+    "Flushes",
+    "Installs"
+   ],
+   [
+    "flush",
+    "install"
+   ],
+   [
+    "Flush",
+    "Install"
+   ],
+   [
+    "sewer camera inspection",
+    "lock audit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Lock audit"
+   ],
+   [
+    "sewer camera report",
+    "lock audit report"
+   ],
+   [
+    "Sewer camera report",
+    "Lock audit report"
+   ],
+   [
+    "ran a sewer camera at the visit, like the $199 inspection",
+    "ran a lock audit at the visit, like the $199 audit"
+   ],
+   [
+    "Ran a sewer camera at the visit, like the $199 inspection",
+    "Ran a lock audit at the visit, like the $199 audit"
+   ],
+   [
+    "run a camera down my sewer line?",
+    "check every lock and window latch too?"
+   ],
+   [
+    "Run a camera down my sewer line?",
+    "Check every lock and window latch too?"
+   ],
+   [
+    "camera report",
+    "lock audit report"
+   ],
+   [
+    "Camera report",
+    "Lock audit report"
+   ],
+   [
+    "camera inspections",
+    "lock audits"
+   ],
+   [
+    "Camera inspections",
+    "Lock audits"
+   ],
+   [
+    "camera inspection",
+    "lock audit"
+   ],
+   [
+    "Camera inspection",
+    "Lock audit"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Tomás's notes"
+   ],
+   [
+    "bring the camera next time",
+    "bring a new strike plate next time"
+   ],
+   [
+    "Bring the camera next time",
+    "Bring a new strike plate next time"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes:",
+    "NOTE back door strike is out of line."
+   ],
+   [
+    "Note: Leak under the bathroom sink. The valve is shut.",
+    "Note: the back door lock sticks. The key won't turn."
+   ],
+   [
+    "Leak under the bathroom sink. The valve is shut.",
+    "The back door lock sticks. The key won't turn."
+   ],
+   [
+    "there's a leak under my bathroom sink",
+    "my back door lock sticks"
+   ],
+   [
+    "There's a leak under my bathroom sink",
+    "My back door lock sticks"
+   ],
+   [
+    "a roof leak",
+    "a roof repair"
+   ],
+   [
+    "A roof leak",
+    "A roof repair"
+   ],
+   [
+    "leak repair",
+    "lock repair"
+   ],
+   [
+    "Leak repair",
+    "Lock repair"
+   ],
+   [
+    "if anything leaks",
+    "if anything sticks"
+   ],
+   [
+    "If anything leaks",
+    "If anything sticks"
+   ],
+   [
+    "if it leaks again",
+    "if it sticks again"
+   ],
+   [
+    "If it leaks again",
+    "If it sticks again"
+   ],
+   [
+    "is it leaking",
+    "is it stuck"
+   ],
+   [
+    "Is it leaking",
+    "Is it stuck"
+   ],
+   [
+    "it isn't leaking",
+    "it isn't stuck"
+   ],
+   [
+    "It isn't leaking",
+    "It isn't stuck"
+   ],
+   [
+    "the leak",
+    "the stuck lock"
+   ],
+   [
+    "The leak",
+    "The stuck lock"
+   ],
+   [
+    "a leak",
+    "a stuck lock"
+   ],
+   [
+    "A leak",
+    "A stuck lock"
+   ],
+   [
+    "leaking",
+    "sticking"
+   ],
+   [
+    "Leaking",
+    "Sticking"
+   ],
+   [
+    "leaks",
+    "lock problems"
+   ],
+   [
+    "Leaks",
+    "Lock problems"
+   ],
+   [
+    "leak",
+    "lock problem"
+   ],
+   [
+    "Leak",
+    "Lock problem"
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "replace the back deadbolt, too worn to rekey"
+   ],
+   [
+    "Replace both shutoff valves, corroded",
+    "Replace the back deadbolt, too worn to rekey"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the back deadbolt"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the back deadbolt"
+   ],
+   [
+    "finds corroded shutoff valves",
+    "finds the back deadbolt too worn to rekey"
+   ],
+   [
+    "Finds corroded shutoff valves",
+    "Finds the back deadbolt too worn to rekey"
+   ],
+   [
+    "both shutoff valves",
+    "the back deadbolt"
+   ],
+   [
+    "Both shutoff valves",
+    "The back deadbolt"
+   ],
+   [
+    "two shutoff valves",
+    "the back deadbolt"
+   ],
+   [
+    "Two shutoff valves",
+    "The back deadbolt"
+   ],
+   [
+    "shutoff valve",
+    "new deadbolt"
+   ],
+   [
+    "Shutoff valve",
+    "New deadbolt"
+   ],
+   [
+    "valve quote",
+    "deadbolt quote"
+   ],
+   [
+    "Valve quote",
+    "Deadbolt quote"
+   ],
+   [
+    "valve 165 supply line 80",
+    "deadbolt 165 strike plate 80"
+   ],
+   [
+    "Valve 165 supply line 80",
+    "Deadbolt 165 strike plate 80"
+   ],
+   [
+    "supply line",
+    "strike plate"
+   ],
+   [
+    "Supply line",
+    "Strike plate"
+   ],
+   [
+    "the cold-water valve",
+    "the door"
+   ],
+   [
+    "The cold-water valve",
+    "The door"
+   ],
+   [
+    "valves",
+    "locks"
+   ],
+   [
+    "Valves",
+    "Locks"
+   ],
+   [
+    "valve",
+    "lock"
+   ],
+   [
+    "Valve",
+    "Lock"
+   ],
+   [
+    "clear the cabinet under the sink",
+    "have your photo ID and proof of address ready"
+   ],
+   [
+    "Clear the cabinet under the sink",
+    "Have your photo ID and proof of address ready"
+   ],
+   [
+    "clearing the cabinet under the sink",
+    "having a photo ID and proof of address ready"
+   ],
+   [
+    "Clearing the cabinet under the sink",
+    "Having a photo ID and proof of address ready"
+   ],
+   [
+    "old water stain on the cabinet floor",
+    "old scratches on the door frame"
+   ],
+   [
+    "Old water stain on the cabinet floor",
+    "Old scratches on the door frame"
+   ],
+   [
+    "cabinet floor",
+    "door frame"
+   ],
+   [
+    "Cabinet floor",
+    "Door frame"
+   ],
+   [
+    "under the sink",
+    "at the back door"
+   ],
+   [
+    "Under the sink",
+    "At the back door"
+   ],
+   [
+    "the bathroom sink",
+    "the back door"
+   ],
+   [
+    "The bathroom sink",
+    "The back door"
+   ],
+   [
+    "my bathroom sink",
+    "my back door lock"
+   ],
+   [
+    "My bathroom sink",
+    "My back door lock"
+   ],
+   [
+    "the kitchen sink",
+    "the front door"
+   ],
+   [
+    "The kitchen sink",
+    "The front door"
+   ],
+   [
+    "dripping kitchen faucet",
+    "worn back door lock"
+   ],
+   [
+    "Dripping kitchen faucet",
+    "Worn back door lock"
+   ],
+   [
+    "a dripping faucet",
+    "a worn lock"
+   ],
+   [
+    "A dripping faucet",
+    "A worn lock"
+   ],
+   [
+    "faucet",
+    "lock cylinder"
+   ],
+   [
+    "Faucet",
+    "Lock cylinder"
+   ],
+   [
+    "a drying fan",
+    "a loaner lockbox"
+   ],
+   [
+    "A drying fan",
+    "A loaner lockbox"
+   ],
+   [
+    "drying fan",
+    "loaner lockbox"
+   ],
+   [
+    "Drying fan",
+    "Loaner lockbox"
+   ],
+   [
+    "rented fan",
+    "loaner lockbox"
+   ],
+   [
+    "Rented fan",
+    "Loaner lockbox"
+   ],
+   [
+    "ceiling fan installed",
+    "door alarm installed"
+   ],
+   [
+    "Ceiling fan installed",
+    "Door alarm installed"
+   ],
+   [
+    "the fan",
+    "the lockbox"
+   ],
+   [
+    "The fan",
+    "The lockbox"
+   ],
+   [
+    "vent pipe",
+    "strike plate"
+   ],
+   [
+    "Vent pipe",
+    "Strike plate"
+   ],
+   [
+    "new pipes",
+    "new locks"
+   ],
+   [
+    "New pipes",
+    "New locks"
+   ],
+   [
+    "expansion tank",
+    "door closer"
+   ],
+   [
+    "Expansion tank",
+    "Door closer"
+   ],
+   [
+    "clogs again",
+    "sticks again"
+   ],
+   [
+    "Clogs again",
+    "Sticks again"
+   ],
+   [
+    "clogged",
+    "stuck"
+   ],
+   [
+    "Clogged",
+    "Stuck"
+   ],
+   [
+    "kids cut (12 and under)",
+    "mailbox lock rekey"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Mailbox lock rekey"
+   ],
+   [
+    "kids cuts",
+    "mailbox lock rekeys"
+   ],
+   [
+    "Kids cuts",
+    "Mailbox lock rekeys"
+   ],
+   [
+    "kids cut",
+    "mailbox lock rekey"
+   ],
+   [
+    "Kids cut",
+    "Mailbox lock rekey"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "high-security key copy"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "High-security key copy"
+   ],
+   [
+    "signature cut and shave",
+    "high-security key copy"
+   ],
+   [
+    "Signature cut and shave",
+    "High-security key copy"
+   ],
+   [
+    "signature cut",
+    "high-security key copy"
+   ],
+   [
+    "Signature cut",
+    "High-security key copy"
+   ],
+   [
+    "the hot towel shave",
+    "the key card check"
+   ],
+   [
+    "The hot towel shave",
+    "The key card check"
+   ],
+   [
+    "the hot towel part of",
+    "the key card part of"
+   ],
+   [
+    "The hot towel part of",
+    "The key card part of"
+   ],
+   [
+    "hot towel shave",
+    "high-security key copy"
+   ],
+   [
+    "Hot towel shave",
+    "High-security key copy"
+   ],
+   [
+    "towel steamer",
+    "key machine"
+   ],
+   [
+    "Towel steamer",
+    "Key machine"
+   ],
+   [
+    "groom's packages",
+    "master key sets"
+   ],
+   [
+    "Groom's packages",
+    "Master key sets"
+   ],
+   [
+    "groom's package (cut, shave, facial; 2½ hours)",
+    "master key set (2½ hours)"
+   ],
+   [
+    "Groom's package (cut, shave, facial; 2½ hours)",
+    "Master key set (2½ hours)"
+   ],
+   [
+    "groom's package",
+    "master key set"
+   ],
+   [
+    "Groom's package",
+    "Master key set"
+   ],
+   [
+    "groom's party",
+    "landlord's units"
+   ],
+   [
+    "Groom's party",
+    "Landlord's units"
+   ],
+   [
+    "before the facial",
+    "before the master key"
+   ],
+   [
+    "Before the facial",
+    "Before the master key"
+   ],
+   [
+    "color and cut",
+    "antique lock repair"
+   ],
+   [
+    "Color and cut",
+    "Antique lock repair"
+   ],
+   [
+    "color correction",
+    "lock repair"
+   ],
+   [
+    "Color correction",
+    "Lock repair"
+   ],
+   [
+    "color station",
+    "key machine"
+   ],
+   [
+    "Color station",
+    "Key machine"
+   ],
+   [
+    "color",
+    "antique lock work"
+   ],
+   [
+    "Color",
+    "Antique lock work"
+   ],
+   [
+    "$25 consult",
+    "$25 bench check"
+   ],
+   [
+    "consults",
+    "bench checks"
+   ],
+   [
+    "Consults",
+    "Bench checks"
+   ],
+   [
+    "consult",
+    "bench check"
+   ],
+   [
+    "Consult",
+    "Bench check"
+   ],
+   [
+    "beard oil",
+    "key ring"
+   ],
+   [
+    "Beard oil",
+    "Key ring"
+   ],
+   [
+    "beard trim",
+    "key set"
+   ],
+   [
+    "Beard trim",
+    "Key set"
+   ],
+   [
+    "skin fade",
+    "car key copy"
+   ],
+   [
+    "Skin fade",
+    "Car key copy"
+   ],
+   [
+    "haircuts",
+    "rekeys"
+   ],
+   [
+    "Haircuts",
+    "Rekeys"
+   ],
+   [
+    "haircut",
+    "rekey"
+   ],
+   [
+    "Haircut",
+    "Rekey"
+   ],
+   [
+    "cut hair",
+    "make keys"
+   ],
+   [
+    "Cut hair",
+    "Make keys"
+   ],
+   [
+    "cuts hair",
+    "makes keys"
+   ],
+   [
+    "Cuts hair",
+    "Makes keys"
+   ],
+   [
+    "Whichever barber cuts",
+    "Whichever locksmith works"
+   ],
+   [
+    "a power cut",
+    "a power outage"
+   ],
+   [
+    "A power cut",
+    "A power outage"
+   ],
+   [
+    "shorter cut",
+    "shorter job"
+   ],
+   [
+    "Shorter cut",
+    "Shorter job"
+   ],
+   [
+    "had cuts",
+    "had keys made"
+   ],
+   [
+    "Had cuts",
+    "Had keys made"
+   ],
+   [
+    "cuts",
+    "rekeys"
+   ],
+   [
+    "Cuts",
+    "Rekeys"
+   ],
+   [
+    "cut",
+    "rekey"
+   ],
+   [
+    "Cut",
+    "Rekey"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "the chair is saved",
+    "the counter slot is saved"
+   ],
+   [
+    "The chair is saved",
+    "The counter slot is saved"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "Rents a chair",
+    "Rents a bench"
+   ],
+   [
+    "the group's chairs",
+    "the group's bench time"
+   ],
+   [
+    "The group's chairs",
+    "The group's bench time"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Chairs",
+    "Counter spots"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "Chair",
+    "Counter"
+   ],
+   [
+    "Jordan",
+    "Tomás"
+   ],
+   [
+    "Casey",
+    "Andre"
+   ],
+   [
+    "Riley",
+    "Marco"
+   ],
+   [
+    "Avery",
+    "Lena"
+   ],
+   [
+    "barbershops",
+    "lock shops"
+   ],
+   [
+    "barbershop",
+    "lock shop"
+   ],
+   [
+    "Barbershop",
+    "Lock shop"
+   ],
+   [
+    "hot towel",
+    "rekey"
+   ],
+   [
+    "shave",
+    "rekey"
+   ],
+   [
+    "sink",
+    "lock"
+   ],
+   [
+    "Sink",
+    "Lock"
+   ],
+   [
+    "pipe",
+    "lock"
+   ],
+   [
+    "Pipe",
+    "Lock"
+   ],
+   [
+    "water line",
+    "key line"
+   ],
+   [
+    "shaves",
+    "rekeys"
+   ],
+   [
+    "Shave",
+    "Rekey"
+   ],
+   [
+    "shave",
+    "rekey"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books Lee's Key Shop to rekey the two front-door locks from her new home: she brings them to the counter on Sat Oct 24 at 11:00am, and Marco rekeys them while she waits.",
+  "B": "Sam Lee signs up two companies by text. Alex M. books Lee Lock & Key to rekey every lock at 27 Oak St after moving in, and Tomás checks her photo ID and lease at the door on Thu Oct 22, 8 to 10am. A lockout is sent now instead: whoever is on call takes it, at the after-hours price."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 rekey of two locks Alex brings in. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|card|counter": "A $40 car key copy. A card is saved for the shop's $20 fee for a missed bench time. Alex pays at the counter.",
+    "list|deposit|counter": "The $140 master key set (2½ hours). A $40 deposit pays for the key blanks. The $100 rest is paid at the counter.",
+    "list|full|none": "A $55 high-security key copy, paid in full when booking, since the blank is ordered for Alex.",
+    "photos|none|counter": "An antique lock repair: Alex sends photos, Marco prices it at $90, and it's booked once it's OK'd.",
+    "visit|none|counter": "A lock repair at the bench: only the $25 bench check is promised, and Marco prices the repair when he sees the lock."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Lock work"
+    },
+    "list|none|*": {
+     "price": "$35",
+     "name": "Lock rekey"
+    },
+    "list|card|*": {
+     "price": "$40",
+     "fee": "$20",
+     "name": "Car key copy"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Master key set"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "free",
+     "name": "High-security key copy"
+    },
+    "visit|*|*": {
+     "name": "Lock repair"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Antique lock repair"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Car key copy",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$40",
+      "fee": "$20"
+     }
+    }
+   },
+   "labels": {
+    "price": {
+     "visit": "Priced at the bench, with the customer's yes first",
+     "photos": "Priced from the customer's photos first"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|card|card",
+    "list|card|own",
+    "list|full|none",
+    "photos|deposit|bill",
+    "visit|card|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 whole-home rekey. A card is saved for the $89 trip fee. Rosie texts the bill after the job. A lockout at night runs the same way: $199, with a card saved for the $89 fee.",
+    "list|card|card": "A $179 whole-home rekey. A card is saved and charged $179 when Tomás texts DONE.",
+    "list|card|own": "A property manager's rekey: a card is saved for the $89 trip fee, and Sam bills the manager the business's own way.",
+    "list|full|none": "A $150 smart lock install, paid in full when booking.",
+    "photos|deposit|bill": "High-security locks priced from photos at $640 (over $500, so Sam OKs it). A $160 deposit now; the rest on the bill after the job.",
+    "visit|card|bill": "A lock repair priced at the visit. Only the $89 trip fee is promised, and a card is saved for it."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Whole-home rekey"
+    },
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Whole-home rekey"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "free",
+     "name": "Smart lock install"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "High-security locks"
+    },
+    "visit|card|*": {
+     "fee": "$89",
+     "name": "Lock repair"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Lockout at night",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$199",
+      "fee": "$89"
+     }
+    }
+   },
+   "labels": {
+    "price": {
+     "visit": "Priced at the visit, with the customer's yes first",
+     "photos": "Priced from photos first"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B4-81",
+   "B4-78",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-72"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A8-02",
+    "more": [
+     "A car key copy needs a photo ID and the car's registration, in the same name.",
+     "A high-security key needs its key card, or the owner's written OK. No match: the key isn't made."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-45",
+    "more": [
+     "Key codes and key cuts never go in a text, even to the team."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Lock work and key work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Lock work books locksmiths, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Lock work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Lockouts are sent now, at any hour."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The key shop books a locksmith's time at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The key shop books a locksmith's time at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at a key shop is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The key shop's checks are done at the counter: a photo ID, the car's registration or the key card. No form is signed first."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "The key shop takes no drop-offs: Alex waits at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Counter work is rated, like every rekey."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "a locksmith visit is booked by the adult who owns the locks; no child books a lock job"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "no child is left at a lock job"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A locksmith's example: a car lockout by a busy road gets 'wait somewhere safe, away from traffic'.",
+     "Rosa is told to wait away from the road, and to call 911 if anyone is in danger."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay alguien encerrado adentro?",
+      {
+       "lang": "es",
+       "en": "First: is anyone locked inside?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Solo mis llaves.",
+      {
+       "lang": "es",
+       "en": "No. Just my keys.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Espere en un lugar seguro, lejos del tráfico. Si alguien está en peligro, llame al 911.",
+      {
+       "lang": "es",
+       "en": "Wait somewhere safe, away from traffic. If anyone is in danger, call 911.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For a lockout, a child, a pet or an at-risk adult locked inside stops the booking: 911 comes first.",
+    "more": [
+     "A car running in a closed garage stops it too, and so do smoke, gas or someone hurt.",
+     "The message is the plug-in's for that danger, or the general one: get to safety and call 911.",
+     "On a call, the caller hears it, and Sam gets the call summary."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This is an emergency. Call 911 now: they come first when a child or a pet is locked inside. Nothing is booked."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said a child is locked inside. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A child locked inside the home",
+         "Told to call 911 now"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "does": "Some things Rosie may not answer. It points to the business's own number, after 911 if anyone is in danger. Then the booking can go on.",
+    "more": [
+     "Which words go to the business's line is the plug-in's choice. Here: who may get keys made, or get in.",
+     "Where the plug-in says those words stop a booking, nothing is booked. A fight over who may enter does.",
+     "Sam sees the question on the portal."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I just bought a used car with no title yet. Can you make me a key?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't say who may get keys made. To talk it over, call Lee Lock & Key at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "does": "A plug-in holds what one kind of work needs. The steps around it stay the same. Here, Rosie uses the locksmith plug-in's booking parts.",
+    "more": [
+     "Its questions: the place, the lock, own or rent, anyone who objects, and a photo ID.",
+     "Its danger words: a child, a pet or an at-risk adult locked inside, or a car running in a closed garage.",
+     "Its first step: a signed entry statement for any work that gets someone in.",
+     "Who can stand in for whom, and who is on call for lockouts.",
+     "How the visit is checked in: the code, then the ID and proof.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B4-05",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.9"
+      ],
+      "who": "agent",
+      "to": "cust",
+      "via": "chat",
+      "title": "Asks who may let a locksmith in",
+      "q": "May Alex let a locksmith in?",
+      "does": "Before any times, the AI asks the plug-in's entry questions. A locksmith opens or changes a lock only for someone with the right to get in.",
+      "more": [
+       "The questions: home, car or business, own or rent, anyone who objects, and a photo ID on hand.",
+       "The answers are checked again at the door, against the ID and the proof.",
+       "Each answer gets the danger check too."
+      ],
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Lee Lock & Key asks first: is it your home, and do you own or rent? Does anyone object to you going in? Do you have a photo ID with you?"
+       ],
+       [
+        "cust",
+        "agent",
+        "It's my home. I own it, nobody objects, and my ID is in my wallet."
+       ]
+      ],
+      "needs": [
+       "pf.questions",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "Yes: Alex's home, ID on hand",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Someone objects to the entry",
+        "end": "end",
+        "endText": "Not booked: someone objects to the entry. Nothing was saved.",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.7",
+           "3.9"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "sync",
+          "title": "Sends the plug-in's fixed reply",
+          "does": "An ex, a roommate or a landlord objects to the entry. Rosie never books a disputed entry, so it sends the plug-in's fixed reply. Nothing is saved.",
+          "more": [
+           "Sam sees the request on the portal.",
+           "The courts and the police settle who may enter, never a locksmith."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Rosie can't book a locksmith when someone objects to the entry. Nothing was saved. To talk it over, call Lee Lock & Key at (555) 010-0142."
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No photo ID on hand",
+        "end": "end",
+        "endText": "Not booked: no photo ID on hand. Nothing was saved.",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "4.7",
+           "8.15"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "sync",
+          "title": "Says why it can't book yet",
+          "does": "The plug-in's door rule needs a photo ID and proof of address before any lock is opened. With no ID on hand, Rosie says so plainly and saves nothing.",
+          "more": [
+           "Proof can be a lease, a deed, a utility bill or a car's registration, in the same name as the ID.",
+           "Alex can book again once the ID is at hand."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "A locksmith can open or change a lock only after seeing a photo ID and proof you live there. Nothing was saved. Book again once you have your ID."
+           ]
+          ],
+          "needs": [
+           "pf.visit"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-16",
+    "more": [
+     "A lockout goes only to a locksmith whose license is on file as given, where the state's rules require one."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-13",
+    "more": [
+     "The confirmation asks Alex to have a photo ID and proof of address ready."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-54",
+    "more": [
+     "A locksmith's example: no proof Alex lives there, or someone at the door objects. Tomás touches no lock and leaves.",
+     "Both are the customer's side: Alex said at booking there was proof, and that nobody objects.",
+     "Someone objects: Alex gets the plug-in's fixed reply. The courts and the police settle who may enter, never a locksmith.",
+     "If anyone is in danger, call 911 first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S12-28",
+    "more": [
+     "A locksmith's cap: one lockout a day per phone and per address. A rekey or a lock change has no daily limit."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Lock work and key work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Lock work books locksmiths, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Lock work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Lockouts are sent now, at any hour."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Lock work books a locksmith in an arrival window, or sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in lock work is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Lock work at the customer's place books a locksmith, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "No",
+    "why": "Every visit that gets someone in or changes a lock needs the signed entry statement first."
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "label": "Missing, but it can go on",
+    "why": "The ID and the proof are what the plug-in requires, and without them no lock is touched."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "Lock work is never with a child: the locksmith waits for an adult on the booking, who shows ID and proof."
+   },
+   {
+    "op": "words",
+    "at": "B8-69",
+    "does": "The plug-in marks work that can be done with nobody home. Lee Lock & Key marks none: an adult with ID and proof of the right to get in must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "No lock work at the customer's place is done with nobody home: an adult with ID and proof must be there (pf.services)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "not a named-only trade: the rating is asked"
+   },
+   {
+    "op": "words",
+    "at": "B4-07",
+    "does": "The price, {{price:$179}}, comes straight from Sam's list. List prices never need Sam's OK."
+   }
+  ]
+ },
+ "keep": [],
+ "notes": "Flow B's main story stays on the master's set-window timeline: a whole-home rekey at 27 Oak St, Thu Oct 22, 8 to 10am. The master's dates run through every step and its money variants, so a same-night lockout can't replace them by renaming.\nThe urgent lockout uses the master's sent-now steps (v1.1): the offer with the after-hours price in full first (B4-19, words), the locksmith on call then the backup (S2-27, B6-16 to B6-18), no reminder and free cancel until OMW (B7-48 to B7-50). Only locksmith lines are added there (B6-16, B7-48).\nIdentity comes first on every visit at the customer's place, not only lockouts (a rekey needs the right to enter too): the entry questions before any times (B4-x01), the entry statement as the master's form on the secure page (B4-38's form branch, B4-86, due while the time is saved), and the ID-and-proof check at the door before any lock is touched (B8-45, the master's 'Is anything required missing?'). No match or an objection is 'Missing: can't go ahead' (B8-54).\nThe master's money numbers are kept: the $89 service call is the $89 trip fee, the $179 drain clearing a whole-home rekey, the $150 flush a smart lock install, the $640 water heater high-security locks priced from photos. The lockout is $159 by day and $199 after hours ($89 trip + $110 opening): the example business's own prices.\nFlow A is the key shop counter (Lee's Key Shop, the master's second company): rekeys of locks brought in, key copies, car keys, high-security keys, a master key set, antique lock repair from photos, and lock repair priced at the bench. The master's color services became antique lock work; its patch test became a key card check for restricted keys.\nMain money paths: A list|none|counter (a key counter rarely saves a card for a $35 rekey); B list|hold|bill (Rosie's default at the customer's place, and right for a lockout: the trip fee held).\nOne rename list serves both flows, since the shared sections (sign-up, team, running the business) hold both stories. Whole master sentences are swapped first where word-by-word swaps would garble a story; no keep words were needed.\nNames: Jordan is Tomás (the old flowchart's on-call locksmith), Casey is Andre (the master calls him he), Riley and Avery are Marco and Lena. The second kind of work under Lee Lock & Key is alarm work, with its own state form and an alarm tech, like the master's electrical.\nTurned off in flow A: 'Yes, with a parent' of A4-70 (an adult books lock work; a child booking gets the master's 'adults only', and a teen asks a parent) and 'A reaction last time' of A4-43 (lock work has no health step).\nMaster v1.1 took the locksmith's general ideas: the on-call dispatch (G1), the visit that can't go ahead (G11, B8-54), the visit record (G12, B8-55 and B8-56: the opening record's fields are a more line) and the phone or address limit (G23, S12-28: the one-lockout-a-day cap is a more line and in the plug-in). The own steps that drew them (B4-x06, B6-x01 to B6-x04, B8-x01 to B8-x04) are gone.\nNo proof at the door, or someone there who objects, is the customer's side in master v1.2 (D35, B8-60): Alex said at booking there was proof and that nobody objects. So the $89 trip fee Alex agreed to may be charged, only if Sam confirms; no answer, no fee. That's the old flowchart's trip-fee question again (lk20b). The trip fee also applies to a cancel after OMW, only if Sam confirms.\nMoney: no visit+deposit path. Lee Lock & Key holds the $89 trip fee for work priced at the visit; it never takes it as a deposit.\nThe old flowchart's one-state facts (an NC license, a 3-year record, a 5-business-day cancel right) are switches now, filled from the state's form. Its Workiz parts are outdated: Rosie is the software.\nThe old $75 trip-fee link (lk18f, lk20c) is now a fee taken from the hold or the saved card, Sam confirming first, the way the master draws every fee.\nNot sure: the urgent pattern may deserve the lockout as flow B's main path. That needs an urgent variant of the master's flow B timeline (sent now, no day-before steps), so it's listed as a gap rather than rewritten here.\nMaster v1.2 (D24): at every plug-in split the locksmith keeps its own branch and turns the others off. Both flows: the $2, no added agreement, people not spaces, no classes, lockouts sent now, every booking by name. The license splits (S1-60, S1-63, S2-28) keep both branches: only some states license locksmiths. Flow A (the key shop): walk-ins wait in a line; a locksmith's time, no drop-offs; adults only; no form, no damage hold, no crew, no date that can't move, no minimum; late means a shorter visit or a later start; it's rated.\nFlow B (the home, car or business): sent now (lockouts) or soonest first (rekeys); arrival windows; own or rent asked, or skipped for a car; a contract over the plug-in's amount; the entry statement is the only first step (B4-38's other branches are off, and so are B7-05's late-form and first-step branches); no damage hold; one locksmith by name, never a crew; no group minimum; nothing missing can go on at the door; no outside check and no permit inspection.\nMaster v1.2 final (round 4): B4-83's new '4 A seat in a session' and '5 No person named' are off (every lock job names a locksmith). The new section 8 plug-in splits: an adult must be there when a child answers (B8-67); nobody home is never allowed (B8-69, B8-70: the plug-in's 'nobody home: never'); no service is delivered and set up (B8-71); a lock cylinder may go to the bench, so both branches of B8-72 stay on. A8-32's child branch is off, since the key shop books adults only (A4-70).\nPlug-in splits kept whole (splitsKept, check-prof's D24 check), since the locksmith uses every branch: the license splits S1-60, S1-63, S2-28 in both flows (only some states license locksmiths); in A, A7-61 (antique locks have no stand-in) and A8-02 (locks, an ID and registration, or a key card to bring); in B, B4-81, B7-55, B8-58 (lockouts sent now, rekeys at a set time), B4-78 (own or rent for a home, skipped for a car), B4-57 (a written estimate over the state's amount) and B8-72 (a cylinder to the bench).\nReview (Oct 22): first pairs added for the master's barbershop leftovers in flow A: 'takes no cut of' (S1-25, A9-01, both flows) had become 'takes no rekey of'; the shop's web address; the Spanish caller still asked for a haircut (A3-07); the perm (A4-38) is a camera install the shop doesn't do; the $15 gloss on a bench quote (A8-25 to A8-48) is a lock cleaning; Alex is at the counter, not in the chair (A8-07); the cape clip (A8-39), the doctor (A3-26, A4-48: the building's OK for a restricted key), the brassy note (A4-22, A6-15), the steamer (A7-38), the kids cut (A4-34, A10-20), the uneven cut (A10-08), the interview rush (A4-29) and the 4-weekly cut (A4-30) got lock versions; the key card check is for a high-security key copy, as the plug-in says (A4-44, A7-33); the missing item at check-in (A8-51 to A8-60) is the locks to rekey, not a signed form.\nReview (Oct 22): the master's example license numbers carry trade letters (MP and JP plumbing, BS barbershop, EC and JE electrical, BR barber); they get this work's own letters.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Why: a price the owner can plan for.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "takes no cut of",
+    "Quiero un corte el sábado.",
+    "doesn't do perms.",
+    "Gloss to finish",
+    "gloss",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Do you do kids cuts? My son is 8.",
+    "a Kids cut (12 and under) is $25",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Alex asks for a cut every 4 weeks",
+    "The signed form this service needs is missing.",
+    "May the shop show photos of your hair? Yes / No",
+    "Add photos of your hair, and a barber will price your color and cut",
+    "photos of your hair",
+    "Promises the $25 consult; priced at the chair",
+    "like a burst pipe or a lockout",
+    "like a 15-minute style consult",
+    "like a burst pipe",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Electric.",
+    "Panel upgrade",
+    "the Groom's package",
+    "a Kids cut",
+    "The Groom's package",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A haircut could mean a salon or a barbershop.",
+    "once Riley sees the hair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "like a skin-test result",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "A barbershop has none, so nothing is sent here.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A haircut needs nothing.",
+    "color quote",
+    "color and house calls",
+    "does color",
+    "Color always stays with",
+    "a color and cut",
+    "patch test",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing service",
+    "plumbing job",
+    "Plumbing price list",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical license",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Drain clearing",
+    "Drains",
+    "Drain",
+    "water heaters",
+    "water heater",
+    "a leak",
+    "Leaks",
+    "leak",
+    "Leak",
+    "valve",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "kids cut",
+    "Kids cut",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Signature cut",
+    "hot towel shave",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "color",
+    "Color",
+    "$25 consult",
+    "consult",
+    "Consult",
+    "beard trim",
+    "Beard trim",
+    "skin fade",
+    "Skin fade",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "cut hair",
+    "shorter cut",
+    "cuts",
+    "cut",
+    "at the chair",
+    "At the chair",
+    "rents a chair",
+    "chairs",
+    "chair",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perms",
+    "perm",
+    "skin fades",
+    "skin fade",
+    "Skin fade"
+   ],
+   "B": [
+    "Why: a price the owner can plan for.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "takes no cut of",
+    "leehomeservices.com",
+    "when the pipes are in",
+    "replacing the old pipes",
+    "Replace the old pipes",
+    "like a burst pipe or a lockout",
+    "It's overflowing. Can someone come tonight?",
+    "like an overflowing drain",
+    "like a burst pipe",
+    "Overflowing kitchen drain",
+    "the shutoff valves",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Electric.",
+    "Is the sink still full of water?",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Alex texts that the sink is now overflowing.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Under the sink, before",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan finds mold behind the sink wall.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "valve work",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Panel upgrade",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A haircut could mean a salon or a barbershop.",
+    "can cut your hair at the shop",
+    "color and house calls",
+    "does color",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "plumbing and electrical work",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing visit",
+    "plumbing service",
+    "plumbing job",
+    "plumbing license",
+    "Plumbing license",
+    "plumbing plug-in",
+    "Plumbing price list",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical license",
+    "Electrical license",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Kitchen drain clearing",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the kitchen drain",
+    "The kitchen drain",
+    "My kitchen drain is clogged",
+    "kitchen drain",
+    "Kitchen drain",
+    "a $2,400 repipe",
+    "repipe",
+    "Repipe",
+    "yard drain",
+    "Yard drain",
+    "drain clearing",
+    "Drain clearing",
+    "clear the drain",
+    "drain is clogged again",
+    "drain is clogged",
+    "drain clogs again",
+    "Drains",
+    "drain",
+    "Drain",
+    "$89 service call",
+    "service call fee",
+    "Service call fee",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater flush",
+    "Water heater flush",
+    "flush my water heater",
+    "replaces water heaters",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "flush plan",
+    "flush",
+    "sewer camera inspection",
+    "Sewer camera inspection",
+    "sewer camera report",
+    "Sewer camera report",
+    "run a camera down my sewer line?",
+    "camera report",
+    "camera inspection",
+    "Video and Jordan's notes",
+    "bring the camera next time",
+    "NOTE grease clog 12 ft in. Old pipes:",
+    "a roof leak",
+    "leak repair",
+    "Leak repair",
+    "the leak",
+    "a leak",
+    "A leak",
+    "leaking",
+    "Leaks",
+    "leak",
+    "Leak",
+    "replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "finds corroded shutoff valves",
+    "both shutoff valves",
+    "shutoff valve",
+    "Shutoff valve",
+    "valve quote",
+    "valve 165 supply line 80",
+    "supply line",
+    "Supply line",
+    "the cold-water valve",
+    "valves",
+    "valve",
+    "clear the cabinet under the sink",
+    "old water stain on the cabinet floor",
+    "cabinet floor",
+    "Cabinet floor",
+    "under the sink",
+    "Under the sink",
+    "my bathroom sink",
+    "the kitchen sink",
+    "a dripping faucet",
+    "faucet",
+    "drying fan",
+    "new pipes",
+    "clogs again",
+    "clogged",
+    "hot towel shave",
+    "color",
+    "consult",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "cut hair",
+    "cuts",
+    "cut",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "chair",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "hot towel",
+    "shave",
+    "sink",
+    "pipe",
+    "water line",
+    "shaves",
+    "shave"
+   ]
+  },
+  "A": {
+   "A8-02": "15f418fec4",
+   "A8-45": "6589a6b4d4",
+   "S1-62": "b5b0310865",
+   "S1-29": "fb61245096",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-24": "0a292df05b",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B3-21": "ad48326ac5",
+   "B4-04": "df3ea4b2f5",
+   "B4-05": "fb3a9061c8",
+   "B6-16": "d428d8c29e",
+   "B6-13": "ed1f412f7d",
+   "B8-54": "0f180048ca",
+   "S12-28": "6e7a9bf25f",
+   "S1-62": "b5b0310865",
+   "S1-29": "592bd8f1a2",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B4-38": "9539521dc7",
+   "B8-45": "09e62897a6",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B10-32": "7713bff255",
+   "B4-07": "9d0dbc90ad"
+  }
+ }
+}

@@ -1,0 +1,5539 @@
+{
+ "id": "sports-medicine",
+ "name": "Sports medicine",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "physical-therapist",
+ "plugin": {
+  "pf.license": {
+   "need": "each sports doctor holds their own state medical license; the clinic where the state's form asks",
+   "who": "each person; the clinic too where the state's form asks for it",
+   "ask": "the owner gives each license number in plain words, by text or on the secure page; Rosie keeps it as the owner's own word",
+   "check": "none: Rosie looks no license up and checks none (D96); the owner is responsible for the licenses they add",
+   "blocks": "Rosie books only the work the owner says it is licensed for; a doctor the owner says is not licensed for a service is not offered it",
+   "away": "home and field visits only where the owner says the state allows them",
+   "acupuncture": "none: the clinic offers no acupuncture",
+   "xray": "imaging only where the owner says the clinic is registered for it; ordered by the doctor",
+   "video": "off: exams, injury checks and concussion checks are in person; no visit is booked by video or phone",
+   "agreement": "the clinic's own privacy notice, shown on the secure page before the first booking",
+   "renewals": "the owner keeps the license numbers up to date; Rosie does not track renewals",
+   "insurance": "malpractice insurance only as the owner's own word, if the owner adds it"
+  },
+  "pf.services": {
+   "shape": "visit types in the clinic's exam rooms, and at a home or a field, each with a set length; a sports physical is a yearly check for a school sport; an injury exam is a history, an exam and a plan, with imaging only when the doctor orders it; a return to play is written only by a doctor after an exam; a plan of care's follow-ups are booked as a series only with the patient's own yes, and each is paid when it happens",
+   "examples": "the example clinic's own prices (Lee Sports Medicine and Lee Sports Mobile), not a standard; a plan pays its own share, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "Sports physical (a yearly school-sport check, with the school's form)",
+     "price": "$75",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "a minor is booked by a parent or guardian, who stays and signs the consent"
+    },
+    {
+     "name": "New injury exam (history, exam, and a plan; imaging only if the doctor orders it)",
+     "price": "$165",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the clinic",
+     "before": "nothing taken (a card saved only where the clinic turns on its $50 missed-visit fee)",
+     "after": "at the front desk: the self-pay price, or the plan's share"
+    },
+    {
+     "name": "Head-injury check (a concussion visit, after the danger signs are checked)",
+     "price": "$220",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk: the self-pay price, or the plan's share"
+    },
+    {
+     "name": "Follow-up check (from the plan of care)",
+     "price": "$85",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Return-to-play check (a doctor's note after an exam)",
+     "price": "$60",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Taping or bracing (added to a visit)",
+     "price": "$30",
+     "kind": "one price, added to a visit",
+     "length": "10 min",
+     "where": "added to a visit, at the clinic",
+     "before": "nothing taken",
+     "after": "with the visit"
+    },
+    {
+     "name": "Claim visit (a school, auto, or work injury)",
+     "price": "billed to the claim",
+     "kind": "set by the claim",
+     "length": "60 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "the clinic bills the claim its own way",
+     "note": "the claim number goes on the secure page first, and the desk confirms the claim before the visit"
+    },
+    {
+     "name": "Home injury exam (history, exam, and a plan; no imaging at home)",
+     "price": "$220",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the athlete's home",
+     "before": "a card saved for the $75 missed-visit fee, or nothing taken",
+     "after": "the saved card charged when the doctor texts DONE, or Rosie texts the bill"
+    },
+    {
+     "name": "Home sports physical (set time, at home or at the team's gym)",
+     "price": "$95",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at home, or a gym",
+     "before": "nothing taken",
+     "after": "Rosie texts the bill when the doctor texts DONE"
+    },
+    {
+     "name": "Home follow-up (from the plan of care)",
+     "price": "$140",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the athlete's home",
+     "before": "a card saved for the $75 fee, or nothing taken",
+     "after": "the saved card charged at DONE, or Rosie texts the bill"
+    },
+    {
+     "name": "Missed-visit fee",
+     "price": "$50 at the clinic; $75 for a home visit",
+     "kind": "a fee",
+     "where": "both places",
+     "note": "only from a saved card, and only when the owner confirms it"
+    }
+   ],
+   "capacity": "one athlete per exam room; the imaging room is booked with the imaging visit; a doctor's home or field visit is booked like a person",
+   "nobodyHome": "never: the athlete or a parent is always there",
+   "online": "off: exams and injury checks are in person"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, or for your child (a parent or guardian books a minor, who stays)",
+    "new or returning patient (a new patient gets the 45-minute new injury exam)",
+    "which visit: the clinic's own visit types only, never an injury described in the AI chat",
+    "a school sport, a car accident, or a work injury (then it's billed to that claim)",
+    "a health plan (its name only), or paying yourself",
+    "mornings, midday or evenings"
+   ],
+   "afterTime": [
+    "anything that helps at the visit, like the step-free door or an interpreter",
+    "at home or at a field: where to park, and a room for the exam"
+   ],
+   "securePage": [
+    "birth date",
+    "plan member ID and a photo of the insurance card",
+    "for a school sport: the school's sports form, if the school asks for one",
+    "for an injury: the claim number and the adjuster, if one applies",
+    "health history: past injuries, surgeries, medicines, allergies and conditions",
+    "consent to care, after the doctor's main risks are explained, and the privacy notice",
+    "a parent's or guardian's consent for anyone under 18"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18, who stays for the visit; a guardian or health care agent for an adult who can't consent",
+   "neverAsked": "injuries, symptoms, the reason for the visit and results are never asked or typed in the AI chat; words typed there are checked for danger, then not kept"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "trouble breathing, chest pain, collapsing or passing out during exercise, a seizure, or a head hit with vomiting, confusion, a worse headache or drowsiness",
+     "say": "This needs help now. Call 911. Don't wait for a clinic visit.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a bone poking through the skin, a joint badly out of line, or a limb that's cold, pale or can't move; or heat with vomiting or confusion",
+     "say": "This needs an emergency room now. Call 911, or go to one. Don't wait for a clinic visit.",
+     "booking": "no booking; the same words texted before a visit get the same message, the owner is told and calls, and the visit stays unless the patient cancels, with no fee"
+    },
+    {
+     "words": "thoughts of ending a life",
+     "say": "Call 911 now. You can also call or text 988, any time.",
+     "booking": "no booking; the owner is told at once and calls"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a sprain or a strain from a game, a sports physical, or a follow-up on a plan of care",
+     "what": "books as usual; Rosie only matches words and never judges how serious anything is"
+    }
+   ],
+   "owner": "the clinic's own red-flag list, set with its doctors at sign-up, is the stop list above; Sam can add words that go to the clinic's own line (A3-26)",
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history and consent",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+     "who": "every new patient; a minor's form is signed by the parent or guardian; returning patients once a year, or when their health changes",
+     "result": "the consent is signed after the doctor explains the main risks; not done by its due date: Sam keeps the visit (signed on the secure page at the desk first), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The school's sports form",
+     "when": "on the secure page, before the physical",
+     "who": "a student whose school asks for its own form",
+     "result": "the clinic fills in its part; the family takes the form to the school; a form not returned by its due date is sent again later, and the visit stays"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered (the copay, any deductible left), some services only, not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "The claim for a school, auto, or work injury",
+     "when": "on the secure page while booking; the desk confirms it before the visit",
+     "who": "every patient whose visit is billed to a claim",
+     "result": "no claim confirmed: the visit stays at the self-pay price, or a free cancel"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day, or sooner where the rules require it",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "A return-to-play note",
+     "when": "after an injury exam, only when the doctor decides",
+     "who": "an athlete who asks for a clearance",
+     "result": "the doctor writes the note after an exam; Rosie never gives a clearance or a sign-off"
+    }
+   ],
+   "prep": "arrive 15 minutes early; bring a photo ID, the insurance card, the school's form if there is one, and a list of current medicines; wear clothes you can move in for the exam"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the check-in code at the front desk, with a photo ID; at home or a field: the code at the door, or at the team's check-in table",
+   "beforeWork": "the doctor takes the history and examines before any treatment, with their own danger checks",
+   "changes": "imaging only if the doctor orders it, with the price shown first and the patient's yes; a return to play is decided only by a doctor; something that needs another doctor first means no treatment, the visit is paid, and notes go to the doctor the patient names; a plan of care is suggested in person, stays on the secure page, and is never pushed",
+   "carePlan": "a plan of care's visits are booked as a series only with the patient's own yes by text; one reply stops any visit, or all that are left",
+   "done": "the check-in code or DONE; notes, imaging and results stay in the clinic's own records, shared with the patient only in person, never in Rosie or a text",
+   "away": "home and field visits are exams and plans only; no imaging is taken at a home or a field"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking at the clinic; a card saved only where the clinic turns on its $50 missed-visit fee, never for a sports physical; at home: a card saved for the $75 missed-visit fee and charged at DONE, or nothing saved and Rosie texts the bill; a claim visit: nothing taken",
+   "plans": "the plans the clinic takes (its own list); the front desk checks each by hand and records it: active or not, the copay and any deductible left; the share is an estimate, not a promise",
+   "claims": "a school, auto, or work injury exam is billed to that claim, the business's own way; the claim details go only on the secure page",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "packages": "none: each visit is paid when it happens; a clinic that sells prepaid visits follows the state's rules (a switch)",
+   "fees": "the missed-visit fee: $50 at the clinic and $75 for a home visit (the example's own), only from a saved card and only when the owner confirms it; the same fee for every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one, or whom the owner marks fee-free; a Medicare patient pays a fee only if every patient does; their texts say 'No fee to cancel or miss'",
+   "after": "at the clinic: the self-pay price or the plan's share at the front desk, its own way; the clinic sends the plan's claim; a balance after the plan pays is billed by the clinic, not by Rosie's text; at home: the saved card charged at DONE, or Rosie texts the bill; a claim is billed the business's own way",
+   "rosfield": "the $2 per booking applies, as for every profession: a flat service fee for each booking Rosie's AI makes, not a share of the price; no membership is sold here, so no 1% applies. Card payments also carry Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form; fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)",
+   "repeatPlans": "a repeating plan of care visit is booked only with its own yes; each visit is paid when it happens, like a single visit: at the front desk at the clinic, or at home by the saved card at DONE or Rosfield's bill; no monthly plan charge and nothing paid ahead"
+  },
+  "pf.messages": {
+   "never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the injury, the visit type, the reason, the plan or the doctor's name (at home or a field, the doctor's name stays, for the door check)",
+   "staff": "texts to the owner and staff use the athlete's initials only (A.M., never Alex M.) and never the reason for the visit",
+   "healthQuestions": "Rosie never answers a question about an injury, pain, or a return to play; it goes to the clinic, which calls the patient",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the doctor"
+  },
+  "pf.staff": {
+   "licenses": "each sports doctor's own state medical license, as the owner gives it",
+   "skills": "sports doctors: exams, injury care, sports physicals, return-to-play notes and imaging orders; the front desk: check-in, plan checks, school forms, estimates and payment; only people cleared for home and field visits go out",
+   "supervision": "a medical assistant works only while a doctor is in the building, as the clinic's own rule",
+   "oks": "the owner OKs same-day visits, any price made for one athlete, and anything a doctor flags",
+   "standIn": "a doctor out: another doctor takes their patients where there's room, and the patient chooses; the patient never hears why someone is out",
+   "away": "the field and home team: Dr. Vance and Dr. Quinn"
+  },
+  "pf.rules": {
+   "records": "clinic records are kept by the clinic as long as the state's rules require (a minor's may be kept longer); a delete request removes only Rosie's own booking details, never the clinic's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "consent": "written consent after the main risks are explained, before any treatment, where the state's rules require it",
+   "prepaid": "prepaid visits follow the state's rules (written terms, a cancel, a refund of unused visits); the example clinic sells none",
+   "showLicense": "the license shown where the state asks: posted at the clinic, and on a home or field visit",
+   "minors": "a minor's consent is given by a parent or guardian; a minor may consent alone only where the state's rules let them (a switch from the state form)",
+   "host": "a school or team day only under its written OK on file (the owner's own word)",
+   "ads": "no free-visit or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen, in the time left; later: the front desk may move the visit, with no fee (Rosie never moves it itself)",
+   "standIn": "a doctor out: another doctor with room, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any treatment), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "redFlagBefore": "danger words texted before a visit: the emergency message; the owner is told and calls; the visit stays unless the patient cancels, with no fee",
+   "referral": "something in the exam needs another doctor first: no treatment, the visit is paid, and notes go to the doctor the patient names",
+   "carePlan": "a plan of care's visits are booked only with the patient's own yes; one reply stops any visit or all that are left; no sales texts",
+   "twoBookings": "an athlete with several plan of care visits open: Rosie asks which one before any change",
+   "healthQuestion": "a question about an injury, pain, or a return to play goes to the clinic; Rosie gives no advice",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): a new injury gets the soonest open time, with the owner's OK; the danger words get the emergency message",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "plans",
+   "planbill",
+   "forms",
+   "children",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Sports Medicine",
+   "staff": "Dr. Nolan and Dr. Hale (sports physicians) and the front desk",
+   "cust": "Alex M. (a new patient) · other athletes"
+  },
+  "B": {
+   "business": "Lee Sports Mobile",
+   "staff": "Dr. Vance and Dr. Quinn (sports physicians), who visit homes and fields",
+   "cust": "Alex M. (a new patient, at home) · other athletes",
+   "other": "Others (a parent or guardian, a school or team, a plan or a claim)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dr. Nolan"
+  },
+  "B": {
+   "staff": "Dr. Vance"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "A treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a doctor who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own patients."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see patients at the clinic; Riley also does bracing fitting and home visits."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "New injury exams, follow-up checks and bracing fitting."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'care' visit could mean a sports doctor or a counselor."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Home injury exams and follow-up checks, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A home follow-up check"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached during care?"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most sports medicine clinics set it."
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'Ankle sports care' or 'a sore back' fits an new injury exam."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for chiropractic care, which isn't on the clinic's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Sports Medicine doesn't do chiropractic care."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free entrance:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "How would you like it on top?",
+    "What would you like to be able to do again?"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, make it an new injury exam' goes back to the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter visit in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter visit."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during my visit?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please wear shorts or loose clothes on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please wear shorts or loose clothes."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the clinic, the customer is already there, so there's no door check."
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped part of A.M.'s visit."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the home exercises."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: add balance work next visit"
+   ],
+   [
+    "A.M. says Saturday's cut is uneven on one side.",
+    "A.M. asks for a recheck after Saturday's visit."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "A tip goes the shop's own way.",
+    "Sports medicine takes no tips."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says an ice pack leaked on a jacket today"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The ice pack leaked on my jacket."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a pack of 6 self-pay visits at the clinic."
+   ],
+   [
+    "A beard trim",
+    "Taping or bracing"
+   ],
+   [
+    "a beard trim",
+    "taping or bracing"
+   ],
+   [
+    "Lena",
+    "Tara"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The sports medicine plug-in adds its own after surgery: a hot or swollen calf, a fever, or a red or leaking wound."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a check-in plan with Dr. Nolan, every 4 weeks."
+   ],
+   [
+    "like a color correction done in two steps",
+    "like the visits a plan of care sets"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "so I can't reach Elm Street Dental.",
+    "so I can't reach Elm Street Eye Care."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sports medicine example: a fall with no new injury gets the plug-in's words, then the booking goes on."
+   ],
+   [
+    "A haircut",
+    "An new injury exam"
+   ],
+   [
+    "a haircut",
+    "an new injury exam"
+   ],
+   [
+    "a kids cut",
+    "a child's sports physical"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "MP045210",
+    "PT045210"
+   ],
+   [
+    "BS20981",
+    "PR20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states set their own rules for work done away from the business."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sports classes for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds Sports classes to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW Sports classes"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "An new injury exam is rated, so the shop takes the first branch."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the clinic show photos of your smile?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's sports medicine takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Check-in plan · every 4 weeks"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Sports Medicine LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Sports Mobile's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Sports Medicine"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Sports Mobile"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Sports Mobile and Lee Team Care"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile sports care and team coverage"
+   ],
+   [
+    "1200 Main St",
+    "41 Lake Rd"
+   ],
+   [
+    "88 Elm St",
+    "21 Cedar Ln"
+   ],
+   [
+    "Riley Chen",
+    "Dr. Nolan Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Dr. Hale Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Dr. Vance Price"
+   ],
+   [
+    "Casey Moore",
+    "Dr. Quinn Moore"
+   ],
+   [
+    "Riley",
+    "Dr. Nolan"
+   ],
+   [
+    "Avery",
+    "Dr. Hale"
+   ],
+   [
+    "Jordan",
+    "Dr. Vance"
+   ],
+   [
+    "Casey",
+    "Dr. Quinn"
+   ],
+   [
+    "electrical",
+    "sports care"
+   ],
+   [
+    "Electrical",
+    "Sports care"
+   ],
+   [
+    "plumber",
+    "doctor"
+   ],
+   [
+    "Plumber",
+    "Doctor"
+   ],
+   [
+    "plumbing",
+    "home sports medicine"
+   ],
+   [
+    "Plumbing",
+    "Home sports medicine"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "Barbershop",
+    "Clinic"
+   ],
+   [
+    "barbers",
+    "doctors"
+   ],
+   [
+    "barber",
+    "doctor"
+   ],
+   [
+    "Barber",
+    "Doctor"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "New injury exam and taping or bracing"
+   ],
+   [
+    "Signature cut and shave",
+    "New injury exam and taping or bracing"
+   ],
+   [
+    "hot towel",
+    "bracing fitting"
+   ],
+   [
+    "signature cut",
+    "new injury exam and taping or bracing"
+   ],
+   [
+    "Groom's package",
+    "Sports conditioning"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "bracing fitting"
+   ],
+   [
+    "Color and cut",
+    "Bracing fitting"
+   ],
+   [
+    "color correction",
+    "injury exam"
+   ],
+   [
+    "Color correction",
+    "Injury exam"
+   ],
+   [
+    "kids cuts",
+    "children's visits"
+   ],
+   [
+    "Kids cut",
+    "Child's sports physical"
+   ],
+   [
+    "kids cut",
+    "child's sports physical"
+   ],
+   [
+    "skin fade",
+    "sports physical"
+   ],
+   [
+    "Skin fade",
+    "Sports physical"
+   ],
+   [
+    "beard trim",
+    "taping or bracing"
+   ],
+   [
+    "Beard trim",
+    "Taping or bracing"
+   ],
+   [
+    "haircuts",
+    "new injury exams"
+   ],
+   [
+    "Haircuts",
+    "New injury exams"
+   ],
+   [
+    "haircut",
+    "new injury exam"
+   ],
+   [
+    "Haircut",
+    "New injury exam"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "bracing fitting"
+   ],
+   [
+    "Color",
+    "Bracing fitting"
+   ],
+   [
+    "a patch test",
+    "an exam"
+   ],
+   [
+    "patch test",
+    "exam"
+   ],
+   [
+    "a consult",
+    "an exam"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "is at the chair",
+    "is at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "Home injury exam"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up check"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like an new injury exam on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a check-in visit every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a check-in visit every 4 weeks, after the plan of care ends."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A coach books injury screens for three players on one morning."
+   ],
+   [
+    "staff cut",
+    "staff new injury exam"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My ankle is more swollen. Can I still come in?"
+   ],
+   [
+    "like a skin-test result",
+    "like the plan of care's goals"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Can Dr. Nolan go over my home exercises again? I'm not sure I'm doing them right."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una evaluación el sábado."
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Park Ave"
+   ],
+   [
+    "says the cape clip ripped",
+    "says the bib clip ripped"
+   ],
+   [
+    "finds chairs side by side",
+    "finds open times side by side"
+   ],
+   [
+    "no-show fee",
+    "missed-visit fee"
+   ],
+   [
+    "No-show fee",
+    "Missed-visit fee"
+   ],
+   [
+    "for a son before the times",
+    "first"
+   ]
+  ],
+  "B": [
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "A treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a doctor who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own patients."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see patients at the clinic; Riley also does bracing fitting and home visits."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "New injury exams, follow-up checks and bracing fitting."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'care' visit could mean a sports doctor or a counselor."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Home injury exams and follow-up checks, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A home follow-up check"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most sports medicine clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules clinics often set."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a home visit after my ankle surgery."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa home visit Thu 12-2 Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Help walking after surgery' fits a home injury exam."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like care the state's rules don't allow."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The clinic's own visits are in the other flow."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is it after surgery, or a new problem?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes many visits, like 2 home visits a week for 3 weeks."
+   ],
+   [
+    "can clear the drain:",
+    "can do a home injury exam:"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are there steps to get in?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, three steps"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home injury exam needs none."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do a home injury check?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the hip hurts more now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Rest it, and call your surgeon's office. Chest pain or trouble breathing: call 911."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds two loose grab bars."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a loose stair rail."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a doctor stops there, so Alex gets a written note."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a loose stair rail and stopped the stair practice for your safety."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the rail fixed first"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's equipment scuffs the hallway floor, and Jordan texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "Jordan's equipment scuffed the hallway floor at A.M.'s. The before photo shows no scuff."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Alex asks for a second visit 2 weeks later, so Sam OKs it with its own code."
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M. asks for a second visit after the Thu Oct 22 visit."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Any question about your care? Reply here, and Sam OKs the next visit."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Any question about your care? Reply here."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan rushed and didn't explain the exercises."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on my floor from the visit."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come again next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a home follow-up check."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a home follow-up check, today,"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I had hip surgery last week and can't drive yet. Can a sports doctor come to my home Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mother needs sports medicine at home."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi mamá necesita terapia física en casa."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien se cayó o está herido?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: has anyone fallen, or is anyone hurt?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie se cayó."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody fell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se cae y no puede levantarse, o se golpea la cabeza, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If she falls and can't get up, or hits her head, call 911."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sports medicine example: a fall with no new injury gets the plug-in's words, then the booking goes on."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if her mother falls and can't get up, or hits her head."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a sports doctor come to Kim's home this Thursday? What does it cost?"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Sports Medicine can do an new injury exam at the clinic for $140, or at your home for $179, before any health plan."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan cares for both parents at one home, with a check-in plan for each, every 4 weeks."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's check-ins?"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "A haircut",
+    "An new injury exam"
+   ],
+   [
+    "a haircut",
+    "an new injury exam"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomept.com"
+   ],
+   [
+    "MP045210",
+    "PT045210"
+   ],
+   [
+    "BS20981",
+    "PR20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states set their own rules for work done away from the business."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Occupational care for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds occupational care to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW occupational care"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your custom bracing job"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a home injury check Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a home injury check, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A home injury check"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's sports medicine takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "The work never started, so there's no $2.",
+    "The work never started."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Sports Mobile LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Sports Mobile's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Sports Medicine"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Sports Mobile"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Sports Mobile and Lee Team Care"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile sports care and team coverage"
+   ],
+   [
+    "1200 Main St",
+    "41 Lake Rd"
+   ],
+   [
+    "88 Elm St",
+    "21 Cedar Ln"
+   ],
+   [
+    "42 Oak St",
+    "41 Lake Rd"
+   ],
+   [
+    "Riley Chen",
+    "Dr. Nolan Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Dr. Hale Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Dr. Vance Price"
+   ],
+   [
+    "Casey Moore",
+    "Dr. Quinn Moore"
+   ],
+   [
+    "Riley",
+    "Dr. Nolan"
+   ],
+   [
+    "Avery",
+    "Dr. Hale"
+   ],
+   [
+    "Jordan",
+    "Dr. Vance"
+   ],
+   [
+    "Casey",
+    "Dr. Quinn"
+   ],
+   [
+    "electrical",
+    "sports care"
+   ],
+   [
+    "Electrical",
+    "Sports care"
+   ],
+   [
+    "plumbing license",
+    "sports medicine license"
+   ],
+   [
+    "Plumbing license",
+    "Sports medicine license"
+   ],
+   [
+    "plumber",
+    "doctor"
+   ],
+   [
+    "Plumber",
+    "Doctor"
+   ],
+   [
+    "plumbing",
+    "home sports medicine"
+   ],
+   [
+    "Plumbing",
+    "Home sports medicine"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "Barbershop",
+    "Clinic"
+   ],
+   [
+    "barbers",
+    "doctors"
+   ],
+   [
+    "barber",
+    "doctor"
+   ],
+   [
+    "Barber",
+    "Doctor"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "New injury exam and taping or bracing"
+   ],
+   [
+    "beard trim",
+    "taping or bracing"
+   ],
+   [
+    "Beard trim",
+    "Taping or bracing"
+   ],
+   [
+    "haircut",
+    "new injury exam"
+   ],
+   [
+    "Haircut",
+    "New injury exam"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "bracing fitting"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home injury exam"
+   ],
+   [
+    "drain clearing",
+    "home injury exam"
+   ],
+   [
+    "Drain clearing",
+    "Home injury exam"
+   ],
+   [
+    "Water heater replacement",
+    "Custom bracing"
+   ],
+   [
+    "water heater replacement",
+    "custom bracing"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up check"
+   ],
+   [
+    "water heater flush",
+    "home follow-up check"
+   ],
+   [
+    "water heaters",
+    "supports"
+   ],
+   [
+    "water heater",
+    "support"
+   ],
+   [
+    "leak repair",
+    "injury exam"
+   ],
+   [
+    "Leak repair",
+    "Injury exam"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "missed-visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "Service call",
+    "Missed-visit fee"
+   ],
+   [
+    "Sewer camera inspection",
+    "Concussion check"
+   ],
+   [
+    "sewer camera inspection",
+    "home injury check"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a care visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like a chiropractic adjustment"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face or jaw with a fever, or trouble breathing or swallowing."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a loose support."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are there steps at your door?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "warranty plan",
+    "health plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and plan card ready."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that his hip hurts more now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "My hip hurts more now."
+   ],
+   [
+    "Kitchen drain",
+    "Home injury exam"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace two grab bars"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "replace two grab bars, $160"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Replace two grab bars · $160"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace two grab bars"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 grab bar quote"
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "replacing two grab bars for $160"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a loose stair rail, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a loose stair rail"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the visit"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the outlet fixed first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the hallway floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed hallway floor"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 home injury exam"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M.: added on the secure page."
+   ],
+   [
+    "the shutoff valves",
+    "the grab bars"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My ankle has been sore since the visit."
+   ],
+   [
+    "with the store's receipt",
+    "with the lab's receipt"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the home safety report is ready"
+   ],
+   [
+    "Sewer camera report",
+    "home safety report"
+   ],
+   [
+    "Drain clearings already booked",
+    "Home injury exams already booked"
+   ],
+   [
+    "to the repair",
+    "to the treatment"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My hip hurts more today. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back from a doctor's visit 30 minutes late, sorry!"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 custom bracing job"
+   ],
+   [
+    "flush",
+    "follow-up check"
+   ],
+   [
+    "faucet",
+    "support"
+   ],
+   [
+    "finds chairs side by side",
+    "finds open times side by side"
+   ],
+   [
+    "no-show fee",
+    "missed-visit fee"
+   ],
+   [
+    "No-show fee",
+    "Missed-visit fee"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "house call",
+  "clinic"
+ ],
+ "story": {
+  "A": "Sam Lee, a sports doctor, signs up two companies by text. Then Alex, a new patient, books a first injury exam with Dr. Nolan at Lee Sports Medicine for Sat Oct 24 at 11:00am. The health history and the consent are on the secure page, and Alex pays at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who can't get to a clinic for now, books a first home injury exam with Lee Sports Mobile at home, 9 Hollis Ct. Dr. Vance comes Thu Oct 22 at 8:00am. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $165 new injury exam with Dr. Nolan. Nothing is taken. Alex pays at the front desk: the self-pay price, or a plan's share.",
+    "list|card|counter": "The same visit where the clinic turns on its $50 missed-visit fee: a card is saved for it, and Alex pays at the front desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50"
+    },
+    "list|*|*": {
+     "price": "$165",
+     "name": "New injury exam"
+    },
+    "list|card|*": {
+     "price": "$165",
+     "fee": "$50",
+     "name": "New injury exam"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Taping or bracing",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$30"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|none|own"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: a $220 home injury exam with Dr. Vance. A card is saved for the $75 missed-visit fee, and charged $220 when Dr. Vance texts DONE.",
+    "list|none|bill": "A home sports physical with nothing saved. Rosie texts the $95 bill when Dr. Vance texts DONE.",
+    "list|none|own": "A home visit after a school or car injury claim. Nothing is taken, and the office bills the claim its own way."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$75"
+    },
+    "list|*|*": {
+     "price": "$220",
+     "name": "Home injury exam"
+    },
+    "list|none|bill": {
+     "price": "$95",
+     "name": "Home sports physical"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Home taping or bracing",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$30"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A3-22",
+    "more": [
+     "Also a head hit with vomiting, confusion, or a worse headache, or a fall with trouble walking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "For the plug-in's own danger words, like a head hit with vomiting, the AI shows its words instead:",
+     "'This needs help now. Call 911. Don't wait for a clinic visit.'",
+     "Signs of a stroke or a heart attack get 'Call 911 now'."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-37",
+    "more": [
+     "The desk also notes the copay, any deductible left, and whether the plan must OK the visits after the first one.",
+     "The share is the plan's estimate, not a promise. The clinic bills the plan after the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-42",
+    "more": [
+     "The page also asks the birth date, and a plan's member ID and card photo if a plan pays.",
+     "The health history and the consent are on it too. A parent or guardian signs for a minor.",
+     "The page also repeats the right to a written price estimate."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "The health history and the consent are signed on the secure page, never by text.",
+     "They're due the day before. A returning athlete's forms stay on file for a year."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For a sports visit, the consent and the health history are signed on the secure page.",
+     "The code goes to whoever brings the athlete to the clinic."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Sports Medicine, the forms are the health history, the consent to care and the school's sports form.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-35",
+    "more": [
+     "Here: Dr. Nolan finds a sign that needs another doctor first, so the visit stops there.",
+     "The history and the exam were done, so the visit is paid. Dr. Nolan sends the notes to the doctor the patient names."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-20",
+    "more": [
+     "Lee Sports Medicine sends the claim itself. The patient pays the estimated share at the front desk.",
+     "A balance after the plan pays is billed by the clinic, never by Rosie's text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Medical records stay with the clinic as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A new injury gets the soonest open time instead, once Sam OKs it. Danger words get the emergency message."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A sports visit books people, a doctor by name, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Sports medicine runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No sports medicine visit is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the clinic: the athlete is at the front desk."
+   },
+   {
+    "op": "off",
+    "at": "S1-43",
+    "why": "Every clinic visit is at the clinic, so no clinic service is checked for a home. Home visits are Lee Sports Mobile's, under its own plug-in."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "The clinic books no visits at a home. Home visits are Lee Sports Mobile's, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Sports care is in person: no visit is booked by video or phone (the plug-in's video switch is off)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The example clinic sells no prepaid packages or memberships: each visit is paid when it happens."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The clinic sells no packs or memberships, at booking or at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Sports medicine bills each visit on its own, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the clinic: the athlete is always there."
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "label": "Safety steps, then go on",
+    "why": "Sports care has no safety steps that let a booking go on: its danger words stop the booking."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The clinic's plans are paid at the front desk after each visit, so no plan charge is ever texted (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "No redo or free fix is sold here; a worry after a visit is handled as a reaction (pf.edges)."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 per booking applies to every profession; the no-$2 choice is off."
+   },
+   {
+    "op": "off",
+    "at": "S2-11",
+    "why": "D96: Rosie looks no license up; the owner's word is kept on the own step after it."
+   },
+   {
+    "op": "after",
+    "at": "S2-11",
+    "steps": [
+     {
+      "id": "A2-x01",
+      "line": [
+       "2.4"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "title": "Keeps each person's license as the owner gave it",
+      "does": "Each license number a person gave is kept as the owner's own word. Rosie looks nothing up and checks nothing.",
+      "more": [
+       "A background check or certificate the owner names is kept as the owner's word, with the date and renew-by."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Kept as you gave it. Rosie doesn't look licenses up, so you confirm them on the next card."
+       ]
+      ],
+      "needs": [
+       "added",
+       "pf.license"
+      ],
+      "gives": [
+       "license_checked"
+      ],
+      "sec": 2
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "label": "The number isn't found",
+    "why": "D96: no license lookup runs, so no number is ever 'not found'."
+   },
+   {
+    "op": "words",
+    "at": "S1-02",
+    "more": [
+     "Rosie matches Sam's words to the closest kinds of work, and Sam picks. A pick-list helps.",
+     "The first kind named is set up first. Sam can pick another.",
+     "Means 'One isn't on the list yet': a service with a visit that Rosie has no plug-in for.",
+     "Means 'Not a service we book': goods with no visit, delivery only, renting a thing alone, or work the law bars.",
+     "Gift cards are never set up either.",
+     "Never: set up any of those.",
+     "Safe default: draft it as new work, offline until Rosie's team reviews it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-03",
+    "more": [
+     "It matches the work to the closest booking pattern, like a home visit or an appointment at the business.",
+     "The services come from the owner's own price list.",
+     "The checklist has 15 blocks, shown on the screen. Each starts from its safe default, and a no skips that block.",
+     "Each answer sets a switch or a fact, like sensitive work, classes or results later. The screen names every fact each block sets.",
+     "Protective facts start on: contracts, crews and forms.",
+     "Only the business's clear no turns a protective fact off. Silence or a skipped block keeps it on, so its question is never hidden.",
+     "Block 6 also sets one bill for many visits. Deposit or fee caps show as suggested owner rules (S1-21).",
+     "Block 12's 'a pro alone' sets a check-out timer, which runs only with an emergency contact (S1-78, S2-06).",
+     "Is this health care? A yes means the health privacy agreement is signed first (S1-71, S1-72).",
+     "Each price-list service is still matched to Rosie's known kinds of work, line by line (S1-12). A no to block 5 never skips that.",
+     "Licenses are the owner's own word: Rosie looks no license up, and every service is kept to the owner's words.",
+     "The plug-in is a draft, offline until it's reviewed. Sam hears the result within 1 business day.",
+     "If the license rules are unclear, that work stays offline, saved.",
+     "Never: make up a rule. Only the owner's own words and the checklist count."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "title": "Asks if this work needs a license",
+    "does": "The license question comes before prices and money. The state may license the business itself, and each person. The owner says which licenses the work needs.",
+    "more": [
+     "The plug-in names the licenses and who issues them: a state, a city or the federal government. None named, none asked.",
+     "Rosie looks no license up and checks none. The owner's own word is what counts, and it is kept as given.",
+     "Safe default: ask for the license the business holds, and book only the work the owner says it is licensed for.",
+     "Nothing is booked on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "One question: the license number the business works under, as the owner gives it. Rosie does not look it up.",
+    "more": [
+     "Whose license it is comes from the owner's own words: the business's, the owner's, or a license holder's.",
+     "A license holder gives their own number after their invite, by text or on the secure page. Rosie does not check it.",
+     "Where the rules ask for insurance or a bond, the owner may add it here too, as its own word.",
+     "Licenses: S13-43. A license claim shows as the owner's word, not as checked.",
+     "Never: let a license stand for control (S1-75), or say a license is checked.",
+     "Safe default: the owner's word is kept, and that work is booked only as the owner says it is licensed."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state may license the business itself, and each person. What's the license number? You can skip it if your work doesn't need one."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. I've kept it as your own word. Rosie doesn't look it up. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks only for the business registration, where one is required, and keeps it as the owner's word.",
+    "more": [
+     "Insured or bonded shows only once the owner says so.",
+     "The registration's name and number must match the listing. Stripe's name check reads it (S1-27).",
+     "Customers see no license claim. Each person is asked for nothing either, unless the plug-in names something.",
+     "A price-list service that is a licensed kind of work still takes its license step (S1-12). Registration never covers it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business registration number, if it has one. I'll keep it as your own word."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's kept as your word, and nothing is looked up. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-32",
+    "title": "The ID and control checks come back",
+    "does": "Nothing shows to AI assistants until the ID and the control of the business are confirmed. Licenses are the owner's word and are not looked up.",
+    "more": [
+     "Means 'Confirmed in minutes': the ID and the control of the business check out.",
+     "Means 'The ID doesn't match': the ID check can't match the photo to the selfie.",
+     "Control still with Rosie's team (S1-75): that company stays offline, setup saved, while the rest goes on.",
+     "Never: show a business to AI assistants before the ID and control are confirmed.",
+     "Safe default: nothing goes live until a person confirms it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Dr. Nolan"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Sports Medicine! Please fill in your secure page. Licenses are kept as you give them.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "License numbers: here, or by text",
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t02"
+       },
+       "form": [
+        "Doctor license number",
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Dr. Nolan"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 8am",
+      {
+       "as": "Dr. Nolan"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Dr. Nolan Chen · Lee Sports Medicine",
+        "lines": [
+         "Every clinic service, bracing fitting and home visits",
+         "License: on file, as given Oct 19",
+         "Hours: the clinic's hours",
+         "Languages: English and Spanish",
+         "Day list: 8am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Dr. Nolan"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Dr. Nolan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "title": "The licenses are on file; asks Sam",
+    "does": "Nobody is offered to customers until the owner says yes. Rosie asks about everyone at once.",
+    "more": [
+     "Each person's license is as they gave it: Sam confirms it with this yes.",
+     "Where the plug-in sets a timer, anyone with no emergency contact is named on this card (S2-06).",
+     "Means '1 Yes, all of them': a clear yes to let them take bookings.",
+     "Never: offer anyone to customers before Sam's yes.",
+     "Safe default: they stay off the calendar, and Sam's morning list asks again."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone's licenses are on file as you gave them, and nothing is looked up. You confirm them. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Dr. Vance: mobile sports care and team coverage",
+         "Dr. Quinn: home sports medicine",
+         "Dr. Nolan: doctor, bracing fitting and home visits",
+         "Dr. Hale: doctor"
+        ]
+       },
+       "buttons": [
+        "Yes, all of them",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "title": "Asks if each person needs a license",
+    "does": "Decides if each person added gives a license number. Some work needs one each, some only the business. The owner says which.",
+    "more": [
+     "The owner's own word decides, and Rosie looks nothing up.",
+     "A background check or certificate the owner names is kept as the owner's word: who ran it, when, and renew-by.",
+     "Safe default: no person license, unless the business's license form names one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your clinic, paid at the front desk, your own way",
+         "When they book: a card saved, for a $50 fee you OK",
+         "Home visits: allowed where you are, for those cleared",
+         "Free on your board: nothing taken, nothing after"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Sports physical",
+          "$75"
+         ],
+         [
+          "New injury exam",
+          "$165"
+         ],
+         [
+          "Head-injury check",
+          "$220"
+         ],
+         [
+          "Follow-up check",
+          "$85"
+         ],
+         [
+          "Claim visit",
+          "Billed to the claim"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:deposit+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:full": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $50 fee you OK",
+           "Home visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Sports physical",
+            "$75"
+           ],
+           [
+            "New injury exam",
+            "$165"
+           ],
+           [
+            "Head-injury check",
+            "$220"
+           ],
+           [
+            "Follow-up check",
+            "$85"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B4-28",
+    "more": [
+     "For a self-pay patient, the notice is the right to a written price estimate. Alex pays, so the AI says it here.",
+     "Lee Sports Mobile emails it within 1 business day, or sooner where the rules say so."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "The page also asks the birth date, and a plan's member ID and card photo if a plan pays.",
+     "The health history and the consent are on it too. Alex can finish them before the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-20",
+    "more": [
+     "Dr. Quinn does first home visits too, so Dr. Quinn can do the whole visit."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A home visit always needs the athlete there, or a parent."
+   },
+   {
+    "op": "more",
+    "at": "B9-17",
+    "more": [
+     "Here, the office bills Alex's school or auto claim for the visit, from the claim details on the secure page.",
+     "Rosie sends nothing about money."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Medical records stay with the business as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a home visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever meets the doctor at the home or the field."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "For a home visit, the forms are the health history and the consent to care.",
+     "Kept: the patient, or the person who decides, signs them on the secure page at the door before any care."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-65",
+    "title": "New times with Dr. Vance; free cancel stays"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Mobile sports care takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for sports medicine (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B6-16",
+    "why": "Nobody is on call for sports medicine, so no job is texted to a doctor first (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A home visit always needs the athlete there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the doctor's care at home: a parent or guardian stays (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A sports visit books people, a doctor by name, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Sports medicine runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No sports medicine visit is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A home visit starts at a set time, not in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A home visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile sports care sells no seats in a session: each athlete has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No home visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No home visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "S1-43",
+    "why": "Every clinic visit is at the clinic, so no clinic service is checked for a home. Home visits are Lee Sports Mobile's, under its own plug-in."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Each company works in one place: home visits are Lee Sports Mobile's, and clinic visits Lee Sports Medicine's."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Sports care is in person, so no visit is booked by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "No home visit is over the plug-in's amount, and the business sells no prepaid plans, so none needs a contract."
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "label": "Safety steps, then go on",
+    "why": "Sports care has no safety steps that let a booking go on: its danger words stop the booking."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "No home visit is paid in stages: each visit is paid when it happens."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "The owner of the home never pays for a home visit: nobody is asked about the owner."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Sports care has no warranty or free redo. A worry after a visit comes in as a reply to the aftercare tips."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "No imaging is taken at a home visit, so no report comes later."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Each visit is paid when it happens, so a bank transfer is not used for a home visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A plan of care's home visits are each paid when they happen, so no plan charge is ever texted (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "A plan of care's home visits are each billed when they happen, never on one monthly bill (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 per booking applies to every profession; the no-$2 choice is off."
+   },
+   {
+    "op": "off",
+    "at": "S2-11",
+    "why": "D96: Rosie looks no license up; the owner's word is kept on the own step after it."
+   },
+   {
+    "op": "after",
+    "at": "S2-11",
+    "steps": [
+     {
+      "id": "B2-x01",
+      "line": [
+       "2.4"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "title": "Keeps each person's license as the owner gave it",
+      "does": "Each license number a person gave is kept as the owner's own word. Rosie looks nothing up and checks nothing.",
+      "more": [
+       "A background check or certificate the owner names is kept as the owner's word, with the date and renew-by."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Kept as you gave it. Rosie doesn't look licenses up, so you confirm them on the next card."
+       ]
+      ],
+      "needs": [
+       "added",
+       "pf.license"
+      ],
+      "gives": [
+       "license_checked"
+      ],
+      "sec": 2
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "label": "The number isn't found",
+    "why": "D96: no license lookup runs, so no number is ever 'not found'."
+   },
+   {
+    "op": "words",
+    "at": "S1-02",
+    "more": [
+     "Rosie matches Sam's words to the closest kinds of work, and Sam picks. A pick-list helps.",
+     "The first kind named is set up first. Sam can pick another.",
+     "Means 'One isn't on the list yet': a service with a visit that Rosie has no plug-in for.",
+     "Means 'Not a service we book': goods with no visit, delivery only, renting a thing alone, or work the law bars.",
+     "Gift cards are never set up either.",
+     "Never: set up any of those.",
+     "Safe default: draft it as new work, offline until Rosie's team reviews it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-03",
+    "more": [
+     "It matches the work to the closest booking pattern, like a home visit or an appointment at the business.",
+     "The services come from the owner's own price list.",
+     "The checklist has 15 blocks, shown on the screen. Each starts from its safe default, and a no skips that block.",
+     "Each answer sets a switch or a fact, like sensitive work, classes or results later. The screen names every fact each block sets.",
+     "Protective facts start on: contracts, crews and forms.",
+     "Only the business's clear no turns a protective fact off. Silence or a skipped block keeps it on, so its question is never hidden.",
+     "Block 6 also sets one bill for many visits. Deposit or fee caps show as suggested owner rules (S1-21).",
+     "Block 12's 'a pro alone' sets a check-out timer, which runs only with an emergency contact (S1-78, S2-06).",
+     "Is this health care? A yes means the health privacy agreement is signed first (S1-71, S1-72).",
+     "Each price-list service is still matched to Rosie's known kinds of work, line by line (S1-12). A no to block 5 never skips that.",
+     "Licenses are the owner's own word: Rosie looks no license up, and every service is kept to the owner's words.",
+     "The plug-in is a draft, offline until it's reviewed. Sam hears the result within 1 business day.",
+     "If the license rules are unclear, that work stays offline, saved.",
+     "Never: make up a rule. Only the owner's own words and the checklist count."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "title": "Asks if this work needs a license",
+    "does": "The license question comes before prices and money. The state may license the business itself, and each person. The owner says which licenses the work needs.",
+    "more": [
+     "The plug-in names the licenses and who issues them: a state, a city or the federal government. None named, none asked.",
+     "Rosie looks no license up and checks none. The owner's own word is what counts, and it is kept as given.",
+     "Safe default: ask for the license the business holds, and book only the work the owner says it is licensed for.",
+     "Nothing is booked on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "One question: the license number the business works under, as the owner gives it. Rosie does not look it up.",
+    "more": [
+     "Whose license it is comes from the owner's own words: the business's, the owner's, or a license holder's.",
+     "A license holder gives their own number after their invite, by text or on the secure page. Rosie does not check it.",
+     "Where the rules ask for insurance or a bond, the owner may add it here too, as its own word.",
+     "Licenses: S13-43. A license claim shows as the owner's word, not as checked.",
+     "Never: let a license stand for control (S1-75), or say a license is checked.",
+     "Safe default: the owner's word is kept, and that work is booked only as the owner says it is licensed."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state may license the business itself, and each person. What's the license number? You can skip it if your work doesn't need one."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. I've kept it as your own word. Rosie doesn't look it up. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks only for the business registration, where one is required, and keeps it as the owner's word.",
+    "more": [
+     "Insured or bonded shows only once the owner says so.",
+     "The registration's name and number must match the listing. Stripe's name check reads it (S1-27).",
+     "Customers see no license claim. Each person is asked for nothing either, unless the plug-in names something.",
+     "A price-list service that is a licensed kind of work still takes its license step (S1-12). Registration never covers it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business registration number, if it has one. I'll keep it as your own word."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's kept as your word, and nothing is looked up. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-32",
+    "title": "The ID and control checks come back",
+    "does": "Nothing shows to AI assistants until the ID and the control of the business are confirmed. Licenses are the owner's word and are not looked up.",
+    "more": [
+     "Means 'Confirmed in minutes': the ID and the control of the business check out.",
+     "Means 'The ID doesn't match': the ID check can't match the photo to the selfie.",
+     "Control still with Rosie's team (S1-75): that company stays offline, setup saved, while the rest goes on.",
+     "Never: show a business to AI assistants before the ID and control are confirmed.",
+     "Safe default: nothing goes live until a person confirms it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Dr. Vance"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Sports Mobile! Please fill in your secure page. Licenses are kept as you give them.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "License numbers: here, or by text",
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t01"
+       },
+       "form": [
+        "Sports medicine license number",
+        "Sports care license number",
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Dr. Vance"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 7am",
+      {
+       "as": "Dr. Vance"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Dr. Vance Price · Lee Sports Mobile",
+        "lines": [
+         "Every home sports medicine job, and sports care jobs",
+         "Licenses: on file, as given Oct 19",
+         "Hours: Mon–Fri 7:30am–5:30pm",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Dr. Vance"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Dr. Vance"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "title": "The licenses are on file; asks Sam",
+    "does": "Nobody is offered to customers until the owner says yes. Rosie asks about everyone at once.",
+    "more": [
+     "Each person's license is as they gave it: Sam confirms it with this yes.",
+     "Where the plug-in sets a timer, anyone with no emergency contact is named on this card (S2-06).",
+     "Means '1 Yes, all of them': a clear yes to let them take bookings.",
+     "Never: offer anyone to customers before Sam's yes.",
+     "Safe default: they stay off the calendar, and Sam's morning list asks again."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone's licenses are on file as you gave them, and nothing is looked up. You confirm them. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Dr. Vance: mobile sports care and team coverage",
+         "Dr. Quinn: home sports medicine",
+         "Dr. Nolan: doctor, bracing fitting and home visits",
+         "Dr. Hale: doctor"
+        ]
+       },
+       "buttons": [
+        "Yes, all of them",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "title": "Asks if each person needs a license",
+    "does": "Decides if each person added gives a license number. Some work needs one each, some only the business. The owner says which.",
+    "more": [
+     "The owner's own word decides, and Rosie looks nothing up.",
+     "A background check or certificate the owner names is kept as the owner's word: who ran it, when, and renew-by.",
+     "Safe default: no person license, unless the business's license form names one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At the athlete's home, your own way",
+         "When they book: a card saved, for a $75 fee you OK",
+         "Clinic visits: allowed where you are, for those cleared",
+         "Free on your board: nothing taken, nothing after"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Home injury exam",
+          "$220"
+         ],
+         [
+          "Home sports physical",
+          "$95"
+         ],
+         [
+          "Home follow-up",
+          "$140"
+         ],
+         [
+          "Claim visit",
+          "Billed to the claim"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:card+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:card+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:card+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:full": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most sports medicine clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the athlete's home, your own way",
+           "When they book: a card saved, for a $75 fee you OK",
+           "Clinic visits: allowed where you are, for those cleared",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Home injury exam",
+            "$220"
+           ],
+           [
+            "Home sports physical",
+            "$95"
+           ],
+           [
+            "Home follow-up",
+            "$140"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A4-43",
+   "A8-02",
+   "A8-67"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "notes": "Built Tue Oct 27 2026 (K6, Haiku) from physical-therapist. Sports medicine clinic: sports physicals for school sports, injury exams, head-injury checks, return-to-play notes (doctor only), plans of care; home and field visits in flow B. Children on (children fact): a parent or guardian books and stays for a minor. Facts: plans, planbill, forms, children, extrawork. Switch: sensitive on (health). No $2 off: the $2 applies (D97). Licenses optional and not verified (D96): pf.license says so; the lookup split S2-11 is off and replaced by an own step (A2-x01 / B2-x01); the not-found branch of S1-32 is off. Money A: list|none|counter (main, $165 new injury exam), list|card|counter ($50 fee on a card). Money B: list|card|card (main, $220 home injury exam, $75 fee charged at DONE), list|none|bill ($95 home sports physical), list|none|own (claim). Added taping or bracing paid with the visit (D91). B6-16 (sent-now on-call text) off. Stop words: head injury with danger signs, a limb or joint emergency, heat with vomiting, self-harm (911 and 988). Example names and prices are the example clinic's own (Lee Sports Medicine, Lee Sports Mobile).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Classic cuts, fades and hot towel shaves.",
+    "A haircut could mean a salon or a barbershop.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "or can't be reached while care is due?",
+    "Each service starts the way most barbershops set it.",
+    "A chair renter asked for by name",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Access, like a step-free chair:",
+    "My employer pays for this cut.",
+    "How would you like it on top?",
+    "'Yes, make it a fade' goes back to the times.",
+    "Riley can do a shorter cut in the time left",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Stopped A.M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "A.M. says Saturday's cut is uneven on one side.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "3 jobs",
+    "A tip goes the shop's own way.",
+    "says the cape clip ripped a shirt collar today",
+    "The cape clip ripped my shirt collar.",
+    "Alex bought a package of cuts at the shop.",
+    "A beard trim",
+    "a beard trim",
+    "Lena",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "like a color correction done in two steps",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "so I can't reach Elm Street Dental.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A haircut",
+    "a haircut",
+    "a kids cut",
+    "a house call",
+    "MP045210",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "A cut is rated, so the shop takes the first branch.",
+    "May the shop show photos of your hair?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel",
+    "signature cut",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "a consult",
+    "consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "like a skin-test result",
+    "The cut is uneven on one side.",
+    "Quiero un corte el sábado.",
+    "Step-free door on Elm St",
+    "says the cape clip ripped",
+    "finds chairs side by side",
+    "no-show fee",
+    "No-show fee",
+    "for a son before the times"
+   ],
+   "B": [
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Classic cuts, fades and hot towel shaves.",
+    "A haircut could mean a salon or a barbershop.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "The shop's chair is in the other flow.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "can clear the drain:",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Alex texts that the sink is now overflowing.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds mold behind the sink wall.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Call a mold cleanup company first",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Your drain is under warranty, so this visit is free.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "3 jobs",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Someone calls for a dentist: a wrong number.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "A haircut",
+    "a haircut",
+    "leehomeservices.com",
+    "MP045210",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The work never started, so there's no $2.",
+    "LATE camera report Mon Oct 26",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "consult",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "water heater",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "credited to the repair",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "warranty plan",
+    "A plan or warranty pays",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Kitchen drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote",
+    "replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "The kitchen drain is clogged again.",
+    "with the store's receipt",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "Drain clearings already booked",
+    "to the repair",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "$2,400 repipe",
+    "flush",
+    "faucet",
+    "no-show fee"
+   ]
+  },
+  "A": {
+   "A3-22": "0057d8fc9f",
+   "A3-24": "78e61fd50f",
+   "A4-37": "4ee9e74e71",
+   "A4-42": "7f259bddbf",
+   "A4-43": "c17d56f766",
+   "A4-64": "b98f95b738",
+   "A7-74": "b3ec278ce4",
+   "A8-35": "a67e890a5b",
+   "A9-20": "0cfe0e1776",
+   "A10-21": "08514557c8",
+   "S2-31": "320ac5e4cb",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "S1-43": "9775f13de8",
+   "A4-01": "9d65299834",
+   "A5-01": "6c5c5c2f87",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A7-94": "6490d5d8e6",
+   "A10-44": "50aad85ac2",
+   "A10-34": "78c2d9a6a3",
+   "S1-62": "b5b0310865",
+   "S2-11": "a6763770f6",
+   "S1-32": "5888cee64e",
+   "S1-02": "b5a958a81f",
+   "S1-03": "dc0ffdc698",
+   "S1-60": "7f268b2a07",
+   "S1-23": "6a6fbdc2ec",
+   "S1-61": "e2f61caf97",
+   "S2-06": "535c8da70b",
+   "S2-22": "4589734da5",
+   "S2-28": "578f6c41b7",
+   "S1-13": "eca22651fd"
+  },
+  "B": {
+   "B4-28": "506d267aaf",
+   "B4-29": "9234c5ed40",
+   "B7-20": "364245afef",
+   "B8-03": "ac9d404766",
+   "B9-17": "24b5acdf89",
+   "B10-17": "b5f4aef51b",
+   "B4-74": "bae5529af9",
+   "B7-61": "342b55fd9b",
+   "B7-65": "a1053328a8",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B6-16": "d428d8c29e",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "S1-43": "2197eac59a",
+   "B4-01": "826f4058c2",
+   "B5-34": "917f89b62f",
+   "B3-17": "3eb7d7f259",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B7-91": "7132851ec1",
+   "B10-32": "7713bff255",
+   "S1-62": "b5b0310865",
+   "S2-11": "a6763770f6",
+   "S1-32": "5888cee64e",
+   "S1-02": "eb5f21a2dd",
+   "S1-03": "dc0ffdc698",
+   "S1-60": "6b80e83cea",
+   "S1-23": "51cfaf83fd",
+   "S1-61": "2a82b488cb",
+   "S2-06": "df80417ffe",
+   "S2-22": "4589734da5",
+   "S2-28": "578f6c41b7",
+   "S1-13": "6964bfbe60"
+  }
+ }
+}

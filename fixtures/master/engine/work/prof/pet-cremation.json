@@ -1,0 +1,2834 @@
+{
+ "id": "pet-cremation",
+ "name": "Pet cremation and pet cemetery",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "funeral",
+ "plugin": {
+  "pf.license": {
+   "need": "No state license for a pet cremation or pet cemetery in most places. Where the state or a city asks for a crematory permit or the business registration, the owner names it: shown as given, never checked by Rosie.",
+   "who holds it": "The business and its owner, as the owner says. Staff hold no license Rosie checks.",
+   "how it's checked": "Not checked by Rosie. The owner keeps the permits and the registration.",
+   "insurance or bond": "Liability insurance: the owner's own certificate, shown as given, never checked.",
+   "blocks going live": "Nothing: Rosie shows no license claim for the business.",
+   "renewals": "The owner's own list; Rosie sends no reminder for a permit it never checked.",
+   "background checks": "None."
+  },
+  "pf.services": {
+   "shape": "a private cremation with a memorial garden (flow A: the family comes to the garden or drops the pet off); a home pick-up and cremation (flow B: the business goes to the family or the vet)",
+   "price kind": "one price per pet, by the pet's weight, from the owner's own list; no travel fee and no extra fee: the pick-up is part of the price",
+   "examples": "the example garden's own prices (Lee Pet Garden, Lee Pet Cremation), not a standard",
+   "list": [
+    {
+     "name": "Urn chosen at the visit",
+     "price": "$110, with an engraved plaque at $15 if the family wants one",
+     "kind": "one price, chosen at the visit",
+     "where": "at the garden (flow A)",
+     "before": "nothing taken",
+     "after": "paid at the desk only for what the family chooses"
+    },
+    {
+     "name": "Garden visit, private",
+     "price": "free",
+     "kind": "free",
+     "length": "about 30 minutes",
+     "where": "at the garden (flow A)",
+     "before": "nothing taken",
+     "after": "nothing to pay; an urn or a plaque is chosen and paid at the desk only if the family wants one"
+    },
+    {
+     "name": "Private cremation, up to 50 lb",
+     "price": "$190",
+     "kind": "one price per pet",
+     "length": "the cremation takes a day; the ashes come back in an urn",
+     "where": "at the garden (flow A)",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Drop-off cremation, at a set time",
+     "price": "$190",
+     "kind": "one price per pet",
+     "where": "at the garden (flow A)",
+     "before": "nothing taken",
+     "after": "paid at the desk when the family collects the urn"
+    },
+    {
+     "name": "Home pick-up and private cremation",
+     "price": "$240, with the pick-up",
+     "kind": "one price per pet",
+     "where": "at the family's home or the vet's (flow B)",
+     "before": "nothing taken",
+     "after": "the bill texted after the ashes are returned"
+    },
+    {
+     "name": "Home pick-up, paid in full",
+     "price": "$240",
+     "kind": "one price per pet",
+     "where": "at the family's home (flow B)",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Home pick-up, paid the business's own way",
+     "price": "$240",
+     "kind": "one price per pet",
+     "where": "at the family's home (flow B)",
+     "before": "nothing taken",
+     "after": "paid at the return of the ashes, cash or check"
+    }
+   ],
+   "never sold": "No upsell and no sales talk. Urns, plaques and keepsakes are shown only when the family asks, from the owner's list, at the family's pace.",
+   "capacity": "one pet per cremation; a pick-up takes one trip",
+   "online": "booked by text or the secure page; the family can always call the garden instead."
+  },
+  "pf.questions": {
+   "before times": [
+    "What kind of pet, and about how much does it weigh?",
+    "Where is the pet now: at home, at a vet's, or at the garden?",
+    "Would the family like a visit to the garden first, or a pick-up?",
+    "Is a same-day pick-up needed? Yes, no or not sure."
+   ],
+   "after a time is picked": [
+    "Where the pet is, and a way in (a gate, a side door)",
+    "Anyone else who will be there, if the family wants them to be"
+   ],
+   "only on the secure page": [
+    "The family's address and any gate code",
+    "The name of the pet, and the family's own words about it",
+    "Any ashes or memorial wishes",
+    "The vet's name, if the pet came from a clinic",
+    "Who is the owner of the pet, and anyone else with a say"
+   ],
+   "who may book": "An adult in the family, or someone the family asks to book for them. A pet is always booked by an adult who may decide for it."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "someone in danger right now (call 911)"
+   ],
+   "words that go on with safety steps": [
+    "a family member who is very upset or unwell: the booking goes on, and the garden is told so it can call the family"
+   ],
+   "what Rosie says": {
+    "in danger right now": "Call 911 now. Nothing is booked.",
+    "upset family": "Rosie is gentle, says the garden will call, and doesn't ask for details now."
+   },
+   "legal questions": "Never answered: Rosie gives no advice on the law, the death, or a pet's remains beyond the garden's own steps."
+  },
+  "pf.first_steps": {
+   "required": "None.",
+   "prep for the reminder": [
+    "The pet's name and a photo, if the family likes",
+    "A blanket or towel for the pet, if the family wants to send one",
+    "A way to reach the family on the day, and a gate or door code",
+    "Any wishes for the ashes, written down"
+   ]
+  },
+  "pf.visit": {
+   "check-in": "At the garden: the code at the front desk, given quietly. At a home: the code from whoever meets the crew.",
+   "before the cremation": "The garden confirms the pet's name and weight with the family, then records the pet's care on the secure page. Nothing is shown to anyone else.",
+   "after the cremation": "The ashes are returned in the urn the family chose, with the paperwork, on the family's own schedule.",
+   "stops": "A family member asks to stop or change anything: the garden stops, and asks what they need, with no pressure."
+  },
+  "pf.money": {
+   "before": "nothing taken for a visit; a private cremation paid in full when booking; a drop-off or home pick-up with nothing taken before",
+   "after": "paid at the desk when the urn is collected, the bill texted after the ashes are returned, or the family's own way at a home pick-up",
+   "cancel": "no fee to cancel or move a pick-up, a cremation or a visit; a family that needs more time can always move it",
+   "caps": "none: no fee of any kind is added",
+   "tips": "none: staff take no tips"
+  },
+  "pf.messages": "Texts are gentle and short. The pet's name, the family's words, any health detail and any price are never in a text: the secure page only.",
+  "pf.staff": {
+   "skills": "garden staff (visits and keepsakes), pick-up drivers (home pick-ups and the vet's), crematory operator",
+   "licenses": "none from the state for the staff; the crematory permit the owner names, shown as given",
+   "ratio": "one pick-up team per trip; two people at a home pick-up when the family asks",
+   "standIn": "any trained staff member; nobody is booked by name",
+   "oks": "Sam OKs any special request and any change to a booking the family has made"
+  },
+  "pf.rules": {
+   "no fees": "No fee is added to any booking, at any time; a cancelled visit or pick-up costs nothing.",
+   "no sales": "No upsell. Urns and keepsakes appear only when the family asks, at the family's pace.",
+   "privacy": "A family's grief is never mentioned in a text. Details stay on the secure page."
+  },
+  "pf.edges": {
+   "nightPickups": "A same-day pick-up at night is sent when the family asks, with the crew's first arrival window.",
+   "walkins": "A family who comes to the garden without a booking is seen when a staff member is free; no one is turned away."
+  },
+  "pf.facts": [
+   "documents",
+   "sentnow"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Each branch shows how the first words arrive. They're checked for danger before any answer.",
+    "Each branch shows how the first words arrive. Danger is checked first."
+   ],
+   [
+    "Every way in reaches the same booking desk, with the same rules.",
+    "Every way in reaches the same booking desk."
+   ],
+   [
+    "One proof rule covers every channel, and the rows below say who may do what.",
+    "One proof rule covers every channel."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Toner",
+    "Keepsake"
+   ],
+   [
+    "toner",
+    "keepsake"
+   ],
+   [
+    "pet care staff",
+    "staff"
+   ],
+   [
+    "Pet care staff",
+    "Staff"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home pick-up"
+   ],
+   [
+    "kitchen drain clearing",
+    "home pick-up"
+   ],
+   [
+    "Color quotes",
+    "Memorial quotes"
+   ],
+   [
+    "Color quote",
+    "Memorial quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "kids cuts",
+    "garden visits"
+   ],
+   [
+    "Kids cuts",
+    "Garden visits"
+   ],
+   [
+    "water heaters",
+    "memorial stones"
+   ],
+   [
+    "Water heaters",
+    "Memorial stones"
+   ],
+   [
+    "visit fee",
+    "visit charge"
+   ],
+   [
+    "Visit fee",
+    "Visit charge"
+   ],
+   [
+    "Kids cut",
+    "Garden visit"
+   ],
+   [
+    "kids cut",
+    "garden visit"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Pet Garden LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pet Garden"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pet Cremation"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Pet Keepsakes"
+   ],
+   [
+    "Lee Electric",
+    "Lee Pet Records"
+   ],
+   [
+    "Riley Chen",
+    "Dara Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Noah Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Ruth Price"
+   ],
+   [
+    "Casey Moore",
+    "Gus Moore"
+   ],
+   [
+    "Riley",
+    "Dara"
+   ],
+   [
+    "Avery",
+    "Noah"
+   ],
+   [
+    "Jordan",
+    "Ruth"
+   ],
+   [
+    "Casey",
+    "Gus"
+   ],
+   [
+    "Shop's",
+    "Garden's"
+   ],
+   [
+    "barbershops",
+    "pet gardens"
+   ],
+   [
+    "barbershop",
+    "pet garden"
+   ],
+   [
+    "Barbershop",
+    "Pet garden"
+   ],
+   [
+    "barbers",
+    "staff"
+   ],
+   [
+    "barber chair",
+    "viewing bench"
+   ],
+   [
+    "barber",
+    "staff"
+   ],
+   [
+    "Barber",
+    "Staff"
+   ],
+   [
+    "the shop's",
+    "the garden's"
+   ],
+   [
+    "The shop's",
+    "The garden's"
+   ],
+   [
+    "shop's",
+    "garden's"
+   ],
+   [
+    "the shop",
+    "the garden"
+   ],
+   [
+    "The shop",
+    "The garden"
+   ],
+   [
+    "shops",
+    "gardens"
+   ],
+   [
+    "shop",
+    "garden"
+   ],
+   [
+    "Shop",
+    "Garden"
+   ],
+   [
+    "Haircuts",
+    "Garden visits"
+   ],
+   [
+    "haircuts",
+    "garden visits"
+   ],
+   [
+    "Haircut",
+    "Garden visit"
+   ],
+   [
+    "haircut",
+    "garden visit"
+   ],
+   [
+    "Beard trim",
+    "Keepsake"
+   ],
+   [
+    "beard trim",
+    "keepsake"
+   ],
+   [
+    "beard line",
+    "stone line"
+   ],
+   [
+    "beard",
+    "stone"
+   ],
+   [
+    "Skin fades",
+    "Pick-ups"
+   ],
+   [
+    "skin fades",
+    "pick-ups"
+   ],
+   [
+    "Skin fade",
+    "Pick-up"
+   ],
+   [
+    "skin fade",
+    "pick-up"
+   ],
+   [
+    "Groom's package",
+    "Cremation package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Cremation package"
+   ],
+   [
+    "Signature cut and shave",
+    "Cremation package"
+   ],
+   [
+    "Color and cut",
+    "Cremation package"
+   ],
+   [
+    "color and cut",
+    "cremation package"
+   ],
+   [
+    "Color correction",
+    "Memorial quote"
+   ],
+   [
+    "color correction",
+    "memorial quote"
+   ],
+   [
+    "Color touch-up",
+    "Keepsake"
+   ],
+   [
+    "color touch-up",
+    "keepsake"
+   ],
+   [
+    "color quotes",
+    "memorial quotes"
+   ],
+   [
+    "color quote",
+    "memorial quote"
+   ],
+   [
+    "Color",
+    "Memorial"
+   ],
+   [
+    "color",
+    "memorial"
+   ],
+   [
+    "patch test",
+    "health check"
+   ],
+   [
+    "cut hair",
+    "arrange"
+   ],
+   [
+    "hot towel shaves",
+    "garden visits"
+   ],
+   [
+    "hot towel",
+    "garden"
+   ],
+   [
+    "shaves",
+    "visits"
+   ],
+   [
+    "shave",
+    "visit"
+   ],
+   [
+    "perms",
+    "urn choices"
+   ],
+   [
+    "perm",
+    "urn choice"
+   ],
+   [
+    "cape clip",
+    "urn box"
+   ],
+   [
+    "cape",
+    "box"
+   ],
+   [
+    "massage",
+    "garden visit"
+   ],
+   [
+    "Massage",
+    "Garden visit"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "keepsake"
+   ],
+   [
+    "house calls",
+    "home pick-ups"
+   ],
+   [
+    "house call",
+    "home pick-up"
+   ],
+   [
+    "House calls",
+    "Home pick-ups"
+   ],
+   [
+    "House call",
+    "Home pick-up"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Plumbing and electrical",
+    "Keepsakes and records"
+   ],
+   [
+    "plumbing and electrical",
+    "keepsakes and records"
+   ],
+   [
+    "plumber",
+    "staff"
+   ],
+   [
+    "Plumber",
+    "Staff"
+   ],
+   [
+    "plumbing",
+    "memorial"
+   ],
+   [
+    "Plumbing",
+    "Memorial"
+   ],
+   [
+    "electrician",
+    "staff"
+   ],
+   [
+    "electrical",
+    "memorial"
+   ],
+   [
+    "Electrical",
+    "Memorial"
+   ],
+   [
+    "Drain clearing",
+    "Home pick-up"
+   ],
+   [
+    "drain clearing",
+    "home pick-up"
+   ],
+   [
+    "clogged drain",
+    "stuck gate"
+   ],
+   [
+    "drain",
+    "gate"
+   ],
+   [
+    "Drain",
+    "Gate"
+   ],
+   [
+    "water heater flush",
+    "cremation"
+   ],
+   [
+    "Water heater flush",
+    "Cremation"
+   ],
+   [
+    "water heater replacement",
+    "memorial quote"
+   ],
+   [
+    "Water heater replacement",
+    "Memorial quote"
+   ],
+   [
+    "water heater",
+    "memorial stone"
+   ],
+   [
+    "Water heater",
+    "Memorial stone"
+   ],
+   [
+    "heater",
+    "stone"
+   ],
+   [
+    "flush",
+    "cremation"
+   ],
+   [
+    "service call",
+    "pick-up"
+   ],
+   [
+    "Service call",
+    "Pick-up"
+   ],
+   [
+    "faucet",
+    "stone"
+   ],
+   [
+    "dishwasher",
+    "display case"
+   ],
+   [
+    "garbage disposal",
+    "storage room"
+   ],
+   [
+    "sewer",
+    "storage room"
+   ],
+   [
+    "toilet",
+    "storage room"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "pipes",
+    "stones"
+   ],
+   [
+    "pipe",
+    "stone"
+   ],
+   [
+    "valves",
+    "urns"
+   ],
+   [
+    "Valves",
+    "Urns"
+   ],
+   [
+    "valve",
+    "urn"
+   ],
+   [
+    "shutoff",
+    "keepsake"
+   ],
+   [
+    "repipe",
+    "re-engrave"
+   ],
+   [
+    "supply line",
+    "garden path"
+   ],
+   [
+    "water line",
+    "garden path"
+   ],
+   [
+    "heating and cooling",
+    "garden care"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "Clogs",
+    "Jams"
+   ],
+   [
+    "cabinet",
+    "storage room"
+   ],
+   [
+    "leak",
+    "tear"
+   ],
+   [
+    "leaks",
+    "tears"
+   ],
+   [
+    "Short on the sides",
+    "Short on the stone"
+   ],
+   [
+    "travel fee",
+    "pick-up fee"
+   ],
+   [
+    "Travel fee",
+    "Pick-up fee"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "220 Garden Rd"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "Elm St",
+    "Garden Rd"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "Estate collection",
+    "Memorial"
+   ],
+   [
+    "estate collection",
+    "memorial"
+   ],
+   [
+    "Home appraisal",
+    "Home pick-up"
+   ],
+   [
+    "home appraisal",
+    "home pick-up"
+   ],
+   [
+    "Design phase",
+    "Cremation"
+   ],
+   [
+    "design phase",
+    "cremation"
+   ],
+   [
+    "Design review",
+    "Garden visit"
+   ],
+   [
+    "design review",
+    "garden visit"
+   ],
+   [
+    "Site visit",
+    "Pick-up"
+   ],
+   [
+    "site visit",
+    "pick-up"
+   ],
+   [
+    "Site visits",
+    "Pick-ups"
+   ],
+   [
+    "site visits",
+    "pick-ups"
+   ],
+   [
+    "Estate visit",
+    "Garden visit"
+   ],
+   [
+    "estate visit",
+    "garden visit"
+   ],
+   [
+    "Appraisal",
+    "Memorial"
+   ],
+   [
+    "appraisal",
+    "memorial"
+   ],
+   [
+    "Appraisals",
+    "Memorials"
+   ],
+   [
+    "appraisals",
+    "memorials"
+   ],
+   [
+    "Barbershops",
+    "Pet gardens"
+   ],
+   [
+    "Barbers",
+    "Staff"
+   ],
+   [
+    "Barber chair",
+    "Viewing bench"
+   ],
+   [
+    "Shops",
+    "Gardens"
+   ],
+   [
+    "Beard line",
+    "Stone line"
+   ],
+   [
+    "Beard",
+    "Stone"
+   ],
+   [
+    "Patch test",
+    "Health check"
+   ],
+   [
+    "Cut hair",
+    "Arrange"
+   ],
+   [
+    "Hot towel shaves",
+    "Garden visits"
+   ],
+   [
+    "Hot towel",
+    "Garden"
+   ],
+   [
+    "Shaves",
+    "Visits"
+   ],
+   [
+    "Shave",
+    "Visit"
+   ],
+   [
+    "Perms",
+    "Urn choices"
+   ],
+   [
+    "Perm",
+    "Urn choice"
+   ],
+   [
+    "Cape clip",
+    "Urn box"
+   ],
+   [
+    "Cape",
+    "Box"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Keepsake"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Staff"
+   ],
+   [
+    "Clogged drain",
+    "Stuck gate"
+   ],
+   [
+    "Heater",
+    "Stone"
+   ],
+   [
+    "Flush",
+    "Cremation"
+   ],
+   [
+    "Faucet",
+    "Stone"
+   ],
+   [
+    "Dishwasher",
+    "Display case"
+   ],
+   [
+    "Garbage disposal",
+    "Storage room"
+   ],
+   [
+    "Sewer",
+    "Storage room"
+   ],
+   [
+    "Toilet",
+    "Storage room"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "Pipes",
+    "Stones"
+   ],
+   [
+    "Pipe",
+    "Stone"
+   ],
+   [
+    "Valve",
+    "Urn"
+   ],
+   [
+    "Shutoff",
+    "Keepsake"
+   ],
+   [
+    "Repipe",
+    "Re-engrave"
+   ],
+   [
+    "Supply line",
+    "Garden path"
+   ],
+   [
+    "Water line",
+    "Garden path"
+   ],
+   [
+    "Heating and cooling",
+    "Garden care"
+   ],
+   [
+    "Cabinet",
+    "Storage room"
+   ],
+   [
+    "Leak",
+    "Tear"
+   ],
+   [
+    "Leaks",
+    "Tears"
+   ],
+   [
+    "$130",
+    "@@0@@"
+   ],
+   [
+    "$35",
+    "@@1@@"
+   ],
+   [
+    "$55",
+    "@@2@@"
+   ],
+   [
+    "$75",
+    "@@3@@"
+   ],
+   [
+    "$140",
+    "@@4@@"
+   ],
+   [
+    "$90",
+    "@@5@@"
+   ],
+   [
+    "$89",
+    "@@6@@"
+   ],
+   [
+    "$20",
+    "@@7@@"
+   ],
+   [
+    "$40",
+    "@@8@@"
+   ],
+   [
+    "$25",
+    "@@9@@"
+   ],
+   [
+    "$10",
+    "@@10@@"
+   ],
+   [
+    "@@0@@",
+    "$125"
+   ],
+   [
+    "@@1@@",
+    "$190"
+   ],
+   [
+    "@@2@@",
+    "$190"
+   ],
+   [
+    "@@3@@",
+    "$240"
+   ],
+   [
+    "@@4@@",
+    "$190"
+   ],
+   [
+    "@@5@@",
+    "$190"
+   ],
+   [
+    "@@6@@",
+    "$0"
+   ],
+   [
+    "@@7@@",
+    "$0"
+   ],
+   [
+    "@@8@@",
+    "$0"
+   ],
+   [
+    "@@9@@",
+    "$0"
+   ],
+   [
+    "@@10@@",
+    "$0"
+   ]
+  ],
+  "B": [
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Pet Garden can take a pet to the garden for $190, or pick it up at home for $240. Where would you like it?"
+   ],
+   [
+    "Every way in reaches the same booking desk, with the same rules.",
+    "Every way in reaches the same booking desk."
+   ],
+   [
+    "One proof rule covers every channel, and the rows below say who may do what.",
+    "One proof rule covers every channel."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a neighbor's fence without asking."
+   ],
+   [
+    "Toner",
+    "Keepsake"
+   ],
+   [
+    "toner",
+    "keepsake"
+   ],
+   [
+    "pet care staff",
+    "staff"
+   ],
+   [
+    "Pet care staff",
+    "Staff"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home pick-up"
+   ],
+   [
+    "kitchen drain clearing",
+    "home pick-up"
+   ],
+   [
+    "Color quotes",
+    "Memorial quotes"
+   ],
+   [
+    "Color quote",
+    "Memorial quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "kids cuts",
+    "garden visits"
+   ],
+   [
+    "Kids cuts",
+    "Garden visits"
+   ],
+   [
+    "water heaters",
+    "memorial stones"
+   ],
+   [
+    "Water heaters",
+    "Memorial stones"
+   ],
+   [
+    "visit fee",
+    "visit charge"
+   ],
+   [
+    "Visit fee",
+    "Visit charge"
+   ],
+   [
+    "Kids cut",
+    "Garden visit"
+   ],
+   [
+    "kids cut",
+    "garden visit"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Pet Garden LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pet Garden"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pet Cremation"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Pet Keepsakes"
+   ],
+   [
+    "Lee Electric",
+    "Lee Pet Records"
+   ],
+   [
+    "Riley Chen",
+    "Dara Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Noah Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Ruth Price"
+   ],
+   [
+    "Casey Moore",
+    "Gus Moore"
+   ],
+   [
+    "Riley",
+    "Dara"
+   ],
+   [
+    "Avery",
+    "Noah"
+   ],
+   [
+    "Jordan",
+    "Ruth"
+   ],
+   [
+    "Casey",
+    "Gus"
+   ],
+   [
+    "Shop's",
+    "Garden's"
+   ],
+   [
+    "barbershops",
+    "pet gardens"
+   ],
+   [
+    "barbershop",
+    "pet garden"
+   ],
+   [
+    "Barbershop",
+    "Pet garden"
+   ],
+   [
+    "barbers",
+    "staff"
+   ],
+   [
+    "barber chair",
+    "viewing bench"
+   ],
+   [
+    "barber",
+    "staff"
+   ],
+   [
+    "Barber",
+    "Staff"
+   ],
+   [
+    "the shop's",
+    "the garden's"
+   ],
+   [
+    "The shop's",
+    "The garden's"
+   ],
+   [
+    "shop's",
+    "garden's"
+   ],
+   [
+    "the shop",
+    "the garden"
+   ],
+   [
+    "The shop",
+    "The garden"
+   ],
+   [
+    "shops",
+    "gardens"
+   ],
+   [
+    "shop",
+    "garden"
+   ],
+   [
+    "Shop",
+    "Garden"
+   ],
+   [
+    "Haircuts",
+    "Garden visits"
+   ],
+   [
+    "haircuts",
+    "garden visits"
+   ],
+   [
+    "Haircut",
+    "Garden visit"
+   ],
+   [
+    "haircut",
+    "garden visit"
+   ],
+   [
+    "Beard trim",
+    "Keepsake"
+   ],
+   [
+    "beard trim",
+    "keepsake"
+   ],
+   [
+    "beard line",
+    "stone line"
+   ],
+   [
+    "beard",
+    "stone"
+   ],
+   [
+    "Skin fades",
+    "Pick-ups"
+   ],
+   [
+    "skin fades",
+    "pick-ups"
+   ],
+   [
+    "Skin fade",
+    "Pick-up"
+   ],
+   [
+    "skin fade",
+    "pick-up"
+   ],
+   [
+    "Groom's package",
+    "Cremation package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Cremation package"
+   ],
+   [
+    "Signature cut and shave",
+    "Cremation package"
+   ],
+   [
+    "Color and cut",
+    "Cremation package"
+   ],
+   [
+    "color and cut",
+    "cremation package"
+   ],
+   [
+    "Color correction",
+    "Memorial quote"
+   ],
+   [
+    "color correction",
+    "memorial quote"
+   ],
+   [
+    "Color touch-up",
+    "Keepsake"
+   ],
+   [
+    "color touch-up",
+    "keepsake"
+   ],
+   [
+    "color quotes",
+    "memorial quotes"
+   ],
+   [
+    "color quote",
+    "memorial quote"
+   ],
+   [
+    "Color",
+    "Memorial"
+   ],
+   [
+    "color",
+    "memorial"
+   ],
+   [
+    "patch test",
+    "health check"
+   ],
+   [
+    "cut hair",
+    "arrange"
+   ],
+   [
+    "hot towel shaves",
+    "garden visits"
+   ],
+   [
+    "hot towel",
+    "garden"
+   ],
+   [
+    "shaves",
+    "visits"
+   ],
+   [
+    "shave",
+    "visit"
+   ],
+   [
+    "perms",
+    "urn choices"
+   ],
+   [
+    "perm",
+    "urn choice"
+   ],
+   [
+    "cape clip",
+    "urn box"
+   ],
+   [
+    "cape",
+    "box"
+   ],
+   [
+    "massage",
+    "garden visit"
+   ],
+   [
+    "Massage",
+    "Garden visit"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "keepsake"
+   ],
+   [
+    "house calls",
+    "home pick-ups"
+   ],
+   [
+    "house call",
+    "home pick-up"
+   ],
+   [
+    "House calls",
+    "Home pick-ups"
+   ],
+   [
+    "House call",
+    "Home pick-up"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Plumbing and electrical",
+    "Keepsakes and records"
+   ],
+   [
+    "plumbing and electrical",
+    "keepsakes and records"
+   ],
+   [
+    "plumber",
+    "staff"
+   ],
+   [
+    "Plumber",
+    "Staff"
+   ],
+   [
+    "plumbing",
+    "memorial"
+   ],
+   [
+    "Plumbing",
+    "Memorial"
+   ],
+   [
+    "electrician",
+    "staff"
+   ],
+   [
+    "electrical",
+    "memorial"
+   ],
+   [
+    "Electrical",
+    "Memorial"
+   ],
+   [
+    "Drain clearing",
+    "Home pick-up"
+   ],
+   [
+    "drain clearing",
+    "home pick-up"
+   ],
+   [
+    "clogged drain",
+    "stuck gate"
+   ],
+   [
+    "drain",
+    "gate"
+   ],
+   [
+    "Drain",
+    "Gate"
+   ],
+   [
+    "water heater flush",
+    "cremation"
+   ],
+   [
+    "Water heater flush",
+    "Cremation"
+   ],
+   [
+    "water heater replacement",
+    "memorial quote"
+   ],
+   [
+    "Water heater replacement",
+    "Memorial quote"
+   ],
+   [
+    "water heater",
+    "memorial stone"
+   ],
+   [
+    "Water heater",
+    "Memorial stone"
+   ],
+   [
+    "heater",
+    "stone"
+   ],
+   [
+    "flush",
+    "cremation"
+   ],
+   [
+    "service call",
+    "pick-up"
+   ],
+   [
+    "Service call",
+    "Pick-up"
+   ],
+   [
+    "faucet",
+    "stone"
+   ],
+   [
+    "dishwasher",
+    "display case"
+   ],
+   [
+    "garbage disposal",
+    "storage room"
+   ],
+   [
+    "sewer",
+    "storage room"
+   ],
+   [
+    "toilet",
+    "storage room"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "pipes",
+    "stones"
+   ],
+   [
+    "pipe",
+    "stone"
+   ],
+   [
+    "valves",
+    "urns"
+   ],
+   [
+    "Valves",
+    "Urns"
+   ],
+   [
+    "valve",
+    "urn"
+   ],
+   [
+    "shutoff",
+    "keepsake"
+   ],
+   [
+    "repipe",
+    "re-engrave"
+   ],
+   [
+    "supply line",
+    "garden path"
+   ],
+   [
+    "water line",
+    "garden path"
+   ],
+   [
+    "heating and cooling",
+    "garden care"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "Clogs",
+    "Jams"
+   ],
+   [
+    "cabinet",
+    "storage room"
+   ],
+   [
+    "leak",
+    "tear"
+   ],
+   [
+    "leaks",
+    "tears"
+   ],
+   [
+    "Short on the sides",
+    "Short on the stone"
+   ],
+   [
+    "travel fee",
+    "pick-up fee"
+   ],
+   [
+    "Travel fee",
+    "Pick-up fee"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "220 Garden Rd"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "Elm St",
+    "Garden Rd"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "Estate collection",
+    "Memorial"
+   ],
+   [
+    "estate collection",
+    "memorial"
+   ],
+   [
+    "Home appraisal",
+    "Home pick-up"
+   ],
+   [
+    "home appraisal",
+    "home pick-up"
+   ],
+   [
+    "Design phase",
+    "Cremation"
+   ],
+   [
+    "design phase",
+    "cremation"
+   ],
+   [
+    "Design review",
+    "Garden visit"
+   ],
+   [
+    "design review",
+    "garden visit"
+   ],
+   [
+    "Site visit",
+    "Pick-up"
+   ],
+   [
+    "site visit",
+    "pick-up"
+   ],
+   [
+    "Site visits",
+    "Pick-ups"
+   ],
+   [
+    "site visits",
+    "pick-ups"
+   ],
+   [
+    "Estate visit",
+    "Garden visit"
+   ],
+   [
+    "estate visit",
+    "garden visit"
+   ],
+   [
+    "Appraisal",
+    "Memorial"
+   ],
+   [
+    "appraisal",
+    "memorial"
+   ],
+   [
+    "Appraisals",
+    "Memorials"
+   ],
+   [
+    "appraisals",
+    "memorials"
+   ],
+   [
+    "Barbershops",
+    "Pet gardens"
+   ],
+   [
+    "Barbers",
+    "Staff"
+   ],
+   [
+    "Barber chair",
+    "Viewing bench"
+   ],
+   [
+    "Shops",
+    "Gardens"
+   ],
+   [
+    "Beard line",
+    "Stone line"
+   ],
+   [
+    "Beard",
+    "Stone"
+   ],
+   [
+    "Patch test",
+    "Health check"
+   ],
+   [
+    "Cut hair",
+    "Arrange"
+   ],
+   [
+    "Hot towel shaves",
+    "Garden visits"
+   ],
+   [
+    "Hot towel",
+    "Garden"
+   ],
+   [
+    "Shaves",
+    "Visits"
+   ],
+   [
+    "Shave",
+    "Visit"
+   ],
+   [
+    "Perms",
+    "Urn choices"
+   ],
+   [
+    "Perm",
+    "Urn choice"
+   ],
+   [
+    "Cape clip",
+    "Urn box"
+   ],
+   [
+    "Cape",
+    "Box"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Keepsake"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Staff"
+   ],
+   [
+    "Clogged drain",
+    "Stuck gate"
+   ],
+   [
+    "Heater",
+    "Stone"
+   ],
+   [
+    "Flush",
+    "Cremation"
+   ],
+   [
+    "Faucet",
+    "Stone"
+   ],
+   [
+    "Dishwasher",
+    "Display case"
+   ],
+   [
+    "Garbage disposal",
+    "Storage room"
+   ],
+   [
+    "Sewer",
+    "Storage room"
+   ],
+   [
+    "Toilet",
+    "Storage room"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "Pipes",
+    "Stones"
+   ],
+   [
+    "Pipe",
+    "Stone"
+   ],
+   [
+    "Valve",
+    "Urn"
+   ],
+   [
+    "Shutoff",
+    "Keepsake"
+   ],
+   [
+    "Repipe",
+    "Re-engrave"
+   ],
+   [
+    "Supply line",
+    "Garden path"
+   ],
+   [
+    "Water line",
+    "Garden path"
+   ],
+   [
+    "Heating and cooling",
+    "Garden care"
+   ],
+   [
+    "Cabinet",
+    "Storage room"
+   ],
+   [
+    "Leak",
+    "Tear"
+   ],
+   [
+    "Leaks",
+    "Tears"
+   ],
+   [
+    "$140",
+    "@@0@@"
+   ],
+   [
+    "$169",
+    "@@1@@"
+   ],
+   [
+    "$89",
+    "@@2@@"
+   ],
+   [
+    "$150",
+    "@@3@@"
+   ],
+   [
+    "$179",
+    "@@4@@"
+   ],
+   [
+    "$40",
+    "@@5@@"
+   ],
+   [
+    "$110",
+    "@@6@@"
+   ],
+   [
+    "$20",
+    "@@7@@"
+   ],
+   [
+    "$640",
+    "@@8@@"
+   ],
+   [
+    "$160",
+    "@@9@@"
+   ],
+   [
+    "$480",
+    "@@10@@"
+   ],
+   [
+    "$120",
+    "@@11@@"
+   ],
+   [
+    "$245",
+    "@@12@@"
+   ],
+   [
+    "$199",
+    "@@13@@"
+   ],
+   [
+    "$55",
+    "@@14@@"
+   ],
+   [
+    "$75",
+    "@@15@@"
+   ],
+   [
+    "@@0@@",
+    "$190"
+   ],
+   [
+    "@@1@@",
+    "$230"
+   ],
+   [
+    "@@2@@",
+    "$0"
+   ],
+   [
+    "@@3@@",
+    "$240"
+   ],
+   [
+    "@@4@@",
+    "$240"
+   ],
+   [
+    "@@5@@",
+    "$0"
+   ],
+   [
+    "@@6@@",
+    "$0"
+   ],
+   [
+    "@@7@@",
+    "$0"
+   ],
+   [
+    "@@8@@",
+    "$240"
+   ],
+   [
+    "@@9@@",
+    "$0"
+   ],
+   [
+    "@@10@@",
+    "$0"
+   ],
+   [
+    "@@11@@",
+    "$0"
+   ],
+   [
+    "@@12@@",
+    "$240"
+   ],
+   [
+    "@@13@@",
+    "$240"
+   ],
+   [
+    "@@14@@",
+    "$240"
+   ],
+   [
+    "@@15@@",
+    "$240"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books a private cremation at Lee Pet Garden for a dog, Sat Oct 24 at 11:00am. Dara meets the family at the garden, and the family pays $190 when booking.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Pet Cremation for a home pick-up at 14 Cedar Ln for a cat. Ruth and Gus arrive Thu Oct 22 between 8 and 10am, bring the pet gently to the cremation, and return the ashes in the urn the family chose."
+ },
+ "cast": {
+  "A": {
+   "staff": "Dara and Noah (garden staff)",
+   "cust": "Alex M. (the family) · other families",
+   "other": "Others (a vet's office, a family member)"
+  },
+  "B": {
+   "staff": "Ruth and Gus (pick-up crew)",
+   "cust": "Alex M. (the family) · other families",
+   "other": "Others (a vet's office, a family member)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dara"
+  },
+  "B": {
+   "staff": "Ruth"
+  }
+ },
+ "keep": [],
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|none|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a private cremation for a dog up to 50 lb, $190, paid in full when booking. No fee.",
+    "list|none|counter": "A drop-off cremation at a set time: $190, paid at the desk when the family collects the urn.",
+    "visit|none|counter": "A private visit to the garden: free, nothing taken. An urn or plaque is paid at the desk only if the family chooses one."
+   },
+   "amounts": {
+    "*": {
+     "price": "$190",
+     "fee": "$0",
+     "name": "Private cremation"
+    },
+    "list|full|*": {
+     "price": "$190",
+     "paid": "$190",
+     "fee": "$0",
+     "name": "Private cremation, up to 50 lb"
+    },
+    "list|none|*": {
+     "price": "$190",
+     "fee": "$0",
+     "name": "Drop-off cremation"
+    },
+    "visit|none|*": {
+     "price": "$0",
+     "fee": "$0",
+     "name": "Private garden visit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|bill",
+   "combos": [
+    "list|none|bill",
+    "list|full|none",
+    "list|none|own"
+   ],
+   "examples": {
+    "list|none|bill": "The main story: a home pick-up and private cremation, $240 with the pick-up. Nothing is taken; the bill is texted after the ashes are returned.",
+    "list|full|none": "A home pick-up, paid in full when booking: $240. No fee.",
+    "list|none|own": "A home pick-up, $240, paid the business's own way at the return of the ashes: cash or check."
+   },
+   "amounts": {
+    "*": {
+     "price": "$240",
+     "fee": "$0",
+     "name": "Home pick-up and private cremation"
+    },
+    "list|none|*": {
+     "price": "$240",
+     "fee": "$0",
+     "name": "Home pick-up and private cremation"
+    },
+    "list|full|*": {
+     "price": "$240",
+     "paid": "$240",
+     "fee": "$0",
+     "name": "Home pick-up, paid in full"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02",
+   "S2-30",
+   "A8-53",
+   "A10-34"
+  ],
+  "B": [
+   "B4-38",
+   "B8-45",
+   "S2-30",
+   "B7-55",
+   "B8-58",
+   "B10-32"
+  ]
+ },
+ "notes": "Pet cremation and pet cemetery: a grief-sensitive start from funeral (sensitive on, fees $0). Refit for the rebuilt master (N4, Oct 27): a free garden visit, a cremation booked and paid in full, a drop-off, and a home pick-up in flow B with the bill or the business's own way. No upselling; gentle words; children and health details never in a text.",
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup (D96): the owner's own permits, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license lookup (D96)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A garden books families, not rooms."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a cremation."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A garden books a family's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A garden books a family's time, never a room."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child is never left at the garden; an adult stays."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "No proposals and no sales (sensitive work)."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "No results step: a cremation has no results later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left unclaimed; the ashes are collected by the family."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup (D96): the owner's own permits, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license lookup (D96)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A garden books families, not rooms."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "No seats."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "No child is in the crew's care; an adult stays."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "An adult from the family is there, or the family says who may let the crew in."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "A pick-up is never quoted at the visit: the price is the list price."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "Something of Alex's is damaged",
+    "why": "Not in this work: the crew handles no item of the family's."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "No proposals and no sales (sensitive work)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "No results later: a cremation has no report."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A pet is paid once; no stages."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No pet is billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for a pick-up."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Bank transfer is not taken for a pet cremation (no bank-transfer fact)."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans."
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each branch shows how the first words arrive. They're checked for danger before any answer.",
+    "Every way in reaches the same booking desk, with the same rules.",
+    "One proof rule covers every channel, and the rows below say who may do what.",
+    "We'd share only where they're working, only after a missed check.",
+    "Toner",
+    "toner",
+    "Color quotes",
+    "Color quote",
+    "At the chair",
+    "kids cuts",
+    "water heaters",
+    "visit fee",
+    "Kids cut",
+    "kids cut",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Shop's",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "beard",
+    "Skin fade",
+    "skin fade",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Color touch-up",
+    "color touch-up",
+    "color quote",
+    "Color",
+    "color",
+    "patch test",
+    "cut hair",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perms",
+    "perm",
+    "cape clip",
+    "cape",
+    "massage",
+    "Massage",
+    "gloss",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain clearing",
+    "Drain",
+    "water heater",
+    "heater",
+    "pipe",
+    "valve",
+    "leak",
+    "travel fee",
+    "Springfield",
+    "2020-1187",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Beard",
+    "Gloss",
+    "Leak",
+    "Leaks",
+    "$130",
+    "$35",
+    "$55",
+    "$75",
+    "$140",
+    "$90",
+    "$89",
+    "$20",
+    "$40",
+    "$25",
+    "$10"
+   ],
+   "B": [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Every way in reaches the same booking desk, with the same rules.",
+    "One proof rule covers every channel, and the rows below say who may do what.",
+    "We'd share only where they're working, only after a missed check.",
+    "Like tapping a neighbor's water line without asking.",
+    "Kitchen drain clearing",
+    "water heaters",
+    "visit fee",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircut",
+    "haircut",
+    "beard trim",
+    "beard",
+    "color",
+    "cut hair",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perm",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain clearing",
+    "drain clearing",
+    "drain",
+    "Drain",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater",
+    "Water heater",
+    "heater",
+    "flush",
+    "service call",
+    "Service call",
+    "faucet",
+    "dishwasher",
+    "sewer",
+    "overflowing",
+    "sink",
+    "clog",
+    "pipes",
+    "pipe",
+    "valves",
+    "valve",
+    "shutoff",
+    "repipe",
+    "supply line",
+    "water line",
+    "heating and cooling",
+    "clogs",
+    "cabinet",
+    "leak",
+    "travel fee",
+    "Springfield",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Sewer",
+    "Overflowing",
+    "Shutoff",
+    "Repipe",
+    "Supply line",
+    "Heating and cooling",
+    "Cabinet",
+    "Leak",
+    "Leaks",
+    "$140",
+    "$169",
+    "$89",
+    "$150",
+    "$179",
+    "$40",
+    "$110",
+    "$20",
+    "$640",
+    "$160",
+    "$480",
+    "$120",
+    "$245",
+    "$199",
+    "$75"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A8-03": "7fe61cccf5",
+   "A8-67": "e9fd748fc5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "B4-43": "fc9855955a",
+   "B4-83": "93095f28e5",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B8-93": "c1406fd6bc",
+   "B8-22": "50d78f1af0",
+   "B10-38": "867fe1ab7c",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B5-01": "841c417586"
+  }
+ }
+}

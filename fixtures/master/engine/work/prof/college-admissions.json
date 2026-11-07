@@ -1,0 +1,3630 @@
+{
+ "id": "college-admissions",
+ "name": "College admissions consultant",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "coach",
+ "plugin": {
+  "pf.facts": [
+   "video",
+   "firststeps",
+   "forms",
+   "documents",
+   "children",
+   "groups",
+   "photos"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  },
+  "pf.license": {
+   "need": "No license is needed for this work in most places. A registration or certificate the state asks for is the business's own to add. It is optional, and nothing is looked up.",
+   "ask": "Any registration, certificate or insurance the business wants shown, as the business's own word.",
+   "who holds it": "The business. No person license is needed by default.",
+   "how it's checked": "Rosie checks none of it and never says it was checked. Anything shown is the business's own word.",
+   "blocks going live": "Nothing. Licenses and insurance are optional and never block going live.",
+   "never claimed": "Rosie never says a license, certificate or insurance is confirmed; anything shown is the business's own word.",
+   "renewals": "None tracked by Rosie.",
+   "insurance or bond": "The business's own choice, shown only as its own word.",
+   "background check": "None."
+  },
+  "pf.services": {
+   "shape": "College advising: strategy sessions, essay reviews and an application plan, by video, by phone or at the office (flow A), and a campus visit at a family's home or a family information night at a host's place (flow B). Every new family starts with a free intro call with the student and a parent. Advice is not a promise of admission.",
+   "examples": "The example office's own prices, not a standard.",
+   "at the business (flow A)": [
+    {
+     "name": "Free intro call",
+     "length": "20 minutes, by video or phone",
+     "price": "free",
+     "kind": "free",
+     "before": "nothing taken",
+     "after": "nothing"
+    },
+    {
+     "name": "Strategy session",
+     "length": "60 minutes",
+     "price": "$55",
+     "kind": "one price",
+     "where": "video or the office",
+     "before": "paid in full when booking; refunded if cancelled 24 hours or more before",
+     "after": "nothing more"
+    },
+    {
+     "name": "Essay review",
+     "length": "60 minutes, per essay",
+     "price": "$35",
+     "kind": "one price",
+     "where": "video or the office",
+     "before": "a card saved for the $20 late-cancel fee",
+     "after": "the saved card charged when the advisor texts DONE"
+    },
+    {
+     "name": "Quick check",
+     "length": "30 minutes",
+     "price": "$25",
+     "kind": "one price",
+     "where": "the office",
+     "before": "nothing taken",
+     "after": "paid at the front desk"
+    },
+    {
+     "name": "Application package",
+     "length": "the whole application plan",
+     "price": "$640, quoted from the family's answers first",
+     "where": "the office",
+     "before": "a $160 deposit when booking",
+     "after": "the $480 rest at the front desk"
+    }
+   ],
+   "at the customer's place (flow B)": [
+    {
+     "name": "Campus visit at home",
+     "length": "90 minutes, within 20 miles",
+     "price": "$179",
+     "kind": "one price",
+     "before": "a card saved for the $89 visit fee",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Application package at home",
+     "length": "the whole application plan",
+     "price": "$640, quoted from the family's answers first",
+     "before": "a $160 deposit when booking",
+     "after": "the $480 rest on the bill after"
+    },
+    {
+     "name": "Family info night at a host's place",
+     "length": "2 hours, up to 12 families",
+     "price": "$179",
+     "kind": "one price",
+     "before": "nothing taken",
+     "after": "the bill texted after"
+    },
+    {
+     "name": "Campus visit at home, paid in full",
+     "length": "60 minutes",
+     "price": "$150",
+     "kind": "one price",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    }
+   ],
+   "capacity": "one advisor per meeting",
+   "skills": "admissions by school type, essays, testing plans, financial aid timelines, the advisor's own list",
+   "online": "The intro call and sessions by video or phone."
+  },
+  "pf.questions": {
+   "before times": [
+    "Who is the session for: the student, a parent, or both? What's the goal: a plan, essays, or a visit?",
+    "Roughly when, and how many people?",
+    "At the office, by video or phone, or at your home?"
+   ],
+   "after a time is picked": [
+    "The student's grade and the year of applications, in a few words.",
+    "Anything that helps the meeting, like a step-free way in."
+   ],
+   "only on the secure page": [
+    "The student's grades, test scores and school records the family chooses to share",
+    "Learning needs or accommodations, only if the family chooses to share them",
+    "Family budget and aid questions, for the advisor's plan only",
+    "The advisor's terms, the parent's consent, and whether the advisor may keep a copy of an essay (no by default)",
+    "The student's name as it appears on school records, and the parent's name as booker"
+   ],
+   "who may book": "A parent or guardian books for a student under 18 and pays. A student may book alone only at 18 or older. A parent may not book for an adult student."
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone in danger or hurt right now, at school, at home or anywhere",
+     "say": "If anyone is in danger, call 911, or the local emergency number.",
+     "booking": "no booking in that chat"
+    },
+    {
+     "words": "crisis words, from the student or a parent",
+     "say": "the 988 line and 911",
+     "booking": "no booking in that chat"
+    },
+    {
+     "words": "a student who says an adult is hurting them",
+     "say": "Call 911 now, or the local child-protection line. Rosie never takes a report.",
+     "booking": "no booking in that chat"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a family dispute over who may see the student's records",
+     "what": "the advisor follows the papers on file, asks the parent who may book, and never tells one parent what the other shared."
+    }
+   ],
+   "never answered": "Legal questions about records and consent, financial aid rules, and mental-health or learning-assessment questions: the advisor says so and points to the school, a lawyer or a licensed professional.",
+   "never said": "No promise of admission, a scholarship or a school's decision."
+  },
+  "pf.first_steps": {
+   "required": [
+    {
+     "name": "The advisor's terms and the family's consent form",
+     "when": "before the first session",
+     "who": "the parent, on the secure page",
+     "goodFor": "until the terms change",
+     "result": "signed: on file for later sessions"
+    }
+   ],
+   "prep for the reminder": "Have the student's grades, the list of schools, the deadlines and the test dates ready."
+  },
+  "pf.visit": {
+   "check-in": "At the office: the code at the desk. By video or phone: the advisor asks for the code at the start. At home: the code at the door.",
+   "at the visit": "The advisor goes over the plan and the deadlines. Nothing is bought through Rosie: fees to schools, testing and exam fees are paid to those organizations.",
+   "work changes": "Extra time on a plan, an extra essay or a longer session is priced and OK'd before it's added.",
+   "what proves it's done": "The code, or DONE when the meeting ends."
+  },
+  "pf.money": {
+   "before": "A strategy session: paid in full when booked (refunded 24 hours or more before). An essay review or a home visit: a card saved. An application package: a deposit now, the rest after. Family info nights: nothing taken.",
+   "after": "The saved card is charged when the advisor texts DONE; an application package's rest goes to the front desk or the bill; a quick check pays at the desk; an info night's bill is texted after.",
+   "school fees": "Never through Rosie: school application fees and testing fees are paid to those organizations.",
+   "fees": "Late-cancel fee: $20 (an essay review) or $89 (a home visit), only with the advisor's OK; no fee on silence.",
+   "tips": "None.",
+   "tax": "None by default; the state form says if the service is taxed there.",
+   "rosfield": "$2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never in a text": "A student's grades, test scores, school records, learning needs, family money or aid, health, and anything the family shares about the student's life.",
+   "card or document texted by mistake": "Not kept or passed on; the family is told once where it goes instead (the secure page).",
+   "staff texts": "the student's first name and the kind of session; details on the secure page",
+   "languages": "English and Spanish.",
+   "minors": "A student under 18 is never texted directly by Rosie; the parent gets the texts."
+  },
+  "pf.staff": {
+   "roles": "Advisors (some with teaching or counseling-office experience, shown as their own word), a front desk person.",
+   "licenses": "None needed. Experience is the advisor's own word, shown as stated.",
+   "who OKs": "Sam OKs any price made for one family.",
+   "stand-ins": "Another advisor who knows the student's list; a family that asked for their advisor by name is asked first; nobody moves on silence.",
+   "after hours": "None: bookings are by text or on the page."
+  },
+  "pf.rules": {
+   "advising": "Advising isn't legal, financial or counseling advice; the advisor says so when asked. Fees to schools and testing organizations are never taken by Rosie. An essay is kept only with the family's yes.",
+   "records": "7 years."
+  },
+  "pf.edges": {
+   "matter most": {
+    "a student who says an adult is hurting them": "911 or the local child-protection line at once; no booking.",
+    "a parent and an adult student who disagree on who books": "The adult student decides for themselves; Rosie never tells one party what the other shared.",
+    "a request for an admission promise": "The advisor says no promise is made.",
+    "a late cancel": "The fee only with the advisor's OK; no fee on silence.",
+    "an essay sent as a photo": "Used only for the review; not shared."
+   },
+   "the rest": "All other edge cases are handled the generic way."
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Simon and Tara style at companies; Simon runs team workshops too. Ruth and Grace style clients; Ruth also does home visits. Pat is my office manager, for prices over $500. Jules rents a room in the office, with their own clients."
+   ],
+   [
+    "Haircut at their home",
+    "Campus visit at home, paid in full"
+   ],
+   [
+    "$75",
+    "$150"
+   ],
+   [
+    "$140 an hour",
+    "$120 an hour"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Ruth: advisor, color, home visits"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ruth: advisor, color and home visits"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "New clients come to you first. Returning clients never need one"
+   ],
+   [
+    "Style consult",
+    "Intro call"
+   ],
+   [
+    "free style consult",
+    "free intro call"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a facial peel, which isn't on the office's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Advising doesn't do facial peels."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The advisor's pin tore my shirt collar."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says the advisor's pin tore a shirt collar today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "Likes warm colors, soft lines at the sides, and no logos."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a essay review for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "two skin fades on",
+    "two strategy sessions on"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Advising for families in Springfield. Strategy sessions, essay reviews and campus visits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A essay review"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most advising offices set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood advising office on Elm St. Strategy sessions, essay reviews and application packages."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most advising offices start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules advising offices often set."
+   ],
+   [
+    "From the list, from photos, or at the visit?",
+    "From the list, from family answers, or at the visit?"
+   ],
+   [
+    "color quote",
+    "package quote"
+   ],
+   [
+    "Give your check-in code at the chair.",
+    "Give your check-in code at the start."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next visit at a session's end"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una sesión de asesoría el sábado."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A strategy session could mean a office visit or a advisor at your home."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some work takes several visits, like a essay review done in two steps. Where the plug-in says so, all the times are picked now."
+   ],
+   [
+    "You're booked! Give this code at the chair when you arrive.",
+    "You're booked! Give this code at the office desk when you arrive."
+   ],
+   [
+    "Done. Your Sat 11:00am visit is now with Avery. Give this code at the chair.",
+    "Done. Your Sat 11:00am session is now with Grace. Give this code at the desk."
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at the desk."
+   ],
+   [
+    "The problem gets worse",
+    "Alex's plans change"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 14 · 10:00am"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A office takes no drop-offs. A tailor or a shoe repair does."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens in the session?"
+   ],
+   [
+    "Stops, and sends a written note",
+    "Points to other help, in a note"
+   ],
+   [
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. A student under 18 comes with a parent, who stays for the session."
+   ],
+   [
+    "Riley finishes the work",
+    "Riley finishes the session"
+   ],
+   [
+    "Riley adds notes for next time",
+    "Riley keeps their own notes"
+   ],
+   [
+    "Anything added at the chair is paid there, the shop's own way.",
+    "Anything added in a session is paid when the session ends, the office's own way."
+   ],
+   [
+    "A tip at the chair is the shop's own way too.",
+    "Advising takes no tips."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A session is rated, with only the score kept, so the office takes the first branch."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The color came out patchy on one side."
+   ],
+   [
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Lee Advising will make up the time for free. Pick a time:"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you help students? My son is 16, a junior in high school."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds group advising to Lee Advising. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "NEW massage",
+    "NEW group advising"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Group advising for Lee Advising: is it the same company?"
+   ],
+   [
+    "Paid at the chair",
+    "Charged after the session"
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley, so Riley's next times show."
+   ],
+   [
+    "Other days, the customer pays at the chair, the shop's own way.",
+    "Anything more needs the client's yes first."
+   ],
+   [
+    "No bill is texted, so there's no tip line. A tip at the chair is the shop's own.",
+    "No bill is texted, so there's no tip line. Advising takes no tips."
+   ],
+   [
+    "2 At my home",
+    "2 At my workplace"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a follow-up every 2 weeks"
+   ],
+   [
+    "A no-show is marked 15 minutes after the start.",
+    "A no-show: nobody joins a video session within 10 minutes, or 15 at the office."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "No work here is sent now, so nobody is put on call."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The office takes no jobs sent now: advising is booked ahead."
+   ],
+   [
+    "From the price list or photos, the price is set. A service priced at the chair gets its price now.",
+    "From the price list, or from family answers, the price is set. A service priced at the session gets its price now."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every advising service, essay help and campus visits"
+   ],
+   [
+    "Hours: the shop's hours",
+    "Hours: the office's hours"
+   ],
+   [
+    "The licenses check out; asks Sam",
+    "Everyone has joined; asks Sam"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: advising and workshops"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: advising"
+   ],
+   [
+    "Avery: barber",
+    "Avery: college advisor"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Advising can book you from now on, by video, at the office and for home visits. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop. Your day list comes at the time you picked.",
+    "You're all set: Lee Advising can book you from now on, by video and at the office. Your day list comes at the time you picked."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Services's"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Advising LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Advising"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Campus Visits"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Essay Lab"
+   ],
+   [
+    "Lee Electric",
+    "Lee Info Nights"
+   ],
+   [
+    "88 Elm St",
+    "14 Park Ave"
+   ],
+   [
+    "1200 Main St",
+    "400 Main St"
+   ],
+   [
+    "every 4 weeks",
+    "every 2 weeks"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Strategy session"
+   ],
+   [
+    "Signature cut and shave",
+    "Strategy session"
+   ],
+   [
+    "signature cut",
+    "strategy session"
+   ],
+   [
+    "$55",
+    "$55"
+   ],
+   [
+    "Groom's package",
+    "Full-day planning"
+   ],
+   [
+    "Color and cut",
+    "Essay review"
+   ],
+   [
+    "color and cut",
+    "essay review"
+   ],
+   [
+    "Color correction",
+    "Student profile"
+   ],
+   [
+    "color correction",
+    "student profile"
+   ],
+   [
+    "Skin fade",
+    "Essay review"
+   ],
+   [
+    "skin fade",
+    "essay review"
+   ],
+   [
+    "Beard trim",
+    "Transcript check"
+   ],
+   [
+    "beard trim",
+    "transcript check"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Quick check (30 minutes, 18 and up)"
+   ],
+   [
+    "kids cut",
+    "quick check"
+   ],
+   [
+    "Haircut plans",
+    "Follow-up plans"
+   ],
+   [
+    "haircut plan",
+    "follow-up plan"
+   ],
+   [
+    "Haircut plan",
+    "Follow-up plan"
+   ],
+   [
+    "Haircuts",
+    "Follow-up sessions"
+   ],
+   [
+    "haircuts",
+    "follow-up sessions"
+   ],
+   [
+    "Haircut",
+    "Follow-up session"
+   ],
+   [
+    "haircut",
+    "follow-up session"
+   ],
+   [
+    "a patch test",
+    "an intro call"
+   ],
+   [
+    "patch test",
+    "intro call"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "barbershop",
+    "advising office"
+   ],
+   [
+    "Barbershop",
+    "Advising office"
+   ],
+   [
+    "Barbering",
+    "Advising"
+   ],
+   [
+    "barbers",
+    "advisors"
+   ],
+   [
+    "barber",
+    "advisor"
+   ],
+   [
+    "Barber",
+    "Advisor"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "office's price list"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Drain clearing",
+    "Strategy session"
+   ],
+   [
+    "Panel upgrade",
+    "Full-day planning"
+   ],
+   [
+    "plumbing jobs",
+    "advising sessions"
+   ],
+   [
+    "electrical jobs",
+    "workshops"
+   ],
+   [
+    "Electrical",
+    "Workshops"
+   ],
+   [
+    "electrical",
+    "workshops"
+   ],
+   [
+    "plumber",
+    "advisor"
+   ],
+   [
+    "Plumber",
+    "Advisor"
+   ],
+   [
+    "Plumbing",
+    "Advising"
+   ],
+   [
+    "plumbing",
+    "advising"
+   ],
+   [
+    "Riley Chen",
+    "Ruth Adler"
+   ],
+   [
+    "Avery Diaz",
+    "Grace Owens"
+   ],
+   [
+    "Jordan Price",
+    "Simon Vale"
+   ],
+   [
+    "Casey Moore",
+    "Tara Holt"
+   ],
+   [
+    "Riley",
+    "Ruth"
+   ],
+   [
+    "Avery",
+    "Grace"
+   ],
+   [
+    "Jordan",
+    "Simon"
+   ],
+   [
+    "Casey",
+    "Tara"
+   ],
+   [
+    "priced from photos",
+    "priced from family answers"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your family answers"
+   ],
+   [
+    "a interview practice",
+    "a essay review"
+   ],
+   [
+    "A interview practice",
+    "A essay review"
+   ],
+   [
+    "with the code at the chair",
+    "with the code at the desk"
+   ],
+   [
+    "Kids cut",
+    "Quick check"
+   ]
+  ],
+  "B": [
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Simon and Tara style at companies; Simon runs team workshops too. Ruth and Grace style clients; Ruth also goes to clients' homes. Pat is my office manager, for prices over $500. Jules rents a room in the office, with their own clients."
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Campus Visits has a yearly color plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 3 months?"
+   ],
+   [
+    "Under the sink, before",
+    "Mirror area, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Rug, before"
+   ],
+   [
+    "$140 an hour",
+    "$120 an hour"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Ruth: advisor, color, home visits"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ruth: advisor, color and home visits"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "New clients come to you first. Returning clients never need one"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Campus visit at home"
+   ],
+   [
+    "Yard drain",
+    "Quick check at home"
+   ],
+   [
+    "Kitchen drain",
+    "Campus visit at home"
+   ],
+   [
+    "the kitchen drain",
+    "the campus visit at home"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about the session wasn't right, reply here."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about advising for my new managers. A text back is fine."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can advising help with my anxiety medication?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a advisor come to our office this Thursday? What does it cost?"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like reporting on what an employee said."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Help my son with applications' fits a strategy session."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding an essay review? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many people, and what should the session cover?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At our office. Just me, for now."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a color check every year."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some work takes more than one visit, like a half-day split over two mornings."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you do a color check every year, too?"
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a application package at home is priced from family answers, so Rosie's first text asks for them."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your family's answers, and a advisor will price the edit."
+   ],
+   [
+    "couldn't price your water heater this time.",
+    "couldn't price your essay review this time."
+   ],
+   [
+    "Your water heater price is with",
+    "Your essay review price is with"
+   ],
+   [
+    "Your water heater contract is waiting for your signature.",
+    "Your essay review agreement is waiting for your signature."
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Agreement · Application package at home · $640"
+   ],
+   [
+    "Your water heater visit wasn't booked",
+    "Your essay review wasn't booked"
+   ],
+   [
+    "didn't sign the water heater contract in time",
+    "didn't sign the essay review agreement in time"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home session needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a table for the papers."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Say Morgan has a repeat plan: a team style check at two offices every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's style check?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my manager sit in on the session?"
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Campus visit at home|Visit}}"
+   ],
+   [
+    "{{svc.intext:Yard drain|Visit}}",
+    "{{svc.intext:Quick check at home|Visit}}"
+   ],
+   [
+    "{{svc.intext:Water heater flush|Visit}}",
+    "{{svc.intext:Campus visit at home, paid in full|Visit}}"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $640 quote is good for 7 days."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Add a color check · $160"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the color check for $160."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Simon spots a fit issue."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 color check"
+   ],
+   [
+    "replace both shutoff valves, $160.",
+    "a color check, $160."
+   ],
+   [
+    "the shutoff valves",
+    "the color check"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Simon spills a drink on the office's rug and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE coffee spilled on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Coffee on the rug"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "spilled coffee on the rug at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows a clean rug."
+   ],
+   [
+    "Harper J.'s $2,400 repipe is over it, so the link offers a bank transfer too.",
+    "Harper J.'s $2,400 leadership program is over it, so the link offers a bank transfer too."
+   ],
+   [
+    "$800 for stage 2 of your repipe.",
+    "$800 for stage 2 of your leadership program."
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your leadership program"
+   ],
+   [
+    "the {{svc.intext:kitchen drain|visit}}",
+    "the {{svc.intext:campus visit at home|visit}}"
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The session's plan wasn't sent 2 weeks later. Sam OKs a free follow-up visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "I never got the action plan from the session."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "'s session on Thu Oct 22 had no action plan sent."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. Your follow-up visit is free."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My coat was missing after the session this morning."
+   ],
+   [
+    "like replacing the old pipes Jordan noted.",
+    "like a team program Simon noted."
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a team program, from Simon's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Team program"
+   ],
+   [
+    "your sewer camera report from Thursday is ready.",
+    "your session summary from Thursday is ready."
+   ],
+   [
+    "Sewer camera report",
+    "Session summary"
+   ],
+   [
+    "your sewer camera report needs a little more time.",
+    "your session summary needs a little more time."
+   ],
+   [
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "your session summary from Thu Oct 22 is ready."
+   ],
+   [
+    "that a sewer camera report comes Fri Oct 23.",
+    "that a session summary comes Fri Oct 23."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a campus visit at home, today,"
+   ],
+   [
+    "The service call is $89.",
+    "The visit fee is $89."
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the essay review quote before booking."
+   ],
+   [
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Ivy C. books a campus visit at home for Mon Nov 9 in the morning."
+   ],
+   [
+    "two {{svc.intext:drain clearings|visits}}",
+    "two {{svc.intext:home strategy sessions|visits}}"
+   ],
+   [
+    "you have two drain clearings on",
+    "you have two home strategy sessions on"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Advising for homes in Springfield. Home strategy sessions and essay reviews, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A application package at home"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most advising offices set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An advising office on Elm St. Strategy sessions, essay reviews and application packages."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most advising offices start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules advising offices often set."
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both managers' sessions go on one bill on the 1st."
+   ],
+   [
+    "7am Thu",
+    "6pm Wed"
+   ],
+   [
+    "7am on the visit day",
+    "6pm the day before"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "No license needed for advising"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks the family for answers"
+   ],
+   [
+    "Prices it: the list, photos or the visit",
+    "Prices it: the list, a quote or the visit"
+   ],
+   [
+    "Quoted from photos first",
+    "Quoted from the family's answers first"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A sign of danger gets 988 or 911 first."
+   ],
+   [
+    "Lee Electric.",
+    "Lee Info Nights."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Simon also bring a admissions summary?"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Store 1 manager · Tue Oct 20 · $179"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Store 2 manager · Wed Oct 21 · $179"
+   ],
+   [
+    "Jordan from Lee Home Services is on the way, about 15 minutes. When Jordan arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in.",
+    "Simon from Lee Campus Visits is on the way, about 15 minutes. When Simon arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in."
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code at the meeting room"
+   ],
+   [
+    "Jordan couldn't enter your code. If the person at your door isn't Jordan, don't let them in.",
+    "Simon couldn't enter your code. If the person at your door isn't Simon, don't let them in."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped on the stairs, need to stop"
+   ],
+   [
+    "Sam bills Alex the business's own way",
+    "Sam bills the company its own way"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Color check"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Simon left a mess in the fitting room."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can I see Jordan again next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the report link"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE team report Mon Oct 26"
+   ],
+   [
+    "The problem gets worse",
+    "Alex's plans change"
+   ],
+   [
+    "Jordan found more work.",
+    "Jordan suggests one more thing."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE nothing to note"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 session"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE session held. My notes are in my own files."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "It's Sam's call each time."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds color consulting to Lee Campus Visits. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW color consulting"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Color consulting for Lee Campus Visits: is it the same company?"
+   ],
+   [
+    "Nora can ask to be next for that window. If Ivy's saved time runs out, it's saved for Nora at once.",
+    "Nora can ask to be next for that time. If Ivy's saved time runs out, it's saved for Nora at once."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'd like a strategy session for two people."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero una sesión de asesoría para dos personas."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa advising Thu 12pm Casey"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A campus visit at home happens only at the client's home, so nothing is asked."
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your family's answers"
+   ],
+   [
+    "Add photos",
+    "Add the family's answers"
+   ],
+   [
+    "Photos and answers added",
+    "Family answers added"
+   ],
+   [
+    "From the photos and answers",
+    "From the family's answers"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Advising books a set start time."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Simon's times show: Simon does the essay reviews."
+   ],
+   [
+    "1 At my home",
+    "1 At my workplace"
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Each session has a set start time. The advisor comes 10 minutes early to set up."
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "10am–12pm",
+    "10:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "No work here is sent now, so nobody is put on call."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The office takes no jobs sent now: advising is booked ahead."
+   ],
+   [
+    "A plug-in holds what one kind of work needs. The steps around it stay the same. Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "A plug-in holds what one kind of work needs. The steps around it stay the same. Rosie loads advising's now, and the others when Sam gets to them."
+   ],
+   [
+    "After that, or nobody home",
+    "After that, or a no-show"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Electrical and Lee's Barbershop are saved, about 10 minutes from live. Text MORE anytime to finish.",
+    "Workshops and Lee Advising are saved, about 10 minutes from live. Text MORE anytime to finish."
+   ],
+   [
+    "The licenses check out; asks Sam",
+    "Everyone has joined; asks Sam"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: advising and workshops"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: advising"
+   ],
+   [
+    "Avery: barber",
+    "Avery: college advisor"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Advising can book you from now on, by video, at the office and for home visits. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop. Your day list comes at the time you picked.",
+    "You're all set: Lee Advising can book you from now on, by video and at the office. Your day list comes at the time you picked."
+   ],
+   [
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "Workshops and Lee Advising now show to AI assistants too."
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "A drain clearing",
+    "A campus visit at home"
+   ],
+   [
+    "a drain clearing",
+    "a campus visit at home"
+   ],
+   [
+    "a water heater replacement",
+    "a application package at home"
+   ],
+   [
+    "a water heater flush",
+    "a campus visit at home, paid in full"
+   ],
+   [
+    "A leak repair",
+    "A strategy debrief"
+   ],
+   [
+    "a leak repair",
+    "a strategy debrief"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Campus Visits'"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Campus Visits LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Advising"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Campus Visits"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Essay Lab"
+   ],
+   [
+    "88 Elm St",
+    "14 Park Ave"
+   ],
+   [
+    "1200 Main St",
+    "400 Main St"
+   ],
+   [
+    "leehomeservices.com",
+    "leecampusvisits.com"
+   ],
+   [
+    "42 Oak St",
+    "500 Harbor Ave"
+   ],
+   [
+    "beard trim",
+    "transcript check"
+   ],
+   [
+    "Haircut",
+    "Follow-up session"
+   ],
+   [
+    "haircut",
+    "follow-up session"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "barbershop",
+    "advising office"
+   ],
+   [
+    "Barbershop",
+    "Advising office"
+   ],
+   [
+    "barbers",
+    "advisors"
+   ],
+   [
+    "barber",
+    "advisor"
+   ],
+   [
+    "Barber",
+    "Advisor"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Drain clearings",
+    "Home strategy sessions"
+   ],
+   [
+    "Drain clearing",
+    "Campus visit at home"
+   ],
+   [
+    "drain clearing",
+    "campus visit at home"
+   ],
+   [
+    "Water heater replacement",
+    "Application package at home"
+   ],
+   [
+    "water heater replacement",
+    "application package at home"
+   ],
+   [
+    "Water heater flush",
+    "Campus visit at home, paid in full"
+   ],
+   [
+    "water heater flush",
+    "campus visit at home, paid in full"
+   ],
+   [
+    "Leak repair",
+    "Strategy debrief"
+   ],
+   [
+    "leak repair",
+    "strategy debrief"
+   ],
+   [
+    "Sewer camera inspection",
+    "Admissions summary"
+   ],
+   [
+    "sewer camera inspection",
+    "admissions summary"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "Service call",
+    "Visit fee"
+   ],
+   [
+    "Panel upgrade",
+    "Full-day planning"
+   ],
+   [
+    "plumbing and electrical work",
+    "advising and workshops"
+   ],
+   [
+    "plumbing jobs",
+    "advising sessions"
+   ],
+   [
+    "electrical jobs",
+    "workshops"
+   ],
+   [
+    "electrical prices",
+    "workshop prices"
+   ],
+   [
+    "Electrical",
+    "Workshops"
+   ],
+   [
+    "electrical",
+    "workshops"
+   ],
+   [
+    "plumber",
+    "advisor"
+   ],
+   [
+    "Plumber",
+    "Advisor"
+   ],
+   [
+    "Plumbing",
+    "Advising"
+   ],
+   [
+    "plumbing",
+    "advising"
+   ],
+   [
+    "Riley Chen",
+    "Ruth Adler"
+   ],
+   [
+    "Avery Diaz",
+    "Grace Owens"
+   ],
+   [
+    "Jordan Price",
+    "Simon Vale"
+   ],
+   [
+    "Casey Moore",
+    "Tara Holt"
+   ],
+   [
+    "Riley",
+    "Ruth"
+   ],
+   [
+    "Avery",
+    "Grace"
+   ],
+   [
+    "Jordan",
+    "Simon"
+   ],
+   [
+    "Casey",
+    "Tara"
+   ],
+   [
+    "nobody home",
+    "a no-show"
+   ],
+   [
+    "Rental 1",
+    "Store 1 manager"
+   ],
+   [
+    "Rental 2",
+    "Store 2 manager"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Advising needs no state license by default, so the company gives only its registration (S1-61). It's a switch: a state's form can name one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Advising pays Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Advising adds no agreement before going live, so nothing is left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Advising books a advisor's time, never a room on its own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Advising is one-to-one or a team session booked by the company; no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No advisor needs a person license by default; credentials are the advisor's own word."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Advising is never sent now: sessions are booked ahead."
+   },
+   {
+    "op": "more",
+    "at": "S13-10",
+    "more": [
+     "Advising: crisis words get 988 and 911, and nothing else. Sam's flag never carries the words, and the AI never counsels."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "Advising isn't therapy or legal advice. Those questions wait for the advisor, who points to a licensed pro."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Advising: what a client shares about their job, health or money stays on the secure page. Texts to the owner or staff carry none of it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "The advising plug-in brings a free intro call, the advisor's client check and the office's terms.",
+     "It needs no license by default, and gives 988 for crisis words."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Every session is a advisor's time (A4-14)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Advising books a advisor, not a space."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A session is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every new client has the intro call, the intake and the agreement; a returning client has them on file."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Adults only: no child is left with a advisor."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with a advisor."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked after a session, as in the old flowchart. Only the score is kept."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Clients pay for advising themselves: no insurance plan is billed."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A package is paid in full when booked; nothing is billed in stages."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance plan pays for advising."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left with a advisor."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A session has no result that comes later; the advisor's notes stay with the advisor."
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "label": "Safety steps, then go on",
+    "why": "Advising has no safety steps to send before booking: danger gets 911, crisis words get 988 and 911."
+   },
+   {
+    "op": "after",
+    "at": "A3-22",
+    "steps": [
+     {
+      "id": "A3-x01",
+      "line": [
+       "3.9"
+      ],
+      "who": "san",
+      "via": "auto",
+      "type": "split",
+      "title": "Checks it's advising, not therapy",
+      "q": "Asking for therapy, not advising?",
+      "does": "The plug-in's scope check, right after the danger check. Words like 'therapy', 'treat my anxiety' or 'my depression' get a plain answer about what advising is.",
+      "more": [
+       "Rosie never judges how anyone is doing, and never names a condition.",
+       "It goes by meaning, whatever words are used. A career or life goal goes straight on.",
+       "Crisis words never come here: they get 988 and 911 first, above."
+      ],
+      "needs": [
+       "request",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "No: advising goals",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Asks for therapy",
+        "steps": [
+         {
+          "id": "A3-x02",
+          "line": [
+           "3.9"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "sync",
+          "type": "split",
+          "title": "Says what advising is; Alex picks",
+          "q": "Still want advising?",
+          "does": "Rosie says plainly that advising isn't therapy, and that a licensed therapist is the right person for that. Then Alex picks. Rosie doesn't push either way.",
+          "more": [
+           "The AI can help Alex look for a therapist, outside Rosie.",
+           "Advising for career or life goals can still be booked."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Ruth is a advisor, not a therapist. Advising doesn't diagnose or treat mental health conditions. For that, a licensed therapist is the right person. Would you still like advising for your goals?",
+            {
+             "buttons": [
+              "Advising goals",
+              "Look for a therapist"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Advising goals",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Look for a therapist",
+            "steps": [],
+            "end": "end",
+            "endText": "No booking. Alex looks for a therapist; nobody at the office is told."
+           }
+          ]
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-03",
+    "more": [
+     "Here: the free intro call first, the intake on the secure page, Ruth's client check, the terms, and the scope notice."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "A team session is booked by a company, in flow B. One more person, like a partner, is added on the secure page (A4-71)."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "An adult the booker acts for",
+    "why": "Advising needs the client's own consent and goals; a guardian doesn't book it for another adult."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The package is booked as its own service: its $55 is this booking's full price (A5-16). Nothing else is sold on the page."
+   },
+   {
+    "op": "more",
+    "at": "A7-03",
+    "more": [
+     "On a package, only this session moves. The others keep their times."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-51",
+    "label": "The customer's to bring",
+    "why": "A advising session asks the client to bring nothing; what it needs was done at booking. Only the office's side, like a conflict, can stop it (A8-61)."
+   },
+   {
+    "op": "more",
+    "at": "A10-02",
+    "more": [
+     "Only the score is kept, never what the session was about."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Ruth replies YES, then checks what Sam set. One reply covers every kind of work Ruth does.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Grace, Simon and Tara join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES"
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Advising! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Ruth Adler · Lee Advising",
+        "lines": [
+         "Application reviews and planning, essay reviews and home visits",
+         "No license needed for this work",
+         "Hours: the office's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Campus Visits",
+       "At the client's office",
+       "None needed · registration 2019-0451",
+       "Yes"
+      ],
+      [
+       "Simon Vale",
+       "Lee Campus Visits",
+       "At the client's office",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Tara Holt",
+       "Lee Campus Visits",
+       "At the client's office",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Campus Visits",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Ruth Adler",
+       "Lee Advising",
+       "Video, the office, home visits",
+       "None needed · registration 2020-1187",
+       "Once Sam says yes"
+      ],
+      [
+       "Grace Owens",
+       "Lee Advising",
+       "Video and the office",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "A3-22",
+    "more": [
+     "The general check looks for danger to life, fire, gas, a medical emergency or self-harm.",
+     "Every answer later in the booking is checked the same way, in any wording.",
+     "On a call, the voice AI says any safety words out loud.",
+     "The plug-in adds its own: anyone who says they may hurt themselves or someone else gets 988 and 911 at once."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-25",
+    "does": "Words about suicide, self-harm, hurting someone else or a mental health crisis get 988 and 911 at once. There's no booking in that chat.",
+    "more": [
+     "This is always on, for every kind of work, whatever words are used.",
+     "The AI never counsels: no comfort as a counselor, no questions about it, no advice.",
+     "Sam sees only that the crisis lines were given, never the words. Nobody else is told, unless Alex asks.",
+     "On a call, Rosie says the same words out loud.",
+     "Alex can come back and book any time later."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "If you're thinking about hurting yourself or someone else, call or text 988 now. If anyone is in danger right now, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "more": [
+     "Sam set this line at sign-up: the number customers call for what only a advisor should answer.",
+     "911 or 988 come first when they're needed.",
+     "The plug-in lists which words go to this line. Sam can add more.",
+     "Advising isn't legal, financial or medical advice, so those questions are never answered here.",
+     "Where the plug-in says those words stop a booking, nothing is booked. Otherwise Alex can go on."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the advisors themselves. Ruth can go over it in your session. For anything sooner, call Lee Advising at (555) 010-0177."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-36",
+    "does": "Alex picks video. Advising can be done by video or phone. It counts as at the business, so Ruth asks for the code at the start.",
+    "more": [
+     "The plug-in says which services can be done by video or phone. The customer picks it here, like a place.",
+     "Advising needs no license, so no state is asked first.",
+     "The confirmation and the reminder carry Ruth's own video link from the Team page.",
+     "Nobody joins within 10 minutes: it's handled like a no-show."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "more": [
+     "It's one booking, with one code.",
+     "If no one advisor has time for both, the times show two advisors back to back.",
+     "A session for Alex and a quick check for Alex's daughter, 19, are booked the same way. Both are asked before the times."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "more": [
+     "A named advisor is the client's choice. Rosie never suggests, ranks or rates advisors."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "The first one, please."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-16",
+    "does": "Alex asked for Ruth by name, so only Ruth's times show, at Ruth's price. A named advisor is offered only if they pass the same tests.",
+    "more": [
+     "If Ruth can't take it, the AI says so. It offers Ruth's next open day, or the office's other advisors, listed with no ranking."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-26",
+    "does": "Alex books a session for their adult brother, as a gift, and pays for it. The code goes to the brother.",
+    "more": [
+     "The brother gets texts only once Alex says the brother agreed to them.",
+     "The brother answers the private questions and signs the terms on their own secure page.",
+     "Alex gets the receipt, as the one who pays. Alex never sees what the brother shares."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "It's a gift for my brother. Can I pay for it?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-55",
+    "does": "A what-if: Alex's employer pays from its learning budget. Alex forwards the payer a link. The payer pays on the secure page, and gives their own OK to texts there.",
+    "more": [
+     "Rosie texts the payer only after that OK.",
+     "The receipt goes to the one who paid. It shows only the date, the length and the price.",
+     "The payer never sees Alex's answers or what's said in a session.",
+     "The plug-in says if someone else may pay at all."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-41",
+    "does": "The plug-in's scope notice is due when booking, so the AI says it before Alex's yes. The secure page and the confirmation repeat it.",
+    "more": [
+     "It's the advisor's own scope text, from the plug-in.",
+     "The booking records that the notice was said.",
+     "Any paper owed after booking becomes a to-do for the office, with its due date."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Before you book: advising with Ruth isn't therapy, and isn't legal, financial or medical advice. What you share stays on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says a new client needs first steps: a free intro call with the advisor, and the intake form. Rosie checks before the secure link, so the page knows what to ask."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "does": "On the secure page, Alex answers one short question: are texts to this phone safe? Advising shows no photos of clients, so there's no photo question.",
+    "more": [
+     "A work phone or a shared one: Alex picks this page, email or a call. Rosie then reaches Alex only that way.",
+     "A job search can be private from an employer, so a work phone is a good reason to say no.",
+     "Here, Alex says texts are safe."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "One quick question.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-03",
+    "does": "Say Alex books session 3 of the package as its own booking. It uses one of the 6, so it's already paid. The page shows 3 left after it.",
+    "more": [
+     "So nothing more is taken for it.",
+     "A cancel in time puts the session back on the package.",
+     "A late cancel or a no-show can use the session up. Sam confirms it. No answer in 24 hours: it stays on the package.",
+     "Rosie never offers a package in a booking text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-21",
+    "more": [
+     "The terms say how often, the price a session, when each is paid, and how to skip, pause or end.",
+     "A follow-up plan saves a card, like a follow-up session.",
+     "Saving the card takes nothing. A fee is charged only if Sam says yes.",
+     "Repeat charges need this yes of their own. A yes to the booking isn't enough.",
+     "Alex gets a copy of the terms the way Alex picked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-19",
+    "does": "Back to Alex's booking. The plug-in's job rules need the office's terms before a client's first paid session, signed before any money is taken.",
+    "more": [
+     "A returning client's agreement is on file, so a follow-up needs none. A new package gets a new one.",
+     "Its deposit limit and cancel window come from the state's form."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-20",
+    "does": "Rosie builds the terms from Ruth's own text and the package. Alex signs on the secure page. Sam signed the office's side at sign-up, and each gets a copy.",
+    "form": [
+     [
+      "Terms · Lee Advising",
+      "Full text shown"
+     ],
+     [
+      "What advising is",
+      "Advising for your goals. Not therapy, and not legal, financial or medical advice"
+     ],
+     [
+      "Confidentiality",
+      "What you share stays between you and Ruth, unless the law requires otherwise or someone is in danger"
+     ],
+     [
+      "Package",
+      "6 sessions of 60 minutes · $55"
+     ],
+     [
+      "Cancel",
+      "Free until 24 hours before a session. Later, it may be used up"
+     ],
+     [
+      "Ending",
+      "Either of you may end it. Sessions left are refunded"
+     ],
+     [
+      "Signed",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-23",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your booking at Lee Advising wasn't made, since the terms wasn't signed in time. Nothing was charged."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-01",
+    "more": [
+     "Rosie checked this before the secure page too.",
+     "Here it books right away: Alex is a returning client, and it isn't for today.",
+     "A request also waits if it has an answer only Sam, or the advisor, should read.",
+     "Pat, the office manager, gets the same requests. Sam's answer wins."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "does": "Ruth is running late. Rosie tells Alex the new start. Alex can keep it, or move the session with no fee.",
+    "more": [
+     "2, Move my visit: Alex gets open times, with no fee.",
+     "With no reply, the later start stands.",
+     "A late advisor still gives the full session."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 10"
+     ],
+     [
+      "san",
+      "cust",
+      "Ruth is running about 10 minutes late, so your 11:00am starts about 11:10am. You still get your full session.",
+      {
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Ruth opens the video call at 10:58am. The plug-in asks nothing to bring, so the session can start.",
+    "more": [
+     "The intake and the terms were done at booking.",
+     "The code is taken only once nothing required is missing."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex's session, Sat 11:00am. Advising keeps no before record, so Ruth goes straight on.",
+    "more": [
+     "Nothing about what's said is ever noted in Rosie.",
+     "At a drop-off, before photos of the item are the record."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Alex starts talking about something advising can't cover, like a health worry or a legal question. Ruth says so, suggests a licensed pro, and goes on with Alex's goals.",
+    "more": [
+     "Danger first: if anyone may be hurt, Ruth gives 988 or 911.",
+     "Ruth's note names the kind of pro to see, like a therapist or a lawyer, never a named one.",
+     "The note goes on the secure page, never in a text.",
+     "The session goes on, so nothing is refunded for it."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: suggested other help. Note on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Ruth left you a note from today's session.",
+      {
+       "card": {
+        "title": "A note from Lee Advising",
+        "lines": [
+         "The kind of help Ruth suggested"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "The session ends on time: what was booked, and anything Alex said yes to."
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "Before the session ends, Ruth and Alex agree on next steps for the two weeks ahead. Nothing is charged for it.",
+    "more": [
+     "What they discuss stays between them. Rosie only knows the session happened.",
+     "Anything new needs Alex's yes and its price first.",
+     "Work with no walk-through, like a class or a table, skips this."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-32",
+    "does": "Say a single session leads to more, like Ruth's strategy session after a follow-up. It goes on the secure page, to sign or decline.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Advising sent you a proposal: Ruth's strategy session. Read it, then sign or decline on the secure page.",
+      {
+       "card": {
+        "title": "Proposal · strategy session",
+        "lines": [
+         "6 sessions with Ruth · $55",
+         "Good until Sat Nov 7"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/p/a15"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A9-02",
+    "does": "Alex paid the $55 in full after the intro call. Rosie sends no bill."
+   },
+   {
+    "op": "words",
+    "at": "A10-26",
+    "does": "Say Alex bought a package from Ruth at a talk at Alex's workplace. Where the state's rules give a cancel period, Rosie sends it in writing."
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Advising and workshops license nobody by default, so nobody on Sam's team is checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "does": "Ruth's day is blocked, and each customer picks: Grace by name, new times with Ruth, or a free cancel. Anything paid is refunded. With no reply in 24 hours, nobody moves: Sam calls."
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee Advising. Quinn gets one invite and replies YES. Advising needs no license, so Quinn can be booked once Sam says yes.",
+    "more": [
+     "No reply in 48 hours: one reminder, then Sam is told.",
+     "Where a state's form names a license for this work, it's asked and checked then."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Advising. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Advising needs no person license, so only the business's registration comes due. Dates come from what Sam sent. Reminders go 30 days and 7 days before.",
+    "more": [
+     "Insurance works the same way, where a company client asks for proof.",
+     "Where a state's form names a license for advising, it comes due the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Advising's registration 2020-1187 has lapsed.",
+      {
+       "card": {
+        "title": "Registration renewal",
+        "lines": [
+         "Not renewed by then: new bookings pause"
+        ],
+        "button": "Upload the receipt",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches essay review from a saved card, charged at DONE, to paid in full when booked. It's for new bookings only, and read back first.",
+    "more": [
+     "Essay reviews already booked keep their saved card.",
+     "Paid in full is taken when the customer books, so no card stays saved for it.",
+     "A late cancel then follows the rules for paid sessions.",
+     "The price-OK limit changes the same way: from now on, and read back first."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Advising needs no state license by default, so the company gives only its registration (S1-61). It's a switch: a state's form can name one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Advising pays Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Advising adds no agreement before going live, so nothing is left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Advising books a advisor's time, never a room on its own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Advising is one-to-one or a team session booked by the company; no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No advisor needs a person license by default; credentials are the advisor's own word."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Advising is never sent now: sessions are booked ahead."
+   },
+   {
+    "op": "more",
+    "at": "S13-10",
+    "more": [
+     "Advising: crisis words get 988 and 911, and nothing else. Sam's flag never carries the words, and the AI never counsels."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "Advising isn't therapy or legal advice. Those questions wait for the advisor, who points to a licensed pro."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Advising: what a client shares about their job, health or money stays on the secure page. Texts to the owner or staff carry none of it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "The advising plug-in brings a free intro call, the advisor's client check and the office's terms.",
+     "It needs no license by default, and gives 988 for crisis words."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A session starts at a set time (B4-84): the advisor is in the meeting room before it."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A session is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A company books the whole session; no seats are sold one by one."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Advising is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Advising is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Only a child answers",
+    "why": "The advisor meets adults at a company's office, never a child at a door."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for advising; the company pays under its contract."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "An adult the booker acts for",
+    "why": "Advising needs the person's own consent and goals; a guardian doesn't book it."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A session needs the person coached there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A session needs the person coached there, so no gate code is used."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Alex is in the session with the advisor; there's nothing to update him on."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Each session is billed on its own, or once a month for a company (B9-22)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for advising."
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "label": "Safety steps, then go on",
+    "why": "Advising has no safety steps to send before booking: danger gets 911, crisis words get 988 and 911."
+   },
+   {
+    "op": "after",
+    "at": "B3-17",
+    "steps": [
+     {
+      "id": "B3-x01",
+      "line": [
+       "3.9"
+      ],
+      "who": "san",
+      "via": "auto",
+      "type": "split",
+      "title": "Checks it's advising, not therapy",
+      "q": "Asking for therapy, not advising?",
+      "does": "The plug-in's scope check, right after the danger check. Words like 'therapy', 'treat my anxiety' or 'my depression' get a plain answer about what advising is.",
+      "more": [
+       "Rosie never judges how anyone is doing, and never names a condition.",
+       "It goes by meaning, whatever words are used. A work or life goal goes straight on.",
+       "Crisis words never come here: they get 988 and 911 first, above."
+      ],
+      "needs": [
+       "request",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "No: advising goals",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Asks for therapy",
+        "steps": [
+         {
+          "id": "B3-x02",
+          "line": [
+           "3.9"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "sync",
+          "type": "split",
+          "title": "Says what advising is; Alex picks",
+          "q": "Still want advising?",
+          "does": "Rosie says plainly that advising isn't therapy, and that a licensed therapist is the right person for that. Then the person picks. Rosie doesn't push either way.",
+          "more": [
+           "Many companies also offer a confidential help line for staff. The person can ask their company about it.",
+           "Advising for work goals can still be booked."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Lee Campus Visits's advisors are advisors, not therapists. Advising doesn't diagnose or treat mental health conditions. For that, a licensed therapist is the right person. Would you still like advising for your work goals?",
+            {
+             "buttons": [
+              "Advising goals",
+              "Look for a therapist"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Advising goals",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Look for a therapist",
+            "steps": [],
+            "end": "end",
+            "endText": "No booking. The person looks for a therapist; nobody at the business or the company is told."
+           }
+          ]
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Advising is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord: the company that books is the one that pays."
+   },
+   {
+    "op": "more",
+    "at": "B10-02",
+    "more": [
+     "Only the score is kept, never what the session was about. The company never sees it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Work done at the session has no cancel period (B8-24); only a program sold at the office gets one."
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Simon replies YES, then checks what Sam set. One reply covers every kind of work Simon does.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Tara, Ruth and Grace join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES"
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Campus Visits! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Simon Vale · Lee Campus Visits",
+        "lines": [
+         "Advising, and workshops",
+         "No license needed for this work",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Campus Visits",
+       "At the client's office",
+       "None needed · registration 2019-0451",
+       "Yes"
+      ],
+      [
+       "Simon Vale",
+       "Lee Campus Visits",
+       "At the client's office",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Tara Holt",
+       "Lee Campus Visits",
+       "At the client's office",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Campus Visits",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Ruth Adler",
+       "Lee Advising",
+       "Video, the office, home visits",
+       "None needed · registration 2020-1187",
+       "Once Sam says yes"
+      ],
+      [
+       "Grace Owens",
+       "Lee Advising",
+       "Video and the office",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "My company pays for advising for new managers with Lee Campus Visits. Can a advisor meet me at our office Thursday morning? We're in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For advising, someone in danger right now, or a medical emergency, stops the booking.",
+    "more": [
+     "The message is the general one: get to safety and call 911.",
+     "On a call, the caller hears it, and Sam gets the call summary.",
+     "Sam's text says only that there was a safety stop, never the words."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If anyone is in danger right now, call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI described an emergency. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "Told to call 911",
+         "Nothing booked"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-20",
+    "does": "Words about suicide, self-harm, hurting someone else or a mental health crisis get 988 and 911 at once. No booking happens in that chat.",
+    "more": [
+     "This is always on, for every kind of work, whatever words are used.",
+     "The AI never counsels: no comfort as a counselor, no questions about it, no advice.",
+     "Sam sees only that the crisis lines were given, never the words. No advisor or company is told, unless the person asks.",
+     "The customer can come back and book later, like anyone."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "If you're thinking about hurting yourself or someone else, call or text 988 now. If anyone is in danger right now, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "does": "The request turns out to be for work Lee Campus Visits doesn't do, like an HR investigation. Rosie says so plainly, and the AI can look for another business.",
+    "more": [
+     "Rosie never hands a customer to a business on its own. The AI looks again, ranked fairly.",
+     "The plug-in can name the kind of work to suggest."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Campus Visits does advising and workshops, not HR investigations. Nothing was saved. You can look for an HR investigator."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: one-to-one or a team session, how many people, and what it's about, in a few words.",
+     "Its danger words: anyone who may hurt themselves or someone else gets 988 and 911 at once.",
+     "Its first steps: a free intro call for a new client, the intake on the secure page, and the terms.",
+     "Stand-ins: another advisor only by name. Check-in: the code to the advisor at the meeting room.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-77",
+    "more": [
+     "The plug-in names the kinds of place: a home, an office, a venue, a roadside, or where a car is parked.",
+     "Lee Campus Visits goes 25 miles from 400 Main St. Alex's office in Springfield is inside it.",
+     "The kind of place decides what's asked later, like who meets the advisor there.",
+     "If Sam set a trip charge for farther towns, the price shows with it."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Campus Visits comes to you in Springfield. Is it at a home, an office or somewhere else?"
+     ],
+     [
+      "cust",
+      "agent",
+      "At my company's office."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Campus Visits asks: one-to-one advising, or a session for a team? And what's it about, in a few words?"
+     ],
+     [
+      "cust",
+      "agent",
+      "One-to-one, for me. Leading a new team."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-46",
+    "does": "Say the company's HR lead books sessions for 4 new managers on one morning at the office. It's one booking with one code, given by whoever meets the advisor at reception.",
+    "more": [
+     "The plug-in sets the group's size limits and its price.",
+     "Each manager answers the private questions on their own secure page. The HR lead never sees them."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-48",
+    "does": "Say Alex also asks for a admissions summary. Both go in one booking, with one start time and one code.",
+    "more": [
+     "Each service keeps its own price kind and money.",
+     "If both don't fit one person's day, the AI offers another time."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can Simon also bring a admissions summary?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. A admissions summary is $199, and Simon goes over it in the same visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-27",
+    "does": "Say the HR lead books a session for a manager. The manager's name and mobile go on the secure page, and they get the visit texts and the code. The HR lead gets a copy without the code.",
+    "more": [
+     "Rosie texts the manager only on the HR lead's word that they agreed to texts.",
+     "The HR lead never sees the manager's answers, or what's said.",
+     "At a venue or an office, it's the day-of contact, not the customer."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "Rosie checks this before the secure page, so the page knows what to ask. The plug-in says a new client needs a free intro call, the intake and the terms."
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "does": "The plug-in's scope notice is due at booking, so the AI says it before Alex's yes. The secure page and the confirmation repeat it.",
+    "more": [
+     "It's the advisor's own scope text, from the plug-in.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Before you book: advising with Simon isn't therapy, and isn't legal, financial or medical advice. Your company pays, but it never sees what you say."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "more": [
+     "Building rules, like an office's sign-in or proof of insurance, go to Sam to check.",
+     "The plug-in adds its own question: a private room for the session."
+    ],
+    "form": [
+     [
+      "Parking",
+      "Visitor spots by the front door"
+     ],
+     [
+      "Front desk",
+      "Sign in; the advisor gets a visitor badge"
+     ],
+     [
+      "Room",
+      "Small meeting room, 3rd floor"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "more": [
+     "Here it books right away: it isn't for today, and Maple Row's contract covers it.",
+     "Simon checked for conflicts when the contract was signed: Simon doesn't advisor Alex's own manager.",
+     "A new company's first client can ask Sam first, or the advisor's read (the third branch)."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Say Alex's hard team meeting moves to Wednesday, and Alex would like to meet sooner. Alex's words are checked for danger first, then an earlier time is offered if one is free.",
+    "more": [
+     "A sign of danger gets 988 or 911 first.",
+     "An earlier time shows its price first. No reply: the session stays as booked.",
+     "If Alex picks the earlier time, Simon is told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "My hard meeting moved to Wednesday. Can we meet sooner?"
+     ],
+     [
+      "san",
+      "cust",
+      "Simon can come sooner, at the same price. Or keep Thursday.",
+      {
+       "times": [
+        "Wed Oct 21 · starts at 8:00am · Simon"
+       ],
+       "buttons": [
+        "Keep Thursday"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "more": [
+     "The offer comes first, since Alex picked Simon and a new advisor needs Alex's yes.",
+     "No reply by 8pm Wed: nobody moves, and Sam calls Alex.",
+     "For advising, the default is a call from Sam, never a swap."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-22",
+    "does": "No reply from Alex. A advisor is never swapped without Alex's yes, so nobody moves. Sam is asked to call Alex.",
+    "more": [
+     "If they can't reach each other by the morning, the session is cancelled with no fee.",
+     "Simon's Thursday stays blocked."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered about tomorrow, and no advisor is swapped without Alex's yes. Please call Alex."
+     ],
+     [
+      "san",
+      "cust",
+      "Simon can't make tomorrow. Sam will call you to sort it out, with no fee."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 7:35am"
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 7:55am"
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "does": "Back at the office, 7:55am. Simon checks what the plug-in asked Alex to have ready: a private room. The small meeting room is free, so the session starts.",
+    "more": [
+     "Examples: a private room, a sign-in at the front desk.",
+     "Missing, but the plug-in lets the visit go on: Simon notes it, and the session starts.",
+     "No private room at all: it goes as 'Can't go ahead', on the company's side."
+    ],
+    "t": "Thu Oct 22, 7:55am"
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Advising keeps no before record, so Simon goes straight on.",
+    "more": [
+     "Nothing about what's said is ever noted in Rosie.",
+     "A damage claim at the office is checked against Sam's own records."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Alex starts talking about something advising can't cover, like a health worry or a legal question. Simon says so, suggests a licensed pro, and goes on with Alex's goals.",
+    "more": [
+     "Danger first: if anyone may be hurt, Simon gives 988 or 911.",
+     "Simon's note names the kind of pro to see, never a named one.",
+     "The note goes on the secure page, never in a text, and never to the company.",
+     "The session goes on, so it's billed as booked."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: suggested other help. Note on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Simon left you a note from today's session.",
+      {
+       "card": {
+        "title": "A note from Lee Campus Visits",
+        "lines": [
+         "The kind of help Simon suggested"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Simon and Alex agree on next steps for the weeks ahead. Nothing is charged for it.",
+    "more": [
+     "What they discuss stays between them. Rosie only knows the session happened.",
+     "The company never sees it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 9:00am"
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Advising and workshops license nobody by default, so nobody on Sam's team is checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "does": "Tara's day is blocked, and each customer picks: Simon by name, new times with Tara, or a free cancel. Anything paid is refunded. With no reply in 24 hours, nobody moves: Sam calls."
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Reese K. to Lee Campus Visits. Reese gets one invite and replies YES. Advising needs no license, so Reese can be booked once Sam says yes.",
+    "more": [
+     "No reply in 48 hours: one reminder, then Sam is told.",
+     "Where a state's form names a license for this work, it's asked and checked then."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Campus Visits. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Advising needs no person license, so only the business's registration comes due. Dates come from what Sam sent. Reminders go 30 days and 7 days before.",
+    "more": [
+     "Insurance works the same way, where a company client asks for proof.",
+     "Where a state's form names a license for advising, it comes due the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Campus Visits's registration 2019-0451 has lapsed.",
+      {
+       "card": {
+        "title": "Registration renewal",
+        "lines": [
+         "Not renewed by then: new bookings pause"
+        ],
+        "button": "Upload the receipt",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-09",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Alex M. sent answers about a application package at home. Price it on the secure page.",
+      {
+       "card": {
+        "title": "Application package at home · Alex M.",
+        "lines": [
+         "8 shift leads · goals and room added",
+         "Price it before anyone says yes"
+        ],
+        "button": "Open and price it",
+        "link": "rosfield.com/q/r3j"
+       },
+       "as": "Simon"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-39",
+    "say": [
+     [
+      "staff",
+      "san",
+      "I'm running about 30 minutes late for my 1 o'clock.",
+      {
+       "as": "Simon"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Reading it back: you'll start your 1:00pm session about 30 minutes late. Say yes to tell the customer.",
+      {
+       "as": "Simon"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "Yes.",
+      {
+       "as": "Simon"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches the admissions summary from Sam's own invoice to the bill Rosie texts. It's for new bookings only, and read back first.",
+    "more": [
+     "Reports already booked keep Sam's own way.",
+     "The bill goes out once the advisor texts DONE.",
+     "The price-OK limit changes the same way: from now on, and read back first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Campus Visits: your card was charged twice for the same payment. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $179",
+        "lines": [
+         "Campus visit at home bill · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Nora S."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nora S.'s $179 bill for an campus visit at home was charged twice. The second charge is refunded, and Nora is told."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-15",
+    "more": [
+     "The word CANCEL also means 'stop texting me', never 'cancel my visit'.",
+     "To cancel the visit, Alex taps Cancel the visit, or calls.",
+     "With no code, Simon texts DONE when the session is finished."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-24",
+    "does": "Simon does the assessment at the session. Work done at the session has no cancel period. Only a program or package sold at the office gets a written right to cancel, where the state's rules require it.",
+    "more": [
+     "It's billed with the rest, the way this session is paid.",
+     "Simon tells Alex out loud too."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Added to today's session.",
+      {
+       "card": {
+        "title": "Work-style assessment · $160",
+        "lines": [
+         "Done today, with a short debrief",
+         "Billed with the rest of the session"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "A session, and extra work done at it, has no cancel period. Only a program or package sold at the office does, where the state's rules give one."
+   },
+   {
+    "op": "words",
+    "at": "B10-19",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your admissions summary from Thursday is ready.",
+      {
+       "card": {
+        "title": "Admissions summary",
+        "lines": [
+         "Your team's survey results",
+         "Thu Oct 22 · Maple Row Logistics"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/v/r4c"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-30",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your admissions summary from Thu Oct 22 is ready.",
+      {
+       "card": {
+        "title": "Admissions summary",
+        "lines": [
+         "Your team's survey results",
+         "Thu Oct 22 · Maple Row Logistics"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/v/r4c"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A advising session is rated, like any visit."
+   },
+   {
+    "op": "words",
+    "at": "S1-78",
+    "say": [
+     [
+      "san",
+      "other",
+      "This is Rosie, an automated assistant for Lee Campus Visits. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check.",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ],
+       "stop": "first",
+       "as": "Morgan Lee"
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "story": {
+  "A": "A parent books a $55 strategy session by video for their student, paid in full when booking; the advisor goes over the plan, and school fees are paid to the schools.",
+  "B": "A parent books a $179 campus visit at home for their student; a card is saved for the $89 visit fee and the $179 is charged when the advisor texts DONE."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|card",
+    "photos|deposit|counter",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a $55 strategy session by video, paid in full when booking.",
+    "list|card|card": "A $35 essay review: a card is saved for the $20 late-cancel fee, and the $35 is charged when the advisor texts DONE.",
+    "photos|deposit|counter": "A $640 application package, quoted from the family's answers: a $160 deposit now, and the $480 rest at the front desk.",
+    "list|none|counter": "A $25 quick check at the office: nothing is taken, and the family pays at the front desk."
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from the family's answers first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Essay review"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Essay review"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Strategy session"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Essay review"
+    },
+    "list|none|*": {
+     "price": "$25",
+     "name": "Quick check"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$20",
+     "name": "Application package"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "photos|deposit|bill",
+    "list|none|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 campus visit at home; a card is saved for the $89 visit fee and the $179 is charged when the advisor texts DONE.",
+    "photos|deposit|bill": "A $640 application package at the family's home, quoted from the family's answers: a $160 deposit now, and the $480 rest on the bill after.",
+    "list|none|bill": "A $179 family info night at a host's place: nothing is taken, and the bill is texted after.",
+    "list|full|none": "A $150 campus visit at home, paid in full when booking; a late cancel may keep the $89 visit fee."
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from the family's answers first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Campus visit at home"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Campus visit at home"
+    },
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Campus visit at home"
+    },
+    "list|none|*": {
+     "price": "$179",
+     "name": "Family info night"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$89",
+     "name": "Campus visit at home, paid in full"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "Application package at home"
+    }
+   }
+  }
+ },
+ "keep": [
+  "therapy",
+  "Follow-up session",
+  "follow-up session",
+  "Workshops",
+  "workshops",
+  "visit fee",
+  "Visit fee",
+  "14 Park Ave",
+  "400 Main St",
+  "500 Harbor Ave",
+  "leak",
+  "facial",
+  "color",
+  "student"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ },
+ "notes": "Students are minors: children fact on; a parent books, pays and gets the texts; the child branches (A4-24 'A child', A4-25) stay on; no minor is texted directly.\nGrades, test scores, records, learning needs and family aid are on the secure page only; never in a text.\nPrices are the master's example numbers by role (a $55 strategy session, $35 essay review with $20 fee, $640 application package with $160 deposit and $480 rest; home $179 with $89 fee, $150 paid in full, $179 info night at a host's place).\nSchool and testing fees are paid to those organizations, never through Rosie.\nNo promise of admission, a scholarship or a school's decision (pf.safety never said).\nD96: no license check; any state registration for educational consultants is the business's own word.\nName 'Lee Advising' (short, for the S1-78 message limit). The master's example owner name 'Hugo P.' is left as the master's example."
+}

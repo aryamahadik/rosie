@@ -1,0 +1,3370 @@
+{
+ "id": "sharpening",
+ "name": "Knife and tool sharpening",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "repair-shop",
+ "plugin": {
+  "pf.license": {
+   "need": "none for sharpening; the business registration, where the city or state asks for one",
+   "ask": [
+    "The business registration number, where the city or state gave one"
+   ],
+   "who": "the business. Sharpeners need no license of their own",
+   "check": "the state's or city's business lookup; where there's none, a person on Rosie's team checks within 1 business day",
+   "blocks": "a registration the city or state requires that the owner says the business lacks keeps the business offline",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance and cover for customers' knives and tools in the shop and in the truck, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'; customers see no license claim"
+  },
+  "pf.services": {
+   "pattern": "drop-off: the knives and tools are left at the shop and picked up when they're READY; or a mobile sharpener comes to a home, a kitchen or a salon",
+   "list": [
+    {
+     "name": "Kitchen knife set (up to 5 knives)",
+     "price": "one price (the example shop: $35)",
+     "length": "about 30 minutes while you wait, or left for the day",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Scissor and shear sharpening",
+     "price": "one price per pair",
+     "length": "left for the day",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Garden tool, pruner and axe sharpening",
+     "price": "one price per tool",
+     "length": "about 20 minutes while you wait",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Restaurant knife batch (up to 30 knives)",
+     "price": "one price",
+     "length": "left 1 to 2 days",
+     "place": "at the shop, or in the truck at the kitchen",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Blade restoration (chipped, bent or rusty blades)",
+     "price": "quoted after an edge check (the example: $10, counted toward the work): a written estimate, OK'd before any work",
+     "length": "the edge check is about 15 minutes; more time needs a new yes",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill Rosie texts with READY"
+    },
+    {
+     "name": "Saw and mower blade grinding",
+     "price": "one price per blade; set by size",
+     "place": "at the shop, or at the customer's place"
+    },
+    {
+     "name": "Kitchen visit (up to 30 knives and tools)",
+     "price": "one price (the example: $179 at the customer's place)",
+     "length": "about 2 hours",
+     "place": "at the customer's place",
+     "before": "a card saved for the trip fee",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    },
+    {
+     "name": "Big batch, priced at the visit",
+     "price": "priced at the visit; a written estimate OK'd before any work",
+     "place": "at the customer's place",
+     "before": "a card saved for the trip fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Trip to a home, kitchen or salon",
+     "price": "the trip fee (the example: $89), counted toward the work",
+     "place": "at the customer's place",
+     "before": "a card saved for the trip fee",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    }
+   ],
+   "capacity": "drop-off slots every 30 minutes in open hours; one sharpener per batch; the shop's one wet grinder is saved like equipment",
+   "parts": "handles, rivets and polishing compounds are in stock; a new handle or part is ordered once the customer says yes, 3 to 7 business days",
+   "warranty": "on the receipt (the example: a 30-day edge promise: a blade that isn't sharp is redone free); never for chips from use, or a blade that was dropped after sharpening",
+   "nobody_home": "no: someone must be there to hand over the knives and OK the work",
+   "online": "no: a blade is sharpened in hand"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What needs sharpening: kitchen knives, scissors or shears, garden tools, an axe, a saw or mower blades",
+    "How many pieces, and are any chipped, bent or rusty?",
+    "Are the blades wrapped or in a sleeve or a box?",
+    "For a visit at the customer's place: a home, a kitchen or a salon, and the address"
+   ],
+   "after_time": [
+    "Any other problems, like a loose handle or a cracked blade",
+    "Leave them, or wait for a quick sharpening",
+    "A special edge angle, or leave the serrated blades alone? Yes or no"
+   ],
+   "secure_page_only": [
+    "A gate or door code for an on-site visit: never asked in chat",
+    "Someone else who may pick them up, named in writing",
+    "For a restaurant or salon: the person who OKs prices, and the account's billing contact"
+   ],
+   "who_may_book": "an adult: the owner of the knives, or someone they let bring them in; a child never books or drops off blades"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "fire",
+    "sparks near fuel or something that burns",
+    "someone badly cut or hurt"
+   ],
+   "stop_action": "'Call 911' and the generic emergency steps; no booking",
+   "safety_words": [
+    "a cracked or loose blade or axe head",
+    "a blade that is chipped and could break",
+    "a bare blade carried loose"
+   ],
+   "safety_action": "Rosie says: don't use it, wrap the blade or put it in a box, and carry it handle-first. Then the booking goes on, marked urgent, soonest times first.",
+   "during_work": "a crack found in a blade during sharpening: the work stops, the blade is wrapped, and the customer gets a written note",
+   "can_continue": "yes, after the safety steps"
+  },
+  "pf.first_steps": {
+   "required": "none before the visit",
+   "at_check_in": [
+    "The count and tag: every piece is counted with the customer, tagged and listed on the ticket",
+    "Notes and photos of chips, cracks and loose handles",
+    "For an on-site visit: where the knives are, and a safe table near an outlet"
+   ],
+   "prep_for_reminder": [
+    "Wrap each blade, or put the knives in a sleeve or a box. Carry them handle-first.",
+    "Clean the knives and the tools",
+    "For an on-site visit: put everything out on a table, and keep pets and children away"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "a drop-off: the check-in code at the counter when the knives are left. On-site: the code at the door.",
+   "intake": "the count and condition of every piece, with photos; the edge the customer wants",
+   "diagnosis": "the OK'd edge check covers about 15 minutes; more time needs a new yes; no answer is never a yes",
+   "estimate": "written, with a line for each piece; OK'd before any work; an OK on some lines does only those",
+   "added_work": "anything over the OK'd estimate needs a new yes first, logged with the time",
+   "status_words": [
+    "IN",
+    "CHECKING",
+    "WAITING ON A PART",
+    "IN SHARPENING",
+    "READY"
+   ],
+   "part_test": "every piece is test-cut before READY; a blade that isn't sharp is redone at no extra charge",
+   "updates": "by text",
+   "ready": "READY says what was done, the count, the total and the pick-up hours",
+   "pick_up": "the knives go only to the customer, or someone they named; the count is checked at the counter",
+   "done_proof": "the drop-off code checks it in; READY and the pick-up close it; on-site, the code at the door and DONE",
+   "late_drop_off": "dropped off any time before closing, and looked at next in line",
+   "unclaimed": "held 90 days, with reminders at 30 and 60 days; then written notice and the state's waiting period",
+   "items_to_the_shop": "on-site: a blade that needs restoring goes to the shop and comes back on a booked return"
+  },
+  "pf.money": {
+   "before": "the starting answer is nothing taken; the edge check is OK'd on the booking page, not charged",
+   "deposit": "none to start; the owner may ask for a deposit toward a very large batch; deposit cap: from the state form",
+   "after": "paid at the counter at pick-up, the shop's own way; or the bill Rosie texts with READY, if the owner turns it on",
+   "on_site": "a card saved for the trip fee; the saved card charged when the sharpener texts DONE, or the bill Rosie texts",
+   "after_a_no": "after a no to the estimate, only the OK'd edge check is owed",
+   "fees": "at the shop: no cancel or no-show fee to start; on-site: the saved card may be charged the trip fee for a late cancel or nobody there, only if the owner confirms",
+   "storage": "no storage fee to start; unclaimed knives follow the state's notice and waiting rules: from the state form",
+   "tips": "no tip line to start",
+   "tax": "the shop's tax rate on parts",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "A gate or door code",
+    "Photos of the customer's home or kitchen"
+   ],
+   "languages": "English and Spanish",
+   "minors": "a minor never books or drops off blades; an adult does"
+  },
+  "pf.staff": {
+   "skills": [
+    "kitchen knife sharpening",
+    "scissor and shear sharpening",
+    "garden tool, axe and saw sharpening",
+    "blade restoration",
+    "on-site visits in the truck"
+   ],
+   "licenses": "no person license for sharpening",
+   "supervision": "none to start; a trainee works only while a lead sharpener is in, if the owner sets it",
+   "who_oks": "the owner OKs estimates over the owner's amount, added work and any fee",
+   "stand_in": "only someone with the skill for that tool; blade restoration only by a sharpener who does it"
+  },
+  "pf.rules": {
+   "written_estimate": "switch: a written estimate before any work over an amount: from the state form",
+   "show_registration": "switch: the shop's registration number on estimates and receipts: from the state form",
+   "unclaimed_items": "switch: how long knives are held, what notice is sent, and the waiting period: from the state form",
+   "blade_carry": "switch: how blades are carried in the truck and the shop (sleeves, boxes, locked): from the city or state form",
+   "dust_and_water": "switch: grinding dust and used water follow the city's rules for the shop and the truck",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A cracked blade or loose axe head before the visit: the safety steps first, then the soonest time",
+    "A crack found during sharpening: the work stops",
+    "More edge-check time needed",
+    "No answer to the estimate",
+    "A no to the estimate",
+    "More work found",
+    "A blade the shop won't sharpen (a sword, a dagger or a throwing knife)",
+    "A count that doesn't match at pick-up",
+    "The knives aren't picked up: reminders, written notice, then the state's rules",
+    "The edge dulls again under the edge promise",
+    "A piece damaged at the shop"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "7am the day of",
+    "B": "6pm the day before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Gus and Rita (sharpeners)",
+   "other": "Others (a bank, a chef)"
+  },
+  "B": {
+   "staff": "Hank and Nora (mobile sharpeners)",
+   "other": "Others (a bank, a restaurant manager)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Gus"
+  },
+  "B": {
+   "staff": "Hank"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "barbershop license",
+    "business registration"
+   ],
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Sharpenings have a set price. Damaged blades are priced at the visit. A fire or a bad cut stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Knives, shears and tools are dropped off at the shop and picked up when ready. A truck can also sharpen at the customer's place."
+   ],
+   [
+    "MP045210",
+    "REG-2020-0471"
+   ],
+   [
+    "BS20981",
+    "REG-2020-0533"
+   ],
+   [
+    "BS20918",
+    "REG-2020-0353"
+   ],
+   [
+    "$140 an hour",
+    "$40 a pair"
+   ],
+   [
+    "A chair, ready",
+    "A knife set, ready"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 15-degree edge on the chef's knife, bread knife left as is"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Gus can still take the knives in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the time left."
+   ],
+   [
+    "please come with dry hair on Saturday.",
+    "please wrap each knife on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please wrap each knife."
+   ],
+   [
+    "would like to see your hair before pricing it",
+    "would like to see the blade before pricing it"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this sharpening."
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s sharpening"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A knife's example: 'A chipped blade needs a quick edge check first. Had one at Lee's in the last 3 months?'"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Restoration quotes come to you first. Board prices never need one"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A sharpening shop takes drop-offs, as a tailor or a groomer does."
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken"
+   ],
+   [
+    "Style consult",
+    "Quick look at the knives"
+   ],
+   [
+    "style consult",
+    "quick look at the knives"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Can Lee's Sharpening do my kitchen knives on Saturday?"
+   ],
+   [
+    "once Riley sees the hair.",
+    "once Gus sees the knives."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a lawn mower tune-up, which isn't on the shop's list."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Gus use a mirror polish instead?"
+   ],
+   [
+    "asks for a toner instead of the gloss. What's the new price?",
+    "asks for a mirror polish instead. What's the new price?"
+   ],
+   [
+    "two skin fades on",
+    "two pruner sharpenings on"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood sharpening shop on Elm St. Knives, scissors and garden tools sharpened."
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "a beard trim today at 2:00pm with Avery",
+    "a pruner sharpening today at 2:00pm"
+   ],
+   [
+    "the beard trim today at 2:00pm with Avery",
+    "the pruner sharpening today at 2:00pm"
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: a 10:00am drop-off"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken when they book"
+   ],
+   [
+    "haircut with Riley",
+    "knife set"
+   ],
+   [
+    "Sat 11am Riley",
+    "Sat 11am drop-off"
+   ],
+   [
+    "at 11:20am on Riley's phone",
+    "at 12:25pm on Gus's phone"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Edge polish · $15"
+   ],
+   [
+    "Riley quotes the rest at the chair, before any work.",
+    "Gus writes an estimate before any repair."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was your visit with Gus?"
+   ],
+   [
+    "Sun Oct 25 · 11:00am · Riley",
+    "Mon Oct 26 · 11:00am drop-off"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Do I need to wrap the knives?"
+   ],
+   [
+    "Walk-in for a haircut",
+    "Walk-in for a knife set"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: an axe sharpening is $25."
+   ],
+   [
+    "Your item is still waiting for pick-up.",
+    "Your knives are still waiting for pick-up."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $10 edge check first"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds scissor sharpening to Lee's Sharpening."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Scissor sharpening for Lee's Sharpening: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW scissor sharpening"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Sharpening doesn't fix mowers."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Mobile Sharpening and Lee Salon Shears."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero afilar mis cuchillos de cocina el sábado."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A sharpening shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no sharpener. A day shows only if a sharpener with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Sharpening · drop-off"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A sharpening is rated, so the shop takes the first branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like the chipped blade Gus noted, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Sharpening sent you a proposal: the chipped blade Gus noted."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Chipped blade repair"
+   ],
+   [
+    "3 visits with Riley",
+    "One drop-off · about 2 days"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The work is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Drain clearing",
+    "Kitchen visit"
+   ],
+   [
+    "home warranty plan",
+    "yearly sharpening plan"
+   ],
+   [
+    "a package of cuts",
+    "a package of sharpenings"
+   ],
+   [
+    "patch test",
+    "wrap check"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A knife sharpening could mean a hardware store or a sharpening shop."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A sharpening shop's plug-in adds danger words, like a cracked blade."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sharpening shop's example: a cracked blade gets 'don't use it, and wrap the blade'."
+   ],
+   [
+    "A barbershop's services need none.",
+    "A sharpening shop needs none at booking: each piece is counted at drop-off."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a restaurant's knives together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A chef books sharpening for five knife sets on one morning. Rosie finds bench time side by side across Gus and Rita."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "There's a new chip in my cleaver."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says there's a new chip in the cleaver"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The knives are still dull on one side."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the knives are still dull since the sharpening"
+   ],
+   [
+    "Riley looks, then prices it",
+    "Gus looks, then writes the estimate"
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the edge check; the estimate stays open"
+   ],
+   [
+    "a skin-test result",
+    "an edge angle"
+   ],
+   [
+    "color and house calls",
+    "blade restorations and on-site visits"
+   ],
+   [
+    "color, house calls",
+    "blade restorations, on-site visits"
+   ],
+   [
+    "Consult only",
+    "Edge check only"
+   ],
+   [
+    "photos of your hair",
+    "photos of the blade"
+   ],
+   [
+    "a cut on Saturday",
+    "a sharpening on Saturday"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a sharpening every 3 months"
+   ],
+   [
+    "a cut every 4 weeks",
+    "a sharpening every 3 months"
+   ],
+   [
+    "for a staff cut",
+    "for a staff knife"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Sharpening"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Sharpening's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Sharpening"
+   ],
+   [
+    "Electrical",
+    "Salon shear service"
+   ],
+   [
+    "electrical",
+    "salon shear service"
+   ],
+   [
+    "plumber",
+    "sharpener"
+   ],
+   [
+    "Plumber",
+    "Sharpener"
+   ],
+   [
+    "Plumbing",
+    "Knife sharpening"
+   ],
+   [
+    "plumbing",
+    "knife sharpening"
+   ],
+   [
+    "Barbershop",
+    "Sharpening shop"
+   ],
+   [
+    "barbershops",
+    "sharpening shops"
+   ],
+   [
+    "barbershop",
+    "sharpening shop"
+   ],
+   [
+    "barbers",
+    "sharpeners"
+   ],
+   [
+    "barber",
+    "sharpener"
+   ],
+   [
+    "Barber",
+    "Sharpener"
+   ],
+   [
+    "cut hair",
+    "sharpen blades"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Gus texts READY when Alex's knives are done. Alex hears what was done, the pick-up hours, and anything due."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your knives are ready for pick-up at Lee's Sharpening."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Tue to Sat, 9am to 5pm"
+   ],
+   [
+    "4471",
+    "5160"
+   ],
+   [
+    "Sofia",
+    "Alex"
+   ],
+   [
+    "Riley",
+    "Gus"
+   ],
+   [
+    "Avery",
+    "Rita"
+   ],
+   [
+    "Jordan",
+    "Hank"
+   ],
+   [
+    "Casey",
+    "Nora"
+   ],
+   [
+    "88 Elm St",
+    "205 Foundry St"
+   ],
+   [
+    "Elm St",
+    "Foundry St"
+   ],
+   [
+    "Oak St",
+    "Maple Ct"
+   ],
+   [
+    "1200 Main St",
+    "310 Grove Ave"
+   ],
+   [
+    "Haircuts",
+    "Knife sets"
+   ],
+   [
+    "haircuts",
+    "knife sets"
+   ],
+   [
+    "A haircut",
+    "A knife set"
+   ],
+   [
+    "a haircut",
+    "a knife set"
+   ],
+   [
+    "Haircut",
+    "Knife set"
+   ],
+   [
+    "haircut",
+    "knife set"
+   ],
+   [
+    "kids cuts",
+    "axe sharpenings"
+   ],
+   [
+    "a kids cut",
+    "an axe sharpening"
+   ],
+   [
+    "Kids cut",
+    "Axe sharpening"
+   ],
+   [
+    "kids cut",
+    "axe sharpening"
+   ],
+   [
+    "Skin fade",
+    "Scissor sharpening"
+   ],
+   [
+    "skin fade",
+    "scissor sharpening"
+   ],
+   [
+    "fade",
+    "scissor sharpening"
+   ],
+   [
+    "Beard trim",
+    "Pruner sharpening"
+   ],
+   [
+    "beard trim",
+    "pruner sharpening"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Knife set and shears"
+   ],
+   [
+    "Signature cut and shave",
+    "Knife set and shears"
+   ],
+   [
+    "signature cut",
+    "knife set and shears"
+   ],
+   [
+    "Groom's package",
+    "Restaurant knife batch"
+   ],
+   [
+    "Color and cut",
+    "Chipped blade repair"
+   ],
+   [
+    "color and cut",
+    "chipped blade repair"
+   ],
+   [
+    "Color correction",
+    "Blade restoration"
+   ],
+   [
+    "color correction",
+    "blade restoration"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "$25 consult",
+    "$10 edge check"
+   ],
+   [
+    "Only the consult",
+    "Only the edge check"
+   ],
+   [
+    "the consult",
+    "the edge check"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the sharpening?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once checked"
+   ],
+   [
+    "priced at the chair",
+    "priced once checked"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "a house call",
+    "an on-site visit"
+   ],
+   [
+    "water heaters",
+    "saw blades"
+   ],
+   [
+    "water heater",
+    "saw blade"
+   ],
+   [
+    "Panel upgrade",
+    "Saw grinding"
+   ],
+   [
+    "like a burst pipe",
+    "like a deep cut"
+   ],
+   [
+    "$75",
+    "$124"
+   ],
+   [
+    "Gloss",
+    "Edge polish"
+   ],
+   [
+    "gloss",
+    "edge polish"
+   ],
+   [
+    "Toner",
+    "Mirror polish"
+   ],
+   [
+    "toner",
+    "mirror polish"
+   ]
+  ],
+  "B": [
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "BS20981",
+    "REG-2020-0533"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Sharpenings have a set price. Damaged blades are priced at the visit. A fire or a bad cut stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Knives, shears and tools are dropped off at the shop and picked up when ready. A truck can also sharpen at the customer's place."
+   ],
+   [
+    "MP045210",
+    "REG-2020-0471"
+   ],
+   [
+    "MP045201",
+    "REG-2020-0417"
+   ],
+   [
+    "$140 an hour",
+    "$40 a pair"
+   ],
+   [
+    "A chair, ready",
+    "A knife set, ready"
+   ],
+   [
+    "water is off on Main St after 2pm",
+    "Main St is closed after 2pm"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my kitchen knives. They're dull. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My knives are dull' fits a kitchen visit."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like sharpening a neighbor's knives without asking."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, they're dull"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 kitchen visit needs none."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "'s knives, sharpened Thu Oct 22, are dull again."
+   ],
+   [
+    "Drain clearings",
+    "Kitchen visits"
+   ],
+   [
+    "drain clearings",
+    "kitchen visits"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Chipped blade repair · $540"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a scissor check? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my place. Just the kitchen knives."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Hank scratches a counter and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the counter"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched counter"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "scratched the counter at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "heating and cooling",
+    "saw sharpening"
+   ],
+   [
+    "Heating and cooling",
+    "Saw sharpening"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood sharpening shop on Elm St. Knives, scissors and garden tools sharpened."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the chipped blade, and a sharpener will price the job."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said someone was badly cut."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does knife sharpening and salon shear service, not mower repair."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a mower dealer near you."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you sharpen my knives every 3 months, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Home Services has a quarterly sharpening plan, $150 a visit."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a sharpening every 3 months."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Quarterly sharpening plan"
+   ],
+   [
+    "water heater contract",
+    "sharpening contract"
+   ],
+   [
+    "replaces water heaters",
+    "re-handles knives"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Hank found the problem. Here's the price to fix it today."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Hank finds the problem and texts the price with its lines."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the pieces are, how many, and whether any are chipped."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I wash the knives before you come?"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Mobile Sharpening and Lee Salon Shears."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Sharpening can sharpen your knives at the shop for $35, or at your home for $75."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's counter is in the other flow."
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both kitchens' visits go on one bill on the 1st."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the chipped blade Hank noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Home Services sent you a proposal for a chipped blade repair, from Hank's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Chipped blade repair"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Hank look at my garden tools next week?"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Hank left metal dust on the counter."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My kitchen knives are dull."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Eight knives and a cleaver. One has a chip."
+   ],
+   [
+    "a leak under the sink",
+    "a chipped cleaver"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please put the knives out on the counter."
+   ],
+   [
+    "a drain cleaning at two rentals",
+    "a sharpening at two kitchens"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's sharpening"
+   ],
+   [
+    "clear a yard drain",
+    "sharpen the knives"
+   ],
+   [
+    "Yard drain",
+    "Knife sharpening"
+   ],
+   [
+    "yard drain",
+    "knife sharpening"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa knives"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Kitchen visit"
+   ],
+   [
+    "Kitchen drain",
+    "Kitchen"
+   ],
+   [
+    "Drain clearing",
+    "Kitchen visit"
+   ],
+   [
+    "drain clearing",
+    "kitchen visit"
+   ],
+   [
+    "clear the drain",
+    "sharpen the knives"
+   ],
+   [
+    "your new pipes are in",
+    "your knives are sharp"
+   ],
+   [
+    "a roof leak",
+    "a broken mower"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Hank's notes"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Hank finds a cracked handle."
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "replace the handle, cracked"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the handle"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the handle"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing the handle"
+   ],
+   [
+    "shutoff valves",
+    "handle"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a chef books the same job for 4 kitchens at one address."
+   ],
+   [
+    "Each unit's notes",
+    "Each kitchen's notes"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Kitchen Cover, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "kitchen cover plan"
+   ],
+   [
+    "home warranty",
+    "kitchen cover"
+   ],
+   [
+    "supply house",
+    "parts supplier"
+   ],
+   [
+    "Rental 1",
+    "Kitchen 1"
+   ],
+   [
+    "Rental 2",
+    "Kitchen 2"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that someone just cut a hand."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Someone cut a hand on a knife just now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Wrap the knife and keep it away from everyone. Call 911 if someone is badly hurt."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a deep cut or sparks near fuel, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The knives are dull again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The knives are dull again."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your sharpening is under warranty"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I need them for tonight. Can someone come?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Hank also look at my garden tools?"
+   ],
+   [
+    "$160 valve quote",
+    "$160 handle quote"
+   ],
+   [
+    "$160 valve work",
+    "$160 handle work"
+   ],
+   [
+    "a bathroom drain",
+    "your scissors"
+   ],
+   [
+    "kitchen drain",
+    "kitchen knives"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The scissors are a repair, quoted at the visit."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A knife sharpening could mean a hardware store or a sharpening shop."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sharpening shop's example: a cracked blade gets 'don't use it, and wrap the blade'."
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi cuchillo tiene la hoja rota."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My knife has a cracked blade."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told not to use it and to wrap the blade, and to call 911 if someone is hurt."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay fuego?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is there a fire?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay fuego."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no fire."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No lo use y envuelva la hoja. Si hay alguien herido, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't use it, and wrap the blade. If someone is hurt, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For sharpening, a fire, sparks near fuel or an injury stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurt, call 911 now. Then wrap the blade and keep it away from everyone."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My knife set got wet in a flood. Is it safe to use?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "which knives are they, and are any chipped?"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are the knives still wet?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE small chip near the tip, handle loose"
+   ],
+   [
+    "Under the sink, before",
+    "Chef's knife, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Cleaver, before"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 knives"
+   ],
+   [
+    "245 valve 165 supply line 80",
+    "245 handle 165 chip repair 80"
+   ],
+   [
+    "Shutoff valve",
+    "Chip repair"
+   ],
+   [
+    "Supply line",
+    "Handle fix"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE bread knife serrated, left as is. Offer a honing steel next time."
+   ],
+   [
+    "1-year labor warranty",
+    "30-day edge promise"
+   ],
+   [
+    "a dripping faucet",
+    "a dull saw"
+   ],
+   [
+    "color and house calls",
+    "chipped blade repairs and on-site visits"
+   ],
+   [
+    "color, house calls",
+    "chipped blade repairs, on-site visits"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Sharpening"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Sharpening's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Sharpening"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilesharpening.com"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Electrical",
+    "Salon shear service"
+   ],
+   [
+    "electrical",
+    "salon shear service"
+   ],
+   [
+    "plumber",
+    "sharpener"
+   ],
+   [
+    "Plumber",
+    "Sharpener"
+   ],
+   [
+    "Plumbing",
+    "Knife sharpening"
+   ],
+   [
+    "plumbing",
+    "knife sharpening"
+   ],
+   [
+    "Barbershop",
+    "Sharpening shop"
+   ],
+   [
+    "barbershops",
+    "sharpening shops"
+   ],
+   [
+    "barbershop",
+    "sharpening shop"
+   ],
+   [
+    "barbers",
+    "sharpeners"
+   ],
+   [
+    "barber",
+    "sharpener"
+   ],
+   [
+    "Barber",
+    "Sharpener"
+   ],
+   [
+    "cut hair",
+    "sharpen blades"
+   ],
+   [
+    "Riley",
+    "Gus"
+   ],
+   [
+    "Avery",
+    "Rita"
+   ],
+   [
+    "Jordan",
+    "Hank"
+   ],
+   [
+    "Casey",
+    "Nora"
+   ],
+   [
+    "88 Elm St",
+    "205 Foundry St"
+   ],
+   [
+    "Elm St",
+    "Foundry St"
+   ],
+   [
+    "42 Oak St",
+    "4 Maple Ct"
+   ],
+   [
+    "1200 Main St",
+    "310 Grove Ave"
+   ],
+   [
+    "a haircut",
+    "a knife set"
+   ],
+   [
+    "Haircut",
+    "Knife set"
+   ],
+   [
+    "fade",
+    "scissor sharpening"
+   ],
+   [
+    "beard trim",
+    "pruner sharpening"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once diagnosed"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "Water heater flush",
+    "Saw grinding"
+   ],
+   [
+    "water heater flush",
+    "saw grinding"
+   ],
+   [
+    "Water heater replacement",
+    "Restaurant batch"
+   ],
+   [
+    "water heater replacement",
+    "restaurant batch"
+   ],
+   [
+    "water heaters",
+    "restaurant batches"
+   ],
+   [
+    "Water heater",
+    "Restaurant batch"
+   ],
+   [
+    "water heater",
+    "restaurant batch"
+   ],
+   [
+    "Sewer camera inspection",
+    "Blade check"
+   ],
+   [
+    "sewer camera inspection",
+    "blade check"
+   ],
+   [
+    "Sewer camera report",
+    "Blade report"
+   ],
+   [
+    "sewer camera report",
+    "blade report"
+   ],
+   [
+    "camera inspection",
+    "blade check"
+   ],
+   [
+    "camera report",
+    "blade report"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Panel upgrade",
+    "Saw set"
+   ],
+   [
+    "under my sink",
+    "on my knives"
+   ],
+   [
+    "under the sink",
+    "on the knives"
+   ],
+   [
+    "like a burst pipe",
+    "like a deep cut"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 handle fix stays good until Thu Oct 29."
+   ],
+   [
+    "shutoff valve",
+    "handle"
+   ],
+   [
+    "$75",
+    "$124"
+   ],
+   [
+    "Leak repair",
+    "Blade restoration"
+   ],
+   [
+    "leak repair",
+    "blade restoration"
+   ],
+   [
+    "supply line",
+    "handle fix"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off at Lee's Sharpening, Sat Oct 24, for a set of kitchen knives. Gus sharpens them while Alex runs errands, and texts READY. Alex pays at the counter at pick-up. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Sharpening to sharpen the kitchen knives at Alex's place, at 4 Maple Ct, and Hank comes Thu Oct 22 between 8 and 10am. The saved card is charged when Hank texts DONE. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "visit|none|counter",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 knife set (up to 5 knives) from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter at pick-up.",
+    "visit|none|counter": "A rusty, chipped knife set, priced after a look. Only the $10 edge check is promised. Gus's written estimate is OK'd before any work, and Alex pays at the counter at pick-up.",
+    "list|none|bill": "The same $35 knife set, with the bill texted once it's ready, so Alex can pay before pick-up."
+   },
+   "amounts": {
+    "*": {
+     "name": "Knife set"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Knife set"
+    },
+    "visit|*|*": {
+     "name": "Blade restoration"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|card|bill",
+    "visit|card|bill",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 kitchen visit (up to 30 knives and tools) at Alex's place. A card is saved for the $89 trip fee, which is charged only for a late cancel or a no-show, and only on Sam's yes. Hank works alone, so the saved card is charged for the visit when Hank texts DONE.",
+    "list|card|bill": "The same $179 kitchen visit. A card is saved for the $89 trip fee. Rosie texts the bill after.",
+    "visit|card|bill": "A big, mixed batch priced at the visit. A card is saved for the $89 trip fee.",
+    "list|none|bill": "A restaurant kitchen on account: the $179 visit. Nothing is taken when it books, and Rosie texts the bill after."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Kitchen visit"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Kitchen visit"
+    },
+    "visit|*|*": {
+     "name": "Big batch sharpening"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-38"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every sharpening booking through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The sharpening plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A sharpening shop books drop-off slots and sharpeners, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Sharpening runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Sharpening is never sent now: a cracked blade gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "An item is fixed in hand. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The shop sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The shop bills no plan or insurance. A customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee's Sharpening books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee's Sharpening books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee's Sharpening books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no sharpener. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "Sharpening needs no form first: the count and tag is done at drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "A sharpening shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A sharpening shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A sharpening shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "An item waits in its drop-off slot, so a sharpener running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child never leaves an item at the shop: an adult drops off and picks up."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A repair is paid once: at pick-up, or by the bill."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The shop bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A repair is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "A sharpening shop books no next visit at pick-up: each repair is booked when it's needed."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A repair at the shop needs no contract before booking: the written estimate comes before any work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "The shop sells no plans: each repair is paid at its own pick-up, or by its own bill."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The shop sells no plans or contracts, so nothing signed at the shop has a cancel period."
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Sharpening",
+       "At the customer's place",
+       "None needed · registration on file",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Hank Price",
+       "Lee Mobile Sharpening",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Nora Moore",
+       "Lee Mobile Sharpening",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Sharpening",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Gus Chen",
+       "Lee's Sharpening",
+       "At the shop, and on-site visits",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Rita Diaz",
+       "Lee's Sharpening",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Hank: knife sharpening and salon shear service",
+         "Nora: knife sharpening",
+         "Gus: blade restorations and on-site visits",
+         "Rita: knife sets and shears"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee's Sharpening. Quinn gets one invite, and replies YES. This work needs no license, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Sharpening. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "A license problem",
+    "why": "This work has no mechanic license, so none can have a problem."
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "The license holder leaves",
+    "why": "This work has no mechanic license, so there is no license holder to leave."
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Gus replies YES, then checks what Sam set. This work needs no license, so no number is asked. One reply covers everything Gus does for Lee's Sharpening.",
+    "more": [
+     "No license number is asked: this work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Rita joins the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Gus"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee's Sharpening! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t02"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Gus"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 8am",
+      {
+       "as": "Gus"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Gus Chen · Lee's Sharpening",
+        "lines": [
+         "Every shop service, blade restorations and on-site visits",
+         "Hours: the shop's hours",
+         "Languages: English and Spanish",
+         "Day list: 8am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Gus"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Gus"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "An item is never served as a child: an adult books and brings it in."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Sharpening needs no state license: the company gives its business registration (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Sharpening licenses nobody, so no sharpener takes a license check."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. A gate or door code never goes in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "For knives, the counter counts every piece with the customer and tags it.",
+     "The ticket lists each piece and any chip, crack or loose handle."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "For a drop-off, Alex gives the code at the counter when leaving the knives.",
+     "The reminder says to wrap each blade and carry the knives handle-first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "For knives, the count is checked at the counter before they're handed over."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-01",
+    "more": [
+     "The shop's edge promise, 30 days here, is on its receipt."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent, with the soonest drop-off first.",
+    "more": [
+     "A sharpening shop's example: a cracked or loose blade.",
+     "It gets 'don't use it, wrap the blade, and carry it handle-first'."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "A cracked blade can break and hurt someone. Please don't use it, wrap the blade, and carry it handle-first in a box. The soonest drop-off times are next."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No sharpener is named: once the item is in, the shop gives it to a sharpener with the skill.",
+    "more": [
+     "A wish for one sharpener goes in the notes, and the shop follows it where it can."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.3",
+       "8.21"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 11:05am",
+      "title": "Gus counts and tags the pieces",
+      "does": "Before any work, Gus counts each knife with Alex and ties a tag to it. The ticket lists every piece and any chip or crack.",
+      "more": [
+       "Blades go in a sleeve or a box, never loose.",
+       "The count is checked again at pick-up.",
+       "A chip or crack found now is noted with a photo, so the estimate says so.",
+       "It's kept with the booking, and Alex can see it on the secure page."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "COUNTED Alex M. 8 knives and a cleaver, tagged. One chip near a tip. Photos added."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s knives as the count and condition."
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: knife set $40 for visits from Mon Nov 2. Knife sets already booked keep $35."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A registration shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. Any deposit sits right next to it.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee's Sharpening",
+      "205 Foundry St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Knife set $35 ($40 from Nov 2) · Scissor sharpening $40 · Pruner sharpening $20"
+     ],
+     [
+      "To book",
+      "Nothing taken · no cancel or no-show fee"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Mobile Sharpening",
+      "Knife sharpening and salon shear service · within 25 miles of 310 Grove Ave, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam turns on the bill Rosie texts with READY for knife sets, for new bookings only. Each change is read back first.",
+    "more": [
+     "Knife sets already booked are still paid at the counter.",
+     "The customer can still pay at the counter, the shop's own way.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex brings the knives to the shop. The reminder said to wrap each blade, or use a sleeve or a box.",
+    "more": [
+     "Bare blades loose in a bag are not taken in. A missing wrap stops that work (the next branch).",
+     "The reminder already said what to bring.",
+     "The code is taken only once nothing required is missing."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-51",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M. The blades are loose in a bag, with no sleeve or box."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-23",
+    "does": "Alex's knives are ready, but they aren't picked up. The shop holds them 90 days. Rosie reminds Alex at 30 and 60 days, then Sam decides what's next.",
+    "more": [
+     "Rosie never starts a fee on its own. It's always Sam's call.",
+     "Two reminders only, inside text hours. No nudges after that."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every sharpening booking through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The sharpening plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A sharpening shop books drop-off slots and sharpeners, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Sharpening runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Sharpening is never sent now: a cracked blade gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "An item is fixed in hand, where Alex is. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty is billed: a customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "On-site work arrives in a 2-hour window, with a named sharpener (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "On-site work arrives in a 2-hour window, with a named sharpener (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "On-site work arrives in a 2-hour window, with a named sharpener (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "On-site repair needs no first step."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Sharpening is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Sharpening has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Sharpening is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A sharpener never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone must be there to hand over the knives and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for this work."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance is billed."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Sharpening is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Sharpening is never sent now (S2-30), so there's no such button."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Someone must be there to hand over the knives and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "Someone must be there to hand over the knives and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A repair is rated, like any job."
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Sharpening",
+       "At the customer's place",
+       "None needed · registration on file",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Hank Price",
+       "Lee Mobile Sharpening",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Nora Moore",
+       "Lee Mobile Sharpening",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Sharpening",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Gus Chen",
+       "Lee's Sharpening",
+       "At the shop, and on-site visits",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Rita Diaz",
+       "Lee's Sharpening",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Hank: knife sharpening and salon shear service",
+         "Nora: knife sharpening",
+         "Gus: blade restorations and on-site visits",
+         "Rita: knife sets and shears"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee's Sharpening. Quinn gets one invite, and replies YES. This work needs no license, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Sharpening. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "A license problem",
+    "why": "This work has no mechanic license, so none can have a problem."
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "The license holder leaves",
+    "why": "This work has no mechanic license, so there is no license holder to leave."
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Hank replies YES, then checks what Sam set. This work needs no license, so no number is asked. One reply covers everything Hank does for Lee Mobile Sharpening.",
+    "more": [
+     "No license number is asked: this work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Nora joins the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Hank"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Mobile Sharpening! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t02"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Hank"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 8am",
+      {
+       "as": "Hank"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Hank Price · Lee Mobile Sharpening",
+        "lines": [
+         "Every knife sharpening job, and salon shear jobs",
+         "Hours: Mon–Fri 7:30am–5:30pm",
+         "Languages: English and Spanish",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Hank"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Hank"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "A repair priced at the visit is done as part of this job, never as its own project."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "An item is never served as a child: an adult books and is there."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Sharpening needs no state license: the company gives its business registration (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Sharpening licenses nobody, so no sharpener takes a license check."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. A gate or door code never goes in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "The sharpening plug-in adds danger words, like a cracked blade or a bare blade carried loose."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "The plug-in asks Alex to put the knives on a table, and to keep pets and children away."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Hank counts every piece with Alex at the door, and notes any chip or crack before any work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For sharpening, a fire, sparks near fuel or a bad cut stops the booking.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If anyone is hurt, call 911 now. Then wrap the blade and keep it away from everyone."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said someone was badly cut. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A bad cut at the home",
+         "Told to call 911"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Hank looks at the cleaver and finds a crack in the blade. The plug-in says to stop there, so Alex gets a written note and the photo.",
+    "more": [
+     "The note says what was found, what wasn't done and why, and what to do next.",
+     "A cracked blade can break while it's ground. Hank does not sharpen it, and wraps it.",
+     "Only the work done is charged.",
+     "Sam is told, and the note and photos stay with the job."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD cleaver cracked, not sharpened. Wrapped.",
+      {
+       "photos": [
+        "Cracked cleaver"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Hank found a crack in the cleaver and stopped, to keep you safe. Please don't use it.",
+      {
+       "card": {
+        "title": "Safety note · 4 Maple Ct",
+        "lines": [
+         "Found: a crack in the cleaver",
+         "Not done: the cleaver, for now",
+         "Next: a new cleaver, or a repair quote"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: kitchen visit $199 for visits from Mon Nov 2. Kitchen visits already booked keep $179."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A registration shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. Any deposit sits right next to it.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee Mobile Sharpening",
+      "Knife sharpening and salon shear service · within 25 miles of 310 Grove Ave, Springfield · (555) 010-0142"
+     ],
+     [
+      "Prices",
+      "Kitchen visit $179 ($199 from Nov 2) · Saw grinding $150"
+     ],
+     [
+      "To book",
+      "A card saved for the $89 trip fee, charged only for a late cancel or a no-show"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee's Sharpening",
+      "Knives dropped off · 205 Foundry St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-78",
+    "say": [
+     [
+      "san",
+      "other",
+      "This is Rosie, an automated assistant for Lee Mobile Sharpening. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check.",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ],
+       "stop": "first",
+       "as": "Morgan Lee"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-54",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CANT START the knives aren't out and nobody answers the door"
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "From repair-shop (from: repair-shop), refitted Tue Oct 27 and merged on the REDESIGN 2 master (frozen 9:17am). A sharpening shop runs like a repair shop's quick side: the knives are dropped off, an edge check is OK'd only for damaged blades, a written estimate is OK'd before any work, and READY comes before the pick-up. No base plug-in or old flowchart existed (new profession); the plug-in is built from the trade's norm.\nTwo companies: Lee's Sharpening (the master's barbershop, flow A: the shop for knives, shears and tools) and Lee Mobile Sharpening (the master's Lee Home Services, flow B: a truck that sharpens at homes, kitchens and salons). Kinds of work: plumbing became knife sharpening, electrical became salon shear service, the later NEW kind is saw sharpening (B) and scissor sharpening (A). People: Riley and Avery became Gus and Rita (the shop); Jordan and Casey became Hank and Nora (the truck), so the master's pronouns still fit (Jordan he, Casey she). Addresses: 205 Foundry St (the shop), 4 Maple Ct (Alex), 310 Grove Ave (the second site).\nNo license: sharpening needs no person license; the business gives its registration where the city or state asks (S1-60 '1 A license', S2-28 '1 Yes, each one' and S11-42's two license branches are off; the sign-up license sentences are reworded as registration only).\nFlow A money: main list|none|counter (a $35 knife set, up to 5 knives, from the board: nothing taken, paid at the counter), visit|none|counter (a rusty or chipped set priced after a look: the $10 edge check is promised, Gus's written estimate is $110 blade restoration + $15 edge polish = $125 with the check included), list|none|bill (the bill goes with READY). The shop saves no card, holds nothing, takes no deposit and no full price: no cancel or no-show fee at the shop.\nFlow B money: main list|card|card ($179 kitchen visit, up to 30 knives and tools, at the customer's place; a card is saved for the $89 trip fee, which is the late-cancel and no-show fee, charged only on Sam's yes, and owed after a no to a visit price: B4-14; the sharpener works alone, so the saved card is charged for the visit at DONE), list|card|bill (Rosie texts the bill), visit|card|bill (a big mixed batch priced at the visit), list|none|bill (a restaurant kitchen on account: nothing taken, the bill after). No deposit and no full price anywhere. All amounts have names per path.\nFacts: dropoff (knives left at the shop), extrawork (a chip or crack found at the bench, OK'd first). No photos fact: sharpening is priced from the board or after a look. No documents fact: the written estimate is the visit path's own price OK, so B8-93's 'An estimate becomes its own job' branch is off. No switches. Settings: A a set start (drop-off slots), B a 2-hour window; cutoff A 7am the day of, B 6pm the day before (the truck's route is planned the evening before).\nSafety: fire, sparks near fuel or a bad cut stops the booking; a cracked or loose blade, a chipped blade that could break, or a bare blade carried loose gets the safety steps, then the booking goes on, marked urgent. A crack found during sharpening stops the work (B8-30). A child never books or drops off blades (A4-24 / B4-32 'A child' off).\nOwn step: A8-x01, the count and tag at the counter (every piece counted with the customer and listed on the ticket, checked again at pick-up), a real first step of this trade.\nOffs for work this shop never has: video or phone (A4-01, B4-01), plans and insurance, packages, a person by name, plan steps, rented items, 'too few booked', a child left, stage billing, next visit at checkout, a signed contract, nobody-home branches and sent-now steps.\nNot sure (for the verifier): S1-13's sign-up example card still lists 'Paid in full' lines and a $20 fee for services this shop never prepays (master text); A8-02 keeps the 'something required is missing' branch for loose, unwrapped blades; a restaurant on a standing route would be a repeat plan, which this build leaves to the master's plan branches (off in flow A, offered in B only as the master's example); the $179 kitchen visit is the master's number, kept so sums and fees stay right.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "barbershop license",
+    "EC22871",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "MP045210",
+    "BS20981",
+    "BS20918",
+    "$140 an hour",
+    "A chair, ready",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "would like to see your hair before pricing it",
+    "My employer pays for this cut.",
+    "Alex M.'s cut",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Color quotes come to you first. Board prices never need one",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Style consult",
+    "style consult",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "once Riley sees the hair.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Could Riley use a toner instead of the gloss?",
+    "asks for a toner instead of the gloss. What's the new price?",
+    "two skin fades on",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Today · 3:00pm · Avery",
+    "a beard trim today at 2:00pm with Avery",
+    "the beard trim today at 2:00pm with Avery",
+    "first tomorrow: 10:00am, Riley",
+    "A card saved for the $20 fee",
+    "haircut with Riley",
+    "Sat 11am Riley",
+    "at 11:20am on Riley's phone",
+    "Gloss to finish · $15",
+    "Riley quotes the rest at the chair, before any work.",
+    "Wants Saturday morning, with Riley",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "How was your visit with Riley?",
+    "Sun Oct 25 · 11:00am · Riley",
+    "Can my son wait in the shop during my cut?",
+    "Walk-in for a haircut",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Your item is still waiting for pick-up.",
+    "Promises the $25 consult; priced at the chair",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "like Lee Plumbing and Lee Electric.",
+    "Quiero un corte el sábado.",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Drain clearing",
+    "home warranty plan",
+    "a package of cuts",
+    "patch test",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop's services need none.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "Riley looks, then prices it",
+    "Texts Alex the price",
+    "Only the consult; the price stays open",
+    "a skin-test result",
+    "color and house calls",
+    "color, house calls",
+    "Consult only",
+    "photos of your hair",
+    "a cut on Saturday",
+    "Books a cut every 4 weeks",
+    "a cut every 4 weeks",
+    "for a staff cut",
+    "in the chair",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "4471",
+    "Sofia",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "fade",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "$25 consult",
+    "Only the consult",
+    "the consult",
+    "What happens at the chair?",
+    "Priced at the chair",
+    "priced at the chair",
+    "Paid at the chair",
+    "At the chair",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "a house call",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "like a burst pipe",
+    "$75",
+    "Gloss",
+    "gloss",
+    "Toner",
+    "toner"
+   ],
+   "B": [
+    "EC22871",
+    "BS20981",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "MP045210",
+    "MP045201",
+    "$140 an hour",
+    "A chair, ready",
+    "water is off on Main St after 2pm",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "Drain clearings",
+    "drain clearings",
+    "Shutoff valve and wall pipe · $540",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "heating and cooling",
+    "Heating and cooling",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "You can look for a roofer near you.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "water heater contract",
+    "replaces water heaters",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Can I run the dishwasher before you come?",
+    "like Lee Plumbing and Lee Electric.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "Both rentals' visits go on one bill on the 1st.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "Just the kitchen sink.",
+    "a leak under the sink",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals",
+    "next week's drain cleaning",
+    "clear a yard drain",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "your new pipes are in",
+    "a roof leak",
+    "Video and Jordan's notes",
+    "Jordan finds corroded shutoff valves.",
+    "replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "shutoff valves",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "supply house",
+    "Rental 1",
+    "Rental 2",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also run a camera down my sewer line?",
+    "$160 valve quote",
+    "$160 valve work",
+    "a bathroom drain",
+    "kitchen drain",
+    "The faucet is a leak repair, quoted at the visit.",
+    "A haircut could mean a salon or a barbershop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Texts Alex the price",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Is the sink still full of water?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "DONE 179 drain",
+    "245 valve 165 supply line 80",
+    "Shutoff valve",
+    "Supply line",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "1-year labor warranty",
+    "a dripping faucet",
+    "color and house calls",
+    "color, house calls",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "plumbing license",
+    "Plumbing license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "a haircut",
+    "Haircut",
+    "fade",
+    "beard trim",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "camera inspection",
+    "camera report",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Panel upgrade",
+    "under my sink",
+    "under the sink",
+    "like a burst pipe",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "shutoff valve",
+    "$75",
+    "Leak repair",
+    "leak repair",
+    "supply line"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A5-19": "5d5db6f3c1",
+   "A10-05": "63c3536c7a",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-42": "fde535c99e",
+   "S2-06": "6b01a08c94",
+   "A4-24": "0a292df05b",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S13-22": "5324c9a041",
+   "A3-20": "b8251d2535",
+   "A6-14": "b17b52115e",
+   "A8-54": "bc2f9467fd",
+   "A10-01": "77ff9c7550",
+   "A3-23": "4a8b7c72a2",
+   "A8-23": "e3a35f7f9e",
+   "S11-54": "ce20fc799b",
+   "S11-57": "a3996ae84e",
+   "S11-56": "bd841a4732",
+   "A8-02": "15f418fec4",
+   "A8-51": "71142aa1fa",
+   "A10-23": "105d7f426a"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B9-06": "f091432f2d",
+   "B9-19": "b97bfbf0d2",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B8-03": "ac9d404766",
+   "B10-32": "7713bff255",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-42": "8f63c529f7",
+   "S2-06": "b78d25d6e2",
+   "B8-93": "c1406fd6bc",
+   "B4-32": "fcfe092e37",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S13-22": "9c91065dc1",
+   "B3-17": "3eb7d7f259",
+   "B4-34": "74ff52d83d",
+   "B8-18": "530038d2b8",
+   "B3-19": "2f53161fb2",
+   "B8-30": "a1ef4983e4",
+   "S11-54": "f2d479cd60",
+   "S11-57": "2f34f23d8a",
+   "S1-78": "8d0e25526e",
+   "B8-54": "0f180048ca"
+  }
+ }
+}

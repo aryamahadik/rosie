@@ -1,0 +1,6076 @@
+{
+ "id": "pet-sitter",
+ "name": "Pet sitter",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "cleaner",
+ "plugin": {
+  "pf.license": {
+   "need": "Usually none to visit or stay with pets at the owner's home. Boarding pets at the sitter's own home or a kennel is licensed in some states: where the state's rules require it, the form asks for the boarding license. Some cities ask for a business license.",
+   "ask": "The company's business registration. For boarding, the state's boarding or kennel license number, where the form asks for one.",
+   "who_holds": "The business. Sitters need no license of their own unless the state's form says so.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "inspections": "Where the state inspects boarding homes, a lapsed license or a failed inspection pauses boarding bookings (the license re-check).",
+   "insurance_bond": "Pet-care insurance or a bond is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "not_this_work": "Vet care (checking or treating a sick pet) is a vet's work. Grooming is its own kind of work."
+  },
+  "pf.services": {
+   "pattern": "Set service: care visits or stays while the owner is away, priced per visit or per night. Boarding is a stay at the business.",
+   "list": [
+    {
+     "name": "Meet-and-greet",
+     "price_kind": "free",
+     "length": "30 minutes",
+     "where": "at the customer's home for pet sitting; at the Lodge for boarding",
+     "money": "nothing taken",
+     "note": "the first step for new clients"
+    },
+    {
+     "name": "Drop-in visits",
+     "price_kind": "per visit",
+     "example": "30 minutes, $25 a visit; a trip of 6 visits, twice a day Thu to Sat: $150 (the example business's own prices)",
+     "length": "30 minutes, in arrival windows (8–10am, 6–8pm)",
+     "where": "at the customer's home; nobody needs to be home",
+     "money": "a card saved at booking; the trip charged when the sitter texts DONE after the last visit"
+    },
+    {
+     "name": "Overnight stay at the customer's home",
+     "price_kind": "per night",
+     "example": "$89 a night, 7pm to 8am, up to 3 pets",
+     "where": "at the customer's home",
+     "money": "a card saved; charged at DONE. Holiday stays can take a deposit or the full price."
+    },
+    {
+     "name": "Medicine",
+     "price_kind": "included",
+     "example": "pills and insulin shots given at the visit, no extra charge in the example",
+     "note": "only sitters with the skill give shots"
+    },
+    {
+     "name": "Holiday dates",
+     "price_kind": "an extra price a night or visit",
+     "example": "+$20 a night on the holiday dates the owner sets; a minimum number of nights"
+    },
+    {
+     "name": "Vet trip",
+     "price_kind": "one price",
+     "example": "$65, there and back, waiting included",
+     "note": "added only when the customer asks; the vet's bill is the customer's"
+    },
+    {
+     "name": "Late-cancel fee",
+     "price_kind": "one price",
+     "example": "$89 after 7am the day care starts: only if the owner confirms it",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Dog walking (the second kind of work)",
+     "price_kind": "per walk",
+     "example": "30-minute walk $25; 60-minute walk $40; a weekday plan",
+     "where": "from the customer's home; nobody needs to be home"
+    },
+    {
+     "name": "Special-care visits (rare)",
+     "price_kind": "a price made for one pet, from the answers; the owner OKs any over the price-OK limit",
+     "example": "3 weeks of longer visits for a senior dog: $640, over the $500 limit, so Sam OKs it (the example business)",
+     "where": "at the customer's home",
+     "money": "a 25% deposit when booking; the rest after the last visit",
+     "note": "most pet sitting is on the list; this is for a pet whose care doesn't fit a list price"
+    },
+    {
+     "name": "Boarding at the Lodge (Lee's Pet Lodge, its own company)",
+     "price_kind": "per night",
+     "example": "dog $35 a night, puppy $40, cat $25, a bath before going home $20, a night with a bath $55, a long weekend of 4 nights $140",
+     "where": "at the business: dropped off and picked up at set times",
+     "money": "a card saved for the $20 late-cancel fee ($40 for 4 nights or more); paid at pick-up. A deposit or the full price where the owner sets it."
+    },
+    {
+     "name": "Special-care stay at the Lodge (rare)",
+     "price_kind": "a price made for one pet, from the answers; Sam OKs every one",
+     "example": "a senior dog who needs medicine: $90 a night (the example Lodge)",
+     "where": "at the Lodge",
+     "money": "like other stays: a card saved for the fee, paid at pick-up"
+    },
+    {
+     "name": "Overnight care at the customer's home, from the Lodge",
+     "price_kind": "per night",
+     "example": "$89 a night",
+     "where": "at the customer's home (the place the customer picks when both are offered)"
+    }
+   ],
+   "capacity": "One sitter per booking. Boarding: the Lodge's spaces a night (the example: 4 dogs and 2 cats), as the owner sets and the state's rules allow.",
+   "nobody_home": "Yes: pet sitting is done while the owner is away. The sitter gets in with the key from the meet-and-greet, a lockbox or a door code. Each visit ends with a photo; DONE after the last visit.",
+   "stays": "A booking of several visits or nights is one booking: its first and last day, each visit inside it, one price, one $2.",
+   "online": "No.",
+   "not_offered": "Vet care and grooming. A pet with a bite history only if the owner OKs it after a meet-and-greet."
+  },
+  "pf.questions": {
+   "before_times": [
+    "The first and last day away",
+    "Drop-in visits (how many a day), overnight stays at home, or boarding at the Lodge",
+    "The pets: kind, how many, age and size",
+    "Any medicine or shots? Yes or no; the details go on the secure page",
+    "For boarding: spayed or neutered, and does the dog get along with other dogs?"
+   ],
+   "after_a_time": [
+    "Friendly with visitors? Has a pet ever bitten anyone?",
+    "Are the cats indoor-only?",
+    "Does anyone else live in or visit the home?",
+    "Feeding times and food",
+    "Walks, litter, plants, mail and lights",
+    "How the sitter gets in: a key, a lockbox or a door code"
+   ],
+   "secure_page_only": [
+    "Door, lockbox and alarm codes, and where a key is kept",
+    "Medicine names and doses",
+    "The vet's name and number, and an emergency contact",
+    "The emergency vet OK and its spending limit",
+    "The travel dates and that the home will be empty"
+   ],
+   "who_may_book": "An adult who owns the pets or lives in the home, or someone they name."
+  },
+  "pf.safety": {
+   "words": [
+    "a pet hurt, not breathing, bleeding, having a seizure, or that ate something toxic, right now",
+    "a pet that has bitten someone or is aggressive",
+    "a gas smell or a fire at the home",
+    "a lost pet"
+   ],
+   "what_happens": [
+    "A pet in danger now: Rosie can't judge how sick a pet is. It says to call the vet or go to the nearest emergency vet now, gives the business's emergency vet line if the plug-in has one, and books nothing.",
+    "A bite history: the request goes to the owner first. The owner decides, after a meet-and-greet.",
+    "A gas smell or a fire: leave and call 911. No booking until it's safe.",
+    "A lost pet during care: the sitter texts LOST. The owner and the customer are told at once."
+   ],
+   "booking_goes_on": "No, for a pet in danger now (the vet comes first). Only with the owner's OK for a bite history."
+  },
+  "pf.first_steps": {
+   "meet_and_greet": "New clients get a free 30-minute meet-and-greet before the first booking. Pet sitting: at the customer's home, to meet the pets, see the food, medicine and litter, and take the key. Boarding: at the Lodge, where the dog meets the sitters and the other dogs. It stays good while the same sitter cares for the pets; a new sitter meets them first where there's time.",
+   "papers": "A care sheet and the business's service agreement, signed on the secure page before the first visit: food, medicine, the vet, an emergency contact and the emergency vet OK with its spending limit.",
+   "vaccines": "Boarding: vaccine records on file before the first night (rabies, and the others the business or the state's rules require). A vet's written exemption where the rules allow it. The vet can send them.",
+   "boarding_notice": "Boarding at a home: any notice the state's rules require before booking, like overnight cover and time alone, signed on the secure page.",
+   "prep_for_reminder": [
+    "Leave out food, litter and medicine supplies",
+    "Check the care sheet is current",
+    "Codes go on the secure page, never in a text",
+    "Boarding: bring the food, any medicine and the leash"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Pet sitting: nobody's home, so there's no code. The sitter lets themself in with the key from the meet-and-greet, a lockbox or a door code. Each visit ends with a photo. DONE after the last visit closes the booking. Someone home (a meet-and-greet): the code at the door. Boarding: the code at drop-off.",
+   "pick_up": "Boarding: a pet goes home only with its owner, who gives the code, or someone they named on the secure page, who shows an ID.",
+   "entry_codes": "Shown only to the booked sitter, only on visit days, each view logged, deleted after the last visit. Keys are kept or returned, the customer's choice, on tags with no address.",
+   "lockout": "The key or code fails with nobody home: the sitter texts it, the customer gets one link for a new code, and the sitter waits 30 minutes. Pets can't go without care, so the owner calls the customer and the emergency contact. A fee only if the owner confirms it.",
+   "updates": "A photo and a short note after each visit: fed, water, litter, medicine given. Boarding: one a day, with a photo.",
+   "vet_plan": "A pet unwell: the sitter calls the vet on file or takes the pet to the emergency vet, as the customer agreed on the secure page, up to their spending limit. The customer and the owner are told at once. The vet's bill is the customer's.",
+   "changes_at_visit": "An extra visit, an extra night or a vet trip only when the customer says yes, with the price first.",
+   "proof_done": "A photo at each visit; DONE after the last visit. Boarding: the pick-up with the code."
+  },
+  "pf.money": {
+   "start": "Pet sitting: a card saved at booking for the late-cancel fee; the whole booking charged when the sitter texts DONE after the last visit. Boarding: a card saved for the late-cancel fee; paid at pick-up.",
+   "other_ways": "A bill texted after the last visit (nothing taken at booking); a deposit, or the full price, for holiday and long bookings.",
+   "deposits": "Within the state's caps (the example: a $40 deposit, or 25% on a special-care price). Deposit cap: from the state form.",
+   "fees": "Late cancel (the example: after 7am the day care starts): the business's own fee (the example: $89 for pet sitting; $20 for a night of boarding, $40 for 4 nights or more), never more than the booking. The owner confirms each one; no answer, no fee.",
+   "vet_bills": "Paid by the customer to the vet, never through Rosie.",
+   "tips": "Optional, all to the sitter. A tip line only if the owner turns it on; card tips follow the state's rules.",
+   "tax": "A sales tax line only where the state taxes pet care, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking: one $2 for a booking of several visits."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Door, lockbox and alarm codes, and where a key is kept",
+    "That the home will be empty, and the travel dates, to anyone outside the business",
+    "Medicine names, doses and health details beyond 'medicine given'"
+   ],
+   "photos": "Pet and home photos go only to the customer and the business.",
+   "emergency_contact": "Listed on the secure page. Rosie never texts them unless they agreed to texts; the sitter or the owner calls them.",
+   "languages": "English and Spanish.",
+   "minors": "Nobody under 18 books. A teen at home isn't the booking's adult."
+  },
+  "pf.staff": {
+   "skills": [
+    "Drop-in visits",
+    "Overnight stays",
+    "Insulin shots and other medicine",
+    "Dog walking",
+    "Boarding care at the Lodge",
+    "Puppies, senior pets and pets with special needs"
+   ],
+   "licenses": "None per person unless the state's form says so.",
+   "new_person_ok": "A sitter the customer hasn't met is offered by text first, never sent without an OK, and meets the pets first where there's time. Only a sitter with the skill (like insulin shots) is offered.",
+   "keys": "Each key is on a tag with no address. A backup key only for a backup sitter the customer OK'd.",
+   "who_oks": "The owner OKs holiday bookings and new clients with a bite history. The office manager may too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "agreement": "The business's service agreement and care sheet, signed on the secure page before the first visit.",
+   "vet_ok": "The customer's signed OK for emergency vet care, with a spending limit.",
+   "boarding": "Boarding at a home or a kennel: a license, inspections, vaccine records, the number of pets and any notice before booking, where the state's rules require them.",
+   "holiday": "Holiday dates the owner sets: their own minimum nights, price, deposit and free-cancel cut-off, shown before booking.",
+   "keys_codes": "Codes deleted after the last visit; keys kept or returned, the customer's choice (Rosie's rule).",
+   "records": "7 years, with the visit photos and the care sheet."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "A pet unwell or hurt during care: the vet plan the customer signed. The customer and the owner are told at once.",
+    "A lost pet: LOST from the sitter. The owner and the customer are told at once; the times are logged. Rosie never offers money.",
+    "The key or code fails with nobody home: one link for a new code; the sitter waits 30 minutes; the owner calls the customer and the emergency contact.",
+    "The sitter is out: a sitter with the skill is offered first, never sent without the customer's OK. No answer: the owner calls, since pets can't go without care.",
+    "The trip changes: days added or cut, priced first, with the customer's yes.",
+    "A meet-and-greet not done before the first visit: the owner decides. A full refund if the booking can't go ahead.",
+    "A pet not picked up from boarding: reminders; extra nights at the nightly price only after the customer is told.",
+    "Several open bookings (a meet-and-greet and the trip): which one is asked first."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "animals",
+   "dropoff",
+   "firststeps",
+   "incare",
+   "multiday",
+   "photos",
+   "plans",
+   "photos",
+   "spaces",
+   "tips"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Hayden and Logan (lodge sitters)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Ellis and Shea (pet sitters)",
+   "cust": "Alex M. (customer) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Hayden"
+  },
+  "B": {
+   "staff": "Ellis"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Riley couldn't start today's visit: the signed form it needs is missing. The shop will text you about any fee. Once you have the form, you can book again:",
+    "Riley couldn't check Moose in today: his rabies record has run out. The Lodge will text you about any fee. Once your vet sends a new one, you can book again:"
+   ],
+   [
+    "Sam says yes, with a change, like another barber or a shorter service. Rosie reads it back, then asks Alex. Here, Avery stands in for Riley.",
+    "Sam says yes, with a change, like another drop-off or pick-up time. Rosie reads it back, then asks Alex. Here, pick-up moves to Sun 4pm."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Sat Nov 21, after 30 days' notice.",
+    "Saved: dog boarding $40 a night from Mon Nov 2. Stays already booked keep $35. Boarding plans go to $40 from Sat Nov 21, after 30 days' notice."
+   ],
+   [
+    "Sam set every color quote to come to him first. Say another customer, Nia K., sends photos for a color and cut. Riley prices it at $90.",
+    "Sam set every special-care price to come to him first. Say another customer, Nia K., has a senior dog who needs medicine. Riley prices it at $90 a night."
+   ],
+   [
+    "Sam raises the haircut to $40 on the portal. Plans get 30 days' notice, so Owen is texted the same day: $40 a visit from Sat Nov 21.",
+    "Sam raises dog boarding to $40 a night on the portal. Plans get 30 days' notice, so Owen is texted the same day: $40 a night from Sat Nov 21."
+   ],
+   [
+    "Some services need a room or equipment as well as a person. Color services need the shop's one color station, so two can't overlap.",
+    "Some stays need a room, not just a space. A cat stays in a cat room, away from the dogs. The Lodge has 2, so a third can't overlap."
+   ],
+   [
+    "Riley couldn't start Alex M.'s 11:00am: Alex isn't eligible for the service. It's on the shop's side, so nothing was charged.",
+    "Riley couldn't check in Alex M.'s dog at 11:00am: the Lodge was overbooked. It's on the Lodge's side, so nothing was charged."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family boards its three dogs together for a weekend. Rosie checks there's a space for each dog every night."
+   ],
+   [
+    "The shop's own license is checked first. Customers see the shop once a barber's license checks out and Sam says yes.",
+    "Customers see the Lodge once a lodge sitter joins and Sam says yes."
+   ],
+   [
+    "Riley couldn't start today's visit. It's on our side, so nothing is charged. You can book another service here.",
+    "Riley couldn't check Moose in today. It's on our side, so nothing is charged. Sam will call you to help find a space."
+   ],
+   [
+    "Each visit is booked and paid like a single one: the card stays saved, and any hold goes on before each visit.",
+    "Each stay is booked and paid like a single one: the card stays saved, and each stay is paid at pick-up."
+   ],
+   [
+    "Alex bought a package of cuts at the shop. This booking uses one of them, so the cut itself is already paid.",
+    "Alex bought a 10-night pack at the Lodge. This stay uses one night from it, so the night itself is already paid."
+   ],
+   [
+    "Labor is $140 an hour with Jordan, and $120 with anyone else. The camera inspection is $249 when Sam goes.",
+    "An overnight is $99 a night with Jordan, and $89 with anyone else. A vet trip is $85 when Sam goes."
+   ],
+   [
+    "Say it's on the shop's side instead, like a conflict found, or Alex isn't eligible for the service.",
+    "Say it's on the Lodge's side instead, like a booking mix-up that left no space."
+   ],
+   [
+    "Say Ben T. missed his Fri 1:00 signature cut and shave with Riley, and didn't answer in 30 minutes.",
+    "Say Ben T. missed his dog's Fri 1:00 drop-off for a night with a bath, and didn't answer in 30 minutes."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A dog and a cat from one home work the same way. Both are asked before the dates."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Both go on one stay, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "A haircut at Lee's Barbershop is $35 at the shop, or $75 at your home. Where would you like it?",
+    "Lee's Barbershop can board Moose for $35 a night, or stay at your home for $89 a night. Where would you like it?"
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most pet services start. Is it right? Send only what's different."
+   ],
+   [
+    "The shop's side: a conflict found, the customer isn't eligible, or a permit the shop needed.",
+    "The Lodge's side: a conflict found, like a booking mix-up that left no space."
+   ],
+   [
+    "A haircut at home is a house call: Riley comes to Alex, for $75, paid in full when booking.",
+    "Dog care at home is a home overnight: Riley stays at Alex's, for $89 a night, paid in full when booking."
+   ],
+   [
+    "Say Ben T. missed his Fri 1:00 Groom's package with Riley, and didn't answer in 30 minutes.",
+    "Say Ben T. missed his dog's Fri 1:00 drop-off for a long weekend, and didn't answer in 30 minutes."
+   ],
+   [
+    "If Riley says the cut was done, a person at Rosie reviews it first, and no fee is asked.",
+    "If Riley says Moose was dropped off, a person at Rosie reviews it first, and no fee is asked."
+   ],
+   [
+    "Sam says some people charge differently: Jordan's labor, and Sam's own camera inspections.",
+    "Sam says some people charge differently: Jordan's overnight stays, and Sam's own vet trips."
+   ],
+   [
+    "Here it books right away: Alex has had cuts at the shop before, and it isn't for today.",
+    "Here it books right away: Moose has stayed at the Lodge before, and it isn't for today."
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "It's a night of dog boarding for a returning customer, drop-off today at 2:00pm with Avery. It's $35. Accept it?"
+   ],
+   [
+    "Reply YES with your barber license number to join and get your bookings here by text.",
+    "Reply YES to join and get your bookings here by text."
+   ],
+   [
+    "Riley couldn't start Alex M.'s 11:00am: the signed form Alex was to bring is missing.",
+    "Riley couldn't check in Alex M.'s dog at 11:00am: the rabies record has run out."
+   ],
+   [
+    "Say Ben T. missed his Fri 1:00 haircut with Riley, and didn't answer in 30 minutes.",
+    "Say Ben T. missed his dog's Fri 1:00 drop-off, and didn't answer in 30 minutes."
+   ],
+   [
+    "Plumbing, electrical and barbering need one, so Sam's three take the license step.",
+    "Pet sitting and dog walking need none where Sam works, so Sam gives the registration."
+   ],
+   [
+    "Plumbing, electrical and barbering license each person, so Sam's four are checked.",
+    "Pet sitting, dog walking and boarding license no one person where Sam works, so nobody is checked."
+   ],
+   [
+    "Keep: the form is signed at the desk, on the secure page, before the work starts.",
+    "Keep: the form is signed at drop-off, on the secure page, before the stay starts."
+   ],
+   [
+    "Nobody on Sam's team needs one: every plumber and barber holds their own license.",
+    "Nobody on Sam's team needs one: nobody works under someone else's license."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Puppy boarding at Lee's Barbershop is $40 a night, not $35. Here are the open dates at $40."
+   ],
+   [
+    "At the chair, Alex gives the code from an earlier text, or Riley marks it done.",
+    "At drop-off, Alex gives the code from an earlier text, or Riley marks it done."
+   ],
+   [
+    "shows the color costs more since then. Sam set every color quote to come to him",
+    "shows the medicine and food cost more since then. Sam set every special-care price to come to him"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A pet lodge on Elm St. Dog and cat boarding, and sitting visits."
+   ],
+   [
+    "CAN'T START Alex M. Not eligible for this service, as the plug-in's rules say.",
+    "CAN'T START Alex M. The Lodge is full: one dog too many was booked."
+   ],
+   [
+    "The plug-in says which requests wait for Sam's OK. Here, it's a new customer.",
+    "The plug-in says which requests wait for Sam's OK. Here, it's a same-day stay."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "We couldn't find registration 2019-0451 for Lee Home Services on the state's business lookup."
+   ],
+   [
+    "If no one barber has time for both, the times show two barbers back to back.",
+    "The bath is done the morning of pick-up."
+   ],
+   [
+    "We still can't confirm plumbing license MP045210, so plumbing stays offline.",
+    "We still can't confirm registration 2019-0451, so pet sitting stays offline."
+   ],
+   [
+    "Its license checked out. It shows once a barber is confirmed and you say yes",
+    "Its boarding license is on file as given, not checked. It shows once a lodge sitter joins and you say yes"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A boarding home's visits are drop-offs: the pet stays, and is picked up later."
+   ],
+   [
+    "Reply YES with your license numbers to join and get your jobs here by text.",
+    "Reply YES to join and get your jobs here by text."
+   ],
+   [
+    "Riley replies YES with a barber license number, then checks what Sam set.",
+    "Riley replies YES, then checks what Sam set."
+   ],
+   [
+    "Lee's Barbershop can't do Sat 11:00am. They offered another time instead:",
+    "Lee's Barbershop can't take Moose at 11:00am. They offered another drop-off time instead:"
+   ],
+   [
+    "suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "suggests moving Moose's stay until a vet says the cough is OK, with no fee. Pick new dates:"
+   ],
+   [
+    "Only Riley is cleared for house calls, so only Riley is offered for them.",
+    "Only Riley is cleared for home overnights, so only Riley is offered for them."
+   ],
+   [
+    "At the chair, Alex is already there, so the shop takes the first branch.",
+    "At the Lodge, Moose stays, so it takes the drop-off branch."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sitter's example: a pet that gets into the medicine gets the vet's number first."
+   ],
+   [
+    "A cut paid at the chair is disputed through the shop's own card reader.",
+    "A stay paid at pick-up is disputed through the Lodge's own card reader."
+   ],
+   [
+    "Plumbing goes live at 2:16pm, and Sam can be booked on his own license.",
+    "Plumbing goes live at 2:16pm, and Sam can be booked now."
+   ],
+   [
+    "Jordan replies YES with both license numbers, then checks what Sam set.",
+    "Jordan replies YES, then checks what Sam set."
+   ],
+   [
+    "Goes on as a house call in the other flow: Riley at Alex's home, $75.",
+    "Goes on as a home overnight in the other flow: Riley at Alex's home, $89."
+   ],
+   [
+    "Alex picks home. A haircut at home is $75, paid in full when booking.",
+    "Alex picks home. Dog care at home is $89 a night, paid in full when booking."
+   ],
+   [
+    "The patch test is saved with the main visit, on the same secure link.",
+    "The meet-and-greet is saved with the stay, on the same secure link."
+   ],
+   [
+    "With times to pick, all with Riley, since only Riley does color here.",
+    "With dates to pick, all on nights Riley works, since only Riley gives the medicine."
+   ],
+   [
+    "Rosie checks that Riley has the time, then shows the price first.",
+    "Rosie checks the Lodge has time for it, then shows the price first."
+   ],
+   [
+    "At the shop, Alex is already in the chair, so there's no door check.",
+    "At the Lodge, Alex hands Moose over in person, so there's no door check."
+   ],
+   [
+    "Customers come to each shop, so each shop's own state's rules apply.",
+    "Customers come to each lodge, so each lodge's own state's rules apply."
+   ],
+   [
+    "2 Jordan is 140 an hour. The camera inspection is 249 if I go myself",
+    "2 Jordan's overnights are 99 a night. A vet trip is 85 if I go myself"
+   ],
+   [
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "The Lodge has time for it. Add a bath before Moose goes home?"
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. Moose's rabies record has run out."
+   ],
+   [
+    "Alex M. missed the Sat 11:00am visit with Riley and didn't answer.",
+    "Alex M. didn't bring Moose to the Sat 11:00am drop-off, and didn't answer."
+   ],
+   [
+    "A barbershop has none. The plug-in sets which services run longer.",
+    "Every stay at the Lodge runs over days: drop-off, a daily photo, then pick-up."
+   ],
+   [
+    "The state's lookup doesn't find license MP045210 under Sam's name.",
+    "The state's business lookup doesn't find registration 2019-0451 under Sam's name."
+   ],
+   [
+    "The barbershop's says the state licenses the shop and each barber.",
+    "The Lodge's says the state licenses boarding at a home, where its rules require it."
+   ],
+   [
+    "Only Riley does color, so color services offer only Riley's times.",
+    "Only Riley gives insulin shots at the Lodge, so a diabetic pet's stay shows only nights Riley works."
+   ],
+   [
+    "Offer Dee W. her skin fade today at 3:00pm with Riley, not Avery?",
+    "Offer Dee W. her puppy's night with drop-off at 4:00pm, not 3:00pm?"
+   ],
+   [
+    "Jesse R. helps out on big jobs, but Jesse has their own business.",
+    "Jesse R. helps out on busy holidays, but Jesse has their own business."
+   ],
+   [
+    "To-do for a new booking: get the doctor's note before the visit.",
+    "To-do for a new booking: get the vaccine records from the dog's vet before drop-off."
+   ],
+   [
+    "Who goes out on plumbing and electrical jobs, and who cuts hair?",
+    "Who goes out on pet sitting and dog walking jobs, and who works at the Lodge?"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms. Other businesses nearby may.",
+    "Lee's Barbershop doesn't do full grooming. A groomer nearby may."
+   ],
+   [
+    "Alex wants 10:00am, which another customer is saving right now.",
+    "Alex wants a 10:00am drop-off, which another customer is saving right now."
+   ],
+   [
+    "Some work is booked with one person, like a haircut with Riley.",
+    "Some work is booked with one person, like a pet sitter's visits."
+   ],
+   [
+    "Example: a color needs its patch test at least 48 hours before.",
+    "Example: a new dog's meet-and-greet at least a day before."
+   ],
+   [
+    "A price from photos stays good for 7 days, if Alex comes back.",
+    "A special-care price stays good for 7 days, if Alex comes back."
+   ],
+   [
+    "Did you have your 11:00am visit at Lee's Barbershop yesterday?",
+    "Did you drop Moose off at Lee's Barbershop yesterday at 11:00am?"
+   ],
+   [
+    "asks her AI for a skin fade at Lee's Barbershop late at night",
+    "asks her AI for a night of puppy boarding at Lee's Barbershop late at night"
+   ],
+   [
+    "Barbering pays the $2, so the shop gets its own monthly bill.",
+    "Boarding pays the $2, so the Lodge gets its own monthly bill."
+   ],
+   [
+    "Sam's three kinds of work book people, so he lists no spaces.",
+    "Pet sitting and dog walking book people. The Lodge books its spaces: 4 dog runs and 2 cat rooms."
+   ],
+   [
+    "Jules rents a chair at the shop but runs their own business.",
+    "Jules boards dogs in a room at the Lodge but runs their own business."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at the business's own place"
+   ],
+   [
+    "Alex M. would like any Saturday-morning time, if one opens.",
+    "Alex M. would like a space Saturday night, if one opens."
+   ],
+   [
+    "Say Alex has a scalp rash that gets worse before the visit.",
+    "Say Moose starts coughing before the stay."
+   ],
+   [
+    "Both want Sat Oct 31, 2:00pm with Avery, 0.4 seconds apart.",
+    "Both want the last space for Sat Oct 31, 0.4 seconds apart."
+   ],
+   [
+    "Cancel your Sat 11:00am signature cut and hot towel shave?",
+    "Cancel Moose's night with a bath (drop-off Sat 11:00am)?"
+   ],
+   [
+    "Jobs sent now go to whoever is on call, set with the team.",
+    "Pet sitting is never sent now, so nobody is on call."
+   ],
+   [
+    "Once your electrician's license checks out and you say yes",
+    "Once your walker joins and you say yes"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · Groom's package with Riley",
+    "Booked · Sat Oct 24, 11:00am drop-off · long weekend"
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a boarding plan, one weekend a month."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your dog's stay is part of a plan, one weekend a month."
+   ],
+   [
+    "Like a barber who rents a chair, or a helper on big jobs.",
+    "Like a sitter who rents a room at the Lodge, or a helper on busy holidays."
+   ],
+   [
+    "A cut is one barber, so the shop takes the first branch.",
+    "Each pet's care is one lodge sitter on duty, so the Lodge takes the first branch."
+   ],
+   [
+    "New booking for you: Dee W., skin fade, today at 3:00pm.",
+    "New stay: Dee W.'s puppy, tonight, drop-off 3:00pm."
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2.",
+    "Sam raises dog boarding to $40 a night, for stays from Mon Nov 2."
+   ],
+   [
+    "Check the number and the name as printed on the license.",
+    "Check the number and the name as printed on the paper."
+   ],
+   [
+    "Everyone's licenses are confirmed on the state's lookup.",
+    "Everyone has joined."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own: a pet that's hurt or ate something toxic, a bite, a gas smell, or a lost pet."
+   ],
+   [
+    "Alex books a cut for an adult brother, and pays for it.",
+    "Alex books a stay for an adult brother's dog, and pays for it."
+   ],
+   [
+    "A cut is shortened, so the shop takes the first branch.",
+    "A late drop-off is taken until drop-off hours end, so the Lodge takes the first branch."
+   ],
+   [
+    "cancelled a haircut membership inside its cancel period",
+    "cancelled a boarding pack inside its cancel period"
+   ],
+   [
+    "At the shop, prices are the same whichever barber cuts.",
+    "At the Lodge, prices are the same whoever is on duty."
+   ],
+   [
+    "A barbershop's way is a line for the next free barber.",
+    "A boarding home takes no walk-ins: a new pet needs its vaccine records and a meet-and-greet first."
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · signature cut and shave",
+    "Booked · Sat Oct 24, 11:00am drop-off · 1 night with a bath"
+   ],
+   [
+    "We saved Sat Oct 24 at 11:00am for you for 10 minutes.",
+    "We saved the Sat Oct 24 drop-off at 11:00am for you for 10 minutes."
+   ],
+   [
+    "Dana's patch test is done, and Riley texts its result.",
+    "Dana's puppy met the Lodge, and Riley texts how it went."
+   ],
+   [
+    "Signature cut and hot towel shave · Sat Oct 24 · Riley",
+    "Night with a bath · Sat Oct 24 to Sun Oct 25"
+   ],
+   [
+    "When only the visit fee is promised, it's shown first.",
+    "When only a starting fee is promised, it's shown first."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a pet taxi, which isn't on the list."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Dog training for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "rents a chair here, but Jules has their own business.",
+    "rents a room here, but Jules has their own business."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pet services set it."
+   ],
+   [
+    "Lee's Barbershop has open times on Saturday morning.",
+    "Lee's Barbershop has space on Saturday night."
+   ],
+   [
+    "Alex had a bad reaction last time, like to hair dye.",
+    "Alex's dog got into a fight on its last stay."
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel Moose's stay (drop-off Sat 11:00am)? It's free."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "Moose started coughing today. Can he still come Saturday?"
+   ],
+   [
+    "Alex needs a cut within the hour, for an interview.",
+    "Alex needs a space tonight, for a work trip tomorrow."
+   ],
+   [
+    "A cut has none, so the shop takes the first branch.",
+    "A stay has none, so the Lodge takes the first branch."
+   ],
+   [
+    "Riley did the cut, but entered no code and no DONE.",
+    "Riley took Moose in, but entered no code and no DONE."
+   ],
+   [
+    "A barbershop needs none, so Riley goes straight on.",
+    "Where Sam works, the state asks for no boarding log, so Riley goes straight on."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A stay is rated, so the Lodge takes the first branch."
+   ],
+   [
+    "Lee's Barbershop can do your color and cut for $90.",
+    "Lee's Barbershop can board your senior dog for $90 a night."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Ben's AI asks for puppy boarding at $35 a night, an old price."
+   ],
+   [
+    "Until then, a haircut books with a YES and no card.",
+    "Until then, a stay books with a YES and no card."
+   ],
+   [
+    "Jesse helps on big jobs but has their own business.",
+    "Jesse helps on busy holidays but has their own business."
+   ],
+   [
+    "Jesse's license goes through the same state lookup.",
+    "Jesse's business details go through the same checks."
+   ],
+   [
+    "Gemini hears right away that 2:00pm was just taken",
+    "Gemini hears right away that the space was just taken"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No work here is sent now: a new client meets the sitter first."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a dog walk for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "accept the beard trim today at 2:00pm with Avery.",
+    "accept the night of dog boarding, drop-off today at 2:00pm, with Avery."
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24, 11:00am drop-off · 1 night"
+   ],
+   [
+    "A service priced at the chair gets its price now.",
+    "A stay's price is set from the board."
+   ],
+   [
+    "The shop's license BS20981 checks out in minutes.",
+    "The Lodge's boarding license BL20981 is on file as given by the business, not checked."
+   ],
+   [
+    "Alex asks for a perm, which the shop doesn't do.",
+    "Alex asks for a full groom, which the Lodge doesn't do."
+   ],
+   [
+    "for Saturday morning, so you're off the waitlist",
+    "for Saturday night, so you're off the waitlist"
+   ],
+   [
+    "Some bookings name a person, like Riley's chair.",
+    "Some bookings name a person, like a pet sitter's visits."
+   ],
+   [
+    "Say Alex signed a membership at the shop today.",
+    "Say Alex bought a 10-night pack at the Lodge today."
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 11:00am with Avery?",
+    "Offer Alex M. the same dates, with pick-up Sun at 4:00pm?"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 special-care price."
+   ],
+   [
+    "Electrical and the barbershop can still go live",
+    "Dog walking and the Lodge can still go live"
+   ],
+   [
+    "May the haircut be done at the customer's home?",
+    "May dog care be done at the customer's home?"
+   ],
+   [
+    "Electrical is set up; waits for its electrician",
+    "Dog walking is set up; waits for its walker"
+   ],
+   [
+    "Reads back plumbing's money, service by service",
+    "Reads back pet sitting's money, by service"
+   ],
+   [
+    "$35 a visit · a card saved now for the $20 fee",
+    "$35 a night · a card saved now for the $20 fee"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "Alex M.'s fee for the missing form is waiting.",
+    "Alex M.'s fee for the missing record is waiting."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says Moose's collar came back broken"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Pet care could mean a sitter at home or a boarding home."
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's for my brother's dog. Can I pay for it?"
+   ],
+   [
+    "Your Sat 11:00am time stays saved until then.",
+    "Your Sat drop-off stays saved until then."
+   ],
+   [
+    "'s patch test is done. Result is on the page.",
+    "'s meet-and-greet is done. Result is on the page."
+   ],
+   [
+    "Back to the main path: every license matched.",
+    "Back to the main path: nobody needed a license check."
+   ],
+   [
+    "A haircut is offered in both, so Alex picks.",
+    "Dog care is offered in both, so Alex picks."
+   ],
+   [
+    "You're on the waitlist for Saturday morning.",
+    "You're on the waitlist for Saturday night."
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code at drop-off."
+   ],
+   [
+    "A barber can work at both, on one calendar.",
+    "A lodge sitter can work at both, on one calendar."
+   ],
+   [
+    "Reply YES with your license number to join.",
+    "Reply YES to join."
+   ],
+   [
+    "Any scalp trouble Riley should know about?",
+    "Does Moose take any medicine?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I bring Moose's own bed?"
+   ],
+   [
+    "Your color quote is with the shop's owner.",
+    "Your price is with the Lodge's owner."
+   ],
+   [
+    "like a repair left at the shop or a course",
+    "like a repair left at a shop, or a course"
+   ],
+   [
+    "You can be booked now, on your own license",
+    "You can be booked now"
+   ],
+   [
+    "Was the color done at a salon, or at home?",
+    "Has your pet stayed away from home before?"
+   ],
+   [
+    "If it's urgent, see a doctor or call 911.",
+    "If it's urgent for a pet, call your vet."
+   ],
+   [
+    "Check Alex in with the code at the chair.",
+    "Check Moose in with the code at drop-off."
+   ],
+   [
+    "moved your visit to Sat Oct 24 at 1:00pm.",
+    "moved Moose's drop-off to Sat Oct 24 at 1:00pm."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every Lodge service, insulin shots, home overnights"
+   ],
+   [
+    "Booking rules; color quotes need Sam's OK",
+    "Booking rules; new dogs need Sam's OK"
+   ],
+   [
+    "Riley Chen: barber, color and house calls",
+    "Riley Chen: lodge sitter, insulin shots, home overnights"
+   ],
+   [
+    "New request from Dee W., a new customer.",
+    "New request from Dee W., a returning customer, for tonight."
+   ],
+   [
+    "$35 a visit · card saved for the $20 fee",
+    "$35 a night · card saved for the $20 fee"
+   ],
+   [
+    "Cancel your Sat 11:00am Groom's package?",
+    "Cancel Moose's long weekend stay (drop-off Sat 11:00am)?"
+   ],
+   [
+    "so your 3:00 haircut can't go ahead then",
+    "so your dog's 3:00 drop-off can't go ahead then"
+   ],
+   [
+    "Check him in with the code at the chair.",
+    "Check his dog in with the code at drop-off."
+   ],
+   [
+    "Plumbing is live; offers electrical next",
+    "Pet sitting is live; offers dog walking next"
+   ],
+   [
+    "Sat Oct 24 · 11:00am · Avery, not Riley",
+    "Sat Oct 24 to Sun Oct 25 · pick-up 4:00pm, not 11:00am"
+   ],
+   [
+    "cancelled late: Sat 11:00am with Riley.",
+    "cancelled late: the Sat 11:00am drop-off."
+   ],
+   [
+    "A cut at the shop has no cancel period.",
+    "A stay at the Lodge has no cancel period."
+   ],
+   [
+    "Haircut · Sat Oct 31 · 10:00am · Riley",
+    "Dog boarding · Sat Oct 31 to Sun Nov 1"
+   ],
+   [
+    "Send Nia K. $80 for the color and cut?",
+    "Send Nia K. $80 a night for the special-care stay?"
+   ],
+   [
+    "Ben T. missed his Fri 1:00 with Riley.",
+    "Ben T. missed his Fri 1:00 drop-off."
+   ],
+   [
+    "Every shop service, color, house calls",
+    "Every Lodge service, insulin shots, home overnights"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Pet sitting · dog walking"
+   ],
+   [
+    "looks at Alex's hair and texts a price",
+    "looks Moose over and texts a price"
+   ],
+   [
+    "Alex's employer pays for a staff cut.",
+    "Alex's employer pays for the stay, during a work trip."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Moose's collar came back broken."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds dog training to Lee's Barbershop."
+   ],
+   [
+    "Adds a second shop, with its own team",
+    "Adds a second lodge, with its own team"
+   ],
+   [
+    "Give your check-in code at the chair.",
+    "Give your check-in code at drop-off."
+   ],
+   [
+    "and electrical's and the barbershop's",
+    "and dog walking's and boarding's"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like dog care at the Lodge or at home"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Riley also gives insulin shots and does home overnights"
+   ],
+   [
+    "and replies YES with a license number",
+    "and replies YES"
+   ],
+   [
+    "like a membership signed at the shop",
+    "like a 10-night pack bought at the Lodge"
+   ],
+   [
+    "Haircut plan · every 4 weeks · Riley",
+    "Boarding plan · one weekend a month"
+   ],
+   [
+    "Offers a shorter cut or a later time",
+    "Takes a late drop-off, or a later time"
+   ],
+   [
+    "had to cancel your Sat Oct 24 visit.",
+    "had to cancel Moose's Sat Oct 24 stay."
+   ],
+   [
+    "1 color quote · Still waiting on you",
+    "1 special-care price · Still waiting on you"
+   ],
+   [
+    "Checks where house calls are allowed",
+    "Checks where home overnights are allowed"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: lodge sitter, insulin shots, home overnights"
+   ],
+   [
+    "legal, tax, medical or repair advice",
+    "legal, tax, medical or vet advice"
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Long weekend (4 nights)"
+   ],
+   [
+    "Riley can go over it at your visit.",
+    "Riley can go over it at drop-off."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A boarding home books a stay, start to end."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can Moose get a bath before pick-up?"
+   ],
+   [
+    "Charged Sat Oct 31, after the visit",
+    "Charged Sun Nov 1, at pick-up"
+   ],
+   [
+    "weren't at Sat's 11:00am with Riley",
+    "didn't come to Sat's 11:00am drop-off"
+   ],
+   [
+    "Book Alex M. again Sat Nov 21, 11am",
+    "Book Moose again Sat Nov 21, 11am"
+   ],
+   [
+    "refund for the cancelled membership",
+    "refund for the cancelled pack"
+   ],
+   [
+    "The barbershop gets its own listing",
+    "The Lodge gets its own listing"
+   ],
+   [
+    "Riley Chen and Avery Diaz cut hair.",
+    "Riley Chen and Avery Diaz work at the Lodge."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Drop-ins, overnights, insulin shots"
+   ],
+   [
+    "a signature cut and hot towel shave",
+    "a night with a bath"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Pet Lodge doesn't do taxis."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday drop-off, one night"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a weekend stay every month, for work trips."
+   ],
+   [
+    "Paid at the chair after each visit",
+    "Paid at pick-up after each stay"
+   ],
+   [
+    "Can I skip this one? I'll be away.",
+    "Can I skip this one? My trip is off."
+   ],
+   [
+    "Riley's color quote needs your OK.",
+    "Riley's special-care price needs your OK."
+   ],
+   [
+    "Keeps the haircut at the shop only",
+    "Keeps dog care at the Lodge only"
+   ],
+   [
+    "Sat Oct 24 · any time before noon",
+    "Sat Oct 24 · one night"
+   ],
+   [
+    "or the AI can look at other shops",
+    "or the AI can look at other boarding homes"
+   ],
+   [
+    "since the signed form was missing",
+    "since the rabies record had run out"
+   ],
+   [
+    "I waited 25 minutes past my time.",
+    "I waited 25 minutes at pick-up."
+   ],
+   [
+    "Follows up on an item left behind",
+    "Follows up on a pet not picked up"
+   ],
+   [
+    "Today · 3:00pm · Riley, not Avery",
+    "Tonight · drop-off 4:00pm, not 3:00pm"
+   ],
+   [
+    "Its name, like Table 4 or Court 2",
+    "Its name, like Dog run 1 or Cat room"
+   ],
+   [
+    "Haircuts and plumbing both pay it",
+    "Boarding and pet sitting both pay it"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Night with a bath"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "night with a bath"
+   ],
+   [
+    "Is your hair past your shoulders?",
+    "Does your dog weigh over 80 pounds?"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's dogs together"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a stay and a bath"
+   ],
+   [
+    "Alex gives the code at the chair",
+    "Alex gives the code at drop-off"
+   ],
+   [
+    "Alex M. rated the visit 2 stars.",
+    "Alex M. rated Moose's stay 2 stars."
+   ],
+   [
+    "Alex's page shows the cuts left.",
+    "Alex's page shows the nights left."
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Pet sitting, Dog walking, Boarding"
+   ],
+   [
+    "Sat Oct 24 · 11:00am · 2½ hours",
+    "Sat Oct 24 to Wed Oct 28 · drop-off 11:00am"
+   ],
+   [
+    "Your Sat Oct 31 visit stays $35",
+    "Your Oct 31 stay keeps $35"
+   ],
+   [
+    "Shows Alex the cut; fixes first",
+    "Tells Alex how the stay went"
+   ],
+   [
+    "'Is this your first skin fade?'",
+    "'Has your puppy had all its shots?'"
+   ],
+   [
+    "For Nia K. · priced from photos",
+    "For Nia K. · priced from her answers"
+   ],
+   [
+    "Avery Diaz: barber, at the shop",
+    "Avery Diaz: lodge sitter"
+   ],
+   [
+    "Uses a cut from Alex's package",
+    "Uses a night from Alex's pack"
+   ],
+   [
+    "This one: Sat Oct 31 · 10:00am",
+    "This one: Sat Oct 31 · drop-off 10:00am"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "One weekend a month"
+   ],
+   [
+    "A skin problem stops the work",
+    "A sick pet can't board"
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Barbershop · Dog boarding"
+   ],
+   [
+    "When a chair is about to open",
+    "When a dog run is about to open"
+   ],
+   [
+    "Sat Oct 24 · 10:00am · Riley",
+    "Sat Oct 24 to Sun Oct 25 · drop-off 10:00am"
+   ],
+   [
+    "No barber is free that week.",
+    "No space is free that week."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Boarding plan · one weekend a month"
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at drop-off."
+   ],
+   [
+    "Sat Oct 31 · 11:00am · Riley",
+    "Sat Oct 31 to Sun Nov 1 · drop-off 11:00am"
+   ],
+   [
+    "Sun Oct 25 · 11:00am · Riley",
+    "Sun Oct 25 to Mon Oct 26 · drop-off 11:00am"
+   ],
+   [
+    "Tue Oct 27 · 11:00am · Riley",
+    "Tue Oct 27 to Wed Oct 28 · drop-off 11:00am"
+   ],
+   [
+    "Alex's to bring, like a form",
+    "Alex's to bring, like a record"
+   ],
+   [
+    "Asks Sam about a storage fee",
+    "Asks Sam about an extra night"
+   ],
+   [
+    "Is this her first skin fade?",
+    "Has her puppy had all its shots?"
+   ],
+   [
+    "before he OKs your skin fade",
+    "before he OKs your puppy's stay"
+   ],
+   [
+    "A color quote needs Sam's OK",
+    "A special-care price needs Sam's OK"
+   ],
+   [
+    "Supplier invoice: color +$20",
+    "Receipts: medicine and food +$20"
+   ],
+   [
+    "Yes: tables, courts or rooms",
+    "Yes: tables, rooms or pet runs"
+   ],
+   [
+    "Every shop service but color",
+    "Every Lodge service but insulin shots"
+   ],
+   [
+    "Sat Oct 24 · 11:00am · Riley",
+    "Sat Oct 24 to Sun Oct 25 · drop-off 11:00am"
+   ],
+   [
+    "Sat Oct 24 · 12:30pm · Avery",
+    "Sat Oct 24 to Sun Oct 25 · drop-off 12:30pm"
+   ],
+   [
+    "Like the color in my photos.",
+    "He sleeps on his own bed."
+   ],
+   [
+    "Longer hair takes more time.",
+    "A bigger dog takes more time."
+   ],
+   [
+    "Saves the color station too",
+    "Saves a cat room too"
+   ],
+   [
+    "Saturdays · 11:00am · Riley",
+    "Saturdays · drop-off 11:00am"
+   ],
+   [
+    "Sat Oct 24 · 3:00pm · Riley",
+    "Sat Oct 24 to Sun Oct 25 · drop-off 3:00pm"
+   ],
+   [
+    "Tue Nov 3 · 11:00am · Riley",
+    "Fri Nov 6 to Sat Nov 7 · drop-off 11:00am"
+   ],
+   [
+    "$40 a visit from Sat Nov 21",
+    "$40 a night from Sat Nov 21"
+   ],
+   [
+    "Sat Oct 31 · 2:00pm · Avery",
+    "Sat Oct 31 to Sun Nov 1 · drop-off 2:00pm"
+   ],
+   [
+    "Sat Oct 24 · 2:00pm · Riley",
+    "Sat Oct 24 to Sun Oct 25 · drop-off 2:00pm"
+   ],
+   [
+    "How long is your beard now?",
+    "How long is your dog's coat now?"
+   ],
+   [
+    "$140 · Saturday times open",
+    "$140 for 4 nights · Saturday space open"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 28 · drop-off 10:00am"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the stay?"
+   ],
+   [
+    "Electrical license JE30417",
+    "Skills: insulin shots, dog walks"
+   ],
+   [
+    "A long beard takes longer.",
+    "A long coat takes longer to bathe."
+   ],
+   [
+    "Groom's package, 2½ hours",
+    "Long weekend stay, 4 nights"
+   ],
+   [
+    "$35 · Saturday times open",
+    "$35 a night · Saturday space open"
+   ],
+   [
+    "$55 · Saturday times open",
+    "$55 · Saturday space open"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a stay every month"
+   ],
+   [
+    "Shorter, in the time left",
+    "Taken until drop-off ends"
+   ],
+   [
+    "Ben T. is booked at 3:00.",
+    "Ben T.'s dog comes in at 3:00."
+   ],
+   [
+    "as with every color quote",
+    "as with every special-care price"
+   ],
+   [
+    "the barbershop is its own",
+    "the Lodge is its own"
+   ],
+   [
+    "Plumbing license JP031552",
+    "No license needed for this work"
+   ],
+   [
+    "once Hayden sees the hair",
+    "once Hayden sees the pet"
+   ],
+   [
+    "A haircut needs nothing.",
+    "For boarding, the vaccine records must be on file. Moose's are."
+   ],
+   [
+    "No: people (Sam's three)",
+    "No: people (pet sitting)"
+   ],
+   [
+    "color-correction session",
+    "senior pet stay"
+   ],
+   [
+    "The color Hayden ordered",
+    "The medicine Hayden ordered"
+   ],
+   [
+    "Dee W., a new customer,",
+    "Dee W., a returning customer,"
+   ],
+   [
+    "Ben cancels Sat 10:00am",
+    "Ben cancels his dog's stay from Sat"
+   ],
+   [
+    "Sat Oct 24 · with Riley",
+    "Sat Oct 24 to Sun Oct 25 stay"
+   ],
+   [
+    "An item isn't picked up",
+    "A pet isn't picked up"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "Sewer camera inspection",
+    "Vet trip"
+   ],
+   [
+    "Signature cut and shave",
+    "Night with a bath"
+   ],
+   [
+    "signature cut and shave",
+    "night with a bath"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Cat boarding"
+   ],
+   [
+    "plumbing and electrical",
+    "pet sitting and dog walking"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex adds an extra"
+   ],
+   [
+    "One person, like a cut",
+    "One person on duty"
+   ],
+   [
+    "No minimum, like a cut",
+    "No minimum, like a stay"
+   ],
+   [
+    "No: a cut at the chair",
+    "No: a stay at the Lodge"
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Tonight · drop-off 3:00pm"
+   ],
+   [
+    "Today · 5:00pm · Avery",
+    "Tonight · drop-off 5:00pm"
+   ],
+   [
+    "Riley instead of Avery",
+    "Drop-off 4pm instead of 3pm"
+   ],
+   [
+    "Barber license BR41862",
+    "No license needed of their own"
+   ],
+   [
+    "Mon–Fri, 7:30am–5:30pm",
+    "Every day, 7am–9pm"
+   ],
+   [
+    "A haircut needs none.",
+    "A stay needs one only where the state's rules require it, like a boarding notice."
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Every day, 7am–9pm"
+   ],
+   [
+    "A: 11:00am with Riley",
+    "A: Sat to Sun, 11:00am drop-off"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Pet Sitting LLC"
+   ],
+   [
+    "Plumbing + electrical",
+    "Pet sitting + dog walking"
+   ],
+   [
+    "Keep the beard short.",
+    "He eats only his own food."
+   ],
+   [
+    "like a doctor's note",
+    "like vaccine records from the dog's vet"
+   ],
+   [
+    "A reaction last time",
+    "A fight last time"
+   ],
+   [
+    "Sat Nov 21 · 11:00am",
+    "Drop-off Sat Nov 21 · 11:00am"
+   ],
+   [
+    "YES JP031552 JE30417",
+    "YES"
+   ],
+   [
+    "From my invite reply",
+    "None needed for this work"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Pet Lodge LLC"
+   ],
+   [
+    "photos of your hair",
+    "photos of your pet"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at drop-off"
+   ],
+   [
+    "YES, with a license",
+    "YES"
+   ],
+   [
+    "the Groom's package",
+    "the long weekend stay"
+   ],
+   [
+    "The Groom's package",
+    "The long weekend stay"
+   ],
+   [
+    "leehomeservices.com",
+    "leepetsitting.com"
+   ],
+   [
+    "Just a trim on top.",
+    "Just a quick brush."
+   ],
+   [
+    "The color I ordered",
+    "The medicine I ordered"
+   ],
+   [
+    "Riley · Sat Oct 24",
+    "Moose's stay · Sat Oct 24 to Sun Oct 25"
+   ],
+   [
+    "With a package cut",
+    "With a pack night"
+   ],
+   [
+    "11:00am with Riley",
+    "the 11:00am drop-off"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pet Sitting's"
+   ],
+   [
+    "every shop service",
+    "every Lodge service"
+   ],
+   [
+    "the group's chairs",
+    "the group's runs"
+   ],
+   [
+    "skin fades|visits",
+    "dog walks|visits"
+   ],
+   [
+    "like $480 of $640",
+    "like $600 of $750"
+   ],
+   [
+    "the signature cut",
+    "the night with a bath"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pet Sitting"
+   ],
+   [
+    "the color station",
+    "the medicine fridge"
+   ],
+   [
+    "The color ordered",
+    "The medicine ordered"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "Avery, same time",
+    "Same dates, pick-up Sun 4pm"
+   ],
+   [
+    "like a beard oil",
+    "like a bag of the food Moose ate at the Lodge"
+   ],
+   [
+    "Plumbing license",
+    "Registration paper"
+   ],
+   [
+    "Groom's packages",
+    "long weekend stays"
+   ],
+   [
+    "Color correction",
+    "Senior pet stay"
+   ],
+   [
+    "color correction",
+    "senior pet stay"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Pet Lodge"
+   ],
+   [
+    "the color Hayden",
+    "the special-care stay Hayden"
+   ],
+   [
+    "Now $35 a visit",
+    "Now $35 a night"
+   ],
+   [
+    "Yes, like a cut",
+    "Yes, like a stay"
+   ],
+   [
+    "Groom's package",
+    "Long weekend stay"
+   ],
+   [
+    "A package cut",
+    "A pack night"
+   ],
+   [
+    "1 color quote",
+    "1 special-care price"
+   ],
+   [
+    "Signature cut",
+    "Night with a bath"
+   ],
+   [
+    "signature cut",
+    "night with a bath"
+   ],
+   [
+    "Color and cut",
+    "Special-care stay"
+   ],
+   [
+    "color and cut",
+    "special-care stay"
+   ],
+   [
+    "Haircut plans",
+    "Boarding plans"
+   ],
+   [
+    "haircut plans",
+    "boarding plans"
+   ],
+   [
+    "the color for",
+    "the medicine for"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "$140 an hour",
+    "$99 a night"
+   ],
+   [
+    "$120 an hour",
+    "$89 a night"
+   ],
+   [
+    "at the chair",
+    "at pick-up"
+   ],
+   [
+    "At the chair",
+    "At pick-up"
+   ],
+   [
+    "a beard trim",
+    "a bath"
+   ],
+   [
+    "Haircut plan",
+    "Boarding plan"
+   ],
+   [
+    "haircut plan",
+    "boarding plan"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Sitters"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dog Walks"
+   ],
+   [
+    "1200 Main St",
+    "75 Walnut St"
+   ],
+   [
+    "electricians",
+    "dog walkers"
+   ],
+   [
+    "were a color",
+    "were a special-care stay"
+   ],
+   [
+    "Alex's color",
+    "Alex's special-care stay"
+   ],
+   [
+    "YES BR41862",
+    "YES"
+   ],
+   [
+    "NEW massage",
+    "NEW dog training"
+   ],
+   [
+    "YES 4471203",
+    "YES"
+   ],
+   [
+    "Beard trims",
+    "Baths"
+   ],
+   [
+    "beard trims",
+    "baths"
+   ],
+   [
+    "electrician",
+    "dog walker"
+   ],
+   [
+    "At the shop",
+    "At the Lodge"
+   ],
+   [
+    "house calls",
+    "home overnights"
+   ],
+   [
+    "House calls",
+    "Home overnights"
+   ],
+   [
+    "for a color",
+    "for a special-care stay"
+   ],
+   [
+    "Beard trim",
+    "Bath before pick-up"
+   ],
+   [
+    "beard trim",
+    "bath"
+   ],
+   [
+    "Electrical",
+    "Dog walking"
+   ],
+   [
+    "electrical",
+    "dog walking"
+   ],
+   [
+    "Barbershop",
+    "Boarding"
+   ],
+   [
+    "barbershop",
+    "boarding home"
+   ],
+   [
+    "house call",
+    "home overnight"
+   ],
+   [
+    "House call",
+    "Home overnight"
+   ],
+   [
+    "Visit fee",
+    "Late-cancel fee"
+   ],
+   [
+    "visit fee",
+    "late-cancel fee"
+   ],
+   [
+    "Skin fade",
+    "Dog walk"
+   ],
+   [
+    "skin fade",
+    "dog walk"
+   ],
+   [
+    "Hot towel",
+    "Walk"
+   ],
+   [
+    "hot towel",
+    "walk"
+   ],
+   [
+    "Kids cuts",
+    "Cat stays"
+   ],
+   [
+    "kids cuts",
+    "cat stays"
+   ],
+   [
+    "Skin fade",
+    "Puppy boarding"
+   ],
+   [
+    "skin fade",
+    "puppy boarding"
+   ],
+   [
+    "A haircut",
+    "A night of dog boarding"
+   ],
+   [
+    "a haircut",
+    "a night of dog boarding"
+   ],
+   [
+    "88 Elm St",
+    "19 Willow Ct"
+   ],
+   [
+    "on Elm St",
+    "on Willow Ct"
+   ],
+   [
+    "42 Oak St",
+    "26 Maple Ave"
+   ],
+   [
+    "barbering",
+    "boarding"
+   ],
+   [
+    "Barbering",
+    "Boarding"
+   ],
+   [
+    "Kids cut",
+    "Cat boarding"
+   ],
+   [
+    "kids cut",
+    "cat boarding"
+   ],
+   [
+    "Haircuts",
+    "Stays"
+   ],
+   [
+    "haircuts",
+    "stays"
+   ],
+   [
+    "Plumbing",
+    "Pet sitting"
+   ],
+   [
+    "plumbing",
+    "pet sitting"
+   ],
+   [
+    "Plumbers",
+    "Pet sitters"
+   ],
+   [
+    "plumbers",
+    "pet sitters"
+   ],
+   [
+    "the shop",
+    "the Lodge"
+   ],
+   [
+    "The shop",
+    "The Lodge"
+   ],
+   [
+    "Haircut",
+    "Dog boarding"
+   ],
+   [
+    "haircut",
+    "dog boarding"
+   ],
+   [
+    "Plumber",
+    "Pet sitter"
+   ],
+   [
+    "plumber",
+    "pet sitter"
+   ],
+   [
+    "Barbers",
+    "Lodge sitters"
+   ],
+   [
+    "barbers",
+    "lodge sitters"
+   ],
+   [
+    "Barber",
+    "Lodge sitter"
+   ],
+   [
+    "barber",
+    "lodge sitter"
+   ],
+   [
+    "Jordan",
+    "Ellis"
+   ],
+   [
+    "shave",
+    "walk"
+   ],
+   [
+    "Labor",
+    "Overnight stay"
+   ],
+   [
+    "Color",
+    "Special care"
+   ],
+   [
+    "color",
+    "special care"
+   ],
+   [
+    "Casey",
+    "Shea"
+   ],
+   [
+    "Riley",
+    "Hayden"
+   ],
+   [
+    "Avery",
+    "Logan"
+   ],
+   [
+    "Jamie",
+    "Wren"
+   ],
+   [
+    "$249",
+    "$85"
+   ],
+   [
+    "$199",
+    "$65"
+   ],
+   [
+    "$179",
+    "$150"
+   ],
+   [
+    "$358",
+    "$300"
+   ]
+  ],
+  "B": [
+   [
+    "A what-if: nobody needs to be home for Kim's yard drain, but the gate code from booking fails. Jordan texts it, and Kim gets a link to send a new one.",
+    "A what-if: nobody needs to be home for Kim's dog walk, but the lockbox code from booking fails. Jordan texts it, and Kim gets a link to send a new one."
+   ],
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans get 30 days' notice first.",
+    "Saved: drop-in visit $30 for visits from Mon Nov 2. Drop-in visits already booked keep $25. Visit plans get 30 days' notice first."
+   ],
+   [
+    "The $179 drain and the $150 flush need no notice here. The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Pet sitting needs no notice at booking here. Where a state's rules require one, the plug-in names it."
+   ],
+   [
+    "say Alex's job is the water heater replacement priced from photos, with an estimate visit first. Jordan texts what it found, with photos.",
+    "say the meet-and-greet finds the visits need more time. Jordan texts what it found, with a photo."
+   ],
+   [
+    "we need proof that you may have this work done at the home, like the owner's OK. Reply here once you have it, and we'll book a new time.",
+    "your care sheet and vet OK aren't signed yet, and they're needed first. Please sign them now, and Jordan comes right back."
+   ],
+   [
+    "Jordan can't start today: the permit for this work isn't in yet. Nothing is charged. We'll text you once it's in, to pick a new time.",
+    "Jordan can't get in today: the key we hold went missing. Nothing is charged. Sam is calling you about a spare key."
+   ],
+   [
+    "A job sent now skips Sam's same-day OK. The on-call plumber's yes books it, as Sam set with the on-call list. Sam sees it on Today.",
+    "Holiday dates and a pet with a bite history ask Sam first."
+   ],
+   [
+    "Jordan's estimate visit found that the new water heater can't go in as planned. Lee Home Services has cancelled it, with no fee.",
+    "Jordan's meet-and-greet found the visits can't go ahead as planned. Lee Home Services has cancelled them, with no fee, and Sam will call you."
+   ],
+   [
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a sitter visit my dog this Thursday? What does it cost?"
+   ],
+   [
+    "A job sent now goes first to the plumber on call, with no window. Only a booking marked sent now, at the pick, comes here.",
+    "Pet sitting is never sent now, so no job goes to a sitter on call."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services does pet sitting and dog walking, not grooming. Nothing was saved. You can look for a groomer near you."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Sitting takes jobs sent now, like a sick pet. Sam names who takes them in open hours and who's on call while closed."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee's Barbershop about a dog instead. Dog care is offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Alex asks to add a sewer camera inspection. It's on the price list at $199, so Alex sees the price and says yes first.",
+    "Alex asks to add a vet trip on Friday, for Pickles' check-up. It's on the price list at $65, so Alex sees the price and says yes first."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Sitting takes jobs sent now, like a sick pet. Who takes them in open hours, and who's on call when you're closed?"
+   ],
+   [
+    "The shop's own license is checked first. Customers see the shop once a barber's license checks out and Sam says yes.",
+    "Customers see the Lodge once a lodge sitter joins and Sam says yes."
+   ],
+   [
+    "Here, Jordan quotes $190 for Morgan P.'s two shutoff valves. Before the emergency, Lee Home Services charged $160.",
+    "Here, Jordan quotes $218 for Morgan P.'s two storm nights. Before the emergency, Lee Home Services charged $198."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a vet trip on Friday. Both go in one booking, with one sitter."
+   ],
+   [
+    "Labor is $140 an hour with Jordan, and $120 with anyone else. The camera inspection is $249 when Sam goes.",
+    "An overnight is $99 a night with Jordan, and $89 with anyone else. A vet trip is $85 when Sam goes."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can board your dog for $35 a night, or stay at your home for $89 a night. Where would you like it?"
+   ],
+   [
+    "A leak priced at the visit has no price yet. If its quote is over the amount, it's signed at the visit.",
+    "Pet sitting is never priced at the visit."
+   ],
+   [
+    "The default is the stand-in. Sam can pick another in the portal: a smaller crew for longer, or a call.",
+    "The default is the stand-in. In the portal, Sam can make a call from Sam the default instead."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Ivy's AI asks for a drop-in visit at $20, an old price. Rosie answers with the real price, $25."
+   ],
+   [
+    "wasn't home for her Fri 10am to 12pm water heater flush with Casey. She didn't answer in 30 minutes.",
+    "cancelled her Fri to Sun drop-in visits with Casey at 9am Fri, after free cancel ended."
+   ],
+   [
+    "Alex cancels the $160 valve work on the page. Sam is told, and the $160 goes back to Alex's card.",
+    "Alex cancels the $65 vet trip on the page. Sam is told, and the $65 goes back to Alex's card."
+   ],
+   [
+    "wasn't home for her Fri 10am to 12pm drain clearing with Casey. She didn't answer in 30 minutes.",
+    "cancelled her Fri to Sun drop-in visits with Casey at 9am Fri, after free cancel ended."
+   ],
+   [
+    "Call summary: Rosa, in Spanish. Water is leaking from the water heater, and the valve is shut.",
+    "Call summary: Rosa, in Spanish. She needs cat visits while she's away, and her cat was sick today."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in on one day and finished on another.",
+    "Some jobs take more than one visit, like the visits of one trip."
+   ],
+   [
+    "Alex M. opted out of texts. The visit stays. Call Alex instead of texting when you head over.",
+    "Alex M. opted out of texts. The visits stay. Email Alex the visit photos instead."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the pet is, if it's still eating, and if the door is shut."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call the vet's line and to leave if a pet is hurt."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "New clients meet the sitter first, at least a day before. So the first visits can start Wednesday."
+   ],
+   [
+    "Most show only for the money choices that use them. Harper's stage bills show on every path.",
+    "Most show only for the money choices that use them."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads pet sitting now, and dog walking's and boarding's when Sam gets to them."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A vet trip is $65, from the list. It fits right after Friday's morning visit."
+   ],
+   [
+    "the plug-in asks Alex to sign a work consent form on the secure page by 10am the day before",
+    "the plug-in asks Alex to sign the care sheet and agreement on the secure page by 10am the day before"
+   ],
+   [
+    "The plug-in names any service that delivers and sets something up, like a new water heater.",
+    "The plug-in names any service that delivers and sets something up. Pet sitting has none."
+   ],
+   [
+    "It's a leak under the sink, today 3 to 5pm with Jordan. The service call is $89. Accept it?",
+    "It's a drop-in visit for a returning client's cat, today 3 to 5pm with Jordan. It's $25. Accept it?"
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A drop-in visit with Lee Home Services is $25, not $20. Here are the open times at $25."
+   ],
+   [
+    "A gate code from booking is used only for work the plug-in marks as done with nobody home.",
+    "A door or lockbox code from booking is used only for work the plug-in marks as done with nobody home."
+   ],
+   [
+    "Sam says some people charge differently: Jordan's labor, and Sam's own camera inspections.",
+    "Sam says some people charge differently: Jordan's overnight stays, and Sam's own vet trips."
+   ],
+   [
+    "The plug-in names which notices: a cancel notice, a lead-safe paper, a written estimate.",
+    "The plug-in names which notices, like a cancel notice."
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the visits you asked Jordan about in late Aug 2027."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some stays take more than one night, like a boarding for two dogs and a cat."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Only sitters who give insulin shots are shown."
+   ],
+   [
+    "Jordan is at your gate, but the code doesn't work. Send a new one on your secure page.",
+    "Jordan is at your door, but the lockbox code doesn't work. Send a new one on your secure page."
+   ],
+   [
+    "The business's side: a conflict, Alex isn't eligible, or a permit the business needed.",
+    "The business's side: a conflict, Alex isn't eligible, or a key the business lost."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Pet sitting for homes in Springfield. Drop-in visits and overnight stays, within 25 miles."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I'd like a sitter for my cat on Thursday morning. I'm in Springfield."
+   ],
+   [
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "Lee Home Services: $750 for October's daily visits. Pay by card, or by bank transfer."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If a pet is in danger, call the vet now and get out of the house."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like grooming."
+   ],
+   [
+    "Say the plug-in sets a first step with a lead time, like a permit that takes 5 days.",
+    "Say the plug-in sets a first step with a lead time, like a meet-and-greet at least a day before."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the dog walk from a card saved for the $89 fee to a $40 deposit."
+   ],
+   [
+    "With times to pick, all with Jordan, since only Jordan replaces water heaters here.",
+    "With dates to pick, all with Jordan, who knows Morgan's dog."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a dog walk? Say so.'"
+   ],
+   [
+    "Plumbing, electrical and barbering need one, so Sam's three take the license step.",
+    "Pet sitting and dog walking need none where Sam works, so Sam gives the registration."
+   ],
+   [
+    "Plumbing, electrical and barbering license each person, so Sam's four are checked.",
+    "Pet sitting, dog walking and boarding license no one person where Sam works, so nobody is checked."
+   ],
+   [
+    "Some visits have a first step tied to a date, like a permit or an estimate visit.",
+    "Some visits have a first step tied to a date, like a meet-and-greet before the first visit."
+   ],
+   [
+    "Nobody on Sam's team needs one: every plumber and barber holds their own license.",
+    "Nobody on Sam's team needs one: nobody works under someone else's license."
+   ],
+   [
+    "The plug-in can name the kind of work to suggest, like a roofer for a roof leak.",
+    "The plug-in can name the kind of work to suggest, like a groomer for a bath and nail trim."
+   ],
+   [
+    "Lin's $89 hold isn't placed until the day before, so nothing is on her card yet.",
+    "Lin's card is only saved, so nothing was charged."
+   ],
+   [
+    "A clogged drain that's overflowing may be. A water heater replacement never is.",
+    "Pet sitting never is: a new client meets the sitter first."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan broke a lamp at Alex M.'s. The before photo shows it whole."
+   ],
+   [
+    "Lin agreed to the $89 service call fee if nobody's home, and her card is saved.",
+    "Lin agreed to the $89 late-cancel fee, and her card is saved."
+   ],
+   [
+    "It's there for an $89 fee Sam confirms, if nobody's home or Alex cancels late.",
+    "It's there for the $89 late-cancel fee, if Sam confirms one."
+   ],
+   [
+    "The plug-in says which requests wait for Sam's OK. Here, it's a new customer.",
+    "The plug-in says which requests wait for Sam's OK. Here, it's a same-day visit."
+   ],
+   [
+    "Alex's visit has no first step tied to a date, so every free time is offered.",
+    "Alex's meet-and-greet is Tue, so every free time after it is offered."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Pet sitting's price is always set before the visit."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "We couldn't find registration 2019-0451 for Lee Home Services on the state's business lookup."
+   ],
+   [
+    "A late cancel or nobody home: the $89 fee may be kept and the rest refunded.",
+    "A late cancel: the $89 fee may be kept and the rest refunded."
+   ],
+   [
+    "Lee Home Services can't do Thu 8 to 10am. They offered another time instead:",
+    "Lee Home Services can't do Thu to Sat. They offered other days instead:"
+   ],
+   [
+    "The plug-in marks work that can be done with nobody home, like a yard drain.",
+    "The plug-in marks work that can be done with nobody home, like pet sitting while the owner is away."
+   ],
+   [
+    "We still can't confirm plumbing license MP045210, so plumbing stays offline.",
+    "We still can't confirm registration 2019-0451, so pet sitting stays offline."
+   ],
+   [
+    "Its license checked out. It shows once a barber is confirmed and you say yes",
+    "Its boarding license is on file as given, not checked. It shows once a lodge sitter joins and you say yes"
+   ],
+   [
+    "Book Tessa for a clogged drain, Thu Oct 22, arriving 12 to 2pm, with Casey?",
+    "Book Tessa for a drop-in visit, Thu Oct 22, arriving 12 to 2pm, with Casey?"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Drop-in visits happen only at the customer's home, so nothing is asked."
+   ],
+   [
+    "The $179 drain and the $150 flush are under that amount, so they need none.",
+    "So the 6 visits need none."
+   ],
+   [
+    "Only the charges shown, like $89 if nobody's home or I cancel after 7am Thu",
+    "Only the charges shown, like $89 if I cancel after 7am Thu"
+   ],
+   [
+    "Your permit isn't ready yet, so Lee Home Services needs to move your visit.",
+    "Your meet-and-greet isn't done yet, so Lee Home Services needs to move your visits."
+   ],
+   [
+    "Jordan left Kim's. Sam decides about any fee; with no answer, there's none.",
+    "Jordan left Kim's, and Sam calls her. Any fee is Sam's call; with no answer, none."
+   ],
+   [
+    "Extra work Alex said yes to is added as its own line, like the $160 valves.",
+    "Extra work Alex said yes to is added as its own line, like a $65 vet trip."
+   ],
+   [
+    "Nothing was taken when Lin booked her drain clearing, so no fee was agreed.",
+    "Nothing was taken when Lin booked her drop-in visit, so no fee was agreed."
+   ],
+   [
+    "Reply YES with your license numbers to join and get your jobs here by text.",
+    "Reply YES to join and get your jobs here by text."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At the last visit, Alex asks for Jordan again for a trip next fall."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: cat visits each time she travels for work, twice a month."
+   ],
+   [
+    "Money is only held until Sam accepts, so Nora's $89 hold is released now.",
+    "Nora's card was only saved, so nothing was charged."
+   ],
+   [
+    "Reading it back: accept the leak repair for today, 3 to 5pm, with Jordan.",
+    "Reading it back: accept the drop-in visit for today, 3 to 5pm, with Jordan."
+   ],
+   [
+    "Only Riley is cleared for house calls, so only Riley is offered for them.",
+    "Only Riley is cleared for home overnights, so only Riley is offered for them."
+   ],
+   [
+    "Here, it's Jordan's $640 quote from photos for Morgan P.'s water heater.",
+    "Here, it's Jordan's $640 price for Morgan P.'s 3 weeks of visits for her senior dog."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sitter's example: a pet that gets into the medicine gets the vet's number first."
+   ],
+   [
+    "Nobody was home for Lin W.'s 10am to 12pm visit, and she didn't answer.",
+    "Lin W. cancelled her Fri to Sun visits late, at 9am Fri."
+   ],
+   [
+    "Plumbing goes live at 2:16pm, and Sam can be booked on his own license.",
+    "Plumbing goes live at 2:16pm, and Sam can be booked now."
+   ],
+   [
+    "Jordan replies YES with both license numbers, then checks what Sam set.",
+    "Jordan replies YES, then checks what Sam set."
+   ],
+   [
+    "asks her AI for a drain clearing with Lee Home Services late at night.",
+    "asks her AI for a drop-in visit with Lee Home Services late at night."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My dog needs a walk."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a sick pet."
+   ],
+   [
+    "With no card, no fee can be charged for a late cancel or nobody home.",
+    "With no card, no fee can be charged for a late cancel."
+   ],
+   [
+    "'s $150 water heater flush, paid when she booked, was charged twice.",
+    "'s $150 drop-in visits, paid when she booked, were charged twice."
+   ],
+   [
+    "2 Jordan is 140 an hour. The camera inspection is 249 if I go myself",
+    "2 Jordan's overnights are 99 a night. A vet trip is 85 if I go myself"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My dog got into the trash. Is it safe to give him water?"
+   ],
+   [
+    "If Alex named a warranty plan before the times, Sam checks it here.",
+    "No plan pays for pet sitting, so nothing is checked here."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone walk my dog at midday this Thursday? What does it cost?"
+   ],
+   [
+    "The $110 rest is charged to the saved card when Jordan texts DONE.",
+    "The $110 rest is charged to the saved card when Jordan texts DONE after the last visit."
+   ],
+   [
+    "Say Alex's job needs a permit, and it isn't back yet. Sam decides.",
+    "Say Alex missed the meet-and-greet, and it isn't done yet. Sam decides."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Pet taxi for Lee Home Services: is it the same company?"
+   ],
+   [
+    "The state's lookup doesn't find license MP045210 under Sam's name.",
+    "The state's business lookup doesn't find registration 2019-0451 under Sam's name."
+   ],
+   [
+    "The barbershop's says the state licenses the shop and each barber.",
+    "The Lodge's says the state licenses boarding at a home, where its rules require it."
+   ],
+   [
+    "Only Riley does color, so color services offer only Riley's times.",
+    "Only Riley gives insulin shots at the Lodge, so a diabetic pet's stay shows only nights Riley works."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my cat's medicine. A text back is fine."
+   ],
+   [
+    "Reminder: please sign the work consent form for tomorrow's visit.",
+    "Reminder: please sign the care sheet and agreement for tomorrow's visits."
+   ],
+   [
+    "Jesse R. helps out on big jobs, but Jesse has their own business.",
+    "Jesse R. helps out on busy holidays, but Jesse has their own business."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the dog walk to $25 for visits from Mon Nov 2."
+   ],
+   [
+    "A crew that goes short-handed tells the customer the new length.",
+    "The stand-in meets the pets first, where there's time."
+   ],
+   [
+    "Nothing was taken for her drain clearing, so nothing is charged.",
+    "Nothing was taken for her drop-in visit, so nothing is charged."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises a drop-in visit to $30 for visits from Mon Nov 2."
+   ],
+   [
+    "Jordan's supplier invoice shows the valves cost more since then.",
+    "Jordan's receipts show the costs went up since then."
+   ],
+   [
+    "Who goes out on plumbing and electrical jobs, and who cuts hair?",
+    "Who goes out on pet sitting and dog walking jobs, and who works at the Lodge?"
+   ],
+   [
+    "The check-in code confirmed the visit, so Rosfield's $2 counts.",
+    "The last visit's DONE confirmed the trip, so Rosfield's $2 counts."
+   ],
+   [
+    "Back to Alex's pick: Thu Oct 22, arriving 8–10am, with Jordan.",
+    "Back to Alex's pick: 6 visits, Thu Oct 22 to Sat Oct 24, with Jordan."
+   ],
+   [
+    "Here, that's until 11:59pm Mon Oct 26, for a full $160 refund.",
+    "Here, that's until 11:59pm Mon Oct 26, for a full $65 refund."
+   ],
+   [
+    "would like to talk about the water heater quote before booking",
+    "would like to talk about the $640 price before booking"
+   ],
+   [
+    "So your 12 to 2pm sewer camera inspection can't go ahead then.",
+    "So your 12 to 2pm drop-in visit can't go ahead then."
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "Pet sitting is priced from the list. A special-care price made for one pet is rare."
+   ],
+   [
+    "like a renter's new water heater. Plumbing in a home asks it.",
+    "like a repair in a rented home. Pet sitting never asks it."
+   ],
+   [
+    "A what-if: Jordan cracks the cabinet floor and texts a photo.",
+    "A what-if: Jordan knocks over a lamp while playing with the cats, and texts a photo."
+   ],
+   [
+    "The $89 hold stays on her card until the visit is checked in.",
+    "Her card is saved for the $89 fee, and nothing is charged."
+   ],
+   [
+    "Barbering pays the $2, so the shop gets its own monthly bill.",
+    "Boarding pays the $2, so the Lodge gets its own monthly bill."
+   ],
+   [
+    "Sam's three kinds of work book people, so he lists no spaces.",
+    "Pet sitting and dog walking book people. The Lodge books its spaces: 4 dog runs and 2 cat rooms."
+   ],
+   [
+    "Voicemail from a new caller about a dripping kitchen faucet.",
+    "Voicemail from a new caller about weekday dog walks."
+   ],
+   [
+    "like a water heater replacement, which only Jordan does here",
+    "like insulin shots, if only Jordan gave them here"
+   ],
+   [
+    "please read and sign the lead-safe work notice for your home",
+    "please read and sign the notice the rules require for this job"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at the business's own place"
+   ],
+   [
+    "Say another customer's AI saved Thu 8–10am a moment before.",
+    "Say another customer's AI saved Jordan's Thu to Sat visits a moment before."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Drop-in visits already booked keep $25, even after Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Dog walks already booked keep only their saved card."
+   ],
+   [
+    "Offer Alex M. Fri Oct 23, arriving 8 to 10am, with Jordan?",
+    "Offer Alex M. Fri Oct 23 to Sun Oct 25, twice a day, with Jordan?"
+   ],
+   [
+    "Alex M.: the vent pipe needs replacing too. New price 700.",
+    "Alex M.: two litter boxes and medicine take 45 minutes. New price 180."
+   ],
+   [
+    "The estimate visit found the job can't be done as planned.",
+    "The meet-and-greet found the visits can't go ahead as planned."
+   ],
+   [
+    "charged the service call fee you agreed to when you booked",
+    "charged the late-cancel fee you agreed to when you booked"
+   ],
+   [
+    "'s $40 deposit for a water heater flush was charged twice.",
+    "'s $40 deposit for drop-in visits was charged twice."
+   ],
+   [
+    "Jobs sent now go to whoever is on call, set with the team.",
+    "Pet sitting is never sent now, so nobody is on call."
+   ],
+   [
+    "Once your electrician's license checks out and you say yes",
+    "Once your walker joins and you say yes"
+   ],
+   [
+    "An example: a signed waiver that's good until a set date.",
+    "An example: a meet-and-greet, good while the same sitter cares for the pets."
+   ],
+   [
+    "The permit for Alex M.'s job (Thu 8–10am) isn't back yet.",
+    "Alex M.'s meet-and-greet (for Thu to Sat) isn't done yet."
+   ],
+   [
+    "Lee Home Services can replace your water heater for $640.",
+    "Lee Home Services can do your 3 weeks of visits for $640."
+   ],
+   [
+    "Like a barber who rents a chair, or a helper on big jobs.",
+    "Like a sitter who rents a room at the Lodge, or a helper on busy holidays."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for drop-in visits."
+   ],
+   [
+    "Check the number and the name as printed on the license.",
+    "Check the number and the name as printed on the paper."
+   ],
+   [
+    "Everyone's licenses are confirmed on the state's lookup.",
+    "Everyone has joined."
+   ],
+   [
+    "won't charge the service call fee for the missed visit.",
+    "won't charge the late-cancel fee."
+   ],
+   [
+    "At the shop, prices are the same whichever barber cuts.",
+    "At the Lodge, prices are the same whoever is on duty."
+   ],
+   [
+    "We saved Thu Oct 22, 8 to 10am for you for 10 minutes.",
+    "We saved Jordan's visits, Thu Oct 22 to Sat Oct 24, for you for 10 minutes."
+   ],
+   [
+    "Offer Alex M. Thu Oct 22, arriving 8–10am, with Casey?",
+    "Offer Alex M. Thu Oct 22 to Sat Oct 24, twice a day, with Casey?"
+   ],
+   [
+    "Lin paid a $40 deposit on the $150 water heater flush.",
+    "Lin paid a $40 deposit on her $150 drop-in visits."
+   ],
+   [
+    "Jordan quoted $190 for Morgan P.'s two shutoff valves.",
+    "Jordan quoted $190 for Morgan P.'s overnight stays."
+   ],
+   [
+    "When only the visit fee is promised, it's shown first.",
+    "When only a starting fee is promised, it's shown first."
+   ],
+   [
+    "$150 for the water heater flush, less the $40 deposit",
+    "$150 for the 6 visits, less the $40 deposit"
+   ],
+   [
+    "Most jobs don't. Say the water heater job needed one.",
+    "Most jobs don't, and pet sitting never does."
+   ],
+   [
+    "Send Morgan P. $600 for the water heater replacement?",
+    "Send Morgan P. $600 for the 3 weeks of visits?"
+   ],
+   [
+    "{{name.staff:Jordan}} finds corroded shutoff valves.",
+    "{{name.staff:Jordan}} finds a torn leash."
+   ],
+   [
+    "A drain clearing is $179. I can't book on this call.",
+    "A 30-minute walk is $25. I can't book on this call."
+   ],
+   [
+    "A drain clearing has none, so the times start today.",
+    "Alex's meet-and-greet can be Tue, so visits could start Wed. The trip starts Thu."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $65 vet trip offer is good for 7 days."
+   ],
+   [
+    "Nobody was home for Lin W.'s Fri 10am to 12pm visit.",
+    "Lin W. cancelled her Fri to Sun visits late."
+   ],
+   [
+    "Until then, a haircut books with a YES and no card.",
+    "Until then, a stay books with a YES and no card."
+   ],
+   [
+    "Jesse helps on big jobs but has their own business.",
+    "Jesse helps on busy holidays but has their own business."
+   ],
+   [
+    "Jesse's license goes through the same state lookup.",
+    "Jesse's business details go through the same checks."
+   ],
+   [
+    "Kitchen drain clearing · $179, paid after the job.",
+    "6 drop-in visits · $179, paid after the last visit."
+   ],
+   [
+    "hasn't signed the work consent form for Thu 8–10am",
+    "hasn't signed the care sheet and agreement for Thu to Sat"
+   ],
+   [
+    "Done: the $160 for the shutoff valves is refunded.",
+    "Done: the $65 for the vet trip is refunded."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds pet taxi rides to Lee Home Services."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No work here is sent now: a new client meets the sitter first."
+   ],
+   [
+    "Leak at the gas water heater · safety steps given",
+    "A sick cat · told to call her vet if it gets worse"
+   ],
+   [
+    "$179 after the job · $89 of it held when you book",
+    "$25 after the walk · a card saved for fees"
+   ],
+   [
+    "the proof Alex was asked to have ready is missing",
+    "the care sheet and vet OK Alex was asked to sign are missing"
+   ],
+   [
+    "The shop's license BS20981 checks out in minutes.",
+    "The Lodge's boarding license BL20981 is on file as given by the business, not checked."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Sitting takes jobs sent now, like a pet that's sick."
+   ],
+   [
+    "$179 after the job · nothing taken when you book",
+    "$25 after the walk · nothing taken when you book"
+   ],
+   [
+    "$179 after the job · a card saved for an $89 fee",
+    "$25 after the walk · a card saved for a late-cancel fee"
+   ],
+   [
+    "Moved: Fri Oct 23, arriving 8–10am, with Jordan.",
+    "Moved: Fri Oct 23 to Sun Oct 25, with Jordan."
+   ],
+   [
+    "moved your visit to Thu Oct 22, arriving 12–2pm.",
+    "moved your morning visits to 10am–12pm, Thu to Sat."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also take Pickles to her vet check-up on Friday?"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START care sheet and vet OK not signed"
+   ],
+   [
+    "Nobody was home for Lin W.'s 10am to 12pm visit.",
+    "Lin W. cancelled her Fri to Sun visits late."
+   ],
+   [
+    "Alex can pay on the pay page on Jordan's phone.",
+    "Visit photos go to Alex by email instead."
+   ],
+   [
+    "Lin paid $150 in full for a water heater flush.",
+    "Lin paid $150 in full for her drop-in visits."
+   ],
+   [
+    "Electrical and the barbershop can still go live",
+    "Dog walking and the Lodge can still go live"
+   ],
+   [
+    "May the haircut be done at the customer's home?",
+    "May dog care be done at the customer's home?"
+   ],
+   [
+    "Electrical is set up; waits for its electrician",
+    "Dog walking is set up; waits for its walker"
+   ],
+   [
+    "Reads back plumbing's money, service by service",
+    "Reads back pet sitting's money, by service"
+   ],
+   [
+    "We got your voicemail about a dripping faucet.",
+    "We got your voicemail about dog walks."
+   ],
+   [
+    "May Lee Home Services show photos of the work?",
+    "May Lee Home Services show photos of your pets?"
+   ],
+   [
+    "May Lee Home Services show photos of this job?",
+    "May Lee Home Services show photos of your pets?"
+   ],
+   [
+    "Here, jobs over the plug-in's amount need one.",
+    "Pet sitting needs none: its service agreement is signed on the page."
+   ],
+   [
+    "The water heater flush, $150, is paid in full.",
+    "The 6 drop-in visits, $150, are paid in full."
+   ],
+   [
+    "'s visit moved to Fri Oct 23, arriving 8–10am.",
+    "'s visits moved to Fri Oct 23 to Sun Oct 25."
+   ],
+   [
+    "cancelled late: water heater flush, Thu 8–10am",
+    "cancelled late: water heater flush, Thu to Sat"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan visit my cats again next weekend?"
+   ],
+   [
+    "Flushes already booked keep their $40 deposit.",
+    "Visits already booked keep their $40 deposit."
+   ],
+   [
+    "drain clearing goes to $199 for new bookings.",
+    "dog walks go to $25 for new bookings."
+   ],
+   [
+    "Alex M. moved to Fri Oct 23, arriving 8–10am.",
+    "Alex M. moved to Fri Oct 23 to Sun Oct 25."
+   ],
+   [
+    "Casey does drain work, so Casey can stand in.",
+    "Casey gives insulin shots, so Casey can stand in."
+   ],
+   [
+    "Your drain cleaning plan's price is changing.",
+    "Your cat visit plan's price is changing."
+   ],
+   [
+    "The $89 no-show fee you agreed to may be kept",
+    "The $89 fee you agreed to may be kept"
+   ],
+   [
+    "'s: the permit isn't in. Nothing was charged.",
+    "'s: the key we hold went missing. Nothing was charged. Please call Alex now."
+   ],
+   [
+    "cancelled the $160 valve work. It's refunded.",
+    "cancelled the $65 vet trip. It's refunded."
+   ],
+   [
+    "Back to the main path: every license matched.",
+    "Back to the main path: nobody needed a license check."
+   ],
+   [
+    "A $40 deposit on the $150 water heater flush",
+    "A $40 deposit on the 6 drop-in visits, $150"
+   ],
+   [
+    "Your Thu 8–10am time stays saved until then.",
+    "Your Thu to Sat visits stay saved until then."
+   ],
+   [
+    "Move Alex M. to Thu Oct 22, arriving 12–2pm?",
+    "Move Alex M.'s morning visits to 10am–12pm, Thu to Sat?"
+   ],
+   [
+    "Alex can book again once the proof is ready.",
+    "Jordan comes back once it's signed."
+   ],
+   [
+    "The $89 held on your card has been released.",
+    "Nothing was charged."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a dog walk."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the Lodge's sitters does overnights at a customer's home."
+   ],
+   [
+    "cancelled late: plumbing visit, Thu 8–10am.",
+    "cancelled late: pet sitting visits, Thu to Sat."
+   ],
+   [
+    "Alex's drain is booked with Jordan by name.",
+    "Alex's visits are booked with Jordan by name, on trip dates that can't move."
+   ],
+   [
+    "For older homes, where the rules require it",
+    "Where the state's rules require one"
+   ],
+   [
+    "The $89 no-show fee you agreed to may apply",
+    "The $89 fee you agreed to may apply"
+   ],
+   [
+    "The $110 rest is on the bill after the job.",
+    "The $110 rest is on the bill after the last visit."
+   ],
+   [
+    "her drain clearing today, arriving 1 to 3pm",
+    "her drop-in visit today, arriving 1 to 3pm"
+   ],
+   [
+    "Nothing was taken for Nora's drain clearing",
+    "Nothing was taken for Nora's drop-in visit"
+   ],
+   [
+    "Reply YES with your license number to join.",
+    "Reply YES to join."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also walk the dog?"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also take Pickles to her vet check on Friday?"
+   ],
+   [
+    "Your water heater quote is with the owner.",
+    "Your price for the visits is with the owner."
+   ],
+   [
+    "You can be booked now, on your own license",
+    "You can be booked now"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I leave the dog's food out for you?"
+   ],
+   [
+    "New request from Nora S., a new customer.",
+    "New request from Nora S., a returning client, for today."
+   ],
+   [
+    "New job for you: Nora S., drain clearing,",
+    "New job for you: Nora S., drop-in visit,"
+   ],
+   [
+    "Lee Home Services · Drain clearing · $179",
+    "Lee Home Services · Drop-in visit · $25"
+   ],
+   [
+    "Flushes already booked stay paid in full.",
+    "Visits already booked stay paid in full."
+   ],
+   [
+    "Booking rules; color quotes need Sam's OK",
+    "Booking rules; new dogs need Sam's OK"
+   ],
+   [
+    "Riley Chen: barber, color and house calls",
+    "Riley Chen: lodge sitter, insulin shots, home overnights"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Dog walks already booked keep $25"
+   ],
+   [
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "Cancel your pet sitting visits (Thu to Sat)?"
+   ],
+   [
+    "Pauses new bookings for a lapsed license",
+    "Pauses new bookings after a failed check"
+   ],
+   [
+    "Plumbing is live; offers electrical next",
+    "Pet sitting is live; offers dog walking next"
+   ],
+   [
+    "Indoor work, like Alex's drain, has none",
+    "Indoor work, like Alex's drop-ins, has none"
+   ],
+   [
+    "Lee Home Services · Yard drain clearing",
+    "Lee Home Services · Dog walk, 30 minutes"
+   ],
+   [
+    "Can you reach the water shut-off valve?",
+    "Has a sitter given Pickles her medicine before?"
+   ],
+   [
+    "Alex M. cancelled the Thu 8–10am visit.",
+    "Alex M. cancelled the Thu to Sat visits."
+   ],
+   [
+    "Does Kim send a new code in 15 minutes?",
+    "Does Kim send a new code in 30 minutes?"
+   ],
+   [
+    "The service, time and price you picked",
+    "6 drop-in visits, Thu Oct 22 to Sat Oct 24, with Ellis: $150"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A stay at the Lodge is in the other flow."
+   ],
+   [
+    "Cancelled by Sam: Alex M., Thu 8–10am.",
+    "Cancelled by Sam: Alex M., Thu to Sat."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's visits?"
+   ],
+   [
+    "like a permit it needed that isn't in.",
+    "like a key it holds that went missing."
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe instead.",
+    "Say Harper J.'s $750 month of daily visits instead."
+   ],
+   [
+    "Your $800 bank transfer is on its way.",
+    "Your $750 bank transfer is on its way."
+   ],
+   [
+    "Nobody home: what can a fee come from?",
+    "A late cancel: what can a fee come from?"
+   ],
+   [
+    "Every shop service, color, house calls",
+    "Every Lodge service, insulin shots, home overnights"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Pet sitting · dog walking"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds a torn leash."
+   ],
+   [
+    "Lee Home Services · Water heater leak",
+    "Lee Home Services · Drop-in visits"
+   ],
+   [
+    "Tue Oct 27 · arriving 8–10am · Jordan",
+    "Tue Oct 27 to Thu Oct 29 · twice a day · Jordan"
+   ],
+   [
+    "Is a gate code used with nobody home?",
+    "Is a door code used with nobody home?"
+   ],
+   [
+    "and electrical's and the barbershop's",
+    "and dog walking's and boarding's"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like dog care at the Lodge or at home"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Riley also gives insulin shots and does home overnights"
+   ],
+   [
+    "and replies YES with a license number",
+    "and replies YES"
+   ],
+   [
+    "Thu Oct 22 · arriving 8–10am · Jordan",
+    "Thu Oct 22 to Sat Oct 24 · twice a day · Jordan"
+   ],
+   [
+    "Fri Oct 23 · arriving 8–10am · Jordan",
+    "Fri Oct 23 to Sun Oct 25 · twice a day · Jordan"
+   ],
+   [
+    "Mon Oct 26 · arriving 8–10am · Jordan",
+    "Mon Oct 26 to Wed Oct 28 · twice a day · Jordan"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The pet sitter's visit runs late again 2 weeks later."
+   ],
+   [
+    "Wants the faucet looked at this week",
+    "Wants dog walks from next week"
+   ],
+   [
+    "The Thu 8–10am time has been let go.",
+    "The Thu to Sat visits have been let go."
+   ],
+   [
+    "Alex's kitchen drain has a set time.",
+    "Alex's visits have set times."
+   ],
+   [
+    "Thu Oct 22 · 8–10am · plumbing visit",
+    "Thu Oct 22 to Sat Oct 24 · pet sitting visits"
+   ],
+   [
+    "had to cancel your Thu Oct 22 visit.",
+    "had to cancel your Thu Oct 22 to Sat Oct 24 visits."
+   ],
+   [
+    "Checks where house calls are allowed",
+    "Checks where home overnights are allowed"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: lodge sitter, insulin shots, home overnights"
+   ],
+   [
+    "legal, tax, medical or repair advice",
+    "legal, tax, medical or vet advice"
+   ],
+   [
+    "Thu Oct 22 · arriving 12–2pm · Casey",
+    "Thu Oct 22 to Sat Oct 24 · twice a day · Casey"
+   ],
+   [
+    "Mon Oct 26 · arriving 8–10am · Casey",
+    "Mon Oct 26 to Wed Oct 28 · twice a day · Casey"
+   ],
+   [
+    "Alex wasn't home: Sam decides a fee",
+    "Jordan couldn't get in: Sam decides a fee"
+   ],
+   [
+    "Nothing more is owed for the flush.",
+    "Nothing more is owed for the visits."
+   ],
+   [
+    "Pay $800 for stage 2 of your repipe",
+    "Pay $750 for October's visits"
+   ],
+   [
+    "asks: water heater flush, 12 months",
+    "asks: visits for a trip, next fall"
+   ],
+   [
+    "and nobody was home for any of them",
+    "and no sitter got in"
+   ],
+   [
+    "The barbershop gets its own listing",
+    "The Lodge gets its own listing"
+   ],
+   [
+    "Riley Chen and Avery Diaz cut hair.",
+    "Riley Chen and Avery Diaz work at the Lodge."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Drop-ins, overnights, insulin shots"
+   ],
+   [
+    "Cancel Alex M.'s Thu 8–10am visit?",
+    "Cancel Alex M.'s Thu to Sat visits?"
+   ],
+   [
+    "the $89 no-show fee Alex agreed to",
+    "the $89 fee Alex agreed to"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Vet trip · $65"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left the back door unlocked."
+   ],
+   [
+    "Is water backing up into the sink?",
+    "Is your cat friendly with visitors?"
+   ],
+   [
+    "For Morgan P. · priced from photos",
+    "For Morgan P. · a price made for her"
+   ],
+   [
+    "Lee Home Services · 1 missed visit",
+    "Lee Home Services · 1 late cancel"
+   ],
+   [
+    "from a $40 deposit to the $89 hold",
+    "from a $40 deposit to a card saved for fees"
+   ],
+   [
+    "Supplier invoice: valves +$15 each",
+    "Receipts: costs +$30"
+   ],
+   [
+    "Lee Home Services · Drain clearing",
+    "Lee Home Services · Drop-in visit"
+   ],
+   [
+    "Keeps the haircut at the shop only",
+    "Keeps dog care at the Lodge only"
+   ],
+   [
+    "is free then and does drain work.",
+    "is free then and can give the medicine."
+   ],
+   [
+    "Billed only the $89 service call.",
+    "Billed only what was promised before."
+   ],
+   [
+    "Paid after the job, with the rest",
+    "Paid after the last visit, with the rest"
+   ],
+   [
+    "Here, it's Nora's drain clearing.",
+    "Here, it's Nora's drop-in visit."
+   ],
+   [
+    "before he OKs your drain clearing",
+    "before he OKs your drop-in visit"
+   ],
+   [
+    "Its name, like Table 4 or Court 2",
+    "Its name, like Dog run 1 or Cat room"
+   ],
+   [
+    "Haircuts and plumbing both pay it",
+    "Boarding and pet sitting both pay it"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the pet's food still in the bowl?"
+   ],
+   [
+    "Plumbing, electrical, barbershop",
+    "Pet sitting, dog walking, boarding"
+   ],
+   [
+    "Alex was to have the proof ready",
+    "Alex was to sign the care sheet first"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE broke a lamp in the living room"
+   ],
+   [
+    "like a drain clearing with Casey",
+    "like a drop-in visit with Casey"
+   ],
+   [
+    "Charge the $89 service call fee?",
+    "Charge the $89 late-cancel fee?"
+   ],
+   [
+    "Nobody home · 10am to 12pm visit",
+    "Late cancel · Fri to Sun visits"
+   ],
+   [
+    "Water heater flush · nobody home",
+    "Drop-in visits · late cancel"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Pet sitting, Dog walking, Boarding"
+   ],
+   [
+    "the rest of the water heater job",
+    "the rest of the farm sitting"
+   ],
+   [
+    "Lee Home Services · Leak repair",
+    "Lee Home Services · Dog walks"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa drop-in Thu 12-2 Casey"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Drop-ins book a 2-hour window."
+   ],
+   [
+    "Water heater flush · Thu 8–10am",
+    "Water heater flush · Thu to Sat"
+   ],
+   [
+    "Alex signs the changed estimate",
+    "Alex OKs the new price"
+   ],
+   [
+    "Pay $160 for the shutoff valves",
+    "Pay $65 for the vet trip"
+   ],
+   [
+    "Alex M. rated the visit 2 stars",
+    "Alex M. rated the visits 2 stars"
+   ],
+   [
+    "Water heater replacement · $640",
+    "3 weeks of visits · $640"
+   ],
+   [
+    "Avery Diaz: barber, at the shop",
+    "Avery Diaz: lodge sitter"
+   ],
+   [
+    "late-cancel or nobody-home fee",
+    "late-cancel fee"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Vet trip · $65"
+   ],
+   [
+    "Visits before Nov 23 stay $179",
+    "Trips before Nov 23 stay $150"
+   ],
+   [
+    "Pay $179 for the kitchen drain",
+    "Pay $179 for the 6 visits"
+   ],
+   [
+    "Texts the receipt and warranty",
+    "Texts the receipt and care promise"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "For Jordan, with today's bill",
+    "For Jordan, with the trip's bill"
+   ],
+   [
+    "The Thu 8–10am visit stands.",
+    "The Thu to Sat visits stand."
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Trip 1 · Oct 6 to Oct 8 · $150"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Trip 2 · Oct 13 to Oct 15 · $150"
+   ],
+   [
+    "the code confirmed the visit",
+    "DONE confirmed the visits"
+   ],
+   [
+    "Thu Oct 22 visit with Jordan",
+    "Thu to Sat visits with Jordan"
+   ],
+   [
+    "about the Thu Oct 22 payment",
+    "about the Sat Oct 24 payment"
+   ],
+   [
+    "Nora's $89 hold is released.",
+    "Nothing was charged for it."
+   ],
+   [
+    "Yes: tables, courts or rooms",
+    "Yes: tables, rooms or pet runs"
+   ],
+   [
+    "Every shop service but color",
+    "Every Lodge service but insulin shots"
+   ],
+   [
+    "Thu Oct 22 · arriving 8–10am",
+    "Thu Oct 22 to Sat Oct 24 · twice a day"
+   ],
+   [
+    "$160 for today's extra work",
+    "$65 for today's vet trip"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Vet trip"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise drop-ins to 30"
+   ],
+   [
+    "Jordan finds a torn leash.",
+    "Jordan finds a torn leash."
+   ],
+   [
+    "The gate code doesn't work",
+    "The door code doesn't work"
+   ],
+   [
+    "$179 for the kitchen drain",
+    "$179 for the 6 visits"
+   ],
+   [
+    "Kitchen drain · Thu Oct 22",
+    "Drop-in visits · Thu Oct 22 to Sat Oct 24"
+   ],
+   [
+    "Electrical license JE30417",
+    "Skills: insulin shots, dog walks"
+   ],
+   [
+    "Sends Jordan back to $160",
+    "Sends Jordan back to $198"
+   ],
+   [
+    "A: Thu 8–10am with Jordan",
+    "A: Thu to Sat with Jordan"
+   ],
+   [
+    "1 Yes, Alex will be there",
+    "1 Nobody home: Alex is away"
+   ],
+   [
+    "CODE FAILS gate at Kim L.",
+    "CODE FAILS lockbox at Kim L."
+   ],
+   [
+    "the barbershop is its own",
+    "the Lodge is its own"
+   ],
+   [
+    "Plumbing license JP031552",
+    "No license needed for this work"
+   ],
+   [
+    "water heater replacements",
+    "farm sitting jobs"
+   ],
+   [
+    "replace your water heater",
+    "do your farm sitting"
+   ],
+   [
+    "drains, leaks and flushes",
+    "drop-ins, walks and special care"
+   ],
+   [
+    "like an overflowing drain",
+    "like a last-minute drop-in"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Last-minute drop-in"
+   ],
+   [
+    "Water heater replacement",
+    "Overnight stay"
+   ],
+   [
+    "Nora S., a new customer,",
+    "Nora S., a returning client,"
+   ],
+   [
+    "for October's two visits",
+    "for October's two trips"
+   ],
+   [
+    "No: people (Sam's three)",
+    "No: people (pet sitting)"
+   ],
+   [
+    "Water heater replacement",
+    "Farm sitting"
+   ],
+   [
+    "water heater replacement",
+    "farm sitting"
+   ],
+   [
+    "like a faucet to rebuild",
+    "like a dog bed to wash"
+   ],
+   [
+    "Plumbing has none here.",
+    "Pet sitting's is the service agreement and the emergency vet OK."
+   ],
+   [
+    "$189 a visit (now $179)",
+    "$180 a trip (now $150)"
+   ],
+   [
+    "No answer in 15 minutes",
+    "No answer in 30 minutes"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW pet taxi"
+   ],
+   [
+    "Sewer camera inspection",
+    "Vet trip"
+   ],
+   [
+    "plumbing and electrical",
+    "pet sitting and dog walking"
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Drop-in visit"
+   ],
+   [
+    "Right to cancel · $160",
+    "Right to cancel · $65"
+   ],
+   [
+    "stage 2 of your repipe",
+    "October's daily visits"
+   ],
+   [
+    "The rest after the job",
+    "The rest after the last visit"
+   ],
+   [
+    "Service call fee · $89",
+    "Late-cancel fee · $89"
+   ],
+   [
+    "Mon–Fri, 7:30am–5:30pm",
+    "Every day, 7am–9pm"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Drop-in visits"
+   ],
+   [
+    "kitchen drain clearing",
+    "drop-in visits"
+   ],
+   [
+    "replaces water heaters",
+    "does farm sitting"
+   ],
+   [
+    "MOVE Alex to Thu 12pm",
+    "MOVE Alex mornings to 10 to 12"
+   ],
+   [
+    "Lead-safe work notice",
+    "Notice before the work"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken lamp"
+   ],
+   [
+    "Drain clearing · $179",
+    "Drop-in visit · $25"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Every day, 7am–9pm"
+   ],
+   [
+    "a free estimate visit",
+    "a free meet-and-greet"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Pet Sitting LLC"
+   ],
+   [
+    "Plumbing + electrical",
+    "Pet sitting + dog walking"
+   ],
+   [
+    "replace water heaters",
+    "do farm sitting"
+   ],
+   [
+    "water heater contract",
+    "farm sitting contract"
+   ],
+   [
+    "for the missed visit",
+    "for the late cancel"
+   ],
+   [
+    "YES JP031552 JE30417",
+    "YES"
+   ],
+   [
+    "From my invite reply",
+    "None needed for this work"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Pet Lodge LLC"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it's still full"
+   ],
+   [
+    "like a move-out day",
+    "like the days of a trip"
+   ],
+   [
+    "the gate code fails",
+    "the door code fails"
+   ],
+   [
+    "YES, with a license",
+    "YES"
+   ],
+   [
+    "leehomeservices.com",
+    "leepetsitting.com"
+   ],
+   [
+    "Sewer camera report",
+    "Vet trip report"
+   ],
+   [
+    "A water heater job",
+    "A dog walk"
+   ],
+   [
+    "Water heater flush",
+    "Dog walk"
+   ],
+   [
+    "2 Alex wasn't home",
+    "2 Jordan couldn't get in"
+   ],
+   [
+    "Water heater flush",
+    "Drop-in visits"
+   ],
+   [
+    "water heater flush",
+    "drop-in visits"
+   ],
+   [
+    "the estimate visit",
+    "the meet-and-greet"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pet Sitting's"
+   ],
+   [
+    "water heater quote",
+    "farm sitting quote"
+   ],
+   [
+    "A fix-a-leak class",
+    "A puppy care class"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pet Sitting"
+   ],
+   [
+    "Work consent form",
+    "Care sheet and agreement"
+   ],
+   [
+    "the kitchen drain",
+    "the 6 visits"
+   ],
+   [
+    "like $480 of $640",
+    "like $600 of $750"
+   ],
+   [
+    "like a burst pipe",
+    "like a last-minute drop-in"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "Water heater fix",
+    "Holiday visit"
+   ],
+   [
+    "Is the sink full",
+    "Is the bowl full"
+   ],
+   [
+    "for today's work",
+    "for your 6 visits"
+   ],
+   [
+    "for today's $179",
+    "for the trip's $179"
+   ],
+   [
+    "A warranty claim",
+    "Something was missed"
+   ],
+   [
+    "Plumbing license",
+    "Registration paper"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Pet Lodge"
+   ],
+   [
+    "the water jetter",
+    "the van"
+   ],
+   [
+    "drain clearings",
+    "dog walks"
+   ],
+   [
+    "DONE 160 valves",
+    "DONE 65 vet trip"
+   ],
+   [
+    "shutoff valves",
+    "torn leashes"
+   ],
+   [
+    "Drain clearing",
+    "Drop-in visits"
+   ],
+   [
+    "drain clearing",
+    "drop-in visits"
+   ],
+   [
+    "yard drain dig",
+    "dog hike"
+   ],
+   [
+    "shutoff valve",
+    "torn leash"
+   ],
+   [
+    "Old vent pipe",
+    "Two litter boxes"
+   ],
+   [
+    "New gate code",
+    "New lockbox code"
+   ],
+   [
+    "paid cash 179",
+    "paid cash 150"
+   ],
+   [
+    "(Thu, Jordan)",
+    "(Sat, Jordan)"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "water heater",
+    "dog"
+   ],
+   [
+    "$140 an hour",
+    "$99 a night"
+   ],
+   [
+    "$120 an hour",
+    "$89 a night"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Sitters"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dog Walks"
+   ],
+   [
+    "1200 Main St",
+    "75 Walnut St"
+   ],
+   [
+    "electricians",
+    "dog walkers"
+   ],
+   [
+    "overflowing",
+    "spilled"
+   ],
+   [
+    "YES 4471203",
+    "YES"
+   ],
+   [
+    "electrician",
+    "dog walker"
+   ],
+   [
+    "At the shop",
+    "At the Lodge"
+   ],
+   [
+    "house calls",
+    "home overnights"
+   ],
+   [
+    "House calls",
+    "Home overnights"
+   ],
+   [
+    "Leak repair",
+    "Special-care visit"
+   ],
+   [
+    "leak repair",
+    "special-care visit"
+   ],
+   [
+    "water line",
+    "food bowl"
+   ],
+   [
+    "dishwasher",
+    "dog bowl"
+   ],
+   [
+    "Electrical",
+    "Dog walking"
+   ],
+   [
+    "electrical",
+    "dog walking"
+   ],
+   [
+    "Barbershop",
+    "Boarding"
+   ],
+   [
+    "barbershop",
+    "boarding home"
+   ],
+   [
+    "house call",
+    "home overnight"
+   ],
+   [
+    "House call",
+    "Home overnight"
+   ],
+   [
+    "yard drain",
+    "dog hike"
+   ],
+   [
+    "Yard drain",
+    "Dog hike"
+   ],
+   [
+    "Visit fee",
+    "Late-cancel fee"
+   ],
+   [
+    "visit fee",
+    "late-cancel fee"
+   ],
+   [
+    "88 Elm St",
+    "19 Willow Ct"
+   ],
+   [
+    "on Elm St",
+    "on Willow Ct"
+   ],
+   [
+    "42 Oak St",
+    "26 Maple Ave"
+   ],
+   [
+    "barbering",
+    "boarding"
+   ],
+   [
+    "Barbering",
+    "Boarding"
+   ],
+   [
+    "Plumbing",
+    "Pet sitting"
+   ],
+   [
+    "plumbing",
+    "pet sitting"
+   ],
+   [
+    "Plumbers",
+    "Pet sitters"
+   ],
+   [
+    "plumbers",
+    "pet sitters"
+   ],
+   [
+    "the shop",
+    "the Lodge"
+   ],
+   [
+    "The shop",
+    "The Lodge"
+   ],
+   [
+    "cabinet",
+    "cupboard"
+   ],
+   [
+    "shutoff",
+    "vet"
+   ],
+   [
+    "haircut",
+    "walk"
+   ],
+   [
+    "Fri 8am",
+    "Fri to Sun"
+   ],
+   [
+    "Plumber",
+    "Pet sitter"
+   ],
+   [
+    "plumber",
+    "pet sitter"
+   ],
+   [
+    "Barbers",
+    "Lodge sitters"
+   ],
+   [
+    "barbers",
+    "lodge sitters"
+   ],
+   [
+    "faucet",
+    "bowl"
+   ],
+   [
+    "Barber",
+    "Lodge sitter"
+   ],
+   [
+    "barber",
+    "lodge sitter"
+   ],
+   [
+    "Jordan",
+    "Ellis"
+   ],
+   [
+    "drain",
+    "walk"
+   ],
+   [
+    "valve",
+    "leash"
+   ],
+   [
+    "flush",
+    "walk"
+   ],
+   [
+    "Labor",
+    "Overnight stay"
+   ],
+   [
+    "Casey",
+    "Shea"
+   ],
+   [
+    "Riley",
+    "Hayden"
+   ],
+   [
+    "Avery",
+    "Logan"
+   ],
+   [
+    "Jamie",
+    "Wren"
+   ],
+   [
+    "sink",
+    "pet bowl"
+   ],
+   [
+    "Sink",
+    "Pet bowl"
+   ],
+   [
+    "clog",
+    "tangle"
+   ],
+   [
+    "pipe",
+    "pet"
+   ],
+   [
+    "$800",
+    "$750"
+   ],
+   [
+    "$249",
+    "$85"
+   ],
+   [
+    "$199",
+    "$65"
+   ],
+   [
+    "$179",
+    "$150"
+   ],
+   [
+    "$358",
+    "$300"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books Moose, a 9-year-old Lab, into Lee's Pet Lodge for one night: drop-off Sat Oct 24 at 11:00am, pick-up Sun Oct 25 by 11:00am. The stay depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Pet Sitting for 26 Maple Ave while away: a free meet-and-greet first, then 6 drop-in visits for two cats, twice a day from Thu Oct 22 to Sat Oct 24, with Ellis. The visits depend on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|deposit|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: one night of dog boarding, $35. A card is saved for the Lodge's $20 late-cancel fee. Alex pays at pick-up.",
+    "list|deposit|counter": "A long weekend, 4 nights, $140. A $40 deposit when booking; the $100 rest at pick-up.",
+    "list|full|none": "One night with a bath before going home, $55, paid in full when booking."
+   },
+   "amounts": {
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Boarding at the Lodge, a night"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Boarding at the Lodge, 4 nights"
+    },
+    "list|full|*": {
+     "price": "$140",
+     "paid": "$140",
+     "fee": "$40",
+     "name": "Boarding at the Lodge, 4 nights"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|deposit|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: 6 drop-in visits, $150. A card is saved, and charged $150 when Ellis texts DONE after the last visit.",
+    "list|none|bill": "The same 6 visits, $150. Nothing is taken. Rosie texts the bill after the last visit.",
+    "list|deposit|card": "The same 6 visits, $150. A $40 deposit when booking; the $110 rest charged to the saved card at DONE.",
+    "list|full|none": "The same 6 visits, $150, paid in full when booking."
+   },
+   "amounts": {
+    "list|card|*": {
+     "price": "$25",
+     "fee": "$89",
+     "name": "Drop-in visit, 30 minutes"
+    },
+    "list|none|*": {
+     "price": "$25",
+     "name": "Drop-in visit, 30 minutes"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Trip of 6 visits"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$89",
+     "name": "Trip of 6 visits"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-13",
+    "more": [
+     "For a trip of several visits, the pet sitter texts DONE after the last one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Dog walking goes live on the company's own details. Each person is offered once they join and Sam says yes.",
+    "more": [
+     "Sam doesn't walk dogs himself, so dog walking waits for the person on the team who does.",
+     "Dog walking needs no state license where Sam works. Where a state's form asks for one, it's asked here, like any license."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Dog walking needs no state license where you work, so it goes live on the company's registration. AI assistants can book it once your walker joins and you say yes. You'll add your people at the end. Next, Lee's Pet Lodge: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where pet care at the customer's home is allowed, and who may go. Rosie checks that before a home overnight is offered.",
+    "more": [
+     "Some states license boarding, and leave care at a customer's home alone.",
+     "Some ask for a background check or insurance for work inside a home.",
+     "Times at the customer's home offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ],
+    "rule": "Rosie's rule: a service can't be set at the customer's place where the plug-in says it isn't allowed. Why: some kinds of work are licensed only at the business's own place."
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in says where the state licenses boarding at a home or a kennel. Where Sam works, it does, so Sam may give the Lodge's number. It's optional, and Rosie doesn't check it.",
+    "more": [
+     "Lodge sitters need no license of their own unless the state's form says so.",
+     "Where the state inspects boarding homes, a lapsed license or a failed inspection pauses boarding bookings.",
+     "Each lodge sitter can link their own calendar when they join."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state licenses boarding at a home. What's the Lodge's boarding license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "BL20981"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "Where the state doesn't license boarding, the Lodge gives only its business registration, where the state asks for one. Customers see no license claim.",
+    "more": [
+     "Nobody on the Lodge's team is asked for a license either, unless the plug-in says so."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Shea Moore"
+     ],
+     [
+      "Company",
+      "Lee Pet Sitting"
+     ],
+     [
+      "Kinds of work",
+      "Pet sitting"
+     ],
+     [
+      "Jobs",
+      "Drop-in visits, overnight stays, insulin shots"
+     ],
+     [
+      "Hours",
+      "Every day, 7am–9pm"
+     ],
+     [
+      "Shea agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Pet Sitting",
+       "At the customer's home",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Ellis Price",
+       "Lee Pet Sitting",
+       "At the customer's home",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Shea Moore",
+       "Lee Pet Sitting",
+       "At the customer's home",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Pet Sitting",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Hayden Chen",
+       "Lee's Pet Lodge",
+       "At the Lodge, and home overnights",
+       "None of their own",
+       "Once Sam says yes"
+      ],
+      [
+       "Logan Diaz",
+       "Lee's Pet Lodge",
+       "At the Lodge",
+       "None of their own",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee's Pet Lodge",
+      "19 Willow Ct, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Dog boarding $35 a night ($40 from Nov 2) · Puppy $40 · Bath $20"
+     ],
+     [
+      "To book",
+      "A card saved · $20 for a no-show or a late cancel"
+     ],
+     [
+      "Licenses",
+      "Boarding license, as given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Pet Sitting",
+      "Pet sitting · within 25 miles of 75 Walnut St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-07",
+    "more": [
+     "Rosie never guesses a language from a name.",
+     "The Lodge's job text says which language the customer speaks."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero dejar a mi perro el sábado.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like to board my dog on Saturday."
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee's Pet Lodge. Esta llamada se graba. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee's Pet Lodge. This call is recorded. How can I help?"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-05",
+    "say": [
+     [
+      "agent",
+      "san",
+      "Hi, I'm an automated assistant from Google, calling for a customer, Alex. Can Lee's Pet Lodge take a dog for Saturday night? What does it cost?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-19",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BOOK Alex M. Moose 1 night Sat 11am"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "more": [
+     "A boarding home's example: a dog that's been sick gets 'call your vet first. A sick dog can't board with others until the vet OKs it.'",
+     "Then the booking goes on, with that note for the Lodge."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If a pet is hurt or ate something toxic, call your vet or the nearest emergency vet now. If a person is in danger, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: the dog's size, and if it gets along with other dogs. Both set the space it needs.",
+     "Questions that only add detail come later, once a time is saved.",
+     "A cat or a puppy is picked here, so the space fits it."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "How big is your dog, and does he get along with other dogs?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Moose is a 9-year-old Lab, about 80 pounds. He loves other dogs."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Anything the Lodge should know about Moose?"
+     ],
+     [
+      "cust",
+      "agent",
+      "He eats twice a day, and he's scared of thunder."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says if this work needs a first step: a meet-and-greet, vaccine records, a form or a waiver. Rosie checks before the secure link, so the page knows what to ask.",
+    "more": [
+     "New dogs meet the Lodge first, and their vaccine records go on file."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "New dogs meet the Lodge first, and their vaccine records go on file.",
+       "Its page not finished: it stays booked, with nothing taken."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Neither meet-and-greet time works. The AI offers later stays, each with room for a meet-and-greet first. Alex picks again.",
+    "more": [
+     "The new pick is saved for 10 minutes instead.",
+     "Any lodge sitter can do the meet-and-greet."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "No problem. Here are later stays, each with a meet-and-greet before:",
+      {
+       "times": [
+        "Fri Oct 30 to Sat Oct 31 · drop-off 11:00am",
+        "Sat Oct 31 to Sun Nov 1 · drop-off 11:00am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex at drop-off, Sat 11:00am. Hayden notes how Moose looks before the stay: his coat, his paws and anything already wrong.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Before the stay: small scab on Moose's left ear. Bright and eating.",
+      {
+       "photos": [
+        "Moose at drop-off"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Moose's stay as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "A pet is hurt, sick or lost during the stay. Hayden helps first: the vet Alex OK'd, or the emergency vet. Sam and Alex are told at once.",
+    "more": [
+     "Alex's emergency vet OK, with its spending limit, is on the secure page.",
+     "A record is kept on the secure page, never in a text to the customer.",
+     "Lost means a pet in the Lodge's care: Alex is told at once, and the times are logged.",
+     "Call 911 first if a person is in danger."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Moose won't eat and seems weak. Taking him to the emergency vet, as Alex OK'd."
+     ],
+     [
+      "san",
+      "owner",
+      "Hayden is taking Alex M.'s dog, Moose, to the emergency vet. Call Hayden now."
+     ],
+     [
+      "san",
+      "cust",
+      "Urgent from Lee's Pet Lodge: Moose seems unwell tonight. Hayden is taking him to the emergency vet now, as you OK'd, and Sam is calling you."
+     ]
+    ],
+    "t": "Sat Oct 24, 9:10pm"
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "more": [
+     "A stand-in sees them too.",
+     "They never go in a text to Alex.",
+     "Alex can get a copy, as with any record.",
+     "The plug-in names what's worth keeping, like a pet's habits and vaccine dates."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Moose: scared of thunder, sleeps best on his own bed. Eats fast: use the slow bowl."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A9-03",
+    "t": "Sun Oct 25, 10:58am"
+   },
+   {
+    "op": "words",
+    "at": "A10-01",
+    "t": "Sun Oct 25, 11:00am"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pet sitting plug-in adds no agreement for Sam to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: visits, walks and stays."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Sitters need no license of their own unless the state's form says so (the plug-in's staff rules)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Pet sitting, dog walking and boarding are never sent now: a new client meets the sitter first."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Pets are boarded at the Lodge or cared for at home, never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The Lodge bills no pet insurance or plan. Owners claim pet insurance themselves."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "The Lodge books stays, start to end, by its spaces a night, not a lodge sitter's time (A4-68)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The Lodge books stays, start to end, by its spaces a night (A4-68)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The Lodge books stays, start to end, by its spaces a night (A4-68)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Stays name no lodge sitter. A wish for one goes in the notes."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A pet's stay is booked by an adult. No child is booked or left at the Lodge."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A pet comes in at its drop-off time whoever is on duty, so a lodge sitter running late moves nothing for Alex."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A stay has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes at the Lodge."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The pet stays at the Lodge: updates, the ready text and the pick-up follow (A8-11, A8-50, A8-54)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A stay is paid at pick-up, or before."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The Lodge bills no pet insurance or plan (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The Lodge sends no proposals; the next stay is booked when the customer asks."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A stay has no result that comes later: the pick-up is the end."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A stay is rated."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Pet sitting takes no child in care."
+   },
+   {
+    "op": "words",
+    "at": "S12-32",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee's Pet Lodge: you now have two {{svc.intext:dog walks|visits}} on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+      {
+       "buttons": [
+        "Keep both",
+        "Just one: keep 2:00pm"
+       ],
+       "as": "Ben T.",
+       "stop": "first"
+      }
+     ]
+    ],
+    "does": "Ben T. books a dog walk for Sat Nov 7 at 2:00pm. A second one at 2:30pm comes from another app. Rosie asks once which Ben meant. Nothing is charged twice.",
+    "why": "Pet visits are not skin fades: the example is a dog walk (a slot's example words can't be renamed)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-13",
+    "more": [
+     "For a trip of several visits, the pet sitter texts DONE after the last one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Dog walking goes live on the company's own details. Each person is offered once they join and Sam says yes.",
+    "more": [
+     "Sam doesn't walk dogs himself, so dog walking waits for the person on the team who does.",
+     "Dog walking needs no state license where Sam works. Where a state's form asks for one, it's asked here, like any license."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Dog walking needs no state license where you work, so it goes live on the company's registration. AI assistants can book it once your walker joins and you say yes. You'll add your people at the end. Next, Lee's Pet Lodge: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where pet care at the customer's home is allowed, and who may go. Rosie checks that before a home overnight is offered.",
+    "more": [
+     "Some states license boarding, and leave care at a customer's home alone.",
+     "Some ask for a background check or insurance for work inside a home.",
+     "Times at the customer's home offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ],
+    "rule": "Rosie's rule: a service can't be set at the customer's place where the plug-in says it isn't allowed. Why: some kinds of work are licensed only at the business's own place."
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "The plug-in says where the state licenses boarding at a home or a kennel. Where Sam works, it does, so Sam may give the Lodge's number. It's optional, and Rosie doesn't check it.",
+    "more": [
+     "Lodge sitters need no license of their own unless the state's form says so.",
+     "Where the state inspects boarding homes, a lapsed license or a failed inspection pauses boarding bookings.",
+     "Each lodge sitter can link their own calendar when they join."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state licenses boarding at a home. What's the Lodge's boarding license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "BL20981"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Where the state doesn't license boarding, the Lodge gives only its business registration, where the state asks for one. Customers see no license claim.",
+    "more": [
+     "Nobody on the Lodge's team is asked for a license either, unless the plug-in says so."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Shea Moore"
+     ],
+     [
+      "Company",
+      "Lee Pet Sitting"
+     ],
+     [
+      "Kinds of work",
+      "Pet sitting"
+     ],
+     [
+      "Jobs",
+      "Drop-in visits, overnight stays, insulin shots"
+     ],
+     [
+      "Hours",
+      "Every day, 7am–9pm"
+     ],
+     [
+      "Shea agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Pet Sitting",
+       "At the customer's home",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Ellis Price",
+       "Lee Pet Sitting",
+       "At the customer's home",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Shea Moore",
+       "Lee Pet Sitting",
+       "At the customer's home",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Pet Sitting",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Hayden Chen",
+       "Lee's Pet Lodge",
+       "At the Lodge, and home overnights",
+       "None of their own",
+       "Once Sam says yes"
+      ],
+      [
+       "Logan Diaz",
+       "Lee's Pet Lodge",
+       "At the Lodge",
+       "None of their own",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee's Pet Lodge",
+      "19 Willow Ct, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Dog boarding $35 a night ($40 from Nov 2) · Puppy $40 · Bath $20"
+     ],
+     [
+      "To book",
+      "A card saved · $20 for a no-show or a late cancel"
+     ],
+     [
+      "Licenses",
+      "Boarding license, as given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Pet Sitting",
+      "Pet sitting · within 25 miles of 75 Walnut St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "does": "Alex uses any AI assistant, like ChatGPT, Claude or Gemini. The AI passes on the work, the area and the days. No name, phone or street address yet.",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I'm away Thu Oct 22 to Sat Oct 24. Can a pet sitter visit my two cats twice a day? One needs insulin. I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Me voy de viaje y mi gata vomitó dos veces hoy.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'm going on a trip, and my cat threw up twice today.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Pet Sitting. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Pet Sitting. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, with a note for the sitter. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A pet sitter's example: a pet that's sick, but not in danger now, gets 'call your vet if it gets worse'.",
+     "Rosa is told to call her vet now if her cat gets worse, and the emergency vet after hours."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿su gata respira bien? ¿Comió algo tóxico?",
+      {
+       "lang": "es",
+       "en": "First: is your cat breathing well? Did she eat something toxic?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "Sí, respira bien. No comió nada raro.",
+      {
+       "lang": "es",
+       "en": "Yes, she's breathing well. She didn't eat anything strange.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Si empeora o no toma agua, llame a su veterinario ahora. De noche, vaya a la clínica de emergencias.",
+      {
+       "lang": "es",
+       "en": "If she gets worse or won't drink, call your vet now. At night, go to the emergency vet.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "My dog is limping. Can I give him my own pain pills?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't answer health questions about pets. Please call your vet before giving any medicine. To talk to a sitter, call Lee Pet Sitting at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Pet Sitting asks: what pets, and how many visits a day? Does any pet take medicine?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Two cats, Pickles and Olive. Twice a day. Pickles needs insulin."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-43",
+    "does": "Some answers change which times can be offered, so the AI asks them before showing any. Here, Alex's trip is 6 visits, booked together: a series.",
+    "more": [
+     "Answers that only add detail come later, once a time is saved.",
+     "More than one can apply, like a series and a first step. The AI asks each one that fits, in this order.",
+     "Most pet sitting bookings are a series: the visits or nights of one trip."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I have to leave tonight. Can someone feed my cats tomorrow?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Lee Pet Sitting meets new clients first, so it can't start tomorrow. Its soonest visits start Wed Oct 21, after a meet-and-greet Tue."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "more": [
+     "Private answers, like a door code or medicine doses, go only on the secure page."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Are the cats friendly with visitors? Does anyone else live in or visit the home?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Both are friendly. Nobody else lives here."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-26",
+    "does": "The visit texts and any code go to whoever is home. Alex will be away, so nobody is: Alex gets the texts and photos, and the key from the meet-and-greet lets Ellis in.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Will anyone be home during the visits?",
+      {
+       "buttons": [
+        "No, I'm away",
+        "Someone else will"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "form": [
+     [
+      "I'm 18 or older",
+      "Yes"
+     ],
+     [
+      "An adult (18+) will be home for the meet-and-greet",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-03",
+    "does": "Alex is away, so nobody gives a code at the door: the visits go the nobody-home way, with a photo each time. The code is for when someone's home, like the meet-and-greet."
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "does": "Back to Alex's home, 8:20am. Ellis checks what the care sheet asked Alex to leave out: food, litter and Pickles' insulin. All here, so the visit starts.",
+    "more": [
+     "Examples: the pets' food and medicine, a key that works, a signed care sheet.",
+     "Missing, but the visit can go on: Ellis notes it, and Alex is told.",
+     "If the plug-in says it stops the visit, it goes as 'Can't go ahead'."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before anything else, Ellis notes how the pets and the home look, and what's already wrong. The photos stay with the job.",
+    "more": [
+     "The plug-in names the checks: each pet, the food, water and litter, and anything already broken.",
+     "Alex can see them on the secure page.",
+     "A damage claim later is checked against them.",
+     "With nobody home, these photos are the record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE both cats fine; old scratch on the hall door",
+      {
+       "photos": [
+        "Pickles and Olive",
+        "Hall door, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s job."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "does": "Ellis texts a short update after a visit. Rosie sends it to Alex in the business's name, inside text hours, with a photo.",
+    "more": [
+     "Alex's reply goes to Ellis, like a question before the visit.",
+     "Updates about safety go at any hour.",
+     "Medicine is named only as 'medicine given'.",
+     "Each update stays on the job record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE Olive hid under the bed, then came out to play. Both ate.",
+      {
+       "photos": [
+        "Olive with her toy"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Update from Ellis: Olive hid under the bed at first, then came out to play. Both cats ate well.",
+      {
+       "photos": [
+        "Olive with her toy"
+       ]
+      }
+     ]
+    ],
+    "t": "Fri Oct 23, 7:15pm"
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Ellis checks the visit against the care sheet. Both cats are fed, Pickles has her medicine, and the litter is done.",
+    "more": [
+     "Anything missed is done before Ellis texts DONE.",
+     "Ellis locks up and sets the alarm.",
+     "The last photo shows the cats and the home as Ellis leaves them."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-47",
+    "does": "By the morning after the last visit, nothing was entered: no photo, no DONE. So Alex gets one question, never a chase.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Did Ellis from Lee Pet Sitting do your visits, Thu Oct 22 to Sat Oct 24?",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ]
+      }
+     ]
+    ],
+    "t": "Sun Oct 25, 10:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Olive hides at first: treats under the bed help. Pickles takes her medicine best with wet food."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private record."
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A pet gets out",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.20"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Fri Oct 23, 8:40am",
+       "title": "A pet gets out: Sam and Alex told at once",
+       "does": "A what-if: Olive slips out the front door during the morning visit. Ellis texts LOST and starts looking. Sam and Alex are told at once, and the times are logged.",
+       "more": [
+        "LOST is the plug-in's urgent word. It goes at any hour, like a safety update.",
+        "Ellis searches nearby. Sam calls Alex, and sends Shea to help if Shea is free.",
+        "Rosie never says whose fault it is and never offers money. Sam decides anything after.",
+        "Found: Ellis texts FOUND, and Alex gets a photo."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "LOST Olive slipped out the front door, searching the yard and street"
+        ],
+        [
+         "san",
+         "owner",
+         "Urgent: Olive, Alex M.'s cat, slipped out at 26 Maple Ave at 8:40am. Ellis is searching. Call Alex now.",
+         {
+          "buttons": [
+           "Send Shea to help",
+           "I'll call Alex"
+          ]
+         }
+        ],
+        [
+         "san",
+         "cust",
+         "Urgent from Lee Pet Sitting: Olive slipped out the front door at 8:40am during Ellis's visit. Ellis is searching now, and Sam is calling you."
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Sat Oct 24, 7:36pm"
+   },
+   {
+    "op": "words",
+    "at": "B9-11",
+    "t": "Wed Oct 28, 11:00am"
+   },
+   {
+    "op": "words",
+    "at": "B9-14",
+    "t": "Wed Oct 28, 11:00am"
+   },
+   {
+    "op": "words",
+    "at": "B10-35",
+    "does": "After the last DONE, Alex gets the plug-in's tips for the days ahead. A reply about a problem goes to Sam.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Welcome home! Pickles may be extra hungry or clingy for a day. Ellis's notes from each visit are on your page. Anything odd, reply here."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Pet sitting and dog walking need no state license where Sam works (the plug-in's license rules), so the company gives its registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pet sitting plug-in adds no agreement for Sam to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: visits, walks and stays."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Sitters need no license of their own unless the state's form says so (the plug-in's staff rules)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Pet sitting, dog walking and boarding are never sent now: a new client meets the sitter first."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Pets are cared for in person, never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "Pet sitting books one home's pets at a time."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for pet sitting."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Drop-in visits come in arrival windows (B4-15); overnight stays are a start and an end (B4-85)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Pet sitting sells no seats."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Pet sitting is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "The plug-in names no contract above an amount for pet sitting. Its service agreement is signed on the secure page (B4-86)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Pet sitting is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Pet sitting is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Pet sitting has no group to fill."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "Alex runs late",
+    "why": "Alex is away during the visits, so being late doesn't apply."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Pet sitting is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody home",
+    "why": "Pet sitting is done while the owner is away. A key or code that fails goes as B8-70."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A pet sitter never looks after a child. An adult on the booking must be there when someone's home."
+   },
+   {
+    "op": "off",
+    "at": "B8-23",
+    "label": "No phone at hand",
+    "why": "Alex is away during the visits, so a yes comes only by text."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "The visits are paid together, at the end."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for pet sitting."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Pays on the pro's phone",
+    "why": "Alex is away when the last visit ends, so there's no phone to pay on."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for pet sitting (B4-78)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Pet sitting sends no proposals; a plan is booked when the customer asks."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "No report comes later: each visit's photo is the report."
+   },
+   {
+    "op": "words",
+    "at": "B10-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Ellis visit my cats again next weekend?"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. Here are Ellis's next times for drop-in visits.",
+      {
+       "times": [
+        "Sat Nov 21 to Sun Nov 22 · 8–10am and 6–8pm · Ellis",
+        "Fri Nov 20 to Sun Nov 22 · 8–10am and 6–8pm · Ellis"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-30",
+    "form": [
+     [
+      "What the AI sent",
+      "Drop-in visits · Thu Oct 22 to Sat Oct 24 · twice a day · Ellis"
+     ],
+     [
+      "Wrong? Fix it here",
+      "Change service · Change time"
+     ],
+     [
+      "Street address (Alex types it)",
+      "26 Maple Ave, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-11",
+    "form": [
+     [
+      "Your visit",
+      "6 drop-in visits, Thu Oct 22 to Sat Oct 24, with Ellis: $150"
+     ],
+     [
+      "Deposit now",
+      "$40 · the $110 rest after the last visit"
+     ],
+     [
+      "Card",
+      "•••• 4242"
+     ],
+     [
+      "I agree",
+      "Free to cancel until 7am Thu for a full refund. After that, the deposit may be kept"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A pet visit is rated, like any service (not sensitive work)."
+   }
+  ]
+ },
+ "notes": "Pilot: cleaner. Pet sitting runs like house cleaning: visits at the customer's home while nobody is home, a key or a code, a photo at the end, and a stand-in when the sitter can't come. The cleaner's flow A (a drop-off and pick-up at the shop) also fits boarding at the sitter's own home, with nights added (A4-66 \"A stay, start to end\", A4-68).\nWorld: Lee Pet Sitting LLC (drop-in visits, overnight stays and dog walks at the customer's home; 75 Walnut St; sitters Ellis and Shea) and Lee's Pet Lodge LLC (boarding at a home, 19 Willow Ct; lodge sitters Hayden and Logan; 4 dog runs and 2 cat rooms).\nFlow B is the usual side: Alex M. at 26 Maple Ave, cats Pickles (12, diabetic, insulin twice a day) and Olive. A free meet-and-greet Tue Oct 20, 6:30pm, then 6 drop-in visits Thu Oct 22 to Sat Oct 24, 8-10am and 6-8pm, $25 each, $150 in all. The old flowchart's Moose and Pickles stay in the story (Moose is flow A's dog).\nFlow A is the less usual side: Moose (9-year-old Lab, 80 lb) boards at the Lodge, drop-off Sat Oct 24 at 11:00am, pick-up Sun Oct 25 by 11am. He's a returning dog, so his meet-and-greet and vaccine records are on file (A4-44).\nPrices: drop-in visit $25 (30 min), overnight stay 7pm to 8am $89 a night ($99 with Ellis), meet-and-greet free, vet trip $65 ($85 with Sam), insulin shots no extra; dog boarding $35 a night, puppy $40, cat $25, bath $20, night with a bath $55, long weekend (4 nights) $140, special-care stays priced from the answers. Late cancel fee $89 at home, $20 at the Lodge.\nMoney paths, flow B: card saved and charged after the last visit (the main path), nothing taken and a bill after (regular clients), a $40 deposit with the rest charged after, and paid in full when booking. These are how sitters really take money for a trip. No hold path: sitters don't hold money on a card, and a trip can be weeks away.\nMoney paths, flow A: card saved for the $20 fee and paid at pick-up (the main path), a $40 deposit on a long weekend with the rest at pick-up, and a night with a bath paid in full. No photo or at-the-visit prices: every stay is on the price list.\nSign-up words S1-13 to S1-16 and S1-41 to S1-47 were changed to these paths, not the master's hold or house-call example. S11-56 now changes a card-saved service to a deposit, not a hold.\nMulti-visit trips: B4-45 books the 6 visits as one series with one price and one $2. Each visit ends with DONE and a photo (B8-17, visit 1 of 6); the money waits for the last visit's DONE, Sat Oct 24 at 7:35pm (B8-37, B8-41).\nStand-in: B7-54 is used because a trip's dates can't move: a stand-in with the skill (Shea gives insulin too) or a full refund.\nOwn step B8-x01: a pet gets out during a visit (the old flowchart's lost-pet node). The master has no branch for it; it is also a gap.\nsplitsKept S1-63: the Lodge's boarding is licensed in some states and only registered in others, so both branches are used, state by state.\nsplitsKept S2-25: Lee Pet Sitting books people, and the Lodge books spaces (runs and cat rooms), so both branches are used.\nsplitsKept A4-43: new dogs meet the Lodge first, returning ones are on file, vaccine records come from the vet, a form is signed where the state asks, and a pet with trouble last time is checked first, so every branch can happen.\nsplitsKept A8-02: at drop-off, food, medicine or vaccine proof can be missing, so both branches are used.\nTurned off: branches pet sitting never uses, like video visits, classes, seats, crews, rentals, items taken to the shop, results reports, stages, insurance plans, landlords, permits, sent-now work (a new client always meets the sitter first) and booking a sitter by name at the Lodge.\nLate-night requests and the AI agent sections (S11, S12) use their own customers: Nora (one same-day drop-in), Lin, Morgan (a plan), Ivy and Dee.\nClocks: every listed path runs forward from sign-up on Mon Oct 19 to the rating on Sun Oct 25, in both flows; the long weekend runs to Wed Oct 28.\nNot on any listed path, so left in the master's words: the photo-priced and at-the-visit varies, the hold path, and sent-now work. A few service names there were given pet sitting words (tailA, tailB pairs) so the read is less confusing.\nReview (Oct 23): S1-46 is plain 'paid at pick-up' in both flows (the Sunday saved-card story clashed with Alex's Sunday pick-up). Drop-off runs 8am to 6pm, pick-up 8 to 11am or 4 to 6pm (S1-47, A4-68, A7-29). Medicine names stay out of texts, as pf.messages says (B6-14, B7-01, B7-19, B7-37, B7-38, B7-54, B6-22, B8-44). Nora (flow B) and Dee (flow A) are returning customers with same-day requests, since new clients meet the sitter first. Lin's late cancel is a Fri to Sun trip, so the $89 fee, the $40 deposit and the $150 payment fit. Special-care prices (S11-08) are listed in pf.services as rare, priced for one pet; their path isn't listed, since almost all pet sitting is on the list. The emergency price (S12-20) follows Ellis's $99 overnight. A7-02's crew, set-date and too-few branches are off.",
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S1-80",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "S1-38",
+   "S1-80"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Each service starts the way most barbershops set it.",
+    "Lee's Barbershop has open times on Saturday morning.",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Gemini hears right away that 2:00pm was just taken",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "accept the beard trim today at 2:00pm with Avery.",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "A service priced at the chair gets its price now.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "says the cape clip ripped a shirt collar today",
+    "A haircut could mean a salon or a barbershop.",
+    "It's a gift for my brother. Can I pay for it?",
+    "You're on the waitlist for Saturday morning.",
+    "Give this code at the chair when you arrive.",
+    "A barber can work at both, on one calendar.",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "Haircut · Sat Oct 31 · 10:00am · Riley",
+    "Plumbing JP031552 · electrical JE30417",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Adds a second shop, with its own team",
+    "Give your check-in code at the chair.",
+    "like a haircut at the shop or at home",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Riley can go over it at your visit.",
+    "A barbershop books a person's time.",
+    "Can I add a beard trim on Saturday?",
+    "Charged Sat Oct 31, after the visit",
+    "Book Alex M. again Sat Nov 21, 11am",
+    "refund for the cancelled membership",
+    "Lee's Barbershop doesn't do perms.",
+    "Wants Saturday morning, with Riley",
+    "Alex asks for a cut every 4 weeks.",
+    "Can I skip this one? I'll be away.",
+    "Sat Oct 24 · any time before noon",
+    "I waited 25 minutes past my time.",
+    "Follows up on an item left behind",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "Books a haircut and a beard trim",
+    "Alex M. rated the visit 2 stars.",
+    "This one: Sat Oct 31 · 10:00am",
+    "like a burst pipe or a lockout",
+    "Haircut every 4 weeks · Riley",
+    "Lee's Barbershop · with Riley",
+    "Sat Oct 24 · 10:00am · Riley",
+    "Haircut plan · every 4 weeks",
+    "Give this code at the chair.",
+    "Sat Oct 31 · 11:00am · Riley",
+    "Sun Oct 25 · 11:00am · Riley",
+    "Tue Oct 27 · 11:00am · Riley",
+    "Sat Oct 24 · 11:00am · Riley",
+    "Sat Oct 24 · 12:30pm · Avery",
+    "Saturdays · 11:00am · Riley",
+    "Sat Oct 24 · 3:00pm · Riley",
+    "Tue Nov 3 · 11:00am · Riley",
+    "Sat Oct 24 · 2:00pm · Riley",
+    "Next: Sat Nov 28 · 10:00am",
+    "What happens at the chair?",
+    "Books a cut every 4 weeks",
+    "the barbershop is its own",
+    "A haircut needs nothing.",
+    "Dee W., a new customer,",
+    "Sat Oct 24 · with Riley",
+    "An item isn't picked up",
+    "Priced from your photos",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "plumbing and electrical",
+    "Alex adds a beard trim",
+    "Today · 3:00pm · Avery",
+    "Sat Nov 21 · 11:00am",
+    "Lee's Barbershop LLC",
+    "photos of your hair",
+    "Priced at the chair",
+    "the Groom's package",
+    "The Groom's package",
+    "Riley · Sat Oct 24",
+    "11:00am with Riley",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Color correction",
+    "color correction",
+    "Lee's Barbershop",
+    "Groom's package",
+    "1 color quote",
+    "Signature cut",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Haircut plans",
+    "$140 an hour",
+    "at the chair",
+    "At the chair",
+    "a beard trim",
+    "Haircut plan",
+    "haircut plan",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "NEW massage",
+    "At the shop",
+    "house calls",
+    "House calls",
+    "Beard trim",
+    "beard trim",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "house call",
+    "House call",
+    "visit fee",
+    "Skin fade",
+    "skin fade",
+    "hot towel",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "A haircut",
+    "a haircut",
+    "88 Elm St",
+    "on Elm St",
+    "Barbering",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "Plumbing",
+    "plumbing",
+    "the shop",
+    "The shop",
+    "Haircut",
+    "haircut",
+    "Plumber",
+    "plumber",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "Jordan",
+    "shave",
+    "Color",
+    "color",
+    "Casey",
+    "Riley",
+    "Avery"
+   ],
+   "B": [
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "would like to talk about the water heater quote before booking",
+    "A job quoted at the visit promises only the service call now.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Drain clearings already booked keep only their saved card.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Moved: Fri Oct 23, arriving 8–10am, with Jordan.",
+    "Can Jordan also run a camera down my sewer line?",
+    "CANT START no proof Alex may have this work done",
+    "May Lee Home Services show photos of the work?",
+    "May Lee Home Services show photos of this job?",
+    "Can Jordan look at my bathroom sink next week?",
+    "drain clearing goes to $199 for new bookings.",
+    "Move Alex M. to Thu Oct 22, arriving 12–2pm?",
+    "Say Alex also asks about a dripping faucet.",
+    "One of the shop's barbers does house calls.",
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "Drain clearings already booked keep $179",
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "The shop's chair is in the other flow.",
+    "Can I skip next week's drain cleaning?",
+    "like a permit it needed that isn't in.",
+    "Your $800 bank transfer is on its way.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Jordan finds corroded shutoff valves.",
+    "and electrical's and the barbershop's",
+    "like a haircut at the shop or at home",
+    "Riley also does color and house calls",
+    "Thu Oct 22 · arriving 8–10am · Jordan",
+    "Fri Oct 23 · arriving 8–10am · Jordan",
+    "Mon Oct 26 · arriving 8–10am · Jordan",
+    "The drain clogs again 2 weeks later.",
+    "Riley: barber, color and house calls",
+    "Thu Oct 22 · arriving 12–2pm · Casey",
+    "Mon Oct 26 · arriving 8–10am · Casey",
+    "asks: water heater flush, 12 months",
+    "and nobody was home for any of them",
+    "Replace both shutoff valves · $160",
+    "Jordan left a mess under the sink.",
+    "Lee Home Services · Drain clearing",
+    "Is the sink still full of water?",
+    "Plumbing, electrical, barbershop",
+    "DAMAGE cracked the cabinet floor",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Plumbing books a 2-hour window.",
+    "Alex M. rated the visit 2 stars",
+    "Water heater replacement · $640",
+    "late-cancel or nobody-home fee",
+    "Sewer camera inspection · $199",
+    "like a burst pipe or a lockout",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "Thu Oct 22 visit with Jordan",
+    "Thu Oct 22 · arriving 8–10am",
+    "$160 for today's extra work",
+    "Replace both shutoff valves",
+    "raise drain clearing to 199",
+    "1 Yes, Alex will be there",
+    "CODE FAILS gate at Kim L.",
+    "the barbershop is its own",
+    "like an overflowing drain",
+    "Overflowing kitchen drain",
+    "Water heater replacement",
+    "Nora S., a new customer,",
+    "for October's two visits",
+    "Water heater replacement",
+    "water heater replacement",
+    "No answer in 15 minutes",
+    "NEW heating and cooling",
+    "Sewer camera inspection",
+    "plumbing and electrical",
+    "Tessa · Drain clearing",
+    "stage 2 of your repipe",
+    "Kitchen drain clearing",
+    "replaces water heaters",
+    "MOVE Alex to Thu 12pm",
+    "Cracked cabinet floor",
+    "Drain clearing · $179",
+    "Mon–Fri 7:30am–5:30pm",
+    "Lee Home Services LLC",
+    "water heater contract",
+    "for the missed visit",
+    "Yes, it won't drain",
+    "like a move-out day",
+    "leehomeservices.com",
+    "Sewer camera report",
+    "A water heater job",
+    "Water heater flush",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services'",
+    "water heater quote",
+    "A fix-a-leak class",
+    "Lee Home Services",
+    "the kitchen drain",
+    "like a burst pipe",
+    "service call fee",
+    "Service call fee",
+    "Water heater fix",
+    "for today's work",
+    "Plumbing license",
+    "Lee's Barbershop",
+    "drain clearings",
+    "shutoff valves",
+    "Drain clearing",
+    "drain clearing",
+    "shutoff valve",
+    "New gate code",
+    "(Thu, Jordan)",
+    "service call",
+    "Service call",
+    "Service call",
+    "water heater",
+    "$140 an hour",
+    "$120 an hour",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "overflowing",
+    "At the shop",
+    "house calls",
+    "House calls",
+    "Leak repair",
+    "leak repair",
+    "water line",
+    "dishwasher",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "house call",
+    "House call",
+    "yard drain",
+    "Yard drain",
+    "visit fee",
+    "88 Elm St",
+    "on Elm St",
+    "42 Oak St",
+    "Plumbing",
+    "plumbing",
+    "the shop",
+    "The shop",
+    "cabinet",
+    "shutoff",
+    "haircut",
+    "Fri 8am",
+    "Plumber",
+    "plumber",
+    "Barbers",
+    "barbers",
+    "faucet",
+    "Barber",
+    "barber",
+    "Jordan",
+    "drain",
+    "valve",
+    "flush",
+    "Labor",
+    "Casey",
+    "Riley",
+    "Avery",
+    "sink",
+    "clog",
+    "pipe",
+    "$800",
+    "$199",
+    "$179",
+    "$358"
+   ]
+  },
+  "A": {
+   "S1-13": "eca22651fd",
+   "S1-38": "b50b0bd4e8",
+   "S1-43": "e16d5048f3",
+   "S1-23": "39941a5377",
+   "S1-61": "7421d186d5",
+   "S11-48": "03f824b27b",
+   "S2-21": "bf6617b6d3",
+   "S11-57": "a3996ae84e",
+   "A3-07": "6b005cf195",
+   "A3-05": "ec1662d32f",
+   "A3-19": "85065db5d4",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A4-50": "6f43775326",
+   "A4-65": "fa7ec0389d",
+   "A4-43": "c17d56f766",
+   "A4-15": "db5792db95",
+   "A8-23": "e3a35f7f9e",
+   "A8-38": "5e48b74f3a",
+   "A8-45": "6589a6b4d4",
+   "A9-03": "219c966588",
+   "A10-01": "77ff9c7550",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A7-93": "46cca94e45",
+   "A8-03": "7accda6f86",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-34": "78c2d9a6a3",
+   "A8-67": "e9fd748fc5",
+   "S12-32": "69107511cd"
+  },
+  "B": {
+   "S1-13": "6964bfbe60",
+   "S1-38": "6301c86637",
+   "S1-43": "dd3ae2a1a9",
+   "S11-48": "6fd1c7b7b9",
+   "S2-21": "bf6617b6d3",
+   "S11-57": "2f34f23d8a",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-21": "ad48326ac5",
+   "B4-05": "fb3a9061c8",
+   "B4-43": "fc9855955a",
+   "B4-15": "f13240b9c6",
+   "B4-34": "74ff52d83d",
+   "B4-26": "912686f788",
+   "B4-32": "fcfe092e37",
+   "B8-03": "ac9d404766",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B8-32": "1cfd4f7afa",
+   "B8-39": "aa75251207",
+   "B8-47": "8b91635433",
+   "B8-44": "3847104a93",
+   "B8-22": "50d78f1af0",
+   "B9-06": "f091432f2d",
+   "B9-11": "9525d5f9c9",
+   "B9-14": "63b87042d1",
+   "B10-35": "5ed99b23b3",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B7-89": "889628e2d6",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-23": "dd780a2ec8",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B10-16": "c7a47a391c",
+   "B4-30": "26ca477d69",
+   "B5-11": "bda80de20e",
+   "B10-32": "7713bff255"
+  }
+ }
+}

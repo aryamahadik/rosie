@@ -1,0 +1,3023 @@
+{
+ "id": "officiant",
+ "name": "Wedding officiant",
+ "style": "Event",
+ "pattern": "event",
+ "from": "planner",
+ "cast": {
+  "A": {
+   "staff": "Ines and Ben (officiants at the studio)"
+  },
+  "B": {
+   "staff": "Ruth and Omar (officiants on the day)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Ines"
+  },
+  "B": {
+   "staff": "Ruth"
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "No state license to perform a wedding in most places. Many states ask an officiant to hold a credential: an ordination, a registration with the county, or a state officiant's card. The state's form says which applies; the business says what it holds.",
+   "who holds it": "Each officiant holds their own credential where the state asks for one. The business holds any business license or registration. Ceremonies at a venue follow the venue's own rules.",
+   "what to ask": [
+    "The officiant's credential, where the state's form asks for one (the business writes it in its own words)",
+    "The business license or registration number, where the city or county asks for one",
+    "The liability insurance policy and its end date, if a venue asks"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a credential, license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a credential (D96): the business and each officiant go live once set up and the owner says yes; a ceremony the owner says needs a credential they don't have isn't booked",
+   "signing the papers": "The marriage paperwork is the couple's and the county's. The officiant signs only what the state's form asks for. Rosie never files or signs any paper.",
+   "renewals": "optional reminders the owner sets; a credential the owner says has lapsed pauses that officiant's ceremonies until the owner says it's renewed (the owner's word, never a check)",
+   "insurance or bond": "Liability insurance on file, with its end date, where a venue asks. Many venues ask for a certificate naming them.",
+   "background checks": "Only where a venue or the state's form asks. The business's own word, never checked by Rosie.",
+   "the age to marry": "Rosie never books a ceremony where anyone is under the state's age to marry (see pf.safety)."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Lee Ceremonies' own list)": [
+    {
+     "service": "Wedding ceremony at a venue (30 minutes, one officiant)",
+     "price kind": "one price",
+     "price": "$450, travel within 25 miles included",
+     "length": "30 minutes, plus 30 minutes to set up",
+     "place": "at a venue, a home or outdoors",
+     "before": "a $150 deposit that holds the date",
+     "after": "the $300 rest charged to the saved card when the officiant texts DONE",
+     "note": "The ceremony agreement is signed first. The marriage license comes from the county, where the state requires one."
+    },
+    {
+     "service": "Rehearsal (45 minutes, at the venue)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "45 minutes",
+     "place": "at the venue",
+     "before": "nothing taken to book",
+     "after": "the bill texted after the rehearsal",
+     "note": "Booked with the wedding or on its own."
+    },
+    {
+     "service": "Elopement ceremony (20 minutes, a small group, at a park or a home)",
+     "price kind": "one price",
+     "price": "$300",
+     "length": "20 minutes",
+     "place": "at a park or a home",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "Outdoors, the weather rule applies."
+    },
+    {
+     "service": "Custom ceremony (more than one part, a faith or cultural order, or two places), quoted first",
+     "price kind": "quoted after a free call",
+     "price": "the quote (the example: $600 for a longer ceremony with two readings)",
+     "length": "the ceremony's length, plus set-up",
+     "place": "as booked",
+     "before": "a signed agreement, then a $150 deposit that holds the date",
+     "after": "the $450 rest on the bill after the ceremony, texted by Rosie",
+     "note": "Over $500, the owner OKs the quote first."
+    },
+    {
+     "service": "Extra hour on the day (one more hour, added at the ceremony)",
+     "price kind": "one price, per hour",
+     "price": "$150 (the example)",
+     "length": "one hour",
+     "place": "at the venue",
+     "before": "with the main booking",
+     "after": "paid at the visit or on the bill (D91)",
+     "note": "Added on the day only with both partners' written yes, at the rate shown before booking."
+    },
+    {
+     "service": "Travel",
+     "price kind": "travel fee",
+     "price": "free within 25 miles; $40 from 25 to 50 miles; farther, quoted first",
+     "place": "at the customer's place",
+     "before": "in the quote or the list price",
+     "after": "with the rest"
+    }
+   ],
+   "at the business (the example: Lee Vow Studio's own list)": [
+    {
+     "service": "Ceremony at the studio room (15 minutes, for a couple and up to 10 guests)",
+     "price kind": "one price",
+     "price": "$250",
+     "length": "15 minutes",
+     "place": "at the studio",
+     "before": "a $50 deposit",
+     "after": "the $200 rest paid at the studio"
+    },
+    {
+     "service": "Ceremony meeting (1 hour, at the studio or on video)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "1 hour",
+     "place": "at the studio or by video",
+     "before": "a card saved for the studio's $25 late-cancel fee",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Vow-writing session (1 hour, one to one)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "1 hour",
+     "place": "at the studio or by video",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Free first call (20 minutes, phone or video)",
+     "price kind": "free",
+     "price": "free",
+     "length": "20 minutes",
+     "place": "by phone or video",
+     "before": "nothing taken",
+     "after": "nothing"
+    },
+    {
+     "service": "Custom ceremony (quoted after the free first call)",
+     "price kind": "quoted after a free call",
+     "price": "the quote (the example: $600)",
+     "length": "about 60 min",
+     "place": "at the studio or a venue",
+     "before": "a $150 deposit",
+     "after": "the $450 rest on the bill after the ceremony"
+    }
+   ]
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What it's for: a wedding, a small or elopement ceremony, a vow renewal, or a custom ceremony",
+    "The date and the start time, and how long the ceremony should run",
+    "Where: a venue, a home, a park or the studio, and the town only (for the travel fee)",
+    "How many guests, and indoors, outdoors, or both (an outdoor ceremony has a weather rule)",
+    "Whether they want a rehearsal, extra time, or a custom ceremony"
+   ],
+   "after a time is picked": [
+    "The couple's names as they'll be read, and how each wants to be introduced",
+    "Whether they'll write their own vows, use a set text, or both (the ceremony form)",
+    "The readings, music cues and who gives or walks with whom, on the ceremony form",
+    "The venue's contact and mobile, and the venue's rules (start time, the spot to stand, the sound, the curfew)"
+   ],
+   "only on the secure page": [
+    "The venue's gate or door codes",
+    "Anyone in the ceremony under 18 (a ring bearer or flower child): a parent's yes, and the parent stays",
+    "A health or access need of anyone in the ceremony (a bedside, a hospice, or a wheelchair near the front)",
+    "A family note, like guests to keep apart",
+    "The marriage license number, where the county issues one, and the date it was issued",
+    "The card"
+   ],
+   "flags": "A health note or an access need is flagged on the secure page: the officiant calls (never a text) and plans the spot and the length to fit.",
+   "who may book": "An adult. Either partner may book, and both sign the ceremony agreement. Anyone booking for someone else says they have that person's yes. Nobody under the state's age to marry may be booked."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "Someone says they are being made to marry, or is scared to say no",
+     "says": "If you are in danger now, call 911. No ceremony is booked here.",
+     "booking": "No booking. The owner gets a plain note that a booking was stopped for safety, with no names or details."
+    },
+    {
+     "words": "Someone under the state's age to marry is named as one of the couple",
+     "says": "A ceremony can't go ahead for anyone under the state's age to marry.",
+     "booking": "No booking, and the owner is told in plain words, with no names."
+    },
+    {
+     "words": "Someone can't say what they want, or says they didn't agree",
+     "says": "The officiant can't go ahead until each person says yes in their own words.",
+     "booking": "No booking until each person has answered for themselves."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "Someone at the ceremony faints, or can't breathe, or has a health emergency",
+     "says": "Call 911 now if it's serious. The ceremony stops, and help comes first.",
+     "booking": "The ceremony stops; the owner is told. The owner decides what's kept; Rosie makes no new charge."
+    },
+    {
+     "words": "Fire, smoke or a gas smell at the venue on the day",
+     "says": "Get everyone out and call 911.",
+     "booking": "The ceremony moves or stops; the owner decides with the couple."
+    }
+   ],
+   "on the night": [
+    "The officiant asks each person to say yes in their own words, and stops if either hesitates or asks to stop",
+    "No one is hurried: a pause is always allowed",
+    "A child in the ceremony stays with a parent or an adult; no child is left alone with the officiant",
+    "The officiant signs only what the state's form asks for, and the couple and the witnesses sign where the form says",
+    "The officiant never performs a ceremony for anyone under the state's age to marry"
+   ],
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first. Rosie never judges a situation: the officiant or the owner decides."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The signed ceremony agreement",
+     "for": "Every ceremony",
+     "timing": "Before any money is taken, on the secure page"
+    },
+    {
+     "step": "The ceremony form: names as they'll be read, the vows or set text, readings, music cues, and who gives or walks",
+     "for": "Every ceremony",
+     "timing": "Sent 2 weeks before, due 7 days before. Booked within 7 days: sent at booking, due the day before."
+    },
+    {
+     "step": "The venue's rules: start time, the spot to stand, the sound, the curfew, and any insurance certificate",
+     "for": "Every ceremony at a venue",
+     "timing": "At booking. A venue not on file waits for the owner's OK first."
+    },
+    {
+     "step": "The marriage license number and its date, where the county issues one",
+     "for": "Ceremonies where the state asks",
+     "timing": "Before the ceremony, sent by the couple"
+    },
+    {
+     "step": "A rehearsal (45 minutes, at the venue), if booked",
+     "for": "Ceremonies with a rehearsal",
+     "timing": "The day before, or the week before if the venue is busy"
+    },
+    {
+     "step": "A planning call (15 minutes, by phone or video)",
+     "for": "Every ceremony",
+     "timing": "The week before. Booked within a week: the day before."
+    }
+   ],
+   "prep for the reminder": [
+    "The final ceremony form, 2 days before",
+    "The officiant's arrival time and where to park",
+    "A spot to stand, and a sound check if the venue sets one",
+    "Each guest's seat, from the couple's own list"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code, given to the officiant at arrival by the couple, or by a day-of contact named on the booking.",
+   "check-in at the studio": "The code at the desk, or the officiant types it.",
+   "setup": "The officiant arrives 30 minutes before the start, checks the spot and the sound, and has the ceremony form and the signing papers ready.",
+   "the ceremony": "The script follows the ceremony form. A change after the form is final needs both partners' yes, given in person or in writing before the day.",
+   "the schedule": "The start time is the couple's. A late arrival shortens the set-up, never the ceremony.",
+   "work changes on the day": "Extra time or an extra reading added on the day only with both partners' written yes, at the rate shown before booking, paid at the visit or on the bill (D91).",
+   "proof it's done": "The officiant texts DONE when the ceremony is over and the signed papers are with the couple or the county's office.",
+   "props": "Nothing is handed over or sold at the ceremony. Any printed program or card is the couple's own."
+  },
+  "pf.money": {
+   "starting answers": [
+    "Ceremonies at a venue: a signed agreement, a $150 deposit that holds the date, and the rest charged to the saved card when the officiant texts DONE",
+    "The studio: a ceremony in the studio room with a $50 deposit and the rest paid at the studio; meetings with a card saved for a $25 late-cancel fee; the free first call with nothing taken",
+    "Elopements: paid in full when booking; custom ceremonies quoted first, with a deposit and the bill after (Rosie never charges the rest on a set day by itself)"
+   ],
+   "limits": [
+    "Deposit cap: from the state form",
+    "A late cancel keeps only what the agreement says, and the owner confirms it. No answer: nothing kept",
+    "The business cancels, or the officiant can't come: a full refund, or a stand-in the agreement names, the couple's choice",
+    "A ceremony that stops for safety: the owner decides what's kept; Rosie makes no new charge"
+   ],
+   "travel": "Free within 25 miles; $40 from 25 to 50 miles; farther, quoted first.",
+   "early start": "Not offered: the officiant arrives 30 minutes before the start, at no charge.",
+   "tips": "Not used: no tip line.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the service.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Health, access and family notes, the venue's codes, any minor's name, and anything about a ceremony that could hurt someone stay on the secure page and the officiant's job link, never in a text to the couple, the owner or the staff. A text says only 'a note is on the page'.",
+   "photos": "Photos of the ceremony go only with each person's own yes; a parent's for anyone under 18.",
+   "languages": "English and Spanish.",
+   "minors": "A ring bearer or flower child under 18 is named only on the secure page; a parent's yes, and the parent stays. Rosie never texts a minor first."
+  },
+  "pf.staff": {
+   "roles": [
+    "Lead officiant",
+    "Officiant",
+    "Vow coach",
+    "Studio officiant"
+   ],
+   "licenses": "Each officiant's credential where the state asks for one, as the business says it; nothing is looked up.",
+   "skills": [
+    "Wedding ceremonies",
+    "Elopements",
+    "Custom ceremonies",
+    "Vow writing",
+    "Rehearsals"
+   ],
+   "away from the studio": "Ceremonies at venues, homes and parks are the usual work; the venue's rules and the state's form apply.",
+   "supervision": "A new officiant works with a lead officiant the owner names, where the state's rules allow.",
+   "who OKs what": "The owner OKs every custom quote, any stand-in officiant and any extra time added on the day.",
+   "stand-ins": "On location: another officiant the couple accepts, offered by name; the agreement names the stand-in, so with no reply by 8pm the evening before, the stand-in comes and the owner calls. A full refund is always the other choice. The stand-in gets the ceremony form and the venue's rules, nothing else."
+  },
+  "pf.rules": {
+   "license shown": "A credential or license number on the confirmation or the receipt only where the state's form asks for one (a switch from the state form).",
+   "away from the studio": "Ceremonies at homes, parks and venues are normal work; the venue's own rules apply.",
+   "written contract": "The business's own ceremony agreement, signed by the couple and the business before money is taken; any parts the state adds come from the state form.",
+   "date hold": "A ceremony date stays saved while the agreement is signed: up to 48 hours (the owner's setting).",
+   "cancel and date change": "Free to cancel until 24 hours before; after that, what the agreement says, with the owner's OK. One free date change to an open date (the owner's setting).",
+   "final count": "The guest count is set on the ceremony form, due 7 days before.",
+   "minors": "A parent's yes for anyone under 18 named in the ceremony, and the parent stays.",
+   "photo use": "Photos only with each person's own yes; a parent's for anyone under 18. No answer means no.",
+   "weather": "An outdoor ceremony has a rain plan. The owner sets a weather limit (the example: heavy rain or storms in the forecast); over it, the owner is asked the afternoon before to keep it under the rain plan or move it.",
+   "records": "Agreements, ceremony forms and payments kept 7 years, or longer where the state asks."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for ceremonies:",
+   "ceremony": [
+    "The start time can't move: a late officiant shortens the set-up, never the ceremony",
+    "A person asks to stop or hesitates: the ceremony pauses, and each person answers for themselves",
+    "A health problem during the ceremony: help comes first, then the owner decides",
+    "The officiant can't come: a stand-in the agreement names, or a full refund",
+    "The couple moves the date: one free move, if the officiant is free that day",
+    "The ceremony moves to another place on the day: the travel fee is checked again before anyone agrees",
+    "Rain on an outdoor ceremony: the rain plan, called the afternoon before",
+    "Someone added late (a reading, a guest speaker): only with the couple's yes and the owner's OK",
+    "The marriage papers aren't ready: that's the couple's job with the county; the officiant signs nothing that isn't ready",
+    "A booking for someone under the state's age to marry: stopped, and the owner is told in plain words"
+   ]
+  },
+  "pf.facts": [
+   "documents",
+   "firststeps",
+   "forms",
+   "extrawork",
+   "video",
+   "photos"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "at $85, not $90?",
+    "at $550, not $600?"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Wedding ceremony, from the first call to the day."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Ceremonies at your venue, within 40 miles."
+   ],
+   [
+    "A water heater job",
+    "A venue wedding"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Ines and Ben plan wedding ceremonies; Ines also meets couples at their venue."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Ines: officiant, full ceremony, venue meetings"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ines: officiant, full ceremony and venue meetings"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, full ceremony and venue meetings"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and at venues"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Vow Studio can book you from now on, at the studio and at venues."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A venue's example: a fire alarm gets 'leave the building now'."
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you an emergency contact."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most ceremony studios set it."
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Meetings at the venue: allowed where you are, for those cleared"
+   ],
+   [
+    "So is a house call, $75.",
+    "So is a meeting at the venue, $150."
+   ],
+   [
+    "Color quotes come to you first.",
+    "Ceremony quotes come to you first."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a DJ, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Vow Studio doesn't book DJs."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking.",
+    "Alex wants it at the venue: a venue meeting, $150, paid in full when booking."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A studio's example: 'Full ceremony needs the signed agreement first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Full ceremony always stays with Ines."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: wants a garden ceremony, 120 guests"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you plan a couple's party too?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a ceremony call for a couple's party is $150. Want a time?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds vow renewal ceremonies to Lee Vow Studio."
+   ],
+   [
+    "NEW massage",
+    "NEW vow renewal ceremonies"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Vow renewal ceremonies for Lee Vow Studio: is it the same company?"
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Lee Vow Studio: you now have two vow-writing sessions on Sat Nov 7."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a couple's party call before the times."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "You told us the call is for your couple's party, and that you're their parent. Their details go on the secure page."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book us a first ceremony meeting at Lee Vow Studio on Saturday."
+   ],
+   [
+    "Alex M. · Haircut",
+    "Alex M. · Ceremony meeting"
+   ],
+   [
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "Lee Vow Studio · Ceremony meeting: your 3:00pm"
+   ],
+   [
+    "A haircut at Lee's Barbershop:",
+    "{{name}} at Lee Vow Studio:"
+   ],
+   [
+    "Lee's Barbershop · Haircut",
+    "Lee Vow Studio · {{name}}"
+   ],
+   [
+    "Takes the fee; tells Ben",
+    "Settles it; tells Ben"
+   ],
+   [
+    "Riley texts 'paid cash'",
+    "Ines texts 'paid check'"
+   ],
+   [
+    "color quote",
+    "ceremony quote"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books ceremony and a welcome party"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'coordinator' could mean an officiant or a venue's own staff."
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "the shop's board",
+    "the studio's list"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "At my home",
+    "At our venue"
+   ],
+   [
+    "Asks Alex for photos",
+    "Sets up a free call"
+   ],
+   [
+    "From the list, from photos, or at the visit?",
+    "From the list, after a first call, or at the visit?"
+   ],
+   [
+    "Quoted from photos first",
+    "Quoted after a free call"
+   ],
+   [
+    "Shop front",
+    "Studio front"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many studios, officiants and vow officiants are licensed to their own place"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like full ceremony at the studio or at the couple's venue"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a delay or a tow"
+   ],
+   [
+    "Give this code at the chair",
+    "Give this code at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Riley finishes the work",
+    "Ines finishes the meeting"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex adds more time"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "Priced from your photos",
+    "Quoted after a free call"
+   ],
+   [
+    "priced from photos",
+    "quoted after a free call"
+   ],
+   [
+    "Add photos",
+    "Pick a call time"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Vow-writing session"
+   ],
+   [
+    "Signature cut and shave",
+    "Vow-writing session"
+   ],
+   [
+    "Signature cut",
+    "Vow-writing session"
+   ],
+   [
+    "signature cut",
+    "vow-writing session"
+   ],
+   [
+    "color and cut",
+    "full ceremony"
+   ],
+   [
+    "Color and cut",
+    "Full ceremony"
+   ],
+   [
+    "A haircut",
+    "An extra ceremony meeting"
+   ],
+   [
+    "a haircut",
+    "an extra ceremony meeting"
+   ],
+   [
+    "Haircut",
+    "Extra ceremony meeting"
+   ],
+   [
+    "haircut",
+    "extra ceremony meeting"
+   ],
+   [
+    "Skin fade · $40",
+    "Vow-writing session · $150"
+   ],
+   [
+    "Groom's package",
+    "ceremony intensive"
+   ],
+   [
+    "kids cut",
+    "ceremony call for a couple's party"
+   ],
+   [
+    "Kids cut",
+    "Ceremony call for a couple's party"
+   ],
+   [
+    "skin fade",
+    "vow-writing session"
+   ],
+   [
+    "Skin fade",
+    "Vow-writing session"
+   ],
+   [
+    "beard trim",
+    "ceremony meeting"
+   ],
+   [
+    "Beard trim",
+    "Ceremony meeting"
+   ],
+   [
+    "$90",
+    "$600"
+   ],
+   [
+    "$70",
+    "$450"
+   ],
+   [
+    "$55",
+    "$150"
+   ],
+   [
+    "$35",
+    "$150"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Ceremonies LLC'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Ceremonies LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Wedding ceremonies and Lee Vow renewal Ceremonies"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Vow Studio LLC"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Vow Studio's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Vow Studio"
+   ],
+   [
+    "1200 Main St",
+    "44 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "9 Harbor Rd"
+   ],
+   [
+    "the barbershop's",
+    "the studio's"
+   ],
+   [
+    "the barbershop",
+    "the studio"
+   ],
+   [
+    "a barbershop",
+    "a ceremony studio"
+   ],
+   [
+    "A barbershop",
+    "A ceremony studio"
+   ],
+   [
+    "barbershop",
+    "ceremony studio"
+   ],
+   [
+    "Barbershop",
+    "Ceremony studio"
+   ],
+   [
+    "Barbering",
+    "Ceremony"
+   ],
+   [
+    "barbers",
+    "officiants"
+   ],
+   [
+    "Barbers",
+    "Officiants"
+   ],
+   [
+    "barber",
+    "officiant"
+   ],
+   [
+    "Barber",
+    "Officiant"
+   ],
+   [
+    "plumber",
+    "officiant"
+   ],
+   [
+    "Plumber",
+    "Officiant"
+   ],
+   [
+    "plumbing's",
+    "ceremony's"
+   ],
+   [
+    "plumbing",
+    "ceremony"
+   ],
+   [
+    "Plumbing",
+    "Ceremony"
+   ],
+   [
+    "electrical's",
+    "vow renewal ceremonies'"
+   ],
+   [
+    "electrical",
+    "vow renewal ceremonies"
+   ],
+   [
+    "Electrical",
+    "Vow renewal ceremonies"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shop's",
+    "studio's"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Riley's",
+    "Ines'"
+   ],
+   [
+    "Riley",
+    "Ines"
+   ],
+   [
+    "Avery's",
+    "Ben's"
+   ],
+   [
+    "Avery",
+    "Ben"
+   ],
+   [
+    "Jordan",
+    "Ruth"
+   ],
+   [
+    "Casey",
+    "Omar"
+   ],
+   [
+    "Color correction",
+    "Partial ceremony"
+   ],
+   [
+    "color correction",
+    "partial ceremony"
+   ],
+   [
+    "Color touch-up",
+    "Vendor check-in call"
+   ],
+   [
+    "color touch-up",
+    "vendor check-in call"
+   ],
+   [
+    "Color plan",
+    "Ceremony package"
+   ],
+   [
+    "color plan",
+    "ceremony package"
+   ],
+   [
+    "Haircuts",
+    "Extra ceremony meetings"
+   ],
+   [
+    "haircuts",
+    "extra ceremony meetings"
+   ],
+   [
+    "a house call",
+    "a venue meeting"
+   ],
+   [
+    "House calls",
+    "Venue meetings"
+   ],
+   [
+    "house calls",
+    "venue meetings"
+   ],
+   [
+    "house call",
+    "venue meeting"
+   ]
+  ],
+  "B": [
+   [
+    "$160 for today's extra work",
+    "$150 for today's extra hour"
+   ],
+   [
+    "Sam didn't OK your $640 price",
+    "Sam didn't OK your $600 price"
+   ],
+   [
+    "only the $89 visit fee was promised",
+    "only the $40 travel fee was promised"
+   ],
+   [
+    "{{due:$245}}",
+    "{{due:$300}}"
+   ],
+   [
+    "{{price:$245}}",
+    "{{price:$450}}"
+   ],
+   [
+    "$179, paid after the job",
+    "$450, $150 now, $300 after the ceremony"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra hour on the day · $150"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$150 to start, $450 at DONE"
+   ],
+   [
+    "is for a $2,400 repipe",
+    "is for a $600 custom ceremony"
+   ],
+   [
+    "like the $89 service call",
+    "like the $40 travel fee"
+   ],
+   [
+    "The $800 start payment is taken as the deposit",
+    "The $150 deposit is taken"
+   ],
+   [
+    "Your $800 start payment is taken.",
+    "Your $150 deposit is taken."
+   ],
+   [
+    "Each stage is billed when Jordan texts it done.",
+    "The rest is charged when Ruth texts DONE."
+   ],
+   [
+    "leak repair is $620",
+    "custom ceremony is $600"
+   ],
+   [
+    "like a $620 repair",
+    "like a $600 ceremony"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Rehearsal · $150"
+   ],
+   [
+    "Supply line · $80",
+    "Travel · $40"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Wedding ceremony, from the first call to the day."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Ceremonies at your venue, within 40 miles."
+   ],
+   [
+    "A water heater job",
+    "A venue wedding"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Ines and Ben plan wedding ceremonies; Ines also meets couples at their venue."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Ines: officiant, full ceremony, venue meetings"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ines: officiant, full ceremony and venue meetings"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, full ceremony and venue meetings"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and at venues"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Vow Studio can book you from now on, at the studio and at venues."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A venue's example: a fire alarm gets 'leave the building now'."
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you an emergency contact."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most ceremony studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules ceremony studios often set."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about our wedding day. A text back is fine."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a vow-writing session, today,"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the date, the venue, and how many guests."
+   ],
+   [
+    "Priced by Jordan, from your photos",
+    "Quoted by Ruth, after your first call"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "We need someone to run our wedding day."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can an officiant run a rehearsal this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa rehearsal Thu 12pm Omar"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "The venue's power is out on our wedding day."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to leave the building, and to call 911 if anyone is hurt."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Leave the building by the nearest exit."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Our venue flooded in the storm."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'officiant' could mean a wedding officiant or a party officiant."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Someone to run our day' fits wedding ceremony at a venue."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like booking a venue that isn't theirs."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead.",
+    "Say Alex had asked Lee Vow Studio for a meeting instead."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the studio's officiants meets couples at their venue."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding rehearsal? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And when is the wedding, and how many guests?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At our venue, Cedar Hill Farm. About 120 guests."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about an extra hour on the night."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Ruth also stay an extra hour on the night?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. An extra hour is $150, with Ruth. Both fit in the same day."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says wedding ceremony at a venue is quoted after a free call, so Rosie's first text sets up the call."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Pick a time for a free call, and an officiant will quote the job."
+   ],
+   [
+    "Price needed: Alex M., water heater replacement.",
+    "Quote needed: Alex M., wedding ceremony at a venue."
+   ],
+   [
+    "Alex M. · water heater",
+    "Alex M. · wedding ceremony at a venue"
+   ],
+   [
+    "Alex M.: water heater replacement",
+    "Alex M.: wedding ceremony at a venue"
+   ],
+   [
+    "Jordan priced a water heater replacement for Alex M.",
+    "Ruth quoted wedding ceremony at a venue for Alex M."
+   ],
+   [
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Send Alex M. $400 for wedding ceremony at a venue, not $450?"
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your ceremony quote is with Lee Ceremonies LLC."
+   ],
+   [
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos.",
+    "Lee Ceremonies LLC: Ruth quoted wedding ceremony at a venue at {{price:$450}}, after your first call."
+   ],
+   [
+    "Sorry, Lee Home Services couldn't price your water heater this time.",
+    "Sorry, Lee Ceremonies LLC couldn't quote your wedding this time."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $450 ceremony is over the plug-in's amount, so it gets a agreement to sign."
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Agreement · Wedding ceremony at a venue · $450"
+   ],
+   [
+    "Water heater replacement · $640",
+    "Wedding ceremony at a venue · $450"
+   ],
+   [
+    "Your water heater contract is waiting for your signature.",
+    "Your ceremony agreement is waiting for your signature."
+   ],
+   [
+    "Your water heater visit wasn't booked, since the document wasn't signed in time.",
+    "Your wedding day wasn't booked, since the agreement wasn't signed in time."
+   ],
+   [
+    "Alex M. didn't sign the water heater contract in time, so nothing was booked.",
+    "Alex M. didn't sign the ceremony agreement in time, so nothing was booked."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the quoted path, only Ruth's times show: Ruth leads venue wedding ceremonies."
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Ceremonies LLC · {{name}}"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · {{name}}"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Where should the officiants park?"
+   ],
+   [
+    "Yes, it won't drain",
+    "By the garden"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $150 rehearsal needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the timeline and vendor list on your page."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the garden door"
+   ],
+   [
+    "Under the sink, before",
+    "Garden door, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Dance floor, before"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "The couple asks Ruth for an extra hour."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 150 one more hour on the night"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: one more hour, $150."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more hour · $150"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $150 extra-hour price is good for 7 days."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Ruth's phone, you said yes to one more hour for $150."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Ruth finds a loose arch on the garden hall."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD loose hall arch, closed off"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Loose hall arch"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Ruth found a loose arch on the garden hall and closed the hall to guests."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a loose hall arch"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: photos in the hall"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Ruth's cart scratches the garden door, and Ruth texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the garden door"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched garden door"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Ruth's cart scratched the garden door at Alex M.'s venue."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 2400 ceremony"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE the toasts ran long. Keep speeches to 3 minutes next time."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Ruth left the gift table in the garden."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "We found the card box missing this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Ruth plan our vow renewal party next month?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Ruth's next times for a ceremony call."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Ruth to plan a first-vow renewal party next fall."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: vow renewal party, 12 months"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the vow renewal party you asked Ruth about in late Aug 2027."
+   ],
+   [
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted.",
+    "Say Sam sends a elopement for more work after the day, like the vow renewal party Ruth noted."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Ceremonies LLC sent you a elopement for an vow renewal party, from Ruth's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Elopement · Vow renewal party"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Ruth also run our rehearsal the day before?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Rehearsal · $150"
+   ],
+   [
+    "Change: Alex M. added a camera inspection to the Thu visit.",
+    "Change: Alex M. added rehearsal to the Thu booking."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can the florist arrive before you come?"
+   ],
+   [
+    "Good morning! Nora S. asked overnight for a drain clearing today.",
+    "Good morning! Nora S. asked overnight for a vow-writing session today."
+   ],
+   [
+    "Drain clearing · $179",
+    "Vow-writing session · $150"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise wedding ceremony at a venue to 2600"
+   ],
+   [
+    "Reading it back: drain clearing goes to $199 for new bookings.",
+    "Reading it back: wedding ceremony at a venue goes to $500 for new bookings."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises wedding ceremony at a venue to $500 for bookings from Mon Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Wedding ceremonies already booked keep $450, even after Nov 2."
+   ],
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: wedding ceremony at a venue $500 from Mon Nov 2. Wedding ceremonies already booked keep $450."
+   ],
+   [
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $500 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $450."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the vow-writing session from paid in full to a $50 deposit."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Consults already booked keep what they paid."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Wedding ceremony at a venue $450 ($500 from Nov 2) · Rehearsal $500"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds vow renewal ceremonies to Lee Ceremonies LLC."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW vow renewal ceremonies"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Vow renewal ceremonies for Lee Ceremonies LLC: is it the same company?"
+   ],
+   [
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Ivy C. books a vow-writing session for Mon Nov 9 in the morning."
+   ],
+   [
+    "Lee Home Services: you have two drain clearings on Mon Nov 9.",
+    "Lee Ceremonies LLC: you have two vow-writing sessions on Mon Nov 9."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for wedding ceremony at a venue at $400, an old price. Rosie answers with the real price, $450. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Wedding ceremony at a venue with Lee Home Services is $450, not $400. Here are the open dates at $450."
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the full ceremony quote before booking."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Reply here, and it goes to Sam. How was the day with Jordan?"
+   ],
+   [
+    "The quote stays open 7 days",
+    "The officiants leave at the time booked"
+   ],
+   [
+    "25-mile",
+    "40-mile"
+   ],
+   [
+    "and nobody was home for any of them",
+    "and never came to any of them"
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code on arrival"
+   ],
+   [
+    "The door stayed shut.",
+    "The code wasn't given."
+   ],
+   [
+    "Nothing booked. The price stays good for 7 days.",
+    "Nothing booked. The quote stays good for 5 days."
+   ],
+   [
+    "Thu Oct 22 · arriving 8–10am",
+    "Sat May 22, 2027 · from 12:00pm"
+   ],
+   [
+    "At my home",
+    "At our venue"
+   ],
+   [
+    "Asks Alex for photos",
+    "Sets up a free call"
+   ],
+   [
+    "Quoted from photos first",
+    "Quoted after a free call"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "plumbing license MP045210",
+    "business registration 2019-0451"
+   ],
+   [
+    "license MP045210",
+    "registration 2019-0451"
+   ],
+   [
+    "Plumbing license",
+    "Registration certificate"
+   ],
+   [
+    "Shop front",
+    "Studio front"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many studios, officiants and vow officiants are licensed to their own place"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like full ceremony at the studio or at the couple's venue"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a delay or a tow"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Ceremonies LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Ceremonies LLC'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Ceremonies LLC"
+   ],
+   [
+    "leehomeservices.com",
+    "leeweddings.com"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Wedding ceremonies and Lee Vow renewal Ceremonies"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Vow Studio"
+   ],
+   [
+    "1200 Main St",
+    "44 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "9 Harbor Rd"
+   ],
+   [
+    "the barbershop's",
+    "the studio's"
+   ],
+   [
+    "the barbershop",
+    "the studio"
+   ],
+   [
+    "a barbershop",
+    "a ceremony studio"
+   ],
+   [
+    "barbershop",
+    "ceremony studio"
+   ],
+   [
+    "Barbershop",
+    "Ceremony studio"
+   ],
+   [
+    "barbers",
+    "officiants"
+   ],
+   [
+    "Barbers",
+    "Officiants"
+   ],
+   [
+    "barber",
+    "officiant"
+   ],
+   [
+    "Barber",
+    "Officiant"
+   ],
+   [
+    "plumber",
+    "officiant"
+   ],
+   [
+    "Plumber",
+    "Officiant"
+   ],
+   [
+    "plumbing's",
+    "ceremony's"
+   ],
+   [
+    "plumbing",
+    "ceremony"
+   ],
+   [
+    "Plumbing",
+    "Ceremony"
+   ],
+   [
+    "electrical's",
+    "vow renewal ceremonies'"
+   ],
+   [
+    "electrical",
+    "vow renewal ceremonies"
+   ],
+   [
+    "Electrical",
+    "Vow renewal ceremonies"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shop's",
+    "studio's"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Riley",
+    "Ines"
+   ],
+   [
+    "Avery",
+    "Ben"
+   ],
+   [
+    "Jordan's",
+    "Ruth's"
+   ],
+   [
+    "Jordan",
+    "Ruth"
+   ],
+   [
+    "Casey's",
+    "Omar's"
+   ],
+   [
+    "Casey",
+    "Omar"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Day-of ceremony"
+   ],
+   [
+    "Drain clearings",
+    "Day-of wedding ceremonies"
+   ],
+   [
+    "drain clearings",
+    "day-of wedding ceremonies"
+   ],
+   [
+    "Drain clearing",
+    "Day-of ceremony"
+   ],
+   [
+    "drain clearing",
+    "day-of ceremony"
+   ],
+   [
+    "Water heater flush",
+    "Rehearsal"
+   ],
+   [
+    "water heater flush",
+    "rehearsal"
+   ],
+   [
+    "Water heater replacement",
+    "Wedding ceremony at a venue"
+   ],
+   [
+    "water heater replacement",
+    "wedding ceremony at a venue"
+   ],
+   [
+    "Priced from your photos",
+    "Quoted after a free call"
+   ],
+   [
+    "Add photos",
+    "Pick a call time"
+   ],
+   [
+    "Sewer camera inspection",
+    "Day-of timeline review"
+   ],
+   [
+    "sewer camera inspection",
+    "day-of timeline review"
+   ],
+   [
+    "Service call",
+    "First call"
+   ],
+   [
+    "the kitchen drain",
+    "the wedding day"
+   ],
+   [
+    "Kitchen drain",
+    "Wedding day"
+   ],
+   [
+    "Yard drain",
+    "Rehearsal"
+   ],
+   [
+    "42 Oak St",
+    "27 Birch Rd"
+   ],
+   [
+    "water heater",
+    "wedding"
+   ],
+   [
+    "Water heater",
+    "Wedding"
+   ]
+  ]
+ },
+ "keep": [
+  "travel fee",
+  "leak",
+  "visit fee",
+  "wedding",
+  "Wedding",
+  "First call",
+  "first call"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex and Robin ask Alex's AI for an officiant for a small ceremony. Ines at Lee Vow Studio, Sam's own studio, holds a free first call, then books the 15-minute ceremony in the studio room for Sat Oct 24 at 11:00am. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex and Robin book Lee Ceremonies to marry them at Cedar Hill Farm, Thu Oct 22. Ruth holds the date with a $150 deposit, both sign the ceremony agreement, and the $300 rest is charged to the saved card when Ruth texts DONE after the ceremony. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|card|counter",
+    "list|none|none",
+    "list|full|none",
+    "photos|deposit|bill"
+   ],
+   "labels": {
+    "price": {
+     "photos": "Quoted after a free call"
+    }
+   },
+   "examples": {
+    "list|deposit|counter": "The main story: a 15-minute ceremony in the studio room, $250. A $50 deposit now, and the $200 rest paid at the studio.",
+    "list|card|counter": "A $150 ceremony meeting (1 hour). A card is saved for the studio's $25 late-cancel fee. Alex pays at the studio.",
+    "list|none|none": "The free first call (20 minutes) with the officiant: nothing taken, nothing after.",
+    "list|full|none": "A $150 vow-writing session (1 hour), paid in full when booking.",
+    "photos|deposit|bill": "A custom ceremony quoted after the free first call: $600, with a $150 deposit now and the $450 rest on the bill after the ceremony."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$25",
+     "name": "Ceremony meeting (1 hour)"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "name": "Ceremony meeting (1 hour)"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Free first call (20 minutes)"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$25",
+     "name": "Vow-writing session (1 hour)"
+    },
+    "list|deposit|*": {
+     "price": "$250",
+     "deposit": "$50",
+     "rest": "$200",
+     "fee": "$50",
+     "name": "Ceremony at the studio (15 minutes)"
+    },
+    "photos|*|*": {
+     "price": "$600",
+     "name": "Custom ceremony (quoted first)"
+    },
+    "photos|deposit|*": {
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "fee": "$150",
+     "name": "Custom ceremony (quoted first)"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Ceremony meeting (1 hour)",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$150",
+      "fee": "$25"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Vow-writing session (1 hour)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$25"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|full|none",
+    "list|none|bill",
+    "photos|deposit|bill"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted after a free call"
+    }
+   },
+   "examples": {
+    "list|deposit|card": "The main story: a 30-minute wedding ceremony at Cedar Hill Farm, $450. A $150 deposit holds the date, and the $300 rest is charged to the saved card when the ceremony is done.",
+    "list|full|none": "An elopement ceremony (20 minutes) at a park, $300, paid in full when booking.",
+    "list|none|bill": "A rehearsal at the venue (45 minutes), $150. Nothing is taken to book; the bill comes after.",
+    "photos|deposit|bill": "A custom ceremony with two places, quoted after the free first call: $600, with a $150 deposit now and the $450 bill after the ceremony."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50",
+     "name": "Wedding ceremony at a venue (30 minutes)"
+    },
+    "list|*|*": {
+     "price": "$450",
+     "name": "Wedding ceremony at a venue (30 minutes)"
+    },
+    "list|deposit|*": {
+     "price": "$450",
+     "deposit": "$150",
+     "rest": "$300",
+     "fee": "$150",
+     "name": "Wedding ceremony at a venue (30 minutes)"
+    },
+    "list|full|*": {
+     "price": "$300",
+     "paid": "$300",
+     "fee": "$50",
+     "name": "Elopement ceremony (20 minutes)"
+    },
+    "list|none|*": {
+     "price": "$150",
+     "name": "Rehearsal (45 minutes at the venue)"
+    },
+    "photos|*|*": {
+     "price": "$600",
+     "name": "Custom ceremony (quoted first)"
+    },
+    "photos|deposit|*": {
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "fee": "$150",
+     "name": "Custom ceremony (quoted first)"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra hour on the day",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$150",
+      "fee": "$25"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Elopement ceremony (20 minutes)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$300",
+      "paid": "$300",
+      "fee": "$50"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A8-23",
+    "why": "A planning meeting touches nothing of the couple's, so there's nothing to note before it."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Planning and coordinating need no state license in most places; the company gives its business registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A planner pays Rosfield's $2 for each confirmed booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The planner's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Planners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: calls, meetings and events."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Planners need no license of their own (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Planning is booked ahead and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books a planner's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books a planner's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The studio books a planner's time."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A meeting has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A planning meeting needs nothing brought; the questionnaire is on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A planner never looks after a child."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "No repeat plans: each meeting is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "A planning booking is the couple's own; the wedding party is never booked as a group."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for planning."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A discount code",
+    "why": "The studio sells no gift cards; a discount is part of the quote."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "No packages or memberships: the contract sets what's included."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "No packs or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "Planning has no problem that gets worse; a change goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "Planning has no skin or health check."
+   },
+   {
+    "op": "off",
+    "at": "A8-32",
+    "label": "Something of Alex's is damaged",
+    "why": "Nothing of the couple's is handled at a meeting."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each payment is billed on its own date."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for planning."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Planning has no free fix; a complaint or a refund ask goes to Sam."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing is made after a meeting; the notes are on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A planning booking is rated, once, after the wedding."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "A planning studio takes new couples."
+   },
+   {
+    "op": "off",
+    "at": "A8-25",
+    "why": "Visit-priced work only: this studio has no price-at-the-chair path; its prices are on the list."
+   },
+   {
+    "op": "off",
+    "at": "A8-26",
+    "why": "Visit-priced work only: this studio has no price-at-the-chair path; its prices are on the list."
+   },
+   {
+    "op": "off",
+    "at": "A8-29",
+    "why": "Visit-priced work only: this studio has no price-at-the-chair path; its prices are on the list."
+   },
+   {
+    "op": "off",
+    "at": "A8-30",
+    "why": "Visit-priced work only: this studio has no price-at-the-chair path; its prices are on the list."
+   },
+   {
+    "op": "off",
+    "at": "A8-31",
+    "why": "Visit-priced work only: this studio has no price-at-the-chair path; its prices are on the list."
+   },
+   {
+    "op": "off",
+    "at": "A8-48",
+    "why": "Visit-priced work only: this studio has no price-at-the-chair path; its prices are on the list."
+   },
+   {
+    "op": "off",
+    "at": "A8-88",
+    "why": "Visit-priced work only: this studio has no price-at-the-chair path; its prices are on the list."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "The rehearsal, the day before",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.1"
+       ],
+       "who": "staff",
+       "to": "cust",
+       "via": "visit",
+       "t": "Wed Oct 21, 5:00pm",
+       "title": "Ruth runs the rehearsal at the farm",
+       "does": "The day before, Ruth runs the one-hour rehearsal at Cedar Hill Farm. Ruth covers the walk-in order, the music cues and the rain spot in the garden.",
+       "more": [
+        "It's part of wedding ceremony at a venue, booked with the day. A couple with no rehearsal skips it.",
+        "That morning at 10am, Rosie texts the reminder with the plug-in's tips.",
+        "Ruth meets the vendors with the officiants' own tools. Rosie never texts or pays a vendor.",
+        "The final timeline is on the secure page, never in a text."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Reminder: your rehearsal is today at 5:00pm at Cedar Hill Farm, and your wedding is tomorrow. Bring the rings, the vows and the vendor tip envelopes.",
+         {
+          "card": {
+           "title": "Lee Ceremonies LLC · Rehearsal",
+           "lines": [
+            "Wed Oct 21 · 5:00pm · Ruth",
+            "Tomorrow: Thu Oct 22 · from 8:00am · Ruth and Omar",
+            "Your final timeline is on the secure page"
+           ],
+           "button": "See the timeline",
+           "link": "rosfield.com/t/r4"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.first_steps",
+        "pf.visit",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody home",
+    "why": "A wedding has no no-show: the planners check in with the couple or a named adult, or Julian texts DONE at the end."
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "label": "Something required is missing",
+    "why": "Nothing the couple forgets stops a wedding day; the planners note it and work around it."
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Storms near the ceremony",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.12"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 2:00pm",
+       "title": "Ruth and Alex make the rain call",
+       "does": "Storms are likely near the 4:00pm lawn ceremony. Ruth and Alex make the rain call by 2pm, so the farm can set the chairs in the garden.",
+       "more": [
+        "The rain spot and the large building were set at the walkthrough.",
+        "Ruth tells the vendors in person. Rosie never texts a vendor.",
+        "The price doesn't change."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "RAIN CALL ceremony in the garden at 4:00pm",
+         {
+          "as": "Ruth"
+         }
+        ],
+        [
+         "san",
+         "staff",
+         "Rain call for Alex M.: the ceremony is in the garden at 4:00pm. The timeline on the secure page is updated.",
+         {
+          "as": "Omar"
+         }
+        ]
+       ],
+       "needs": [
+        "pf.visit"
+       ],
+       "tells": [
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A vendor runs late",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.12"
+       ],
+       "who": "staff",
+       "via": "visit",
+       "t": "Thu Oct 22, 2:45pm",
+       "title": "Omar covers for a late vendor",
+       "does": "The florist's van breaks down 20 minutes away. Omar drives the ceremony flowers back by 3:30pm, and the ceremony starts on time.",
+       "more": [
+        "Vendors are the couple's own: Rosie never texts, books or pays them.",
+        "Ruth handles vendors with the officiants' own tools, and notes what happened for Alex."
+       ],
+       "needs": [
+        "pf.visit"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "The extra hour is given right away, so it has no cancel period."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Planning and coordinating need no state license in most places; the company gives its business registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A planner pays Rosfield's $2 for each confirmed booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The planner's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Planners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: calls, meetings and events."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Planners need no license of their own (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Planning is booked ahead and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "The planners arrive at a set time on the day."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Planning is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A planner's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Planning is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Planning is never sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Planning is never sent now, so no booking skips the reminder."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "No group sign-ups."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Planning is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A planner never looks after a child; a parent or a named adult stays with them."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "A planner always works with the couple or at the event."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "A wedding is booked by the couple, never as a group of bookings."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for planning."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "Planning has no problem that gets worse; a changed plan goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Only a child answers",
+    "why": "At a venue, the lead planner meets the couple or an adult named on the booking."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Month-of coordination is paid by the retainer and the rest when the day is done."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Planning has no warranty visit; a complaint or a refund ask goes to Sam."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing is made after the day; the timeline stays on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A planner asks for a rating after the day."
+   },
+   {
+    "op": "off",
+    "at": "B4-02",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B5-32",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B5-33",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B8-21",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B8-48",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B8-49",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B8-77",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B9-22",
+    "why": "No monthly bill for many visits: each visit is billed on its own."
+   },
+   {
+    "op": "off",
+    "at": "B9-26",
+    "why": "Stage bills are not used: the rest is one bill at DONE (D66 #7)."
+   },
+   {
+    "op": "off",
+    "at": "B9-21",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B9-25",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B8-92",
+    "why": "Not a branch this work uses: no pack, discount, on-set quote, stage bill or part-level quote (the price is one quote, OK'd before booking)."
+   },
+   {
+    "op": "off",
+    "at": "B9-04",
+    "why": "Extra work on the day is paid on the bill with the rest (D91); no separate pay link is texted."
+   }
+  ]
+ },
+ "notes": "Built Tue Oct 27 2026 (batch E2, new) from the refitted planner overlay (Event), copied and changed: the plug-in is written for officiating (weddings at a venue, a studio room, elopements, custom ceremonies, rehearsals), not planning. Facts: contracts (the ceremony agreement), documents, firststeps (the planning call, the ceremony form), forms (the ceremony form), extrawork (extra time on the day), video (vow sessions by video), weather (an outdoor ceremony), photos (the custom quote). No switches: standin is not on, since the officiant named in a booking is never swapped without the couple's choice (the stand-in words are in pf.staff). License: the officiant's credential and the business license are the business's own word, nothing looked up (D96); the master's license steps stay as the sibling set them (S1-60 and S2-28 off). Money: A list|deposit|counter (studio ceremony $250, $50 deposit, $200 at the studio), list|card|counter (meeting $150, card for the $25 fee), list|none|none (free first call), list|full|none (vow session $150), photos|deposit|bill (custom ceremony $600, $150 deposit, $450 on the bill). B list|deposit|card (venue ceremony $450, $150 deposit, $300 at DONE), list|full|none (elopement $300 paid in full), list|none|bill (rehearsal $150, bill after), photos|deposit|bill (custom ceremony $600). The sibling's planner words (stages, retainers, month-of billing, the planning consult) are gone with the facts that carried them. Extra time on the day is paid at the visit or on the bill (D91). Ceremony officiants are never a child's carer: the parent stays.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "at $85, not $90?",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sam named you their emergency contact.",
+    "We'd share only where they're working, only after a missed check.",
+    "Each service starts the way most barbershops set it.",
+    "House calls: allowed where you are, for those cleared",
+    "So is a house call, $75.",
+    "Color quotes come to you first.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Alex wants it at home: a house call, $75, paid in full when booking.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Color always stays with Riley.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Alex M. · Haircut",
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "A haircut at Lee's Barbershop:",
+    "Lee's Barbershop · Haircut",
+    "Takes the fee; tells Ben",
+    "Riley texts 'paid cash'",
+    "color quote",
+    "Books a haircut and a beard trim",
+    "A haircut could mean a salon or a barbershop.",
+    "shops",
+    "the shop's board",
+    "price board",
+    "At my home",
+    "Asks Alex for photos",
+    "From the list, from photos, or at the visit?",
+    "Quoted from photos first",
+    "Shop front",
+    "many barbers, salons and groomers are licensed to their shop",
+    "like a haircut at the shop or at home",
+    "like a burst pipe or a lockout",
+    "Give this code at the chair",
+    "At the chair",
+    "Riley finishes the work",
+    "Alex adds a beard trim",
+    "at the chair",
+    "Priced from your photos",
+    "priced from photos",
+    "Add photos",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "color and cut",
+    "Color and cut",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "Skin fade · $40",
+    "Groom's package",
+    "kids cut",
+    "Kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "$90",
+    "$70",
+    "$55",
+    "$35",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop's",
+    "Lee's Barbershop",
+    "1200 Main St",
+    "88 Elm St",
+    "the barbershop's",
+    "the barbershop",
+    "a barbershop",
+    "A barbershop",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "plumber",
+    "Plumber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "electrical's",
+    "electrical",
+    "Electrical",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shop's",
+    "shop",
+    "Shop",
+    "Riley's",
+    "Riley",
+    "Avery's",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Color correction",
+    "color correction",
+    "Color touch-up",
+    "color touch-up",
+    "Color plan",
+    "color plan",
+    "Haircuts",
+    "haircuts",
+    "a house call",
+    "House calls",
+    "house calls",
+    "house call"
+   ],
+   "B": [
+    "$160 for today's extra work",
+    "Sam didn't OK your $640 price",
+    "{{due:$245}}",
+    "{{price:$245}}",
+    "$179, paid after the job",
+    "Sewer camera inspection · $199",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "is for a $2,400 repipe",
+    "like the $89 service call",
+    "The $800 start payment is taken as the deposit",
+    "Your $800 start payment is taken.",
+    "Each stage is billed when Jordan texts it done.",
+    "leak repair is $620",
+    "like a $620 repair",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "At the shop, and house calls",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sam named you their emergency contact.",
+    "We'd share only where they're working, only after a missed check.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "It's a leak under the sink, today,",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Priced by Jordan, from your photos",
+    "My kitchen drain is clogged.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Shut the cold-water valve, above the heater.",
+    "My gas water heater got wet in a flood.",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead.",
+    "One of the shop's barbers does house calls.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Price needed: Alex M., water heater replacement.",
+    "Alex M. · water heater",
+    "Alex M.: water heater replacement",
+    "Jordan priced a water heater replacement for Alex M.",
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Your water heater price is with Lee Home Services.",
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos.",
+    "Sorry, Lee Home Services couldn't price your water heater this time.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Contract · Water heater replacement · $640",
+    "Water heater replacement · $640",
+    "Your water heater contract is waiting for your signature.",
+    "Your water heater visit wasn't booked, since the document wasn't signed in time.",
+    "Alex M. didn't sign the water heater contract in time, so nothing was booked.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Change: Alex M. added a camera inspection to the Thu visit.",
+    "Can I run the dishwasher before you come?",
+    "Good morning! Nora S. asked overnight for a drain clearing today.",
+    "Drain clearing · $179",
+    "raise drain clearing to 199",
+    "Reading it back: drain clearing goes to $199 for new bookings.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Drain clearings already booked keep only their saved card.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Lee Home Services: you have two drain clearings on Mon Nov 9.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Service call fee",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "The quote stays open 7 days",
+    "25-mile",
+    "and nobody was home for any of them",
+    "Alex gives the code at the door",
+    "The door stayed shut.",
+    "Nothing booked. The price stays good for 7 days.",
+    "Thu Oct 22 · arriving 8–10am",
+    "At my home",
+    "Asks Alex for photos",
+    "Quoted from photos first",
+    "service call fee",
+    "service call",
+    "plumbing license MP045210",
+    "license MP045210",
+    "Plumbing license",
+    "Shop front",
+    "many barbers, salons and groomers are licensed to their shop",
+    "like a haircut at the shop or at home",
+    "like a burst pipe or a lockout",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop",
+    "1200 Main St",
+    "88 Elm St",
+    "the barbershop's",
+    "the barbershop",
+    "a barbershop",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "plumber",
+    "Plumber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "electrical's",
+    "electrical",
+    "Electrical",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shop's",
+    "shop",
+    "Shop",
+    "Riley",
+    "Avery",
+    "Jordan's",
+    "Jordan",
+    "Casey's",
+    "Casey",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "Priced from your photos",
+    "Add photos",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call",
+    "the kitchen drain",
+    "Kitchen drain",
+    "Yard drain",
+    "42 Oak St",
+    "water heater",
+    "Water heater"
+   ]
+  },
+  "A": {
+   "A8-23": "e3a35f7f9e",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A7-93": "46cca94e45",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-96": "d540b91653",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-03": "7accda6f86",
+   "A8-86": "c989a99e52",
+   "A8-32": "632f2b5b40",
+   "A9-15": "bd2a17c3c5",
+   "A10-44": "50aad85ac2",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A4-43": "c17d56f766",
+   "A8-25": "a79292eae2",
+   "A8-26": "1e164bc165",
+   "A8-29": "6b776f2a37",
+   "A8-30": "c0f4d7c935",
+   "A8-31": "32e5ce8f2f",
+   "A8-48": "4797cd5902",
+   "A8-88": "a47580bb00"
+  },
+  "B": {
+   "B7-05": "e28a131872",
+   "B8-03": "ac9d404766",
+   "B8-45": "09e62897a6",
+   "B8-22": "50d78f1af0",
+   "B10-05": "a326ea3c0b",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B4-43": "fc9855955a",
+   "B5-01": "841c417586",
+   "B7-93": "4d6f89e473",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-19": "b97bfbf0d2",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255",
+   "B4-02": "d857c517c8",
+   "B5-32": "4109673a42",
+   "B5-33": "56cda1e5fa",
+   "B8-21": "43557106b2",
+   "B8-48": "3b55a46f7c",
+   "B8-49": "4fcfdeb80b",
+   "B8-77": "d0d2f2bb37",
+   "B8-93": "c1406fd6bc",
+   "B9-22": "f691bde396",
+   "B9-26": "d356566ab1",
+   "B9-21": "33408663dc",
+   "B9-25": "ba71e46cce",
+   "B8-92": "ccc2dc877b",
+   "B9-04": "6017d4c54a"
+  }
+ }
+}

@@ -1,0 +1,3776 @@
+{
+ "id": "irrigation",
+ "name": "Irrigation and sprinkler installer",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "lawn",
+ "plugin": {
+  "pf.license": {
+   "need": "if: an irrigation contractor license or registration for the company, and a license or certificate for each person who designs, installs or tests, where the state's form requires them (some states license irrigation on its own, some under a landscape or plumbing license, some not at all)",
+   "ask": [
+    "The company's irrigation license or registration number, and its class",
+    "For each irrigator who designs or installs, their license number, where the state's form asks",
+    "For each backflow tester, their test certificate and its number (a device that protects the drinking water is tested by a certified tester)",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business holds the company license. A licensed irrigator signs the design and the permit where the rules ask. A certified tester signs each backflow test.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No irrigation work goes live until the company's license checks out, where one is required",
+    "A backflow test is offered only by a tester whose certificate the business gives",
+    "A job over the license's size limit is never offered or quoted: the owner is told why"
+   ],
+   "renewals": "License, certificate, insurance and bond dates kept; reminded 30 days out; a lapse pauses that person's bookings",
+   "water_district": "A new backflow device or a test may be filed with the water district, where the rules ask; the tester files it",
+   "background": "Background checks only where the state's form asks",
+   "shop": "The shop: a registration where the state's form asks; selling or setting up a controller needs no license"
+  },
+  "pf.services": {
+   "pattern": "Seasonal service at the home at a set price, a visit to look and then a quote for a repair, and a design visit then a contract for a new system",
+   "B": [
+    {
+     "service": "Fall winterization (blow the water out of the lines before the first hard freeze)",
+     "price kind": "one price, up to 8 zones",
+     "price": "$179; each zone over 8 is $15 (the example business's own prices)",
+     "length": "45 to 60 minutes",
+     "place": "at the customer's place; nobody needs to be home with a gate code",
+     "before": "a card saved for the $89 trip fee",
+     "after": "the saved card is charged when the tech texts DONE"
+    },
+    {
+     "service": "Spring start-up and check (turn the water on, run every zone, adjust heads, set the controller)",
+     "price kind": "one price, up to 8 zones",
+     "price": "$150 a visit, a plan customer's price (the yearly plan: a start-up in spring, a winterization in fall, each paid in full when booked)",
+     "length": "45 to 60 minutes",
+     "place": "at the customer's place; nobody needs to be home with a gate code",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "service": "Sprinkler repair (broken heads, a leaking valve, a pipe leak, wiring)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 trip fee is promised, counted toward the repair (example: $245)",
+     "length": "60 to 90 minutes",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 trip fee",
+     "after": "the saved card is charged when the tech texts DONE"
+    },
+    {
+     "service": "Extra zone, drip line or smart controller (priced from photos and a yard sketch)",
+     "price kind": "priced from photos",
+     "price": "the quote (the example: $640; over $500, Sam OKs it)",
+     "length": "half a day to a day",
+     "place": "at the customer's place",
+     "before": "the utility locate first if anything is dug; then a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill"
+    },
+    {
+     "service": "New sprinkler system (design visit, then a written quote and a contract)",
+     "price kind": "quoted after a design visit",
+     "price": "its own quote (the example: $2,400 for a back lawn, billed in three stages)",
+     "length": "1 to 3 days",
+     "place": "at the customer's place",
+     "before": "a deposit only after the contract is signed; the utility locate and any permit first",
+     "after": "stage bills, the last after the backflow test and the zone walk-through"
+    },
+    {
+     "service": "System audit and report (a flow and coverage check, for a water bill or a sale)",
+     "price kind": "one price",
+     "price": "$199, with a written report",
+     "length": "about 90 minutes",
+     "place": "at the customer's place",
+     "before": "nothing, or a card saved for the $89 trip fee",
+     "after": "the bill; the report comes the same day or the next"
+    },
+    {
+     "service": "Backflow test and certificate (the yearly test of the device that protects the drinking water)",
+     "price kind": "one price",
+     "price": "$95, with the certificate filed where the water district asks",
+     "length": "30 minutes",
+     "place": "at the customer's place",
+     "note": "Only a certified tester. A device that fails is repaired or replaced, then retested."
+    },
+    {
+     "service": "Photo quote",
+     "price kind": "free",
+     "price": "free; a written quote from the photos Alex sends, for small jobs",
+     "place": "by text or the secure page; nobody comes",
+     "before": "nothing taken",
+     "after": "nothing more; Alex can book a visit from the quote"
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum",
+     "place": "at the customer's place",
+     "note": "Goes on quoted repairs; not booked alone"
+    }
+   ],
+   "A": [
+    {
+     "service": "Irrigation design consult",
+     "price kind": "one price",
+     "price": "$35, 30 minutes",
+     "place": "at the shop; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the shop counter"
+    },
+    {
+     "service": "Quick sprinkler chat",
+     "price kind": "free",
+     "price": "free, 15 minutes",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "nothing more"
+    },
+    {
+     "service": "Controller setup session",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the shop; the customer brings the controller and stays while it is programmed",
+     "before": "a card saved",
+     "after": "at the shop counter"
+    },
+    {
+     "service": "Zone map print",
+     "price kind": "one price",
+     "price": "$20, an add-on",
+     "place": "at the shop"
+    },
+    {
+     "service": "Nozzle match",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the shop",
+     "note": "The customer brings an old head; the tech matches the nozzle and spray pattern"
+    },
+    {
+     "service": "Watering schedule session (a schedule by zone that follows the water district's rules)",
+     "price kind": "one price",
+     "price": "$55, 60 minutes; counts toward a new system if Alex signs with Lee Irrigation",
+     "place": "at the shop",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "service": "Full irrigation plan (design, zone map, parts list)",
+     "price kind": "one price",
+     "price": "$140, 2½ hours",
+     "place": "at the shop",
+     "before": "a card saved for the $40 fee (over 2 hours), or a $40 deposit",
+     "after": "at the shop counter"
+    },
+    {
+     "service": "Photo zone plan",
+     "price kind": "priced from the customer's photos and a yard sketch",
+     "price": "the quote (the example: $90); Sam OKs each one",
+     "place": "at the shop"
+    },
+    {
+     "service": "Smart controller match",
+     "price kind": "quoted at the shop",
+     "price": "only the $25 consult is promised",
+     "place": "at the shop",
+     "note": "The consultant sees the old controller and the zone count first"
+    }
+   ],
+   "capacity": "One tech or consultant per booking; one crew per install, up to 3 days; a trench day needs two people. The shop's layout table is saved with long sessions.",
+   "skills each needs": "Winterization and start-up: any tech. Repairs: a tech cleared for valves and wiring. Design and installs: a licensed irrigator where the state asks. Backflow tests: a certified tester.",
+   "nobody home": "Winterization and start-up: nobody needs to be home with a gate code; a start photo and an end photo. A repair or a design visit: an adult is home. Never left with a child.",
+   "online": "No video consult: designs use the yard, the photos and the zone map",
+   "extras": "Travel inside the service area only (the example: 25 miles). Parts at the owner's price, shown on the quote. No tax line unless the owner sets a rate. A system fed by a well pump: the pump and its wiring are an electrician's job, not touched here."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What is it: a winterization, a start-up, a repair, a backflow test or a new system or zone?",
+    "How many zones does the system have, if you know?",
+    "What feeds it: city water, a well or a rainwater tank?",
+    "When was it last serviced?",
+    "Is anything broken or leaking now?"
+   ],
+   "after a time is picked": [
+    "Who will be home: the customer, or another adult (their name and mobile go on the secure page)",
+    "Gate, dog and where the controller and the water shut-off are",
+    "Do you own the home or rent? (the owner signs any new system)",
+    "Is the home in an owners' association? (some need approval for a new system)"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "Gate or lock codes",
+    "Photos of the yard, the controller and the backflow device",
+    "A sketch of the yard, for a new system",
+    "The card"
+   ],
+   "who may book": "An adult. A renter may book a winterization, a start-up or a repair with the owner's OK; the owner signs a new system. A business or a property manager books as an organization.",
+   "shop": [
+    "What the customer wants: a plan, a controller setup, a nozzle match",
+    "Photos of the yard and the old controller (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A gas smell, sparks, smoke or a burning smell from the controller or an outlet; a gas or power line hit while digging",
+     "says": "Leave the area now and keep everyone away. Once outside, call 911 and the gas or power company.",
+     "booking": "No booking until the gas or power company clears it."
+    },
+    {
+     "words": "Water reaching the electrical panel, or standing water at outlets with the power on",
+     "says": "Stay out of the water. Don't touch the panel or any outlet. If it is safe to reach, switch off the main breaker from a dry spot; otherwise leave and call 911.",
+     "booking": "No booking until it's safe."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "Water spraying or flooding from a broken head, pipe or valve",
+     "says": "Shut off the irrigation water at its shut-off valve if you can reach it safely. Keep away from wet outlets and the controller.",
+     "booking": "Goes on, marked urgent; the soonest time is offered first."
+    },
+    {
+     "words": "The backflow device leaking or spraying, or odd-tasting or odd-smelling drinking water after the system ran",
+     "says": "Shut off the irrigation water if it's safe. Don't run the system. Call the water company about the drinking water.",
+     "booking": "Goes on, marked urgent."
+    }
+   ],
+   "business_line": "Questions about whether the drinking water is safe, or about the electrical panel, go to the business's own line",
+   "never": "Customers are told never to dig near a marked line, and never to work on the controller's wiring from the house panel"
+  },
+  "pf.first_steps": {
+   "at the start of the visit": "A start-up begins with a pressure check at the backflow device and the main valve: passed, the zones run; a leak or a weak valve is priced first and needs the customer's yes",
+   "before the first visit": "A new system or an extra zone waits for the utility locate (buried lines marked) before any digging, about 3 days; the first open times start after that. The permit, where the rules ask, is pulled by the license holder.",
+   "prep": [
+    "Leave the gate unlocked or give the code on the secure page, and keep the controller, the valve boxes and the shut-off clear",
+    "For a start-up or a repair, an adult home if the controller is inside",
+    "For a new system, mark where pets, a septic tank and any private lines are, and don't dig before the locate"
+   ],
+   "shop prep": [
+    "Bring the old controller and photos of the yard, if you have them",
+    "Bring an old head for a nozzle match"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "At the home: the check-in code at the door, or a start photo from the crew where nobody is home. At the shop: the code at the counter.",
+   "at_the_visit": "A winterization blows the water out of every zone with compressed air and drains the backflow device. A start-up turns the water on, runs every zone, and adjusts the heads and the controller. A leak or a broken part is shown and priced before it is fixed.",
+   "changes": "A broken head, a weak valve or a leak found at a visit is priced first and needs the customer's yes. Work done is billed; work declined is not.",
+   "install_day": "Lines marked, trench opened and closed the same day, ruts raked, a zone walk-through and the backflow test before the last stage",
+   "outside_checks": "The backflow test and certificate, and a permit inspection where the permit requires one",
+   "done": "Every zone shown running, the controller set, then DONE",
+   "shop done": "DONE after the consult, with the plan saved; or READY for a controller setup",
+   "before photos": "The controller, the backflow device and any broken head, with the zone number"
+  },
+  "pf.money": {
+   "visit": "A winterization or a repair: a card is saved for the $89 trip fee, and charged when the tech texts DONE. The $89 is owed after a no to a repair price and counts toward the repair.",
+   "yearly plan": "A yearly plan is a start-up in spring and a winterization in fall at $150 a visit, each paid in full when booked; each visit is booked and paid like a single one.",
+   "new system": "A new system is a design visit, then a written quote and a contract; a deposit only after signing, stage bills, the last after the backflow test. The deposit cap comes from the state's form.",
+   "extra zone": "An extra zone priced from photos takes a 25% deposit once the quote is OK'd, and the rest on the bill",
+   "rosfield_fee": "Rosfield's $2 follows the plug-in's choice at sign-up; counted at the first check-in or at DONE",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears",
+   "tips": "No tip line",
+   "tax": "Tax on parts and labor follows the state's form",
+   "shop": "A design consult's $35 is the shop's; a watering schedule session is paid in full when booked and counts toward a new system; a $20 fee on a consult only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate or lock codes",
+    "The street address (the secure page has it)",
+    "Contract, change-order and permit papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home never lets the crew in"
+  },
+  "pf.staff": {
+   "roles": "Irrigation techs and crew leads (Bram, Selin): winterizations, start-ups, repairs and installs. Shop consultants (Noor, Kit).",
+   "licenses": "A licensed irrigator designs and signs a new system where the state asks; a certified tester signs each backflow test; both are checked before they are named on a job",
+   "who_oks": "Sam OKs quotes over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another tech may take a winterization or a start-up; a design or an install keeps its licensed irrigator unless Sam moves it",
+   "on_call": "None: every job is booked ahead",
+   "digging": "A crew never digs before the utility locate; a marked line in the way stops that trench"
+  },
+  "pf.rules": {
+   "contract": "A written contract for a new system or an extra zone above the plug-in's amount (the example: $500), signed by everyone on title before any money",
+   "cancel_window": "A cancel window after signing, where the state's rules give one. Work and orders wait for it.",
+   "locate": "The utility locate before any digging; the license holder calls for it, never the customer",
+   "permits": "A new system: pulled by the license holder in the business's name, where the rules require one",
+   "backflow": "A new system gets a backflow device that is tested before the last stage; the test is filed where the water district asks",
+   "water_rules": "The controller is set to the water district's rules on watering days and hours, where they apply",
+   "change_orders": "Written and signed by both before added work, past what the contract already OK'd",
+   "warranty": "1 year on a new system's parts and labor, 90 days on a repair (the example's)",
+   "records": "The zone count, the controller model and the last test date are kept for the next visit; 7 years"
+  },
+  "pf.edges": {
+   "weather": "A winterization moves up when a hard freeze is forecast, and a start-up waits until after the last hard freeze; no digging in frozen or soaked ground. A weather move never costs the customer.",
+   "freeze_damage": "A cracked pipe or head found at a start-up is priced first; it is the customer's yes, not the tech's choice",
+   "backflow_fails": "A device that fails its test is repaired or replaced, then tested again; the certificate waits, and the last stage waits",
+   "buried_line": "A marked or unmarked line in the way stops that trench; the crew leaves the area, the customer gets a written note, and the utility comes first",
+   "well_pump": "A system fed by a well pump: the pump, its wiring and its panel are an electrician's job; the tech never works on them",
+   "water_rules": "A city's watering days or bans: the schedule follows them; the tech does not run zones on a banned day",
+   "nobody_home": "Winterizations and start-ups: start and end photos; repairs and design visits: an adult is home",
+   "over_license_limit": "Not offered, and the owner is told why",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "photos",
+   "multiday",
+   "extrawork",
+   "stages",
+   "firststeps",
+   "banktransfer"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Noor and Kit (shop consultants)",
+   "other": "Others (a bank, a landlord)"
+  },
+  "B": {
+   "staff": "Bram and Selin (irrigation techs)",
+   "other": "Others (a bank, a landlord)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Noor"
+  },
+  "B": {
+   "staff": "Bram"
+  }
+ },
+ "keep": [
+  "color",
+  "valve",
+  "pipe",
+  "leak",
+  "drips",
+  "drain",
+  "trip fee",
+  "Trip fee"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Sprinkler Shop, Sam's sprinkler shop, for a design consult with Noor on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Irrigation to winterize the sprinklers at 14 Orchard Way before the first freeze. Bram comes Thu Oct 22 between 8 and 10am and blows out the lines. A repair is priced at the visit, and a new system gets a written quote and a contract first. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Irrigation design consult, $35 at the shop; a card saved for the $20 missed-consult fee; paid at the shop counter.",
+    "list|none|counter": "Irrigation design consult, $35; nothing taken; a YES books it; paid at the shop counter.",
+    "list|full|none": "Watering schedule session, $55, paid in full when booking; it counts toward a new system if Alex signs.",
+    "list|deposit|counter": "Full irrigation plan, $140; a $40 deposit now; the $100 rest at the shop counter.",
+    "photos|card|counter": "Photo zone plan, priced from Alex's photos and yard sketch at $90 (Sam OKs it); a card saved for the $20 fee; paid at the counter.",
+    "visit|card|counter": "Smart controller match, priced at the shop once Noor sees the old controller: only the $25 consult is promised; a card saved; paid at the counter."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Irrigation design consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Irrigation design consult"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Full irrigation plan"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Watering schedule session"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Photo zone plan"
+    },
+    "visit|*|*": {
+     "name": "Smart controller match"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|full|none",
+    "photos|deposit|bill",
+    "visit|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 fall winterization of an 8-zone system. A card is saved for the $89 trip fee and charged $179 when Bram texts DONE.",
+    "list|none|bill": "A $179 winterization for a returning customer. Nothing is taken before. Rosie texts the bill after the job.",
+    "list|full|none": "A $150 spring start-up (the yearly plan's visit), paid in full when booking.",
+    "photos|deposit|bill": "An extra zone, priced from photos and a yard sketch at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+    "visit|card|card": "A sprinkler repair, priced at the visit. A card is saved; the $89 trip fee is owed even after a no to the price, and counts toward the repair. The card is charged at DONE."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Fall winterization"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Fall winterization"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Spring start-up"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Extra zone"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Extra zone"
+    },
+    "visit|*|*": {
+     "name": "Sprinkler repair"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34",
+   "B4-78",
+   "B8-69"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "style consult",
+    "quick sprinkler chat"
+   ],
+   [
+    "Style consult",
+    "Quick sprinkler chat"
+   ],
+   [
+    "A chair renter",
+    "A desk renter"
+   ],
+   [
+    "like a chair renter",
+    "like a desk renter"
+   ],
+   [
+    "would like to see your hair before pricing it",
+    "would like to see the old controller before pricing it"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring photos of your yard on Saturday."
+   ],
+   [
+    "please come with dry hair",
+    "please bring photos of your yard"
+   ],
+   [
+    "$89 service-call fee",
+    "$89 trip fee"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Noor and Kit run the design consults; Noor also does home consults"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Noor and Kit run the shop"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Controller quotes come to you first. List prices never need one"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most sprinkler shops set it."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Backflow device install: a free estimate, then a quote"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter, your own way"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A sprinkler shop on Weir Rd. Controllers and heads to look at, zone maps, and plans to take home."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most sprinkler shops start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules sprinkler shops often set."
+   ],
+   [
+    "barbershops",
+    "sprinkler shops"
+   ],
+   [
+    "The chairs",
+    "The sample heads"
+   ],
+   [
+    "A chair, ready",
+    "A sample head"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Irrigation for homes in Springfield. Winterizations, start-ups, repairs and new systems, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A fall winterization"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a pond pump repair, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Sprinkler Shop doesn't fix pond pumps."
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7",
+    "you now have two controller setup sessions on Sat Nov 7"
+   ],
+   [
+    "two skin fades on",
+    "two controller setup sessions on"
+   ],
+   [
+    "skin fades",
+    "controller setups"
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "The watering schedule session, $55, is paid in full when booked."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a controller setup session for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7",
+    "Ben T. books a controller setup session for Sat Nov 7"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A design consult's example: 'A big yard needs a quick measure check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which spray heads or drip do you want?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sample head next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the pipe"
+   ],
+   [
+    "like a skin reading",
+    "like a moisture reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call the gas company first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "scratches a sample head and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched a sample head"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "scratched a sample head at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched sample head"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the shop and for home consults"
+   ],
+   [
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Nia K.'s refund for a cancelled consult was due yesterday."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a dead battery"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a nozzle match is $25"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither irrigation nor the shop takes jobs sent now."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "License EX-1042 · certificate EX-3041"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A sample head fell and scratched my bag."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a sample head fell and scratched a bag today."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a sample head fell and scratched a bag today."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 8 zones, rain sensor on, spray heads on the front lawn"
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "likes 8 zones, a rain sensor, drip in the beds"
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says a sample head fell and scratched a bag today."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you match drip emitters too?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A design consult could mean a sprinkler shop or a garden center."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants Saturday morning, with Noor"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24, 11:00am · design consult with Noor"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything Noor should know?"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am visit with Noor? It's free."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. design consult Sat 11am Noor"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A property manager books design consults for five rentals on one morning. Rosie finds times side by side across Noor and Kit."
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds times side by side across Noor and Kit."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Rosie finds one time long enough for both, with one consultant, and adds the prices: $35 and $20."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds landscape lighting to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW landscape lighting"
+   ],
+   [
+    "takes no cut of them",
+    "takes no part of them"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Landscape lighting for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "The sprinkler shop books a consultant's time."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Noor, so Noor's next times show. Controller work always stays with Noor."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Sprinkler Shop · with Noor"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 consult; priced at the counter"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A consult is rated, so the shop takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Noor's zone plan after a consult"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Sprinkler Shop sent you a proposal: Noor's zone plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Zone plan"
+   ],
+   [
+    "your first color plan visit",
+    "your first zone plan visit"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of your yard and your controller"
+   ],
+   [
+    "photos of your hair",
+    "photos of your house"
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 controller match + 15 rain sensor check Alex M."
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Controller match $110 · rain sensor check $15"
+   ],
+   [
+    "Color correction · $110",
+    "Controller match · $110"
+   ],
+   [
+    "$110 color correction and $15 gloss",
+    "$110 controller match and $15 rain sensor check"
+   ],
+   [
+    "The color correction alone is the $110 starting price",
+    "The controller match alone is the $110 starting price"
+   ],
+   [
+    "Today: the color correction, $110.",
+    "Today: the controller match, $110."
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the controller match only, $110. No rain sensor check today."
+   ],
+   [
+    "Gloss to finish",
+    "Rain sensor check to finish"
+   ],
+   [
+    "$15 gloss",
+    "$15 rain sensor check"
+   ],
+   [
+    "gloss",
+    "rain sensor check"
+   ],
+   [
+    "an estimate visit",
+    "a measure visit"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "An irrigation license behind the company, and one for each licensed irrigator where the state asks. A winterization has a set price. A repair is priced at the visit. A gas smell stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Design consults, controller setup sessions and zone maps at the shop. Consults at home only where the state's rules allow them."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Noor can do a shorter consult in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "The sprinkler shop takes no drop-offs: Alex stays for the consult."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An irrigation contractor's example: water spraying from a broken pipe gets 'shut off the irrigation water, if that's safe'."
+   ],
+   [
+    "Electric.",
+    "About 8 zones."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small repairs have a set price. A roof is quoted after an inspection. A tree through the roof stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "An irrigation license behind the company, and one for each licensed irrigator where the state asks."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero preparar los aspersores para el invierno."
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A controller setup session at Lee Sprinkler Shop is $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for a controller setup session at $35"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A property manager books design consults for five rentals on one morning."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work, like salons and groomers, is licensed to its own place."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your consult is part of a plan, every 4 weeks."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The irrigation plug-in adds its own danger words, like a gas smell or water at the breaker panel."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "A big storm is forecast for Saturday morning. Can I still come in?"
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's plan left out the side yard."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A shop has none, so nothing is sent here."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during my consult?"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a sprinkler shop or a garden center"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a design consult every 4 weeks."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Watering schedule session"
+   ],
+   [
+    "Books the groom's party together",
+    "Books three neighbors together"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A design consult and a nozzle match work the same way."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the side yard."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the side yard"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Weir Rd"
+   ],
+   [
+    "Barber license",
+    "Seller's license"
+   ],
+   [
+    "JP031552",
+    "EX-1552"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Noor stopped Alex M.'s consult."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a design consult on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero preparar los aspersores para el invierno."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a consult every 4 weeks"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Noor sees the old controller"
+   ],
+   [
+    "plumbing and electrical",
+    "sprinklers and backflow testing"
+   ],
+   [
+    "Plumbing and electrical",
+    "Sprinklers and backflow testing"
+   ],
+   [
+    "Signature cut and shave",
+    "Watering schedule session"
+   ],
+   [
+    "a Kids cut (12 and under)",
+    "a nozzle match"
+   ],
+   [
+    "like a skin-test result",
+    "like a flow test result"
+   ],
+   [
+    "A barbershop has none.",
+    "A shop has none."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s consult."
+   ],
+   [
+    "Haircut every 4 weeks",
+    "Design consult every 4 weeks"
+   ],
+   [
+    "also does color and",
+    "also does controllers and"
+   ],
+   [
+    "A color correction",
+    "A smart controller match"
+   ],
+   [
+    "a color correction",
+    "a smart controller match"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Irrigation's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Irrigation"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Sprinkler Shop LLC"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Noor: consultant, controllers and home consults"
+   ],
+   [
+    "barber, color and",
+    "consultant, controllers and"
+   ],
+   [
+    "a package of cuts",
+    "a package of consults"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Sprinkler Shop"
+   ],
+   [
+    "Color correction",
+    "Smart controller match"
+   ],
+   [
+    "color correction",
+    "smart controller match"
+   ],
+   [
+    "The Groom's package",
+    "The full irrigation plan"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 full irrigation plan"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Noor: consultant, controllers, home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, controllers and home consults"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the shop, and home consults"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A rain sensor' or 'a new controller' fits a design consult."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a builder: 'We'd like design consults for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "the Groom's package",
+    "the full irrigation plan"
+   ],
+   [
+    "Groom's package · ",
+    "Full irrigation plan · "
+   ],
+   [
+    "Groom's package",
+    "Full irrigation plan"
+   ],
+   [
+    "service, color",
+    "service, controllers"
+   ],
+   [
+    "signature cut",
+    "watering schedule session"
+   ],
+   [
+    "Color and cut",
+    "Photo zone plan"
+   ],
+   [
+    "color and cut",
+    "photo zone plan"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Irrigation"
+   ],
+   [
+    "Lee Electric",
+    "Lee Backflow"
+   ],
+   [
+    "1200 Main St",
+    "205 Spring St"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "a office",
+    "an office"
+   ],
+   [
+    "A excavation",
+    "An excavation"
+   ],
+   [
+    "a excavation",
+    "an excavation"
+   ],
+   [
+    "A edge",
+    "An edge"
+   ],
+   [
+    "a edge",
+    "an edge"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "color quote",
+    "custom quote"
+   ],
+   [
+    "color plan",
+    "custom plan"
+   ],
+   [
+    "Color plan",
+    "Custom plan"
+   ],
+   [
+    "a staff cut",
+    "a contractor's consult"
+   ],
+   [
+    "Electrical",
+    "Backflow testing"
+   ],
+   [
+    "Panel upgrade",
+    "Backflow test"
+   ],
+   [
+    "electrical",
+    "backflow testing"
+   ],
+   [
+    "Barbershop",
+    "Shop"
+   ],
+   [
+    "barbershop",
+    "shop"
+   ],
+   [
+    "Beard trim",
+    "Zone map print"
+   ],
+   [
+    "beard trim",
+    "zone map print"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "patch test",
+    "sample pickup"
+   ],
+   [
+    "skin-test result",
+    "sample Alex picked"
+   ],
+   [
+    "88 Elm St",
+    "18 Weir Rd"
+   ],
+   [
+    "on Elm St",
+    "on Weir Rd"
+   ],
+   [
+    "Skin fade",
+    "Controller setup session"
+   ],
+   [
+    "skin fade",
+    "controller setup session"
+   ],
+   [
+    "the chair",
+    "the shop"
+   ],
+   [
+    "Drain clearing",
+    "Fall winterization"
+   ],
+   [
+    "water heaters",
+    "backflow devices"
+   ],
+   [
+    "water heater",
+    "backflow device"
+   ],
+   [
+    "Drain",
+    "Sprinkler repair"
+   ],
+   [
+    "Elm St",
+    "Weir Rd"
+   ],
+   [
+    "MP045210",
+    "EX-4521"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "BS20981",
+    "EX-2098"
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Plumbing",
+    "Irrigation"
+   ],
+   [
+    "plumbing",
+    "irrigation"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Nozzle match"
+   ],
+   [
+    "Kids cut",
+    "Nozzle match"
+   ],
+   [
+    "kids cut",
+    "nozzle match"
+   ],
+   [
+    "Haircuts",
+    "Design consults"
+   ],
+   [
+    "haircuts",
+    "design consults"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "Plumber",
+    "Irrigation contractor"
+   ],
+   [
+    "plumber",
+    "irrigation contractor"
+   ],
+   [
+    "barbers",
+    "consultants"
+   ],
+   [
+    "Haircut",
+    "Design consult"
+   ],
+   [
+    "haircut",
+    "design consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "Jordan",
+    "Bram"
+   ],
+   [
+    "Barber",
+    "Consultant"
+   ],
+   [
+    "barber",
+    "consultant"
+   ],
+   [
+    "Casey",
+    "Selin"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Noor?"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am · Noor"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm · Noor"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm · Noor"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am · Noor"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm · Kit"
+   ],
+   [
+    "Riley",
+    "Noor"
+   ],
+   [
+    "Avery",
+    "Kit"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ]
+  ],
+  "B": [
+   [
+    "has no screens for this job, and no first step.",
+    "has no screens for this job. A new system or an extra zone waits for the utility locate."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs the utility locate first. It takes about 3 days, so the first open times are later this week."
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "Bank transfer over $500"
+   ],
+   [
+    "like a chair renter",
+    "like a desk renter"
+   ],
+   [
+    "$89 service-call fee",
+    "$89 trip fee"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my yard."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Noor: consultant, controllers, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Noor: consultant, controllers and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, controllers and home consults"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the shop, and home consults"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A rain sensor' or 'a new controller' fits a design consult."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a builder: 'We'd like design consults for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A design consult's example: 'A big yard needs a quick measure check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which spray heads or drip do you want?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sample head next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the pipe"
+   ],
+   [
+    "like a skin reading",
+    "like a moisture reading"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Backflow device install: a free estimate, then a quote"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Water pressure check",
+    "Photo quote"
+   ],
+   [
+    "Alex books on the shop's booking page",
+    "Alex books on the company's booking page"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Tells Alex it's with the shop",
+    "Tells Alex it's with the company"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Noor and Kit run the design consults; Noor also does home consults"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most sprinkler shops start."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter, your own way"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules sprinkler shops often set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A sprinkler shop on Weir Rd. Controllers and heads to look at, zone maps, and plans to take home."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most sprinkler shops set it."
+   ],
+   [
+    "barbershops",
+    "sprinkler shops"
+   ],
+   [
+    "The chairs",
+    "The sample heads"
+   ],
+   [
+    "A chair, ready",
+    "A sample head"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Irrigation for homes in Springfield. Winterizations, start-ups, repairs and new systems, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A fall winterization"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about winterizing my sprinklers. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Winterize my sprinklers' fits a fall winterization."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like watering a neighbor's lawn without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a rain sensor? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. The front lawn and the beds."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a new system's trenching day and its finishing day."
+   ],
+   [
+    "The customer is offered an estimate visit, booked like any visit.",
+    "The customer is offered a design visit, booked like any visit."
+   ],
+   [
+    "Lee Home Services · Estimate visit",
+    "Lee Irrigation · Design visit"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Bram's trencher leaves a rut in the lawn, and Bram texts a photo."
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · sprinkler system"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages, as Sam set it up.",
+    "Say Harper J.'s $2,400 sprinkler system is billed in three stages, as Sam set it up."
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Say Harper J.'s $2,400 sprinkler system is billed in three stages, as Sam set it up."
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Irrigation can winterize the sprinklers:"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Irrigation asks: is the job at a home, an office or somewhere else? And how many zones does the system have, and is anything leaking?"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Noor and Kit run the shop"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 winterization needs none."
+   ],
+   [
+    "Kim L.'s yard drain needs nobody home.",
+    "Kim L.'s winterization needs nobody home."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Valve manifold and wiring · $540"
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Bram's design visit at Harper J.'s is for a $2,400 sprinkler system for the back lawn."
+   ],
+   [
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Today's design visit owes only what was promised for it, like the $89 trip fee."
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Irrigation's quote for your sprinkler system."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a wet spot on the lawn near a head this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a broken head, this week"
+   ],
+   [
+    "The service call is $89.",
+    "The trip fee is $89."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a broken head, this week"
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9",
+    "you have two winterizations on Mon Nov 9"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a dead battery"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither irrigation nor the shop takes jobs sent now."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "License EX-1042 · certificate EX-3041"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call the gas company first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "scratches a sample head and texts a photo"
+   ],
+   [
+    "asks an AI for a plumber",
+    "asks an AI for a sprinkler tech"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Bram's notes"
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a locate it needed that isn't back"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I run the sprinklers before you come?"
+   ],
+   [
+    "takes no cut of them",
+    "takes no part of them"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Bram says no. Please leave the system off until Bram is there."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone winterize my sprinklers this Thursday? What does it cost?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds landscape lighting to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW landscape lighting"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Landscape lighting for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Heating and cooling for",
+    "Landscape lighting for"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 sprinkler system, 3 stages"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "An irrigation license behind the company, and one for each licensed irrigator where the state asks. A winterization has a set price. A repair is priced at the visit. A gas smell stops the booking."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small repairs have a set price. A roof is quoted after an inspection. A tree through the roof stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "An irrigation license behind the company, and one for each licensed irrigator where the state asks."
+   ],
+   [
+    "quote for your repipe",
+    "quote for your sprinkler system"
+   ],
+   [
+    "Repipe · $2,400",
+    "Sprinkler system · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the lines are laid, $800 at the finish"
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: your new lines are laid."
+   ],
+   [
+    "$800 when the pipes are in",
+    "$800 when the lines are laid"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 sprinkler system"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your sprinkler system"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the extra zone Bram noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for an extra zone, from Bram's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Extra zone"
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My sprinkler is flooding the walkway. Can someone look at it soon?"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Broken head before a party"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to leave, then call 911 and the power company"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the valve only, $165. Leave the heads."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Bram rebuilds the valve today, $165. The $80 heads stay good until Thu Oct 29."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "rebuilds the valve today, $165. The $80 heads stay good until Thu Oct 29."
+   ],
+   [
+    "LATE camera report",
+    "LATE audit report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Sprinkler work happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Design consults, controller setup sessions and zone maps at the shop. Consults at home only where the state's rules allow them."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Irrigation does sprinkler and backflow work, not mowing. Nothing was saved. You can look for a landscaper near you."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to shut off the irrigation water if it's safe. If the water reaches the panel, she leaves and calls 911."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: how many zones, what feeds the system, when it was last serviced, and if anything is leaking."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Cierre el agua del riego si es seguro, y no toque enchufes mojados. Si el agua llega al panel de breakers, salga y llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Shut off the irrigation water if it's safe, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you start up and winterize them every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Irrigation has a yearly sprinkler plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a start-up and a winterization every year."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My sprinklers need winterizing. Can someone come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Bram found a marked gas line right where the trench goes at your home, and stopped that part of the work."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Shut off the irrigation water if it's safe, and keep away from wet outlets. If the water reaches the panel, get out and call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Irrigation doesn't do, like mowing."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For irrigation, a gas smell, a hit gas or power line, or water at the breaker panel stops the booking."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Bram finds a marked gas line right where the trench goes. The plug-in says an irrigation contractor stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Bram finds a marked gas line right where the trench goes. The plug-in says an irrigation contractor stops there"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An irrigation contractor's example: water spraying from a broken pipe gets 'shut off the irrigation water, if that's safe'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A broken sprinkler is flooding the yard."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to run the sprinklers after the pipes froze?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a leaking head."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Bram also look at a leaking head?"
+   ],
+   [
+    "a dripping faucet",
+    "a leaking head"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The head is a sprinkler repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your yard, the controller and the backflow device, and a tech will price the job."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, a hit gas or power line, or water at the breaker panel."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE zone 3 head replaced, zone 5 valve weak. Rebuild it in spring."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many zones does it have, and is anything leaking?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how many zones does it have, and is anything leaking?"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work, like salons and groomers, is licensed to its own place."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Bram finds the weak valve and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Bram found the problem. Here's the price to fix it today."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Bram went to get a part and will be back about 9:30am."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s sprinkler repair, done Thu Oct 22, leaks again."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Bram scrapes a hand and texts HURT."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT",
+    "Bram scrapes a hand and texts HURT."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your repair is under warranty, so this visit is free."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your repair is under warranty"
+   ],
+   [
+    "Electric.",
+    "About 8 zones."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The head is a sprinkler repair, quoted at the visit."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Bram also write a water-use audit for my water bill?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace both heads, cracked"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Un aspersor roto está inundando el patio."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a winterization at two rentals every fall."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a winterization at two rentals every fall"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Bram look at my back lawn next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Bram's next times for a design visit."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the sprinkler repair for today"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Bram's trencher left a rut in the lawn at Alex M.'s."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE one broken head in zone 3, a weak valve in zone 5"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas, o llega agua al panel de breakers?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "A head is spraying a fountain now."
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Bram needs a part from the supply house."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD marked gas line where the trench goes, stopped"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please leave the gate unlocked, and keep the controller and the valve boxes clear."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Do you smell gas, or is water reaching the breaker panel?"
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "he's the one who installs backflow devices"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Bram finds two cracked heads."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A head leaks again 2 weeks later."
+   ],
+   [
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Thu Nov 5 · arriving 8–10am · Bram"
+   ],
+   [
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Bram"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The replaced head leaks again."
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left a hole by the front walk.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left a hole by the front walk."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 valve 165 heads 80"
+   ],
+   [
+    "Sam adds heating and cooling to",
+    "Sam adds landscape lighting to"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the trench along the north side"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the system still running?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a head is now spraying a fountain."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a marked gas line where the trench goes"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched a sample head"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "scratched a sample head at"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Bram's trencher leaves a rut in the lawn"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "an estimate visit",
+    "a measure visit"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Valve · $165"
+   ],
+   [
+    "Shutoff valve",
+    "Valve"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing both heads"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace both heads"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both heads"
+   ],
+   [
+    "both shutoff valves",
+    "both heads"
+   ],
+   [
+    "the shutoff valves",
+    "the heads"
+   ],
+   [
+    "shutoff valve",
+    "valve"
+   ],
+   [
+    "Supply line · $80",
+    "Heads · $80"
+   ],
+   [
+    "Supply line",
+    "Heads"
+   ],
+   [
+    "supply line",
+    "heads"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't smell gas and the water isn't near the panel."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the audit report link"
+   ],
+   [
+    "the sink is now overflowing",
+    "a head is now spraying a fountain"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip this fall's winterization?"
+   ],
+   [
+    "next week's drain cleaning",
+    "this fall's winterization"
+   ],
+   [
+    "Mold behind the sink wall",
+    "A marked gas line where the trench goes"
+   ],
+   [
+    "Water heater replacement",
+    "Extra zone"
+   ],
+   [
+    "water heater replacement",
+    "extra zone"
+   ],
+   [
+    "plumbing and electrical",
+    "sprinklers and backflow testing"
+   ],
+   [
+    "Plumbing and electrical",
+    "Sprinklers and backflow testing"
+   ],
+   [
+    "Sewer camera inspection",
+    "System audit and report"
+   ],
+   [
+    "sewer camera inspection",
+    "system audit and report"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Fall winterization"
+   ],
+   [
+    "credited to the repair",
+    "credited to the sprinkler work"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the front lawn."
+   ],
+   [
+    "Under the sink, before",
+    "Zone 3, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched sample head"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the shop and for home consults"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a head leaks"
+   ],
+   [
+    "Leak repair · $245",
+    "Sprinkler repair · $245"
+   ],
+   [
+    "Cabinet floor, before",
+    "Zone 5, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A repair is priced at the visit: only the $89 trip fee was promised."
+   ],
+   [
+    "mold behind the sink wall",
+    "a marked gas line where the trench goes"
+   ],
+   [
+    "your new pipes are in",
+    "your new lines are laid"
+   ],
+   [
+    "1-year labor warranty",
+    "90-day warranty"
+   ],
+   [
+    "for a bathroom drain",
+    "for a design visit"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 heads quote"
+   ],
+   [
+    "leehomeservices.com",
+    "leeirrigation.com"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A design consult could mean a sprinkler shop or a garden center."
+   ],
+   [
+    "the $160 valve work",
+    "the $160 heads work"
+   ],
+   [
+    "Sewer camera report",
+    "System audit and report"
+   ],
+   [
+    "also does color and",
+    "also does controllers and"
+   ],
+   [
+    "Water heater flush",
+    "Spring start-up"
+   ],
+   [
+    "water heater flush",
+    "spring start-up"
+   ],
+   [
+    "water heaters",
+    "backflow devices"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Irrigation's"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Irrigation LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Irrigation"
+   ],
+   [
+    "camera inspection",
+    "system audit"
+   ],
+   [
+    "the kitchen drain",
+    "the winterization"
+   ],
+   [
+    "barber, color and",
+    "consultant, controllers and"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Sprinkler Shop can do your design consult at the shop for $35, or at your home for $75."
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Sprinkler Shop"
+   ],
+   [
+    "plumbing license",
+    "irrigation license"
+   ],
+   [
+    "Plumbing license",
+    "Irrigation license"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa winterization Thu 12-2 Selin"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa winterization"
+   ],
+   [
+    "Drain clearings",
+    "Fall winterizations"
+   ],
+   [
+    "drain clearings",
+    "winterizations"
+   ],
+   [
+    "Drain clearing",
+    "Fall winterization"
+   ],
+   [
+    "drain clearing",
+    "fall winterization"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 winterization"
+   ],
+   [
+    "Kitchen drain",
+    "Fall winterization"
+   ],
+   [
+    "kitchen drain",
+    "winterization"
+   ],
+   [
+    "cut your hair",
+    "do your design consult"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Irrigation"
+   ],
+   [
+    "Lee Electric",
+    "Lee Backflow"
+   ],
+   [
+    "1200 Main St",
+    "205 Spring St"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Water heater",
+    "Backflow device"
+   ],
+   [
+    "water heater",
+    "backflow device"
+   ],
+   [
+    "Yard drain",
+    "Fall winterization"
+   ],
+   [
+    "yard drain",
+    "fall winterization"
+   ],
+   [
+    "drain",
+    "sprinkler repair"
+   ],
+   [
+    "Drain",
+    "Sprinkler repair"
+   ],
+   [
+    "88 Elm St",
+    "18 Weir Rd"
+   ],
+   [
+    "Elm St",
+    "Weir Rd"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop is in the other flow."
+   ],
+   [
+    "shop's chair",
+    "shop's counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Leak repair",
+    "Sprinkler repair"
+   ],
+   [
+    "leak repair",
+    "sprinkler repair"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "a office",
+    "an office"
+   ],
+   [
+    "A excavation",
+    "An excavation"
+   ],
+   [
+    "a excavation",
+    "an excavation"
+   ],
+   [
+    "A edge",
+    "An edge"
+   ],
+   [
+    "a edge",
+    "an edge"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Electrical",
+    "Backflow testing"
+   ],
+   [
+    "Panel upgrade",
+    "Backflow test"
+   ],
+   [
+    "electrical",
+    "backflow testing"
+   ],
+   [
+    "Barbershop",
+    "Shop"
+   ],
+   [
+    "barbershop",
+    "shop"
+   ],
+   [
+    "42 Oak St",
+    "14 Orchard Way"
+   ],
+   [
+    "MP045210",
+    "EX-4521"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "BS20981",
+    "EX-2098"
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "JP031552",
+    "EX-1552"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "Plumbing",
+    "Irrigation"
+   ],
+   [
+    "plumbing",
+    "irrigation"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "Plumber",
+    "Irrigation contractor"
+   ],
+   [
+    "plumber",
+    "irrigation contractor"
+   ],
+   [
+    "barbers",
+    "consultants"
+   ],
+   [
+    "haircut",
+    "design consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "Haircut",
+    "Design consult"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the shop"
+   ],
+   [
+    "Jordan",
+    "Bram"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No huele a gas y el agua no llega al panel."
+   ],
+   [
+    "Barber",
+    "Consultant"
+   ],
+   [
+    "barber",
+    "consultant"
+   ],
+   [
+    "Casey",
+    "Selin"
+   ],
+   [
+    "Riley",
+    "Noor"
+   ],
+   [
+    "Avery",
+    "Kit"
+   ],
+   [
+    "flush",
+    "start-up"
+   ],
+   [
+    "Labor",
+    "By the hour"
+   ],
+   [
+    "sewer camera report",
+    "audit report"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A design consult is for the home's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the design visit at home",
+      "does": "Noor saves Alex's picks for the quote. If Alex wants the system designed, Noor books Bram's design visit at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Irrigation, Sam's other company. It runs in the other flow.",
+       "The picks, the photos and the yard sketch go with it, so Bram's quote uses them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: design visit at home. Picks saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Noor saved your picks. Want Lee Irrigation to design your system at your home?",
+        {
+         "buttons": [
+          "Book the design visit",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Irrigation is licensed or registered at the company, and its irrigators and testers hold their own, where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Irrigation and the shop both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The irrigation plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Estimators, crews and consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: winterizations, repairs, installs and shop consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Licensed irrigators and certified backflow testers hold their own licenses or certificates where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Irrigation is booked ahead. A broken head or a freeze forecast gets the soonest time, but nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Design picks use the yard, the photos and the zone map at the shop; the plug-in offers no video or phone consult."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The shop books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The shop books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The shop books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A shop consult has no form to sign first; a new system's contract comes after the design visit, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "A shop sells no repeat plan: a consult is booked once, when a system needs designing."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plan at the shop (A4-28's plan branch is off), so no plan terms are shown."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plan at the shop, so no plan visit to skip."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plan at the shop, so no plan charge."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plan at the shop, so no plan price to change."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a shop consult; no insurance claim pays for a shop consult."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a shop consult; no insurance claim pays for a shop consult."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A shop consult: no child is left with the staff."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Irrigation is never sent now, so no job goes to a tech on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Irrigation is never sent now, so every visit has a set time and a reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Irrigation is never sent now, so every visit starts with the day list and OMW."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "Nothing is done or signed at a design visit (the plug-in's rule): Alex signs a written contract for a new system first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A new system's quote is signed whole, as one contract. A small repair is its own written quote from Bram."
+   },
+   {
+    "op": "after",
+    "at": "B8-78",
+    "steps": [
+     {
+      "id": "B8-x07",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Wed Oct 28, 8:00am",
+      "title": "Sam calls for the locate and the permit",
+      "q": "Are the locate and the permit in by the first work day?",
+      "does": "The cancel window (B8-78) ends Tue Oct 27 with no cancel. Sam calls for the utility locate, and files the permit where one is needed.",
+      "more": [
+       "The license holder calls for the locate and pulls the permit, never Alex.",
+       "Nobody digs before the lines are marked.",
+       "Sam gets a to-do with its due date, and replies when it's done."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s new sprinkler system: call for the utility locate, and file the permit if one is needed. Both are due before Mon Nov 2.",
+        {
+         "buttons": [
+          "It's done",
+          "Not yet"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner"
+      ],
+      "branches": [
+       {
+        "label": "1 Done in time",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Not yet",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x08",
+          "line": [
+           "7.16",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Fri Oct 30, 10:00am",
+          "title": "Moves the work days, with no fee",
+          "does": "The locate isn't back, or the permit is in review, on Fri Oct 30. The business caused the move, so it's free. Alex picks new work days.",
+          "more": [
+           "Only days after the new expected date are offered.",
+           "The parts delivery moves with it."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your locate is not back yet, so Lee Irrigation needs to move your work days. There's no fee.",
+            {
+             "times": [
+              "Mon Nov 9 · 8am · Bram's crew",
+              "Tue Nov 10 · 8am · Bram's crew"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "line": [
+       "8.18",
+       "8.3"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 2, 8:05am",
+      "title": "The crew starts: lines marked, trench opened",
+      "does": "Bram's crew arrives at 8am. Nobody needs to be home, so Bram texts a start photo instead of a code, and Alex gets it.",
+      "more": [
+       "If Alex is home, the check-in code works as usual.",
+       "The trench is opened and closed the same day.",
+       "The crew never digs before the locate."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "IN lines marked, trench opened on the north side",
+        {
+         "photos": [
+          "North side, 8am"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Bram's crew started your new sprinkler system at 8:05am. You'll get photos at the end of each day."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "B8-x12",
+      "type": "split",
+      "line": [
+       "8.12",
+       "8.18"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Wed Nov 4, 2:00pm",
+      "title": "Tests the backflow device; walks every zone",
+      "q": "Does the backflow device pass its test?",
+      "does": "On the last day Bram tests the backflow device and runs every zone with Alex. A pass is certified and filed. A fail is fixed and tested again, and the last stage waits.",
+      "more": [
+       "Only a certified tester signs the test.",
+       "The certificate is filed where the water district asks.",
+       "The last stage is billed after the test passes."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "TEST backflow passed, all 6 zones run",
+        {
+         "photos": [
+          "Backflow device, tagged",
+          "Zone 6, running"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your backflow device passed its test and every zone runs. Your certificate is on your page."
+       ]
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.rules"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Passes: certificate filed",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Fails: fixed, then retested",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x13",
+          "line": [
+           "8.12",
+           "8.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Fixes the device and tests it again",
+          "does": "The backflow device failed its test. Bram repairs or replaces it and tests it again. The last stage and the certificate wait for a pass.",
+          "more": [
+           "A part for the device is priced first and needs Alex's yes.",
+           "The certificate is filed only after a pass."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your backflow device did not pass. Bram is fixing it and will test it again. The last stage waits for a pass."
+           ]
+          ],
+          "needs": [
+           "pf.rules"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Bram and Alex check that every zone runs. Anything wrong is fixed before Bram texts DONE."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Irrigation is licensed or registered at the company, and its irrigators and testers hold their own, where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Irrigation and the shop both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The irrigation plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Estimators, crews and consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: winterizations, repairs, installs and shop consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Licensed irrigators and certified backflow testers hold their own licenses or certificates where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Irrigation is booked ahead. A broken head or a freeze forecast gets the soonest time, but nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "A winterization has no form to sign first; a new system's contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Visits are booked in 2-hour arrival windows; install days run 8am to 4pm, set with the contract."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Irrigation books visits and work days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Irrigation books a tech's or a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking meets the crew (the plug-in's messages)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each irrigation job is rated."
+   }
+  ]
+ },
+ "notes": "New profession on the REDESIGN 2 master (batch P4, Tue Oct 27 2026), built from lawn (refitted that morning, check-prof 0/0). Why lawn: irrigation is a set seasonal service at the home (a winterization in fall, a start-up in spring, nobody home with a gate code, a card saved and charged at DONE), with repairs priced at the visit and a new system as a project. Unlike lawn: no weekly plan, no sprays or neighbor notices, no mower-shop drop-off; the second side is a sprinkler shop where Alex stays (design consults, controller setup), built like a showroom.\nFlow B main path (list|card|card): a $179 fall winterization of an 8-zone system at 14 Orchard Way, Thu Oct 22, 8-10am with Bram, before the first freeze (the master's October calendar). A card is saved for the $89 trip fee and charged $179 when Bram texts DONE. Other B paths: list|none|bill (a returning customer), list|full|none (the spring start-up, $150 paid in full when booked: the yearly plan is a start-up in spring and a winterization in fall, each visit paid like a single one), photos|deposit|bill (an extra zone, drip line or smart controller, $640 from photos and a yard sketch, over $500 so Sam OKs it, 25% deposit $160), visit|card|card (a sprinkler repair priced at the visit: valve $165 + heads $80 = $245; only the $89 trip fee is promised and counts toward the repair). The system audit and report ($199) is added at a visit and paid with the rest; the backflow test ($95) is booked by a certified tester.\nA new system is the master's estimate path (B8-93 '1 Signs the contract' -> B8-62 -> B8-63 start payment -> B8-78 cancel window, switch cancelright on in B only -> B9-21 stage bills), with Harper J.'s $2,400 back-lawn system in three stages ($800 / $800 when the lines are laid / $800 after the backflow test). Own steps: B8-x07 and B8-x08 Sam calls for the utility locate and files the permit (Wed Oct 28, due before Mon Nov 2; late: new days Mon Nov 9 or Tue Nov 10, no fee); B8-x11 the crew starts and opens the trench; B8-x12 and B8-x13 the last day: the backflow device is tested and every zone is run (a pass is certified and filed; a fail is fixed and retested, and the last stage waits). The first-step mechanism carries two real rules: a new system or an extra zone waits for the utility locate (B4-97 lead time), and a start-up begins with a pressure check at the backflow device (B8-89 / B8-90).\nStop words: a gas smell, sparks, smoke or a burning smell from the controller or an outlet, a gas or power line hit while digging, water reaching the breaker panel or standing at powered outlets. Water spraying from a broken head or pipe, and a backflow device leaking or odd drinking water, get the safety steps and the booking goes on, marked urgent. B8-30's hazard is a marked gas line right where the trench goes (stop that trench, written note, the gas company first). A crew never digs before the locate. A system fed by a well pump: the pump and its wiring are an electrician's job.\nLicenses: an irrigation license or registration at the company, a license for each irrigator who designs or installs and a certificate for each backflow tester, where the state's form asks (S1-60 keeps 'A license' and S2-28 keeps 'Yes, each one'); a certified tester signs each backflow test, filed where the water district asks. No state, city or law is named; license numbers use the EX- format. Not booked: a minor; a visit with no adult home when the visit needs one; a renter signing a new system without the owner; a job over the license limit.\nMoney: the $89 is the trip fee, the late-cancel and no-show fee, owed after a no to a repair price. Nothing is taken before a new system's contract is signed by everyone; deposits only after signing (or 25% on an extra zone once the quote is OK'd); the last stage after the backflow test. No tip line (S1-21's tip row is paired out). Added work is paid with the rest at the visit (D91). The $89 fee also sits on the $179 winterization (97 master steps hard-code $89); the owner may set a smaller fee. Warranty: 90 days on a repair, 1 year on a new system (the example's).\nFlow A is the sprinkler shop (Lee Sprinkler Shop, Sam's second company, consultants Noor and Kit; the customer stays): design consult $35 (card saved for the $20 missed-consult fee; or at home for $75), controller setup session $40, nozzle match $25, zone map print $20, a quick chat (free), a watering schedule session $55 paid in full, a full irrigation plan $140 with a $40 deposit, a photo zone plan $90 (Sam OKs), a smart controller match priced at the shop after the $25 consult. Set starts; no drop-off, no video.\nThe second kind of work at sign-up is backflow testing; the NEW kind of work added later is landscape lighting.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "style consult",
+    "Style consult",
+    "A chair renter",
+    "like a chair renter",
+    "would like to see your hair before pricing it",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair",
+    "$89 service-call fee",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley and Avery cut hair",
+    "Color quotes come to you first. Board prices never need one",
+    "Each service starts the way most barbershops set it.",
+    "Panel upgrade: a free estimate, then a quote",
+    "At your shop, paid at the chair, your own way",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "barbershops",
+    "The chairs",
+    "A chair, ready",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "you now have two skin fades on Sat Nov 7",
+    "two skin fades on",
+    "skin fades",
+    "The signature cut, $55, is paid in full when booked.",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a skin fade for Sat Nov 7",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "How would you like it on top?",
+    "like the cut in the mirror",
+    "like a mark on an item or the skin",
+    "like a skin reading",
+    "at the shop and for house calls",
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "like a burst pipe or a lockout",
+    "a Kids cut (12 and under) is $25",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing JP031552 · electrical JE30417",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "says the cape clip ripped a shirt collar today.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "#2 on the sides, scissors on top, low beard line",
+    "says the cape clip ripped a shirt collar today",
+    "Do you do kids cuts? My son is 8.",
+    "A haircut could mean a salon or a barbershop.",
+    "Wants Saturday morning, with Riley",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Anything Riley should know?",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "takes no cut of them",
+    "no cut of",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "takes jobs sent now, like a burst pipe",
+    "Promises the $25 consult; priced at the chair",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "Add photos of your hair",
+    "photos of your hair",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Color correction $110 · gloss $15",
+    "Color correction · $110",
+    "$110 color correction and $15 gloss",
+    "The color correction alone is the $110 starting price",
+    "Today: the color correction, $110.",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Gloss to finish",
+    "$15 gloss",
+    "gloss",
+    "an estimate visit",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Electric.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "A repair shop, a tailor or a groomer does.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "A groom books cuts for himself and four friends on one morning.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "A barbershop has none, so nothing is sent here.",
+    "Can my son wait in the shop during my cut?",
+    "could mean a salon or a barbershop",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Barber license",
+    "JP031552",
+    "JE30417",
+    "Riley stopped Alex M.'s cut.",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "once Riley sees the hair",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "a Kids cut (12 and under)",
+    "like a skin-test result",
+    "A barbershop has none.",
+    "Stopped Alex M.'s cut.",
+    "Haircut every 4 weeks",
+    "also does color and",
+    "A color correction",
+    "a color correction",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Riley: barber, color and house calls",
+    "barber, color and",
+    "a package of cuts",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "The Groom's package",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley: barber, color, house calls",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "'A trim' or 'a fade' fits a haircut.",
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "the Groom's package",
+    "Groom's package · ",
+    "Groom's package",
+    "service, color",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "house calls",
+    "House calls",
+    "House call",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "color quote",
+    "color plan",
+    "Color plan",
+    "a staff cut",
+    "Electrical",
+    "Panel upgrade",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "patch test",
+    "skin-test result",
+    "88 Elm St",
+    "on Elm St",
+    "Skin fade",
+    "skin fade",
+    "the chair",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Drain",
+    "Elm St",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "rents a chair",
+    "Plumbing",
+    "plumbing",
+    "Kids cut (12 and under)",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Riley",
+    "Avery",
+    "visit fee"
+   ],
+   "B": [
+    "has no screens for this job, and no first step.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A tip line · bank transfer over $500",
+    "like a chair renter",
+    "$89 service-call fee",
+    "Me, and yes. It's my kitchen.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "At the shop, and house calls",
+    "Panel upgrade: a free estimate, then a quote",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Water pressure check",
+    "Alex books on the shop's booking page",
+    "Gives the shop's own line",
+    "Tells Alex it's with the shop",
+    "shop-added",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Its money card is set the way most barbershops start.",
+    "At your shop, paid at the chair, your own way",
+    "Here are the rules barbershops often set.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "barbershops",
+    "The chairs",
+    "A chair, ready",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "The customer is offered an estimate visit, booked like any visit.",
+    "Lee Home Services · Estimate visit",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Right to cancel · repipe",
+    "Say Harper J.'s $2,400 repipe is billed in three stages, as Sam set it up.",
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Lee Home Services can clear the drain:",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Riley and Avery cut hair",
+    "The $179 drain needs none.",
+    "Kim L.'s yard drain needs nobody home.",
+    "Shutoff valve and wall pipe · $540",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Here's Lee Home Services' quote for your repipe.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "The service call is $89.",
+    "It's a leak under the sink, today",
+    "you have two drain clearings on Mon Nov 9",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Call a mold cleanup company first",
+    "cracks the cabinet floor and texts a photo",
+    "asks an AI for a plumber",
+    "Video and Jordan's notes",
+    "like a permit it needed that isn't in",
+    "Can I run the dishwasher before you come?",
+    "takes no cut of them",
+    "no cut of",
+    "Jordan says no. Please wait until the job is done.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Heating and cooling for",
+    "takes jobs sent now, like a burst pipe",
+    "QUOTE 2400 repipe, 3 stages",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "$800 when the pipes are in",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "like an overflowing drain",
+    "It's overflowing. Can someone come tonight?",
+    "Overflowing kitchen drain",
+    "Told to leave, then call 911 and the gas company",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan cuts a hand and texts HURT",
+    "Your drain is under warranty, so this visit is free.",
+    "Your drain is under warranty",
+    "Electric.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Can Jordan also run a camera down my sewer line?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "BEFORE old water stain on the cabinet floor",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "he's the one who replaces water heaters",
+    "Jordan finds corroded shutoff valves.",
+    "The drain clogs again 2 weeks later.",
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "The kitchen drain is clogged again.",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Sam adds heating and cooling to",
+    "Not done: the pipe behind the wall",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "cracked the cabinet floor at",
+    "Jordan cracks the cabinet floor",
+    "HURT cut my hand, need to stop",
+    "an estimate visit",
+    "Shutoff valve · $165",
+    "Shutoff valve",
+    "replacing both shutoff valves",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "shutoff valve",
+    "Supply line · $80",
+    "Supply line",
+    "supply line",
+    "No. It doesn't smell like gas.",
+    "Texts the camera report link",
+    "the sink is now overflowing",
+    "Can I skip next week's drain cleaning?",
+    "next week's drain cleaning",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Cracked cabinet floor",
+    "at the shop and for house calls",
+    "Yes, it won't drain",
+    "Leak repair · $245",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "mold behind the sink wall",
+    "your new pipes are in",
+    "1-year labor warranty",
+    "for a bathroom drain",
+    "The $160 valve quote",
+    "leehomeservices.com",
+    "A haircut could mean a salon or a barbershop.",
+    "the $160 valve work",
+    "Sewer camera report",
+    "also does color and",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "Lee Home Services'",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "camera inspection",
+    "the kitchen drain",
+    "barber, color and",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa drain",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "cut your hair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Water heater",
+    "water heater",
+    "Yard drain",
+    "yard drain",
+    "drain",
+    "Drain",
+    "88 Elm St",
+    "Elm St",
+    "The shop's chair is in the other flow.",
+    "shop's chair",
+    "at the chair",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Electrical",
+    "Panel upgrade",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "42 Oak St",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "rents a chair",
+    "JP031552",
+    "JE30417",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "haircut",
+    "cuts",
+    "Haircut",
+    "cut",
+    "the chair",
+    "Jordan",
+    "No. No huele a gas.",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "flush",
+    "Labor",
+    "sewer camera report",
+    "visit fee"
+   ]
+  },
+  "A": {
+   "A4-24": "0a292df05b",
+   "A8-44": "4410a4860c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-93": "c1406fd6bc",
+   "B8-78": "628ca6843e",
+   "B8-37": "3ce85cf051",
+   "B8-39": "aa75251207",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

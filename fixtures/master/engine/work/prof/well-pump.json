@@ -1,0 +1,2879 @@
+{
+ "id": "well-pump",
+ "name": "Well drilling and well pump service",
+ "style": "Home visit",
+ "pattern": "fix",
+ "from": "plumber",
+ "plugin": {
+  "pf.license": {
+   "need": "Pump and well work in a home needs a license where the state or county licenses well drillers and pump installers. New well drilling can need its own driller license. Water line and electrical work can need a plumbing or electrical license too.",
+   "who holds it": "Both: the company (a well and pump contractor license, where the state asks) and each technician (apprentice or journeyman, where the state has levels).",
+   "what to ask": [
+    "The company's license number and class",
+    "Each technician's own number and level, in their invite reply",
+    "A driller license, for new wells, where the state has one",
+    "Any job-size limit the license has"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "The well and pump listing goes live once it's set up. Each technician is offered only once the owner says yes. A job over the license's size limit is never offered or quoted: the owner is told why.",
+   "renewals": "Reminders before each expiry, on the dates the owner picks (the example: 5 weeks and 1 week before). A lapsed license pauses new bookings for that person.",
+   "insurance or bond": "Liability insurance, and a bond where the state's form asks for one: from the state form.",
+   "background checks": "Only where the state's form asks.",
+   "at the counter": "Work done at the counter: the state's form says if it needs a license. Safe default: the company's license on file, shown on the listing.",
+   "local rules": "Some counties require a permit to drill, replace or seal a well, or to change a pump: the form for that place applies, by the customer's address. Water test results go through a certified lab where the rules require it."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Stonecreek Well's own list)": [
+    {
+     "service": "Service call (find any problem)",
+     "price kind": "one price",
+     "price": "$89, taken off the repair",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89",
+     "after": "Rosie texts the bill",
+     "note": "Goes on the jobs below; not booked alone"
+    },
+    {
+     "service": "Pressure switch replacement",
+     "price kind": "one price",
+     "price": "$179, the $89 call included",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Pressure tank air check and gauge",
+     "price kind": "one price",
+     "price": "$169, the $89 call included",
+     "length": "45 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Well pump repair (pump, wiring, control box)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "60 to 120 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Well pump replacement",
+     "price kind": "quoted at the visit; a written estimate over the owner's amount",
+     "price": "the quote (the example: $2,400, a 25% deposit of $600 once the contract is signed)",
+     "length": "half a day to a day, then the well is disinfected where the rules require it",
+     "place": "at the customer's place",
+     "before": "a signed contract, then the deposit",
+     "after": "the rest on the final bill, after the pump is in and tested",
+     "note": "The business pulls the permit and the owner OKs it. Only a technician with the pump installer license."
+    },
+    {
+     "service": "Well water test (bacteria and nitrates)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "30 min to collect the sample",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "A certified lab does the test. The result goes on the secure page, never in a text."
+    },
+    {
+     "service": "Pressure tank replacement",
+     "price kind": "quoted from photos, or after the service call",
+     "price": "the quote (the example: $640, a small tank)",
+     "length": "half a day",
+     "place": "at the customer's place",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill",
+     "note": "Over the owner's amount, a written estimate is signed first"
+    },
+    {
+     "service": "Well inspection and flow test",
+     "price kind": "one price",
+     "price": "$249, with a written report",
+     "length": "90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill",
+     "note": "The report link comes later; the report is on the secure page"
+    },
+    {
+     "service": "New well drilling",
+     "price kind": "quoted after a site visit",
+     "price": "only the $89 service call is promised",
+     "length": "set by the owner (days)",
+     "place": "at the customer's place",
+     "before": "a signed contract, then a deposit (cap from the state form)",
+     "after": "the rest on the bill, after the pump is in and the water is tested",
+     "note": "The owner OKs each booking first. A state well permit and a utility locate come first. Only a driller with the driller license."
+    },
+    {
+     "service": "After-hours no-water call",
+     "price kind": "one price",
+     "price": "$149, taken off the repair; flat-price jobs $60 more",
+     "length": "sent now: an arrival estimate, not a window",
+     "place": "at the customer's place",
+     "before": "a card saved for the $149",
+     "after": "Rosie texts the bill",
+     "note": "Sent now to the technician on call, then the backup. Free to cancel until the technician texts OMW."
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum",
+     "place": "at the customer's place",
+     "note": "Goes on quoted jobs; not booked alone"
+    }
+   ],
+   "at the business (the example: Stonecreek Pump's counter board)": [
+    {
+     "service": "Pressure switch test (bring the switch)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "both: at the counter, or at the customer's home as a $75 home visit paid in full",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Fitting job",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Hose fitting",
+     "price kind": "one price",
+     "price": "$20",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Pressure gauge swap",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Water sample test (bacteria and nitrates)",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "10 min to drop off the sample",
+     "place": "at the counter",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "The result goes on the secure page, never in a text. Bring the sample in the counter's bottle, as the counter says."
+    },
+    {
+     "service": "Jet pump rebuild",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours, or a drop-off",
+     "place": "at the counter",
+     "before": "a $40 deposit (over 2 hours)",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Control box repair (a box with a bad part)",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $90)",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "The owner OKs each quote"
+    },
+    {
+     "service": "Pump repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $25 check is promised",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Video check of a pump house or a part",
+     "price kind": "the owner's own price",
+     "place": "at the business (a video session)",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Only where the owner offers it"
+    }
+   ],
+   "capacity": "One technician per booking. Bigger jobs, like a pump pulled from a deep well, can need a crew of two; the counter's rebuilds need its one test bench.",
+   "skills each needs": "New well drilling needs the driller license and the rig. Pump replacement needs the pump installer license and the pulling rig. Wiring needs an electrician or a license that covers it. Counter rebuilds need the rebuild skill.",
+   "nobody home": "A pump house or well cap outside with its own access: nobody needs to be home. DONE comes with a photo.",
+   "online": "A video check only, where the owner offers it. No repair is done by video.",
+   "extras": "Travel inside the service area only (the example: 40 miles). Parts at cost or at list, the owner's pick. No tax line unless the owner sets a rate.",
+   "smallest_job": "A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the example takes any list job and any quote over $500)."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What's wrong: no water, weak pressure, a pump that clicks or runs, odd water, or something else",
+    "Is the pump running? Is the power on? Where are the pump and the pressure tank",
+    "Does the water look, smell or taste wrong",
+    "After hours: is there no water at all right now",
+    "At the counter: which part, and its brand if known"
+   ],
+   "after a time is picked": [
+    "Who will be there: the customer, or someone else (their name and mobile go on the secure page)",
+    "Access, the well's location, parking and pets",
+    "Own or rent, and who pays: the customer, or the landlord or manager",
+    "Whether the well serves other homes (a shared well needs every owner's OK or the manager's)",
+    "The year the home was built: only for jobs that may open a wall",
+    "HOA or county rules: only for new wells or digging"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "Gate or lock codes",
+    "The landlord's or manager's name and mobile",
+    "Water test results",
+    "The card"
+   ],
+   "who may book": "An adult who owns the home, or a renter whose landlord OKs it. A shared well needs every owner's OK. A person the owner of the home names may book for them."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A gas smell, hissing, or a carbon monoxide alarm",
+     "says": "Leave the house now. Then call 911 and the gas company.",
+     "booking": "No booking. A new request must say the gas company cleared the house."
+    },
+    {
+     "words": "Someone hurt, sparks, a shock from a tap or pipe, or water on the pump's wiring or the control box",
+     "says": "Get away from the water. Don't touch the pump or its wiring. Call 911.",
+     "booking": "No booking until it's safe; the customer can come back."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "A pump that runs with no water, or no water at all",
+     "says": "Shut off the pump at the breaker. Running dry harms the pump. Use stored water."
+    },
+    {
+     "words": "Water that looks brown, smells like sewage, or came after a flood",
+     "says": "Don't drink or cook with it. Use bottled water until the well is tested."
+    },
+    {
+     "words": "A pressure tank bulging, hissing or leaking hard",
+     "says": "Shut off the pump at the breaker and keep away from the tank."
+    },
+    {
+     "words": "A flooded well pit or pump house",
+     "says": "Keep the power off at the breaker, and stay out. Don't turn the pump on until it's checked."
+    }
+   ],
+   "at the counter": "A pressure tank, a gas part, or a control box with its power on isn't opened at the counter. The customer is offered a home visit by a technician.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "A service call (the $89), or photos first",
+     "for": "Pump replacement and other big jobs",
+     "timing": "Before the quote; the owner picks which"
+    },
+    {
+     "step": "A permit",
+     "for": "New wells, pump replacement and jobs the county names",
+     "timing": "Pulled by the business before the work, where the local rules require one (a to-do for the owner)"
+    },
+    {
+     "step": "A utility locate (call 811) before any digging",
+     "for": "New wells and buried water lines",
+     "timing": "Done by the business, with the lead time the locate service sets"
+    },
+    {
+     "step": "The owner's OK",
+     "for": "New well drilling, and same-day jobs",
+     "timing": "Before the booking is confirmed"
+    },
+    {
+     "step": "A part check (the old part brought in)",
+     "for": "A special-order part at the counter",
+     "timing": "At least 2 days before; stays good 3 months"
+    }
+   ],
+   "prep for the reminder": [
+    "Clear the way to the pump and the pressure tank",
+    "Know where the pump's breaker is",
+    "Put pets in another room",
+    "At the counter: bring the part with its wires and fittings; drain a pump before a drop-off"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code at the door. The on-my-way text names the technician, with a photo.",
+   "check-in at the counter": "The code at the counter (the counter tech or the desk types it). A drop-off gets its code when the item is left, and READY when it's tested.",
+   "quotes at the visit": "The technician texts the quote with its lines before any work. The customer may OK part of it. The quote stays good 7 days.",
+   "extra work": "Quoted by text up to the owner's limit (the example: $500). Above it, the owner OKs it first. A bigger job found gets its own quote.",
+   "work sold at the home": "A written right to cancel, where the rules require it. The work starts at once only if the customer asks for that in writing, where the rules allow it.",
+   "before work": "Photos of the pump house and the tank before work; the year the home was built before opening a wall.",
+   "proof it's done": "The technician texts DONE with the bill's lines, and photos after. After a pump is pulled, the well is disinfected and the water is tested where the rules require it; the result is on the secure page.",
+   "permits": "Where a permit was pulled, the inspector's visit is set up after the work, and the result is kept with the job."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's place: a card saved for the $89 service call, and Rosie texts the bill after the job",
+    "An owner may take nothing up front",
+    "At the counter: a card saved for the $20 fee; paid at the counter. Over 2 hours: a $40 deposit",
+    "After hours: a card saved for the $149 call, taken off the repair"
+   ],
+   "limits": [
+    "Work quoted at the visit: nothing more than the service call is taken before",
+    "Deposits only on quoted big jobs (the example: 25% on a pump replacement). Deposit cap: from the state form. A deposit is the first payment of the quote: $600 of $2,400, and the rest $1,800 on the final bill after the pump is in and tested",
+    "Late cancel or nobody home: the $89 fee (after hours, the $149 call once the technician has headed out). The owner confirms each one; no answer, no fee",
+    "Emergency prices: where the state's rules limit prices in a declared emergency, those limits apply"
+   ],
+   "insurance and plans": "A home warranty plan pays only once the owner checks it; many exclude wells. Insurance: the customer pays, and gets the receipt and photos for the claim.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "parts": "Parts at cost or at list, the owner's pick; parts billed after go on the bill.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Water test results, gate or lock codes, card details, and photos from inside the home: these stay on the secure page.",
+   "languages": "English and Spanish.",
+   "danger words": "Gas words and shock words always get the safety message first, before anything else."
+  },
+  "pf.staff": {
+   "levels": "Apprentice and journeyman, where the state has levels; each person's own license per state, where the state licenses well drillers and pump installers.",
+   "skills": [
+    "Pressure switches and tanks",
+    "Pump repair and replacement",
+    "Wiring and control boxes",
+    "Well water sampling",
+    "New well drilling",
+    "Counter rebuilds"
+   ],
+   "supervision": "An apprentice works only with a journeyman on the job, where the state's rules require it. An apprentice is never sent alone by default.",
+   "special work": "New well drilling only by people with the driller license. Pulling a deep pump only with a crew of two. Wiring only by people whose license covers it.",
+   "who OKs what": "The owner OKs fees, quotes over the limit, new well jobs and same-day jobs. After hours, a job sent now goes to the technician on call, then the backup set at sign-up. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "Another technician with the same skill and level, at the same window and price."
+  },
+  "pf.rules": {
+   "written estimate": "A written estimate before work above an amount: from the state form.",
+   "right to cancel": "A written right to cancel for work sold at the home: where the rules require it.",
+   "permits": "Pulled by the business where the local rules require one; the inspection follows.",
+   "well rules": "Where the rules require it: the well is disinfected after the pump is pulled, an old well is sealed by a licensed driller, and the driller's report goes to the county.",
+   "license on papers": "The license number on quotes and bills: from the state form.",
+   "digging": "A utility locate before any digging: always.",
+   "declared emergency": "Price limits in a declared emergency: where the state's rules require it.",
+   "warranty": "The owner's own (the example: 1 year on labor), shown on the receipt; the maker's warranty on pumps and tanks.",
+   "state notices": "A state's own notices for home repairs: from the state form, sent before the work or with the quote.",
+   "records": "7 years, as for every kind of work."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for well pumps:",
+   "well pumps": [
+    "The pump runs dry or the water worsens before the visit: the safety steps again, then urgent",
+    "A gas smell, or a shock from a tap or pipe, at any point: stop, get out, call 911 and the gas company",
+    "After hours: sent now to the technician on call, then the backup; nobody takes it means no visit tonight and nothing charged",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "A renter whose landlord pays: the landlord's OK first, or the renter pays instead; a shared well needs every owner's OK",
+    "A bigger job found (a failing well casing, a dry well): its own quote, OK'd by the owner over the limit",
+    "A water test is positive or odd: not an emergency; no drinking, the result is on the secure page, and the next step is a disinfection and a retest, by quote",
+    "A flood or a storm brings many calls: PAUSE, and a declared emergency's price limits",
+    "At the counter: a part that can't be rebuilt, a gas part, a pressure tank, or a drop-off nobody picks up"
+   ]
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "sentnow",
+   "dropoff",
+   "extrawork",
+   "photos",
+   "results",
+   "video"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Well pump service takes jobs sent now. The counter takes none."
+   ],
+   [
+    "The chairs",
+    "The counter"
+   ],
+   [
+    "A chair, ready",
+    "A tested switch, ready"
+   ],
+   [
+    "JP031552",
+    "WP-10552"
+   ],
+   [
+    "JE30417",
+    "WT-10417"
+   ],
+   [
+    "Groom's package · ",
+    "Jet pump rebuild · "
+   ],
+   [
+    "$40 for the Groom's package",
+    "$40 for the jet pump rebuild"
+   ],
+   [
+    "the Groom's package",
+    "the jet pump rebuild"
+   ],
+   [
+    "The Groom's package",
+    "The jet pump rebuild"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 jet pump rebuild"
+   ],
+   [
+    "Sent now · Overflowing kitchen drain",
+    "Sent now · No water at all"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Lucia and Joel run the pressure switch tests; Lucia also does home pressure switch tests"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Lucia: counter tech, control box repairs, home visits"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Lucia: counter tech, control box repairs and home visits"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every counter service, control box repairs and home pressure switch tests"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the counter, and home pressure switch tests"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A switch test' or 'a gauge swap' fits a pressure switch test."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a farm: 'We'd like switch tests for 6 pumps before Saturday's planting.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A switch test's example: 'A pump this old needs a part check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which part is the problem?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the part next to the gauge"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the surface"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a licensed well driller first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "cracks a pump housing and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a pump housing"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "cracked a pump housing at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked pump housing"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the counter and for home pressure switch tests"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Repair quotes come to you first. List prices never need one"
+   ],
+   [
+    "Color always stays with Riley",
+    "Control box repairs always stay with Lucia"
+   ],
+   [
+    "Riley's color plan",
+    "Lucia's pump service plan"
+   ],
+   [
+    "Color plan",
+    "Pump service plan"
+   ],
+   [
+    "color plan",
+    "pump service plan"
+   ],
+   [
+    "rents a chair",
+    "works on their own"
+   ],
+   [
+    "Free on your board",
+    "Free on your list"
+   ],
+   [
+    "the shop's board",
+    "the counter's list"
+   ],
+   [
+    "a chair renter",
+    "an independent contractor"
+   ],
+   [
+    "A chair renter",
+    "An independent contractor"
+   ],
+   [
+    "a step-free chair",
+    "a step-free entrance"
+   ],
+   [
+    "would like to see your hair",
+    "would like to see the part"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, but test the gauge too'"
+   ],
+   [
+    "please come with dry hair",
+    "please bring the old switch"
+   ],
+   [
+    "It's my kitchen.",
+    "It's my well."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Softener install: a free estimate, then a quote"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Its own danger words: a gas smell, a shock from a tap or pipe, or water on the pump's wiring."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for no water at home: shut off the pump at the breaker before bringing the part in."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a pump house"
+   ],
+   [
+    "two skin fades on",
+    "two pressure switch tests on"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a gas valve rebuild, which isn't on the counter's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Stonecreek Pump doesn't do gas valve rebuilds."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench vise scratched my pressure gauge."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says the bench vise scratched a pressure gauge today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "submersible pump, 1 horsepower, 240 volt, 200 foot well"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a pressure switch test for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pump counters set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A pump parts and repair counter on Weir St. Pressure switch tests, jet pump rebuilds and water sample tests."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pump counters start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pump counters often set."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds water testing to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Water testing for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW water testing"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like no water at all at night"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a pressure gauge swap is $25"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero revisar un interruptor de presión el sábado."
+   ],
+   [
+    "Gloss to finish",
+    "O-ring set"
+   ],
+   [
+    "gloss",
+    "O-ring set"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like no water at all at night"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "Lee Home Services'",
+    "Stonecreek Well's"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A well pump contractor's example: a shock from a tap or pipe gets 'don't touch the pump, call 911'."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A pressure switch replacement has a set price. A pump repair is priced at the visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Drain clearing",
+    "Pressure switch replacement"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Fitting job at Stonecreek Pump is $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for fitting job at $35"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Lucia sees the part"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do pressure gauge swaps? Mine sticks."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Switch tests, fittings, jet pump rebuilds and water sample drop-offs at the counter. Home visits only where the state's rules allow them. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A pressure switch test could mean a pump supplier or a hardware store."
+   ],
+   [
+    "MP045210",
+    "WP-1042"
+   ],
+   [
+    "EC22871",
+    "WT-2210"
+   ],
+   [
+    "BS20981",
+    "PS-3305"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's pumps together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books pressure switch tests for three pumps on one morning. Rosie finds times side by side with Lucia and Joel."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A pressure switch test and a pressure gauge swap work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your pump"
+   ],
+   [
+    "patch test",
+    "part check"
+   ],
+   [
+    "skin-test result",
+    "part check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the counter during my pressure switch test?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The pump runs now but no water comes out. Can I still come in?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The switch still clicks on and off."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's switch still clicks on and off"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Weir St"
+   ],
+   [
+    "Lee Home Services",
+    "Stonecreek Well"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Stonecreek Pump LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Stonecreek Pump"
+   ],
+   [
+    "Lee Plumbing",
+    "Stonecreek Well"
+   ],
+   [
+    "Lee Electric",
+    "Stonecreek Water Treatment"
+   ],
+   [
+    "1200 Main St",
+    "700 Ridge Rd"
+   ],
+   [
+    "88 Elm St",
+    "9 Weir St"
+   ],
+   [
+    "Riley",
+    "Lucia"
+   ],
+   [
+    "Avery",
+    "Joel"
+   ],
+   [
+    "Jordan",
+    "Colm"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "plumbing and electrical",
+    "well, pump and water treatment"
+   ],
+   [
+    "Plumbing and electrical",
+    "Well, pump and water treatment"
+   ],
+   [
+    "electrical",
+    "water treatment"
+   ],
+   [
+    "Electrical",
+    "Water treatment"
+   ],
+   [
+    "Panel upgrade",
+    "Softener install"
+   ],
+   [
+    "Plumber",
+    "Well and pump contractor"
+   ],
+   [
+    "plumber",
+    "technician"
+   ],
+   [
+    "plumbing",
+    "well and pump"
+   ],
+   [
+    "Plumbing",
+    "Well and pump"
+   ],
+   [
+    "barbershop",
+    "pump counter"
+   ],
+   [
+    "Barbershop",
+    "Pump counter"
+   ],
+   [
+    "barbers",
+    "counter techs"
+   ],
+   [
+    "barber",
+    "counter tech"
+   ],
+   [
+    "Barber",
+    "Counter tech"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Water sample test"
+   ],
+   [
+    "Signature cut and shave",
+    "Water sample test"
+   ],
+   [
+    "signature cut",
+    "water sample test"
+   ],
+   [
+    "Groom's package",
+    "Jet pump rebuild"
+   ],
+   [
+    "Color and cut",
+    "Control box repair"
+   ],
+   [
+    "color and cut",
+    "control box repair"
+   ],
+   [
+    "Color correction",
+    "Pump repair"
+   ],
+   [
+    "color correction",
+    "pump repair"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "Kids cut",
+    "Pressure gauge swap"
+   ],
+   [
+    "kids cut",
+    "pressure gauge swap"
+   ],
+   [
+    "Skin fade",
+    "Fitting job"
+   ],
+   [
+    "skin fade",
+    "fitting job"
+   ],
+   [
+    "Beard trim",
+    "Hose fitting"
+   ],
+   [
+    "beard trim",
+    "hose fitting"
+   ],
+   [
+    "Haircuts",
+    "Pressure switch tests"
+   ],
+   [
+    "haircuts",
+    "pressure switch tests"
+   ],
+   [
+    "Haircut",
+    "Pressure switch test"
+   ],
+   [
+    "haircut",
+    "pressure switch test"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "water heaters",
+    "pressure tanks"
+   ],
+   [
+    "water heater",
+    "pressure tank"
+   ],
+   [
+    "shops",
+    "counters"
+   ],
+   [
+    "shop",
+    "counter"
+   ],
+   [
+    "Shop",
+    "Counter"
+   ],
+   [
+    "Elm St",
+    "Weir St"
+   ],
+   [
+    "house calls",
+    "home pressure switch tests"
+   ],
+   [
+    "house call",
+    "home pressure switch test"
+   ],
+   [
+    "House calls",
+    "Home pressure switch tests"
+   ],
+   [
+    "House call",
+    "Home pressure switch test"
+   ]
+  ],
+  "B": [
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Well pump service takes jobs sent now. The counter takes none."
+   ],
+   [
+    "The chairs",
+    "The counter"
+   ],
+   [
+    "A chair, ready",
+    "A tested switch, ready"
+   ],
+   [
+    "JP031552",
+    "WP-10552"
+   ],
+   [
+    "JE30417",
+    "WT-10417"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "The on-call technician · a STOP before they set out: they call first"
+   ],
+   [
+    "Water pressure check",
+    "Free pressure check by phone"
+   ],
+   [
+    "Alex books on the shop's booking page",
+    "Alex books on the company's booking page"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Tells Alex it's with the shop",
+    "Tells Alex it's with the company"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Sent now · Overflowing kitchen drain",
+    "Sent now · No water at all"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Lucia and Joel run the pressure switch tests; Lucia also does home pressure switch tests"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Lucia: counter tech, control box repairs, home visits"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Lucia: counter tech, control box repairs and home visits"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every counter service, control box repairs and home pressure switch tests"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the counter, and home pressure switch tests"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A switch test' or 'a gauge swap' fits a pressure switch test."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a farm: 'We'd like switch tests for 6 pumps before Saturday's planting.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A switch test's example: 'A pump this old needs a part check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which part is the problem?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the part next to the gauge"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the surface"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a licensed well driller first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "cracks a pump housing and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a pump housing"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "cracked a pump housing at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked pump housing"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the counter and for home pressure switch tests"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Repair quotes come to you first. List prices never need one"
+   ],
+   [
+    "Color always stays with Riley",
+    "Control box repairs always stay with Lucia"
+   ],
+   [
+    "Riley's color plan",
+    "Lucia's pump service plan"
+   ],
+   [
+    "Color plan",
+    "Pump service plan"
+   ],
+   [
+    "color plan",
+    "pump service plan"
+   ],
+   [
+    "rents a chair",
+    "works on their own"
+   ],
+   [
+    "Free on your board",
+    "Free on your list"
+   ],
+   [
+    "the shop's board",
+    "the counter's list"
+   ],
+   [
+    "a chair renter",
+    "an independent contractor"
+   ],
+   [
+    "A chair renter",
+    "An independent contractor"
+   ],
+   [
+    "a step-free chair",
+    "a step-free entrance"
+   ],
+   [
+    "would like to see your hair",
+    "would like to see the part"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, but test the gauge too'"
+   ],
+   [
+    "please come with dry hair",
+    "please bring the old switch"
+   ],
+   [
+    "It's my kitchen.",
+    "It's my well."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Softener install: a free estimate, then a quote"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Its own danger words: a gas smell, a shock from a tap or pipe, or water on the pump's wiring."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for no water at home: shut off the pump at the breaker before bringing the part in."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, the breaker is on"
+   ],
+   [
+    "Leak repair · $245",
+    "Well pump repair · $245"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 pressure switch replacement needs none."
+   ],
+   [
+    "Kim L.'s yard drain needs nobody home.",
+    "Kim L.'s pressure switch replacement needs nobody home."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s pressure switch, replaced Thu Oct 22, clicks on and off again."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT",
+    "Colm scrapes a hand and texts HURT"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "Each stage is billed when Jordan texts it done. One booking, so one $2 for the whole job.",
+    "The rest is billed when Colm texts DONE. One booking, so one $2 for the whole job."
+   ],
+   [
+    "Mon Nov 2 to Wed Nov 4 · 8am–4pm",
+    "Mon Nov 2 · 8am–2pm"
+   ],
+   [
+    "Mon Nov 9 to Wed Nov 11 · 8am–4pm",
+    "Mon Nov 9 · 8am–2pm"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "Bank transfer over $500"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's no water at the taps, today,"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A well driller or pump installer license behind the company, and one for each technician where the state asks."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is there no water at all or just weak pressure, and does the pump run?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Stonecreek Well can come:"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my pressure switch clicking. A text back is fine."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like asking us to fake a water test."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My pump clicks but the water won't come' fits a well pump repair."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a pressure gauge check? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the well."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a new pump put in one day and the well disinfected another."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the way to the pump and the pressure tank."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a wet spot around the pressure tank this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an estimate visit, today,"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Colm checks the pump and texts the price with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 pressure switch 165 wire repair 80"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Pump motor and wiring · $540"
+   ],
+   [
+    "Supply line · $80",
+    "Wire repair and seal · $80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Colm found the problem. Here's the price to fix it today."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Pressure switch and gauge · $165"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the pressure switch only, $165. Leave the wire repair."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Colm does the pressure switch, $165. The $80 wire repair stays good until Thu Oct 29."
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Colm's estimate visit at Harper J.'s is for a $2,400 well pump replacement."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 well pump replacement, a deposit and a final bill"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Stonecreek Well's quote for your well pump replacement."
+   ],
+   [
+    "Repipe · $2,400",
+    "Well pump replacement · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$600 to start, $1,800 when the new pump is in and tested"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · well pump replacement"
+   ],
+   [
+    "The $800 start payment",
+    "The $600 start payment"
+   ],
+   [
+    "Your $800 start payment",
+    "Your $600 start payment"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Say Harper J.'s $2,400 well pump replacement is billed in three stages"
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: the new pump is in and tested."
+   ],
+   [
+    "stage 2 of your repipe",
+    "your well pump replacement, the final bill"
+   ],
+   [
+    "$800",
+    "$1,800"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pump counters set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A pump parts and repair counter on Weir St. Pressure switch tests, jet pump rebuilds and water sample tests."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pump counters start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pump counters often set."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds water testing to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Water testing for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW water testing"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I run the washing machine before you come?"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like no water at all at night"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Colm's notes"
+   ],
+   [
+    "sewer camera report",
+    "well inspection report"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 well pump replacement"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like adding a second pressure tank Colm noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to add a second pressure tank, from Colm's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Add a second pressure tank"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like no water at all at night"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "There's no water at all. Can someone come tonight?"
+   ],
+   [
+    "LATE camera report",
+    "LATE well inspection report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A pressure switch replacement happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Stonecreek Well doesn't do, like a roof leak."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Stonecreek Well does well, pump and water treatment, not roofing. Nothing was saved. You can look for a roofer near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Stonecreek Well's"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what's wrong with the water or the pump, where the pump and tank are, and if the power is on."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, a shock from a tap or pipe, or water on the pump's wiring."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old pressure tank rusted at the base"
+   ],
+   [
+    "Under the sink, before",
+    "Pump house, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Pressure tank, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A well pump repair is priced at the visit: only the $89 service call was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Colm finds a cracked well casing. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "a cracked well casing"
+   ],
+   [
+    "Mold behind the sink wall",
+    "A cracked well casing"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Colm found a cracked well casing and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the pump work in the well"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left muddy boots on the porch.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left muddy boots on the porch."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Colm look at my pressure tank next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Colm's next times for a pressure tank estimate."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the pressure tank estimate for today"
+   ],
+   [
+    "$245",
+    "$245"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? El agua sale marrón y huele mal."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? The water is coming out brown and smells bad."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A well pump contractor's example: a shock from a tap or pipe gets 'don't touch the pump, call 911'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to stop drinking and cooking with the water, use bottled water, and shut off the pump at the breaker."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No beba ni cocine con esa agua. Use agua embotellada. Apague la bomba en el interruptor."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't drink or cook with that water. Use bottled water. Shut off the pump at the breaker."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My well flooded in the storm. Is it safe to turn the pump back on?"
+   ],
+   [
+    "a dripping faucet",
+    "a dripping pressure gauge"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The pressure gauge is a small repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a technician check my pressure switch this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Pump check"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa pump check Thu 12-2 Felix"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a well water test at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's well water test?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My pressure switch is clicking. Can a technician come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the kitchen tap."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the power to the pump on?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the pump is now running with no water."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The pump is running with no water now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Shut off the pump at the breaker, and keep away from wet wiring."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you test my well water every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Stonecreek Well has a yearly well water test plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a well water test every year."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 pressure switch replacement"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE pump holds 52 psi. Tank air charge set to 40. Test the water once a year."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The pump short cycles 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The pump is turning on and off every few seconds again."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your pump is under warranty"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Colm finds a cracked well cap."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace the well cap"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the well cap"
+   ],
+   [
+    "both shutoff valves",
+    "the well cap"
+   ],
+   [
+    "the shutoff valves",
+    "the well cap"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 well cap quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 well cap work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Colm also test the well water?"
+   ],
+   [
+    "Sewer camera report",
+    "Well inspection report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the well inspection report link"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A pressure switch replacement has a set price. A pump repair is priced at the visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Pressure switch replacement"
+   ],
+   [
+    "Drain clearings",
+    "Pressure switch replacements"
+   ],
+   [
+    "drain clearings",
+    "pressure switch replacements"
+   ],
+   [
+    "Drain clearing",
+    "Pressure switch replacement"
+   ],
+   [
+    "drain clearing",
+    "pressure switch replacement"
+   ],
+   [
+    "Kitchen drain",
+    "Well"
+   ],
+   [
+    "kitchen drain",
+    "well"
+   ],
+   [
+    "Water heater flush",
+    "Well water test"
+   ],
+   [
+    "water heater flush",
+    "well water test"
+   ],
+   [
+    "leehomeservices.com",
+    "stonecreekwell.com"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Switch tests, fittings, jet pump rebuilds and water sample drop-offs at the counter. Home visits only where the state's rules allow them. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A pressure switch test could mean a pump supplier or a hardware store."
+   ],
+   [
+    "MP045210",
+    "WP-1042"
+   ],
+   [
+    "EC22871",
+    "WT-2210"
+   ],
+   [
+    "BS20981",
+    "PS-3305"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The counter is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Stonecreek Pump can do your pressure switch test at the counter for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Stonecreek Well LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Stonecreek Well"
+   ],
+   [
+    "Lee's Barbershop",
+    "Stonecreek Pump"
+   ],
+   [
+    "Lee Plumbing",
+    "Stonecreek Well"
+   ],
+   [
+    "Lee Electric",
+    "Stonecreek Water Treatment"
+   ],
+   [
+    "1200 Main St",
+    "700 Ridge Rd"
+   ],
+   [
+    "88 Elm St",
+    "9 Weir St"
+   ],
+   [
+    "42 Oak St",
+    "26 Spring Ln"
+   ],
+   [
+    "Riley",
+    "Lucia"
+   ],
+   [
+    "Avery",
+    "Joel"
+   ],
+   [
+    "Jordan",
+    "Colm"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "plumbing and electrical",
+    "well, pump and water treatment"
+   ],
+   [
+    "Plumbing and electrical",
+    "Well, pump and water treatment"
+   ],
+   [
+    "electrical",
+    "water treatment"
+   ],
+   [
+    "Electrical",
+    "Water treatment"
+   ],
+   [
+    "Panel upgrade",
+    "Softener install"
+   ],
+   [
+    "Plumber",
+    "Well and pump contractor"
+   ],
+   [
+    "plumber",
+    "technician"
+   ],
+   [
+    "plumbing",
+    "well and pump"
+   ],
+   [
+    "Plumbing",
+    "Well and pump"
+   ],
+   [
+    "barbershop",
+    "pump counter"
+   ],
+   [
+    "Barbershop",
+    "Pump counter"
+   ],
+   [
+    "barbers",
+    "counter techs"
+   ],
+   [
+    "barber",
+    "counter tech"
+   ],
+   [
+    "Barber",
+    "Counter tech"
+   ],
+   [
+    "haircut",
+    "pressure switch test"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "Water heater replacement",
+    "Pressure tank replacement"
+   ],
+   [
+    "water heater replacement",
+    "pressure tank replacement"
+   ],
+   [
+    "Leak repair",
+    "Well pump repair"
+   ],
+   [
+    "leak repair",
+    "well pump repair"
+   ],
+   [
+    "Sewer camera inspection",
+    "Well inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "well inspection"
+   ],
+   [
+    "water heaters",
+    "pressure tanks"
+   ],
+   [
+    "Water heater",
+    "Pressure tank"
+   ],
+   [
+    "water heater",
+    "pressure tank"
+   ],
+   [
+    "shop",
+    "counter"
+   ],
+   [
+    "Shop",
+    "Counter"
+   ],
+   [
+    "Elm St",
+    "Weir St"
+   ],
+   [
+    "house calls",
+    "home pressure switch tests"
+   ],
+   [
+    "house call",
+    "home pressure switch test"
+   ],
+   [
+    "House calls",
+    "Home pressure switch tests"
+   ],
+   [
+    "House call",
+    "Home pressure switch test"
+   ]
+  ]
+ },
+ "cast": {
+  "A": {
+   "staff": "Lucia and Joel (counter techs)"
+  },
+  "B": {
+   "staff": "Colm and Felix (technicians)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Lucia"
+  },
+  "B": {
+   "staff": "Colm"
+  }
+ },
+ "keep": [
+  "color",
+  "pump rebuild",
+  "Pump rebuild",
+  "leak",
+  "valve",
+  "pipe",
+  "Pipe",
+  "electrician",
+  "service call"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings a pressure switch that keeps clicking to the counter at Stonecreek Pump, Sam's pump parts and repair shop, and Lucia tests it on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Stonecreek Well Service at 26 Spring Ln, and Colm comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: a switch, a pump repair, a water test or a tank."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 pressure switch test at the counter. A card is saved for the counter's $20 fee. Alex pays at the counter.",
+    "list|none|counter": "A $35 pressure switch test. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|deposit|counter": "The $140 jet pump rebuild. A $40 deposit now, and $100 at the counter.",
+    "list|full|none": "The $55 water sample test, paid in full when booking. The result goes on the secure page.",
+    "photos|card|counter": "A control box repair, priced from Alex's photos at $90. Booked once Sam OKs it.",
+    "visit|card|counter": "A pump repair, priced at the counter. Only the $25 check is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Pressure switch test"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Pressure switch test"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Jet pump rebuild"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Water sample test"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Control box repair"
+    },
+    "visit|*|*": {
+     "fee": "$25",
+     "name": "Pump repair"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "visit|card|bill",
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 pressure switch replacement. A card is saved for the $89 fee, only for a late cancel or nobody home, and only if Sam confirms. Rosie texts the bill after the job.",
+    "list|none|bill": "A $179 pressure switch replacement. Nothing is taken. Rosie texts the bill after the job.",
+    "list|card|card": "A $179 pressure switch replacement. A card is saved and charged $179 when Colm texts DONE.",
+    "visit|card|bill": "A well pump repair, priced at the visit. Only a card is saved. Colm quotes it, and Rosie texts the bill.",
+    "photos|deposit|bill": "A pressure tank replacement, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+    "list|full|none": "A $150 well water test, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Pressure switch replacement"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Pressure switch replacement"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Well water test"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Pressure tank replacement"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Pressure tank replacement"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Well pump repair"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-59",
+   "A7-15",
+   "A8-02",
+   "A8-53",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B4-81",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "B8-71",
+   "B8-65",
+   "B8-72",
+   "B10-29"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "A4-32",
+    "does": "A farm owner brings in five pressure switches from one barn, on one morning. Rosie finds counter spots side by side across Lucia and Joel."
+   },
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "A video check shows a pump house or a part. Lucia says what to bring, or if a technician should come to the home."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say the pump at Alex's home now runs with no water before the visit. The plug-in's danger words are checked first. Then Lucia is asked if the visit can go ahead.",
+    "more": [
+     "A sign of danger gets the safety message first, like 'shut off the pump at the breaker' or 'call 911'.",
+     "A pump that runs with no water needs a technician at the home. That's a new booking with Stonecreek Well.",
+     "Lucia asked for the move, so there's no fee.",
+     "A question only a pro should answer gets the counter's line, (555) 010-0177, and the visit stays booked."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The pump runs now but no water comes out. I shut it off at the breaker. Can I still come in Saturday?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. (Sat 11:00am) sent an update before the visit. It's on the secure page. Can the visit go ahead?",
+      {
+       "card": {
+        "title": "Alex M.'s update",
+        "lines": [
+         "On the secure page"
+        ]
+       },
+       "buttons": [
+        "Yes, come in",
+        "Better to move it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Lucia suggests getting the pump checked at home first. Keep the pump off at the breaker. Your visit here can move, with no fee. Pick a new time:",
+      {
+       "times": [
+        "Sat Oct 31 · 11:00am · Lucia",
+        "Tue Nov 3 · 11:00am · Lucia"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "It can't be rebuilt",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.19",
+        "8.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Sat Oct 24, 11:15am",
+       "title": "Offers a new part, or a technician at home",
+       "does": "Lucia finds the pressure switch can't be repaired. Nothing is charged for the test. Alex picks a new switch at the counter, or a technician at home.",
+       "more": [
+        "A new switch is sold at the counter's own price, once Alex says yes.",
+        "A technician at home is a new booking with Stonecreek Well, at the customer's place.",
+        "Sam sets any price for the time spent, as with a visit stopped early.",
+        "No answer: nothing more is done, and Alex takes the old switch home."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "Alex M.'s pressure switch has a burnt contact. It can't be repaired."
+        ],
+        [
+         "san",
+         "cust",
+         "Lucia found a burnt contact in the switch, so it can't be repaired. Nothing is charged for the test. What would you like?",
+         {
+          "buttons": [
+           "A new switch here",
+           "A technician at home",
+           "Take it back"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.services"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Well pump service and the counter pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The business books technicians and counter techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "No water at night is sent now to the technician on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The counter books a counter tech's time, or a drop-off slot for a pump. No class seats."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The counter books a counter tech's time, or a drop-off slot for a pump. No spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at a pump counter is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The counter's plug-in names no form to sign. Its first steps are a part check, or a paper the shop gets, like a warranty claim number."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Counter work is rated, like every test."
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "The owner sets the daily number at sign-up. A full day isn't shown.",
+     "Pick-up comes once it's READY, in the pick-up hours.",
+     "At the counter, a pump left for a rebuild is a drop-off: the shop takes a few a day."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the pump counter."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A counter visit is an adult's own pump repair; a child is never the one served."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "B4-91",
+    "does": "Say there is no water at all at 6:40pm. The plug-in marks it urgent, and Sam has a technician on call tonight. So the AI offers to send someone now, with an arrival estimate, not a window.",
+    "more": [
+     "After hours, the service call is $149, not $89. A card is saved for it the same way, and it comes off the repair.",
+     "Flat-price jobs cost $60 more after hours. Alex sees the after-hours price before booking.",
+     "The technician on call takes it once Alex books. If nobody does, nothing is charged, and Alex is told.",
+     "Sam set who's on call with the team: open hours too, plus nights, weekends and holidays, with a backup.",
+     "Nobody on call right now: the soonest times show first, as for work that's never sent now.",
+     "A job sent now gets no reminder or day list. Free cancel ends when the pro texts OMW.",
+     "Where the state's rules limit prices in a declared emergency, those limits apply."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "There's no water at all. Can someone come tonight?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Stonecreek Well has a technician on call tonight. Sent now, they'd arrive in about 60 to 90 minutes. After hours, the service call is $149, with a card saved for it, taken off the repair.",
+      {
+       "buttons": [
+        "Send someone now",
+        "See the soonest times"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-16",
+    "more": [
+     "Alex also gets the safety steps again: if the pump is running with no water, shut it off at the breaker."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-30",
+    "more": [
+     "A gas smell at the visit: Colm stops, gets everyone out, and calls 911 and the gas company. Nothing more is done that day.",
+     "A shock from the pump or its wiring: Colm stops, keeps everyone away, and calls 911. The power stays off until an electrician checks it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Well pump service and the counter pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The business books technicians, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "No water at night is sent now to the technician on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Well pump service books a technician in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in well pump service is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A visit at the home books a technician in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "Well pump work is never with a child: the technician waits for an adult on the booking."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after every visit."
+   }
+  ]
+ },
+ "notes": "Started from plumber (pattern: fix, refitted Tue Oct 27 on the frozen master). Flow B is the plumber's usual side: Stonecreek Well, technicians Colm and Felix, at the home. Flow A is the less usual side: Stonecreek Pump, Sam's pump parts and repair counter (the master's Lee's Barbershop), counter techs Lucia and Joel, with a jet pump left as a drop-off. The second kind of work in sign-up (the master's electrical) is water treatment (Stonecreek Water Treatment). Facts: firststeps (a service call, a part check), documents (a written estimate over the owner's amount), sentnow (an after-hours no-water call), dropoff (a pump left at the counter), extrawork, photos, results (a lab result for a water test comes later), video; planbill and forms are not listed (a home warranty plan rarely covers a well; no form is signed first). Switch cancelright in flow B only (work sold at the home). Settings: A a set start, B a 2-hour window.\nFlow B main path list|card|bill: a $179 pressure switch replacement (the $89 service call included), a card saved for the $89 fee, only for a late cancel or nobody home, and only if Sam confirms; Rosie texts the bill. The other paths: list|none|bill, list|card|card (the card charged $179 when Colm texts DONE), visit|card|bill (a well pump repair priced at the visit: only the $89 call is promised; the example quote is a pressure switch and gauge $165 plus wire repair $80 = $245), photos|deposit|bill (a pressure tank replacement from photos, $640: $160 deposit, $480 rest, Sam OKs it), list|full|none (a $150 well water test paid in full; the result goes on the secure page, never in a text).\nA well pump replacement over the owner's amount is the master's 'an estimate becomes its own job' (B8-62, B8-63): a written estimate and contract, a $2,400 example in two payments (a $600 deposit, 25%, and the $1,800 rest on the final bill after the pump is in and tested), no stage bills (a one-day job; the quote split and the day pick say so with pairs). New well drilling is quoted after a site visit on the same path, with a state permit, a utility locate and the driller license first; the owner OKs each one.\nFlow A paths: list|card|counter (main; a $35 pressure switch test, a card saved for the $20 fee), list|none|counter, list|deposit|counter (a $140 jet pump rebuild, $40 deposit and $100 at the counter), list|full|none (a $55 water sample test, paid in full), photos|card|counter (a control box repair from photos, $90, Sam OKs it), visit|card|counter (a pump repair priced at the counter, only the $25 check promised).\nAfter hours: no water at all is sent now to the technician on call, $149 taken off the repair, flat-price jobs $60 more, free cancel until the technician texts OMW (B4-91 words). This is the only sent-now work, so S2-30 keeps its sent-now branch: S2-30's line says well pump service takes jobs sent now and the counter takes none, and S1-21's row names the on-call technician. I searched the joined text for the opposite claim.\nSafety: a gas smell, hissing, a carbon monoxide alarm, someone hurt, sparks, a shock from a tap or pipe, or water on the pump's wiring or control box stops the booking (911 first). A pump running dry or no water, brown or bad-smelling water, a bulging or hissing pressure tank, and a flooded pump pit are safety steps and then the booking goes on, marked urgent. The Spanish call (B3-11, B3-18) is about brown, bad-smelling water: the same go-on branch; its advice is to stop drinking it and shut off the pump at the breaker. The hazard card (B8-30) is a cracked well casing, which stops the pump work and sends a written note: it is not a stop word.\nPrivate: a water test result is on the secure page only, never in a text (pf.messages, pf.questions, pf.edges); a positive test is not an emergency: no drinking, a disinfection and a retest by quote. A shared well needs every owner's OK. Nothing names a state, city or law; the well driller, pump installer and electrician licenses, the county permit, the deposit cap, the right to cancel and emergency prices are switches from the state's or county's form. License numbers use an obviously fake format (WP-1042, WT-2210, PS-3305; people WP-10552, WT-10417).\nRename: built from the contractor family's pair map with a fix-style template (the master's plumbing example words become pump words; service call stays 'service call', credited to the repair; the repipe example becomes the pump replacement). 'cut', 'hair' and price-board words are turned into this work's words. The A3-22 / A3-23 lines that said the plug-in has no danger words now name this work's. Second company names stay at 15 characters or less so S1-78 and B10-01 stay under their limits.\nkeep: pump rebuild (the counter's jet pump rebuild), leak (a roof leak, the work it doesn't do), valve, pipe (a shock from a tap or pipe), electrician (the safety advice), service call (the fix-style visit fee), color (the protected-classes line in S13-40).\nPlug-in splits kept whole (splitsKept): the plumber's list, since this work uses every branch: licensed state by state (S1-60, S1-63, S2-28), a pump drop-off names no technician (A7-59, S11-87, S11-90), control box repairs are Lucia's alone (A7-61), a switch test needs the switch (A8-02), the counter or a drop-off (A8-53); in B, an after-hours call is sent now (B4-81, B7-55, B8-58), a written estimate over the amount (B4-57, B5-34), a pump or tank delivered and set up (B8-71), a pump to the counter (B8-72), an outside check partway (B8-65), a permit inspection (B10-29).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "JP031552",
+    "JE30417",
+    "Groom's package · ",
+    "$40 for the Groom's package",
+    "the Groom's package",
+    "The Groom's package",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "'A trim' or 'a fade' fits a haircut.",
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "How would you like it on top?",
+    "like the cut in the mirror",
+    "like a mark on an item or the skin",
+    "like a skin reading",
+    "at the shop and for house calls",
+    "Color quotes come to you first. Board prices never need one",
+    "Color always stays with Riley",
+    "Riley's color plan",
+    "Color plan",
+    "color plan",
+    "rents a chair",
+    "Free on your board",
+    "the shop's board",
+    "a chair renter",
+    "A chair renter",
+    "a step-free chair",
+    "would like to see your hair",
+    "'Yes, make it a fade'",
+    "please come with dry hair",
+    "Panel upgrade: a free estimate, then a quote",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop has none, so nothing is sent here.",
+    "like a 15-minute style consult",
+    "two skin fades on",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "a Kids cut (12 and under) is $25",
+    "Quiero un corte el sábado.",
+    "Gloss to finish",
+    "gloss",
+    "takes jobs sent now, like a burst pipe",
+    "A repair shop, a tailor or a groomer does.",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Drain clearing",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "water heaters",
+    "water heater",
+    "shops",
+    "shop",
+    "Shop",
+    "Elm St",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call"
+   ],
+   "B": [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "JP031552",
+    "JE30417",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Water pressure check",
+    "Alex books on the shop's booking page",
+    "Gives the shop's own line",
+    "Tells Alex it's with the shop",
+    "shop-added",
+    "Sent now · Overflowing kitchen drain",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "At the shop, and house calls",
+    "Call a mold cleanup company first",
+    "cracks the cabinet floor and texts a photo",
+    "DAMAGE cracked the cabinet floor",
+    "cracked the cabinet floor at",
+    "Cracked cabinet floor",
+    "at the shop and for house calls",
+    "rents a chair",
+    "a chair renter",
+    "It's my kitchen.",
+    "Panel upgrade: a free estimate, then a quote",
+    "Yes, it won't drain",
+    "Leak repair · $245",
+    "The $179 drain needs none.",
+    "Kim L.'s yard drain needs nobody home.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Jordan cuts a hand and texts HURT",
+    "HURT cut my hand, need to stop",
+    "Each stage is billed when Jordan texts it done. One booking, so one $2 for the whole job.",
+    "Mon Nov 2 to Wed Nov 4 · 8am–4pm",
+    "Mon Nov 9 to Wed Nov 11 · 8am–4pm",
+    "A tip line · bank transfer over $500",
+    "It's a leak under the sink, today,",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Like tapping a neighbor's water line without asking.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Right to cancel · repipe",
+    "The $800 start payment",
+    "Your $800 start payment",
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of your repipe",
+    "$800",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "$245",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "leehomeservices.com",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "shop",
+    "Shop",
+    "Elm St",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call"
+   ]
+  },
+  "A": {
+   "A4-32": "d5a284a416",
+   "A4-36": "f261af1660",
+   "A7-13": "e41528a397",
+   "A8-32": "632f2b5b40",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3",
+   "A4-14": "95c7ffcfab",
+   "A8-67": "e9fd748fc5",
+   "A4-24": "0a292df05b"
+  },
+  "B": {
+   "B4-91": "eb948968a8",
+   "B6-16": "d428d8c29e",
+   "B8-30": "a1ef4983e4",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

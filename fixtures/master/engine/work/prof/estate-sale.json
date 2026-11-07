@@ -1,0 +1,3484 @@
+{
+ "id": "estate-sale",
+ "name": "Estate sale company and auctioneer",
+ "style": "Project",
+ "pattern": "project",
+ "from": "junk",
+ "keep": [
+  "leak",
+  "estate",
+  "house call",
+  "Hugo",
+  "cleanout",
+  "crew lead",
+  "hand truck"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings 14 pieces to Lee Gallery, Sam's consignment and appraisal gallery, and Odette logs them for the next auction on Sat Oct 24 at 11:00am. The visit depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Estate Sales for a free walk-through of the house Alex is clearing at 55 Orchard Ln. Gil comes Thu Oct 22 at 9am, sends a written proposal, and runs setup, three sale days and the settlement once the agreement is signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|none",
+   "combos": [
+    "list|none|none",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|none": "A consignment drop-off or a free 15-minute evaluation. Nothing is taken. The gallery keeps 25% of what sells and settles the rest after the auction, its own way.",
+    "list|card|counter": "A written appraisal at the office, 2-hour minimum $350; a card saved for the $50 missed-appointment fee; paid at the counter."
+   },
+   "labels": {
+    "price": {
+     "photos": "Priced from photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50",
+     "name": "Consignment drop-off"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Consignment drop-off"
+    },
+    "list|*|*": {
+     "price": "$350",
+     "name": "Written appraisal",
+     "fee": "$50"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   }
+  },
+  "B": {
+   "main": "visit|none|own",
+   "combos": [
+    "visit|none|own",
+    "visit|none|bill",
+    "list|none|bill"
+   ],
+   "examples": {
+    "visit|none|own": "The main story: a free walk-through, then a managed estate sale: 35% of the gross, $1,500 minimum, taken from the proceeds; nothing up front. Lee Estate Sales settles it its own way within 14 days of the last sale day. Rosie sends nothing about money.",
+    "visit|none|bill": "A cleanout quoted at the walk-through when there's no sale: $900, nothing up front, billed through Rosie after the job.",
+    "list|none|bill": "A written appraisal at the home, $175 an hour with a 2-hour minimum ($350); billed after."
+   },
+   "labels": {
+    "price": {
+     "visit": "Quoted after a free walk-through"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50",
+     "name": "Written appraisal"
+    },
+    "list|*|*": {
+     "price": "$350",
+     "name": "Written appraisal"
+    },
+    "visit|*|*": {
+     "fee": "free",
+     "name": "Estate sale"
+    }
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "setstart"
+    ]
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "notes": "New profession (P3 pass, Tue Oct 27 2026, batch P6), started from the refitted junk (from: junk), merged with the verified Oct 24 test-drive plug-in (work/testdrive/estate-sale.md, 11 findings, all general). Junk's haul-away steps (won't-take list, truck space, dump runs, curbside) were not carried; the structure is a project (a walk-through, a written proposal, a signed agreement, setup days, sale days, a settlement) built on the same master steps the contractor-style professions use.\nMoney: nothing up front. The firm is paid a share of what sells (a managed sale 35% of the gross with a $1,500 minimum, an on-site auction 30%, example), taken from the proceeds and settled in its own tools within 14 days of the last sale day; so no money goes through Rosie on the main path (visit|none|own) and Rosie texts only that the settlement statement is ready (amount on the secure page). Two paths do go through Rosie: a cleanout quoted at the walk-through ($900 example, nothing up front, billed after DONE) and a written appraisal at the home ($175 an hour, 2-hour minimum = $350, billed after). A cancel after setup has started owes the setup hours done at $45 a worker-hour (example), billed the business's own way; before setup nothing is owed.\nFlow B main path visit|none|own: Alex (the person with the right to sell) clearing the house at 55 Orchard Ln. Free walk-through Thu Oct 22, 9am (Gil, set start); proof of the right to sell shown there (Rosie keeps only that it was shown); proposal Fri Oct 23 after Sam's OK; agreement Mon Oct 26 (Alex, and every co-executor or co-owner the business asks for) and Tue Oct 27 (Sam); cancel window to 11:59pm Mon Nov 2 (switch cancelright, flow B only). Own step B8-x01 Wed Nov 4: the family's kept items out by Wed Nov 11, the per-sale local permit (business) and the building's OK (family) before the sale is advertised. Work plan B8-37 (Wed Nov 4): setup Thu Nov 12 to Wed Nov 18, sale Fri Nov 20 to Sun Nov 22, cleanup Mon Nov 23, settlement by Sun Dec 6. B8-x02 (a branch of B8-22) Mon Nov 16: the family calls off the sale after setup began. B9-x01 Sun Dec 6: the settlement statement is ready. Rating once, only after the settlement (B10-02, Mon Dec 7).\nFlow A is Sam's second company Lee Gallery (consignment, free evaluations, written appraisals; appraisers Odette and Felix). Paths: list|none|none (main: a consignment drop-off or a free evaluation: nothing taken; the gallery keeps 25% of what sells, settled after the auction) and list|card|counter (a written appraisal at the office, 2-hour minimum $350, card saved for a $50 missed-appointment fee, paid at the counter). A8-x01 logs the items (they stay for the next auction, they are not picked up); A8-x02 offers the free walk-through, which runs in flow B. Cards name 'an appraisal visit' on every A path (the master hard-codes one service name per flow).\nSafety: stop = someone hurt, fallen or can't breathe; fire, smoke, gas smell. Steps then go on = an unreported death at home, a biohazard, mold, hoarding or unsafe stairs (a cleanup company first, none named; no entry until cleared), firearms and medicines (never sold; the family removes them), a pet left in the home, a grieving family (no sales talk). B3-11 and B3-18 are one Spanish conversation about mold in a basement. Rosie and staff give no advice on what an item is worth.\nWho may book and sign: an adult; the agreement is signed only by people with the right to sell (owner, executor or administrator, trustee, financial power-of-attorney agent, conservator) and every co-owner or co-executor the business asks for; a power of attorney ends at death (then only the executor). Never a minor. A named specialist is not replaced on silence. Never in texts: lockbox and gate codes, item lists and values, the settlement amount, that a home stands empty (told only to the staff on the job), a death or why a home is being sold.\nLicenses: an auctioneer license for each auctioneer (and/or the firm) where the state's rules license auctioneers; a bond and trust account for buyers' money where required; a used-goods dealer license or seller's permit and a per-sale local permit only where required; an auction stand-in must hold the same license. S1-60 and S2-28 are kept both ways. Example license numbers use the EX-2210 format.\nSwitches: cancelright (B). Facts: firststeps, documents, multiday, extrawork, results (the settlement statement is a report promised by a date). Settings: set start times in both flows; cutoff 24 hours. Not set: sensitive, welfare, standin, fixeddate.\nThe old test-drive gaps: nine are closed by the REDESIGN 2 master (partway stop B8-80, named person S13-56, call summary B3-22, rating split B10-32, nobody-home DONE B8-41, customer-side first step cut, need-by date B4-94, everyone signs B8-62, a death B7-73); two stay open (work/gaps/estate-sale.json). keep: leak, estate, house call, Hugo, cleanout, crew lead, hand truck.",
+ "plugin": {
+  "pf.license": {
+   "need": "an auctioneer license where the state's rules license auctioneers (each auctioneer, the firm, or both); a bond and a trust account for buyers' money where those rules require them (the business's own bookkeeping); an estate sale firm usually needs only a business registration; a used-goods dealer license, a seller's permit and a per-sale local permit only where the rules require them",
+   "who": "the business, and each auctioneer where the rules license people",
+   "ask": [
+    "The business registration",
+    "An auctioneer license number, for each auctioneer, where the rules require one",
+    "A bond and a trust account, where the rules require them",
+    "A used-goods dealer license or a seller's permit, only where the rules require one",
+    "General liability insurance, and a bond or crime coverage for staff working in clients' homes"
+   ],
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "A sale or an on-site auction is never run by someone without the auctioneer license the rules require",
+    "A stand-in for an auction must hold the same license"
+   ],
+   "background": "A criminal background check for every person who works in a client's home (the business's own rule)",
+   "renewals": "License, bond and insurance dates reminded 30 days before they lapse; a lapse pauses that part of the work"
+  },
+  "pf.services": {
+   "shape": "Project: a free walk-through at the home, then a written proposal, a signed agreement, setup days, sale days and a settlement; the firm is paid a share of what sells, settled from the proceeds in its own tools, not through Rosie",
+   "examples": "the example firm's own terms, not a standard",
+   "B": [
+    {
+     "name": "Walk-through at the home",
+     "price": "free (example)",
+     "length": "60 to 90 minutes",
+     "where": "at the home; the person with the right to sell is there",
+     "before": "nothing taken",
+     "after": "nothing owed; a written proposal follows within 3 business days"
+    },
+    {
+     "name": "Managed estate sale",
+     "price": "35% of the gross sales, $1,500 minimum (example)",
+     "length": "setup of about 5 days, then 3 sale days",
+     "where": "at the home",
+     "before": "nothing taken",
+     "after": "the settlement statement and payment within 14 days of the last sale day (example), the business's own way; commission comes out of the proceeds"
+    },
+    {
+     "name": "On-site auction",
+     "price": "30% of the gross sales (example)",
+     "length": "setup, then one auction day",
+     "where": "at the home",
+     "before": "nothing taken",
+     "after": "settled from the proceeds, the business's own way"
+    },
+    {
+     "name": "Cleanout",
+     "price": "$900 (example), quoted at the walk-through",
+     "length": "1 to 2 days",
+     "where": "at the home, after a sale or on its own",
+     "before": "nothing taken",
+     "after": "Rosie texts the bill after the job"
+    },
+    {
+     "name": "Written appraisal at the home",
+     "price": "$175 an hour, 2-hour minimum: $350 (example)",
+     "length": "2 hours or more",
+     "where": "at the home",
+     "before": "nothing taken",
+     "after": "billed after; the written report follows"
+    },
+    {
+     "name": "Item appraisal letter",
+     "price": "$150 for one item (example)",
+     "where": "by photos or at the home"
+    },
+    {
+     "name": "Photo inventory of the home",
+     "price": "$199 (example)",
+     "where": "at the home"
+    },
+    {
+     "name": "Contents estimate from photos",
+     "price": "priced from the family's photos (example)",
+     "where": "by photos; for families who live far away"
+    },
+    {
+     "name": "Phone consult",
+     "price": "free: 10 minutes by phone about what can sell; no value advice",
+     "where": "by phone"
+    },
+    {
+     "name": "Labor",
+     "price": "$45 an hour per worker, for extra setup help (example); also the rate for setup hours done if a sale is cancelled after setup started",
+     "where": "added to a job, never booked alone"
+    }
+   ],
+   "A": [
+    {
+     "name": "Consignment drop-off",
+     "price": "free to drop off: the gallery keeps 25% of what sells, settled after the auction (example)",
+     "length": "15 to 30 minutes at the gallery",
+     "where": "at the gallery; the items are logged and stay for the next auction",
+     "before": "nothing taken",
+     "after": "nothing owed; the settlement comes after the sale, the gallery's own way"
+    },
+    {
+     "name": "Quick evaluation",
+     "price": "free",
+     "length": "15 minutes",
+     "where": "at the gallery or by video"
+    },
+    {
+     "name": "Written appraisal at the office",
+     "price": "$175 an hour, 2-hour minimum: $350 (example)",
+     "length": "2 hours or more",
+     "where": "at the gallery's office",
+     "before": "a card saved for a $50 missed-appointment fee",
+     "after": "paid at the counter"
+    },
+    {
+     "name": "Item appraisal letter",
+     "price": "$150 for one item",
+     "where": "at the gallery"
+    },
+    {
+     "name": "Photo page",
+     "price": "$50, an add-on",
+     "where": "at the gallery"
+    },
+    {
+     "name": "Catalog entry",
+     "price": "$25 an item, an add-on for the next auction",
+     "where": "at the gallery"
+    },
+    {
+     "name": "Auction entry fee",
+     "price": "$55 (example)",
+     "where": "at the gallery"
+    },
+    {
+     "name": "Estate consult package",
+     "price": "$140 (example)",
+     "where": "at the gallery"
+    }
+   ],
+   "capacity": "One specialist per walk-through or appraisal; a sale crew of 3 for setup and sale days; the gallery takes a set number of drop-offs a day",
+   "nobody_home": "Setup days, sale days and cleanouts run with nobody from the family there (a start photo and DONE with photos); the walk-through needs the person with the right to sell",
+   "online": "A free evaluation can be a video call (counts as at the gallery)"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What is being sold or cleared: the whole home, a few rooms, or single items?",
+    "Who has the right to sell: the owner, an executor or administrator, a trustee, an agent under a power of attorney, or a conservator?",
+    "Any date the home must be empty by: a closing, a lease end or a listing",
+    "Is the home owned, rented or in a building with rules? (a public sale in a rented or condo home needs the building's OK)"
+   ],
+   "after_time": [
+    "Who will be at the walk-through, and who else has to sign?",
+    "Which things stay with the family, and which must not be sold?",
+    "Stairs, a gate code, parking and neighbors the crew should know about",
+    "Pets in the home, and who looks after them on sale days"
+   ],
+   "secure_page_only": [
+    "The street address and how to get in (lockbox codes)",
+    "Item lists and values, and photos of the contents",
+    "The papers that show the right to sell (shown at the walk-through; Rosie keeps only that they were shown)",
+    "Anything about the family or the person who owned the home"
+   ],
+   "who_may_book": "An adult. The agreement is signed only by people with the right to sell (owner, executor or administrator, trustee, financial power-of-attorney agent, conservator) and by every co-owner or co-executor the business asks for. Never a minor.",
+   "gallery": [
+    "What you are bringing, and about how many pieces",
+    "Photos of the pieces (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone is hurt, has fallen or can't breathe",
+     "says": "Call 911 now.",
+     "booking": "no booking in that chat"
+    },
+    {
+     "words": "a fire, smoke or a gas smell",
+     "says": "Leave the home now, and call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "a death at home that was never reported, a biohazard, mold, hoarding or an unsafe floor or stairs",
+     "says": "Stay out of the area. A cleanup company has to clear it first (no company named). We will not enter until it is cleared.",
+     "booking": "goes on"
+    },
+    {
+     "words": "firearms, medicines or oxygen in the home",
+     "says": "Staff never touch them and never sell them. The family removes them before setup.",
+     "booking": "goes on"
+    },
+    {
+     "words": "unsafe stairs or floors",
+     "says": "Staff do not work there until the family says it is safe.",
+     "booking": "goes on"
+    },
+    {
+     "words": "a pet left in the home",
+     "says": "A family member must take the pet before setup day.",
+     "booking": "goes on"
+    },
+    {
+     "words": "a grieving family",
+     "says": "No sales talk. The walk-through is gentle, and nothing is sold or decided that day.",
+     "booking": "goes on"
+    }
+   ],
+   "business_line": "Questions about what an item is worth, what the law says, or what to do with a will go to the business's own line; Rosie gives no value advice"
+  },
+  "pf.first_steps": {
+   "before_proposal": "The walk-through at the home with the person who has the right to sell; the proof of that right is shown there",
+   "after_agreement": [
+    {
+     "name": "Proof of the right to sell",
+     "when": "shown at the walk-through, before the agreement",
+     "who": "the person signing",
+     "result": "Rosie keeps only that it was shown"
+    },
+    {
+     "name": "Signed agreement",
+     "when": "before setup",
+     "who": "every person with the right to sell, and the business",
+     "result": "the commission, the dates, who is paid and how, what stays with the family"
+    },
+    {
+     "name": "Kept items out",
+     "when": "by the day before setup",
+     "who": "the family",
+     "result": "items that stay with the family are removed or marked"
+    },
+    {
+     "name": "Local sale permit",
+     "when": "before the sale is advertised",
+     "who": "the business",
+     "result": "a per-sale permit where the rules require one"
+    },
+    {
+     "name": "The building's OK",
+     "when": "before the sale is advertised",
+     "who": "the family, for a condo or rented home",
+     "result": "written OK for a public sale"
+    }
+   ],
+   "gallery": "Consignment agreement signed at the gallery on the first drop-off",
+   "prep": "Before the walk-through: have the papers that show the right to sell, and put aside what stays with the family. Do not throw anything away before the walk-through."
+  },
+  "pf.visit": {
+   "check_in": "The check-in code from whoever meets the specialist at the door; with nobody home on setup and sale days, a start photo and DONE with photos. At the gallery: the code at the desk.",
+   "at_the_visit": "The specialist walks the home, sees what can sell, and sends a written proposal on the secure page within 3 business days",
+   "changes": "A new service added later (a cleanout, a buyout, an appraisal of one piece) is priced first and signed first",
+   "found_items": "Cash, jewelry, papers and keepsakes found while setting up are shown to the person with the right to sell on the secure page, logged with a photo, and never sold, thrown away or taken by staff",
+   "done": "Setup ends when the sale is ready. Each sale day ends with DONE. The sale ends with the settlement statement.",
+   "gallery_done": "DONE after the drop-off or the appraisal, with the items logged on the secure page",
+   "items": "Item lists, values and the settlement amount are on the secure page only; that a home stands empty is told only to the staff on the job"
+  },
+  "pf.money": {
+   "walkthrough": "free; nothing taken and nothing owed",
+   "commission": "The commission comes out of the proceeds. It is paid and settled in the firm's own tools, not through Rosie.",
+   "settlement": "The settlement statement and payment are due within 14 days of the last sale day (example). Rosie texts only that it is ready; the amount is on the secure page.",
+   "cleanout": "A cleanout quoted at the walk-through is billed through Rosie after the job; nothing is taken up front.",
+   "cancel": "A cancel after setup has started owes the setup hours done, at $45 a worker-hour (example), billed the business's own way. A cancel before setup owes nothing.",
+   "gallery": "A consignment owes nothing at drop-off. A written appraisal at the office saves a card for a $50 missed-appointment fee, kept only with the owner's yes.",
+   "tips": "None",
+   "fee2": "Rosfield's $2 applies: one per confirmed booking; a whole sale from one agreement is one job, so one $2",
+   "no_advice": "Rosie and its staff give no advice on what an item is worth or what to do with an estate"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Lockbox and gate codes",
+    "Item lists, item values and the settlement amount: the secure page only",
+    "That a home stands empty: told only to the staff on the job",
+    "A death, health details or the family's situation: owner and staff texts never say why a home is being sold"
+   ],
+   "rating": "One rating, asked once, only after the settlement; none if the family asked for no follow-up",
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor"
+  },
+  "pf.staff": {
+   "roles": "Sale specialists (Gil, Irene) run each sale with a crew of 3; appraisers and auctioneers where the rules license them. At the gallery: appraisers Odette and Felix.",
+   "licenses": "Each auctioneer holds the license the rules require; no other person license",
+   "who_oks": "The owner OKs every proposal and any change to the commission",
+   "stand_in": "The specialist the family asked for is not replaced on silence: a new person is offered only with the family's OK first. An auction stand-in must hold the same license.",
+   "never": "Staff never buy from a sale they run, never accept gifts, and never sell firearms, medicines or found cash, jewelry or papers"
+  },
+  "pf.rules": {
+   "agreement": "A written agreement before setup, signed by every person with the right to sell, with the commission, the dates and the cancel terms; a written cancel period where the state's rules give one",
+   "authority": "A power of attorney ends when the person dies; from then on, only the executor may sign",
+   "auction": "An auction is run only by a licensed auctioneer where the rules require one",
+   "permit": "A per-sale local permit where the rules require one",
+   "records": "7 years; sale records as long as the rules require"
+  },
+  "pf.edges": {
+   "family_stops": "The family stops the sale after setup has started: the setup hours done are owed (billed the business's own way) and the sale does not run; before setup nothing is owed",
+   "right_to_sell": "Proof of the right to sell missing at the walk-through: the walk-through goes on, but the agreement can't be signed until it is shown",
+   "empty_by_date": "A home that must be empty by a closing date: the sale days and the cleanout must end before it; if they can't, the family is told before signing",
+   "kept_items": "Kept items not out by the day before setup, or the building's OK not in by the day before advertising: the family's side is late, so the date moves with no fee to the business's side",
+   "weather": "A sale is not moved for rain; the owner can move a day",
+   "found_cash": "Cash, jewelry or papers found: a note on the secure page, never in a text",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "multiday",
+   "extrawork",
+   "results"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Gil and Irene run sales; Gil is also an auctioneer, at $45 an hour. Odette and Felix appraise; Odette also does house visits. Pat is my office manager, for prices over $500. Jules works independently, with their own customers."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "An item appraisal letter at Lee Gallery is $150, not $350."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for an item appraisal letter at $350"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the gallery, and house visits"
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code at the desk when you arrive."
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at the desk."
+   ],
+   [
+    "A step-free door on Elm St, and parking in the back.",
+    "A step-free door on Mill Rd, and parking in the back."
+   ],
+   [
+    "a step-free chair",
+    "a step-free entrance"
+   ],
+   [
+    "see your hair",
+    "see your pieces"
+   ],
+   [
+    "come with dry hair on Saturday",
+    "bring your photos on Saturday"
+   ],
+   [
+    "come with dry hair",
+    "bring your photos"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this appraisal."
+   ],
+   [
+    "a staff cut",
+    "a staff appraisal"
+   ],
+   [
+    "a shorter cut",
+    "a shorter visit"
+   ],
+   [
+    "the shorter cut",
+    "the shorter visit"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s visit"
+   ],
+   [
+    "the cut in the mirror",
+    "the item list on the screen"
+   ],
+   [
+    "A cut is rated",
+    "An appraisal is rated"
+   ],
+   [
+    "The chairs",
+    "The auction room"
+   ],
+   [
+    "A chair, ready",
+    "A lot, ready"
+   ],
+   [
+    "A neighborhood barbershop on Elm St.",
+    "A neighborhood gallery on Mill Rd."
+   ],
+   [
+    "Riley's color plan",
+    "Odette's estate plan"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Estate plan"
+   ],
+   [
+    "color plan visit",
+    "estate plan visit"
+   ],
+   [
+    "a beard trim",
+    "a photo page"
+   ],
+   [
+    "$40",
+    "$150"
+   ],
+   [
+    "$35",
+    "$350"
+   ],
+   [
+    "$20",
+    "$50"
+   ],
+   [
+    "$75",
+    "$525"
+   ],
+   [
+    "Kids cut · $25",
+    "Catalog entry · $25"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like an evaluation on Saturday."
+   ],
+   [
+    "Style consult",
+    "Quick evaluation"
+   ],
+   [
+    "like a chair renter",
+    "like an independent auctioneer"
+   ],
+   [
+    "A chair renter",
+    "An independent auctioneer"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most estate sale galleries set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Consignment, evaluations and written appraisals."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Estate sales and cleanouts, within 25 miles."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for furniture repair, which isn't on the gallery's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Gallery doesn't repair furniture."
+   ],
+   [
+    "skin fades",
+    "free evaluations"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds online auctions to Lee Gallery."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Online auctions for Lee Gallery: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW online auctions"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout or a tow"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Estate Sales'"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sale specialist's example: a fire or a gas smell gets '911 now', and the booking waits."
+   ],
+   [
+    "A skin fade",
+    "A free evaluation"
+   ],
+   [
+    "a skin fade",
+    "a free evaluation"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither estate sales nor the gallery take jobs sent now."
+   ],
+   [
+    "style consult",
+    "quick evaluation"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for an appraisal every 4 weeks."
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has an appraisal plan with Odette, every 4 weeks."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una evaluación el sábado."
+   ],
+   [
+    "Avery can't be booked until it matches.",
+    "Irene can't be booked until it matches."
+   ],
+   [
+    "Avery · license not found",
+    "Irene · license not found"
+   ],
+   [
+    "Avery · license expired",
+    "Irene · license expired"
+   ],
+   [
+    "Avery stays on the team, and can be booked again once it shows renewed.",
+    "Irene stays on the team, and can be booked again once it shows renewed."
+   ],
+   [
+    "so Lee's Barbershop can't book you until it shows renewed",
+    "so Lee Estate Sales can't book you until it shows renewed"
+   ],
+   [
+    "Avery's license is checked again when the lookup answers.",
+    "Irene's license is checked again when the lookup answers."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a display case scratched a vase today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A display case scratched my vase."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Odette sees the pieces"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Mill Rd"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you take coins on consignment? I have a small collection."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "An evaluation could mean an appraiser or an auction house."
+   ],
+   [
+    "2 No person license",
+    "2 No person license: the gallery"
+   ],
+   [
+    "Plumbing JP031552",
+    "Auctioneer EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-2210"
+   ],
+   [
+    "EC22871",
+    "EX-3871"
+   ],
+   [
+    "JE30417",
+    "EX-4417"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works independently"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's evaluations together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books evaluations for three rooms of furniture on one morning. Rosie finds times side by side with Odette and Felix."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "An evaluation and a written appraisal work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of the pieces"
+   ],
+   [
+    "patch test",
+    "item list"
+   ],
+   [
+    "skin-test result",
+    "item list check"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my brother wait in the gallery during my appraisal?"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer's pickup date changes before the drop-off, and they ask if the drop-off can still go ahead."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The pickup date changed. Can I still bring the pieces on Saturday?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 14 pieces logged, two chairs need a look, photos on the page"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The item list left out the sideboard."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's item list left out the sideboard"
+   ],
+   [
+    "takes no cut of",
+    "takes no fee on"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Estate Sales"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Gallery LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Gallery"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Estate Sales"
+   ],
+   [
+    "Lee Electric",
+    "Lee Appraisals"
+   ],
+   [
+    "1200 Main St",
+    "22 Mill Rd"
+   ],
+   [
+    "88 Elm St",
+    "22 Mill Rd, Suite 1"
+   ],
+   [
+    "Riley",
+    "Odette"
+   ],
+   [
+    "Avery",
+    "Felix"
+   ],
+   [
+    "Jordan",
+    "Gil"
+   ],
+   [
+    "Casey",
+    "Irene"
+   ],
+   [
+    "plumbing and electrical",
+    "estate sales and appraisals"
+   ],
+   [
+    "electrical",
+    "appraisals"
+   ],
+   [
+    "Electrical",
+    "Appraisals"
+   ],
+   [
+    "Panel upgrade",
+    "Cleanout"
+   ],
+   [
+    "plumber",
+    "sale specialist"
+   ],
+   [
+    "plumbing",
+    "estate sales"
+   ],
+   [
+    "Plumbing",
+    "Estate sales"
+   ],
+   [
+    "barbershop",
+    "gallery"
+   ],
+   [
+    "Barbershop",
+    "Gallery"
+   ],
+   [
+    "Barbering",
+    "Appraising"
+   ],
+   [
+    "barbers",
+    "appraisers"
+   ],
+   [
+    "barber",
+    "appraiser"
+   ],
+   [
+    "Barber",
+    "Appraiser"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Auction entry fee"
+   ],
+   [
+    "Signature cut and shave",
+    "Auction entry fee"
+   ],
+   [
+    "signature cut",
+    "auction entry fee"
+   ],
+   [
+    "Groom's package",
+    "Estate consult package"
+   ],
+   [
+    "Color and cut",
+    "Estate estimate"
+   ],
+   [
+    "color and cut",
+    "estate estimate"
+   ],
+   [
+    "Color correction",
+    "Estate evaluation"
+   ],
+   [
+    "color correction",
+    "estate evaluation"
+   ],
+   [
+    "color quote",
+    "item quote"
+   ],
+   [
+    "color",
+    "item"
+   ],
+   [
+    "Color",
+    "Item"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Catalog entry"
+   ],
+   [
+    "Kids cut",
+    "Catalog entry"
+   ],
+   [
+    "kids cut",
+    "catalog entry"
+   ],
+   [
+    "Skin fade",
+    "Item appraisal letter"
+   ],
+   [
+    "Beard trim",
+    "Photo page"
+   ],
+   [
+    "beard trim",
+    "photo page"
+   ],
+   [
+    "Haircuts",
+    "Appraisal visits"
+   ],
+   [
+    "haircuts",
+    "appraisal visits"
+   ],
+   [
+    "Haircut",
+    "Appraisal visit"
+   ],
+   [
+    "haircut",
+    "appraisal visit"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "estimate visit",
+    "walk-through"
+   ],
+   [
+    "Gloss to finish",
+    "Extra page"
+   ],
+   [
+    "gloss",
+    "extra page"
+   ],
+   [
+    "water heater",
+    "estate item"
+   ],
+   [
+    "house calls",
+    "house visits"
+   ],
+   [
+    "house call",
+    "house visit"
+   ],
+   [
+    "shops",
+    "galleries"
+   ],
+   [
+    "shop",
+    "gallery"
+   ],
+   [
+    "Shop",
+    "Gallery"
+   ]
+  ],
+  "B": [
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Gil and Irene run sales; Gil is also an auctioneer, at $45 an hour. Odette and Felix appraise; Odette also does house visits. Pat is my office manager, for prices over $500. Jules works independently, with their own customers."
+   ],
+   [
+    "$89, credited to the repair",
+    "Free; the sale or cleanout is quoted after it"
+   ],
+   [
+    "Signed: the deposit, then the work days",
+    "Signed: nothing due, then setup"
+   ],
+   [
+    "Jordan texts the quote",
+    "Gil sends the proposal"
+   ],
+   [
+    "Leak repair · $245",
+    "Cleanout · $900"
+   ],
+   [
+    "The $89 service call is included",
+    "The walk-through was free"
+   ],
+   [
+    "Alex is told before the yes: the {{fee}} service call is owed, even after a no to the price.",
+    "Alex is told before the yes: the walk-through is free, even after a no to the price."
+   ],
+   [
+    "Only the {{fee}} service call is promised now.",
+    "Only the free walk-through is promised now."
+   ],
+   [
+    "The {{fee}} counts toward the work's price.",
+    "The walk-through is free."
+   ],
+   [
+    "the {{fee}} service call is owed, even after a no to the price",
+    "the walk-through costs nothing, even after a no to the price"
+   ],
+   [
+    "up to the $89 service call",
+    "up to the $50 missed-appointment fee"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the gallery, and house visits"
+   ],
+   [
+    "a card saved for the $89 service-call fee you OK",
+    "nothing taken; no fee unless you OK one"
+   ],
+   [
+    "Water pressure check",
+    "Phone consult"
+   ],
+   [
+    "1-year labor warranty",
+    "Questions about the sale"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "An evaluation could mean an appraiser or an auction house."
+   ],
+   [
+    "It's my kitchen.",
+    "It's my house."
+   ],
+   [
+    "like a chair renter",
+    "like an independent auctioneer"
+   ],
+   [
+    "The shop front",
+    "The truck and crew"
+   ],
+   [
+    "The chairs",
+    "A staged room"
+   ],
+   [
+    "A chair, ready",
+    "A priced table"
+   ],
+   [
+    "new pipes put in one day and finished another",
+    "setup done one day and the sale run another"
+   ],
+   [
+    "your new pipes are in",
+    "setup is done"
+   ],
+   [
+    "Harper gets the notice",
+    "Alex gets the notice"
+   ],
+   [
+    "Harper's first cancel message",
+    "Alex's first cancel message"
+   ],
+   [
+    "only in Harper's own words",
+    "only in Alex's own words"
+   ],
+   [
+    "11:59pm Tue Oct 27",
+    "11:59pm Mon Nov 2"
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Estate Sales · Estate sale"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · Estate sale"
+   ],
+   [
+    "Book this drain clearing?",
+    "Book this visit?"
+   ],
+   [
+    "can clear the drain",
+    "can help with this sale"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And what is being sold, and who has the right to sell?"
+   ],
+   [
+    "a camera inspection",
+    "a photo inventory"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most estate sale firms start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules estate sale firms often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Estate sales, cleanouts and written appraisals."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about selling the contents of a house I'm clearing."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I need to sell a house full of furniture' fits a managed estate sale."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please set aside what stays with the family."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a box of old coins this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a walk-through, next week,"
+   ],
+   [
+    "like a $620 repair",
+    "like a $900 cleanout"
+   ],
+   [
+    "leak repair is $620",
+    "the cleanout is $900"
+   ],
+   [
+    "Leak repair · $620",
+    "Cleanout · $900"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Clear three rooms and the garage · $780"
+   ],
+   [
+    "Supply line · $80",
+    "Haul-away and broom clean · $120"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like selling a neighbor's furniture without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding the attic? Say so.'"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · estate sale"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds cleanouts to Lee Estate Sales."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Cleanouts for Lee Estate Sales: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW cleanouts"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the agreement"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the agreement; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 cleanout"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like clearing the attic Gil noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to clear the attic too, from Gil's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Clear the attic too"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout or a tow"
+   ],
+   [
+    "LATE camera report",
+    "LATE settlement statement"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A sale happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Estate Sales doesn't do, like a home repair."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Estate Sales does estate sales and appraisals, not home repair. Nothing was saved. You can look for a handyman near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Estate Sales'"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what is being sold, who has the right to sell, and any date the home must be empty by."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a fire, a gas smell, someone hurt, or a hazard in the home."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scratch on the dining table, chip in the hall mirror"
+   ],
+   [
+    "Under the sink, before",
+    "Dining table, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Hall mirror, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. An estate sale is quoted after the walk-through: only the free walk-through was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds mold in the basement. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold in the basement"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold in the basement"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found mold in your basement and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the basement"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left price tags on the stairs.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left price tags on the stairs."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan also look at my aunt's house next month?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a walk-through."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the walk-through for today"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hay mucho moho en el sótano de la casa."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? There is a lot of mold in the basement of the house."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A sale specialist's example: mold in the basement gets 'stay out until it is cleared'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to stay out of the basement until a cleanup company clears it. The booking goes on."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Gracias. No entre al sótano. Una empresa de limpieza debe despejarlo primero. Si alguien se lastima, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Thank you. Don't go into the basement. A cleanup company has to clear it first. If anyone is hurt, call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "What are these old coins worth?"
+   ],
+   [
+    "a dripping faucet",
+    "an attic full of boxes"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The attic goes in the same proposal. Gil looks at it at the same walk-through."
+   ],
+   [
+    "a leak repair",
+    "an estate sale"
+   ],
+   [
+    "A drain clearing",
+    "A cleanout"
+   ],
+   [
+    "a drain clearing",
+    "a cleanout"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 900 clear 780 haul 120"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Clear three rooms · $780"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Gil walks the home and texts the proposal with its terms."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Gil walked the home. Here's your written proposal."
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the job"
+   ],
+   [
+    "today's repair",
+    "today's work"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "the repair price",
+    "the price"
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep out of the basement until it is cleared."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither estate sales nor the gallery take jobs sent now."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This sale needs a local permit first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "It will be ready Mon Oct 26.",
+    "The result will be ready Mon Oct 26."
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Gil's notes"
+   ],
+   [
+    "sewer camera report",
+    "settlement statement"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I sell a few things myself before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Gil says no. Please wait until the sale is done."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The house closes tomorrow. Can someone come tonight?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Gil needs more price tags from the supply store."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting more tags, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Gil went to get more tags and will be back about 9:30am."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan pinches a hand in a drawer and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT pinched my hand in a drawer, need to stop"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan's hand truck scratched the hall floor at Alex M.'s. The before photo shows no scratch."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE hand truck scratched the hall floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched hall floor"
+   ],
+   [
+    "cracks the cabinet floor",
+    "scratches the hall floor with a hand truck"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone clear a garage this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Garage cleanout"
+   ],
+   [
+    "yard drain",
+    "garage cleanout"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa cleanout Thu 12-2 Casey"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: an appraisal at two properties every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's appraisal?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I need to sell the contents of a house. Can someone come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "A 3-bedroom house, mostly furniture and books."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, December 1."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a closing date?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the closing date is now two weeks sooner."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The closing date is two weeks sooner now."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 350 appraisal, 2 hours"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE dining set kept by the family. Silver shown to Alex. Bring tape next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A sold item is missed 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "An item on the sold list is missing."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s sale, run Thu Oct 22, has a missing item."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your sale is under the settlement terms"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you appraise my jewelry every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Home Services has a yearly appraisal plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for an appraisal every year."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Gil finds a locked case of silver."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 150 appraise the silver set"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves",
+    "Extra for Alex M.: appraise the silver set"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Appraise the silver set"
+   ],
+   [
+    "replacing both shutoff valves",
+    "appraising the silver set"
+   ],
+   [
+    "the shutoff valves",
+    "the silver set"
+   ],
+   [
+    "The $160 valve quote",
+    "The $150 silver quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $150 silver work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Gil also take a photo inventory of the house?"
+   ],
+   [
+    "Sewer camera report",
+    "Settlement statement"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the settlement statement link"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your cleanout"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Written appraisal"
+   ],
+   [
+    "Drain clearings",
+    "Written appraisals"
+   ],
+   [
+    "Drain clearing",
+    "Written appraisal"
+   ],
+   [
+    "drain clearing",
+    "written appraisal"
+   ],
+   [
+    "the kitchen drain",
+    "the appraisal"
+   ],
+   [
+    "Kitchen drain",
+    "Appraisal"
+   ],
+   [
+    "kitchen drain",
+    "appraisal"
+   ],
+   [
+    "Water heater flush",
+    "Item appraisal letter"
+   ],
+   [
+    "water heater flush",
+    "item appraisal letter"
+   ],
+   [
+    "drain",
+    "appraisal"
+   ],
+   [
+    "leehomeservices.com",
+    "leeestatesales.com"
+   ],
+   [
+    "2 No person license",
+    "2 No person license: the gallery"
+   ],
+   [
+    "Plumbing JP031552",
+    "Auctioneer EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-2210"
+   ],
+   [
+    "EC22871",
+    "EX-3871"
+   ],
+   [
+    "JE30417",
+    "EX-4417"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works independently"
+   ],
+   [
+    "takes no cut of",
+    "takes no fee on"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The gallery's evaluations are in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Gallery can appraise your pieces at the gallery for $350, or Lee Estate Sales can walk your home for free."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Estate Sales LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Estate Sales"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Gallery"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Estate Sales"
+   ],
+   [
+    "Lee Electric",
+    "Lee Appraisals"
+   ],
+   [
+    "1200 Main St",
+    "22 Mill Rd"
+   ],
+   [
+    "88 Elm St",
+    "22 Mill Rd, Suite 1"
+   ],
+   [
+    "42 Oak St",
+    "55 Orchard Ln"
+   ],
+   [
+    "Riley",
+    "Odette"
+   ],
+   [
+    "Avery",
+    "Felix"
+   ],
+   [
+    "Jordan",
+    "Gil"
+   ],
+   [
+    "Casey",
+    "Irene"
+   ],
+   [
+    "plumbing and electrical",
+    "estate sales and appraisals"
+   ],
+   [
+    "electrical",
+    "appraisals"
+   ],
+   [
+    "Electrical",
+    "Appraisals"
+   ],
+   [
+    "Panel upgrade",
+    "Cleanout"
+   ],
+   [
+    "plumber",
+    "sale specialist"
+   ],
+   [
+    "plumbing",
+    "estate sales"
+   ],
+   [
+    "Plumbing",
+    "Estate sales"
+   ],
+   [
+    "barbershop",
+    "gallery"
+   ],
+   [
+    "barbers",
+    "appraisers"
+   ],
+   [
+    "barber",
+    "appraiser"
+   ],
+   [
+    "Barber",
+    "Appraiser"
+   ],
+   [
+    "color",
+    "item"
+   ],
+   [
+    "haircut",
+    "appraisal"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "credited to the repair",
+    "credited to the sale"
+   ],
+   [
+    "service call",
+    "walk-through"
+   ],
+   [
+    "Service call",
+    "Walk-through"
+   ],
+   [
+    "estimate visit",
+    "walk-through"
+   ],
+   [
+    "$640 water heater",
+    "$640 contents estimate"
+   ],
+   [
+    "Water heater replacement",
+    "Contents estimate from photos"
+   ],
+   [
+    "water heater replacement",
+    "contents estimate from photos"
+   ],
+   [
+    "replaces water heaters",
+    "runs estate sales"
+   ],
+   [
+    "Leak repair",
+    "Estate sale"
+   ],
+   [
+    "leak repair",
+    "estate sale"
+   ],
+   [
+    "Sewer camera inspection",
+    "Photo inventory"
+   ],
+   [
+    "sewer camera inspection",
+    "photo inventory"
+   ],
+   [
+    "water heaters",
+    "estates"
+   ],
+   [
+    "Water heater",
+    "Estate"
+   ],
+   [
+    "water heater",
+    "estate"
+   ],
+   [
+    "house calls",
+    "house visits"
+   ],
+   [
+    "house call",
+    "house visit"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido o en peligro ahora?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt or in danger right now?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está herido."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is hurt."
+   ],
+   [
+    "$120 an hour",
+    "$45 an hour, per worker"
+   ],
+   [
+    "$140 an hour",
+    "$45 an hour"
+   ],
+   [
+    "$179",
+    "$350"
+   ],
+   [
+    "$89",
+    "$50"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.16",
+       "8.17"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Logs the items; they stay for the auction",
+      "does": "Odette logs each piece with a photo. The pieces stay at the gallery for the next auction. They are not picked up.",
+      "more": [
+       "The gallery keeps 25% of what sells and settles the rest after the auction, its own way.",
+       "Item values and the item list are on the secure page, never in a text.",
+       "A piece that doesn't sell is returned, or donated if Alex says so first."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "INTAKE 14 pieces logged, photos on the page"
+       ],
+       [
+        "san",
+        "cust",
+        "Odette logged your 14 pieces at Lee Gallery. They stay for the next auction. Your item list is on your secure page.",
+        {
+         "card": {
+          "title": "Items logged · 14",
+          "lines": [
+           "On your secure page",
+           "They stay for the next auction"
+          ],
+          "button": "See the list",
+          "link": "rosfield.com/i/e8"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "A8-x02",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the free walk-through at home",
+      "does": "If a whole home needs selling, Odette books Gil's free walk-through with Lee Estate Sales. It runs in the other flow.",
+      "more": [
+       "That visit belongs to Lee Estate Sales, Sam's other company.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Want Lee Estate Sales to walk the whole home, free?",
+        {
+         "buttons": [
+          "Book the walk-through",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "Adults only."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A specialist's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A specialist's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A specialist's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The consignment agreement is signed at the gallery, not first."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Consignment items stay for the auction; they are logged in the intake step, not picked up."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Children are never left."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The customer pays; no plan or insurance bills."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The customer pays; no plan or insurance bills."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "Nothing is required at the gallery."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "An estate sale firm pays Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The estate sale plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People are booked, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "An estate sale is never sent now."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "B5-03",
+    "form": [
+     [
+      "Your visit",
+      "Lee Estate Sales · Thu Oct 22 · starts at 8:00am · Gil"
+     ],
+     [
+      "Price",
+      "As shown above"
+     ],
+     [
+      "Card",
+      "None needed"
+     ],
+     [
+      "I agree",
+      "No fee can be charged. Please cancel before 8am Wed"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "The person with the right to sell is the contact. Why the home is being sold is never in a text.",
+     "Proof of the right to sell is shown at the walk-through. Rosie keeps only that it was shown."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-03",
+    "more": [
+     "The walk-through needs the person with the right to sell. Setup and sale days can run with nobody home.",
+     "If Alex isn't there on a setup day, Gil texts DONE with a photo of the start and the end."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "does": "Gil walks the home and sees what can sell. Alex shows the papers that give the right to sell. On Fri Oct 23, the written proposal reaches Alex's secure page, once Sam OKs it.",
+    "more": [
+     "It's over Sam's $500, so Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+     "The proposal says who is paid and how, the dates, what stays with the family, and the cancel terms.",
+     "The proposal is good for 30 days. The walk-through was free, so nothing is billed if Alex doesn't sign.",
+     "Any fact the state's rules require, like an auctioneer license number, is on it.",
+     "The firm gives no advice on what any item is worth."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "PROPOSAL managed estate sale, 35%, $1,500 min. Terms on the page"
+     ],
+     [
+      "san",
+      "owner",
+      "Gil's proposal for Alex M.: 35% of sales, $1,500 minimum. It's over your $500 limit.",
+      {
+       "card": {
+        "title": "Managed estate sale · 35% of sales",
+        "lines": [
+         "$1,500 minimum; setup 5 days, sale 3 days",
+         "Settled within 14 days of the last sale day"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Here's your written proposal from Lee Estate Sales. It's good until Sun Nov 22.",
+      {
+       "card": {
+        "title": "Managed estate sale · 35% of sales",
+        "lines": [
+         "$1,500 minimum",
+         "Setup 5 days, then 3 sale days",
+         "Paid from the sale's proceeds, not up front",
+         "Settlement statement and payment within 14 days of the last sale day",
+         "Lee Estate Sales settles it, its own way"
+        ],
+        "button": "Read the proposal",
+        "link": "rosfield.com/q/e8"
+       },
+       "buttons": [
+        "Sign the agreement",
+        "Not now"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "does": "Gil walks the home. It will be cleared, not sold, so Gil quotes a cleanout. On Fri Oct 23, the written quote reaches Alex's secure page, once Sam OKs it.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 900 cleanout. Terms on the page"
+       ],
+       [
+        "san",
+        "owner",
+        "Gil's quote for Alex M. is $900. It's over your $500 limit.",
+        {
+         "card": {
+          "title": "Cleanout · $900",
+          "lines": [
+           "Clear three rooms and the garage · $780",
+           "Haul-away and broom clean · $120"
+          ]
+         },
+         "buttons": [
+          "Send it",
+          "Change it"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's your written quote from Lee Estate Sales. It's good until Sun Nov 22.",
+        {
+         "card": {
+          "title": "Cleanout · $900",
+          "lines": [
+           "Clear three rooms and the garage · $780",
+           "Haul-away and broom clean · $120",
+           "Nothing up front",
+           "Paid on the bill we text you after the job"
+          ],
+          "button": "Read the proposal",
+          "link": "rosfield.com/q/e8"
+         },
+         "buttons": [
+          "Sign the agreement",
+          "Not now"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "does": "Alex doesn't sign now. The walk-through was free, so nothing is owed. The proposal stays good until Sun Nov 22.",
+    "more": [
+     "Gil texts DONE for the walk-through. No bill goes out.",
+     "Alex can sign later from the same page, until the proposal's date.",
+     "Alex can ask for a call first. Gil or Sam calls, and the proposal stays open."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your proposal stays good until Sun Nov 22. The walk-through was free, so nothing is owed.",
+      {
+       "card": {
+        "title": "Estate sale proposal",
+        "lines": [
+         "Good until Sun Nov 22"
+        ],
+        "button": "Sign it later",
+        "link": "rosfield.com/q/e8"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "does": "Alex hasn't answered the proposal in 5 days. Rosie sends one reminder. Still no answer 2 days later: Sam picks to call Alex, or let the proposal run to its date.",
+    "more": [
+     "Nothing starts without the signed agreement.",
+     "Let it run: nothing is owed, the same as Not now.",
+     "Alex can still sign from the page until Sun Nov 22.",
+     "Rosie sends no more texts about it.",
+     "No answer from Sam in 2 days: the proposal runs to its date, as with Let it run."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "A reminder: your estate sale proposal from Lee Estate Sales is good until Sun Nov 22.",
+      {
+       "card": {
+        "title": "Estate sale proposal",
+        "lines": [
+         "Good until Sun Nov 22"
+        ],
+        "button": "Read the proposal",
+        "link": "rosfield.com/q/e8"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered Gil's proposal in 7 days. It's good until Sun Nov 22.",
+      {
+       "buttons": [
+        "I'll call Alex",
+        "Let it run"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Wed Oct 28, 10:00am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-62",
+    "does": "Alex taps Sign the agreement on the proposal's page. Rosie builds it from the proposal and the parts the state's rules require. Everyone with the right to sell signs, then Sam does.",
+    "more": [
+     "A co-executor or co-owner signs on a link Alex forwards. Rosie never texts them itself.",
+     "A power of attorney ends when the person dies; from then on, only the executor signs.",
+     "Sam signs within 24 hours. Each one gets a copy by text and email.",
+     "Nothing is taken before everyone has signed.",
+     "Not signed by Sun Nov 22: one reminder 3 days before, then the proposal lapses. Nothing is owed."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. signed the estate sale agreement. Please sign it too. Nothing is charged until you do.",
+      {
+       "card": {
+        "title": "Agreement · Estate sale",
+        "lines": [
+         "Signed by Alex M. · Mon 7:40pm",
+         "Right to sell shown at the walk-through"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/e8"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Estate Sales signed your agreement. Your copy is on the page and in your email.",
+      {
+       "card": {
+        "title": "Agreement signed by both",
+        "lines": [
+         "Estate sale",
+         "Alex M. · Mon Oct 26",
+         "Sam Lee · Tue Oct 27"
+        ],
+        "button": "See your copy",
+        "link": "rosfield.com/k/e8"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Mon Oct 26, 7:40pm"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-63",
+    "does": "With both signatures in, nothing is paid now. The agreement set the terms. Alex picks the setup start.",
+    "more": [
+     "Rosfield's $2 for this booking goes on the monthly bill.",
+     "The commission comes out of the proceeds. Lee Estate Sales settles it its own way.",
+     "No setup starts until the cancel window ends.",
+     "No start picked in 48 hours: one reminder, then Sam calls."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your agreement is signed. Nothing is due now. Pick your setup start:",
+      {
+       "times": [
+        "Thu Nov 12 · setup starts · Gil",
+        "Mon Nov 16 · setup starts · Gil"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Tue Oct 27, 8:20am"
+     },
+     "price:visit+after:bill": {
+      "t": "Tue Oct 27, 8:20am",
+      "does": "With both signatures in, nothing is paid now. The cleanout is billed after the job. Alex picks the day.",
+      "more": [
+       "Rosfield's $2 for this booking is counted at its first check-in.",
+       "Nothing is taken before the cleanout is done.",
+       "No cleanout starts until the cancel window ends."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your agreement is signed. Nothing is due now. Pick your cleanout day:",
+        {
+         "times": [
+          "Thu Nov 12 · cleanout · Gil",
+          "Mon Nov 16 · cleanout · Gil"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-78",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Oct 27, 8:40am"
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B8-78",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "msg",
+      "t": "Wed Nov 4, 10:00am",
+      "title": "Before setup: kept items, the permit, the OK",
+      "does": "The cancel window has ended. First, the family's kept items go out by Wed Nov 11. The business gets the sale permit. The building gives its OK for a public sale.",
+      "more": [
+       "The family's kept items are out or marked by the day before setup.",
+       "The business gets the per-sale permit, where the rules require one, before the sale is advertised.",
+       "A condo or rented home needs the building's written OK before the sale is advertised.",
+       "Late on the family's side: the setup date moves, with no fee to the business's side."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHECKLIST kept items, permit, building OK. Setup Nov 12"
+       ],
+       [
+        "san",
+        "cust",
+        "Before setup on Thu Nov 12: please take out what stays with the family by Wed Nov 11. Lee Estate Sales gets the permit.",
+        {
+         "card": {
+          "title": "Before setup",
+          "lines": [
+           "Kept items out by Wed Nov 11",
+           "The building's OK, if the home has one",
+           "The permit: we get it"
+          ],
+          "button": "See the list",
+          "link": "rosfield.com/s/e8m"
+         },
+         "buttons": [
+          "Done",
+          "Call me"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "when": {
+       "after": [
+        "own"
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "vary": {
+     "price:visit+after:own": {
+      "t": "Wed Nov 4, 10:30am",
+      "does": "The checklist is done. Alex gets the work plan. Setup runs Thu Nov 12 to Wed Nov 18. The sale runs Fri Nov 20 to Sun Nov 22, with cleanup Mon Nov 23. The settlement is due by Sun Dec 6.",
+      "more": [
+       "Setup and sale days can run with nobody home. Each day starts with a photo and ends with one.",
+       "Gil texts a short update each evening. Item lists and values are on the secure page, never in a text.",
+       "Cash, jewelry and papers found are shown to Alex on the secure page, logged with a photo, and never sold or taken.",
+       "If a day moves, only that day moves, and Alex is told.",
+       "Firearms and medicines are never sold. The family removes them first.",
+       "A cancel after setup starts owes the setup hours done, at $45 a worker-hour. It is billed the business's own way."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your estate sale is planned. Here's the plan.",
+        {
+         "card": {
+          "title": "Work plan · 55 Orchard Ln",
+          "lines": [
+           "Thu Nov 12 to Wed Nov 18 · setup",
+           "Fri Nov 20 to Sun Nov 22 · sale days",
+           "Mon Nov 23 · cleanup",
+           "By Sun Dec 6 · settlement statement"
+          ],
+          "button": "See the plan",
+          "link": "rosfield.com/s/e8"
+         }
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "IN setup day 1: kitchen and dining room",
+        {
+         "photos": [
+          "Dining room, start of setup"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Gil's crew started setup. You'll get an update this evening."
+       ]
+      ]
+     },
+     "price:visit+after:bill": {
+      "t": "Wed Nov 4, 10:30am",
+      "does": "Alex gets the day for the cleanout: Thu Nov 12, from 8am, with Gil's crew of three. Nothing is billed until it is done.",
+      "more": [
+       "The crew clears the three rooms and the garage, hauls away what is left and sweeps the floors broom clean.",
+       "Cash, jewelry and papers found are shown to Alex on the secure page and logged with a photo. They are never taken.",
+       "If the day moves, Alex is told. A cancel before the day owes nothing.",
+       "The $900 is billed on the bill Rosie texts after DONE."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your cleanout is set for Thu Nov 12, from 8am.",
+        {
+         "card": {
+          "title": "Cleanout · Thu Nov 12",
+          "lines": [
+           "From 8am · Gil and a crew of three",
+           "Three rooms and the garage",
+           "Billed after the job"
+          ],
+          "button": "See the plan",
+          "link": "rosfield.com/s/e8c"
+         }
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "IN cleanout started: kitchen and garage",
+        {
+         "photos": [
+          "Garage, start of the day"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Gil's crew started the cleanout. You'll get an update this evening."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Alex stops the sale",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.8",
+        "8.9"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Mon Nov 16, 11:20am",
+       "title": "Gil stops: the family calls it off",
+       "does": "Alex says to call off the sale. Setup has started, so the setup hours done are owed, at $45 a worker-hour. The sale does not run.",
+       "more": [
+        "Lee Estate Sales bills those hours its own way. Rosie moves no money.",
+        "Before setup started, a cancel owes nothing.",
+        "Sam calls Alex. Nothing already priced or tagged is sold.",
+        "The home is left as found."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "STOP Alex M. called off the sale. Setup 2 days done"
+        ],
+        [
+         "san",
+         "owner",
+         "Gil stopped Alex M.'s sale at 11:20am. Setup had started. Please call Alex.",
+         {
+          "buttons": [
+           "I'll call Alex"
+          ]
+         }
+        ]
+       ],
+       "tells": [
+        "owner"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "vary": {
+     "price:visit+after:bill": {
+      "t": "Thu Nov 12, 3:30pm",
+      "does": "The cleanout is done and Alex has walked through. Gil texts DONE with the total, so Rosie can text the bill.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 900 cleanout"
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Mon Nov 23, 6:00pm",
+      "does": "The last sale day is done and the home is cleaned up. Gil texts DONE. The settlement follows, the business's own way.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE"
+       ],
+       [
+        "san",
+        "staff",
+        "Done: Alex M., estate sale."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "vary": {
+     "price:visit+after:own": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE sale ran 3 days. Unsold items to the donation pickup Tue. Keys returned to Alex"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     },
+     "price:visit+after:bill": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE cleanout done. Keys returned to Alex. Donation pickup Fri"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-05",
+    "vary": {
+     "price:visit+after:bill": {
+      "does": "Rosie reads Gil's DONE back. The $900 is the cleanout in the signed quote. It matches what Alex signed, so it needs no OK.",
+      "more": [
+       "A bill that matches the signed quote never needs an OK.",
+       "If Alex didn't sign, nothing is billed: the walk-through was free.",
+       "A different total over Sam's $500 goes to Sam first."
+      ],
+      "say": [
+       [
+        "san",
+        "staff",
+        "Alex M.: $900, the cleanout. It matches the quote. Sending Alex the bill.",
+        {
+         "buttons": [
+          "Change it"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "vary": {
+     "price:visit+after:bill": {
+      "t": "Thu Nov 12, 3:35pm",
+      "does": "Alex gets the bill with a pay link. Nothing was saved, so the link is the way to pay. It's over Sam's $500, so it offers bank transfer too.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Estate Sales: your bill for the cleanout.",
+        {
+         "pay": {
+          "amount": "$900",
+          "what": "your cleanout",
+          "link": "rosfield.com/p/e8"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-07",
+    "vary": {
+     "price:visit+after:bill": {
+      "does": "The $900 lands in Lee Estate Sales' own Stripe, less Stripe's card fee.",
+      "more": [
+       "Paid by bank transfer, it counts once it clears, in a few business days.",
+       "The receipt goes out once the money is in."
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B9-17",
+    "steps": [
+     {
+      "id": "B9-x01",
+      "line": [
+       "9.1",
+       "10.7"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "msg",
+      "t": "Sun Dec 6, 10:00am",
+      "title": "The settlement statement is ready",
+      "does": "The settlement statement is ready, within 14 days of the last sale day. The amount and the item list are on Alex's secure page only.",
+      "more": [
+       "Lee Estate Sales pays the proceeds less its commission, its own way. Rosie moves no money.",
+       "The text says only that it is ready. It never gives an amount.",
+       "Late: Alex is told before the due date passes, and Sam is asked what to do."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "SETTLEMENT statement ready"
+       ],
+       [
+        "san",
+        "cust",
+        "Lee Estate Sales: your settlement statement is ready on your secure page.",
+        {
+         "card": {
+          "title": "Settlement statement",
+          "lines": [
+           "Ready on your secure page"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/e8s"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.money"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "when": {
+       "after": [
+        "own"
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "vary": {
+     "price:visit+after:bill": {
+      "t": "Thu Nov 12, 4:00pm",
+      "does": "The receipt goes out once the bill is paid, by text and email.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "Any fact the state's rules require is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your cleanout. Your receipt is on the page.",
+        {
+         "card": {
+          "title": "Receipt · $900",
+          "lines": [
+           "Cleanout · $900",
+           "Paid through Rosie"
+          ],
+          "button": "See your receipt",
+          "link": "rosfield.com/r/e8"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Sun Dec 6, 10:30am",
+      "does": "Lee Estate Sales sends its own settlement papers. Rosie sends nothing about money.",
+      "more": [
+       "Rosie sends no receipt here. The business's own papers carry any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Estate Sales. Your settlement papers come from the business. If anything looks wrong, reply here."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "vary": {
+     "price:visit+after:own": {
+      "t": "Mon Dec 7, 10:00am",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Estate Sales. How was working with Gil and the crew?",
+        {
+         "card": {
+          "title": "Rate your sale",
+          "lines": [
+           "Gil · Lee Estate Sales"
+          ],
+          "button": "Rate it",
+          "link": "rosfield.com/r/e8"
+         },
+         "stars": true
+        }
+       ]
+      ]
+     },
+     "price:visit+after:bill": {
+      "t": "Thu Nov 12, 6:00pm",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Estate Sales. How was working with Gil and the crew?",
+        {
+         "card": {
+          "title": "Rate your cleanout",
+          "lines": [
+           "Gil · Lee Estate Sales"
+          ],
+          "button": "Rate it",
+          "link": "rosfield.com/r/e8"
+         },
+         "stars": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "An estate sale is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "An estate sale is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "An estate sale is never sent now; every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "An estate sale is never sent now; every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Walk-throughs and appraisals start at a set time with a named specialist."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Sales run in days, not stays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "No seats."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "A walk-through has no form to sign first; the agreement is signed with the proposal (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A sale never starts at the walk-through: the family signs a written agreement first."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "The agreement is signed whole."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "An estate sale firm pays Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The estate sale plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People are booked, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "An estate sale is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "The customer pays; no plan or insurance bills."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "The customer pays; no plan or insurance bills."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked once, after the settlement."
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "At the shop, and house calls",
+    "Give this code at the chair when you arrive.",
+    "Give this code at the chair.",
+    "A step-free door on Elm St, and parking in the back.",
+    "a step-free chair",
+    "see your hair",
+    "come with dry hair on Saturday",
+    "come with dry hair",
+    "My employer pays for this cut.",
+    "a staff cut",
+    "a shorter cut",
+    "the shorter cut",
+    "Alex M.'s cut",
+    "the cut in the mirror",
+    "A cut is rated",
+    "The chairs",
+    "A chair, ready",
+    "A neighborhood barbershop on Elm St.",
+    "Riley's color plan",
+    "Proposal · Color plan",
+    "color plan visit",
+    "a beard trim",
+    "$40",
+    "$35",
+    "$20",
+    "$75",
+    "I'd like a cut on Saturday.",
+    "Style consult",
+    "like a chair renter",
+    "A chair renter",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "skin fades",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "takes jobs sent now, like a burst pipe",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A skin fade",
+    "a skin fade",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "style consult",
+    "Alex asks for a cut every 4 weeks.",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Avery can't be booked until it matches.",
+    "Avery · license not found",
+    "Avery · license expired",
+    "Avery stays on the team, and can be booked again once it shows renewed.",
+    "so Lee's Barbershop can't book you until it shows renewed",
+    "Avery's license is checked again when the lookup answers.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "once Riley sees the hair",
+    "Step-free door on Elm St",
+    "Do you do kids cuts? My son is 8.",
+    "A haircut could mean a salon or a barbershop.",
+    "2 No person license",
+    "Plumbing JP031552",
+    "MP045210",
+    "EC22871",
+    "JE30417",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "takes no cut of",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color",
+    "Color",
+    "Kids cut (12 and under)",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "the chair",
+    "estimate visit",
+    "Gloss to finish",
+    "gloss",
+    "water heater",
+    "house calls",
+    "house call",
+    "shops",
+    "shop",
+    "Shop"
+   ],
+   "B": [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "$89, credited to the repair",
+    "Signed: the deposit, then the work days",
+    "Jordan texts the quote",
+    "Leak repair · $245",
+    "The $89 service call is included",
+    "Alex is told before the yes: the {{fee}} service call is owed, even after a no to the price.",
+    "Only the {{fee}} service call is promised now.",
+    "The {{fee}} counts toward the work's price.",
+    "the {{fee}} service call is owed, even after a no to the price",
+    "up to the $89 service call",
+    "At the shop, and house calls",
+    "a card saved for the $89 service-call fee you OK",
+    "Water pressure check",
+    "1-year labor warranty",
+    "A haircut could mean a salon or a barbershop.",
+    "It's my kitchen.",
+    "like a chair renter",
+    "The shop front",
+    "The chairs",
+    "A chair, ready",
+    "new pipes put in one day and finished another",
+    "your new pipes are in",
+    "Harper gets the notice",
+    "Harper's first cancel message",
+    "only in Harper's own words",
+    "11:59pm Tue Oct 27",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Book this drain clearing?",
+    "can clear the drain",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "a camera inspection",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "like a $620 repair",
+    "leak repair is $620",
+    "Leak repair · $620",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Right to cancel · repipe",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "a leak repair",
+    "A drain clearing",
+    "a drain clearing",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "covers part of the repair",
+    "today's repair",
+    "The repair price is good for 7 days.",
+    "Book the repair",
+    "the repair price",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "It will be ready Mon Oct 26.",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "It's overflowing. Can someone come tonight?",
+    "Jordan needs a part from the supply house.",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracks the cabinet floor",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Yes, it won't drain",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "stage 2 of your repipe",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "the kitchen drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "drain",
+    "leehomeservices.com",
+    "2 No person license",
+    "Plumbing JP031552",
+    "MP045210",
+    "EC22871",
+    "JE30417",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "takes no cut of",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "color",
+    "haircut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "estimate visit",
+    "$640 water heater",
+    "Water heater replacement",
+    "water heater replacement",
+    "replaces water heaters",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "house calls",
+    "house call",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "$120 an hour",
+    "$140 an hour",
+    "$179",
+    "$89"
+   ]
+  },
+  "A": {
+   "A8-44": "4410a4860c",
+   "A4-24": "0a292df05b",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-02": "15f418fec4",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3"
+  },
+  "B": {
+   "B5-03": "7c7d43f508",
+   "B6-14": "dfd03ee673",
+   "B8-03": "ac9d404766",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-49": "4fcfdeb80b",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "B8-78": "628ca6843e",
+   "B8-37": "3ce85cf051",
+   "B8-22": "50d78f1af0",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B9-05": "6cbce323ed",
+   "B9-06": "f091432f2d",
+   "B9-07": "310f930c3b",
+   "B9-17": "24b5acdf89",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255"
+  }
+ }
+}

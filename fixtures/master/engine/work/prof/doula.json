@@ -1,0 +1,2775 @@
+{
+ "id": "doula",
+ "name": "Doula",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "pediatrician",
+ "plugin": {
+  "pf.license": {
+   "need": "optional, and never verified by Rosie: a doula may add a certification or training certificate it holds; Rosie looks nothing up and never says anything is checked",
+   "who": "the business says what it holds; the owner adds each person's own number on the secure page",
+   "ask": "each person's certificate number, if they hold one, in their invite reply (or the owner sends it)",
+   "check": "none: nothing is looked up; Rosie never says a certificate was checked by Rosie",
+   "blocks": "the business's own word only: if the owner says a job needs a certificate a person doesn't have, that person isn't offered for it",
+   "video": "a video session counts as at the office; no license is needed for it beyond the owner's word",
+   "away": "home visits only for the doulas the owner clears for home visits",
+   "lactation": "none: breastfeeding help is a lactation consultant's own work (another business)",
+   "vaccines": "none: no shot or vaccine orders are taken through Rosie",
+   "agreement": "a privacy agreement signed on the secure page before the first booking, where the family's health details are kept; every company in Rosie's chain signs one with Rosie",
+   "renewals": "none: Rosie keeps no renewal dates; the owner can note one by hand",
+   "insurance": "liability insurance, if the owner adds it: a note only, never checked",
+   "claims": "'certified' or 'trained' is shown only where the owner says so; never as checked"
+  },
+  "pf.services": {
+   "shape": "support for the family through pregnancy, birth and the weeks after: prenatal sessions at the office or by video, birth support on call from about 37 weeks, and postpartum visits at home; sessions are booked one at a time, the next at checkout",
+   "examples": "the example business's own prices and lengths, not a standard",
+   "list": [
+    {
+     "name": "Meet the doula (free consult)",
+     "price": "free",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the office, or by video",
+     "before": "nothing taken",
+     "after": "nothing to pay",
+     "note": "questions, the way the doula works, and whether the family wants a birth doula, a postpartum doula or both"
+    },
+    {
+     "name": "Birth doula package",
+     "price": "$1,800 (example)",
+     "kind": "one price for the whole package",
+     "length": "about 6 weeks of support around the birth",
+     "where": "prenatal sessions at the office or by video; the birth at the place the family chooses (the doula goes on call); postpartum visits at home",
+     "before": "a $400 deposit when the agreement is signed",
+     "after": "the rest is paid at the visits (office) or on the bill after the birth (home), never charged on a set day by itself",
+     "note": "covers the prenatal sessions, being on call from 37 weeks, the birth support, and the postpartum visits in the package; a session the family adds is priced first"
+    },
+    {
+     "name": "Prenatal session",
+     "price": "$95 (example)",
+     "kind": "one price",
+     "length": "1 hour",
+     "where": "at the office, or by video",
+     "before": "nothing taken",
+     "after": "paid at the visit",
+     "note": "a session on the birth plan or a question the family brings"
+    },
+    {
+     "name": "Birth prep session",
+     "price": "$85 per couple (example)",
+     "kind": "one price",
+     "length": "2 hours",
+     "where": "at the office, or by video",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "a session for the two people who will be at the birth"
+    },
+    {
+     "name": "Postpartum visit at home (3 hours)",
+     "price": "$210 (example)",
+     "kind": "one price",
+     "length": "3 hours",
+     "where": "at the family's home",
+     "before": "nothing taken",
+     "after": "the bill comes after DONE (a link to pay)",
+     "note": "help with feeding, sleep, the house and the older children; the doula does not give medical care"
+    },
+    {
+     "name": "Overnight support at home",
+     "price": "$480 (example)",
+     "kind": "one price",
+     "length": "8 hours overnight",
+     "where": "at the family's home",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    }
+   ],
+   "capacity": "each doula takes a set number of families due in one month (the business's own cap, example 4); every birth has one doula on call, with a backup doula the family has met",
+   "onCall": "from about 37 weeks to the birth, the family's doula is on call for them at any hour; the family uses the business's on-call line (pf.safety) when labor starts or anything worries them. Rosie gives the number and books nothing for it",
+   "online": "a prenatal session by video; it counts as at the office",
+   "nobodyHome": "never for a visit: the family must be there; a visit where nobody answers gets a safety check first (the welfare switch)",
+   "walkIns": "no walk-ins; a family in labor or with a worry uses the on-call line at any hour"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "the first name of the person booking",
+    "a new family or a current one",
+    "which visit: the business's own visit types only, never a symptom typed into the AI",
+    "where the visit is: at the office, by video, or at home (home visits only inside the business's area)",
+    "how the family will pay: the package deposit, or pay for the visit itself"
+   ],
+   "afterTime": [
+    "anything the doula should know to help, like needing an interpreter",
+    "the family's name and mobile (for texts)"
+   ],
+   "securePage": [
+    "the due date",
+    "the birth plan and the place the family plans to give birth",
+    "the health history and the care team's names",
+    "the consents and the privacy notice",
+    "the agreement (signed on the secure page)",
+    "who else may attend, with the family's signed OK",
+    "whether an interpreter is needed"
+   ],
+   "whoMayBook": "the family, or a partner or support person the family names on the secure page; a child under 13 never books, and nothing about them is kept",
+   "whoMayBring": "the family, or a support person the family names with a signed OK on the secure page",
+   "neverAsked": "symptoms, medical questions, pregnancy weeks, tests and results are never asked or typed in the AI chat"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "heavy bleeding, a seizure, trouble breathing, chest pain, a fall or a car crash, or a baby who isn't breathing",
+     "say": "Call 911 now. Rosie can't book support for an emergency. Then call the family's own doctor or midwife, and the business's on-call line: (555) 010-0199.",
+     "booking": "no booking; any visit stays booked"
+    },
+    {
+     "words": "labor, your water breaking, or a worry about the baby",
+     "say": "Call your midwife or doctor now, and the business's on-call line: (555) 010-0199. If you can't reach them, or it's an emergency, call 911.",
+     "booking": "no booking; the on-call line answers at any hour, and Rosie books or moves nothing for it"
+    },
+    {
+     "words": "thoughts of harming yourself or the baby, or a crisis after the birth",
+     "say": "Call or text 988 now. If you are in danger, call 911. Your doula is told.",
+     "booking": "no booking; the same words in a later text get 988 again"
+    },
+    {
+     "words": "swallowed medicine or a chemical",
+     "say": "Call Poison Help now at 1-800-222-1222. If the person isn't breathing or won't wake up, call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "nurseLine": [
+    {
+     "words": "the family's own provider's list of signs that need a call (the example list includes a fever after the birth)",
+     "say": "Please call your midwife or doctor now. If it's an emergency, call 911.",
+     "booking": "no booking by Rosie until the family has talked with their provider"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a worry with nothing on the lists above",
+     "where": "matched to the business's own visit: Rosie never judges how serious it is"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "The intake, the birth plan and the agreement",
+     "when": "on the secure page only, never by text; due before the first session; one reminder before it's due",
+     "who": "every new family",
+     "result": "not done by its due date: the doula keeps the session (signed on the secure page first), moves it, or cancels with no fee"
+    },
+    {
+     "name": "A written price estimate for a session paid by the family",
+     "when": "told while booking; sent within 1 business day",
+     "who": "every family paying for a session itself",
+     "result": "a to-do for the office, with its due date"
+    },
+    {
+     "name": "The owner's OK for a new family",
+     "when": "before the first session is booked",
+     "who": "every new family",
+     "result": "OK: booked; no: told kindly, nothing kept"
+    }
+   ],
+   "prep": "arrive 10 minutes early; bring the questions and any notes from the care team; a support person comes only with the family's signed OK on the secure page; at home: a clear space for the doula's supplies"
+  },
+  "pf.visit": {
+   "checkIn": "at the office: the check-in code at the front desk; by video: the code read out at the start; at home: the code from the family at the door",
+   "beforeWork": "the doula checks in with the family on how they feel and what they want from the visit, before the work starts",
+   "changes": "the doula adds a longer visit or an extra hour only with the family's yes, with any price first",
+   "done": "the check-in code or DONE; the doula's notes stay with the doula, never in Rosie or a text; the next session is booked at checkout",
+   "away": "at home: the doula brings her own supplies; a grown-up is there for the whole visit",
+   "childLeft": "never: an adult who brought a child to a visit stays for the whole visit"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking for a free consult; a birth doula package takes its $400 deposit when the agreement is signed, and the rest is paid at the visits (office) or on the bill after the birth (home), never charged on a set day by itself; a session paid in full (a birth prep session, an overnight) is paid when booking",
+   "plans": "none: the doula takes no health plan",
+   "selfPay": "a family paying for a session itself is told while booking what it costs, and sees the price before the yes",
+   "vaccines": "none",
+   "fees": "no missed-visit fee by default; the owner may set one for sessions only, and it is never more than the deposit or the money paid now",
+   "feeFree": "a switch: no fee ever for a family the owner marks fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "at the office: the rest is paid at the visit; at home: the bill comes after the birth, by a link; a balance is billed by the business, not by a Rosie text on a set day",
+   "caps": "deposit cap: from the state's rules, where they set one",
+   "rosfield": "the $2 per booking applies, as for every kind of work (D97): a flat fee for each booking Rosie's AI makes; no memberships are sold here",
+   "payOverTime": "none: no package is charged on set days by itself; the rest is paid at a visit or on a bill the family gets and pays",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the business's name, the date, the time, the address and a secure link: never the visit type, the pregnancy, the birth plan, symptoms or results (at a home visit the doula's name stays, for the door check)",
+   "staff": "texts to the owner and staff carry the family's initials, the time and a link; never the visit type or any health detail",
+   "languages": "English and Spanish; the secure page asks if the family needs an interpreter, and the business is told",
+   "minors": "texts go to the family, or to the person the family names on the secure page; nothing about a child is texted to anyone but a parent or guardian",
+   "medical": "a medical question is never answered, saved or passed on: 911 if it's an emergency, then the family's own provider"
+  },
+  "pf.staff": {
+   "licenses": "each doula's own certificate, if the owner adds it (optional; never checked by Rosie)",
+   "skills": "birth doulas: prenatal sessions, birth support on call from about 37 weeks, and birth prep sessions; postpartum doulas: postpartum visits and overnight support at home; only people the owner clears go to homes",
+   "supervision": "a doula in training works with an experienced doula, as the owner says (the owner's note, not checked)",
+   "oks": "the owner OKs a new family's first session, and any visit a doula flags",
+   "standIn": "a doula out: the backup doula the family has met may take the visit, with the family's yes; nobody is moved without it",
+   "away": "the home team is the doulas the owner clears for home visits"
+  },
+  "pf.rules": {
+   "records": "the doula's notes are kept as the owner's rules say; a delete request removes only Rosie's own booking details, never the notes",
+   "copies": "a family's copy of its records within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "any certificate the owner adds is shown where the owner says so; Rosie shows nothing as checked",
+   "minors": "a minor's booking follows the owner's rule; until it's set, a parent or guardian books",
+   "custody": "a court order or custody limit the family gives the business is kept on its record, and Rosie follows the record, not the caller's word alone",
+   "language": "free language help where the rules require it",
+   "host": "none: no group or school hosting",
+   "ads": "no claims about medical outcomes; no price or free-visit claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen; later, the office may offer a new time (the business decides; Rosie never changes the booking itself)",
+   "officeLate": "when the doula runs late, a new time costs nothing",
+   "standIn": "a doula out: the backup doula the family has met, with the family's yes, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then the business keeps the session (signed on the secure page first), moves it, or cancels with no fee",
+   "twoBookings": "a family with sessions open for two people: Rosie asks which one before any change",
+   "worse": "a family worried before a visit: the 911 or on-call words if they match; Rosie never judges how serious it is, and the visit stays booked",
+   "healthQuestion": "a question about medicine or care: never answered by Rosie or the doula; 911 if it's an emergency, then the family's own provider",
+   "siblings": "a second person added to a booking gets their own time",
+   "newborn": "a home visit that can't happen as booked: the soonest open window comes first, with no fee",
+   "urgent": "no service is sent now through Rosie: labor is on call through the business's on-call line (pf.safety), and a family with a worry gets the soonest visit",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "children",
+   "documents",
+   "extrawork",
+   "firststeps",
+   "forms",
+   "video"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Birth Support",
+   "staff": "Mara (birth doula) and Wren (birth doula)",
+   "cust": "Alex M. (client) · other families",
+   "other": "Others (a bank, a support person)"
+  },
+  "B": {
+   "business": "Lee Home Support",
+   "staff": "Esme (birth doula) and Dara (postpartum doula), who visit at home",
+   "cust": "Alex M. (client) · other families",
+   "other": "Others (a bank, a support person)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Mara"
+  },
+  "B": {
+   "staff": "Esme"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "This work runs under one person's license, and that person leaves or sells. That day, the license is checked again on the lookup the plug-in names. Until it checks out, that work takes no new bookings.",
+    "This work runs under one person's license, and that person leaves or sells. That day, the owner confirms the license again. Until the owner does, that work takes no new bookings."
+   ],
+   [
+    "Every license, permit or certificate the work needs is checked on the official lookup the plug-in names. The business's is checked before it goes live, each person's before they're offered.",
+    "Every license, permit or certificate is the owner's word: Rosie checks none of them. Each one is shown as the owner's word."
+   ],
+   [
+    "Licenses are checked again every 30 days, before each end date, and the day the license holder leaves or the owner changes. A lapse stops new bookings at once.",
+    "Rosie checks no license. The owner says when a license lapses, and a lapse stops new bookings at once."
+   ],
+   [
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Esme asks in person and opens Alex's page on their own phone. Alex taps there, never Esme."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the home care package from a $400 deposit to a $480 deposit. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for a visit at $200, an old price. Rosie answers with the real price, $210. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "Ben's AI asks for a postpartum visit at $90, an old price. Rosie answers with the real price, $95. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a session at $90, an old price. Rosie answers with the real price, $95. That's the price Ben sees before saying yes."
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the care package from a $400 deposit to a $480 deposit. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Esme texts OMW before they drive. The person who meets the pro gets their name and photo, the arrival time and the code to give at the door."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a visit at $90, an old price. Rosie answers with the real price, $95. That's the price Ben sees before saying yes."
+   ],
+   [
+    "The Birth center care package can take a $1,000 deposit when the care agreement is signed. The rest is on the bill after the birth.",
+    "The Care package can take a $400 deposit when the agreement is signed. The rest is on the bill after the birth."
+   ],
+   [
+    "The Birth center care package can take a $1,000 deposit when the care agreement is signed. The rest is paid at the visits.",
+    "The Care package can take a $400 deposit when the agreement is signed. The rest is paid at the visits."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a session. Rosie finds one time long enough for both, with one doula, and adds the prices: $95 and $85."
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the session to $100 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Your license shows as expired on the official lookup, so Lee Home Services can't book you until it shows renewed.",
+    "Your license is shown as expired, so Lee Home Support can't book you until it's shown renewed."
+   ],
+   [
+    "The lookup shows the license as expired. Avery stays on the team, and can be booked again once it shows renewed.",
+    "The owner says the license has expired. Wren stays on the team, and can be booked again once it's shown renewed."
+   ],
+   [
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "The owner says the license has expired. Dara stays on the team, and can be booked again once it's shown renewed."
+   ],
+   [
+    "Your license shows as expired on the official lookup, so Lee's Barbershop can't book you until it shows renewed.",
+    "Your license is shown as expired, so Lee Birth Support can't book you until it's shown renewed."
+   ],
+   [
+    "Where the plug-in says a license is needed, Reese gives the number by text or call, and it's checked then.",
+    "Reese gives the number by text or call, if one is held."
+   ],
+   [
+    "The license holder for this work left today. New bookings for it pause until the license checks out again.",
+    "The license holder for this work left today. New bookings for it pause until the owner confirms the license again."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The Care package can take a $400 deposit when the agreement is signed. The rest is on the bill after the birth."
+   ],
+   [
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "A session is on the price board: $85. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The Care package can take a $400 deposit when the agreement is signed. The rest is paid at the visits."
+   ],
+   [
+    "Welcome to Lee Home Services! Please fill in your secure page. I check licenses right away.",
+    "Welcome to Lee Home Support! Please fill in your secure page. I note each license the owner gives."
+   ],
+   [
+    "No phone at hand: Jordan opens Alex's page on his own phone, and Alex taps there.",
+    "No phone at hand: Esme opens Alex's page on their own phone, and Alex taps there."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A help hour is priced at the visit: only the $210 visit was promised."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A doula's example: a gas smell at the home gets 'get out and call 911'."
+   ],
+   [
+    "NOTE grease problem 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE Alex: the kit runs low; bring a spare next time."
+   ],
+   [
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there.",
+    "Esme opens Alex's pay page on their own phone, and Alex pays there."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the visit to $220 for visits from Mon Nov 2."
+   ],
+   [
+    "Licenses: Checked by Rosie on the state's lookup, Oct 19",
+    "Licenses: the owner's word, Oct 19"
+   ],
+   [
+    "Jordan's license expires in 30 days. I've reminded Jordan.",
+    "Esme's license expires in 30 days. I've reminded Esme."
+   ],
+   [
+    "Avery's license shows as expired on the official lookup.",
+    "Wren's license is shown as expired by the owner."
+   ],
+   [
+    "Casey's license shows as expired on the official lookup.",
+    "Dara's license is shown as expired by the owner."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like asking for a stranger's records."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 extra quote is good for 7 days."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $95 visit price."
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote.",
+    "Morgan P. asked to talk about the $480 overnight visit."
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The owner says the license has expired."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Session"
+   ],
+   [
+    "Does it match the state's lookup?",
+    "Is it the owner's own word?"
+   ],
+   [
+    "Licenses: on file, checked Oct 19",
+    "Licenses: on file, the owner's word"
+   ],
+   [
+    "Overflowing kitchen postpartum",
+    "Visit at home"
+   ],
+   [
+    "water heater replacement",
+    "kit"
+   ],
+   [
+    "Water heater replacement",
+    "Kit"
+   ],
+   [
+    "Kitchen postpartum visit",
+    "Visit at home"
+   ],
+   [
+    "plumbing and electrical",
+    "home births and care"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home births and care"
+   ],
+   [
+    "Signature cut and shave",
+    "Session"
+   ],
+   [
+    "sewer camera inspection",
+    "visit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Visit"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Visit at home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Support LLC"
+   ],
+   [
+    "water pressure check",
+    "visit"
+   ],
+   [
+    "Water pressure check",
+    "Visit"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Birth Support LLC"
+   ],
+   [
+    "Heating and cooling",
+    "Supplies"
+   ],
+   [
+    "heating and cooling",
+    "supplies"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "water heater flush",
+    "visit"
+   ],
+   [
+    "Water heater flush",
+    "Visit"
+   ],
+   [
+    "Short on the sides",
+    "Short on the top"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Support"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Birth Support"
+   ],
+   [
+    "Color correction",
+    "Session"
+   ],
+   [
+    "color correction",
+    "session"
+   ],
+   [
+    "garbage disposal",
+    "birth ball"
+   ],
+   [
+    "$89 service call",
+    "$210 visit"
+   ],
+   [
+    "Groom's package",
+    "Care package"
+   ],
+   [
+    "hot towel shave",
+    "session"
+   ],
+   [
+    "is at the chair",
+    "is at the visit"
+   ],
+   [
+    "starting price",
+    "visit price"
+   ],
+   [
+    "shutoff valves",
+    "kits"
+   ],
+   [
+    "Color touch-up",
+    "Visit"
+   ],
+   [
+    "color touch-up",
+    "visit"
+   ],
+   [
+    "drain clearing",
+    "visit"
+   ],
+   [
+    "Drain clearing",
+    "Visit"
+   ],
+   [
+    "water heaters",
+    "home care packages"
+   ],
+   [
+    "Water heaters",
+    "Home care packages"
+   ],
+   [
+    "shutoff valve",
+    "kit"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "Groom's party",
+    "Family"
+   ],
+   [
+    "Color and cut",
+    "Check-in"
+   ],
+   [
+    "color and cut",
+    "check-in"
+   ],
+   [
+    "1200 Main St",
+    "305 Cedar Ave"
+   ],
+   [
+    "at the chair",
+    "at the visit"
+   ],
+   [
+    "At the chair",
+    "At the visit"
+   ],
+   [
+    "barber chair",
+    "birth room"
+   ],
+   [
+    "water heater",
+    "home care package"
+   ],
+   [
+    "Water heater",
+    "Home care package"
+   ],
+   [
+    "Service call",
+    "Home visit"
+   ],
+   [
+    "service call",
+    "home visit"
+   ],
+   [
+    "barbershops",
+    "offices"
+   ],
+   [
+    "Barbershops",
+    "Offices"
+   ],
+   [
+    "Leak repair",
+    "Help"
+   ],
+   [
+    "leak repair",
+    "help"
+   ],
+   [
+    "pump valves",
+    "kits"
+   ],
+   [
+    "electrician",
+    "doula"
+   ],
+   [
+    "Electrician",
+    "Doula"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "supply line",
+    "supply list"
+   ],
+   [
+    "overflowing",
+    "full"
+   ],
+   [
+    "electrical",
+    "care"
+   ],
+   [
+    "Electrical",
+    "Care"
+   ],
+   [
+    "barbershop",
+    "office"
+   ],
+   [
+    "Barbershop",
+    "Office"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "beard trim",
+    "session"
+   ],
+   [
+    "Beard trim",
+    "Session"
+   ],
+   [
+    "dishwasher",
+    "birth tub"
+   ],
+   [
+    "water line",
+    "water supply"
+   ],
+   [
+    "patch test",
+    "health history"
+   ],
+   [
+    "kids cuts",
+    "visits"
+   ],
+   [
+    "Kids cuts",
+    "Visits"
+   ],
+   [
+    "88 Elm St",
+    "31 Birch Lane"
+   ],
+   [
+    "42 Oak St",
+    "19 Maple Ct"
+   ],
+   [
+    "skin fade",
+    "visit"
+   ],
+   [
+    "Skin fade",
+    "Visit"
+   ],
+   [
+    "hot towel",
+    "kit"
+   ],
+   [
+    "kids cut",
+    "visit"
+   ],
+   [
+    "plumbing",
+    "home support"
+   ],
+   [
+    "Plumbing",
+    "Home support"
+   ],
+   [
+    "plumbers",
+    "doulas"
+   ],
+   [
+    "Plumbers",
+    "Doulas"
+   ],
+   [
+    "haircuts",
+    "visits"
+   ],
+   [
+    "Haircuts",
+    "Visits"
+   ],
+   [
+    "kids cut",
+    "visit"
+   ],
+   [
+    "Kids cut",
+    "Visit"
+   ],
+   [
+    "cut hair",
+    "see a doula"
+   ],
+   [
+    "plumber",
+    "doula"
+   ],
+   [
+    "Plumber",
+    "Doula"
+   ],
+   [
+    "barbers",
+    "doulas"
+   ],
+   [
+    "Barbers",
+    "Doulas"
+   ],
+   [
+    "haircut",
+    "visit"
+   ],
+   [
+    "Haircut",
+    "Visit"
+   ],
+   [
+    "massage",
+    "session class"
+   ],
+   [
+    "Massage",
+    "Session class"
+   ],
+   [
+    "steamer",
+    "warmer"
+   ],
+   [
+    "line-up",
+    "pickup"
+   ],
+   [
+    "cabinet",
+    "closet"
+   ],
+   [
+    "Cabinet",
+    "Closet"
+   ],
+   [
+    "shutoff",
+    "pump"
+   ],
+   [
+    "Elm St",
+    "Birch Lane"
+   ],
+   [
+    "Oak St",
+    "Pine St"
+   ],
+   [
+    "Jordan",
+    "Esme"
+   ],
+   [
+    "barber",
+    "doula"
+   ],
+   [
+    "Barber",
+    "Doula"
+   ],
+   [
+    "shaves",
+    "classes"
+   ],
+   [
+    "brassy",
+    "rushed"
+   ],
+   [
+    "facial",
+    "nutrition visit"
+   ],
+   [
+    "heater",
+    "warmer"
+   ],
+   [
+    "Heater",
+    "Warmer"
+   ],
+   [
+    "faucet",
+    "pump"
+   ],
+   [
+    "Faucet",
+    "Pump"
+   ],
+   [
+    "toilet",
+    "bath"
+   ],
+   [
+    "Toilet",
+    "Bath"
+   ],
+   [
+    "repipe",
+    "rebuild"
+   ],
+   [
+    "pipes",
+    "tubes"
+   ],
+   [
+    "Pipes",
+    "Tubes"
+   ],
+   [
+    "perms",
+    "tattoos"
+   ],
+   [
+    "Perms",
+    "Tattoos"
+   ],
+   [
+    "flush",
+    "checkup"
+   ],
+   [
+    "Flush",
+    "Checkup"
+   ],
+   [
+    "Riley",
+    "Mara"
+   ],
+   [
+    "Avery",
+    "Wren"
+   ],
+   [
+    "Casey",
+    "Dara"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "Shops",
+    "Offices"
+   ],
+   [
+    "shave",
+    "class"
+   ],
+   [
+    "gloss",
+    "kit"
+   ],
+   [
+    "beard",
+    "care"
+   ],
+   [
+    "drain",
+    "visit"
+   ],
+   [
+    "Drain",
+    "Visit"
+   ],
+   [
+    "sewer",
+    "newborn"
+   ],
+   [
+    "Sewer",
+    "Newborn"
+   ],
+   [
+    "valve",
+    "cord"
+   ],
+   [
+    "Valve",
+    "Cord"
+   ],
+   [
+    "drips",
+    "drops"
+   ],
+   [
+    "Hugo",
+    "Tomas"
+   ],
+   [
+    "Cape",
+    "Gown"
+   ],
+   [
+    "Lena",
+    "Ines"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "cape",
+    "gown"
+   ],
+   [
+    "perm",
+    "tattoo"
+   ],
+   [
+    "clog",
+    "problem"
+   ],
+   [
+    "Clog",
+    "Problem"
+   ],
+   [
+    "sink",
+    "tub"
+   ],
+   [
+    "Sink",
+    "Tub"
+   ],
+   [
+    "pipe",
+    "tube"
+   ],
+   [
+    "Pipe",
+    "Tube"
+   ],
+   [
+    "dye",
+    "tea"
+   ]
+  ],
+  "B": [
+   [
+    "This work runs under one person's license, and that person leaves or sells. That day, the license is checked again on the lookup the plug-in names. Until it checks out, that work takes no new bookings.",
+    "This work runs under one person's license, and that person leaves or sells. That day, the owner confirms the license again. Until the owner does, that work takes no new bookings."
+   ],
+   [
+    "Every license, permit or certificate the work needs is checked on the official lookup the plug-in names. The business's is checked before it goes live, each person's before they're offered.",
+    "Every license, permit or certificate is the owner's word: Rosie checks none of them. Each one is shown as the owner's word."
+   ],
+   [
+    "Licenses are checked again every 30 days, before each end date, and the day the license holder leaves or the owner changes. A lapse stops new bookings at once.",
+    "Rosie checks no license. The owner says when a license lapses, and a lapse stops new bookings at once."
+   ],
+   [
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Esme asks in person and opens Alex's page on their own phone. Alex taps there, never Esme."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the home care package from a $400 deposit to a $480 deposit. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for a visit at $200, an old price. Rosie answers with the real price, $210. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "Ben's AI asks for a postpartum visit at $90, an old price. Rosie answers with the real price, $95. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a session at $90, an old price. Rosie answers with the real price, $95. That's the price Ben sees before saying yes."
+   ],
+   [
+    "Sam sells Lee's Barbershop to Hugo P. Hugo checks ID and links their own Stripe, in the business's name. The license is checked again that day.",
+    "Sam sells Lee Birth Support to Tomas P. Tomas checks ID and links their own Stripe, in the business's name. The owner confirms the license again that day."
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the care package from a $400 deposit to a $480 deposit. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Esme texts OMW before they drive. The person who meets the pro gets their name and photo, the arrival time and the code to give at the door."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a visit at $90, an old price. Rosie answers with the real price, $95. That's the price Ben sees before saying yes."
+   ],
+   [
+    "The Birth center care package can take a $1,000 deposit when the care agreement is signed. The rest is on the bill after the birth.",
+    "The Care package can take a $400 deposit when the agreement is signed. The rest is on the bill after the birth."
+   ],
+   [
+    "The Birth center care package can take a $1,000 deposit when the care agreement is signed. The rest is paid at the visits.",
+    "The Care package can take a $400 deposit when the agreement is signed. The rest is paid at the visits."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a session. Rosie finds one time long enough for both, with one doula, and adds the prices: $95 and $85."
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the session to $100 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "One question: the license number the business works under. It's checked on the official lookup the plug-in names.",
+    "One question: the license number the business works under. It's the business's own word, and nothing is looked up."
+   ],
+   [
+    "Your license shows as expired on the official lookup, so Lee Home Services can't book you until it shows renewed.",
+    "Your license is shown as expired, so Lee Home Support can't book you until it's shown renewed."
+   ],
+   [
+    "The lookup shows the license as expired. Avery stays on the team, and can be booked again once it shows renewed.",
+    "The owner says the license has expired. Wren stays on the team, and can be booked again once it's shown renewed."
+   ],
+   [
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "The owner says the license has expired. Dara stays on the team, and can be booked again once it's shown renewed."
+   ],
+   [
+    "Your license shows as expired on the official lookup, so Lee's Barbershop can't book you until it shows renewed.",
+    "Your license is shown as expired, so Lee Birth Support can't book you until it's shown renewed."
+   ],
+   [
+    "Rosie checks each license again on the state's lookup: every 30 days by default, and before each end date.",
+    "Rosie checks no license again: the owner's word stands."
+   ],
+   [
+    "A license shows as 'checked by Rosie' only after Rosie read it on the state's lookup, with the date.",
+    "No license shows as checked: the owner's word is the only record."
+   ],
+   [
+    "Where the plug-in says a license is needed, Quinn gives the number by text or call, and it's checked then.",
+    "Quinn gives the number by text or call, if one is held."
+   ],
+   [
+    "Where the plug-in says a license is needed, Reese gives the number by text or call, and it's checked then.",
+    "Reese gives the number by text or call, if one is held."
+   ],
+   [
+    "The license holder for this work left today. New bookings for it pause until the license checks out again.",
+    "The license holder for this work left today. New bookings for it pause until the owner confirms the license again."
+   ],
+   [
+    "A license that's expired, or failed a re-check: that person isn't booked for that work until it's fixed.",
+    "A license the owner says has expired: that person isn't booked for that work until it's renewed."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The Care package can take a $400 deposit when the agreement is signed. The rest is on the bill after the birth."
+   ],
+   [
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "A session is on the price board: $85. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Rosie's rule: a claim shows as checked only when it was. Why: customers choose on these claims.",
+    "Rosie's rule: a claim is shown as the owner's word, never as checked. Why: customers choose on these claims."
+   ],
+   [
+    "A license may be a state, city or federal one. Each is checked on the lookup the plug-in names.",
+    "A license may be a state, city or federal one. It's the owner's word; nothing is looked up."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The Care package can take a $400 deposit when the agreement is signed. The rest is paid at the visits."
+   ],
+   [
+    "Checked by Rosie's team · sets the license word, who issues it, services, places, limits",
+    "The owner's word · sets the license word, who issues it, services, places, limits"
+   ],
+   [
+    "Welcome to Lee Home Services! Please fill in your secure page. I check licenses right away.",
+    "Welcome to Lee Home Support! Please fill in your secure page. I note each license the owner gives."
+   ],
+   [
+    "Welcome to Lee's Barbershop! Please fill in your secure page. I check licenses right away.",
+    "Welcome to Lee Birth Support! Please fill in your secure page. I note each license the owner gives."
+   ],
+   [
+    "Quinn can be booked once the license checks out on the state's lookup, and Sam says yes.",
+    "Quinn can be booked once Sam says yes."
+   ],
+   [
+    "Your license expires in 30 days, and the state's lookup doesn't show it renewed yet.",
+    "Your license expires in 30 days. Please say when it's renewed."
+   ],
+   [
+    "You follow your state's rules for your trade, and Rosie checks licenses itself.",
+    "You follow your state's rules for your trade. Rosie checks no licenses."
+   ],
+   [
+    "Nobody is offered to customers until their license is confirmed and Sam says yes.",
+    "Nobody is offered to customers until Sam says yes."
+   ],
+   [
+    "No phone at hand: Jordan opens Alex's page on his own phone, and Alex taps there.",
+    "No phone at hand: Esme opens Alex's page on their own phone, and Alex taps there."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A help hour is priced at the visit: only the $210 visit was promised."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A doula's example: a gas smell at the home gets 'get out and call 911'."
+   ],
+   [
+    "NOTE grease problem 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE Alex: the kit runs low; bring a spare next time."
+   ],
+   [
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there.",
+    "Esme opens Alex's pay page on their own phone, and Alex pays there."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the visit to $220 for visits from Mon Nov 2."
+   ],
+   [
+    "Customers can book it once a barber's own license checks out.",
+    "Customers can book it once the doula's own license is the owner's word and the owner says yes."
+   ],
+   [
+    "Licenses: Checked by Rosie on the state's lookup, Oct 19",
+    "Licenses: the owner's word, Oct 19"
+   ],
+   [
+    "Jordan's license expires in 30 days. I've reminded Jordan.",
+    "Esme's license expires in 30 days. I've reminded Esme."
+   ],
+   [
+    "Everyone's licenses are confirmed on the official lookup.",
+    "Everyone's licenses are the owner's own word."
+   ],
+   [
+    "Avery's license shows as expired on the official lookup.",
+    "Wren's license is shown as expired by the owner."
+   ],
+   [
+    "Casey's license shows as expired on the official lookup.",
+    "Dara's license is shown as expired by the owner."
+   ],
+   [
+    "Riley's license expires in 30 days. I've reminded Riley.",
+    "Mara's license expires in 30 days. I've reminded Mara."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like asking for a stranger's records."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 extra quote is good for 7 days."
+   ],
+   [
+    "It goes live once Jordan's own license checks out",
+    "It goes live once the owner says yes"
+   ],
+   [
+    "Once Jordan's license checks out and you say yes",
+    "Once you say yes"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $95 visit price."
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote.",
+    "Morgan P. asked to talk about the $480 overnight visit."
+   ],
+   [
+    "Licenses as checked, and agreements signed.",
+    "Licenses as the owner's word, and agreements signed."
+   ],
+   [
+    "It goes live once its licenses check out.",
+    "It goes live once the owner says yes."
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The owner says the license has expired."
+   ],
+   [
+    "Barber license: on file, checked Oct 19",
+    "Doula license: on file, the owner's word"
+   ],
+   [
+    "The license is checked again that day.",
+    "The owner confirms the license again that day."
+   ],
+   [
+    "Your license, checked while you go on",
+    "Your license, your word, while you go on"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Session"
+   ],
+   [
+    "Does it match the state's lookup?",
+    "Is it the owner's own word?"
+   ],
+   [
+    "Licenses: on file, checked Oct 19",
+    "Licenses: on file, the owner's word"
+   ],
+   [
+    "Overflowing kitchen postpartum",
+    "Visit at home"
+   ],
+   [
+    "water heater replacement",
+    "kit"
+   ],
+   [
+    "Water heater replacement",
+    "Kit"
+   ],
+   [
+    "Kitchen postpartum visit",
+    "Visit at home"
+   ],
+   [
+    "plumbing and electrical",
+    "home births and care"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home births and care"
+   ],
+   [
+    "Signature cut and shave",
+    "Session"
+   ],
+   [
+    "sewer camera inspection",
+    "visit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Visit"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Visit at home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Support LLC"
+   ],
+   [
+    "water pressure check",
+    "visit"
+   ],
+   [
+    "Water pressure check",
+    "Visit"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Birth Support LLC"
+   ],
+   [
+    "Heating and cooling",
+    "Supplies"
+   ],
+   [
+    "heating and cooling",
+    "supplies"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "Checks each license",
+    "Saves each license"
+   ],
+   [
+    "water heater flush",
+    "visit"
+   ],
+   [
+    "Water heater flush",
+    "Visit"
+   ],
+   [
+    "Short on the sides",
+    "Short on the top"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Support"
+   ],
+   [
+    "Licenses: checked",
+    "Licenses: the owner's word"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Birth Support"
+   ],
+   [
+    "Color correction",
+    "Session"
+   ],
+   [
+    "color correction",
+    "session"
+   ],
+   [
+    "garbage disposal",
+    "birth ball"
+   ],
+   [
+    "$89 service call",
+    "$210 visit"
+   ],
+   [
+    "Groom's package",
+    "Care package"
+   ],
+   [
+    "hot towel shave",
+    "session"
+   ],
+   [
+    "is at the chair",
+    "is at the visit"
+   ],
+   [
+    "starting price",
+    "visit price"
+   ],
+   [
+    "shutoff valves",
+    "kits"
+   ],
+   [
+    "Color touch-up",
+    "Visit"
+   ],
+   [
+    "color touch-up",
+    "visit"
+   ],
+   [
+    "drain clearing",
+    "visit"
+   ],
+   [
+    "Drain clearing",
+    "Visit"
+   ],
+   [
+    "water heaters",
+    "home care packages"
+   ],
+   [
+    "Water heaters",
+    "Home care packages"
+   ],
+   [
+    "shutoff valve",
+    "kit"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "Groom's party",
+    "Family"
+   ],
+   [
+    "Color and cut",
+    "Check-in"
+   ],
+   [
+    "color and cut",
+    "check-in"
+   ],
+   [
+    "1200 Main St",
+    "305 Cedar Ave"
+   ],
+   [
+    "at the chair",
+    "at the visit"
+   ],
+   [
+    "At the chair",
+    "At the visit"
+   ],
+   [
+    "barber chair",
+    "birth room"
+   ],
+   [
+    "water heater",
+    "home care package"
+   ],
+   [
+    "Water heater",
+    "Home care package"
+   ],
+   [
+    "Service call",
+    "Home visit"
+   ],
+   [
+    "service call",
+    "home visit"
+   ],
+   [
+    "barbershops",
+    "offices"
+   ],
+   [
+    "Barbershops",
+    "Offices"
+   ],
+   [
+    "Leak repair",
+    "Help"
+   ],
+   [
+    "leak repair",
+    "help"
+   ],
+   [
+    "pump valves",
+    "kits"
+   ],
+   [
+    "electrician",
+    "doula"
+   ],
+   [
+    "Electrician",
+    "Doula"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "supply line",
+    "supply list"
+   ],
+   [
+    "overflowing",
+    "full"
+   ],
+   [
+    "electrical",
+    "care"
+   ],
+   [
+    "Electrical",
+    "Care"
+   ],
+   [
+    "barbershop",
+    "office"
+   ],
+   [
+    "Barbershop",
+    "Office"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "beard trim",
+    "session"
+   ],
+   [
+    "Beard trim",
+    "Session"
+   ],
+   [
+    "dishwasher",
+    "birth tub"
+   ],
+   [
+    "water line",
+    "water supply"
+   ],
+   [
+    "patch test",
+    "health history"
+   ],
+   [
+    "kids cuts",
+    "visits"
+   ],
+   [
+    "Kids cuts",
+    "Visits"
+   ],
+   [
+    "88 Elm St",
+    "31 Birch Lane"
+   ],
+   [
+    "42 Oak St",
+    "19 Maple Ct"
+   ],
+   [
+    "skin fade",
+    "visit"
+   ],
+   [
+    "Skin fade",
+    "Visit"
+   ],
+   [
+    "hot towel",
+    "kit"
+   ],
+   [
+    "kids cut",
+    "visit"
+   ],
+   [
+    "plumbing",
+    "home support"
+   ],
+   [
+    "Plumbing",
+    "Home support"
+   ],
+   [
+    "plumbers",
+    "doulas"
+   ],
+   [
+    "Plumbers",
+    "Doulas"
+   ],
+   [
+    "haircuts",
+    "visits"
+   ],
+   [
+    "Haircuts",
+    "Visits"
+   ],
+   [
+    "kids cut",
+    "visit"
+   ],
+   [
+    "Kids cut",
+    "Visit"
+   ],
+   [
+    "cut hair",
+    "see a doula"
+   ],
+   [
+    "plumber",
+    "doula"
+   ],
+   [
+    "Plumber",
+    "Doula"
+   ],
+   [
+    "barbers",
+    "doulas"
+   ],
+   [
+    "Barbers",
+    "Doulas"
+   ],
+   [
+    "haircut",
+    "visit"
+   ],
+   [
+    "Haircut",
+    "Visit"
+   ],
+   [
+    "massage",
+    "session class"
+   ],
+   [
+    "Massage",
+    "Session class"
+   ],
+   [
+    "steamer",
+    "warmer"
+   ],
+   [
+    "line-up",
+    "pickup"
+   ],
+   [
+    "cabinet",
+    "closet"
+   ],
+   [
+    "Cabinet",
+    "Closet"
+   ],
+   [
+    "shutoff",
+    "pump"
+   ],
+   [
+    "Elm St",
+    "Birch Lane"
+   ],
+   [
+    "Oak St",
+    "Pine St"
+   ],
+   [
+    "Jordan",
+    "Esme"
+   ],
+   [
+    "barber",
+    "doula"
+   ],
+   [
+    "Barber",
+    "Doula"
+   ],
+   [
+    "shaves",
+    "classes"
+   ],
+   [
+    "brassy",
+    "rushed"
+   ],
+   [
+    "facial",
+    "nutrition visit"
+   ],
+   [
+    "heater",
+    "warmer"
+   ],
+   [
+    "Heater",
+    "Warmer"
+   ],
+   [
+    "faucet",
+    "pump"
+   ],
+   [
+    "Faucet",
+    "Pump"
+   ],
+   [
+    "toilet",
+    "bath"
+   ],
+   [
+    "Toilet",
+    "Bath"
+   ],
+   [
+    "repipe",
+    "rebuild"
+   ],
+   [
+    "pipes",
+    "tubes"
+   ],
+   [
+    "Pipes",
+    "Tubes"
+   ],
+   [
+    "perms",
+    "tattoos"
+   ],
+   [
+    "Perms",
+    "Tattoos"
+   ],
+   [
+    "flush",
+    "checkup"
+   ],
+   [
+    "Flush",
+    "Checkup"
+   ],
+   [
+    "Riley",
+    "Mara"
+   ],
+   [
+    "Avery",
+    "Wren"
+   ],
+   [
+    "Casey",
+    "Dara"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "Shops",
+    "Offices"
+   ],
+   [
+    "shave",
+    "class"
+   ],
+   [
+    "gloss",
+    "kit"
+   ],
+   [
+    "beard",
+    "care"
+   ],
+   [
+    "drain",
+    "visit"
+   ],
+   [
+    "Drain",
+    "Visit"
+   ],
+   [
+    "sewer",
+    "newborn"
+   ],
+   [
+    "Sewer",
+    "Newborn"
+   ],
+   [
+    "valve",
+    "cord"
+   ],
+   [
+    "Valve",
+    "Cord"
+   ],
+   [
+    "drips",
+    "drops"
+   ],
+   [
+    "Hugo",
+    "Tomas"
+   ],
+   [
+    "Cape",
+    "Gown"
+   ],
+   [
+    "Lena",
+    "Ines"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "cape",
+    "gown"
+   ],
+   [
+    "perm",
+    "tattoo"
+   ],
+   [
+    "clog",
+    "problem"
+   ],
+   [
+    "Clog",
+    "Problem"
+   ],
+   [
+    "sink",
+    "tub"
+   ],
+   [
+    "Sink",
+    "Tub"
+   ],
+   [
+    "pipe",
+    "tube"
+   ],
+   [
+    "Pipe",
+    "Tube"
+   ],
+   [
+    "dye",
+    "tea"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee, a birth doula, signs up two companies by text. Then Alex books a free meet-the-doula consult at Lee Birth Support with Mara, for Sat Oct 24 at 11:00am, and later signs the birth doula package. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books the home birth doula package with Lee Home Support: a deposit when the agreement is signed, and Esme, a birth doula, comes to Alex's home Thu Oct 22 for a prenatal visit, arriving 8 to 10am. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|none|none",
+    "list|none|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: the birth doula package. A $400 deposit when the agreement is signed; the rest is paid at the visits, never charged on its own on a set day.",
+    "list|none|none": "The free meet-the-doula consult: nothing is taken and nothing is to pay.",
+    "list|none|counter": "A prenatal session: nothing taken when booking; $95 is paid at the visit.",
+    "list|full|none": "A birth prep session for two, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "name": "Prenatal session"
+    },
+    "list|none|none": {
+     "price": "$0",
+     "name": "Meet the doula (free consult)"
+    },
+    "list|none|counter": {
+     "price": "$95",
+     "name": "Prenatal session"
+    },
+    "list|deposit|*": {
+     "price": "$1,800",
+     "deposit": "$400",
+     "rest": "$1,400",
+     "fee": "$400",
+     "name": "Birth doula package"
+    },
+    "list|full|*": {
+     "price": "$85",
+     "paid": "$85",
+     "name": "Birth prep session",
+     "fee": "$0"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|bill",
+   "combos": [
+    "list|deposit|bill",
+    "list|none|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|bill": "The main story: the home birth doula package. A $400 deposit when the agreement is signed; the rest is on the bill after the birth, paid by a link.",
+    "list|none|bill": "A postpartum visit at home (3 hours): nothing taken at booking; the bill comes after the visit.",
+    "list|full|none": "An overnight support visit at home, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "name": "Prenatal visit at home"
+    },
+    "list|deposit|*": {
+     "price": "$1,800",
+     "deposit": "$400",
+     "rest": "$1,400",
+     "fee": "$400",
+     "name": "Home birth doula package"
+    },
+    "list|none|bill": {
+     "price": "$210",
+     "name": "Postpartum visit at home (3 hours)"
+    },
+    "list|full|*": {
+     "price": "$480",
+     "paid": "$480",
+     "name": "Overnight support at home",
+     "fee": "$0"
+    },
+    "list|*|*": {
+     "price": "$210"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "Asks whether this work needs a license, and which one. The business's own word is all Rosie uses; nothing is looked up.",
+    "more": [
+     "Means '1 A license': the business holds one; its number goes on the secure page, unchecked.",
+     "Means '2 No license: registration only': the business holds none, or only a practice registration.",
+     "Nothing is shown as checked; the owner's word is the only record."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-32",
+    "does": "The ID and control checks come back. Nothing shows to AI assistants until the business's ID and control are confirmed.",
+    "more": [
+     "Means 'Confirmed in minutes': the ID and control of the business check out.",
+     "Means 'The ID doesn't match': the ID check can't match the owner's photo to the ID.",
+     "Control still with Rosie's team (S1-75): that company stays offline, setup saved, while the rest goes on.",
+     "Never: show a business to AI assistants before the ID and control are confirmed.",
+     "No license is looked up here: a license is the business's own word (S1-60)."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "label": "The number isn't found",
+    "why": "D96: no license lookup, so no 'not found' result"
+   },
+   {
+    "op": "words",
+    "at": "S1-62",
+    "does": "Before Rosie's price is shown, the plug-in says if this work pays the $2. The $2 applies to every kind of work, health included.",
+    "more": [
+     "Means 'Yes, $2 a booking': a flat fee for each booking Rosie's AI makes, the same for every business.",
+     "Rosfield's fee is never a share of what the business charges."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 per booking applies to every profession, health and law included; the no-$2 switch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "a midwife books people (the midwife, a birth assistant), never spaces"
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Asks whether each person adds a license number on the secure page. The owner's word decides; nothing is looked up.",
+    "more": [
+     "Means '1 Yes, each one': each person adds their own number, or none.",
+     "Means '2 No person license': the business names no person license.",
+     "Safe default: no person license is asked unless the owner names one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-11",
+    "does": "Each license number on the secure page is saved as the business's own word. Rosie looks nothing up and checks nothing.",
+    "more": [
+     "Means 'Matches': the business says the number and kind match what the person does.",
+     "Means 'Expired': the business says it has lapsed; that person is kept off that work until the owner says it's renewed.",
+     "Never: offer anyone for work the business says their license doesn't cover."
+    ],
+    "rule": "Rosie's rule: nobody is offered for work the business says their license doesn't cover. Rosie acts only on the business's own word. Why: the owner, not Rosie, knows what each license covers."
+   },
+   {
+    "op": "off",
+    "at": "S2-11",
+    "label": "Doesn't match",
+    "why": "D96: no lookup, so no mismatch result"
+   },
+   {
+    "op": "off",
+    "at": "S2-11",
+    "label": "The lookup is down",
+    "why": "D96: no lookup runs"
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "No person license: nothing is looked up. Any certificate the owner names is asked on the secure page and kept as the owner's word.",
+    "more": [
+     "Nobody is shown as checked, and customers see no license claim for that person.",
+     "Safe default: no person license is shown."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license lookup runs, so there is no lookup outage to report"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "no sent-now jobs here: a birth is on call through the on-call line (pf.safety); the master has no on-call ring for a client in care (gap)"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "the doula runs no classes; birth prep is booked as a session"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license lookup runs, so there is no lookup outage to report"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "sensitive work: no rating request (S13-22)"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "a client books a person's time, never a space"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "no stays at the office"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "nothing is left at the office"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "a parent or support person stays with a child at a visit"
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "an agreement signed today has no cancel period: no cancel period for work already given"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "no free fix visit: a worry goes to the on-call line (pf.safety)"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "the doula sends no proposals; more support is booked as its own session (A8-34)"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "new families are welcome; a new family's first session waits for the owner's OK instead"
+   },
+   {
+    "op": "off",
+    "at": "A4-80",
+    "label": "Adults only: it's for a child",
+    "why": "a child is booked on a parent's booking, never by the child"
+   },
+   {
+    "op": "more",
+    "at": "A4-42",
+    "more": [
+     "The due date is not asked here: the doula takes no plan.",
+     "The birth plan, the health history and the agreement are on it too. The family can finish them later."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Notes from the support stay with the doula as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Birth Support, the forms are the intake, the birth plan and the agreement.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "Asks whether this work needs a license, and which one. The business's own word is all Rosie uses; nothing is looked up.",
+    "more": [
+     "Means '1 A license': the business holds one; its number goes on the secure page, unchecked.",
+     "Means '2 No license: registration only': the business holds none, or only a practice registration.",
+     "Nothing is shown as checked; the owner's word is the only record."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-32",
+    "does": "The ID and control checks come back. Nothing shows to AI assistants until the business's ID and control are confirmed.",
+    "more": [
+     "Means 'Confirmed in minutes': the ID and control of the business check out.",
+     "Means 'The ID doesn't match': the ID check can't match the owner's photo to the ID.",
+     "Control still with Rosie's team (S1-75): that company stays offline, setup saved, while the rest goes on.",
+     "Never: show a business to AI assistants before the ID and control are confirmed.",
+     "No license is looked up here: a license is the business's own word (S1-60)."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "label": "The number isn't found",
+    "why": "D96: no license lookup, so no 'not found' result"
+   },
+   {
+    "op": "words",
+    "at": "S1-62",
+    "does": "Before Rosie's price is shown, the plug-in says if this work pays the $2. The $2 applies to every kind of work, health included.",
+    "more": [
+     "Means 'Yes, $2 a booking': a flat fee for each booking Rosie's AI makes, the same for every business.",
+     "Rosfield's fee is never a share of what the business charges."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 per booking applies to every profession, health and law included; the no-$2 switch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "a midwife books people (the midwife, a birth assistant), never spaces"
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Asks whether each person adds a license number on the secure page. The owner's word decides; nothing is looked up.",
+    "more": [
+     "Means '1 Yes, each one': each person adds their own number, or none.",
+     "Means '2 No person license': the business names no person license.",
+     "Safe default: no person license is asked unless the owner names one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-11",
+    "does": "Each license number on the secure page is saved as the business's own word. Rosie looks nothing up and checks nothing.",
+    "more": [
+     "Means 'Matches': the business says the number and kind match what the person does.",
+     "Means 'Expired': the business says it has lapsed; that person is kept off that work until the owner says it's renewed.",
+     "Never: offer anyone for work the business says their license doesn't cover."
+    ],
+    "rule": "Rosie's rule: nobody is offered for work the business says their license doesn't cover. Rosie acts only on the business's own word. Why: the owner, not Rosie, knows what each license covers."
+   },
+   {
+    "op": "off",
+    "at": "S2-11",
+    "label": "Doesn't match",
+    "why": "D96: no lookup, so no mismatch result"
+   },
+   {
+    "op": "off",
+    "at": "S2-11",
+    "label": "The lookup is down",
+    "why": "D96: no lookup runs"
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "No person license: nothing is looked up. Any certificate the owner names is asked on the secure page and kept as the owner's word.",
+    "more": [
+     "Nobody is shown as checked, and customers see no license claim for that person.",
+     "Safe default: no person license is shown."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license lookup runs, so there is no lookup outage to report"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "no sent-now jobs here: a birth is on call through the on-call line (pf.safety); the master has no on-call ring for a client in care (gap)"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "the doula runs no classes; birth prep is booked as a session"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license lookup runs, so there is no lookup outage to report"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "sensitive work: no rating request (S13-22)"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "a visit always needs the family there; a visit where nobody answers gets the welfare check first"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "no jobs sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "no jobs sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "no jobs sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "no jobs sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "a child is never left in the doula's care at home"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "a home visit has a 2-hour arrival window (the setting)"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "the doula sells no seats in a session"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "no repeat plan: support visits are booked one at a time"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "the rest is paid on the bill after the birth, not in stages"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "no monthly bill for visits"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "the doula takes no plan"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "no bank transfer for these bills"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "nobody else pays at booking here"
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "no free fix visit: a worry goes to the on-call line (pf.safety)"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "the doula sends no proposals"
+   },
+   {
+    "op": "off",
+    "at": "B4-92",
+    "label": "Adults only: it's for a child",
+    "why": "a child is booked on the parent's booking"
+   },
+   {
+    "op": "off",
+    "at": "B8-68",
+    "why": "a parent or support person is there for the whole home visit; no child is handed over"
+   },
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "The due date is not asked here: the doula takes no plan.",
+     "The birth plan, the health history and the agreement are on the secure page too. The family can finish them before the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Notes from the support stay with the doula as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   }
+  ]
+ },
+ "notes": "K8 build (Oct 27 2026, REDESIGN 2 frozen master, prof-new + ADDENDUM + Haiku notes D96/D97). From: pediatrician (refit R04, clinic with home visits); the midwife build's shared sign-up ops and license words (D96, D97); the doula's own plug-in: birth doula package, prenatal sessions, birth prep sessions, postpartum visits and overnight support at home. Birth doulas are not medical providers: labor, water breaking and worries go to the family's midwife or doctor and the business's on-call line (pf.safety), 911 for emergencies; no medical advice is given.\nD96: certificates are optional and never verified; pf.license says nothing is looked up; the license words on the lit sign-up and staff steps are the owner's word (the same pairs as the midwife build); S2-11's lookup branches are off; S2-29 stays lit with words; S12-19 (lookup down) is off. The master's own license-check steps are a master change (MASTER lines).\nD97: the $2 applies. S1-62's 'No $2' branch is off in both flows; no2 is never switched on; pf.money.rosfield says the $2 applies.\nMoney A (the office): main list|deposit|counter (the birth doula package, example $1,800: a $400 deposit when the agreement is signed, the rest paid at the visits, never on a set day by itself); list|none|none (the free consult); list|none|counter (a prenatal session, $95, paid at the visit); list|full|none (a birth prep session for two, $85, paid in full when booking).\nMoney B (the home): main list|deposit|bill (the home birth doula package: a $400 deposit, the rest on the bill after the birth); list|none|bill (a postpartum visit at home, 3 hours, $210, the bill after the visit); list|full|none (overnight support at home, $480, paid in full when booking).\nThe fee on the deposit paths is the $400 deposit kept if the family cancels by the agreement (fee never more than what was paid now). No missed-visit fee by default. No plan billing (no planbill fact), no classes, no groups, no stages, no holds.\nSwitches: sensitive (health and pregnancy: no rating, initials-only texts; A10-34 and B10-32 yes-rating branches off) and welfare (a family may be unable to answer during labor or after a birth: a safety check before any no-show words). no2: never on.\nFacts: children, documents, extrawork, firststeps, forms, video. Not listed: classes (S1-82 'Yes' off in both flows), groups, planbill, plans, sentnow (S2-30 'Yes' off: labor is on call through the on-call line), stages, results, spaces, dropoff.\nNames: Sam Lee owns Lee Birth Support LLC (flow A: the office, 52 Harbor Rd) and Lee Home Support LLC (flow B: home visits, 610 Main St). Alex M. is the client. Staff: Mara and Wren (birth doulas) at the office; Esme (birth doula) and Dara (postpartum doula) at home.\nSplits decided: S1-60 and S2-28 kept (both license branches, no lookup); A8-02 kept (all here, or something missing); S1-82 off in both flows; S1-80 spaces off; S1-62 'No $2' off; S2-30 'Yes sent now' off; A4-66, A8-53, A8-67, A10-05, A10-44, A10-45, A4-43, A4-80 off (A); B8-03, B4-16, B6-03, B7-55, B8-58, B8-67, B4-83 (set start, stay, seat), B4-43, B9-19, B9-06, B10-37, B10-38, B4-92, B8-68 off (B).\nNot sure (for the verifier): (1) the package's rest is paid at the visits (A) or on the bill after the birth (B), not in installments: the schedule is a gap shared with the midwife; (2) the on-call line (555) 010-0199 is an example number; labor gives the line now (pf.safety), but nothing rings the on-call doula (the midwife's gap 'On call for a client already in care' applies here too); (3) the doula's words on medical care are plain: no medical advice, a worry goes to the family's provider; (4) the price-change and example pairs are the doula's own; a reader should check the B8-19 labor-support line; (5) the master's S11-99 / S13-41 / S13-43 license-recheck wording reads as a master rule in places (MASTER).\nMASTER: the same D96 and D97 master lines as the midwife build (see log new-K8.md).\nTexts: sensitive work, so visit types and service names are generic words in every text (a visit, a session, care); the business name and the time stay. The midwife, doula and consultant roles are shown as roles only.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "This work runs under one person's license, and that person leaves or sells. That day, the license is checked again on the lookup the plug-in names. Until it checks out, that work takes no new bookings.",
+    "Every license, permit or certificate the work needs is checked on the official lookup the plug-in names. The business's is checked before it goes live, each person's before they're offered.",
+    "Licenses are checked again every 30 days, before each end date, and the day the license holder leaves or the owner changes. A lapse stops new bookings at once.",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "The lookup shows the license as expired. Avery stays on the team, and can be booked again once it shows renewed.",
+    "Your license shows as expired on the official lookup, so Lee's Barbershop can't book you until it shows renewed.",
+    "The license holder for this work left today. New bookings for it pause until the license checks out again.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Avery's license shows as expired on the official lookup.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "The lookup shows the license as expired.",
+    "Signature cut and hot towel shave",
+    "Does it match the state's lookup?",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "Lee's Barbershop LLC",
+    "priced at the chair",
+    "Priced at the chair",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Groom's package",
+    "hot towel shave",
+    "is at the chair",
+    "starting price",
+    "Color touch-up",
+    "color touch-up",
+    "Drain clearing",
+    "water heaters",
+    "groom's party",
+    "Color and cut",
+    "color and cut",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "water heater",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "house call",
+    "House call",
+    "beard trim",
+    "Beard trim",
+    "patch test",
+    "kids cuts",
+    "88 Elm St",
+    "skin fade",
+    "Skin fade",
+    "hot towel",
+    "kids cut",
+    "plumbing",
+    "Plumbing",
+    "haircuts",
+    "Haircuts",
+    "kids cut",
+    "Kids cut",
+    "cut hair",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Barbers",
+    "haircut",
+    "Haircut",
+    "massage",
+    "Massage",
+    "Elm St",
+    "Oak St",
+    "Jordan",
+    "barber",
+    "Barber",
+    "shaves",
+    "heater",
+    "perms",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "shave",
+    "gloss",
+    "beard",
+    "Drain",
+    "valve",
+    "Hugo",
+    "Lena",
+    "shop",
+    "Shop",
+    "cape",
+    "perm",
+    "pipe"
+   ],
+   "B": [
+    "This work runs under one person's license, and that person leaves or sells. That day, the license is checked again on the lookup the plug-in names. Until it checks out, that work takes no new bookings.",
+    "Every license, permit or certificate the work needs is checked on the official lookup the plug-in names. The business's is checked before it goes live, each person's before they're offered.",
+    "Licenses are checked again every 30 days, before each end date, and the day the license holder leaves or the owner changes. A lapse stops new bookings at once.",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit. It's for new bookings only, and each change is read back first.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Your license shows as expired on the official lookup, so Lee Home Services can't book you until it shows renewed.",
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "The license holder for this work left today. New bookings for it pause until the license checks out again.",
+    "No phone at hand: Jordan opens Alex's page on his own phone, and Alex taps there.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Casey's license shows as expired on the official lookup.",
+    "Like tapping a neighbor's water line without asking.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Morgan P. asked to talk about the $640 quote.",
+    "The lookup shows the license as expired.",
+    "Does it match the state's lookup?",
+    "water heater replacement",
+    "Water heater replacement",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "sewer camera inspection",
+    "Sewer camera inspection",
+    "Kitchen drain clearing",
+    "Lee Home Services LLC",
+    "Water pressure check",
+    "Heating and cooling",
+    "heating and cooling",
+    "water heater flush",
+    "Water heater flush",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "$89 service call",
+    "hot towel shave",
+    "starting price",
+    "shutoff valves",
+    "drain clearing",
+    "Drain clearing",
+    "water heaters",
+    "shutoff valve",
+    "1200 Main St",
+    "at the chair",
+    "water heater",
+    "Water heater",
+    "Service call",
+    "service call",
+    "barbershops",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "House calls",
+    "supply line",
+    "overflowing",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "house call",
+    "House call",
+    "beard trim",
+    "dishwasher",
+    "water line",
+    "88 Elm St",
+    "42 Oak St",
+    "hot towel",
+    "plumbing",
+    "Plumbing",
+    "cut hair",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Barbers",
+    "haircut",
+    "Haircut",
+    "cabinet",
+    "Cabinet",
+    "shutoff",
+    "Elm St",
+    "Oak St",
+    "Jordan",
+    "barber",
+    "Barber",
+    "shaves",
+    "heater",
+    "faucet",
+    "repipe",
+    "pipes",
+    "flush",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "shave",
+    "beard",
+    "drain",
+    "Drain",
+    "sewer",
+    "Sewer",
+    "valve",
+    "shop",
+    "Shop",
+    "perm",
+    "clog",
+    "sink",
+    "pipe"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-32": "60f59eda70",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S2-11": "07b9eace96",
+   "S2-29": "974ca3a481",
+   "S12-19": "07db0515b2",
+   "S2-30": "3a9ee593f3",
+   "S1-82": "5fac7742c5",
+   "A10-34": "78c2d9a6a3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-05": "63c3536c7a",
+   "A10-44": "50aad85ac2",
+   "A10-45": "855be6050a",
+   "A4-43": "c17d56f766",
+   "A4-80": "624ec2e303",
+   "A4-42": "7f259bddbf",
+   "A10-21": "08514557c8",
+   "A7-74": "b3ec278ce4"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-32": "60f59eda70",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S2-11": "07b9eace96",
+   "S2-29": "974ca3a481",
+   "S12-19": "176d3d2beb",
+   "S2-30": "3a9ee593f3",
+   "S1-82": "5fac7742c5",
+   "B10-32": "7713bff255",
+   "B8-03": "ac9d404766",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B4-83": "a7473a80ea",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B4-92": "36a6823417",
+   "B8-68": "8ede790b60",
+   "B4-29": "9234c5ed40",
+   "B10-17": "b5f4aef51b"
+  }
+ }
+}

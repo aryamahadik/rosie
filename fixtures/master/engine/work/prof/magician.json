@@ -1,0 +1,3204 @@
+{
+ "id": "magician",
+ "name": "Magician",
+ "style": "Event",
+ "pattern": "event",
+ "from": "dj",
+ "plugin": {
+  "pf.license": {
+   "business": "No trade license for a magician. Business registration where the state's form asks for it; identity checked; 'license: what the business says'.",
+   "person": "None. Where a school, a camp or a venue asks for a background check before working with children, it's a certificate the plug-in names (kept with its date and renew-by), never a license.",
+   "insurance": "The performer's own liability insurance. A venue that asks for proof of insurance gets it from the business's own tools (Rosie doesn't send it)."
+  },
+  "pf.services": [
+   {
+    "name": "Kids' birthday magic show",
+    "price": "list",
+    "example": "$350 for 45 minutes, up to 30 kids (the example performer's own price)",
+    "length": "45 minutes, plus 30 minutes to set up before",
+    "where": "B: the customer's home or a venue they book (a park pavilion, a party room)",
+    "money": "B: a $100 deposit when booking; the $250 rest after the show, on the bill Rosie sends, or cash the performer's own way"
+   },
+   {
+    "name": "Strolling magic for a company or wedding event",
+    "price": "list",
+    "example": "$900 for 2 hours",
+    "length": "2 hours",
+    "where": "B: the event venue",
+    "money": "B: a $450 deposit when booking; the $450 rest on the bill after the event"
+   },
+   {
+    "name": "Balloon twisting add-on",
+    "price": "list",
+    "example": "+$100 for 45 minutes",
+    "length": "45 minutes after the show",
+    "where": "B, added at booking or at the party",
+    "money": "paid with the rest"
+   },
+   {
+    "name": "Virtual magic show by video",
+    "price": "list",
+    "example": "$300 for 40 minutes, for a group online",
+    "length": "40 minutes",
+    "where": "A: by video (the performer's studio)",
+    "money": "A: the full price when booking"
+   },
+   {
+    "name": "Private magic lesson",
+    "price": "list",
+    "example": "$80 for 60 minutes, at the studio",
+    "length": "60 minutes",
+    "where": "A: the performer's studio",
+    "money": "A: a card saved for a $40 late-cancel fee; paid at the lesson"
+   }
+  ],
+  "pf.questions": {
+   "before_times": "The date and start time of the event (a need-by date: the show must happen that day); the kind of event (a child's party, a company event, a wedding); about how many guests and the children's age range (sets the show); indoors or outdoors; the town or ZIP (travel area).",
+   "after_time": "Name and mobile; the venue's address and who meets the performer; where the show will be set up; whether the venue allows small fire effects.",
+   "secure_page_only": "Any guest's allergy that matters for the show (latex balloons, animal fur); a child's name for the birthday call-out.",
+   "who_may_book": "An adult (the host, a parent, or an organization's planner). A teen can't book alone."
+  },
+  "pf.safety": {
+   "stop_words": "A medical emergency at the party; a fire; a threat to the performer or guests.",
+   "show_safety": "No fire or flash effects without the venue's OK and never near children's hair or decorations; no live animal when a guest is allergic; no latex balloons when a guest has a latex allergy (the performer brings latex-free or skips them).",
+   "what_rosie_says": "911 first in an emergency. Allergy answers stay on the secure page and reach only the performer.",
+   "booking_goes_on": "Yes for allergies (the show adapts); no booking during an emergency."
+  },
+  "pf.first_steps": {
+   "required": "Events: the performance agreement signed on the secure page when booking (the date, start time, length, price, deposit and cancel terms). Lessons and video shows: none.",
+   "prep": "A clear space about 10 by 10 feet with the audience seated in front; one small table; an outlet within 20 feet for the sound system; the birthday child's first name for the show."
+  },
+  "pf.visit": {
+   "B": "The performer arrives 30 minutes before the set start to set up; the host or the person they name gives the check-in code at arrival; an adult host stays responsible for the children the whole time (the performer never takes care of a child); extras asked at the party (more time, balloons) are priced first and done only on the customer's own yes; DONE at the end.",
+   "A": "Video show: the code at the start of the call. Lesson: the code at the studio desk.",
+   "done_proof": "DONE from the performer (B); the code (A)."
+  },
+  "pf.money": {
+   "ways": "Events: a deposit when booking (a share of the price), the rest after the show on the bill Rosie sends, or the business's own way (cash or check on the day). Video shows: the full price when booking. Lessons: a card saved for the fee, paid at the lesson.",
+   "fees": "One fee per booking: events keep the deposit when cancelled inside 14 days (the owner's yes); lessons $40 inside 24 hours.",
+   "tips": "A tip line on the bills Rosie sends (the owner's setting).",
+   "travel": "A travel fee for towns farther than the travel area, shown in the first price.",
+   "rosfield": "$2 per booking (not a health practice or a law firm)."
+  },
+  "pf.messages": {
+   "never_in_text": "A guest's allergy or health need; a child's details beyond the first name the host gives for the show.",
+   "languages": "English and Spanish."
+  },
+  "pf.staff": {
+   "skills": "Each performer has their own shows. The customer books a named performer for an event; a stand-in only where the booking didn't name one, and never on silence.",
+   "alone": "Performers work alone at events: an emergency contact is required for the check-out timer.",
+   "children": "Never left alone in charge of children; the host's adult stays."
+  },
+  "pf.rules": {
+   "agreement": "Events: a signed performance agreement before the date (the business's own terms).",
+   "cancel": "Free cancel until 14 days before the event; after that the deposit may be kept, with the owner's yes. One move to another date is the owner's choice.",
+   "venue": "A venue someone else controls: the customer confirms the venue allows the show and any effects."
+  },
+  "pf.edges": {
+   "a sick performer": "the one 'can't give it' path; a named performer is never swapped on silence",
+   "rain at an outdoor party": "the host moves it inside or it's a customer cancel; Rosie never decides weather",
+   "the party runs late or the start moves on the day": "the performer's set start stands; more time is an extra the customer OKs",
+   "a guest's allergy": "secure page only; the performer adapts the show",
+   "a child hurt during the show": "the host's adult and 911 first; the owner told at once",
+   "only children at the door": "the performer waits for the host adult"
+  },
+  "pf.facts": [
+   "documents",
+   "video",
+   "extrawork",
+   "tips"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "14 days before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Max and Nia (performers)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Leo and Rosa (performers)",
+   "other": "Others (a bank, a party host)"
+  }
+ },
+ "keep": [
+  "party"
+ ],
+ "rename": {
+  "A": [
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a balloon twist. Rosie finds one time long enough for both, with one magician, and adds the prices: $350 and $40."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The kids' show can take a $100 deposit when booked. The other $250 is charged to the saved card after the show."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "The virtual show, $300, is paid in full when booked. So is a kids' show, $350, with a $100 deposit."
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $80 private lesson can work this way."
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee's Magic Studio. Sam named you their emergency contact.",
+    "Rosie here, for Lee's Magic Studio. Sam named you their emergency contact."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The kids' show can take a $100 deposit when booked. The other $250 is on the bill after the show."
+   ],
+   [
+    "The main story: a $35 haircut. A card is saved for the shop's $20 fee. Alex pays at the chair.",
+    "The main story: an $80 private lesson. A card is saved for the $40 late-cancel fee. Alex pays at the studio."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the kids' show takes a $100 deposit; the $250 rest is paid after the show."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The kids' show can take a $100 deposit when booked. The other $250 is paid after the show."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "A $35 haircut. Nothing is taken: a YES books it. Alex pays at the chair.",
+    "A $80 private lesson. Nothing is taken: a YES books it. Alex pays at the studio."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they work, after a missed check."
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "can do a private lesson at the studio for $80, or a kids' show at your home for $350"
+   ],
+   [
+    "The $55 signature cut and shave, paid in full when booking.",
+    "The $300 virtual magic show, paid in full when booking."
+   ],
+   [
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Pat: office manager, OKs Lee Party Magic prices over $500"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved for the $40 late-cancel fee"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a free chat first; priced at the studio"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Leo: magic and balloons, $140 an hour"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A magic show could mean a party or a studio."
+   ],
+   [
+    "A at their home too, 75, paid when they book",
+    "A kids' show at home too, $350, $100 deposit when booked"
+   ],
+   [
+    "a house call, $75, paid in full when booking",
+    "a kids' show at home, $350, with a $100 deposit"
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour",
+    "Leo does balloons too, at $140 an hour"
+   ],
+   [
+    "a card saved for the $89 service-call fee",
+    "a card saved for the $40 late-cancel fee"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio lesson, card trick and party show"
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Saturday's show ran long"
+   ],
+   [
+    "Alex wants it at home: a house call, $75",
+    "Alex wants it at home: a kids' show, $350"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A balloon twist is on the price list: $40."
+   ],
+   [
+    "the Groom's package takes a $40 deposit",
+    "the kids' show takes a $100 deposit"
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Kids' magic show · $350"
+   ],
+   [
+    "Card saved for the $89 service-call fee",
+    "Card saved for the $40 late-cancel fee"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Magic CC-10552 · balloons SC-10417"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kids' show (12 and under) is $350."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's booth is in the other flow."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Max also does card tricks and party shows"
+   ],
+   [
+    "Jordan's license expires in 30 days.",
+    "Leo's license expires in 30 days."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Max: magician, card tricks and party shows"
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "The rest is paid after the show."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Magic Studio doesn't do fire effects."
+   ],
+   [
+    "Adding a beard trim, +$20? Say so.",
+    "Adding a balloon twist? Say so."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a stage light out, today,"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Kids' magic show and balloons"
+   ],
+   [
+    "Only the $25 consult is promised.",
+    "Only a free chat is promised."
+   ],
+   [
+    "A $35 haircut can work this way.",
+    "A $80 private lesson can work this way."
+   ],
+   [
+    "Rigging camera inspection · $199",
+    "Strolling show · $350"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The show ran long on one side."
+   ],
+   [
+    "Magic show at their home · $75",
+    "Kids' show at their home · $350"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Magic Shows and Lee Balloon Art"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Kids' magic show · $100 deposit"
+   ],
+   [
+    "plumbing and electrical work",
+    "magic and balloon work"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "magic and balloon jobs"
+   ],
+   [
+    "a card saved for the $20 fee",
+    "a card saved for a late-cancel fee"
+   ],
+   [
+    "Late or no-show: the $20 fee",
+    "Late or no-show: the $40 fee"
+   ],
+   [
+    "Jordan and Casey do plumbing",
+    "Leo and Rosa do magic"
+   ],
+   [
+    "Magic show at the shop · $35",
+    "Private lesson at the studio · $80"
+   ],
+   [
+    "the $20 fee, if you confirm",
+    "the $40 fee, if you confirm"
+   ],
+   [
+    "Card saved for the $20 fee",
+    "Card saved for a late-cancel fee"
+   ],
+   [
+    "Avery · license not found",
+    "Avery · license not on file"
+   ],
+   [
+    "Casey · license not found",
+    "Casey · license not on file"
+   ],
+   [
+    "Haircut at the shop · $35",
+    "Private lesson at the studio · $80"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "The $140 Groom's package",
+    "The $350 kids' show"
+   ],
+   [
+    "$20 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "$40 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "$25 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "Promises the $25 consult",
+    "Promises a free chat first"
+   ],
+   [
+    "the $25 consult included",
+    "the free chat included"
+   ],
+   [
+    "The $25 consult included",
+    "The free chat included"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Max and Nia do private lessons"
+   ],
+   [
+    "Fog machine check · $150",
+    "Kids' show · $350"
+   ],
+   [
+    "Plumbing and electrical",
+    "Magic shows and balloon art"
+   ],
+   [
+    "plumbing and electrical",
+    "magic shows and balloon art"
+   ],
+   [
+    "Avery · license expired",
+    "Avery · license on file"
+   ],
+   [
+    "Casey · license expired",
+    "Casey · license on file"
+   ],
+   [
+    "Signature cut and shave",
+    "Kids' magic show and balloons"
+   ],
+   [
+    "signature cut and shave",
+    "kids' magic show and balloons"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW balloon artistry"
+   ],
+   [
+    "A plan or warranty pays",
+    "A payer pays"
+   ],
+   [
+    "[photo: A chair, ready]",
+    "[photo: A booth, ready]"
+   ],
+   [
+    "[photo: The shop front]",
+    "[photo: The shop front]"
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so no late-cancel fee"
+   ],
+   [
+    "Jordan does electrical",
+    "Leo does balloons"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Strolling show"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Party Magic LLC"
+   ],
+   [
+    "Haircut at home · $75",
+    "Kids' show at home · $350"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Magic Studio LLC"
+   ],
+   [
+    "for a $20 fee you OK",
+    "for a late-cancel fee you OK"
+   ],
+   [
+    "$100 after the visit",
+    "$250 after the show"
+   ],
+   [
+    "the Groom's package",
+    "the kids' magic show"
+   ],
+   [
+    "The Groom's package",
+    "The kids' magic show"
+   ],
+   [
+    "photos of your hair",
+    "photos of your set-up"
+   ],
+   [
+    "heating and cooling",
+    "balloon artistry"
+   ],
+   [
+    "Heating and cooling",
+    "Balloon artistry"
+   ],
+   [
+    "Insurance pays part",
+    "A payer pays part"
+   ],
+   [
+    "Balloon twist · $20",
+    "Balloon twist · $40"
+   ],
+   [
+    "the shop's own line",
+    "the company's own line"
+   ],
+   [
+    "[photo: The chairs]",
+    "[photo: The booths]"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Magic Studio's"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Party Magic'"
+   ],
+   [
+    "electrical license",
+    "balloon training"
+   ],
+   [
+    "the shop's $20 fee",
+    "a late-cancel fee"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Party Magic"
+   ],
+   [
+    "Plumbing MP045210",
+    "Magic CC-10552"
+   ],
+   [
+    "$100 at the chair",
+    "$250 after the show"
+   ],
+   [
+    "a dripping faucet",
+    "a stuck wand"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Magic Studio"
+   ],
+   [
+    "plumbing license",
+    "show permit"
+   ],
+   [
+    "Plumbing license",
+    "Show permit"
+   ],
+   [
+    "Beard trim · $20",
+    "Balloon twist · $40"
+   ],
+   [
+    "color correction",
+    "private lesson"
+   ],
+   [
+    "Color correction",
+    "Private lesson"
+   ],
+   [
+    "garbage disposal",
+    "smoke machine"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "hot towel shaves",
+    "balloon twists"
+   ],
+   [
+    "Magic show · $35",
+    "Private lesson · $80"
+   ],
+   [
+    "Kids' show · $25",
+    "Kids' show · $350"
+   ],
+   [
+    "Groom's package",
+    "kids' magic show"
+   ],
+   [
+    "Gloss to finish",
+    "Balloon to finish"
+   ],
+   [
+    "dripping faucet",
+    "stuck wand"
+   ],
+   [
+    "Repipe · $2,400",
+    "Strolling show · $350"
+   ],
+   [
+    "hot towel shave",
+    "balloon twist"
+   ],
+   [
+    "Hot towel shave",
+    "Balloon twist"
+   ],
+   [
+    "for the $89 fee",
+    "for the $40 fee"
+   ],
+   [
+    "Drain clearing",
+    "Strolling show"
+   ],
+   [
+    "drain clearing",
+    "strolling show"
+   ],
+   [
+    "Under the sink",
+    "Behind the stage"
+   ],
+   [
+    "under the sink",
+    "behind the stage"
+   ],
+   [
+    "shutoff valves",
+    "stage lights"
+   ],
+   [
+    "a chair, ready",
+    "a booth, ready"
+   ],
+   [
+    "groom's party",
+    "party show"
+   ],
+   [
+    "Signature cut",
+    "Kids' magic show"
+   ],
+   [
+    "signature cut",
+    "kids' magic show"
+   ],
+   [
+    "A $35 haircut",
+    "A $80 private lesson"
+   ],
+   [
+    "a $35 haircut",
+    "a $80 private lesson"
+   ],
+   [
+    "Haircut · $35",
+    "Private lesson · $80"
+   ],
+   [
+    "the $100 rest",
+    "the $250 rest"
+   ],
+   [
+    "color and cut",
+    "magic show and balloons"
+   ],
+   [
+    "Color and cut",
+    "Magic show and balloons"
+   ],
+   [
+    "sees the hair",
+    "sees the stage"
+   ],
+   [
+    "Kitchen drain",
+    "Stage"
+   ],
+   [
+    "kitchen drain",
+    "stage"
+   ],
+   [
+    "bathroom sink",
+    "backstage"
+   ],
+   [
+    "shutoff valve",
+    "stage light"
+   ],
+   [
+    "Shutoff valve",
+    "Stage light"
+   ],
+   [
+    "water heaters",
+    "fog machines"
+   ],
+   [
+    "Water heaters",
+    "Fog machines"
+   ],
+   [
+    "cabinet floor",
+    "stage floor"
+   ],
+   [
+    "Cabinet floor",
+    "Stage floor"
+   ],
+   [
+    "The $110 rest",
+    "The $250 rest"
+   ],
+   [
+    "rents a chair",
+    "rents a booth"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Magic Shows"
+   ],
+   [
+    "Lee Electric",
+    "Lee Balloon Art"
+   ],
+   [
+    "Jordan Price",
+    "Leo Price"
+   ],
+   [
+    "1200 Main St",
+    "600 Pine St"
+   ],
+   [
+    "a beard trim",
+    "a balloon twist"
+   ],
+   [
+    "A beard trim",
+    "A balloon twist"
+   ],
+   [
+    "a barbershop",
+    "a magic studio"
+   ],
+   [
+    "A barbershop",
+    "A magic studio"
+   ],
+   [
+    "barber chair",
+    "stage"
+   ],
+   [
+    "water heater",
+    "fog machine"
+   ],
+   [
+    "Water heater",
+    "Fog machine"
+   ],
+   [
+    "service call",
+    "party show"
+   ],
+   [
+    "Service call",
+    "Party show"
+   ],
+   [
+    "At the chair",
+    "At the studio"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "chair renter",
+    "booth renter"
+   ],
+   [
+    "Casey Moore",
+    "Rosa Moore"
+   ],
+   [
+    "$20 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$40 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$25 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$25 consult",
+    "free chat"
+   ],
+   [
+    "house calls",
+    "party shows"
+   ],
+   [
+    "House calls",
+    "Party shows"
+   ],
+   [
+    "barbershops",
+    "magic studios"
+   ],
+   [
+    "Barbershops",
+    "Magic studios"
+   ],
+   [
+    "electrician",
+    "balloon artist"
+   ],
+   [
+    "leak repair",
+    "stage repair"
+   ],
+   [
+    "Leak repair",
+    "Stage repair"
+   ],
+   [
+    "supply line",
+    "sound cable"
+   ],
+   [
+    "Supply line",
+    "Sound cable"
+   ],
+   [
+    "overflowing",
+    "smoking"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Riley Chen",
+    "Max Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Nia Diaz"
+   ],
+   [
+    "skin fades",
+    "private lessons"
+   ],
+   [
+    "Skin fades",
+    "Private lessons"
+   ],
+   [
+    "beard trim",
+    "balloon twist"
+   ],
+   [
+    "Beard trim",
+    "Balloon twist"
+   ],
+   [
+    "color plan",
+    "card-trick plan"
+   ],
+   [
+    "Color plan",
+    "Card-trick plan"
+   ],
+   [
+    "patch test",
+    "rehearsal"
+   ],
+   [
+    "Patch test",
+    "Rehearsal"
+   ],
+   [
+    "house call",
+    "party show"
+   ],
+   [
+    "House call",
+    "Party show"
+   ],
+   [
+    "barbershop",
+    "magic studio"
+   ],
+   [
+    "Barbershop",
+    "Magic studio"
+   ],
+   [
+    "Yard drain",
+    "Stage"
+   ],
+   [
+    "yard drain",
+    "stage"
+   ],
+   [
+    "electrical",
+    "balloon"
+   ],
+   [
+    "Electrical",
+    "Balloon"
+   ],
+   [
+    "dishwasher",
+    "smoke machine"
+   ],
+   [
+    "water line",
+    "sound line"
+   ],
+   [
+    "Water line",
+    "Sound line"
+   ],
+   [
+    "travel fee",
+    "late-cancel fee"
+   ],
+   [
+    "Travel fee",
+    "Late-cancel fee"
+   ],
+   [
+    "The chairs",
+    "The booths"
+   ],
+   [
+    "88 Elm St",
+    "27 Hill Rd"
+   ],
+   [
+    "42 Oak St",
+    "320 Bell St"
+   ],
+   [
+    "skin fade",
+    "private lesson"
+   ],
+   [
+    "Skin fade",
+    "Private lesson"
+   ],
+   [
+    "kids cuts",
+    "kids' shows"
+   ],
+   [
+    "Kids cuts",
+    "Kids' shows"
+   ],
+   [
+    "Electric.",
+    "Balloons."
+   ],
+   [
+    "the chair",
+    "the studio"
+   ],
+   [
+    "hot towel",
+    "magic"
+   ],
+   [
+    "cape clip",
+    "wand tip"
+   ],
+   [
+    "haircuts",
+    "magic shows"
+   ],
+   [
+    "Haircuts",
+    "Magic shows"
+   ],
+   [
+    "kids cut",
+    "kids' show"
+   ],
+   [
+    "Kids cut",
+    "Kids' show"
+   ],
+   [
+    "cut hair",
+    "perform"
+   ],
+   [
+    "Cut hair",
+    "Perform"
+   ],
+   [
+    "a barber",
+    "a magician"
+   ],
+   [
+    "A barber",
+    "A magician"
+   ],
+   [
+    "plumbers",
+    "magicians"
+   ],
+   [
+    "plumbing",
+    "magic"
+   ],
+   [
+    "Plumbing",
+    "Magic"
+   ],
+   [
+    "the sink",
+    "the stage"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "haircut",
+    "magic show"
+   ],
+   [
+    "Haircut",
+    "Magic show"
+   ],
+   [
+    "barbers",
+    "magicians"
+   ],
+   [
+    "Barbers",
+    "Magicians"
+   ],
+   [
+    "massage",
+    "balloon twist"
+   ],
+   [
+    "Massage",
+    "Balloon twist"
+   ],
+   [
+    "plumber",
+    "magician"
+   ],
+   [
+    "Plumber",
+    "Magician"
+   ],
+   [
+    "shutoff",
+    "lights"
+   ],
+   [
+    "Shutoff",
+    "Lights"
+   ],
+   [
+    "clogged",
+    "jammed"
+   ],
+   [
+    "cabinet",
+    "stage prop"
+   ],
+   [
+    "Cabinet",
+    "Stage prop"
+   ],
+   [
+    "steamer",
+    "fog machine"
+   ],
+   [
+    "line-up",
+    "stage plot"
+   ],
+   [
+    "Elm St",
+    "Hill Rd"
+   ],
+   [
+    "Oak St",
+    "Bell St"
+   ],
+   [
+    "Barber",
+    "Magician"
+   ],
+   [
+    "barber",
+    "magician"
+   ],
+   [
+    "faucet",
+    "wand"
+   ],
+   [
+    "Faucet",
+    "Wand"
+   ],
+   [
+    "toilet",
+    "hat"
+   ],
+   [
+    "heater",
+    "fog machine"
+   ],
+   [
+    "Heater",
+    "Fog machine"
+   ],
+   [
+    "valves",
+    "switches"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "facial",
+    "rabbit act"
+   ],
+   [
+    "repipe",
+    "strolling show"
+   ],
+   [
+    "Repipe",
+    "Strolling show"
+   ],
+   [
+    "$2,400",
+    "$350"
+   ],
+   [
+    "Jordan",
+    "Leo"
+   ],
+   [
+    "shaves",
+    "balloon twists"
+   ],
+   [
+    "chairs",
+    "booths"
+   ],
+   [
+    "color",
+    "card trick"
+   ],
+   [
+    "Color",
+    "Card trick"
+   ],
+   [
+    "perms",
+    "fire effects"
+   ],
+   [
+    "gloss",
+    "balloon"
+   ],
+   [
+    "drain",
+    "trick"
+   ],
+   [
+    "Drain",
+    "Trick"
+   ],
+   [
+    "pipes",
+    "wires"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "drips",
+    "fizzles"
+   ],
+   [
+    "valve",
+    "switch"
+   ],
+   [
+    "flush",
+    "check"
+   ],
+   [
+    "Flush",
+    "Check"
+   ],
+   [
+    "sewer",
+    "rigging"
+   ],
+   [
+    "Sewer",
+    "Rigging"
+   ],
+   [
+    "shave",
+    "balloon twist"
+   ],
+   [
+    "Shave",
+    "Balloon twist"
+   ],
+   [
+    "Riley",
+    "Max"
+   ],
+   [
+    "Avery",
+    "Nia"
+   ],
+   [
+    "Casey",
+    "Rosa"
+   ],
+   [
+    "beard",
+    "balloon"
+   ],
+   [
+    "Beard",
+    "Balloon"
+   ],
+   [
+    "perm",
+    "fire effect"
+   ],
+   [
+    "sink",
+    "stage"
+   ],
+   [
+    "Sink",
+    "Stage"
+   ],
+   [
+    "pipe",
+    "wire"
+   ],
+   [
+    "Pipe",
+    "Wire"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "leak",
+    "fault"
+   ],
+   [
+    "Leak",
+    "Fault"
+   ],
+   [
+    "cape",
+    "magic cape"
+   ],
+   [
+    "Cape",
+    "Magic cape"
+   ],
+   [
+    "$800",
+    "$250"
+   ],
+   [
+    "dye",
+    "ink"
+   ]
+  ],
+  "B": [
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a balloon twist. Rosie finds one time long enough for both, with one magician, and adds the prices: $350 and $40."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The kids' show can take a $100 deposit when booked. The other $250 is charged to the saved card after the show."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "The virtual show, $300, is paid in full when booked. So is a kids' show, $350, with a $100 deposit."
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $80 private lesson can work this way."
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee's Magic Studio. Sam named you their emergency contact.",
+    "Rosie here, for Lee's Magic Studio. Sam named you their emergency contact."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The kids' show can take a $100 deposit when booked. The other $250 is on the bill after the show."
+   ],
+   [
+    "The main story: a $35 haircut. A card is saved for the shop's $20 fee. Alex pays at the chair.",
+    "The main story: an $80 private lesson. A card is saved for the $40 late-cancel fee. Alex pays at the studio."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the kids' show takes a $100 deposit; the $250 rest is paid after the show."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The kids' show can take a $100 deposit when booked. The other $250 is paid after the show."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "A $35 haircut. Nothing is taken: a YES books it. Alex pays at the chair.",
+    "A $80 private lesson. Nothing is taken: a YES books it. Alex pays at the studio."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they work, after a missed check."
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "can do a private lesson at the studio for $80, or a kids' show at your home for $350"
+   ],
+   [
+    "The $55 signature cut and shave, paid in full when booking.",
+    "The $300 virtual magic show, paid in full when booking."
+   ],
+   [
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Pat: office manager, OKs Lee Party Magic prices over $500"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved for the $40 late-cancel fee"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a free chat first; priced at the studio"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Leo: magic and balloons, $140 an hour"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A magic show could mean a party or a studio."
+   ],
+   [
+    "A at their home too, 75, paid when they book",
+    "A kids' show at home too, $350, $100 deposit when booked"
+   ],
+   [
+    "a house call, $75, paid in full when booking",
+    "a kids' show at home, $350, with a $100 deposit"
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour",
+    "Leo does balloons too, at $140 an hour"
+   ],
+   [
+    "a card saved for the $89 service-call fee",
+    "a card saved for the $40 late-cancel fee"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio lesson, card trick and party show"
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Saturday's show ran long"
+   ],
+   [
+    "Alex wants it at home: a house call, $75",
+    "Alex wants it at home: a kids' show, $350"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A balloon twist is on the price list: $40."
+   ],
+   [
+    "the Groom's package takes a $40 deposit",
+    "the kids' show takes a $100 deposit"
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Kids' magic show · $350"
+   ],
+   [
+    "Card saved for the $89 service-call fee",
+    "Card saved for the $40 late-cancel fee"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Magic CC-10552 · balloons SC-10417"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kids' show (12 and under) is $350."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's booth is in the other flow."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Max also does card tricks and party shows"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Max: magician, card tricks and party shows"
+   ],
+   [
+    "Riley's license expires in 30 days.",
+    "Max's license expires in 30 days."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "The rest is paid after the show."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Magic Studio doesn't do fire effects."
+   ],
+   [
+    "Adding a beard trim, +$20? Say so.",
+    "Adding a balloon twist? Say so."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a stage light out, today,"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Kids' magic show and balloons"
+   ],
+   [
+    "Only the $25 consult is promised.",
+    "Only a free chat is promised."
+   ],
+   [
+    "A $35 haircut can work this way.",
+    "A $80 private lesson can work this way."
+   ],
+   [
+    "Rigging camera inspection · $199",
+    "Strolling show · $350"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The show ran long on one side."
+   ],
+   [
+    "Magic show at their home · $75",
+    "Kids' show at their home · $350"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Magic Shows and Lee Balloon Art"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Kids' magic show · $100 deposit"
+   ],
+   [
+    "plumbing and electrical work",
+    "magic and balloon work"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "magic and balloon jobs"
+   ],
+   [
+    "a card saved for the $20 fee",
+    "a card saved for a late-cancel fee"
+   ],
+   [
+    "Late or no-show: the $20 fee",
+    "Late or no-show: the $40 fee"
+   ],
+   [
+    "Jordan and Casey do plumbing",
+    "Leo and Rosa do magic"
+   ],
+   [
+    "Magic show at the shop · $35",
+    "Private lesson at the studio · $80"
+   ],
+   [
+    "the $20 fee, if you confirm",
+    "the $40 fee, if you confirm"
+   ],
+   [
+    "Card saved for the $20 fee",
+    "Card saved for a late-cancel fee"
+   ],
+   [
+    "Avery · license not found",
+    "Avery · license not on file"
+   ],
+   [
+    "Casey · license not found",
+    "Casey · license not on file"
+   ],
+   [
+    "Haircut at the shop · $35",
+    "Private lesson at the studio · $80"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "The $140 Groom's package",
+    "The $350 kids' show"
+   ],
+   [
+    "$20 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "$40 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "$25 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "Promises the $25 consult",
+    "Promises a free chat first"
+   ],
+   [
+    "the $25 consult included",
+    "the free chat included"
+   ],
+   [
+    "The $25 consult included",
+    "The free chat included"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Max and Nia do private lessons"
+   ],
+   [
+    "Fog machine check · $150",
+    "Kids' show · $350"
+   ],
+   [
+    "Plumbing and electrical",
+    "Magic shows and balloon art"
+   ],
+   [
+    "plumbing and electrical",
+    "magic shows and balloon art"
+   ],
+   [
+    "Avery · license expired",
+    "Avery · license on file"
+   ],
+   [
+    "Casey · license expired",
+    "Casey · license on file"
+   ],
+   [
+    "Signature cut and shave",
+    "Kids' magic show and balloons"
+   ],
+   [
+    "signature cut and shave",
+    "kids' magic show and balloons"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW balloon artistry"
+   ],
+   [
+    "A plan or warranty pays",
+    "A payer pays"
+   ],
+   [
+    "[photo: A chair, ready]",
+    "[photo: A booth, ready]"
+   ],
+   [
+    "[photo: The shop front]",
+    "[photo: The shop front]"
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so no late-cancel fee"
+   ],
+   [
+    "Jordan does electrical",
+    "Leo does balloons"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Strolling show"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Party Magic LLC"
+   ],
+   [
+    "Haircut at home · $75",
+    "Kids' show at home · $350"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Magic Studio LLC"
+   ],
+   [
+    "for a $20 fee you OK",
+    "for a late-cancel fee you OK"
+   ],
+   [
+    "$100 after the visit",
+    "$250 after the show"
+   ],
+   [
+    "the Groom's package",
+    "the kids' magic show"
+   ],
+   [
+    "The Groom's package",
+    "The kids' magic show"
+   ],
+   [
+    "photos of your hair",
+    "photos of your set-up"
+   ],
+   [
+    "heating and cooling",
+    "balloon artistry"
+   ],
+   [
+    "Heating and cooling",
+    "Balloon artistry"
+   ],
+   [
+    "Insurance pays part",
+    "A payer pays part"
+   ],
+   [
+    "Balloon twist · $20",
+    "Balloon twist · $40"
+   ],
+   [
+    "the shop's own line",
+    "the company's own line"
+   ],
+   [
+    "[photo: The chairs]",
+    "[photo: The booths]"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Magic Studio's"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Party Magic'"
+   ],
+   [
+    "electrical license",
+    "balloon training"
+   ],
+   [
+    "the shop's $20 fee",
+    "a late-cancel fee"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Party Magic"
+   ],
+   [
+    "Plumbing MP045210",
+    "Magic CC-10552"
+   ],
+   [
+    "$100 at the chair",
+    "$250 after the show"
+   ],
+   [
+    "a dripping faucet",
+    "a stuck wand"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Magic Studio"
+   ],
+   [
+    "plumbing license",
+    "show permit"
+   ],
+   [
+    "Plumbing license",
+    "Show permit"
+   ],
+   [
+    "Beard trim · $20",
+    "Balloon twist · $40"
+   ],
+   [
+    "color correction",
+    "private lesson"
+   ],
+   [
+    "Color correction",
+    "Private lesson"
+   ],
+   [
+    "garbage disposal",
+    "smoke machine"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "hot towel shaves",
+    "balloon twists"
+   ],
+   [
+    "Magic show · $35",
+    "Private lesson · $80"
+   ],
+   [
+    "Kids' show · $25",
+    "Kids' show · $350"
+   ],
+   [
+    "Groom's package",
+    "kids' magic show"
+   ],
+   [
+    "Gloss to finish",
+    "Balloon to finish"
+   ],
+   [
+    "dripping faucet",
+    "stuck wand"
+   ],
+   [
+    "Repipe · $2,400",
+    "Strolling show · $350"
+   ],
+   [
+    "hot towel shave",
+    "balloon twist"
+   ],
+   [
+    "Hot towel shave",
+    "Balloon twist"
+   ],
+   [
+    "for the $89 fee",
+    "for the $40 fee"
+   ],
+   [
+    "Drain clearing",
+    "Strolling show"
+   ],
+   [
+    "drain clearing",
+    "strolling show"
+   ],
+   [
+    "Under the sink",
+    "Behind the stage"
+   ],
+   [
+    "under the sink",
+    "behind the stage"
+   ],
+   [
+    "shutoff valves",
+    "stage lights"
+   ],
+   [
+    "a chair, ready",
+    "a booth, ready"
+   ],
+   [
+    "groom's party",
+    "party show"
+   ],
+   [
+    "Signature cut",
+    "Kids' magic show"
+   ],
+   [
+    "signature cut",
+    "kids' magic show"
+   ],
+   [
+    "A $35 haircut",
+    "A $80 private lesson"
+   ],
+   [
+    "a $35 haircut",
+    "a $80 private lesson"
+   ],
+   [
+    "Haircut · $35",
+    "Private lesson · $80"
+   ],
+   [
+    "the $100 rest",
+    "the $250 rest"
+   ],
+   [
+    "color and cut",
+    "magic show and balloons"
+   ],
+   [
+    "Color and cut",
+    "Magic show and balloons"
+   ],
+   [
+    "sees the hair",
+    "sees the stage"
+   ],
+   [
+    "Kitchen drain",
+    "Stage"
+   ],
+   [
+    "kitchen drain",
+    "stage"
+   ],
+   [
+    "bathroom sink",
+    "backstage"
+   ],
+   [
+    "shutoff valve",
+    "stage light"
+   ],
+   [
+    "Shutoff valve",
+    "Stage light"
+   ],
+   [
+    "water heaters",
+    "fog machines"
+   ],
+   [
+    "Water heaters",
+    "Fog machines"
+   ],
+   [
+    "cabinet floor",
+    "stage floor"
+   ],
+   [
+    "Cabinet floor",
+    "Stage floor"
+   ],
+   [
+    "The $110 rest",
+    "The $250 rest"
+   ],
+   [
+    "rents a chair",
+    "rents a booth"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Magic Shows"
+   ],
+   [
+    "Lee Electric",
+    "Lee Balloon Art"
+   ],
+   [
+    "Jordan Price",
+    "Leo Price"
+   ],
+   [
+    "1200 Main St",
+    "600 Pine St"
+   ],
+   [
+    "a beard trim",
+    "a balloon twist"
+   ],
+   [
+    "A beard trim",
+    "A balloon twist"
+   ],
+   [
+    "a barbershop",
+    "a magic studio"
+   ],
+   [
+    "A barbershop",
+    "A magic studio"
+   ],
+   [
+    "barber chair",
+    "stage"
+   ],
+   [
+    "water heater",
+    "fog machine"
+   ],
+   [
+    "Water heater",
+    "Fog machine"
+   ],
+   [
+    "service call",
+    "party show"
+   ],
+   [
+    "Service call",
+    "Party show"
+   ],
+   [
+    "At the chair",
+    "At the studio"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "chair renter",
+    "booth renter"
+   ],
+   [
+    "Casey Moore",
+    "Rosa Moore"
+   ],
+   [
+    "$20 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$40 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$25 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$25 consult",
+    "free chat"
+   ],
+   [
+    "house calls",
+    "party shows"
+   ],
+   [
+    "House calls",
+    "Party shows"
+   ],
+   [
+    "barbershops",
+    "magic studios"
+   ],
+   [
+    "Barbershops",
+    "Magic studios"
+   ],
+   [
+    "electrician",
+    "balloon artist"
+   ],
+   [
+    "leak repair",
+    "stage repair"
+   ],
+   [
+    "Leak repair",
+    "Stage repair"
+   ],
+   [
+    "supply line",
+    "sound cable"
+   ],
+   [
+    "Supply line",
+    "Sound cable"
+   ],
+   [
+    "overflowing",
+    "smoking"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Riley Chen",
+    "Max Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Nia Diaz"
+   ],
+   [
+    "skin fades",
+    "private lessons"
+   ],
+   [
+    "Skin fades",
+    "Private lessons"
+   ],
+   [
+    "beard trim",
+    "balloon twist"
+   ],
+   [
+    "Beard trim",
+    "Balloon twist"
+   ],
+   [
+    "color plan",
+    "card-trick plan"
+   ],
+   [
+    "Color plan",
+    "Card-trick plan"
+   ],
+   [
+    "patch test",
+    "rehearsal"
+   ],
+   [
+    "Patch test",
+    "Rehearsal"
+   ],
+   [
+    "house call",
+    "party show"
+   ],
+   [
+    "House call",
+    "Party show"
+   ],
+   [
+    "barbershop",
+    "magic studio"
+   ],
+   [
+    "Barbershop",
+    "Magic studio"
+   ],
+   [
+    "Yard drain",
+    "Stage"
+   ],
+   [
+    "yard drain",
+    "stage"
+   ],
+   [
+    "electrical",
+    "balloon"
+   ],
+   [
+    "Electrical",
+    "Balloon"
+   ],
+   [
+    "dishwasher",
+    "smoke machine"
+   ],
+   [
+    "water line",
+    "sound line"
+   ],
+   [
+    "Water line",
+    "Sound line"
+   ],
+   [
+    "travel fee",
+    "late-cancel fee"
+   ],
+   [
+    "Travel fee",
+    "Late-cancel fee"
+   ],
+   [
+    "The chairs",
+    "The booths"
+   ],
+   [
+    "88 Elm St",
+    "27 Hill Rd"
+   ],
+   [
+    "42 Oak St",
+    "320 Bell St"
+   ],
+   [
+    "skin fade",
+    "private lesson"
+   ],
+   [
+    "Skin fade",
+    "Private lesson"
+   ],
+   [
+    "kids cuts",
+    "kids' shows"
+   ],
+   [
+    "Kids cuts",
+    "Kids' shows"
+   ],
+   [
+    "Electric.",
+    "Balloons."
+   ],
+   [
+    "the chair",
+    "the studio"
+   ],
+   [
+    "hot towel",
+    "magic"
+   ],
+   [
+    "cape clip",
+    "wand tip"
+   ],
+   [
+    "haircuts",
+    "magic shows"
+   ],
+   [
+    "Haircuts",
+    "Magic shows"
+   ],
+   [
+    "kids cut",
+    "kids' show"
+   ],
+   [
+    "Kids cut",
+    "Kids' show"
+   ],
+   [
+    "cut hair",
+    "perform"
+   ],
+   [
+    "Cut hair",
+    "Perform"
+   ],
+   [
+    "a barber",
+    "a magician"
+   ],
+   [
+    "A barber",
+    "A magician"
+   ],
+   [
+    "barber's",
+    "magician's"
+   ],
+   [
+    "plumbers",
+    "magicians"
+   ],
+   [
+    "plumbing",
+    "magic"
+   ],
+   [
+    "Plumbing",
+    "Magic"
+   ],
+   [
+    "the sink",
+    "the stage"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "haircut",
+    "magic show"
+   ],
+   [
+    "Haircut",
+    "Magic show"
+   ],
+   [
+    "barbers",
+    "magicians"
+   ],
+   [
+    "Barbers",
+    "Magicians"
+   ],
+   [
+    "massage",
+    "balloon twist"
+   ],
+   [
+    "Massage",
+    "Balloon twist"
+   ],
+   [
+    "plumber",
+    "magician"
+   ],
+   [
+    "Plumber",
+    "Magician"
+   ],
+   [
+    "shutoff",
+    "lights"
+   ],
+   [
+    "Shutoff",
+    "Lights"
+   ],
+   [
+    "clogged",
+    "jammed"
+   ],
+   [
+    "cabinet",
+    "stage prop"
+   ],
+   [
+    "Cabinet",
+    "Stage prop"
+   ],
+   [
+    "steamer",
+    "fog machine"
+   ],
+   [
+    "line-up",
+    "stage plot"
+   ],
+   [
+    "Elm St",
+    "Hill Rd"
+   ],
+   [
+    "Oak St",
+    "Bell St"
+   ],
+   [
+    "Barber",
+    "Magician"
+   ],
+   [
+    "barber",
+    "magician"
+   ],
+   [
+    "faucet",
+    "wand"
+   ],
+   [
+    "Faucet",
+    "Wand"
+   ],
+   [
+    "toilet",
+    "hat"
+   ],
+   [
+    "heater",
+    "fog machine"
+   ],
+   [
+    "Heater",
+    "Fog machine"
+   ],
+   [
+    "valves",
+    "switches"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "facial",
+    "rabbit act"
+   ],
+   [
+    "repipe",
+    "strolling show"
+   ],
+   [
+    "Repipe",
+    "Strolling show"
+   ],
+   [
+    "$2,400",
+    "$350"
+   ],
+   [
+    "Jordan",
+    "Leo"
+   ],
+   [
+    "shaves",
+    "balloon twists"
+   ],
+   [
+    "chairs",
+    "booths"
+   ],
+   [
+    "color",
+    "card trick"
+   ],
+   [
+    "Color",
+    "Card trick"
+   ],
+   [
+    "perms",
+    "fire effects"
+   ],
+   [
+    "gloss",
+    "balloon"
+   ],
+   [
+    "drain",
+    "trick"
+   ],
+   [
+    "Drain",
+    "Trick"
+   ],
+   [
+    "pipes",
+    "wires"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "drips",
+    "fizzles"
+   ],
+   [
+    "valve",
+    "switch"
+   ],
+   [
+    "flush",
+    "check"
+   ],
+   [
+    "Flush",
+    "Check"
+   ],
+   [
+    "sewer",
+    "rigging"
+   ],
+   [
+    "Sewer",
+    "Rigging"
+   ],
+   [
+    "shave",
+    "balloon twist"
+   ],
+   [
+    "Shave",
+    "Balloon twist"
+   ],
+   [
+    "Riley",
+    "Max"
+   ],
+   [
+    "Avery",
+    "Nia"
+   ],
+   [
+    "Casey",
+    "Rosa"
+   ],
+   [
+    "beard",
+    "balloon"
+   ],
+   [
+    "Beard",
+    "Balloon"
+   ],
+   [
+    "perm",
+    "fire effect"
+   ],
+   [
+    "sink",
+    "stage"
+   ],
+   [
+    "Sink",
+    "Stage"
+   ],
+   [
+    "pipe",
+    "wire"
+   ],
+   [
+    "Pipe",
+    "Wire"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "leak",
+    "fault"
+   ],
+   [
+    "Leak",
+    "Fault"
+   ],
+   [
+    "cape",
+    "magic cape"
+   ],
+   [
+    "Cape",
+    "Magic cape"
+   ],
+   [
+    "$800",
+    "$250"
+   ],
+   [
+    "dye",
+    "ink"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Alex books a 40-minute virtual magic show by video for a remote team, pays in full when booking, and the performer starts the call with the code.",
+  "B": "Alex books a 45-minute magic show for a child's birthday at home: a $100 deposit and a signed agreement when booking, the performer arrives to set up, and the $250 rest comes on the bill after the show."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|full|none": "A $300 virtual magic show, paid in full when booking.",
+    "list|card|counter": "An $80 private lesson at the studio; a card saved for the $40 late-cancel fee; paid at the lesson."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Virtual magic show"
+    },
+    "list|*|*": {
+     "price": "$80",
+     "fee": "$40",
+     "name": "Private magic lesson"
+    },
+    "list|full|*": {
+     "price": "$300",
+     "paid": "$300",
+     "name": "Virtual magic show"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   }
+  },
+  "B": {
+   "main": "list|deposit|bill",
+   "combos": [
+    "list|deposit|bill",
+    "list|deposit|own"
+   ],
+   "examples": {
+    "list|deposit|bill": "A $350 birthday magic show: $100 deposit when booking, the $250 rest on the bill after the show.",
+    "list|deposit|own": "The same show, the $250 rest paid in cash on the day, the performer's own way."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$100",
+     "name": "Kids' birthday magic show"
+    },
+    "list|*|*": {
+     "price": "$350",
+     "name": "Kids' birthday magic show"
+    },
+    "list|deposit|*": {
+     "price": "$350",
+     "deposit": "$100",
+     "rest": "$250",
+     "fee": "$100",
+     "name": "Kids' birthday magic show"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ],
+    "timing": [
+     "settime"
+    ]
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No trade license for a magician; registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A performer's time is booked, not rooms or things."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable; lessons are one-to-one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Not a health practice or a law firm: the $2 applies."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license; a background check, where asked, is a certificate (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Shows are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A show or lesson is a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with the performer."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child at a lesson stays with a parent; the performer never takes charge of a child."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A show or lesson is rated (one rating)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for magic show lessons or rentals."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books an instructor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books an instructor's time."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The mixing lesson plan is paid at the studio after each visit, so no plan charge is texted."
+   },
+   {
+    "op": "off",
+    "at": "A5-21",
+    "why": "Magic studio sells no plan: nothing to agree to."
+   },
+   {
+    "op": "off",
+    "at": "A5-22",
+    "why": "Magic studio sells no pack or membership on the page."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No trade license; registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A performer's time only."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A show has a set start time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "The performer never takes charge of a child; the host adult stays."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A show is rated (one rating)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Magic show work is never sent now, and nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Magic show work is never sent now (B4-81), so 'Send someone now' is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "A party has no problem that gets worse. A changed plan goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "No group work."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone from the event is always there for a show."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Lee Sound & Light bills no job in stages: a wedding takes a retainer and the rest 14 days before."
+   },
+   {
+    "op": "off",
+    "at": "B4-44",
+    "why": "No yearly plan: repeat visits are booked one at a time."
+   },
+   {
+    "op": "off",
+    "at": "B5-21",
+    "why": "No plan: nothing to agree to."
+   },
+   {
+    "op": "off",
+    "at": "B5-32",
+    "why": "No pack or membership on the page."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "New build (H3, Tue Oct 27 2026) on the frozen master: from dj (refitted), base plug-in = the verified test-drive work/testdrive/magician.md (facts, services, prices, rules and the decided fixes kept).\nFlow B, the performer at the party or event (main): kids' birthday magic show $350, $100 deposit when booking, the $250 rest on the bill after the show or paid in cash the performer's own way; balloon twist add-on; strolling magic for a company or wedding. Set start times; free cancel until 14 days before, then the deposit may be kept with the owner's yes.\nFlow A, the studio: a virtual show by video $300 paid in full when booking; a private lesson $80 with a card saved for the $40 late-cancel fee, paid at the lesson.\nFacts: documents, video, extrawork, tips. Switches: none ($2 applies, D97). Settings: set start; cutoff 14 days before.\nNo fire effects without the venue's OK; no animal or latex balloons when a guest is allergic (allergies only on the secure page).\nPlans, packs, memberships, insurance and staged bills are off. Renames: names, addresses, the studio and party company, and the dj example words moved to magic words; 'party' kept.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "We'd share only where they're working, only after a missed check.",
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "When they book: a card saved for the $89 service-call fee",
+    "Promises the $25 consult; priced at the chair",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "A haircut could mean a salon or a barbershop.",
+    "A at their home too, 75, paid when they book",
+    "a house call, $75, paid in full when booking",
+    "Jordan does electrical too, at $140 an hour",
+    "a card saved for the $89 service-call fee",
+    "Every shop service, color and house calls",
+    "says Saturday's cut is uneven on one side",
+    "Alex wants it at home: a house call, $75",
+    "A beard trim is on the price board: $20.",
+    "the Groom's package takes a $40 deposit",
+    "Signature cut and hot towel shave · $55",
+    "Plumbing JP031552 · electrical JE30417",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Lee's Barbershop doesn't do perms.",
+    "Adding a beard trim, +$20? Say so.",
+    "Signature cut and hot towel shave",
+    "Only the $25 consult is promised.",
+    "A $35 haircut can work this way.",
+    "The cut is uneven on one side.",
+    "Lee Plumbing and Lee Electric",
+    "Groom's package · $40 deposit",
+    "plumbing and electrical jobs",
+    "a card saved for the $20 fee",
+    "Late or no-show: the $20 fee",
+    "Jordan and Casey do plumbing",
+    "the $20 fee, if you confirm",
+    "Card saved for the $20 fee",
+    "Avery · license not found",
+    "Gives the shop's own line",
+    "$20 taken when they book",
+    "$40 taken when they book",
+    "$25 taken when they book",
+    "Promises the $25 consult",
+    "the $25 consult included",
+    "The $25 consult included",
+    "Riley and Avery cut hair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Avery · license expired",
+    "Signature cut and shave",
+    "No card, so no $20 fee",
+    "Jordan does electrical",
+    "Haircut at home · $75",
+    "Lee's Barbershop LLC",
+    "for a $20 fee you OK",
+    "$100 after the visit",
+    "the Groom's package",
+    "The Groom's package",
+    "photos of your hair",
+    "Insurance pays part",
+    "the shop's own line",
+    "Lee's Barbershop's",
+    "Lee Home Services'",
+    "electrical license",
+    "the shop's $20 fee",
+    "Lee Home Services",
+    "Plumbing MP045210",
+    "Lee's Barbershop",
+    "Beard trim · $20",
+    "color correction",
+    "Color correction",
+    "the shop's board",
+    "hot towel shaves",
+    "Groom's package",
+    "Gloss to finish",
+    "hot towel shave",
+    "Drain clearing",
+    "groom's party",
+    "Signature cut",
+    "signature cut",
+    "A $35 haircut",
+    "Haircut · $35",
+    "the $100 rest",
+    "color and cut",
+    "Color and cut",
+    "sees the hair",
+    "water heaters",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "a beard trim",
+    "A beard trim",
+    "a barbershop",
+    "A barbershop",
+    "water heater",
+    "At the chair",
+    "at the chair",
+    "chair renter",
+    "Casey Moore",
+    "$20 deposit",
+    "$40 deposit",
+    "$25 deposit",
+    "$25 consult",
+    "house calls",
+    "House calls",
+    "barbershops",
+    "price board",
+    "Riley Chen",
+    "Avery Diaz",
+    "skin fades",
+    "beard trim",
+    "Beard trim",
+    "color plan",
+    "Color plan",
+    "patch test",
+    "house call",
+    "House call",
+    "barbershop",
+    "Barbershop",
+    "electrical",
+    "Electrical",
+    "travel fee",
+    "The chairs",
+    "88 Elm St",
+    "skin fade",
+    "Skin fade",
+    "kids cuts",
+    "Electric.",
+    "the chair",
+    "hot towel",
+    "cape clip",
+    "haircuts",
+    "Haircuts",
+    "kids cut",
+    "Kids cut",
+    "cut hair",
+    "a barber",
+    "A barber",
+    "plumbing",
+    "Plumbing",
+    "Main St",
+    "haircut",
+    "Haircut",
+    "barbers",
+    "Barbers",
+    "massage",
+    "Massage",
+    "plumber",
+    "Plumber",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "heater",
+    "Jordan",
+    "shaves",
+    "chairs",
+    "color",
+    "Color",
+    "perms",
+    "gloss",
+    "Drain",
+    "valve",
+    "shave",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "Beard",
+    "perm",
+    "pipe",
+    "leak",
+    "Leak",
+    "cape"
+   ],
+   "B": [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "We'd share only where they're working, only after a missed check.",
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "When they book: a card saved for the $89 service-call fee",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "A haircut could mean a salon or a barbershop.",
+    "Jordan does electrical too, at $140 an hour",
+    "a card saved for the $89 service-call fee",
+    "Plumbing JP031552 · electrical JE30417",
+    "The shop's chair is in the other flow.",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Your home warranty covers the rest.",
+    "It's a leak under the sink, today,",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical work",
+    "plumbing and electrical jobs",
+    "Jordan and Casey do plumbing",
+    "Casey · license not found",
+    "Gives the shop's own line",
+    "Riley and Avery cut hair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Casey · license expired",
+    "NEW heating and cooling",
+    "A plan or warranty pays",
+    "Jordan does electrical",
+    "Kitchen drain clearing",
+    "Lee Home Services LLC",
+    "for a $20 fee you OK",
+    "heating and cooling",
+    "Heating and cooling",
+    "Insurance pays part",
+    "the shop's own line",
+    "Lee Home Services'",
+    "electrical license",
+    "Lee Home Services",
+    "Plumbing MP045210",
+    "a dripping faucet",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "service call fee",
+    "Service call fee",
+    "hot towel shaves",
+    "dripping faucet",
+    "Repipe · $2,400",
+    "hot towel shave",
+    "for the $89 fee",
+    "Drain clearing",
+    "drain clearing",
+    "Under the sink",
+    "under the sink",
+    "shutoff valves",
+    "Kitchen drain",
+    "kitchen drain",
+    "bathroom sink",
+    "shutoff valve",
+    "Shutoff valve",
+    "water heaters",
+    "cabinet floor",
+    "Cabinet floor",
+    "The $110 rest",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "a barbershop",
+    "water heater",
+    "Water heater",
+    "service call",
+    "Service call",
+    "at the chair",
+    "chair renter",
+    "Casey Moore",
+    "$40 deposit",
+    "house calls",
+    "House calls",
+    "barbershops",
+    "leak repair",
+    "Leak repair",
+    "supply line",
+    "Supply line",
+    "overflowing",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "house call",
+    "House call",
+    "barbershop",
+    "Barbershop",
+    "Yard drain",
+    "yard drain",
+    "electrical",
+    "Electrical",
+    "dishwasher",
+    "water line",
+    "travel fee",
+    "The chairs",
+    "88 Elm St",
+    "42 Oak St",
+    "Electric.",
+    "the chair",
+    "hot towel",
+    "cut hair",
+    "a barber",
+    "plumbing",
+    "Plumbing",
+    "the sink",
+    "Main St",
+    "haircut",
+    "Haircut",
+    "barbers",
+    "Barbers",
+    "plumber",
+    "Plumber",
+    "shutoff",
+    "Shutoff",
+    "clogged",
+    "cabinet",
+    "Cabinet",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "faucet",
+    "heater",
+    "valves",
+    "repipe",
+    "Repipe",
+    "$2,400",
+    "Jordan",
+    "shaves",
+    "chairs",
+    "color",
+    "drain",
+    "Drain",
+    "pipes",
+    "clogs",
+    "valve",
+    "flush",
+    "sewer",
+    "Sewer",
+    "shave",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "perm",
+    "sink",
+    "pipe",
+    "clog",
+    "leak",
+    "Leak",
+    "$800"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A7-94": "6490d5d8e6",
+   "A5-21": "15fe900660",
+   "A5-22": "7576898f14"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B7-93": "4d6f89e473",
+   "B7-90": "a5b8b2fe42",
+   "B8-69": "5d0e4c0045",
+   "B9-19": "b97bfbf0d2",
+   "B4-44": "514c8ab30c",
+   "B5-21": "925b7342ed",
+   "B5-32": "4109673a42"
+  }
+ }
+}

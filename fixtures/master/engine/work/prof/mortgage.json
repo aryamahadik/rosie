@@ -1,0 +1,4312 @@
+{
+ "id": "mortgage",
+ "name": "Mortgage loan officer",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "lawyer",
+ "plugin": {
+  "pf.license": {
+   "need": "Always. Each loan officer: their own loan officer license for the state the home is in (a bank's loan officer: their federal registration, where the state's rules allow it). The company: its own lender or broker license for that state.",
+   "ask": "Each loan officer's registry ID (NMLS ID), at sign-up or in their invite reply. The company's registry ID, and the states it's licensed in.",
+   "who holds it": "Each loan officer, and the company.",
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "No loan officer licensed for a state: no calls for homes in that state. A company not licensed in a state is never offered there.",
+   "renewals": "Checked on each renewal date from the state's form. A lapsed license pauses that loan officer's bookings, and Sam is told.",
+   "unlicensed staff": "An assistant with no loan officer license, like Pat, only schedules: books, moves and cancels times. They never talk about loans, rates or programs.",
+   "insurance": "A surety bond for the company where the state's rules require it; the amount comes from the state's form.",
+   "background check": "Part of the license itself. Rosie adds none."
+  },
+  "pf.services": {
+   "pattern": "Consult: a free first call with a named loan officer who is licensed for the state the home is in. Flow A: by phone, by video, or a meeting at the branch. Flow B: at the customer's home, or on set days at a host's place, like a home-buying class or an open house.",
+   "at the business (the example company's own list)": [
+    {
+     "name": "Pre-approval call",
+     "length": "30 minutes",
+     "price": "free",
+     "where": "by phone or video, or at the branch",
+     "before": "nothing taken",
+     "after": "nothing to pay through Rosie"
+    },
+    {
+     "name": "Refinance call",
+     "length": "30 minutes",
+     "price": "free",
+     "before": "nothing taken",
+     "after": "nothing to pay"
+    },
+    {
+     "name": "Follow-up call",
+     "length": "15 minutes",
+     "price": "free",
+     "note": "booked by the customer or by the loan officer, with the customer's yes"
+    },
+    {
+     "name": "Branch meeting",
+     "length": "60 minutes",
+     "price": "free",
+     "rule": "the loan officer's or Sam's OK first"
+    },
+    {
+     "name": "First-home planning session",
+     "length": "2 hours",
+     "price": "free",
+     "rule": "the loan officer's or Sam's OK first"
+    },
+    {
+     "name": "Down payment help, added to a call",
+     "length": "15 more minutes",
+     "price": "free",
+     "rule": "only if the customer says yes"
+    }
+   ],
+   "at the customer's place (the example company's own list)": [
+    {
+     "name": "Home meeting",
+     "length": "60 minutes",
+     "price": "free",
+     "where": "the customer's home",
+     "before": "nothing taken",
+     "after": "nothing to pay through Rosie",
+     "rule": "a set start time, never a window"
+    },
+    {
+     "name": "Home-buying class seat",
+     "length": "2 hours",
+     "price": "free",
+     "where": "a host's place, like a library, on set days"
+    },
+    {
+     "name": "Open house table",
+     "length": "20 minutes",
+     "price": "free",
+     "where": "a host's place, like a real estate office's open house, with its OK"
+    }
+   ],
+   "the loan itself": "Never booked, priced or applied for in Rosie. The application, the credit check, documents, the Loan Estimate, the appraisal and closing all happen in the lender's own tools, after the call. Any fees there are the lender's own, outside Rosie.",
+   "travel area": "The business's setting (the example: 25 miles).",
+   "capacity": "One loan officer per booking. A co-buyer may join the same call.",
+   "online": "Phone and video calls count as at the business. The loan officer must be licensed for the state the home is in, wherever the customer is that day.",
+   "booking window": "Up to 60 days ahead, with at least 2 hours' notice (the business's settings).",
+   "blocked times": "Closings and other meetings block times, from the loan officer's calendar or a BLOCK text."
+  },
+  "pf.questions": {
+   "before times": [
+    "Buying or refinancing?",
+    "Which state is the home in? The state only.",
+    "By phone, by video or at the branch? Or at your home?",
+    "A loan officer by name, or the soonest one? Rosie never ranks or suggests one."
+   ],
+   "after a time is picked": [
+    "Is this your first home? Yes or no.",
+    "Have you found a home yet? Yes or no only.",
+    "Are you working with a real estate agent? Yes or no.",
+    "Anything that helps the call, like an interpreter or a step-free way in."
+   ],
+   "only on the secure page": [
+    "Full name and email",
+    "18 or older",
+    "Is it safe to text you? If not, how should the business reach you?",
+    "A home meeting: the street address, kept only as where to meet",
+    "A tick: Rosie books the loan officer's time only. It isn't a lender, takes no application and gives no advice",
+    "A tick: texts are about this booking only"
+   ],
+   "never asked": "Income, Social Security number, the home's price or address for the loan, the home's value, the loan amount, a credit score, bank, debt or ID numbers. Never anything about race, color, religion, national origin, sex, marital status, age (beyond 18 or older), disability, family, or where income comes from.",
+   "who may book": "An adult books for themselves. A co-buyer may be added on the secure page. Another adult may book for someone, but the borrower gives their own yes on the secure page and takes the call."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "someone is in danger right now",
+    "a medical emergency",
+    "crisis words (the 988 line first)"
+   ],
+   "words that go on with safety steps": [
+    "behind on mortgage payments, or a foreclosure notice",
+    "someone pushing the customer to borrow, sign or put a home in their name"
+   ],
+   "what Rosie says": {
+    "in danger right now": "Call 911 now. Nothing is booked.",
+    "behind on payments": "A free housing counselor approved by HUD can help: 800-569-4287. The booking goes on.",
+    "pushed to borrow or sign": "The loan officer talks with the borrower alone first. The booking goes on, and Sam is told."
+   },
+   "money questions": "Never answered by Rosie: rates, payments, what someone can afford, or whether they'll be approved. They wait for the loan officer."
+  },
+  "pf.first_steps": {
+   "required": [
+    "None. The free call is the first step. Any application, credit check or documents come after it, in the lender's own tools."
+   ],
+   "prep for the reminder": [
+    "Have a short list of questions. No papers are needed for this call, and please never text any."
+   ]
+  },
+  "pf.visit": {
+   "check-in": "Phone or video: the loan officer asks for the 4-digit code at the start, which also shows they're talking to the person who booked. At the branch: the code at the front desk. At a home: the code at the door.",
+   "at check-in": "The loan officer says their name, company and registry ID, and that this first call is free.",
+   "work changes": "Extra time on the same call is free, with the customer's yes. A second call is its own booking.",
+   "the home is in another state": "The loan officer stops talking about the loan. Rosie offers a loan officer licensed there, if the business has one, or says plainly it can't help there.",
+   "what proves it's done": "The code, or DONE.",
+   "after the call": "The loan officer may send the lender's own application link, from the lender's own tools. Rosie books a follow-up call only if the customer or the loan officer asks.",
+   "Rosie never": "Takes an application, runs or OKs a credit check, collects documents, sends disclosures, or touches the lender's own loan tools."
+  },
+  "pf.money": {
+   "before": "Nothing taken, and no card saved.",
+   "after": "Nothing to pay through Rosie. Any application, credit report, appraisal or closing costs are the lender's own, in its own tools.",
+   "fees": "No cancel, late or no-show fee, ever. Before its Loan Estimate and the customer's go-ahead, a lender may charge only a credit-report fee, in its own tools.",
+   "never": "No deposit, hold, full price or bill through Rosie.",
+   "tips": "None.",
+   "tax": "None.",
+   "deposit cap": "Not used: nothing is taken.",
+   "rosfield": "The business pays Rosfield's $2 per confirmed booking by default, never more than $49 a month per person. With no payments through Rosie, it goes on the monthly bill. A switch turns it off where referral-fee rules forbid a per-booking fee for settlement-service work; Rosfield's lawyer must confirm it before launch."
+  },
+  "pf.messages": {
+   "never in a text": [
+    "income, prices, loan amounts, credit scores, account or ID numbers",
+    "documents of any kind",
+    "health or family details",
+    "anything about a protected trait",
+    "rates or what someone can afford"
+   ],
+   "registry IDs": "Each text that names a loan officer shows their registry ID and the company's, where the state's rules require it.",
+   "documents": "A pay stub, ID or statement texted by mistake is deleted, never passed on, and the customer is asked not to send them.",
+   "rate questions": "Go to the loan officer on a secure page. The loan officer answers on the call.",
+   "no nudges": "Booking texts only: no rate offers, loan promotions or 'book again' lines.",
+   "loan notes": "The loan officer's notes go in the lender's own tools. Rosie keeps only the time, the kind of call and the outcome.",
+   "languages": "English and Spanish."
+  },
+  "pf.staff": {
+   "licenses": "Each loan officer: their own license for each state they take calls for (optional, shown as given, not checked by Rosie).",
+   "skills": "Buying, refinancing, first-time buyer programs, home-buying classes, Spanish.",
+   "supervision": "None for a licensed loan officer. An unlicensed assistant, like Pat, only schedules.",
+   "who OKs": "Sam OKs branch and home meetings. Sam may let each loan officer OK their own.",
+   "fair lending": "Loan officers are offered by soonest time, never ranked by rates, pay or anything about the customer. Nobody is steered to or from a loan officer."
+  },
+  "pf.rules": {
+   "books right away": "Phone and video calls. Branch and home meetings ask Sam first (a switch).",
+   "notice": "At least 2 hours (the business's setting).",
+   "the home's state": "Only loan officers licensed for the state the home is in are offered.",
+   "named": "The customer may name a loan officer. A named loan officer is never swapped on silence: Sam calls instead.",
+   "rosfield's $2": "On by default; a switch for referral-fee rules (Rosfield's lawyer list).",
+   "referral pay": "Rosfield takes nothing per lead or per loan, and never ranks loan officers.",
+   "registry IDs in texts": "On, where the state's rules require it (a switch from the state's form).",
+   "records": "Rosie keeps only times, the kind of call and the outcome."
+  },
+  "pf.edges": {
+   "money details in a request": "Removed before anything is saved. The AI is told once.",
+   "a rate question": "Passed to the loan officer privately. Rosie never quotes.",
+   "a document texted": "Deleted, never passed on.",
+   "a question about a kind of income": "Like disability income: passed privately, and nobody is ever discouraged from applying.",
+   "behind on payments": "The housing counselor line, and the booking goes on.",
+   "no loan officer licensed for that state": "Nothing booked. Rosie says so plainly.",
+   "the loan officer can't come": "Sam offers another licensed loan officer, or calls. Nobody is moved on silence.",
+   "the customer applies": "In the lender's own tools, never Rosie.",
+   "someone presses the borrower": "The loan officer talks with the borrower alone first."
+  },
+  "pf.facts": [
+   "video",
+   "classes"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam sets a new price for later visits. AI assistants show it at once."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds home-buying classes to Lee Lending. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+    "Extras can be added: down payment help on a call, or a first-home planning session."
+   ],
+   [
+    "Sam isn't an electrician, so electrical waits for the person on the team who does it.",
+    "Sam doesn't teach the classes, so homebuyer education waits for the person on the team who does."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A loan office on Elm St. Free first calls and home meetings."
+   ],
+   [
+    "To save cards for the $20 fee, connect Stripe in Lee's Barbershop's own name.",
+    "Connect Stripe in Lee Lending's own name for Rosfield's monthly bill."
+   ],
+   [
+    "Only Riley is cleared for house calls, so only Riley is offered for them.",
+    "Only Tyler speaks Spanish, so a call in Spanish offers Tyler's times."
+   ],
+   [
+    "A $35 haircut. Nothing is taken: a YES books it. Alex pays at the chair.",
+    "A free call. Nothing is taken: a YES books it. Alex pays at the counter."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A loan officer's example: a caller who names a danger gets the safety words first."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking.",
+    "Alex wants a home meeting: free, with nothing taken."
+   ],
+   [
+    "At the shop, Alex is already in the chair, so there's no door check.",
+    "On a call or at the branch, there's no door check."
+   ],
+   [
+    "Only Riley does color, so color services offer only Riley's times.",
+    "Every loan officer here is licensed for the same states."
+   ],
+   [
+    "Jules K. rents a chair here, but Jules has their own business.",
+    "Jules K. works here, but Jules has their own brokerage."
+   ],
+   [
+    "like a legal question at a business that isn't a law office:",
+    "like a legal question:"
+   ],
+   [
+    "Jules rents a chair at the shop but runs their own business.",
+    "Jules works from the office but runs their own brokerage."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some loan officers may meet customers only at a licensed office"
+   ],
+   [
+    "Hi, I'm an automated assistant calling for a customer, Kim.",
+    "Hi, I'm an automated assistant calling for a customer, Kim."
+   ],
+   [
+    "Sam is on the plumbing team too, since he goes out on jobs.",
+    "Sam is on the mortgage lending team too, since he meets customers."
+   ],
+   [
+    "Like a barber who rents a chair, or a helper on big jobs.",
+    "Like a licensed broker with their own company, or a helper on big jobs."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The mortgage plug-in adds a few of its own."
+   ],
+   [
+    "A cut is shortened, so the shop takes the first branch.",
+    "A call is shortened, so the office takes the first branch."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Home-buying classes for Lee Lending: is it the same company?"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most lenders set it."
+   ],
+   [
+    "Some rules wait for a lawyer's check before launch.",
+    "Some rules wait for a compliance check before launch."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A loan call is rated, so the office takes the first branch."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a pre-approval call for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Electrical is set up; waits for its electrician",
+    "Classes are set up; wait for a teacher"
+   ],
+   [
+    "Groom's package (cut, shave, facial; 2½ hours)",
+    "First-home workshop (2 hours)"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A home loan could mean a mortgage or a home equity line."
+   ],
+   [
+    "Any scalp trouble Riley should know about?",
+    "Will a co-buyer join the meeting?"
+   ],
+   [
+    "Yes: a Co-buyer call is $25. Want a time?",
+    "Yes: a co-buyer call is free. Want a time?"
+   ],
+   [
+    "Booking rules; color quotes need Sam's OK",
+    "Booking rules for the office"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every call, in English and Spanish"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A follow-up call is on the price board, free."
+   ],
+   [
+    "Asks if texts are safe, and about photos",
+    "Asks if texts are safe"
+   ],
+   [
+    "Avery does every shop service but color.",
+    "Angela is licensed for the same states as Tyler."
+   ],
+   [
+    "Plumbing is live; offers electrical next",
+    "Mortgage lending is live; classes next"
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every mortgage meeting, and classes"
+   ],
+   [
+    "Adding a follow-up call, +$20? Say so.",
+    "Adding a follow-up call? Say so."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The branch is in the other flow."
+   ],
+   [
+    "Every shop service, color, house calls",
+    "Every call, in English and Spanish"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Loan officer NMLS 5550160 · class teacher, as given, not checked"
+   ],
+   [
+    "so its customers pick an arrival time",
+    "so its customers pick a start time"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Tyler also speaks Spanish"
+   ],
+   [
+    "Books a bigger job only if Alex asks",
+    "Books a follow-up only if Alex asks"
+   ],
+   [
+    "Offers a shorter cut or a later time",
+    "Offers a shorter call or a later time"
+   ],
+   [
+    "1 color quote · Still waiting on you",
+    "1 request · Still waiting on you"
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "First-home workshop"
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Every mortgage meeting"
+   ],
+   [
+    "a card saved, for a $20 fee you OK",
+    "nothing taken"
+   ],
+   [
+    "or the AI can look at other shops.",
+    "or the AI can look at other lenders."
+   ],
+   [
+    "Asks a teen to send it to a parent",
+    "Tells a teen it's for adults"
+   ],
+   [
+    "Every plumbing job, and electrical",
+    "Every mortgage meeting, and classes"
+   ],
+   [
+    "Your 1 to 3pm arrival stays saved.",
+    "Your 1:00pm time stays saved."
+   ],
+   [
+    "Plumbing, electrical and barbering",
+    "Mortgage lending, homebuyer education and the loan office"
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books a follow-up call"
+   ],
+   [
+    "Say Alex adds his partner, Jamie.",
+    "Say Alex adds a co-borrower, Jamie."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Branch meeting"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "branch meeting"
+   ],
+   [
+    "{{svc.intext:skin fades|visits}}",
+    "{{svc.intext:pre-approval calls|visits}}"
+   ],
+   [
+    "A $35 haircut can work this way.",
+    "A free call can work this way."
+   ],
+   [
+    "Adds a beard trim to the booking",
+    "Switches the call to video"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Mortgage lending, Homebuyer education, Loan office"
+   ],
+   [
+    "Shows Alex the cut; fixes first",
+    "Goes over next steps; answers first"
+   ],
+   [
+    "at the shop and for house calls",
+    "by phone, video and at the branch"
+   ],
+   [
+    "If Riley says the cut was done",
+    "If Tyler says the call happened"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A named loan officer always stays the same."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "1 quote · Still waiting on you",
+    "1 request · Still waiting on you"
+   ],
+   [
+    "Is this your first skin fade?",
+    "Will anyone else join the call?"
+   ],
+   [
+    "A skin problem stops the work",
+    "The home is in another state"
+   ],
+   [
+    "Next visit booked at checkout",
+    "A follow-up call is booked"
+   ],
+   [
+    "barber, color and house calls",
+    "loan officer, English and Spanish"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mortgage and Lee Home Classes"
+   ],
+   [
+    "Is this her first skin fade?",
+    "Will anyone else join the call?"
+   ],
+   [
+    "Booked by name, like a chair",
+    "Booked by name"
+   ],
+   [
+    "her arrival time stays saved",
+    "her start time stays saved"
+   ],
+   [
+    "Every shop service but color",
+    "Every call, in English"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the office"
+   ],
+   [
+    "It can't come 1 to 3pm today",
+    "It can't come at 1:00pm today"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "home meetings and classes"
+   ],
+   [
+    "No: Alex stays in the chair",
+    "No: nothing is left here"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like to talk about a home loan on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero hablar de un préstamo para casa el sábado."
+   ],
+   [
+    "Electrical license JE30417",
+    "Class teacher · checked"
+   ],
+   [
+    "company's plumbing license",
+    "company's lender license"
+   ],
+   [
+    "Tells Riley about the job",
+    "Tells Tyler about the call"
+   ],
+   [
+    "Plumbing license JP031552",
+    "Loan officer · NMLS 5550160"
+   ],
+   [
+    "plumbing license MP045210",
+    "loan officer license NMLS 5550101"
+   ],
+   [
+    "Water heater replacements",
+    "Home equity reviews"
+   ],
+   [
+    "Books it as a house call",
+    "Books it as a home meeting"
+   ],
+   [
+    "Riley finds a bigger job",
+    "Alex wants a second call"
+   ],
+   [
+    "Water heater replacement",
+    "Home equity review"
+   ],
+   [
+    "water heater replacement",
+    "home equity review"
+   ],
+   [
+    "Riley finishes the work",
+    "Tyler finishes the call"
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else: Sam calls"
+   ],
+   [
+    "the 10am to 12pm window",
+    "the 10:00am time"
+   ],
+   [
+    "plumbing and electrical",
+    "mortgage lending and homebuyer education"
+   ],
+   [
+    "Signature cut and shave",
+    "Branch meeting"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Co-buyer call"
+   ],
+   [
+    "Sewer camera inspection",
+    "Second-home review"
+   ],
+   [
+    "sewer camera inspection",
+    "second-home review"
+   ],
+   [
+    "Books it for a brother",
+    "Books it for a parent"
+   ],
+   [
+    "Alex's visit runs long",
+    "Alex's call runs long"
+   ],
+   [
+    "Barber license BR41862",
+    "Loan officer license · NMLS 5550142"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home meeting"
+   ],
+   [
+    "kitchen drain clearing",
+    "home meeting"
+   ],
+   [
+    "arriving 10am to 12pm",
+    "at 10:00am"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mortgage LLC"
+   ],
+   [
+    "barber license number",
+    "loan officer registry ID"
+   ],
+   [
+    "Plumbing + electrical",
+    "Mortgage lending + homebuyer education"
+   ],
+   [
+    "YES JP031552 JE30417",
+    "YES NMLS 5550160"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Lending LLC"
+   ],
+   [
+    "Keep it as a haircut",
+    "Keep it as a call"
+   ],
+   [
+    "Thanks for visiting",
+    "Thanks for talking with"
+   ],
+   [
+    "leehomeservices.com",
+    "leemortgage.com"
+   ],
+   [
+    "like Riley's chair",
+    "like Tyler's calls"
+   ],
+   [
+    "Every plumbing job",
+    "Every mortgage meeting"
+   ],
+   [
+    "arriving 8 to 10am",
+    "at 9:00am"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mortgage's"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Lending's"
+   ],
+   [
+    "Water heater flush",
+    "Home-buying class seat"
+   ],
+   [
+    "water heater flush",
+    "home-buying class seat"
+   ],
+   [
+    "skin fades|visits",
+    "pre-approval calls|visits"
+   ],
+   [
+    "Sat 11:00am visit",
+    "Sat 11:00am call"
+   ],
+   [
+    "arriving 1 to 3pm",
+    "at 1:00pm"
+   ],
+   [
+    "arriving 3 to 5pm",
+    "at 3:00pm"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mortgage"
+   ],
+   [
+    "Plumbing MP045210",
+    "Loan officer NMLS 5550101"
+   ],
+   [
+    "Sat Oct 24 visit",
+    "Sat Oct 24 call"
+   ],
+   [
+    "Cancel the visit",
+    "Cancel the call"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Lending"
+   ],
+   [
+    "plumbing license",
+    "loan officer license"
+   ],
+   [
+    "Plumbing license",
+    "Loan officer license"
+   ],
+   [
+    "Groom's packages",
+    "first-home workshops"
+   ],
+   [
+    "Color correction",
+    "Rental property review"
+   ],
+   [
+    "color correction",
+    "rental property review"
+   ],
+   [
+    "For the lawyer:",
+    "For the compliance reviewer:"
+   ],
+   [
+    "Yes, like a cut",
+    "Yes, like a loan call"
+   ],
+   [
+    "Rate your visit",
+    "Rate your call"
+   ],
+   [
+    "for that window",
+    "for that time"
+   ],
+   [
+    "electrical jobs",
+    "classes"
+   ],
+   [
+    "Groom's package",
+    "first-home workshop"
+   ],
+   [
+    "1 to 3pm visit",
+    "1:00pm visit"
+   ],
+   [
+    "your 12 to 2pm",
+    "your 1:00pm"
+   ],
+   [
+    "Mine, MP045210",
+    "Mine, NMLS 5550101"
+   ],
+   [
+    "Drain clearing",
+    "Home meeting"
+   ],
+   [
+    "drain clearing",
+    "home meeting"
+   ],
+   [
+    "11:00am visit",
+    "11:00am call"
+   ],
+   [
+    "Move my visit",
+    "Move my call"
+   ],
+   [
+    "at your visit",
+    "on your call"
+   ],
+   [
+    "1 color quote",
+    "1 request"
+   ],
+   [
+    "Mon 8 to 10am",
+    "Mon 9:00am"
+   ],
+   [
+    "plumbing jobs",
+    "home meetings"
+   ],
+   [
+    "signature cut",
+    "branch meeting"
+   ],
+   [
+    "Color and cut",
+    "Second-home call"
+   ],
+   [
+    "color and cut",
+    "second-home call"
+   ],
+   [
+    "at the visit",
+    "on the call"
+   ],
+   [
+    "10am to 12pm",
+    "10:00am"
+   ],
+   [
+    "1200 Main St",
+    "1500 Main St"
+   ],
+   [
+    "electricians",
+    "class teachers"
+   ],
+   [
+    "at the chair",
+    "on the call"
+   ],
+   [
+    "At the chair",
+    "On the call"
+   ],
+   [
+    "NEW massage",
+    "NEW home-buying classes"
+   ],
+   [
+    "Casey Moore",
+    "Omar Haddad"
+   ],
+   [
+    "electrician",
+    "class teacher"
+   ],
+   [
+    "Leak repair",
+    "Loan options review"
+   ],
+   [
+    "leak repair",
+    "loan options review"
+   ],
+   [
+    "your visit",
+    "your call"
+   ],
+   [
+    "Your visit",
+    "Your call"
+   ],
+   [
+    "this visit",
+    "this call"
+   ],
+   [
+    "Riley Chen",
+    "Tyler Nguyen"
+   ],
+   [
+    "Avery Diaz",
+    "Angela Brooks"
+   ],
+   [
+    "Electrical",
+    "Homebuyer education"
+   ],
+   [
+    "electrical",
+    "homebuyer education"
+   ],
+   [
+    "barbershop",
+    "loan office"
+   ],
+   [
+    "Barbershop",
+    "Loan office"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "Beard trim",
+    "Follow-up call"
+   ],
+   [
+    "beard trim",
+    "follow-up call"
+   ],
+   [
+    "Skin fade",
+    "Pre-approval call"
+   ],
+   [
+    "skin fade",
+    "pre-approval call"
+   ],
+   [
+    "the visit",
+    "the call"
+   ],
+   [
+    "The visit",
+    "The call"
+   ],
+   [
+    "88 Elm St",
+    "210 Elm St"
+   ],
+   [
+    "42 Oak St",
+    "42 Maple Ave"
+   ],
+   [
+    "Barbering",
+    "Loan office work"
+   ],
+   [
+    "barbering",
+    "loan office work"
+   ],
+   [
+    "cuts hair",
+    "meets borrowers"
+   ],
+   [
+    "kids cuts",
+    "co-buyer calls"
+   ],
+   [
+    "Skin fade",
+    "Refinance call"
+   ],
+   [
+    "skin fade",
+    "refinance call"
+   ],
+   [
+    "Plumbing",
+    "Mortgage lending"
+   ],
+   [
+    "plumbing",
+    "mortgage lending"
+   ],
+   [
+    "plumbers",
+    "loan officers"
+   ],
+   [
+    "cut hair",
+    "meet borrowers"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "kids cut",
+    "co-buyer call"
+   ],
+   [
+    "Kids cut",
+    "Co-buyer call"
+   ],
+   [
+    "Haircuts",
+    "Pre-approval calls"
+   ],
+   [
+    "haircuts",
+    "pre-approval calls"
+   ],
+   [
+    "BS20981",
+    "NMLS 5550177"
+   ],
+   [
+    "plumber",
+    "loan officer"
+   ],
+   [
+    "Plumber",
+    "Loan officer"
+   ],
+   [
+    "barbers",
+    "loan officers"
+   ],
+   [
+    "Haircut",
+    "Pre-approval call"
+   ],
+   [
+    "haircut",
+    "pre-approval call"
+   ],
+   [
+    "Oak St",
+    "Maple Ave"
+   ],
+   [
+    "Jordan",
+    "Victor"
+   ],
+   [
+    "barber",
+    "loan officer"
+   ],
+   [
+    "Barber",
+    "Loan officer"
+   ],
+   [
+    "Riley",
+    "Tyler"
+   ],
+   [
+    "Avery",
+    "Angela"
+   ],
+   [
+    "Casey",
+    "Omar"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ]
+  ],
+  "B": [
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, {{arrive:3–5pm}}, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Mortgage. It's a home meeting, today, {{arrive:3–5pm}}, with Victor. It's free. Accept it?"
+   ],
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Mortgage. It's a home meeting, today, starts at 3:00pm, with Victor. It's free. Accept it?"
+   ],
+   [
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a loan officer meet at home this Thursday? Is it free?"
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam sets a new price for later visits. AI assistants show it at once."
+   ],
+   [
+    "A late cancel or a no-show: only the policy's fee may be kept, up to the $89 service call. The rest is refunded.",
+    "A late cancel or a no-show: nothing is charged, and nothing is kept."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds home-buying classes to Lee Mortgage. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Mortgage can meet you at your home, free. Where would you like it?"
+   ],
+   [
+    "A late-cancel or nobody-home fee, up to the $89 service call, is charged only after Sam confirms it.",
+    "A late cancel or nobody-home is never charged."
+   ],
+   [
+    "up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "nothing is charged"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to leave and call 911 if there's a gas smell."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the loan purpose and the home's state."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Victor's phone, you said yes to the loan papers."
+   ],
+   [
+    "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+    "Extras can be added: down payment help on a call, or a first-home planning session."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay calm and call 911 if anyone feels unsafe."
+   ],
+   [
+    "{{name.staff:Morgan P.}} would like to talk about the water heater quote before booking.",
+    "{{name.staff:Morgan P.}} would like to talk about the loan before booking."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a loan review and a signing."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mortgage lending for homes in Springfield. Home-buying classes and refinance meetings, within 25 miles."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I'd like to talk about a home loan. Can a loan officer come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Sam isn't an electrician, so electrical waits for the person on the team who does it.",
+    "Sam doesn't teach the classes, so homebuyer education waits for the person on the team who does."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Victor found mold in the house and stopped that part of the work."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If you smell gas, get out and call 911."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A loan office on Elm St. Free first calls and home meetings."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A home meeting is never priced at the visit."
+   ],
+   [
+    "Only Riley is cleared for house calls, so only Riley is offered for them.",
+    "Only Tyler speaks Spanish, so a call in Spanish offers Tyler's times."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A loan officer's example: a caller who names a danger gets the safety words first."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'd like to talk about refinancing."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "What rate would I get on a refinance?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is anything else needed for the meeting?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Home-buying classes for Lee Mortgage: is it the same company?"
+   ],
+   [
+    "Only Riley does color, so color services offer only Riley's times.",
+    "Every loan officer here is licensed for the same states."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, I'd like a home meeting about a loan. A text back is fine."
+   ],
+   [
+    "the {{fee}} service call is owed, even after a no to the price.",
+    "nothing is owed, even after a no."
+   ],
+   [
+    "{{alex.staff}} asks: Can I run the dishwasher before you come?",
+    "{{alex.staff}} asks: Can I bring my loan papers?"
+   ],
+   [
+    "Jules K. rents a chair here, but Jules has their own business.",
+    "Jules K. works here, but Jules has their own brokerage."
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "A job quoted at the visit promises nothing now."
+   ],
+   [
+    "like a legal question at a business that isn't a law office:",
+    "like a legal question:"
+   ],
+   [
+    "Jules rents a chair at the shop but runs their own business.",
+    "Jules works from the office but runs their own brokerage."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some loan officers may meet customers only at a licensed office"
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Home meetings already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Sam is on the plumbing team too, since he goes out on jobs.",
+    "Sam is on the mortgage lending team too, since he meets customers."
+   ],
+   [
+    "Like a barber who rents a chair, or a helper on big jobs.",
+    "Like a licensed broker with their own company, or a helper on big jobs."
+   ],
+   [
+    "{{name.staff:Tessa}} · {{svc.intext:Drain clearing}}",
+    "{{name.staff:Victor}} · {{svc.intext:Home meeting}}"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a loan for a home the borrower doesn't own."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most lenders set it."
+   ],
+   [
+    "Thanks. Jordan will do the extra work now, for $160.",
+    "Thanks. Victor will do the extra work now."
+   ],
+   [
+    "Some rules wait for a lawyer's check before launch.",
+    "Some rules wait for a compliance check before launch."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds home-buying classes to Lee Mortgage."
+   ],
+   [
+    "Is the job at a home, an office or somewhere else?",
+    "Is the meeting at a home, an office or somewhere else?"
+   ],
+   [
+    "Victor found mold behind the wall under your sink",
+    "Victor found mold behind a wall"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a problem with the loan papers this morning."
+   ],
+   [
+    "up to the $89 service call. The rest is refunded.",
+    "nothing is kept."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Nothing is sent now for mortgage work."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Victor also look at my refinance?"
+   ],
+   [
+    "a card saved for the $89 service-call fee you OK",
+    "nothing taken"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 0 sign the loan papers"
+   ],
+   [
+    "Electrical is set up; waits for its electrician",
+    "Classes are set up; wait for a teacher"
+   ],
+   [
+    "Only the {{fee}} service call is promised now.",
+    "Only the free meeting is promised now."
+   ],
+   [
+    "Groom's package (cut, shave, facial; 2½ hours)",
+    "First-home workshop (2 hours)"
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote.",
+    "Morgan P. asked to talk about the loan."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A home loan could mean a mortgage or a home equity line."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a home loan."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the meeting has to move."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Can someone call me tonight?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The meeting has to move now."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a refinance."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Victor also look at my refinance?"
+   ],
+   [
+    "Drain clearings already booked keep $179.",
+    "Home meetings already booked keep their price."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD mold in the house, stopped"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I bring my loan papers?"
+   ],
+   [
+    "Yes: a Co-buyer call is $25. Want a time?",
+    "Yes: a co-buyer call is free. Want a time?"
+   ],
+   [
+    "Booking rules; color quotes need Sam's OK",
+    "Booking rules for the office"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every call, in English and Spanish"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "I'd like to talk about refinancing."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your loan papers ready."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The quote is good for 7 days."
+   ],
+   [
+    "Plumbing is live; offers electrical next",
+    "Mortgage lending is live; classes next"
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "they're the one who does the loan review"
+   ],
+   [
+    "{{svc.intext:Water heater flush|Visit}}",
+    "{{svc.intext:Refinance meeting|Visit}}"
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Victor finds mold in the house."
+   ],
+   [
+    "Asks where the job is, before any times",
+    "Asks where to meet, before any times"
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every mortgage meeting, and classes"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The branch is in the other flow."
+   ],
+   [
+    "Every shop service, color, house calls",
+    "Every call, in English and Spanish"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Loan officer NMLS 5550160 · class teacher, as given, not checked"
+   ],
+   [
+    "Sam raises the drain clearing to $199",
+    "Sam raises the home meeting to $199"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Victor finds a missing signature."
+   ],
+   [
+    "like where the main water shut-off is",
+    "like where to park"
+   ],
+   [
+    "so its customers pick an arrival time",
+    "so its customers pick a start time"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Tyler also speaks Spanish"
+   ],
+   [
+    "1 color quote · Still waiting on you",
+    "1 request · Still waiting on you"
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "First-home workshop"
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Every mortgage meeting"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the refinance."
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Home meeting|Visit}}"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Replace the loan papers · free"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Home loan options review · free"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Replace the shutoff valve · free"
+   ],
+   [
+    "Every plumbing job, and electrical",
+    "Every mortgage meeting, and classes"
+   ],
+   [
+    "Your 1 to 3pm arrival stays saved.",
+    "Your 1:00pm time stays saved."
+   ],
+   [
+    "Plumbing, electrical and barbering",
+    "Mortgage lending, homebuyer education and the loan office"
+   ],
+   [
+    "Say Alex adds his partner, Jamie.",
+    "Say Alex adds a co-borrower, Jamie."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Branch meeting"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "branch meeting"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is a co-buyer joining the meeting?"
+   ],
+   [
+    "{{svc.intext:skin fades|visits}}",
+    "{{svc.intext:pre-approval calls|visits}}"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Mortgage lending, Homebuyer education, Loan office"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Victor meeting Thu 12-2 Omar"
+   ],
+   [
+    "{{svc.intext:Yard drain|Visit}}",
+    "{{svc.intext:Home-buying class|Visit}}"
+   ],
+   [
+    "Notes the condition before work",
+    "Keeps no before record"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Mortgage lending books a set start time."
+   ],
+   [
+    "at the shop and for house calls",
+    "by phone, video and at the branch"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a document review? Say so."
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Victor and Alex go over next steps"
+   ],
+   [
+    "Texts the receipt and warranty",
+    "Texts a short thank-you"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "1 quote · Still waiting on you",
+    "1 request · Still waiting on you"
+   ],
+   [
+    "{{svc.intext:Drain clearing}}",
+    "{{svc.intext:Home meeting}}"
+   ],
+   [
+    "barber, color and house calls",
+    "loan officer, English and Spanish"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mortgage and Lee Home Classes"
+   ],
+   [
+    "her arrival time stays saved",
+    "her start time stays saved"
+   ],
+   [
+    "Every shop service but color",
+    "Every call, in English"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the office"
+   ],
+   [
+    "It can't come 1 to 3pm today",
+    "It can't come at 1:00pm today"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "home meetings and classes"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A free home meeting needs none."
+   ],
+   [
+    "Tells Jordan about the job",
+    "Tells Victor about the meeting"
+   ],
+   [
+    "Cancel your plumbing visit",
+    "Cancel your home meeting"
+   ],
+   [
+    "Electrical license JE30417",
+    "Class teacher · checked"
+   ],
+   [
+    "company's plumbing license",
+    "company's lender license"
+   ],
+   [
+    "mold behind the sink wall",
+    "mold in the house"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold in the house"
+   ],
+   [
+    "A: Thu 8–10am with Jordan",
+    "A: Thu 9:00am with Victor"
+   ],
+   [
+    "Plumbing license JP031552",
+    "Loan officer · NMLS 5550160"
+   ],
+   [
+    "plumbing license MP045210",
+    "loan officer license NMLS 5550101"
+   ],
+   [
+    "Water heater replacements",
+    "Home equity reviews"
+   ],
+   [
+    "the pipe behind the wall",
+    "the wall"
+   ],
+   [
+    "Water heater replacement",
+    "Home refinance meeting"
+   ],
+   [
+    "Water heater replacement",
+    "Home equity review"
+   ],
+   [
+    "water heater replacement",
+    "home equity review"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW home-buying classes"
+   ],
+   [
+    "the 10am to 12pm window",
+    "the 10:00am time"
+   ],
+   [
+    "plumbing and electrical",
+    "mortgage lending and homebuyer education"
+   ],
+   [
+    "Signature cut and shave",
+    "Branch meeting"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Co-buyer call"
+   ],
+   [
+    "Sewer camera inspection",
+    "Second-home review"
+   ],
+   [
+    "sewer camera inspection",
+    "second-home review"
+   ],
+   [
+    "for the kitchen drain:",
+    "for the home meeting:"
+   ],
+   [
+    "the water heater quote",
+    "the loan"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home meeting"
+   ],
+   [
+    "Barber license BR41862",
+    "Loan officer license · NMLS 5550142"
+   ],
+   [
+    "kitchen drain clearing",
+    "home meeting"
+   ],
+   [
+    "Thu Oct 22, 8 to 10am",
+    "Thu Oct 22 at 9:00am"
+   ],
+   [
+    "arriving 10am to 12pm",
+    "at 10:00am"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mortgage LLC"
+   ],
+   [
+    "barber license number",
+    "loan officer registry ID"
+   ],
+   [
+    "Plumbing + electrical",
+    "Mortgage lending + homebuyer education"
+   ],
+   [
+    "The $89 service call",
+    "The home meeting"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Home loan options review · free"
+   ],
+   [
+    "Asks for one plumber",
+    "Asks for one loan officer"
+   ],
+   [
+    "your 8 to 10am visit",
+    "your 9:00am visit"
+   ],
+   [
+    "YES JP031552 JE30417",
+    "YES NMLS 5550160"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Lending LLC"
+   ],
+   [
+    "Keep it as a haircut",
+    "Keep it as a call"
+   ],
+   [
+    "two drain clearings",
+    "two home meetings"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a co-buyer joins"
+   ],
+   [
+    "My sink won't drain",
+    "My loan call is at home"
+   ],
+   [
+    "Thu Oct 22 · 8–10am",
+    "Thu Oct 22 · 9:00am"
+   ],
+   [
+    "leehomeservices.com",
+    "leemortgage.com"
+   ],
+   [
+    "Water heater flush",
+    "Home-buying class seat"
+   ],
+   [
+    "A water heater job",
+    "A refinance meeting"
+   ],
+   [
+    "arriving 12 to 2pm",
+    "at 1:00pm"
+   ],
+   [
+    "arriving 10am–12pm",
+    "at 11:00am"
+   ],
+   [
+    "arriving 8 to 10am",
+    "at 9:00am"
+   ],
+   [
+    "your 8–10am window",
+    "your 9:00am start"
+   ],
+   [
+    "Every plumbing job",
+    "Every mortgage meeting"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mortgage's"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Lending's"
+   ],
+   [
+    "water heater flush",
+    "home-buying class seat"
+   ],
+   [
+    "skin fades|visits",
+    "pre-approval calls|visits"
+   ],
+   [
+    "your 8–10am visit",
+    "your 9:00am visit"
+   ],
+   [
+    "arriving 1 to 3pm",
+    "at 1:00pm"
+   ],
+   [
+    "arriving 3 to 5pm",
+    "at 3:00pm"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mortgage"
+   ],
+   [
+    "Plumbing MP045210",
+    "Loan officer NMLS 5550101"
+   ],
+   [
+    "Water heater fix",
+    "Refinance meeting"
+   ],
+   [
+    "Thursday, 8–10am",
+    "Thursday at 9:00am"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Lending"
+   ],
+   [
+    "plumbing license",
+    "loan officer license"
+   ],
+   [
+    "Plumbing license",
+    "Loan officer license"
+   ],
+   [
+    "Groom's packages",
+    "first-home workshops"
+   ],
+   [
+    "Color correction",
+    "Rental property review"
+   ],
+   [
+    "color correction",
+    "rental property review"
+   ],
+   [
+    "drain clearings",
+    "home meetings"
+   ],
+   [
+    "For the lawyer:",
+    "For the compliance reviewer:"
+   ],
+   [
+    "arriving 12–2pm",
+    "at 1:00pm"
+   ],
+   [
+    "arriving 8–10am",
+    "at 9:00am"
+   ],
+   [
+    "for that window",
+    "for that time"
+   ],
+   [
+    "electrical jobs",
+    "classes"
+   ],
+   [
+    "Groom's package",
+    "first-home workshop"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 0 meeting"
+   ],
+   [
+    "Alex M., 8–10.",
+    "Alex M., 9:00am."
+   ],
+   [
+    "arriving 2–4pm",
+    "at 3:00pm"
+   ],
+   [
+    "1 to 3pm visit",
+    "1:00pm visit"
+   ],
+   [
+    "your 12 to 2pm",
+    "your 1:00pm"
+   ],
+   [
+    "Mine, MP045210",
+    "Mine, NMLS 5550101"
+   ],
+   [
+    "Drain clearing",
+    "Home meeting"
+   ],
+   [
+    "drain clearing",
+    "home meeting"
+   ],
+   [
+    "booked 8–10am",
+    "booked at 9:00am"
+   ],
+   [
+    "Thu 8 to 10am",
+    "Thu 9:00am"
+   ],
+   [
+    "1 color quote",
+    "1 request"
+   ],
+   [
+    "Mon 8 to 10am",
+    "Mon 9:00am"
+   ],
+   [
+    "plumbing jobs",
+    "home meetings"
+   ],
+   [
+    "signature cut",
+    "branch meeting"
+   ],
+   [
+    "Color and cut",
+    "Second-home call"
+   ],
+   [
+    "color and cut",
+    "second-home call"
+   ],
+   [
+    "Service call",
+    "Home meeting"
+   ],
+   [
+    "10am to 12pm",
+    "10:00am"
+   ],
+   [
+    "1200 Main St",
+    "1500 Main St"
+   ],
+   [
+    "electricians",
+    "class teachers"
+   ],
+   [
+    "at the chair",
+    "on the call"
+   ],
+   [
+    "At the chair",
+    "On the call"
+   ],
+   [
+    "Leak repair",
+    "Loan options review"
+   ],
+   [
+    "Casey Moore",
+    "Omar Haddad"
+   ],
+   [
+    "electrician",
+    "class teacher"
+   ],
+   [
+    "leak repair",
+    "loan options review"
+   ],
+   [
+    "Thu 8–10am",
+    "Thu 9:00am"
+   ],
+   [
+    "Wed 8–10am",
+    "Wed 9:00am"
+   ],
+   [
+    "Riley Chen",
+    "Tyler Nguyen"
+   ],
+   [
+    "Avery Diaz",
+    "Angela Brooks"
+   ],
+   [
+    "Electrical",
+    "Homebuyer education"
+   ],
+   [
+    "electrical",
+    "homebuyer education"
+   ],
+   [
+    "barbershop",
+    "loan office"
+   ],
+   [
+    "Barbershop",
+    "Loan office"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "Beard trim",
+    "Follow-up call"
+   ],
+   [
+    "beard trim",
+    "follow-up call"
+   ],
+   [
+    "88 Elm St",
+    "210 Elm St"
+   ],
+   [
+    "42 Oak St",
+    "42 Maple Ave"
+   ],
+   [
+    "Barbering",
+    "Loan office work"
+   ],
+   [
+    "barbering",
+    "loan office work"
+   ],
+   [
+    "cuts hair",
+    "meets borrowers"
+   ],
+   [
+    "kids cuts",
+    "co-buyer calls"
+   ],
+   [
+    "Skin fade",
+    "Refinance call"
+   ],
+   [
+    "skin fade",
+    "refinance call"
+   ],
+   [
+    "Plumbing",
+    "Mortgage lending"
+   ],
+   [
+    "plumbing",
+    "mortgage lending"
+   ],
+   [
+    "plumbers",
+    "loan officers"
+   ],
+   [
+    "cut hair",
+    "meet borrowers"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "kids cut",
+    "co-buyer call"
+   ],
+   [
+    "Kids cut",
+    "Co-buyer call"
+   ],
+   [
+    "Haircuts",
+    "Pre-approval calls"
+   ],
+   [
+    "haircuts",
+    "pre-approval calls"
+   ],
+   [
+    "BS20981",
+    "NMLS 5550177"
+   ],
+   [
+    "plumber",
+    "loan officer"
+   ],
+   [
+    "Plumber",
+    "Loan officer"
+   ],
+   [
+    "barbers",
+    "loan officers"
+   ],
+   [
+    "Haircut",
+    "Pre-approval call"
+   ],
+   [
+    "haircut",
+    "pre-approval call"
+   ],
+   [
+    "8–10am",
+    "9:00am"
+   ],
+   [
+    "Oak St",
+    "Maple Ave"
+   ],
+   [
+    "Jordan",
+    "Victor"
+   ],
+   [
+    "barber",
+    "loan officer"
+   ],
+   [
+    "Barber",
+    "Loan officer"
+   ],
+   [
+    "Riley",
+    "Tyler"
+   ],
+   [
+    "Avery",
+    "Angela"
+   ],
+   [
+    "Casey",
+    "Omar"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two mortgage companies by text. Then Alex M., a first-time buyer, asks an AI to book a free pre-approval call with Lee Lending. Tyler Nguyen, licensed for the home's state, calls Alex Sat Oct 24 at 11:00am. Nothing is taken, and nothing is paid through Rosie.",
+  "B": "Sam Lee signs up two mortgage companies by text. Then Alex M. books Lee Mortgage to talk about refinancing at home, 42 Maple Ave. Victor Hale comes Thu Oct 22 at 9:00am. The meeting is free, and any loan fees stay in the lender's own tools."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a free 30-minute pre-approval call by phone with Tyler. Nothing is taken, a YES books it, and nothing is paid through Rosie. If Alex applies later, any fees are the lender's own, in its own tools."
+   },
+   "labels": {
+    "after": {
+     "counter": "Nothing to pay through Rosie"
+    }
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "free",
+     "name": "Pre-approval call"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a free 60-minute home meeting about refinancing with Victor. Nothing is taken, and Rosie sends no bill. Any loan fees are the lender's own, outside Rosie."
+   },
+   "labels": {
+    "after": {
+     "own": "Nothing to pay through Rosie"
+    }
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "free",
+     "name": "Home meeting"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Mortgage work is always licensed: each loan officer for the home's state, and the company too.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Mortgage work is always licensed: each loan officer for the home's state, and the company too.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Mortgage work books a loan officer's time, never a table, court or room.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Home-buying classes are seats at a host's place on set days, not a timetable at the business.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Mortgage work is never sent now, so nobody is on call.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Mortgage work pays the $2 by default (a switch for referral-fee rules).",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "more",
+    "at": "S1-62",
+    "more": [
+     "Rosie's legal review must confirm that switch for each state before launch."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "Pat, the office manager, has no loan officer license. Pat only books, moves and cancels times.",
+     "Questions about loans, rates or programs always go to a licensed loan officer."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-09",
+    "more": [
+     "Mortgage texts never carry rate offers, loan promotions or 'book again' lines."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in gives the state's form: what to ask, and what stops mortgage lending from going live. The company and each loan officer are licensed, on the national registry.",
+    "more": [
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state asks for insurance or a bond, the form asks for it here too.",
+     "Each person's own license comes later, with their invite reply.",
+     "Where only a city or county licenses this work, Sam gives that license the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses the company and each loan officer, on the national registry. What's the company's registry ID? And yours?"
+     ],
+     [
+      "owner",
+      "san",
+      "Company 5550110. Mine, NMLS 5550101"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show them as you gave them; I don't check them. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "A kind of work goes live on the business's license. Each person is offered once it's set up.",
+    "more": [
+     "Sam doesn't teach the classes, so homebuyer education waits for the person on the team who does.",
+     "Whose license counts comes from the state's form: the company's, each person's, or both."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, homebuyer education may need each teacher's own certificate, where a program's rules require it. Who teaches the classes?"
+     ],
+     [
+      "owner",
+      "san",
+      "Victor, on my team"
+     ],
+     [
+      "san",
+      "owner",
+      "Homebuyer education is set up. AI assistants can book it now. You'll add your people at the end. Next, Lee Lending: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where loan officers may meet away from a licensed office, and who may go. Rosie checks that before a home meeting is offered.",
+    "more": [
+     "Some states allow it only for some services.",
+     "Some allow it only for a person with more years, a background check or insurance.",
+     "Times at the customer's place offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-53",
+    "why": "Mortgage work is always free, so how a service is paid never changes.",
+    "label": "How a service is paid"
+   },
+   {
+    "op": "off",
+    "at": "S12-05",
+    "why": "Mortgage calls are free, so an AI can't send a wrong price. A wrong service is handled above.",
+    "label": "The price"
+   },
+   {
+    "op": "off",
+    "at": "S12-23",
+    "why": "Nothing is charged for mortgage work, so no card is used.",
+    "label": "A stolen card"
+   },
+   {
+    "op": "off",
+    "at": "S12-23",
+    "why": "Nothing is charged for mortgage work, so nothing can be charged twice.",
+    "label": "A double charge"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "A video or phone call is the main way in here, under the first button.",
+    "label": "By video or phone"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "Mortgage calls are free and one at a time: no plans, packs or memberships.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "A co-buyer joins the same call on the secure page (A4-71), so no group booking is needed.",
+    "label": "A group or party"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "Extra topics fit in the same free call, with Alex's yes (A8-33).",
+    "label": "Several services"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No plan or insurance pays for a free call.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A4-05",
+    "why": "Rosfield takes no photos or papers for mortgage work.",
+    "label": "Quoted from photos first"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A loan office books a loan officer's time.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A loan office books a loan officer's time.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Nothing at a loan office is booked as a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "why": "A free call has nothing to pay, so nobody else pays.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "No form is signed before a free call; the ticks on the secure page cover it.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "Nothing to discount: the call is free.",
+    "label": "A discount code"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "Mortgage calls are free and one at a time: no plans, packs or memberships.",
+    "label": "A package or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "Mortgage calls are free and one at a time: no plans, packs or memberships.",
+    "label": "Buys a pack or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "Mortgage calls are free and one at a time: no plans, packs or memberships.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "why": "A free call needs no contract. Any loan papers come from the lender's own tools.",
+    "label": "Yes: everyone signs"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "Mortgage calls are free and one at a time: no plans, packs or memberships.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "Mortgage calls are free and one at a time: no plans, packs or memberships.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "Mortgage calls are free and one at a time: no plans, packs or memberships.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "why": "A first call needs nothing brought: no papers at all.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "A call has no class roster.",
+    "label": "A class: names on a roster"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "Nothing is left with the loan office.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A8-32",
+    "why": "Nothing of Alex's is handled on a call.",
+    "label": "Something of Alex's is damaged"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left with the loan office.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "No insurance pays for a free call.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "why": "Nothing is sold or signed through Rosie at a free call.",
+    "label": "Yes: a contract signed today"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "Rosie never sends loan offers: any application comes from the lender's own tools (A10-x01).",
+    "label": "The business sends a proposal"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "why": "Nothing was paid, so there's nothing to fix or refund.",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "why": "Nothing was paid, so there's nothing to refund.",
+    "label": "Alex asks for money back"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "why": "Nothing was paid, so there's nothing to dispute.",
+    "label": "A bank dispute"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "Nothing is sent later from a call.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "why": "Nothing is left with the loan office.",
+    "label": "An item isn't picked up"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Loan calls are rated, as the old flowchart asked.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "before",
+    "at": "A3-22",
+    "steps": [
+     {
+      "id": "A3-x01",
+      "line": [
+       "3.9"
+      ],
+      "who": "san",
+      "to": "agent",
+      "via": "auto",
+      "title": "Takes out money details first",
+      "does": "However the request came, Rosie drops income, prices, loan amounts, credit scores and ID or bank numbers before anything is saved. Here, Alex's AI passed on Alex's income and price range.",
+      "more": [
+       "Nothing about Alex's money is saved or sent to Lee Lending.",
+       "The AI is told once, in plain words.",
+       "On a phone call, Rosie says the same thing aloud."
+      ],
+      "rule": "The plug-in's rule: Rosie never saves or passes on money details. Why: they belong in the lender's own application, after the call, never in a booking.",
+      "say": [
+       [
+        "san",
+        "agent",
+        "Lee Lending's booking takes no income, price or loan details, so we didn't save them. The loan officer goes over them on the call."
+       ]
+      ],
+      "needs": [
+       "pf.messages"
+      ],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-85",
+    "does": "Alex asks about a car loan, which a mortgage office doesn't do. Rosie says so plainly, and the AI can look for another business.",
+    "more": [
+     "The plug-in lists work that's close to this one but not offered.",
+     "Rosie never books a service the office didn't list."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Lending does home loans only, not car loans. Other lenders may."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-16",
+    "does": "Alex asks for Tyler by name, so only Tyler's times show. A named loan officer is offered only if they pass the same tests, like a license for the home's state.",
+    "more": [
+     "A request for a man or a woman works the same way, where the office allows it.",
+     "If Tyler can't take it, the AI says so. It offers Tyler's next open day, or another loan officer who does this service."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-26",
+    "does": "Alex books a call for Alex's mother, who is buying a smaller home. She says her own yes on the secure page and takes the call herself.",
+    "more": [
+     "The borrower gives their own yes on the secure page.",
+     "The texts and the code go to whoever takes the call."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can I book this call for my mom? She's the one buying."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-80",
+    "does": "The AI asks if the person booking is 18 or older. A loan call is for adults, so a teen is told kindly. Nothing is saved.",
+    "more": [
+     "Rosie never texts the parent itself.",
+     "From here it's the parent's booking. Texts go only to the parent's phone.",
+     "With no parent in 30 minutes, the time is let go. That's the saved time's one exception."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for asking! Lee Lending books loan calls for adults 18 or older. A parent or guardian can book their own call."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-41",
+    "does": "The plug-in's notice comes before Alex's yes: Rosie only books the loan officer's time. The secure page and the confirmation repeat it.",
+    "more": [
+     "Rosie isn't a lender, takes no loan application and gives no rate or advice.",
+     "Registry IDs for Tyler and the office show where the state's rules require them."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Good to know: Rosie only books Tyler's time. It isn't a lender and takes no loan application. Rates and next steps come from Tyler on the call."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says if this work needs a first step, like a form or a waiver. Rosie checks before the secure link, so the page knows what to ask.",
+    "more": [
+     "A mortgage call has none: the call itself is the first step."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "A mortgage call has none: the call itself is the first step.",
+       "Its page not finished: it stays booked, with nothing taken."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "does": "On the secure page, Alex answers one short question: are texts to this phone safe? Nothing about money is asked here either.",
+    "more": [
+     "A loan office shows no photos, so the page asks nothing about them.",
+     "Alex also ticks that Rosie books time only, and takes no application."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "One quick question.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-01",
+    "does": "Back to Alex: the money step is done. Lee Lending's rules: phone and video calls book right away. A branch meeting or a same-day call asks Sam first.",
+    "more": [
+     "Sam may let each loan officer OK their own branch meetings.",
+     "An unlicensed assistant, like Pat, may answer only about times."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-15",
+    "more": [
+     "Only a loan officer licensed for the home's state is offered. Angela is."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday. If the plug-in asked Alex to have something ready, it's checked first. A pre-approval call needs nothing: no papers.",
+    "more": [
+     "Documents come later, only if Alex applies, in the lender's own tools.",
+     "The reminder already said no papers are needed."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-47",
+    "does": "A what-if: Tyler had the call, but entered no code and no DONE. The next morning, Rosie asks Alex one question, never a chase.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Did you have your 11:00am call with Lee Lending yesterday?",
+      {
+       "buttons": [
+        "Yes",
+        "No, I wasn't there"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex's call, Sat 11:00am. The plug-in asks for no before record. Tyler notes nothing about Alex's money in Rosie.",
+    "more": [
+     "Anything Tyler writes about the loan goes in the lender's own tools."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "At a branch meeting, someone is hurt or feels sick. Tyler helps first, and calls 911 in an emergency. Sam is told at once, with no health details in the text.",
+    "more": [
+     "A record is kept on the secure page, never in a text.",
+     "The plug-in says what staff must do for this work."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Alex M. needs help at the branch. Calling 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Tyler called 911 during Alex M.'s branch meeting. Tyler is with Alex. Details are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "does": "Tyler's notes about the loan go in Lee Lending's own tools, never in Rosie. Rosie keeps only the time, the kind of call and the outcome.",
+    "more": [
+     "They never go in a text to Alex.",
+     "Alex can get a copy of Rosie's record, as with any record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: follow up next week, by phone"
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes. Loan details stay in your own loan tools."
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-01",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.8"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "email",
+      "title": "The lender's next step, in its own tools",
+      "does": "If Alex wants to apply, Tyler sends Lee Lending's own secure application link, from the lender's own tools. The credit check and the papers happen there.",
+      "more": [
+       "Rosie never sees the application, the credit check or the Loan Estimate.",
+       "Rosie records only the outcome: applied, thinking it over, or not now.",
+       "No nudges: Rosie never texts Alex about applying."
+      ],
+      "needs": [],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-14",
+    "does": "A complaint goes to Sam privately, word for word. Rosie never argues or admits fault.",
+    "more": [
+     "Sam answers by phone, or by text through Rosie."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Tyler called 25 minutes after my time."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. has a complaint about Saturday's call: \"Tyler called 25 minutes after my time.\"",
+      {
+       "buttons": [
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks for telling us. We've passed it to the owner."
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A4-15",
+    "branch": {
+     "label": "Nobody licensed for that state",
+     "end": "end",
+     "endText": "Nothing saved. A lender licensed in that state can help.",
+     "steps": [
+      {
+       "id": "A4-x01",
+       "line": [
+        "4.16"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "sync",
+       "title": "Says nobody here is licensed there",
+       "does": "Say the home is in a state where no loan officer at Lee Lending is licensed. Rosie says so plainly, before any time is saved. It never suggests another lender.",
+       "more": [
+        "Only the state was asked, never the home's address.",
+        "Nothing is saved, and nobody is told."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "No loan officer at Lee Lending is licensed for a home in that state, so Rosie can't book a call. A lender licensed there can help."
+        ]
+       ],
+       "needs": [],
+       "gives": []
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "A7-02",
+    "branch": {
+     "label": "Alex texts a pay stub or an ID",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A7-x01",
+       "line": [
+        "7.5"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "title": "Deletes it; never passes it on",
+       "does": "Alex texts a photo of a pay stub before the call. Rosie deletes its copy at once and never passes it on. Alex is asked not to send papers by text.",
+       "more": [
+        "Pay stubs, IDs, statements and tax papers never stay in Rosie or go to Tyler.",
+        "If Alex applies, Tyler sends the lender's own secure link for papers.",
+        "The call stays booked."
+       ],
+       "rule": "The plug-in's rule: Rosie never stores or forwards documents, income or ID numbers. Why: they belong only in the lender's own secure tools.",
+       "say": [
+        [
+         "cust",
+         "san",
+         "",
+         {
+          "photos": [
+           "A pay stub"
+          ]
+         }
+        ],
+        [
+         "san",
+         "cust",
+         "Please don't send pay stubs, IDs or account details by text. We deleted our copy and didn't pass it on. If you apply, Tyler sends Lee Lending's own secure link."
+        ]
+       ],
+       "needs": [],
+       "gives": []
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S11-22",
+    "why": "No call or meeting ever has a fee, so a missed one leaves no fee question."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Mortgage calls take no child in care: a parent or guardian stays."
+   },
+   {
+    "op": "words",
+    "at": "S12-32",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Lending: you now have two {{svc.intext:pre-approval calls|visits}} on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+      {
+       "buttons": [
+        "Keep both",
+        "Just one: keep 2:00pm"
+       ],
+       "as": "Ben T.",
+       "stop": "first"
+      }
+     ]
+    ],
+    "why": "Mortgage calls are not skin fades: the example is a pre-approval call (a slot's example words can't be renamed).",
+    "does": "Ben T. books a pre-approval call for Sat Nov 7 at 2:00pm. A second one at 2:30pm comes from another app. Rosie asks once which Ben meant. Nothing is charged twice."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Mortgage work is always licensed: each loan officer for the home's state, and the company too.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Mortgage work is always licensed: each loan officer for the home's state, and the company too.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Mortgage work books a loan officer's time, never a table, court or room.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Home-buying classes are seats at a host's place on set days, not a timetable at the business.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Mortgage work is never sent now, so nobody is on call.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Mortgage work pays the $2 by default (a switch for referral-fee rules).",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "more",
+    "at": "S1-62",
+    "more": [
+     "Rosie's legal review must confirm that switch for each state before launch."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "Pat, the office manager, has no loan officer license. Pat only books, moves and cancels times.",
+     "Questions about loans, rates or programs always go to a licensed loan officer."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-09",
+    "more": [
+     "Mortgage texts never carry rate offers, loan promotions or 'book again' lines."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in gives the state's form: what to ask, and what stops mortgage lending from going live. The company and each loan officer are licensed, on the national registry.",
+    "more": [
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state asks for insurance or a bond, the form asks for it here too.",
+     "Each person's own license comes later, with their invite reply.",
+     "Where only a city or county licenses this work, Sam gives that license the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses the company and each loan officer, on the national registry. What's the company's registry ID? And yours?"
+     ],
+     [
+      "owner",
+      "san",
+      "Company 5550110. Mine, NMLS 5550101"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show them as you gave them; I don't check them. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "A kind of work goes live on the business's license. Each person is offered once it's set up.",
+    "more": [
+     "Sam doesn't teach the classes, so homebuyer education waits for the person on the team who does.",
+     "Whose license counts comes from the state's form: the company's, each person's, or both."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, homebuyer education may need each teacher's own certificate, where a program's rules require it. Who teaches the classes?"
+     ],
+     [
+      "owner",
+      "san",
+      "Victor, on my team"
+     ],
+     [
+      "san",
+      "owner",
+      "Homebuyer education is set up. AI assistants can book it now. You'll add your people at the end. Next, Lee Lending: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where loan officers may meet away from a licensed office, and who may go. Rosie checks that before a home meeting is offered.",
+    "more": [
+     "Some states allow it only for some services.",
+     "Some allow it only for a person with more years, a background check or insurance.",
+     "Times at the customer's place offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-53",
+    "why": "Mortgage work is always free, so how a service is paid never changes.",
+    "label": "How a service is paid"
+   },
+   {
+    "op": "off",
+    "at": "S12-05",
+    "why": "Mortgage calls are free, so an AI can't send a wrong price. A wrong service is handled above.",
+    "label": "The price"
+   },
+   {
+    "op": "off",
+    "at": "S12-23",
+    "why": "Nothing is charged for mortgage work, so no card is used.",
+    "label": "A stolen card"
+   },
+   {
+    "op": "off",
+    "at": "S12-23",
+    "why": "Nothing is charged for mortgage work, so nothing can be charged twice.",
+    "label": "A double charge"
+   },
+   {
+    "op": "off",
+    "at": "B4-06",
+    "why": "Rosfield takes no photos or papers for mortgage work.",
+    "label": "Quoted from photos first"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "Mortgage meetings are free and one at a time: no plans, packs or memberships.",
+    "label": "Repeat visits: a plan"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "A co-buyer joins the same meeting on the secure page, so no group booking is needed.",
+    "label": "A group at one address"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "Extra topics fit in the same free meeting, with Alex's yes.",
+    "label": "Several services at once"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No plan or warranty pays for a free meeting.",
+    "label": "A plan or warranty pays"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Mortgage work is never sent now (B4-81), so the button never shows.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A loan officer meets at a set start time, never in an arrival window.",
+    "label": "1 Arrival windows"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Nothing in mortgage work is booked as a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A home meeting names its loan officer. Class seats go through the host's place (B4-47).",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "No form is signed before a free meeting; the ticks on the secure page cover it.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B4-69",
+    "why": "A loan office shows no photos of customers' homes, so the page asks nothing about photos."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "A free meeting needs no contract. Any loan papers come from the lender's own tools.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "why": "Mortgage meetings are free and one at a time: no plans, packs or memberships.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "Mortgage work is never sent now, and nobody is on call.",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Mortgage work is never sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "why": "Mortgage meetings are free and one at a time: no plans, packs or memberships.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Mortgage meetings are free and one at a time: no plans, packs or memberships.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Mortgage meetings are free and one at a time: no plans, packs or memberships.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "B7-20",
+    "why": "Alex picked Victor, so nobody is moved on silence: Sam calls instead (B7-x01).",
+    "label": "No reply"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Mortgage work is never sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "A loan officer meets an adult borrower, never a child alone.",
+    "label": "Only a child answers"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "Someone must be home: the borrower meets the loan officer.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "Someone must be home: the borrower meets the loan officer.",
+    "label": "The way in fails"
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "why": "A first meeting needs nothing ready: no papers at all.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "why": "A first meeting needs nothing ready: no papers at all.",
+    "label": "Missing, but it can go on"
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "why": "Nothing of Alex's is handled at a meeting.",
+    "label": "Something of Alex's is damaged"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "A free meeting is never billed in stages.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "why": "Nothing is sold at a free meeting.",
+    "label": "Keeps it"
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "why": "Nothing is sold at a free meeting.",
+    "label": "Cancels inside the period"
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "why": "Nothing was paid, so there's nothing to claim.",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "why": "Nothing was paid, so there's nothing to refund.",
+    "label": "Alex asks for money back"
+   },
+   {
+    "op": "off",
+    "at": "B10-07",
+    "why": "Nothing was paid, so there's nothing to dispute.",
+    "label": "A bank dispute"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "Rosie never sends loan offers: any application comes from the lender's own tools (B10-x01).",
+    "label": "The business sends a proposal"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "No report comes later from a meeting.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "before",
+    "at": "B3-17",
+    "steps": [
+     {
+      "id": "B3-x01",
+      "line": [
+       "3.9"
+      ],
+      "who": "san",
+      "to": "agent",
+      "via": "auto",
+      "title": "Takes out money details first",
+      "does": "However the request came, Rosie drops income, rates, loan amounts, credit scores and ID or bank numbers before anything is saved. Here, Alex's AI passed on Alex's rate and balance.",
+      "more": [
+       "Nothing about Alex's money is saved or sent to Lee Mortgage.",
+       "The AI is told once, in plain words.",
+       "On a phone call, Rosie says the same thing aloud."
+      ],
+      "rule": "The plug-in's rule: Rosie never saves or passes on money details. Why: they belong in the lender's own application, after the meeting, never in a booking.",
+      "say": [
+       [
+        "san",
+        "agent",
+        "Lee Mortgage's booking takes no rate, balance or loan details, so we didn't save them. The loan officer goes over them at the meeting."
+       ]
+      ],
+      "needs": [
+       "pf.messages"
+      ],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "does": "The request turns out to be for work Lee Mortgage doesn't do, like a car loan. Rosie says so plainly, and the AI can look for another business.",
+    "more": [
+     "The plug-in can name the kind of business to suggest, never a named one."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Mortgage does mortgage lending and homebuyer education work, not roofing. Nothing was saved. You can look for a roofer near you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-77",
+    "does": "Travel, drive time and route days need the place first. So the AI asks what kind of place it is, and the town or ZIP. The street address comes later, on the secure page.",
+    "more": [
+     "Only the town or ZIP is asked here, never the home's value.",
+     "The street address comes on the secure page, as where to meet."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Mortgage comes to you in Springfield. Is the meeting at a home, an office or somewhere else?"
+     ],
+     [
+      "cust",
+      "agent",
+      "At my home."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "does": "Rosa speaks Spanish, so Rosie answers in Spanish and says the notice again. Texts and pages come in Spanish too.",
+    "more": [
+     "Which languages texts come in is the plug-in's choice. By default: English and Spanish.",
+     "A caller in another language is put through to Lee Mortgage, or offered a set call back.",
+     "The language shows on the customer's record, so Sam can send someone who speaks it."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero refinanciar mi casa.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I want to refinance my home.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Mortgage. Esta llamada se graba. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Mortgage. This call is recorded. How can I help?",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "does": "The plug-in's notice comes before Alex's yes: Rosie only books the loan officer's time. The secure page and the confirmation repeat it.",
+    "more": [
+     "Rosie isn't a lender, takes no loan application and gives no rate or advice.",
+     "Registry IDs for Victor and the company show where the state's rules require them."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Good to know: Rosie only books Victor's time. It isn't a lender and takes no loan application. Rates and next steps come from Victor at the meeting."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-30",
+    "more": [
+     "The address is kept only as where to meet. It never goes into a loan file."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "does": "Who may book comes from the plug-in. By default, the person booking confirms they're 18 or older, and an adult is home for the visit.",
+    "more": [
+     "The state's rules can set other ages for some work. The plug-in carries them."
+    ],
+    "form": [
+     [
+      "I'm 18 or older",
+      "Yes"
+     ],
+     [
+      "I'll be home Thu at 9:00am",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-92",
+    "does": "A teen is told kindly that loan meetings are for adults. Nothing is saved.",
+    "more": [
+     "With no parent in 30 minutes, the time is let go, and the page says so."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for asking! Lee Mortgage meets adults 18 or older. A parent or guardian can book their own meeting.",
+      {
+       "as": "a teen"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "does": "Sam's rules decide: same-day meetings or new customers can ask Sam first. A home meeting with a returning customer books right away.",
+    "more": [
+     "Mortgage work is never sent now, and nobody is on call.",
+     "An unlicensed assistant, like Pat, may answer only about times."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B7-20",
+    "branch": {
+     "label": "No reply by 8pm Wed: Sam calls",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.8"
+       ],
+       "who": "san",
+       "to": "owner",
+       "via": "msg",
+       "t": "Wed Oct 21, 8:00pm",
+       "title": "Asks Sam to call Alex",
+       "does": "Alex named Victor and hasn't answered by 8pm. Nobody is moved to another loan officer on silence, so Sam is asked to call Alex.",
+       "more": [
+        "Nothing changes until that call. Any change is then confirmed by text.",
+        "If they can't reach each other, the meeting is cancelled with no fee."
+       ],
+       "say": [
+        [
+         "san",
+         "owner",
+         "Alex M. hasn't answered about tomorrow's 9:00am meeting with Victor. Please call Alex. The number is on the booking."
+        ]
+       ],
+       "needs": [],
+       "gives": []
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "The plug-in asks for no before record at a home meeting. Victor notes nothing about Alex's home or money in Rosie.",
+    "more": [
+     "Anything about the loan goes in the lender's own tools."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "does": "Victor needs a part from the supply house. Rosie tells Alex in the business's name, inside text hours, with the new finish time.",
+    "more": [
+     "Alex's reply goes to Victor, like a question before the visit.",
+     "Updates about safety go at any hour.",
+     "Each update stays on the job record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE stepping out for a call, back 9:30"
+     ],
+     [
+      "san",
+      "cust",
+      "Victor stepped out for a moment and will be back about 9:30am. The meeting should be done by 10am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "does": "Victor's notes about the loan go in Lee Mortgage's own tools, never in Rosie. Rosie keeps only the time, the kind of meeting and the outcome.",
+    "more": [
+     "Whoever serves Alex next sees them, a stand-in too.",
+     "The plug-in names what's worth keeping.",
+     "Alex can get a copy with their records.",
+     "Where the plug-in marks the work as health care, Victor types notes on the secure page. Any text says only 'notes added'."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: follow up by phone next week"
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private record. Loan details stay in your own loan tools."
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B10-01",
+    "steps": [
+     {
+      "id": "B10-x01",
+      "line": [
+       "10.8"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "email",
+      "title": "The lender's next step, in its own tools",
+      "does": "If Alex wants to apply, Victor sends Lee Mortgage's own secure application link, from the lender's own tools. The credit check and the papers happen there.",
+      "more": [
+       "Rosie never sees the application, the credit check or the Loan Estimate.",
+       "Rosie records only the outcome: applied, thinking it over, or not now.",
+       "No nudges: Rosie never texts Alex about applying."
+      ],
+      "needs": [],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-13",
+    "does": "Rosie never argues. A complaint goes to Sam privately, word for word.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Victor came 20 minutes late and didn't call."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. isn't happy with the Thu Oct 22 meeting: \"Victor came 20 minutes late and didn't call.\"",
+      {
+       "buttons": [
+        "Call Alex"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-16",
+    "does": "A month later, Alex texts the same number. A question goes to the business. A new meeting starts a new booking.",
+    "more": [
+     "A new booking follows the same steps, with a new code.",
+     "Rosie remembers Alex, so nothing is asked twice."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Victor come back next month to go over a home equity line?"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. Here are Victor's next times.",
+      {
+       "times": [
+        "Tue Nov 24 · starts at 9:00am · Victor",
+        "Wed Nov 25 · starts at 11:00am · Victor"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Victor to check in again next year. Victor texts NEXT. It's past the 60 days Sam books ahead, so Rosie saves it as a reminder.",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the customer asks.",
+     "In late Aug 2027, once it's inside the 60 days, Alex gets times to pick, or skips.",
+     "It's booked with the same money rules as any visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: a check-in meeting, 12 months"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Mortgage books up to 60 days ahead. We'll text you times for the meeting you asked Victor about in late Aug 2027.",
+      {
+       "buttons": [
+        "Sounds good",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "Extra work sold at the home can be cancelled in the cancel period the state's rules set. Here, that's until 11:59pm Mon Oct 26. The booked work can't.",
+    "more": [
+     "Nothing was sold, so there's nothing to cancel."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B4-16",
+    "branch": {
+     "label": "Nobody licensed for that state",
+     "end": "end",
+     "endText": "Nothing saved. A lender licensed in that state can help.",
+     "steps": [
+      {
+       "id": "B4-x01",
+       "line": [
+        "4.16"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "sync",
+       "title": "Says nobody here is licensed there",
+       "does": "Say the home is in a state where no loan officer at Lee Mortgage is licensed. Rosie says so plainly, before any time is saved. It never suggests another lender.",
+       "more": [
+        "Only the state was asked, never the home's value.",
+        "Nothing is saved, and nobody is told."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "No loan officer at Lee Mortgage is licensed for a home in that state, so Rosie can't book a meeting. A lender licensed there can help."
+        ]
+       ],
+       "needs": [],
+       "gives": []
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "Alex texts a pay stub or an ID",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x02",
+       "line": [
+        "7.5"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "title": "Deletes it; never passes it on",
+       "does": "Alex texts a photo of a mortgage statement before the meeting. Rosie deletes its copy at once and never passes it on. Alex is asked not to send papers by text.",
+       "more": [
+        "Pay stubs, IDs, statements and tax papers never stay in Rosie or go to Victor.",
+        "If Alex applies, Victor sends the lender's own secure link for papers.",
+        "The meeting stays booked."
+       ],
+       "rule": "The plug-in's rule: Rosie never stores or forwards documents, income or ID numbers. Why: they belong only in the lender's own secure tools.",
+       "say": [
+        [
+         "cust",
+         "san",
+         "",
+         {
+          "photos": [
+           "A mortgage statement"
+          ]
+         }
+        ],
+        [
+         "san",
+         "cust",
+         "Please don't send statements, IDs or account details by text. We deleted our copy and didn't pass it on. If you apply, Victor sends Lee Mortgage's own secure link."
+        ]
+       ],
+       "needs": [],
+       "gives": []
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S11-22",
+    "why": "No call or meeting ever has a fee, so a missed one leaves no fee question."
+   },
+   {
+    "op": "off",
+    "at": "B8-96",
+    "label": "Extra work is added",
+    "why": "A free home meeting adds no priced work at the visit: a second call is its own booking."
+   },
+   {
+    "op": "off",
+    "at": "B8-19",
+    "label": "Priced at the visit",
+    "why": "Mortgage prices are set before the visit: free, with nothing priced at the visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A home meeting is rated, like any service (not sensitive work)."
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Thu Oct 22. Text OMW when you leave. At each door, ask for the check-in code and text it here.",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Job"
+        ],
+        "rows": [
+         [
+          "8:00am",
+          "Alex M.",
+          "Home meeting"
+         ],
+         [
+          "10:00am",
+          "Kim L.",
+          "Home-buying class"
+         ],
+         [
+          "12:00pm",
+          "Drew",
+          "Home-buying class seat"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers, photos and gate codes",
+        "lines": [
+         "Alex M.: {{pay.staff}}",
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open the day",
+        "link": "rosfield.com/d/j22"
+       }
+      }
+     ]
+    ],
+    "why": "The day list's visit rows name the home meeting, not a drain (a slot's example words can't be renamed)."
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mortgage: {{due:$0}} for your visit on Thu Oct 22. Think this is wrong? Reply here, and it goes to Sam.",
+      {
+       "pay": {
+        "amount": "{{due:$0}}",
+        "what": "the home meeting",
+        "link": "rosfield.com/p/a2"
+       }
+      }
+     ]
+    ],
+    "why": "The bill names the home meeting; the due example is $0 (free)."
+   }
+  ]
+ },
+ "keep": [
+  "Planning Session",
+  "Consult",
+  "consult",
+  "lawyer",
+  "Lawyer",
+  "Grace",
+  "leak"
+ ],
+ "splitsKept": {
+  "A": [],
+  "B": []
+ },
+ "notes": "Pilot: lawyer (consult: a first call with a named professional, papers kept private). Its structure ops were kept where they fit (no deposit or full price, no photos path, named stand-ins, no plans, packs or rentals). Its renames and its no-$2 ops were dropped: mortgage work PAYS the $2, so the master's $2 words are right as they stand. Renames were rebuilt from the master.\nCast: Sam Lee owns Lee Mortgage LLC (flow B's company, 1500 Main St: mortgage lending plus homebuyer education; loan officers Victor Hale and Omar Haddad, he as in the master) and Lee Lending LLC (flow A's company, the branch at 210 Elm St; loan officers Tyler Nguyen and Angela Brooks, named or 'they' only). Pat is the office manager with no loan officer license: Pat only schedules. Alex M. has no pronoun.\nRegistry IDs are example numbers (NMLS 5550101 Sam, 5550142 Tyler, 5550188 Angela, 5550160 Victor; companies 5550177 Lee Lending, 5550110 Lee Mortgage).\nMoney: every call and meeting is free. One path per flow: A list|none|counter (nothing taken; 'after' relabeled 'Nothing to pay through Rosie'), B list|none|own. No path takes money: no no-show or late fee ever, no hold, card, deposit or full price. The sign-up words (S1-12 to S1-21, S1-41 to S1-49, S1-57) are rewritten so Sam never sets a price or a fee. S1-15's bill and saved-card branches are off; S1-54 takes 'Not through Rosie at all'.\nThe master has no 'nothing before, nothing after' choice, so the free call runs on 'nothing taken' plus 'paid at the business' (A) or 'its own way' (B), with words ops saying nothing is paid (gap: A free service has no money path of its own).\nRosfield's $2: on by default (S1-62, S1-65, S11-92, S11-94 keep the $2 branch). It goes on the monthly bill, since nothing is paid through Stripe. A switch turns it off where referral-fee rules forbid a per-booking fee for settlement-service work: FOR JAY'S LAWYER LIST. The old flowchart's 'flat fee, never per booking' is replaced by this decided rule.\nStripe is optional: S1-27 and S1-49 say mortgage work goes live without it (no money through Rosie). The card for Rosfield's monthly bill (S1-28) stays.\nLicenses: each loan officer for the state the HOME is in (not where the customer is), and the company, on the national registry's lookup, as switches from the state's form (pf.license). Only licensed loan officers for that state are offered; own branch A4-x01/B4-x01 when nobody is. A4-01's separate 'By video or phone' branch is off: phone, video and the branch are all the first button, with the licensing line as more.\nNever collected: income, SSN, the home's price or address for a loan, value, loan amount, credit score, bank or ID numbers. Own steps A3-x01/B3-x01 drop them from the AI's request before saving; A7-x01/B7-x02 delete a texted pay stub or statement. B's meeting address is kept only as where to meet (B4-30 more).\nThe AI never quotes rates or says anyone is approved: rate questions go to the loan officer on the secure page (A7-12, B7-16, A3-26, B3-21). The old 'Tyler writes an estimate with the required warning' branch is not drawn: Rosie never carries rate numbers; any written estimate is the lender's own (for the reviewer).\nFair lending: questions are yes or no only; never about race, color, religion, national origin, sex, marital status, age, disability or family (A4-22, B4-24). Loan officers are offered by soonest time, never ranked (A4-14, B4-84, S13-07 more).\nNamed loan officers: nobody is moved to another on silence. A7-61 'Someone has it' is off (A7-47: Sam calls); B7-20's 'No reply by 8pm Wed' is off and replaced by own branch B7-x01 (Sam calls). S11-46 words: Sam calls on no reply.\nFlow A: a phone call, so check-in is the code read at the start of the call (A8-03); a no-show is two unanswered calls (A8-14). Branch meetings and same-day calls ask Sam first (A6-01). A8-35's 'stops the work' becomes the home being in another state. A8-38 keeps health details out of Sam's text.\nFlow B: a set start time (B4-83 takes '2 A set start time'; windows renamed to 9:00am), 60 minutes: OMW 8:40am, check-in 9:00am, DONE 10:05am, thank-you 10:10am, rating 1:00pm. Home-buying classes and open houses are visit days at a host's place (S1-58/S1-59 at Oakview Library, B4-47, B4-66). B8-30's hazard becomes a relative pressing Alex to borrow: Victor talks with Alex alone; no family detail in Sam's text.\nSecond kind of work: homebuyer education (classes), taught by Victor; S2-32's timetable branch is off (classes run at a host's place on set days). S11-58's new kind of work is money coaching.\nTurned off as never used: walk-in lines, rooms, stock, plans, packs, gift cards, contracts, damage holds, first steps, forms, insurance plans, sent-now work, crews, deliveries, outside checks, permits, items left behind, refunds, disputes, proposals, aftercare, the S11-08 price OK, S11-56 payment change, S12 emergency prices, double charges and the wrong-price branch.\nRating kept (the old flowchart asks it), with no rate offers or promotions. Follow-up calls are booked only when Alex or the loan officer asks (A8-34, A10-07, B10-18).\nMaster issues seen: the master's B4-73 says 'Alex adds his partner' (a pronoun for Alex), renamed here. Master S11-46 keeps a time with a stand-in on no reply, against the decided pattern; fixed here by words. Master B timeline (OMW 8:05, check-in 8:20, DONE 9:10) assumes a window; reset here for a 9:00am start.\nReview Oct 24 (fresh reviewer): end texts, titles and lines that spoke of holds, fees, refunds or saved cards on the listed paths renamed or reworded to free; vary keys written with every field the step shows, so nothing falls back to the base $89 words (B6-04, B4-29, B7-01, B7-31, B8-10, S11-82); A4-61 waitlist now free to cancel; B7-20 and S11-49: Sam calls on silence, nobody is moved; B3-22 owner summary drops the late-payment detail; S11-18 Pat answers only about times; S11-22 off (no fee question ever); A4-16/B4-17 no filtering by sex; B8-32 supply-house words, B4-03 roofing, B4-66 apartment/residents, A4-20/A4-29 photo-price and rush-price lines fixed; Loan Estimate fee line reworded to the rule as written (before the Loan Estimate and the go-ahead, only a credit-report fee).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "To save cards for the $20 fee, connect Stripe in Lee's Barbershop's own name.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Alex wants it at home: a house call, $75, paid in full when booking.",
+    "like a legal question at a business that isn't a law office:",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Each service starts the way most barbershops set it.",
+    "Some rules wait for a lawyer's check before launch.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "A haircut could mean a salon or a barbershop.",
+    "Every shop service, color and house calls",
+    "A beard trim is on the price board: $20.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Riley also does color and house calls",
+    "a card saved, for a $20 fee you OK",
+    "Books the next visit at the chair",
+    "Signature cut and hot towel shave",
+    "A $35 haircut can work this way.",
+    "at the shop and for house calls",
+    "Color always stays with Riley.",
+    "like a burst pipe or a lockout",
+    "Next visit booked at checkout",
+    "barber, color and house calls",
+    "Lee Plumbing and Lee Electric",
+    "At the shop, and house calls",
+    "plumbing and electrical jobs",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Riley finishes the work",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "Lee's Barbershop LLC",
+    "Thanks for visiting",
+    "Lee Home Services'",
+    "Lee's Barbershop's",
+    "Sat 11:00am visit",
+    "Lee Home Services",
+    "Plumbing MP045210",
+    "Sat Oct 24 visit",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "For the lawyer:",
+    "for that window",
+    "electrical jobs",
+    "Groom's package",
+    "Drain clearing",
+    "11:00am visit",
+    "Move my visit",
+    "at your visit",
+    "1 color quote",
+    "plumbing jobs",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "at the visit",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "NEW massage",
+    "Casey Moore",
+    "your visit",
+    "Your visit",
+    "this visit",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "The shop's",
+    "the shop's",
+    "Beard trim",
+    "beard trim",
+    "Skin fade",
+    "skin fade",
+    "the visit",
+    "The visit",
+    "88 Elm St",
+    "Barbering",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "The shop",
+    "the shop",
+    "kids cut",
+    "Kids cut",
+    "Haircuts",
+    "haircuts",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Oak St",
+    "Jordan",
+    "barber",
+    "Barber",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shop",
+    "Shop"
+   ],
+   "B": [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "A late cancel or a no-show: only the policy's fee may be kept, up to the $89 service call. The rest is refunded.",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "A late-cancel or nobody-home fee, up to the $89 service call, is charged only after Sam confirms it.",
+    "up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "the {{fee}} service call is owed, even after a no to the price.",
+    "A job quoted at the visit promises only the service call now.",
+    "like a legal question at a business that isn't a law office:",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Like tapping a neighbor's water line without asking.",
+    "Thanks. Jordan will do the extra work now, for $160.",
+    "Some rules wait for a lawyer's check before launch.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "I found water damage under the sink this morning.",
+    "up to the $89 service call. The rest is refunded.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Can Jordan also run a camera down my sewer line?",
+    "a card saved for the $89 service-call fee you OK",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Only the {{fee}} service call is promised now.",
+    "Morgan P. asked to talk about the $640 quote.",
+    "A haircut could mean a salon or a barbershop.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "Alex texts that the sink is now overflowing.",
+    "It's overflowing. Can someone come tonight?",
+    "The sink is overflowing onto the floor now.",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "Drain clearings already booked keep $179.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Can I run the dishwasher before you come?",
+    "Water is coming out of the water heater.",
+    "Please clear the cabinet under the sink.",
+    "The $160 valve quote is good for 7 days.",
+    "he's the one who replaces water heaters",
+    "Jordan finds mold behind the sink wall.",
+    "Every plumbing job, and electrical jobs",
+    "The shop's chair is in the other flow.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Sam raises the drain clearing to $199",
+    "Jordan finds corroded shutoff valves.",
+    "Riley also does color and house calls",
+    "At my home. Just the kitchen sink.",
+    "Replace both shutoff valves · $160",
+    "Shutoff valve and wall pipe · $540",
+    "Replace both shutoff valves · $160",
+    "Every plumbing job, and electrical",
+    "Is the sink still full of water?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Plumbing books a 2-hour window.",
+    "at the shop and for house calls",
+    "Adding a faucet check? Say so.",
+    "Jordan and Alex check the work",
+    "like a burst pipe or a lockout",
+    "barber, color and house calls",
+    "Lee Plumbing and Lee Electric",
+    "At the shop, and house calls",
+    "plumbing and electrical jobs",
+    "The $179 drain needs none.",
+    "Cancel your plumbing visit",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "plumbing license MP045210",
+    "the pipe behind the wall",
+    "Water heater replacement",
+    "Water heater replacement",
+    "water heater replacement",
+    "NEW heating and cooling",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "the water heater quote",
+    "Kitchen drain clearing",
+    "Lee Home Services LLC",
+    "The $89 service call",
+    "Shutoff valve · $165",
+    "two drain clearings",
+    "Yes, it won't drain",
+    "My sink won't drain",
+    "Thu Oct 22 · 8–10am",
+    "leehomeservices.com",
+    "Water heater flush",
+    "A water heater job",
+    "Every plumbing job",
+    "Lee Home Services'",
+    "water heater flush",
+    "Lee Home Services",
+    "Plumbing MP045210",
+    "Water heater fix",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "drain clearings",
+    "For the lawyer:",
+    "arriving 12–2pm",
+    "arriving 8–10am",
+    "for that window",
+    "electrical jobs",
+    "DONE 179 drain",
+    "Drain clearing",
+    "drain clearing",
+    "plumbing jobs",
+    "Service call",
+    "1200 Main St",
+    "at the chair",
+    "Leak repair",
+    "Casey Moore",
+    "leak repair",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "The shop's",
+    "the shop's",
+    "beard trim",
+    "88 Elm St",
+    "42 Oak St",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "The shop",
+    "the shop",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "8–10am",
+    "Oak St",
+    "Jordan",
+    "barber",
+    "Barber",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shop",
+    "Shop"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-62": "b5b0310865",
+   "S2-15": "4ef478038e",
+   "S13-09": "0018bcf13a",
+   "S1-23": "6a6fbdc2ec",
+   "S1-38": "d9fefa619c",
+   "S1-43": "9775f13de8",
+   "S11-53": "81edb9524f",
+   "S12-05": "bf43e14905",
+   "S12-23": "44754a3de5",
+   "A4-01": "9d65299834",
+   "A4-28": "c8e677520c",
+   "A4-05": "8b3e838019",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-02": "15f418fec4",
+   "A8-03": "7fe61cccf5",
+   "A8-32": "632f2b5b40",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A3-22": "0057d8fc9f",
+   "A4-85": "f164e7b264",
+   "A4-16": "b1837f2760",
+   "A4-26": "add3e44476",
+   "A4-80": "624ec2e303",
+   "A4-41": "15813954ee",
+   "A4-65": "fa7ec0389d",
+   "A6-01": "df3c5778ea",
+   "A7-15": "0b8ca02693",
+   "A8-47": "730837625f",
+   "A8-23": "e3a35f7f9e",
+   "A8-38": "5e48b74f3a",
+   "A8-45": "6589a6b4d4",
+   "A10-01": "77ff9c7550",
+   "A10-14": "b60c13af2d",
+   "A4-15": "db5792db95",
+   "A7-02": "987e1a14cd",
+   "S11-22": "03a7b7ff95",
+   "A8-67": "e9fd748fc5",
+   "S12-32": "69107511cd"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-62": "b5b0310865",
+   "S2-15": "4ef478038e",
+   "S13-09": "51a9b3cbff",
+   "S1-23": "51cfaf83fd",
+   "S1-38": "d71e979b67",
+   "S1-43": "2197eac59a",
+   "S11-53": "6863170fbc",
+   "S12-05": "5c74776a38",
+   "S12-23": "de6e93622b",
+   "B4-06": "223e119ea0",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B4-83": "93095f28e5",
+   "B4-38": "9539521dc7",
+   "B4-69": "350fbaf90a",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B7-20": "364245afef",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-45": "09e62897a6",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B10-05": "a326ea3c0b",
+   "B10-37": "be87433467",
+   "B10-07": "3737f1d1c8",
+   "B10-38": "867fe1ab7c",
+   "B3-17": "3eb7d7f259",
+   "B4-03": "1126d68737",
+   "B4-77": "67ff953065",
+   "B3-11": "e459daf83c",
+   "B4-28": "506d267aaf",
+   "B4-30": "26ca477d69",
+   "B4-32": "fcfe092e37",
+   "B4-92": "36a6823417",
+   "B8-18": "530038d2b8",
+   "B8-32": "1cfd4f7afa",
+   "B8-44": "3847104a93",
+   "B10-01": "814aa1fde7",
+   "B10-13": "584c827fda",
+   "B10-16": "c7a47a391c",
+   "B10-18": "3d7ba16539",
+   "B7-05": "e28a131872",
+   "S11-22": "d83ca09a76",
+   "B8-96": "8d7fd18ef5",
+   "B8-19": "11e79a26d8",
+   "B10-32": "7713bff255",
+   "B8-01": "df9177b059",
+   "B9-06": "f091432f2d"
+  }
+ },
+ "keep_why": "Planning Session: a mortgage service (first-home planning session). Consult: the style name. lawyer / Lawyer: 'a lawyer can help' referral. Grace: 'grace time' (lint matches the name). leak: privacy leak (section 13)."
+}

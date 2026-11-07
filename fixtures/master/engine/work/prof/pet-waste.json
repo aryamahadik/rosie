@@ -1,0 +1,5317 @@
+{
+ "id": "pet-waste",
+ "name": "Pet waste removal",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "dog-walker",
+ "plugin": {
+  "pf.license": {
+   "need": "Usually none: most places license neither pet waste removal nor yard cleanup. Some cities or counties ask for a business license, and some ask for a permit to haul waste away for pay. The state's or city's form says which.",
+   "ask": "The business registration or local business license number, where the form asks for one. A waste hauling permit, where the form asks for it.",
+   "who_holds": "The business. A waste hauling permit, where one is needed, is held by the business, not by each tech.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "insurance_bond": "General liability insurance is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the rules require them, or as the business's own word. Techs work alone in a customer's yard, so a business check of its own is common.",
+   "not_this_work": "Biohazard and sewage cleanup, lawn care, pest control and dog training are other kinds of work, with their own plug-ins."
+  },
+  "pf.services": {
+   "pattern": "Set service: a tech comes to the customer's yard on a set day, usually every week, while the customer is out. A video yard check from the planning desk can come first.",
+   "list": [
+    {
+     "name": "Video yard check",
+     "price_kind": "free",
+     "length": "15 minutes",
+     "where": "by video, with Lee Yard Plans (the second company)",
+     "money": "nothing taken",
+     "note": "The planner sees the yard, the gate and where the dogs stay, and says which plan fits. A heavy yard is priced from photos."
+    },
+    {
+     "name": "Yard plans (Lee Yard Plans)",
+     "price_kind": "one price each",
+     "example": "yard plan call, 30 min, $35 (a written plan for one yard); big yard plan, over a quarter acre, $40; plan update call, 15 min, $25; printed station map $20, added to a plan; community station plan, up to 4 waste stations, $140",
+     "where": "by video, with Lee Yard Plans",
+     "money": "paid in full when booked, like the written plan"
+    },
+    {
+     "name": "Phone setup call",
+     "price_kind": "free",
+     "length": "10 minutes",
+     "where": "by phone, with Lee Yard Scoop",
+     "money": "nothing taken",
+     "note": "Sets the day, the gate and the plan. The gate code is never said on the call: it goes on the secure page."
+    },
+    {
+     "name": "Video yard check with a written plan",
+     "price_kind": "one price",
+     "example": "$55 for an apartment community, an HOA or a dog park, with a written plan after (the example business's own price)",
+     "length": "45 minutes",
+     "where": "by video, with Lee Yard Plans",
+     "money": "paid in full when booked"
+    },
+    {
+     "name": "Weekly yard cleanup, 1 dog",
+     "price_kind": "one price",
+     "example": "$24 a visit (the example business's own price)",
+     "length": "about 20 minutes, in a 2-hour window (like 9–11am)",
+     "where": "at the customer's yard; nobody needs to be home",
+     "money": "card saved at booking; charged after each visit, at DONE",
+     "note": "Up to a quarter acre. The tech scoops every spot, bags the waste and takes it away, and latches the gate."
+    },
+    {
+     "name": "Twice-weekly cleanup, 1 dog",
+     "price_kind": "one price",
+     "example": "$20 a visit, two visits a week",
+     "where": "at the customer's yard",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Every-2-weeks cleanup, 1 dog",
+     "price_kind": "one price",
+     "example": "$30 a visit",
+     "where": "at the customer's yard",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Extra dog, same yard",
+     "price_kind": "one price, added to a cleanup",
+     "example": "$6 a visit"
+    },
+    {
+     "name": "Yard deodorizer",
+     "price_kind": "one price, added to a cleanup when booking",
+     "example": "$15 a visit"
+    },
+    {
+     "name": "One-time cleanup",
+     "price_kind": "one price",
+     "example": "$48 for a yard up to a quarter acre and 2 dogs, for a customer with no plan",
+     "where": "at the customer's yard",
+     "money": "paid in full when booked"
+    },
+    {
+     "name": "First big cleanup",
+     "price_kind": "priced from photos of the yard",
+     "example": "$90 for a yard not cleaned in a month, up to a quarter acre; the owner OKs the price",
+     "where": "at the customer's yard",
+     "money": "card saved; charged at DONE",
+     "note": "A yard left for a season or more, or a big one, is priced the same way."
+    },
+    {
+     "name": "Missed visit: late skip or no way in",
+     "price_kind": "a fee, never more than the visit's own price",
+     "example": "the $24 visit, only if the owner confirms it",
+     "where": "not booked alone"
+    }
+   ],
+   "capacity": "One tech does about 12 yards a day. A yard up to a quarter acre with up to 3 dogs is on the list price; a bigger yard or more dogs is priced from photos and OK'd by the owner.",
+   "nobody_home": "Yes: the tech works in the yard through the gate while the customer is out. Entry is an open gate, a latch or a gate code (the code is never in a text). DONE with a photo of the clean yard and the latched gate confirms it. A video yard check needs the customer on the call.",
+   "online": "Yes, the video yard check, with or without a written plan, only. The cleanup itself is never online.",
+   "not_offered": "Sewage, chemical or biohazard cleanup, lawn care and pest control (other kinds of work). A yard where a dog stays loose and can't be put inside or behind a second gate isn't booked."
+  },
+  "pf.questions": {
+   "before_times": [
+    "How many dogs, and how big each one is",
+    "Has any dog ever bitten or snapped at a person? (a yes sends the request to the owner first)",
+    "The yard: front, back or both; fenced or not; under or over a quarter acre",
+    "How long since the yard was last cleaned: a week, a month, or a season or more (a long time is priced from photos)",
+    "How often: every week, twice a week, every 2 weeks, or just once",
+    "How the tech gets in: an open gate, a latch, or a gate code"
+   ],
+   "after_a_time": [
+    "Will the dogs be inside, or behind a second gate, on the service day?",
+    "Where the waste goes: taken away by the tech, or into the customer's own bin",
+    "Spots to skip: garden beds, buried lines, an invisible fence",
+    "Which side of the house the gate is on, and where to park",
+    "Add the yard deodorizer?"
+   ],
+   "secure_page_only": [
+    "The gate, door or alarm code, and where a key is kept",
+    "An emergency contact, to call if a dog is out and the customer can't be reached",
+    "The landlord's or owner's OK, for a rented or shared yard"
+   ],
+   "who_may_book": "An adult (18 or older) who lives at the address or owns the yard. A renter of a shared yard needs the owner's OK. Nobody under 18 books."
+  },
+  "pf.safety": {
+   "words": [
+    "a dog that is hurt, very sick, struggling to breathe or ate something toxic, right now",
+    "a person bitten and hurt",
+    "a dog loose in the yard that attacks",
+    "a dog that got out of the yard and is lost right now",
+    "needles, broken glass, a dead animal, sewage or chemicals in the yard"
+   ],
+   "what_happens": [
+    "A dog hurt, very sick or poisoned now: Rosie can't judge how sick a pet is. It says to call the vet, or the nearest 24-hour emergency vet, now. No booking until the dog is safe.",
+    "A person bitten and hurt: call 911 first.",
+    "A dog loose in the yard that attacks: the tech doesn't go in. The customer is told, and the visit waits until the dog is inside. The owner decides any fee.",
+    "A lost dog right now: Rosie gives the business's number to call, and tells the owner at once.",
+    "Needles, broken glass, a dead animal, sewage or chemicals: reported when booking, it's other work and isn't booked. Found at a visit, the tech leaves that spot alone, sends a photo note, and cleans the rest. Rosie names the kind of company to call, like animal control or a hazard cleanup company, never one by name."
+   ],
+   "booking_goes_on": "No, for an emergency now, or for a hazard reported when booking. Yes, after the owner's OK, for a dog that has bitten. Yes for a hazard found at a visit: the rest of the yard is cleaned."
+  },
+  "pf.first_steps": {
+   "gate_check": "No meeting is needed. The first visit starts with a gate check: the tech tries the gate or the code and takes a photo of the yard before any work. A gate that doesn't open is a no-way-in, and the owner decides any fee.",
+   "forms": "On the secure page, before the first visit: how the tech gets in, a yes that the dogs will be inside or behind a second gate on service days, and an emergency contact. The business's service agreement, with its skip and weather terms, is signed there too.",
+   "plan": "A weekly plan gets its own yes, apart from the booking, and its terms are texted back. If the first visit finds the yard can't be reached safely, the plan ends with nothing charged.",
+   "prep_for_reminder": [
+    "Put the dogs inside or behind a second gate",
+    "Leave the gate open, latched or on its code",
+    "Move hoses, toys and bowls off the lawn",
+    "Put the gate code on the secure page, never in a text"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Nobody home, no code: the tech opens the gate as set on the secure page, texts IN, and texts DONE with the yard report and a photo. When the customer is home, the code at the gate works as usual. A video yard check: the customer joins by video, and the planner reads the code out at the start.",
+   "entry_codes": "Shown only to the tech on the job, only on the service day. Each opening is logged. Deleted 72 hours after the plan ends.",
+   "lockout": "The gate is locked or the code fails: the tech texts it, the customer gets a link to fix it on the secure page, and the tech waits 10 minutes (the example), then leaves. A fee, never more than the visit's price, only if the owner confirms.",
+   "yard_report": "Time in and out, front and back done, waste taken away, gate latched, any notes, and a photo.",
+   "changes_at_visit": "A bigger yard or more dogs than booked: the tech cleans what was booked and texts a note. A higher price needs the customer's yes first, and is paid with the visit (the card at DONE, or the bill).",
+   "proof_done": "DONE with the yard report and a photo of the clean yard and the latched gate.",
+   "weather": "Heavy rain, lightning, deep snow or frozen ground: the visit moves to the next dry day that week, no fee, or the customer skips it free. The business's call never costs the customer."
+  },
+  "pf.money": {
+   "start": "Cleanups: a card saved at booking, and each visit charged to it at DONE. Sam can send a bill after each visit instead. A one-time cleanup is paid in full when booked. A first big cleanup is priced from photos, the owner OKs the price, and the card is charged at DONE. The video yard check and the phone setup call are free. The video yard check with a written plan is paid in full when booked.",
+   "deposits": "None. Nothing is held for a cleanup.",
+   "fees": "A late skip (the example: after 6pm the night before) or no way in: up to the visit's own price, $24, only if the owner confirms. No answer, no fee. A change the business makes never costs the customer.",
+   "plans": "Each plan visit is charged at its own DONE, or billed after by text. Rosfield's $2 counts once a month for a plan.",
+   "tips": "Optional, all to the tech. A tip line only if the owner turns it on.",
+   "tax": "A sales tax line only where the state taxes yard or pet services, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking, once a month for a plan."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate, door, garage and alarm codes",
+    "Where a key is kept",
+    "A dog's health conditions and medicines"
+   ],
+   "photos": "Visit photos go only to the customer and the business. They show the yard and the gate, never people or the house number. They are shown to others only with the customer's yes.",
+   "urgent": "A dog out of the yard, a bite or an injury: the owner and the customer are told at once, at any hour. Rosie then steps back, and never admits fault or offers money.",
+   "languages": "English and Spanish.",
+   "minors": "Nobody under 18 books. A teen at home isn't the booking's adult."
+  },
+  "pf.staff": {
+   "skills": [
+    "Weekly and one-time yard cleanups",
+    "First big cleanups of heavy yards",
+    "Yards with nervous or protective dogs",
+    "Yard deodorizing",
+    "Video yard checks with a written plan (the planning desk)"
+   ],
+   "licenses": "None per person unless the city's form says so.",
+   "new_person_ok": "A tech the customer hasn't met goes into the yard only after the customer's OK by reply, or after the owner calls them. No answer: the owner calls first, or the visit is skipped with no charge.",
+   "ratio": "One tech at each yard. Two techs for a first big cleanup of a large yard.",
+   "who_oks": "The owner OKs a dog with a bite history, every fee and every refund. The office manager may OK prices over the limit; the owner's answer wins."
+  },
+  "pf.rules": {
+   "plans": [
+    "The plan's terms show before any card is asked: the day and window, the price a visit, when it's charged, skip and weather terms, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking, and the terms are texted back.",
+    "One reply ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask.",
+    "Once a year, the terms and how to end the plan are texted again (the business's own rule), plus any reminder the state's rules require."
+   ],
+   "agreement": "A signed service agreement before the first visit: gate access, dogs secured on service days, and the skip and weather terms (the business's own rule).",
+   "local_rules": "Bag, bin and waste disposal rules, as the city's form sets them.",
+   "records": "2 years, with visit reports, photos and anything that happened at a visit (the business's own rule)."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "A gate left open and a dog out: the owner and the customer are told at once. The business handles it; Rosie never admits fault or offers money.",
+    "A dog loose in the yard: the tech doesn't go in. The visit waits until the dog is inside; the owner decides any fee.",
+    "No way in: a locked gate or a code that fails. The tech waits 10 minutes, then leaves; the owner decides any fee.",
+    "A tech is out: someone the customer hasn't met goes in only after the customer's OK. No reply: the owner calls first, or a free skip.",
+    "Weather day: rain, lightning, deep snow or frozen ground moves the visit to the next dry day that week, or a free skip.",
+    "Skip, pause or end a plan. A skip after the cutoff may be charged, only if the owner confirms.",
+    "A yard bigger than booked, or more dogs: the tech cleans what was booked and texts a note; a higher price needs the customer's yes first.",
+    "A hazard found in the yard (needles, broken glass, a dead animal, sewage or chemicals): that spot is left alone, with a photo note, and the rest is cleaned.",
+    "A shared or rented yard: the owner's OK is on the secure page before the first visit."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "animals",
+   "plans",
+   "forms",
+   "photos",
+   "video"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": {
+     "window": 2
+    }
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Noor and Dale (yard planners)",
+   "cust": "Alex M. (customer, with Scout) · other customers"
+  },
+  "B": {
+   "staff": "Kit and Remy (yard techs)",
+   "cust": "Alex M. (customer, with Scout) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Noor"
+  },
+  "B": {
+   "staff": "Kit"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a free 15-minute video yard check with Lee Yard Plans for Sat Oct 24 at 11:00am: Noor looks at the yard and where Scout, a lab mix, stays, and says which cleanup plan fits. The money depends on the choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Yard Scoop to clean up after Scout, a lab mix, in the back yard at 27 Linden Way: a weekly cleanup every Thursday between 9am and 12pm, from Thu Oct 22, while Alex is at work. The money depends on the choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|none",
+   "combos": [
+    "list|none|none",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|none|none": "The main story: a free 15-minute video yard check with Noor. Nothing is taken, and nothing is paid after.",
+    "list|full|none": "A $55 video yard check with a written plan, 45 minutes, paid in full when booking. Nothing more is owed after."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Video yard check"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Video yard check"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$20",
+     "name": "Video yard check with a written plan"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|full|none",
+    "photos|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $24 weekly yard cleanup after Scout. A card is saved for the $24 late-skip fee, and charged $24 when Kit texts DONE after each visit.",
+    "list|none|bill": "A $24 cleanup. Nothing is taken. Rosie texts the bill after the visit.",
+    "list|full|none": "A one-time $48 cleanup for a customer with no plan, paid in full when booking.",
+    "photos|card|card": "A first big cleanup of a yard not cleaned in a month, priced from photos at $90. Sam OKs it. A card is saved, and charged $90 when Kit texts DONE."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$24",
+     "name": "Weekly yard cleanup, 1 dog"
+    },
+    "list|*|*": {
+     "price": "$24",
+     "name": "Weekly yard cleanup, 1 dog"
+    },
+    "list|full|*": {
+     "price": "$48",
+     "paid": "$48",
+     "fee": "$24",
+     "name": "One-time cleanup"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "First big cleanup"
+    }
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Style consult",
+    "Video yard check"
+   ],
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Yard cleanup needs no state license; a city may ask for a business license."
+   ],
+   [
+    "please come with dry hair",
+    "please have the gate and yard in view"
+   ],
+   [
+    "a step-free chair",
+    "a captioned call"
+   ],
+   [
+    "already in the chair",
+    "already on the call"
+   ],
+   [
+    "The chairs",
+    "The video desk"
+   ],
+   [
+    "A chair, ready",
+    "A station map"
+   ],
+   [
+    "Shop's side",
+    "Desk's side"
+   ],
+   [
+    "At your shop",
+    "At your desk"
+   ],
+   [
+    "each shop",
+    "each desk"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "a $20 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Your video link comes in the reminder"
+   ],
+   [
+    "· 88 Elm St, Springfield",
+    "· by video"
+   ],
+   [
+    "Someone in the shop is threatening people.",
+    "Someone on the video call is threatening people."
+   ],
+   [
+    "someone in the shop was threatening people",
+    "someone on the video call was threatening people"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about the yard check wasn't right, reply here."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "A large community's written plan comes to you first. Listed prices never need one"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A written plan's example: 'A big community needs a quick map of its dog areas first. Sent one in the last 3 months?'"
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some jobs take several visits, like a big community walked through in two video calls."
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Plan update call, 15 min"
+   ],
+   [
+    "barbershops",
+    "yard planning desks"
+   ],
+   [
+    "Kids cut",
+    "Plan update call"
+   ],
+   [
+    "Color correction",
+    "Special plan"
+   ],
+   [
+    "color correction",
+    "special plan"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Video yard checks and written plans for dog owners, apartment communities and dog parks."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for lawn mowing, which isn't on the desk's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Yard Plans doesn't do lawn care."
+   ],
+   [
+    "NEW massage",
+    "NEW yard deodorizing"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Yard deodorizing for Lee Yard Plans: is it the same company?"
+   ],
+   [
+    "Ben T. books a skin fade",
+    "Ben T. books a video check with a written plan"
+   ],
+   [
+    "skin fades",
+    "video checks with a written plan"
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Rosie finds one video slot long enough for both, with one planner, and adds the prices: $55 and $20."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Noor, so Noor's next times show. Written plans always stay with Noor."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A property manager books video checks for two properties on one morning."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds slots side by side across Noor and Dale."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like a dog that's hurt or sick right now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A video check is rated, so the desk takes the first branch."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's video check ended after five minutes, not fifteen."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a cleanup gets the soonest open window."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May Lee Yard Plans show photos of your yard? Yes / No"
+   ],
+   [
+    "your hair",
+    "your yard"
+   ],
+   [
+    "the hair",
+    "the yard"
+   ],
+   [
+    "dry hair",
+    "a dry yard"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. the Sat Oct 24 3:00pm video check with Noor?"
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the video link cut out twice today"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's for my mom's yard, as a gift. Can I pay for it?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my partner join the video check from another room?"
+   ],
+   [
+    "Lee's Barbershop will fix it for free.",
+    "Lee Yard Plans will make it up with a free call."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The video link cut out twice during my check."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds yard deodorizing to Lee Yard Plans."
+   ],
+   [
+    "Adds a second shop, with its own team",
+    "Adds a second desk, with its own team"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a video check or a cleanup at the yard"
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. yard check Sat 11am Noor"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a yard cleaner or a planning desk"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning video check"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a check every month."
+   ],
+   [
+    "The state's license lookup is down",
+    "The business license lookup is down"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Video yard check with a written plan"
+   ],
+   [
+    "Books the groom's party together",
+    "Books two properties together"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up, if Sam says so"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The video check ended after five minutes."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was your video check with Noor?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a same-day request"
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Yard Plans · with Noor"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens on the call?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a check every month"
+   ],
+   [
+    "like a skin-test result",
+    "like a written yard plan"
+   ],
+   [
+    "plumbing and electrical",
+    "dog waste cleanup and yard deodorizing"
+   ],
+   [
+    "Signature cut and shave",
+    "Video yard check with a written plan"
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm · Dale"
+   ],
+   [
+    "the $90 color quote",
+    "the $90 written plan quote"
+   ],
+   [
+    "Alex asks for a fix",
+    "Alex asks for a make-up"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Yard Plans'"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Yard Scoop's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Yard Scoop"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Yard Plans"
+   ],
+   [
+    "a lapsed license",
+    "a lapsed business license"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am · Noor"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am · Noor"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm · Dale"
+   ],
+   [
+    "Groom's package",
+    "Community station plan"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm · Noor"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm · Noor"
+   ],
+   [
+    "2:00pm · Avery",
+    "2:00pm · Dale"
+   ],
+   [
+    "1 color quote",
+    "1 written plan quote"
+   ],
+   [
+    "every 4 weeks",
+    "every month"
+   ],
+   [
+    "color and cut",
+    "large community plan"
+   ],
+   [
+    "Color and cut",
+    "Large community plan"
+   ],
+   [
+    "signature cut",
+    "written plan"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Scoop"
+   ],
+   [
+    "Lee Electric",
+    "Lee Deodorizing"
+   ],
+   [
+    "1200 Main St",
+    "14 Birch Rd"
+   ],
+   [
+    "at the chair",
+    "on the call"
+   ],
+   [
+    "At the chair",
+    "On the call"
+   ],
+   [
+    "house calls",
+    "yard cleanups"
+   ],
+   [
+    "House calls",
+    "Yard cleanups"
+   ],
+   [
+    "patch test",
+    "photo walk"
+   ],
+   [
+    "Electrical",
+    "Yard deodorizing"
+   ],
+   [
+    "electrical",
+    "yard deodorizing"
+   ],
+   [
+    "Barbershop",
+    "Yard planning desk"
+   ],
+   [
+    "barbershop",
+    "yard planning desk"
+   ],
+   [
+    "Beard trim",
+    "Station map"
+   ],
+   [
+    "beard trim",
+    "station map"
+   ],
+   [
+    "house call",
+    "yard cleanup"
+   ],
+   [
+    "The shop's",
+    "Lee Yard Plans'"
+   ],
+   [
+    "the shop's",
+    "Lee Yard Plans'"
+   ],
+   [
+    "Shop front",
+    "The video desk"
+   ],
+   [
+    "kids cuts",
+    "plan update calls"
+   ],
+   [
+    "Skin fade",
+    "Big yard plan"
+   ],
+   [
+    "skin fade",
+    "big yard plan"
+   ],
+   [
+    "88 Elm St",
+    "55 Cedar Ln"
+   ],
+   [
+    "on Elm St",
+    "on Cedar Ln"
+   ],
+   [
+    "kids cut",
+    "plan update call"
+   ],
+   [
+    "Plumbing",
+    "Yard cleanup"
+   ],
+   [
+    "plumbing",
+    "yard cleanup"
+   ],
+   [
+    "Haircuts",
+    "Video yard checks"
+   ],
+   [
+    "haircuts",
+    "video yard checks"
+   ],
+   [
+    "The shop",
+    "The desk"
+   ],
+   [
+    "the shop",
+    "the desk"
+   ],
+   [
+    "25 miles",
+    "15 miles"
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "Plumber",
+    "Yard tech"
+   ],
+   [
+    "plumber",
+    "yard tech"
+   ],
+   [
+    "barbers",
+    "yard planners"
+   ],
+   [
+    "Haircut",
+    "Yard plan call"
+   ],
+   [
+    "haircut",
+    "video yard check"
+   ],
+   [
+    "Jordan",
+    "Kit"
+   ],
+   [
+    "Barber",
+    "Yard planner"
+   ],
+   [
+    "barber",
+    "yard planner"
+   ],
+   [
+    "a cut",
+    "a check"
+   ],
+   [
+    "Casey",
+    "Remy"
+   ],
+   [
+    "Riley",
+    "Noor"
+   ],
+   [
+    "Avery",
+    "Dale"
+   ],
+   [
+    "$89",
+    "$24"
+   ]
+  ],
+  "B": [
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Yard cleanup needs no state license; a city may ask for a business license."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A cleanup at the yard goes on in this flow. The video desk is in the other flow."
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "$89, credited to the repair",
+    "$24, only if you OK it"
+   ],
+   [
+    "service-call fee",
+    "missed-visit fee"
+   ],
+   [
+    "Priced at the visit",
+    "$15 a visit"
+   ],
+   [
+    "Set at the visit",
+    "$15 a visit"
+   ],
+   [
+    "$120 an hour",
+    "$30 a visit"
+   ],
+   [
+    "$199",
+    "$6 a visit"
+   ],
+   [
+    "Labor",
+    "Every-2-weeks cleanup, 1 dog"
+   ],
+   [
+    "Water pressure check",
+    "Phone setup call"
+   ],
+   [
+    "E 25% deposit after the quote",
+    "E a card saved, charged at DONE"
+   ],
+   [
+    "25% deposit",
+    "Card saved for the $24 fee"
+   ],
+   [
+    "The rest after",
+    "Charged at DONE"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every cleanup is booked ahead"
+   ],
+   [
+    "Free until 7am on the visit day",
+    "Free until 6pm the day before"
+   ],
+   [
+    "After that, or nobody home: up to the",
+    "After that, or no way in: up to the"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Mon–Fri 8am–4pm"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "Cards only · a tip line if you turn it on"
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is the gate latch stiff?'"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $24 cleanup needs none."
+   ],
+   [
+    "Someone in the shop is threatening people.",
+    "Someone at the yard is threatening people."
+   ],
+   [
+    "someone in the shop was threatening people",
+    "someone at the yard was threatening people"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about the cleanup wasn't right, reply here."
+   ],
+   [
+    "Leak repair",
+    "Yard deodorizer"
+   ],
+   [
+    "Water heater replacement",
+    "First big cleanup"
+   ],
+   [
+    "Sewer camera inspection",
+    "Extra dog, same yard"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Dog waste cleanup in Springfield: weekly yard visits on a set day, within 15 miles."
+   ],
+   [
+    "A water heater job",
+    "A first big cleanup"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for a yard cleanup every Thursday. Lee Yard Scoop offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a heavy yard cleaned in two passes."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Kit clean the yard every Thursday, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Yard Scoop has a weekly cleanup plan, $24 a visit. Each visit is booked and paid like a single one. Want it every Thursday?"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Kit's times show: Kit does the first big cleanups."
+   ],
+   [
+    "Water heater fix",
+    "Deodorizer add-on"
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the first big cleanup quote before booking."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for the yard deodorizer. Both go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Kit also use the yard deodorizer?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The deodorizer is $15 from the list. Both fit in the same arrival window."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a yard cleanup, today,"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "The cleanup is $24. Accept it?"
+   ],
+   [
+    "accept the leak repair for today,",
+    "accept the cleanup for today,"
+   ],
+   [
+    "Accepted: the leak repair today,",
+    "Accepted: the cleanup today,"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Kit also clean up after my second dog?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about weekly yard cleanups for my dog. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Someone to clean up after my dog every week' fits a weekly yard cleanup."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please leave the gate latched and the dogs inside."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found the back gate unlatched this morning."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone clean my yard this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa cleanup Thu 9-12 Remy"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Yard Scoop can clean the yard:"
+   ],
+   [
+    "Yard drain",
+    "One-time cleanup"
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A cleanup missed the back corner. Sam OKs a free make-up visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Thursday's cleanup missed the back corner."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "'s cleanup on Thu Oct 22 missed the back corner."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. The make-up visit is free."
+   ],
+   [
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Ivy C. books a cleanup for Mon Nov 9 in the morning."
+   ],
+   [
+    "drain clearings",
+    "cleanups"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like cleaning a neighbor's yard without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding the deodorizer? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Yard Scoop asks: is the yard at a home, a rental or somewhere else? And how many dogs, and how long since it was last cleaned?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. One dog, Scout, a lab mix. Back yard only."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $90 first big cleanup price is good for 7 days."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "First big cleanup · $90"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the first big cleanup for $90."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds yard deodorizing to Lee Yard Scoop."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW yard deodorizing"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Yard deodorizing for Lee Yard Scoop: is it the same company?"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Yard Scoop doesn't do, like mowing a lawn."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A cleanup happens only at the customer's yard, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a weekly cleanup at two rental houses, one dog each."
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "A cleanup priced at the yard promises only the missed-visit fee now."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A weekly cleanup with Lee Yard Scoop is $24, not $20."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a weekly cleanup at $20, an old price."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Kit's next times for a weekly cleanup."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a cleanup gets the soonest open window."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Kit do the cleanup next week?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next Thursday's cleanup? I'm away."
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a cleanup at the yard or a video check"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The back gate was left open after the cleanup."
+   ],
+   [
+    "The state's license lookup is down",
+    "The business license lookup is down"
+   ],
+   [
+    "How was your visit with Jordan?",
+    "How was the cleanup with Kit?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a same-day request"
+   ],
+   [
+    "2 Someone else meets the pro",
+    "2 Someone else gets the texts"
+   ],
+   [
+    "Jordan came late and rushed.",
+    "Kit missed the back corner."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise weekly cleanups to 26"
+   ],
+   [
+    "Jordan was late and rushed.",
+    "Kit was late and rushed."
+   ],
+   [
+    "1 Yes, Alex will be there",
+    "1 Alex gets the texts"
+   ],
+   [
+    "plumbing license MP045210",
+    "business registration EX-1042"
+   ],
+   [
+    "plumbing and electrical",
+    "dog waste cleanup and yard deodorizing"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Yard cleanup"
+   ],
+   [
+    "leehomeservices.com",
+    "leeyardscoop.com"
+   ],
+   [
+    "Water heater flush",
+    "One-time cleanup"
+   ],
+   [
+    "water heater flush",
+    "one-time cleanup"
+   ],
+   [
+    "water heater replacement",
+    "first big cleanup"
+   ],
+   [
+    "your water heater",
+    "your yard"
+   ],
+   [
+    "the water heater",
+    "the yard"
+   ],
+   [
+    "water heater",
+    "yard"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Yard Scoop's"
+   ],
+   [
+    "the kitchen drain",
+    "the cleanup"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Yard Scoop"
+   ],
+   [
+    "service call fee",
+    "missed-visit fee"
+   ],
+   [
+    "Service call fee",
+    "Missed-visit fee"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Yard Plans"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "a lapsed license",
+    "a lapsed business license"
+   ],
+   [
+    "Drain clearings",
+    "Cleanups"
+   ],
+   [
+    "Drain clearing",
+    "Cleanup"
+   ],
+   [
+    "drain clearing",
+    "cleanup"
+   ],
+   [
+    "Kitchen drain",
+    "Weekly cleanup"
+   ],
+   [
+    "service call",
+    "missed-visit fee"
+   ],
+   [
+    "Service call",
+    "Missed-visit fee"
+   ],
+   [
+    "today's work",
+    "today's cleanup"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Scoop"
+   ],
+   [
+    "Lee Electric",
+    "Lee Deodorizing"
+   ],
+   [
+    "1200 Main St",
+    "14 Birch Rd"
+   ],
+   [
+    "at the chair",
+    "on the video call"
+   ],
+   [
+    "house calls",
+    "video checks"
+   ],
+   [
+    "House calls",
+    "Video checks"
+   ],
+   [
+    "Electrical",
+    "Yard deodorizing"
+   ],
+   [
+    "electrical",
+    "yard deodorizing"
+   ],
+   [
+    "Barbershop",
+    "Yard planning desk"
+   ],
+   [
+    "barbershop",
+    "yard planning desk"
+   ],
+   [
+    "beard trim",
+    "station map"
+   ],
+   [
+    "The shop's",
+    "Lee Yard Scoop's"
+   ],
+   [
+    "the shop's",
+    "Lee Yard Scoop's"
+   ],
+   [
+    "Shop front",
+    "The crew truck"
+   ],
+   [
+    "42 Oak St",
+    "27 Linden Way"
+   ],
+   [
+    "88 Elm St",
+    "55 Cedar Ln"
+   ],
+   [
+    "Plumbing",
+    "Yard cleanup"
+   ],
+   [
+    "plumbing",
+    "yard cleanup"
+   ],
+   [
+    "The shop",
+    "The company"
+   ],
+   [
+    "the shop",
+    "the company"
+   ],
+   [
+    "25 miles",
+    "15 miles"
+   ],
+   [
+    "40 miles",
+    "25 miles"
+   ],
+   [
+    "7am Thu",
+    "6pm Wed"
+   ],
+   [
+    "Plumber",
+    "Yard tech"
+   ],
+   [
+    "plumber",
+    "yard tech"
+   ],
+   [
+    "barbers",
+    "yard techs"
+   ],
+   [
+    "Haircut",
+    "Weekly cleanup"
+   ],
+   [
+    "haircut",
+    "weekly cleanup"
+   ],
+   [
+    "25-mile",
+    "15-mile"
+   ],
+   [
+    "8–10am",
+    "9–11am"
+   ],
+   [
+    "Jordan",
+    "Kit"
+   ],
+   [
+    "Barber",
+    "Yard tech"
+   ],
+   [
+    "barber",
+    "yard tech"
+   ],
+   [
+    "Casey",
+    "Remy"
+   ],
+   [
+    "Riley",
+    "Noor"
+   ],
+   [
+    "Avery",
+    "Dale"
+   ],
+   [
+    "$179",
+    "$24"
+   ],
+   [
+    "$150",
+    "$48"
+   ],
+   [
+    "$89",
+    "$24"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Pet waste removal needs no state license where Sam works (the plug-in), so each company gives its registration (S1-61). Where a city asks for a business license or a hauling permit, its form asks there."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pet waste plug-in adds no agreement for the business to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Techs and planners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: cleanups and video checks."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Techs and planners need no license of their own unless the city's form says so (the plug-in)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A cleanup is never sent now: a cleanup needed soon gets the soonest open window (the plug-in)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your services and prices for Lee Yard Plans. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Yard planning prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Video yard check",
+          "Free · 15 min"
+         ],
+         [
+          "Yard plan call",
+          "$35 · 30 min"
+         ],
+         [
+          "Big yard plan",
+          "$40"
+         ],
+         [
+          "Plan update call",
+          "$25 · 15 min"
+         ],
+         [
+          "Station map",
+          "$20 · added to a plan"
+         ],
+         [
+          "Video yard check with a written plan",
+          "$55 · 45 min"
+         ],
+         [
+          "Community station plan",
+          "$140 · up to 4 stations"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Yard cleanup next: its own company, Lee Yard Scoop. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The crew truck"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Yard Scoop is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Yard cleanup needs no license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Cleanup price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most yard cleanup businesses start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Yard Scoop, to start",
+        "lines": [
+         "Every yard cleanup",
+         "At the customer's yard, nobody needs to be home",
+         "When they book: a card saved for a $24 fee you OK",
+         "After the visit: the saved card is charged at DONE"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules yard cleanup businesses often set. Your call: keep them, or change any. They become the company's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Yard Scoop, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price, pack, membership and intro-offer services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Yard Scoop will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Dog waste cleanup in Springfield: weekly yard visits on a set day, within 15 miles."
+        ]
+       },
+       "photos": [
+        "The crew truck",
+        "A clean yard"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Yard Scoop the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Yard Scoop · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Video yard checks",
+          "Once a planner joins and you say yes. Stripe still to connect"
+         ],
+         [
+          "Yard cleanup",
+          "Once your yard tech joins and you say yes"
+         ],
+         [
+          "Yard deodorizing",
+          "Once your yard tech joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Book me a free video check of my yard at Lee Yard Plans on Saturday."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero una videollamada para revisar mi patio el sábado.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like a video call to check my yard on Saturday.",
+       "as": "Lucía"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Yard Plans. Esta llamada se graba y se transcribe. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Yard Plans. This call is recorded and transcribed. How can I help?",
+       "as": "Lucía"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent.",
+    "more": [
+     "A yard cleanup example: a dog that nearly bit someone gets 'is anyone hurt?' first.",
+     "Then only video checks that fit are offered."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If your dog is hurt or very sick, call your vet or the nearest emergency vet now. If a person is in danger, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the planners themselves. Noor can go over it on your video check. For anything sooner, call Lee Yard Plans at (555) 010-0177. If your dog seems sick, call your vet."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "A walk-in caller is booked into the next free video slot, if a planner has one. A video check needs the customer on the call.",
+    "more": [
+     "The price, if any, comes before the call.",
+     "The link comes by text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-03",
+    "more": [
+     "Its questions: how many dogs, any bite history, and the yard.",
+     "Its danger words: a dog that's hurt, very sick or poisoned right now, or a person bitten.",
+     "Its forms: none for a video check.",
+     "Who can stand in for whom, and how a video check starts: the code is read out at the start.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Yard Plans asks: how many dogs, and has any dog ever bitten or snapped at a person?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Just Scout, a lab mix. Scout has never bitten anyone."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "does": "Alex adds a station map. Rosie finds one video slot long enough for both, with one planner, and adds the prices: $55 and $20."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "san",
+      "cust",
+      "A few questions before you book.",
+      {
+       "form": [
+        "Which side of the house is the gate on? (optional)",
+        "Anything Noor should know?",
+        "May Lee Yard Plans show photos of your yard? Yes / No"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "does": "Sam says yes, with a change, like another day. Rosie reads it back, then asks Alex. Here, Sam offers the Saturday 3:00pm video check instead.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "What time can you offer?"
+     ],
+     [
+      "owner",
+      "san",
+      "Sat 3pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer {{alex.staff}} Sat Oct 24 at 3:00pm with Noor?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my partner join the video check from another room?"
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff:Alex M.}} asks: Can my partner join the video check from another room?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Noor says yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex is on the call. Alex reads the code from the confirmation or the reminder at the start, and Noor texts it in."
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "t": "Sat Oct 24, 11:05am",
+    "does": "Back to Alex on the call, Sat 11:05am. Noor looks at the yard on Alex's phone camera and notes what's there: the gate, the fence and where the dogs stay.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE added for Alex M. on the page: side gate by the garage, code lock. The dogs stay inside."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the call record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Noor sees something on the video that the plug-in says stops the work, like broken glass all over the lawn. The check ends there, and nothing is charged.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Stopped Alex M.'s video check: broken glass in the yard. I put a note on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Noor left you a note about today's call.",
+      {
+       "card": {
+        "title": "A note from Lee Yard Plans",
+        "lines": [
+         "What was seen, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Noor stopped {{alex.staff:Alex M.}}'s video check. The note is on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "At the end of the call, Noor shows Alex the plan on screen: the day, the gate and the price. Anything Alex wants changed is fixed in the plan first."
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: side gate by the garage, code lock. One dog, inside on Thursdays. Start with the back corner."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for visiting Lee Yard Plans! How was your video check with Noor?",
+      {
+       "card": {
+        "title": "Rate the call",
+        "lines": [
+         "Sat Oct 24",
+         "1 to 5 stars, one tap on the page"
+        ],
+        "button": "Rate it",
+        "link": "rosfield.com/r/a2"
+       },
+       "stars": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Yard Plans",
+          "4 video checks · Noor 2, Dale 2"
+         ],
+         [
+          "Lee Yard Scoop",
+          "11 yards · Kit 6, Remy 5"
+         ],
+         [
+          "Waiting on you",
+          "Dee W.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-11",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your written plan quote is with Lee Yard Plans' owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam cleans yards too, so Sam is on the yard cleanup team.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Kit Price and Remy Moore clean yards. Kit does the first big cleanups too. Noor Chen and Dale Diaz run the video yard checks and written plans."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Kit Price: yard cleanups and first big cleanups",
+         "Remy Moore: yard cleanups",
+         "Noor Chen: video yard checks and site plans",
+         "Dale Diaz: video yard checks"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Remy gets the same invite. Noor and Dale get theirs from Lee Yard Plans.",
+     "Pat gets one too, to OK prices for Lee Yard Scoop.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Sam Lee added you to the team for yard cleanups. Reply YES to join and get your visits here by text.",
+      {
+       "stop": "first",
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Sam Lee added you to the team for yard cleanups. Reply YES to join and get your visits here by text.",
+      {
+       "stop": "first",
+       "as": "Remy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Plans. Sam Lee added you to the desk's team. Reply YES to join and get your video checks here by text.",
+      {
+       "stop": "first",
+       "as": "Noor"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Plans. Sam Lee added you to the desk's team. Reply YES to join and get your video checks here by text.",
+      {
+       "stop": "first",
+       "as": "Dale"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Sam Lee added you to OK its prices. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Kit replies YES, then checks what Sam set. One reply covers every kind of work Kit does.",
+    "more": [
+     "No license number is asked: yard cleanup needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Remy, Noor and Dale join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Yard Scoop! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time",
+         "An emergency contact, since you work alone"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t01"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time",
+        "Emergency contact"
+       ],
+       "as": "Kit"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 7am",
+      {
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Kit Price · Lee Yard Scoop",
+        "lines": [
+         "Every yard cleanup, and first big cleanups",
+         "Hours: Mon–Fri 8am–4pm",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Kit"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Kit"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Yard Scoop",
+       "At the customer's yard",
+       "None needed",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Kit Price",
+       "Lee Yard Scoop",
+       "At the customer's yard",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Remy Moore",
+       "Lee Yard Scoop",
+       "At the customer's yard",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Yard Scoop",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Noor Chen",
+       "Lee Yard Plans",
+       "By video",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Dale Diaz",
+       "Lee Yard Plans",
+       "By video",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license in Sam's state, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Kit: yard cleanups and first big cleanups",
+         "Remy: yard cleanups",
+         "Noor: video yard checks and written plans",
+         "Dale: video yard checks"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, yard deodorizing and Lee Yard Plans now show to AI assistants too. Each person hears they can be booked for their own work: Remy for cleanups, Dale for video checks.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Yard Scoop can book you for yard cleanups from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Yard Plans can book you from now on, for video yard checks. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Noor"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Yard Plans can book you from now on, for video yard checks. Your day list comes at the time you picked.",
+      {
+       "as": "Dale"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Yard deodorizing and Lee Yard Plans now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone else work in Lee Yard Scoop? Working alone? Add one emergency contact on this page. Without one, no safety timer runs while you work alone.",
+      {
+       "card": {
+        "title": "Your emergency contact",
+        "lines": [
+         "Called only for your safety",
+         "Told only where you're working, if you miss a safety check",
+         "Not now: no safety timer"
+        ],
+        "button": "Add a contact",
+        "link": "rosfield.com/v/e01"
+       },
+       "form": [
+        "Name",
+        "Mobile",
+        "They agreed to a call or text from Rosie"
+       ],
+       "buttons": [
+        "Just me, for now",
+        "People to add"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Remy Moore"
+     ],
+     [
+      "Company",
+      "Lee Yard Scoop"
+     ],
+     [
+      "Kinds of work",
+      "Yard cleanup"
+     ],
+     [
+      "Jobs",
+      "Weekly cleanups, one-time cleanups, first big cleanups"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 8am–4pm"
+     ],
+     [
+      "Remy agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Yard Scoop. Reese gets one invite, and replies YES. Where the city's form asks for a permit, it's asked then and checked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": "first",
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Insurance is the one date that comes due for this work: no license is needed. Rosie reminds Sam 30 days and 7 days before the certificate ends.",
+    "more": [
+     "A new certificate in the business's name keeps 'insured' on the listing.",
+     "Not sent by then: 'insured' comes off the listing.",
+     "Each certificate has a record: who checked, when, and the end date."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Yard Scoop's liability insurance certificate ends in 30 days. Send the new one to keep 'insured' on the listing.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "A new certificate in the business's name",
+         "Not sent by then: 'insured' comes off the listing"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Where a city's form asks for a permit, Rosie checks it on the city's own records. While they're down, nobody new is offered for that work until it's checked. Those already checked stay on.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The city's records are down, so Reese K.'s permit isn't checked yet. Reese isn't offered for that work until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "does": "One number booked several cleanups under different names, and each time there was no way in. New requests from it now wait for Sam's OK.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 cleanups at Lee Yard Scoop this week under different names. Each time, there was no way in. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A yard check is booked by the adult who owns the yard, never for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A video check books a planner's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A video check books a planner's time, never a space."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A video check is a short call, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A video check needs no form: the service agreement is signed with the first cleanup (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Missing, but it can go on",
+    "why": "A video check needs nothing to be brought."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A video check needs nothing to be brought."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the desk: the customer is on the call."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left: a video check is with the adult."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A video check is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A video check has no result that comes later."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A video check books nothing more: the customer books the cleanup at Lee Yard Scoop (the other flow)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "A video check is a one-time call. Plans are Lee Yard Scoop's, at the yard."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A video check is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "A video check is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-02",
+    "label": "A plan or count is due",
+    "why": "A video check sells no plans and books no groups."
+   },
+   {
+    "op": "off",
+    "at": "A7-02",
+    "label": "Something needed first",
+    "why": "A video check needs no form or first step."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Pet waste removal needs no state license where Sam works (the plug-in), so each company gives its registration (S1-61). Where a city asks for a business license or a hauling permit, its form asks there."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pet waste plug-in adds no agreement for the business to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Techs and planners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: cleanups and video checks."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Techs and planners need no license of their own unless the city's form says so (the plug-in)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A cleanup is never sent now: a cleanup needed soon gets the soonest open window (the plug-in)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your cleanup services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Cleanup prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Cleanup price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Weekly yard cleanup, 1 dog",
+          "$24 a visit"
+         ],
+         [
+          "Twice-weekly cleanup, 1 dog",
+          "$20 a visit"
+         ],
+         [
+          "Every-2-weeks cleanup, 1 dog",
+          "$30 a visit"
+         ],
+         [
+          "Extra dog, same yard",
+          "$6 a visit"
+         ],
+         [
+          "Yard deodorizer",
+          "$15 a visit"
+         ],
+         [
+          "One-time cleanup",
+          "$48"
+         ],
+         [
+          "First big cleanup",
+          "Priced from photos"
+         ],
+         [
+          "Phone setup call",
+          "Free · 10 min"
+         ],
+         [
+          "Missed visit: late skip or no way in",
+          "Up to the visit's price, if you OK it"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Yard deodorizing next: same company, so only what's new. It needs no license where you work. Send its prices."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Deodorizer price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set it like cleanups. Send only what's different.",
+      {
+       "card": {
+        "title": "Yard deodorizing, set like cleanups",
+        "lines": [
+         "At the customer's yard, with a cleanup",
+         "Added when they book, $15 a visit",
+         "A card saved when they book, charged after each visit"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee Yard Plans is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The video desk"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the video desk is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Video yard checks need no license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most planning desks start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Yard Plans, to start",
+        "lines": [
+         "Video yard check: free, nothing taken",
+         "Video yard check with a written plan: $55, paid in full when they book",
+         "Nothing more is paid after"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules planning desks often set. Your call: keep them, or change any. They become the desk's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Yard Plans, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price, pack, membership and intro-offer services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Yard Plans will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Video yard checks and written plans for dog owners, apartment communities and dog parks."
+        ]
+       },
+       "photos": [
+        "The video desk",
+        "A station map"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Yard Plans the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Yard Plans · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Yard cleanup",
+          "Now"
+         ],
+         [
+          "Yard deodorizing",
+          "Once your yard tech joins and you say yes"
+         ],
+         [
+          "Lee Yard Plans",
+          "Once a planner joins and you say yes. Stripe still to connect"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam cleans yards too, so Sam is on the yard cleanup team.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Kit Price and Remy Moore clean yards. Kit does the first big cleanups too. Noor Chen and Dale Diaz run the video yard checks and written plans."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Kit Price: yard cleanups and first big cleanups",
+         "Remy Moore: yard cleanups",
+         "Noor Chen: video yard checks and site plans",
+         "Dale Diaz: video yard checks"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Remy gets the same invite. Noor and Dale get theirs from Lee Yard Plans.",
+     "Pat gets one too, to OK prices for Lee Yard Scoop.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Sam Lee added you to the team for yard cleanups. Reply YES to join and get your visits here by text.",
+      {
+       "stop": "first",
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Sam Lee added you to the team for yard cleanups. Reply YES to join and get your visits here by text.",
+      {
+       "stop": "first",
+       "as": "Remy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Plans. Sam Lee added you to the desk's team. Reply YES to join and get your video checks here by text.",
+      {
+       "stop": "first",
+       "as": "Noor"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Plans. Sam Lee added you to the desk's team. Reply YES to join and get your video checks here by text.",
+      {
+       "stop": "first",
+       "as": "Dale"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Sam Lee added you to OK its prices. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Kit replies YES, then checks what Sam set. One reply covers every kind of work Kit does.",
+    "more": [
+     "No license number is asked: yard cleanup needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Remy, Noor and Dale join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Yard Scoop! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time",
+         "An emergency contact, since you work alone"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t01"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time",
+        "Emergency contact"
+       ],
+       "as": "Kit"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 7am",
+      {
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Kit Price · Lee Yard Scoop",
+        "lines": [
+         "Every yard cleanup, and first big cleanups",
+         "Hours: Mon–Fri 8am–4pm",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Kit"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Kit"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Yard Scoop",
+       "At the customer's yard",
+       "None needed",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Kit Price",
+       "Lee Yard Scoop",
+       "At the customer's yard",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Remy Moore",
+       "Lee Yard Scoop",
+       "At the customer's yard",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Yard Scoop",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Noor Chen",
+       "Lee Yard Plans",
+       "By video",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Dale Diaz",
+       "Lee Yard Plans",
+       "By video",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license in Sam's state, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Kit: yard cleanups and first big cleanups",
+         "Remy: yard cleanups",
+         "Noor: video yard checks and written plans",
+         "Dale: video yard checks"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, yard deodorizing and Lee Yard Plans now show to AI assistants too. Each person hears they can be booked for their own work: Remy for cleanups, Dale for video checks.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Yard Scoop can book you for yard cleanups from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Yard Plans can book you from now on, for video yard checks. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Noor"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Yard Plans can book you from now on, for video yard checks. Your day list comes at the time you picked.",
+      {
+       "as": "Dale"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Yard deodorizing and Lee Yard Plans now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone else work in Lee Yard Scoop? Working alone? Add one emergency contact on this page. Without one, no safety timer runs while you work alone.",
+      {
+       "card": {
+        "title": "Your emergency contact",
+        "lines": [
+         "Called only for your safety",
+         "Told only where you're working, if you miss a safety check",
+         "Not now: no safety timer"
+        ],
+        "button": "Add a contact",
+        "link": "rosfield.com/v/e01"
+       },
+       "form": [
+        "Name",
+        "Mobile",
+        "They agreed to a call or text from Rosie"
+       ],
+       "buttons": [
+        "Just me, for now",
+        "People to add"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Remy Moore"
+     ],
+     [
+      "Company",
+      "Lee Yard Scoop"
+     ],
+     [
+      "Kinds of work",
+      "Yard cleanup"
+     ],
+     [
+      "Jobs",
+      "Weekly cleanups, one-time cleanups, first big cleanups"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 8am–4pm"
+     ],
+     [
+      "Remy agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Yard Scoop. Reese gets one invite, and replies YES. Where the city's form asks for a permit, it's asked then and checked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": "first",
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Insurance is the one date that comes due for this work: no license is needed. Rosie reminds Sam 30 days and 7 days before the certificate ends.",
+    "more": [
+     "A new certificate in the business's name keeps 'insured' on the listing.",
+     "Not sent by then: 'insured' comes off the listing.",
+     "Each certificate has a record: who checked, when, and the end date."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Yard Scoop's liability insurance certificate ends in 30 days. Send the new one to keep 'insured' on the listing.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "A new certificate in the business's name",
+         "Not sent by then: 'insured' comes off the listing"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Where a city's form asks for a permit, Rosie checks it on the city's own records. While they're down, nobody new is offered for that work until it's checked. Those already checked stay on.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The city's records are down, so Reese K.'s permit isn't checked yet. Reese isn't offered for that work until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "does": "One number booked several cleanups under different names, and each time there was no way in. New requests from it now wait for Sam's OK.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 cleanups at Lee Yard Scoop this week under different names. Each time, there was no way in. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-60",
+    "more": [
+     "Sam fills in that state's form to take those addresses.",
+     "Not now, or no answer in 7 days: only home-state addresses are offered."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "The visit report comes at DONE, with the photo (B8-41)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Cleanups are booked from the list or priced from photos; nothing is proposed after one."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Cleanups are booked in 2-hour windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A cleanup is a visit, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A cleanup books a tech's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "A cleanup has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A tech never looks after a child."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Only a child answers",
+    "why": "Nobody needs to be home for a cleanup: a child at home changes nothing."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody home",
+    "why": "Nobody needs to be home for a cleanup, so nobody home is never a no-show. A gate that won't open is the way-in branch (B8-52)."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "Cleanups are priced from the list or from photos before the visit; nothing is quoted at the yard."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a cleanup."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "A cleanup is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "The service agreement is the plug-in's form on the secure page (B4-38), signed with the booking."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "A cleanup is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "A cleanup is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "A cleanup is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A cleanup is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a cleanup."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam keeps cards only: cleanups are small bills (S1-57)."
+   },
+   {
+    "op": "off",
+    "at": "B9-03",
+    "label": "Yes: one pay link",
+    "why": "No extra work is sold at a yard with nobody home (B8-22). A change before the visit is paid when it's made (B7-31)."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "Alex runs late",
+    "why": "Nobody needs to be home for a cleanup, so a customer running late changes nothing."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at a cleanup (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at a cleanup (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Next visit booked at checkout",
+    "why": "A plan books the next visits. Nobody is home at a cleanup's DONE to book one."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each cleanup is rated."
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can someone clean up after my dog Scout in the back yard every Thursday morning? I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Necesito limpieza semanal del patio para mi perro.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I need weekly yard cleanup for my dog.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Yard Scoop. Esta llamada se graba y se transcribe. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Yard Scoop. This call is recorded and transcribed. How can I help?",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, and a bite history sends it to Sam first. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A cleanup example: a dog that nearly bit someone gets 'is anyone hurt?' first.",
+     "Rosa's dog growled at the mail carrier yesterday and almost bit them. Nobody was hurt, so the call goes on. Sam reads her answers first."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay alguien herido, una persona o un perro?",
+      {
+       "lang": "es",
+       "en": "First: is anyone hurt, a person or a dog?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Mi perro le gruñó al cartero ayer y casi lo muerde, pero nadie se lastimó.",
+      {
+       "lang": "es",
+       "en": "No. My dog growled at the mail carrier yesterday and almost bit them, but nobody got hurt.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Gracias. Si una persona mordida está herida, llame al 911. Sam revisa su pedido antes de reservar.",
+      {
+       "lang": "es",
+       "en": "Thanks. If a person who was bitten is hurt, call 911. Sam checks your request before it's booked.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For yard cleanup, a dog that's hurt, very sick or poisoned right now stops the booking.",
+    "more": [
+     "The message is the plug-in's: Rosie can't judge how sick a pet is, so it says to call the vet now.",
+     "A person who was bitten and is hurt gets 911 first.",
+     "On a call, the caller hears it, and Sam gets the call summary."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency for your dog. Rosie can't judge how sick a pet is. Call your vet, or the nearest 24-hour emergency vet, now. If a person was bitten and is hurt, call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their dog just swallowed a poison and is shaking. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A dog that swallowed a poison",
+         "Told to call the vet or an emergency vet now"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Scout's stool has been loose all week. Should I be worried?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't judge a pet's health. If Scout seems very sick, call your vet. To ask about the cleanups, call Lee Yard Scoop at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa called at 7:12am, in Spanish. She wants weekly yard cleanups. Her dog almost bit the mail carrier yesterday; nobody was hurt. Safety steps given, and a booking link sent.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "A near bite yesterday · nobody hurt · safety steps given",
+         "Booking link sent · comes to you first"
+        ],
+        "button": "Hear the call",
+        "link": "rosfield.com/k/a1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Yard Scoop · Weekly cleanups",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Yard Scoop. We got your voicemail about yard cleanups for your two dogs. Tap to pick a day, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Yard Scoop · Weekly yard cleanup",
+        "lines": [
+         "Pick a day, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about cleanups for two dogs. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants weekly cleanups from next week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Booked, with no texts to Tessa. Please tell her the details yourself.",
+      {
+       "card": {
+        "title": "Tessa · Weekly yard cleanup",
+        "lines": [
+         "Thu Oct 22 · 12–2pm · Remy",
+         "Add the address on the Today page"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/b8"
+       },
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Yard Scoop cleans up after dogs, but doesn't mow lawns. Nothing was saved. You can look for a lawn care company near you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: how many dogs and their size, any bite history, the yard, and how the tech gets in.",
+     "Its danger words: a dog that's hurt, very sick or poisoned right now, or a person bitten.",
+     "Its forms: how the tech gets in, the dogs kept inside on service days, and an emergency contact.",
+     "Who can stand in for whom, and how a cleanup is checked in: the gate, with nobody home.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Yard Scoop asks: how many dogs, and how big is each one? And has any dog ever bitten or snapped at a person?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Just Scout, a lab mix, 62 lb. Scout has never bitten anyone."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "does": "Alex adds how Kit gets in and what Kit should know. The gate code shows to Kit only on the service day.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Will the dogs be inside, or behind a second gate, on Thursdays? And how does the tech get in?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Scout will be inside. The side gate has a code lock. I'll put the code on the page."
+     ]
+    ],
+    "form": [
+     [
+      "Parking",
+      "On the street"
+     ],
+     [
+      "Dogs on service days",
+      "Scout, lab mix, 62 lb · inside"
+     ],
+     [
+      "Gate code",
+      "Typed here only"
+     ],
+     [
+      "Spots to skip",
+      "The herb bed by the back step"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-26",
+    "does": "Nobody needs to be home for a cleanup: Alex will be at work. So the AI asks who gets the visit texts and reports.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Nobody needs to be home for cleanups. Should the visit texts and reports go to you?",
+      {
+       "buttons": [
+        "Yes, to me",
+        "Someone else"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "does": "Who may book comes from the plug-in. The person booking confirms they're 18 or older and live at the address or own the yard.",
+    "form": [
+     [
+      "I'm 18 or older",
+      "Yes"
+     ],
+     [
+      "I live here, or own this yard",
+      "Yes"
+     ],
+     [
+      "Scout is my dog",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "The plug-in needs a form before the first visit. It covers the gate, the dogs kept inside, and the service terms.",
+    "form": [
+     [
+      "Form",
+      "Service agreement: gate access, dogs kept inside or behind a second gate, skip and weather terms"
+     ],
+     [
+      "Due",
+      "Before the first visit"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "more": [
+     "Examples: a written estimate for work over a set amount, or the right to cancel a sale made at home.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date. Sam is reminded before it's late.",
+     "Cleanups need no notice at booking here. The skip and weather terms are on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-12",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your first big cleanup price is with Lee Yard Scoop. We'll let you know by 12:00pm Tue either way."
+     ],
+     [
+      "san",
+      "owner",
+      "Still waiting on you: Kit's price for {{alex.staff}} No answer by 11:30am Tue: it isn't sent.",
+      {
+       "card": {
+        "title": "First big cleanup · {{price:$90}}",
+        "lines": [
+         "{{alex.staff}}"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it",
+        "See it first",
+        "Decline"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "form": [
+     [
+      "How often",
+      "Every Thursday"
+     ],
+     [
+      "Price a visit",
+      "$24"
+     ],
+     [
+      "When it's charged",
+      "Each visit, like a single booking"
+     ],
+     [
+      "Skip, pause or end",
+      "Any time, by text"
+     ],
+     [
+      "I agree to the plan's terms",
+      "Yes"
+     ]
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Weekly yard cleanup plan",
+        "lines": [
+         "Every Thursday · 9–11am",
+         "Each visit: $24",
+         "Each visit is booked and paid like this one",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Fri 9am"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. a first cleanup Fri Oct 23, 9–11am, with Kit?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another day"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-15",
+    "say": [
+     [
+      "cust",
+      "san",
+      "STOP"
+     ],
+     [
+      "san",
+      "cust",
+      "You won't get more texts from Rosie for Lee Yard Scoop. Your cleanups stay booked."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. opted out of texts. The cleanups stay. Text DONE as usual; the report goes to Alex's secure page."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. opted out of texts. The cleanups stand, every Thursday 9–11am. For any change, call Alex."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Kit skip the front lawn this week? I just reseeded it."
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff}} asks: Can Kit skip the front lawn this week? I just reseeded it.",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ],
+       "as": "Kit"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Kit says yes, and will skip the front lawn this week."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that the yard is a mess after a storm. Rosie runs the plug-in's danger check again: nothing in it, so it asks the pro. Remy can come sooner, so that's offered.",
+    "more": [
+     "Real danger, like a dog that is hurt or ate something toxic, gets the safety steps first: call the vet now.",
+     "An earlier day shows its price first. No reply: the cleanup stays as booked.",
+     "If Alex picks the earlier day, Kit and Remy are told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The yard is a mess after the storm. Can someone come before Thursday?"
+     ],
+     [
+      "san",
+      "cust",
+      "Remy can come sooner, at the same price. If a dog is hurt or very sick, call your vet now.",
+      {
+       "times": [
+        "Wed Oct 21 · 12–2pm · Remy"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep Thursday"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 9:35am",
+    "does": "Back to Alex: it's Thursday, and Kit heads to Scout's yard for the first cleanup. Nobody needs to be home, so there's no code and no door check.",
+    "more": [
+     "The text names the tech, with a photo link, so Alex knows who has the gate code.",
+     "The photo link is where a plain text finds the photo.",
+     "If Alex texted STOP, nobody calls: nobody needs to be home.",
+     "When Alex is home for a cleanup, the code at the gate works as usual."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Kit from Lee Yard Scoop is on the way to your yard, about 15 minutes. Nobody needs to be home. You'll get a report and a photo after the visit.",
+      {
+       "photos": [
+        "Kit, from Lee Yard Scoop"
+       ],
+       "photoLink": "rosfield.com/m/r4"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 9:50am"
+   },
+   {
+    "op": "words",
+    "at": "B8-17",
+    "t": "Thu Oct 22, 9:50am",
+    "does": "Nobody needs to be home for a cleanup. Kit opens the side gate with the code shown only on the service day. DONE, with the yard report and a photo, confirms the visit at the end.",
+    "more": [
+     "Each opening of the gate is logged. Kit latches it after the visit.",
+     "Alex gets the report and photo, and has 24 hours to say if something's wrong. Sam is told of any reply.",
+     "There's no code to enter, so DONE confirms the visit for Rosfield's $2.",
+     "Only for work the plug-in marks 'nobody needs to be home', like cleanups."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "IN Alex M."
+     ],
+     [
+      "san",
+      "staff",
+      "Got it: in at 9:50am. Text DONE with the yard report and a photo after the visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before the cleanup, Kit photographs the yard and the gate, and notes anything already broken, like a loose gate latch. The notes stay with the visit.",
+    "more": [
+     "The plug-in names the checks: the gate and its latch, the fence line, and where the dogs stay.",
+     "Alex can see them on the secure page.",
+     "A damage claim later is checked against them.",
+     "When nobody is home, these notes and photos are the record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE side gate latch sticks a little, code works. About 3 days of waste in the back yard.",
+      {
+       "photos": [
+        "Back yard, before",
+        "Side gate, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with {{alex.staff}}'s visit.",
+      {
+       "as": "Kit"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-19",
+    "does": "Cleanups have their price before the visit, from Sam's list or from the photos. Nothing is priced at the yard."
+   },
+   {
+    "op": "words",
+    "at": "B8-22",
+    "does": "Back to Scout's yard on Thursday. Each branch is one thing that can happen at a visit. Most rejoin before DONE."
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A dog gets out of the yard",
+     "end": "end",
+     "endText": "Sam and Kit search, with Alex on the phone. Rosie logged the time and the place.",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.20"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 10:05am",
+       "title": "A dog is out: Sam and Alex told at once",
+       "does": "Kit finds the side gate open and Scout out of the yard. Kit texts DOG OUT with the street. Rosie tells Sam and Alex at once, at any hour, then steps back.",
+       "more": [
+        "Sam and Kit run the search, with Alex on the phone.",
+        "Rosie never admits fault or offers money. Sam decides the rest.",
+        "The time and the place stay on the visit record.",
+        "The gate was found open, not left open by Kit: the gate photos at IN and DONE are the record."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "DOG OUT Scout is out the side gate, heading up Linden Way"
+        ],
+        [
+         "san",
+         "owner",
+         "URGENT: Scout (Alex M.) got out of the yard at 10:05am. Kit is searching. Call Alex now."
+        ],
+        [
+         "san",
+         "cust",
+         "Urgent from Lee Yard Scoop: Scout is out of the yard near Linden Way. Kit is searching now, and Sam is calling you."
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A dog is loose in the yard",
+     "end": "end",
+     "endText": "Kit leaves without going in. The customer picks a new day, and Sam decides any fee.",
+     "steps": [
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.20"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 9:48am",
+       "title": "A dog won't let the tech in",
+       "does": "Kit finds a dog loose in the yard that stands guard at the gate. Kit doesn't go in and texts DOG IN YARD. Alex hears at once and picks a new day. Sam decides any fee.",
+       "more": [
+        "The yard is only entered once the dogs are inside or behind a second gate.",
+        "A fee, never more than the visit's price, only if Sam says yes.",
+        "No reply from Alex: Sam calls before the next visit."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "DOG IN YARD a dog stands at the gate, not going in"
+        ],
+        [
+         "san",
+         "owner",
+         "Kit couldn't go in at Alex M.'s: a dog is loose in the yard. Alex is asked for a new day.",
+         {
+          "buttons": [
+           "No fee",
+           "Charge the fee",
+           "Call Alex"
+          ]
+         }
+        ],
+        [
+         "san",
+         "cust",
+         "Kit couldn't go in today, since a dog is loose in the yard. Please put the dogs inside next time. Pick a new day:",
+         {
+          "times": [
+           "Thu Oct 29 · 9–11am",
+           "Fri Oct 30 · 9–11am"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "does": "Kit sees waste from a second dog, but one dog is booked. The extra dog is on the list, $6 a visit. Alex hears the price and says yes before it's added.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "EXTRA 6 second dog seen, waste for two"
+     ],
+     [
+      "san",
+      "staff",
+      "Extra for {{alex.staff}}: a second dog, $6 a visit. Sent to Alex.",
+      {
+       "as": "Kit"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Kit saw waste from a second dog today. Add the second dog from your next visit?",
+      {
+       "card": {
+        "title": "Extra dog, same yard · $6 a visit",
+        "lines": [
+         "Added from your next visit, if you say yes",
+         "Paid with the rest of each visit"
+        ]
+       },
+       "buttons": [
+        "Yes, add it",
+        "No, one dog"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Kit finds broken glass along the back fence. The plug-in says a tech leaves that spot alone, so Alex gets a written note and the photo. The rest of the yard is cleaned.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD broken glass along the back fence, left alone",
+      {
+       "photos": [
+        "Broken glass by the back fence"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Kit found broken glass along the back fence and left that strip alone. The rest of the yard is done.",
+      {
+       "card": {
+        "title": "Safety note · your yard",
+        "lines": [
+         "Found: broken glass along the back fence",
+         "Not done: the strip along the fence",
+         "Call a fence or yard repair company"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "does": "Kit needs extra time for a heavy yard. Alex is told in the business's name, inside text hours, with the new finish time.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE a lot of waste, taking longer, done by 10:45"
+     ],
+     [
+      "san",
+      "cust",
+      "Kit is taking a bit longer because the yard needs extra time. The visit should be done by 10:45am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-35",
+    "does": "Say Kit's scoop snaps a sprinkler head by the fence and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DAMAGE broke a sprinkler head by the fence",
+      {
+       "photos": [
+        "Broken sprinkler head"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Kit broke a sprinkler head at Alex M.'s. The before photo shows it whole.",
+      {
+       "photos": [
+        "Before",
+        "After"
+       ],
+       "buttons": [
+        "Fix it, no charge",
+        "Take money off",
+        "I'll call Alex"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Alex isn't home, so the yard report is the check: front and back done, waste taken away, gate latched, and a photo. Kit checks the gate before DONE.",
+    "more": [
+     "The plug-in names what's checked: every spot scooped, the waste taken away, the gate latched.",
+     "When Alex is home, Kit tells Alex how the visit went instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:20am",
+    "does": "The visit is done: 9:52am to 10:18am. Kit texts DONE with the yard report. Alex gets the report and a photo.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 24 weekly cleanup. Front and back done, waste taken away, gate latched",
+      {
+       "photos": [
+        "Back yard, after"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Done: Alex M., Thu 9–11am. The report is sent to Alex."
+     ],
+     [
+      "san",
+      "cust",
+      "Scout's yard cleanup is done: front and back, waste taken away, gate latched. 9:52am to 10:18am.",
+      {
+       "photos": [
+        "Back yard, after"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE side gate latch sticks: lift, then push. Most waste is by the back fence."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to {{alex.staff}}'s private record.",
+      {
+       "as": "Kit"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-34",
+    "does": "A loose dog bites Kit on the leg in the yard. Kit texts HURT and steps out. Rosie tells Sam at once, by phone and by text.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT bitten by a dog in the yard, need to stop"
+     ],
+     [
+      "san",
+      "owner",
+      "Urgent: call Kit now about the visit at 27 Linden Way. Details on the secure page.",
+      {
+       "buttons": [
+        "Offer Remy",
+        "New day for Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam is told. If you need care, call 911.",
+      {
+       "as": "Kit"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 6:00pm"
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "A cleanup sells no extra work at the home, so there's nothing here to cancel. The booked cleanups can't be cancelled this way."
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Yard Plans",
+          "4 video checks · Noor 2, Dale 2"
+         ],
+         [
+          "Lee Yard Scoop",
+          "11 yards · Kit 6, Remy 5"
+         ],
+         [
+          "Waiting on you",
+          "Nora S.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes. Alex has them in writing, and can end the plan with one reply.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "Yes: every Thursday",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to the weekly cleanup plan on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: the day and window, the price a visit, and when it's charged. The skip and weather terms, and that it runs until Alex ends it.",
+           "Ending it takes one reply. Visits already done stay paid.",
+           "Once a year, the terms and how to end the plan come again, by the business's own rule. Any reminder the state's rules require comes too."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your cleanup plan with Lee Yard Scoop is set.",
+            {
+             "card": {
+              "title": "Cleanups every Thursday · $24 a visit",
+              "lines": [
+               "From Thu Oct 22 · 9–11am · Kit",
+               "Your saved card is charged after each visit",
+               "Skip free until 6pm the night before",
+               "Runs until you end it"
+              ]
+             },
+             "buttons": [
+              [
+               "3",
+               "End the plan"
+              ]
+             ]
+            }
+           ]
+          ],
+          "vary": {
+           "after:bill": {
+            "say": [
+             [
+              "san",
+              "cust",
+              "Your cleanup plan with Lee Yard Scoop is set.",
+              {
+               "card": {
+                "title": "Cleanups every Thursday · $24 a visit",
+                "lines": [
+                 "From Thu Oct 22 · 9–11am · Kit",
+                 "We text you the bill after each visit",
+                 "Skip free until 6pm the night before",
+                 "Runs until you end it"
+                ]
+               },
+               "buttons": [
+                [
+                 "3",
+                 "End the plan"
+                ]
+               ]
+              }
+             ]
+            ]
+           }
+          },
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "Visit fee",
+  "color"
+ ],
+ "splitsKept": {
+  "A": [],
+  "B": []
+ },
+ "notes": "Built Tue Oct 27 2026 from the refitted dog-walker (from: dog-walker; the plug-in, rename pairs, money and every own step were rewritten for yard cleanup; no sample or test-drive plug-in existed, so it is built from the trade's norm and says so here).\nWork: a tech comes to the customer's yard on a set day and scoops, bags and takes away dog waste, usually every week, with nobody home. Flow B (the usual side) is Lee Yard Scoop at Alex's back yard, 27 Linden Way: weekly cleanup every Thursday, 9 to 11am window, from Thu Oct 22, Kit (tech), Scout the lab mix. Flow A (the less usual side, video counts as A) is Lee Yard Plans, Sam's second company: a free 15-minute video yard check with Noor, Sat Oct 24 at 11:00am, or a video yard check with a written plan for an apartment community, an HOA or a dog park ($55).\nPrices (the example business's own): weekly cleanup 1 dog $24 a visit, twice a week $20 a visit, every 2 weeks $30 a visit, extra dog $6, yard deodorizer $15 (added when booking), one-time cleanup $48, first big cleanup priced from photos ($90 in the example, the owner OKs it), phone setup call free, missed visit (late skip or no way in) up to the visit's own price $24 and only if the owner confirms. Lee Yard Plans: video yard check free, video yard check with a written plan $55 paid in full, late-cancel fee $20; its other plans are yard plan call $35, big yard plan $40, plan update call $25, station map $20 (added to a plan), community station plan $140 (all paid in full when booked), which keeps the S1-13 sign-up rows at the master's amounts.\nMoney paths. B: list|card|card (main: card saved for the $24 fee, charged at each DONE), list|none|bill (nothing taken, Rosie texts the bill), list|full|none (one-time cleanup $48 paid in full, fee $24 never more than paid), photos|card|card (first big cleanup $90, card saved, charged at DONE). A: list|none|none (main, free), list|full|none ($55 paid in full, fee $20). No hold, no deposit, no rest on a set day. An added service (deodorizer, extra dog) is paid with the visit.\nLicenses: none in most places; a city may ask for a business license or a hauling permit, so S1-60 '1 A license' and S2-28 are off and the sign-up gives the business registration only. Insurance is the one date that comes due (S11-50).\nSafety: a dog hurt, very sick or poisoned now (vet, no booking); a person bitten (911); a dog loose in the yard that attacks (the tech doesn't go in); a lost dog; needles, glass, a dead animal, sewage or chemicals (other work if reported when booking; left alone, with a photo note, if found at a visit). A dog with a bite history goes to the owner first. A yard where a dog stays loose and can't be put inside or behind a second gate isn't booked.\nOwn steps: B6-x01 and B6-x02 (the plan's terms texted back), B8-x01 (a dog gets out of the yard) and B8-x02 (a dog is loose in the yard: the tech doesn't go in) as branches of B8-22. No meet-and-greet: the first visit starts with a gate check (B8-18).\nSettings: arrive A a set start, B a 2-hour window; cutoff A 24 hours before, B 6pm the day before (the route is planned that evening). Booking choices limited: nothing is sent now, so S2-30's yes branch and every sent-now branch are off, and S1-21's 'Jobs sent now' row says every cleanup is booked ahead.\nNames: Kit Price and Remy Moore (yard techs), Noor Chen and Dale Diaz (yard planners); the dog is Scout. Kept word: 'leak' (S12-29), 'visit fee', 'color' (S13-40's race, color, religion).\nOff, as pet waste never uses them: children, crews, estimates at the yard, contracts, deliveries, rentals, stays, classes, seats, proposals, results later, insurance or plan pays, bank transfer, stage billing, extra work sold at the yard (nobody is home), groups, drop-offs, video checks having plans (flow A only).\nNot sure (verifier): the S1-13 / S1-14 sign-up money cards are the master's own example rows, with the trade's names and amounts put in by pairs; a few owner-reply lines and the vary read-backs for paths the work never uses still show the master's wording (MASTER 2 of batch D1); B6-13's confirmation card names the main service on every B path (MASTER).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Style consult",
+    "please come with dry hair",
+    "a step-free chair",
+    "already in the chair",
+    "The chairs",
+    "A chair, ready",
+    "Shop's side",
+    "At your shop",
+    "each shop",
+    "shop-added",
+    "a $20 fee ($40 for the Groom's package)",
+    "Step-free door on Elm St · parking in the back",
+    "· 88 Elm St, Springfield",
+    "Someone in the shop is threatening people.",
+    "someone in the shop was threatening people",
+    "Color quotes come to you first. Board prices never need one",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Kids cut (12 and under)",
+    "barbershops",
+    "Kids cut",
+    "Color correction",
+    "color correction",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Ben T. books a skin fade",
+    "skin fades",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "May the shop show photos of your hair? Yes / No",
+    "your hair",
+    "the hair",
+    "dry hair",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "says the cape clip ripped a shirt collar today",
+    "It's a gift for my brother. Can I pay for it?",
+    "Can my son wait in the shop during my cut?",
+    "Lee's Barbershop will fix it for free.",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Adds a second shop, with its own team",
+    "like a haircut at the shop or at home",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "could mean a salon or a barbershop",
+    "Wants Saturday morning, with Riley",
+    "Alex asks for a cut every 4 weeks.",
+    "The state's license lookup is down",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "Books a free fix, if Sam says so",
+    "The cut is uneven on one side.",
+    "How was your visit with Riley?",
+    "like a burst pipe or a lockout",
+    "Lee's Barbershop · with Riley",
+    "What happens at the chair?",
+    "Books a cut every 4 weeks",
+    "like a skin-test result",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "Today · 3:00pm · Avery",
+    "the $90 color quote",
+    "Alex asks for a fix",
+    "Lee's Barbershop's",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "a lapsed license",
+    "11:00am · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Groom's package",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "2:00pm · Avery",
+    "1 color quote",
+    "every 4 weeks",
+    "color and cut",
+    "Color and cut",
+    "signature cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "house calls",
+    "House calls",
+    "patch test",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "The shop's",
+    "the shop's",
+    "Shop front",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "88 Elm St",
+    "on Elm St",
+    "kids cut",
+    "Plumbing",
+    "plumbing",
+    "Haircuts",
+    "haircuts",
+    "The shop",
+    "the shop",
+    "25 miles",
+    "the cut",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "a cut",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$89"
+   ],
+   "B": [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "shop-added",
+    "$89, credited to the repair",
+    "service-call fee",
+    "Priced at the visit",
+    "Set at the visit",
+    "$120 an hour",
+    "$199",
+    "Labor",
+    "Water pressure check",
+    "E 25% deposit after the quote",
+    "25% deposit",
+    "The rest after",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Free until 7am on the visit day",
+    "After that, or nobody home: up to the",
+    "Mon–Fri 7:30am–5:30pm",
+    "A tip line · bank transfer over $500",
+    "like 'Is the sink still full of water?'",
+    "The $179 drain needs none.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Leak repair",
+    "Water heater replacement",
+    "Sewer camera inspection",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Water heater fix",
+    "would like to talk about the water heater quote before booking.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "It's a leak under the sink, today,",
+    "The service call is $89. Accept it?",
+    "accept the leak repair for today,",
+    "Accepted: the leak repair today,",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Lee Home Services can clear the drain:",
+    "Yard drain",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "drain clearings",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Replace both shutoff valves · $160",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A job quoted at the visit promises only the service call now.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Can I skip next week's drain cleaning?",
+    "like a haircut at the shop or at home",
+    "Jordan left a mess under the sink.",
+    "The state's license lookup is down",
+    "How was your visit with Jordan?",
+    "like a burst pipe or a lockout",
+    "2 Someone else meets the pro",
+    "Jordan came late and rushed.",
+    "raise drain clearing to 199",
+    "Jordan was late and rushed.",
+    "1 Yes, Alex will be there",
+    "plumbing license MP045210",
+    "plumbing and electrical",
+    "Kitchen drain clearing",
+    "leehomeservices.com",
+    "Water heater flush",
+    "water heater flush",
+    "water heater replacement",
+    "your water heater",
+    "the water heater",
+    "water heater",
+    "Lee Home Services'",
+    "the kitchen drain",
+    "Lee Home Services",
+    "service call fee",
+    "Service call fee",
+    "Lee's Barbershop",
+    "Plumbing license",
+    "a lapsed license",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "service call",
+    "Service call",
+    "today's work",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "house calls",
+    "House calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "beard trim",
+    "The shop's",
+    "the shop's",
+    "Shop front",
+    "42 Oak St",
+    "88 Elm St",
+    "Plumbing",
+    "plumbing",
+    "The shop",
+    "the shop",
+    "25 miles",
+    "40 miles",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "25-mile",
+    "8–10am",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$179",
+    "$150",
+    "$89"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "41b86c1e72",
+   "S1-38": "b50b0bd4e8",
+   "S1-50": "3167049ceb",
+   "A3-02": "223044a79d",
+   "A3-07": "6b005cf195",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A3-26": "9e3630dc0b",
+   "A3-20": "b8251d2535",
+   "A4-03": "c24298dc38",
+   "A4-50": "6f43775326",
+   "A4-34": "9f322d96aa",
+   "A4-65": "fa7ec0389d",
+   "A6-04": "fe10e3d360",
+   "A7-12": "05f64179a4",
+   "A8-03": "7accda6f86",
+   "A8-23": "e3a35f7f9e",
+   "A8-35": "a67e890a5b",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A10-02": "c9223be948",
+   "S11-02": "d0b2cf9f6c",
+   "A4-11": "2983f72b69",
+   "S2-02": "b2094081ee",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S1-70": "3961b1f903",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S12-19": "07db0515b2",
+   "S12-24": "329bff1093",
+   "A4-24": "0a292df05b",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-02": "15f418fec4",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-02": "987e1a14cd"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "0bea92643b",
+   "S1-38": "6301c86637",
+   "S1-50": "daa9091585",
+   "S2-02": "b2094081ee",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "S1-70": "34e952eac5",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S12-19": "176d3d2beb",
+   "S12-24": "7514a15e65",
+   "S11-60": "3781bd4314",
+   "B10-38": "867fe1ab7c",
+   "B4-83": "a7473a80ea",
+   "B7-90": "a5b8b2fe42",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B8-93": "c1406fd6bc",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B9-03": "df9548d13f",
+   "B7-89": "889628e2d6",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B3-21": "ad48326ac5",
+   "B3-22": "19f64ba1ba",
+   "B3-25": "4413e58bcb",
+   "B3-04": "31447caa31",
+   "B3-24": "a31b436ff1",
+   "B4-03": "1126d68737",
+   "B4-04": "df3ea4b2f5",
+   "B4-05": "fb3a9061c8",
+   "B4-34": "74ff52d83d",
+   "B4-26": "912686f788",
+   "B4-32": "fcfe092e37",
+   "B4-38": "9539521dc7",
+   "B4-28": "506d267aaf",
+   "B4-12": "e6d956ac70",
+   "B5-21": "925b7342ed",
+   "B6-06": "1d676278da",
+   "B7-15": "a00f0c64fb",
+   "B7-16": "3177c3701b",
+   "B7-17": "ac1fd212f3",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-17": "dcff722a6d",
+   "B8-18": "530038d2b8",
+   "B8-19": "11e79a26d8",
+   "B8-22": "50d78f1af0",
+   "B8-23": "dd780a2ec8",
+   "B8-30": "a1ef4983e4",
+   "B8-32": "1cfd4f7afa",
+   "B8-35": "93207824c7",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B8-34": "643812e26f",
+   "B10-02": "eaf53a5e74",
+   "S11-02": "b5be5f9aa7",
+   "B6-13": "ed1f412f7d"
+  }
+ }
+}

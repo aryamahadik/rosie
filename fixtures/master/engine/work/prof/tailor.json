@@ -1,0 +1,3036 @@
+{
+ "id": "tailor",
+ "name": "Tailoring and alterations",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "auto-repair",
+ "plugin": {
+  "pf.license": {
+   "need": "none for tailoring and alterations unless the state's form names one; the business registration, where the state asks for one",
+   "ask": [
+    "The business registration number, where the state gave one",
+    "For makeup sold by the same company: each makeup artist's license, where the state's rules require one"
+   ],
+   "who": "the business; a person only for makeup work, where the state licenses it",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "a registration the state requires that the owner says the business lacks keeps the business offline",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance, as the business says; shown only once proof is sent (a venue may ask for it)",
+   "otherwise": "identity checked, and 'license: what the business says'; customers see no license claim"
+  },
+  "pf.services": {
+   "pattern": "drop-off: a fitting at the shop, the garment is left, then READY and a pick-up",
+   "list": [
+    {
+     "name": "Pants hem",
+     "price": "one price, $35 at the example shop",
+     "length": "a 15-minute fitting, or left at the counter; ready in 5 days",
+     "place": "at the shop; or at the customer's home for $75, the shop's own house call with Linh (sewn at the shop and brought back)",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Jacket sleeves",
+     "price": "one price, $40",
+     "length": "a 15-minute fitting; ready in 5 days",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Button, seam or small repair",
+     "price": "one price, $20",
+     "length": "left at the counter; ready in 3 days",
+     "place": "at the shop"
+    },
+    {
+     "name": "Zipper replaced",
+     "price": "one price, $55",
+     "place": "at the shop"
+    },
+    {
+     "name": "Kids' hem (12 and under)",
+     "price": "one price, $25",
+     "place": "at the shop, with a parent"
+    },
+    {
+     "name": "Suit package (jacket and pants, fitted and pressed)",
+     "price": "one price, $140",
+     "length": "a 30-minute fitting; ready in 7 days",
+     "place": "at the shop"
+    },
+    {
+     "name": "Bridal alterations",
+     "price": "quoted at the visit: a free 60-minute first fitting, then each item priced in writing",
+     "length": "three fittings, about 8, 4 and 1 week before the wedding; pick-up at the last one",
+     "place": "at the shop, only with the master tailor",
+     "before": "nothing taken",
+     "after": "a 50% deposit when the written price is OK'd; the rest at pick-up"
+    },
+    {
+     "name": "Rush",
+     "price": "+30% on every item when needed within 4 weeks, shown in the first price; within 10 days, the owner says first if it can be done",
+     "place": "any"
+    },
+    {
+     "name": "House call (Lee Mobile Tailoring)",
+     "price": "$89, held; credited to the work",
+     "place": "at the customer's home, office or venue",
+     "before": "the $89 held",
+     "after": "Rosie texts the bill after the clothes come back"
+    },
+    {
+     "name": "Suit package at home",
+     "price": "one price, $179",
+     "place": "at the customer's place; sewn at the shop and brought back",
+     "before": "the $89 house call held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Alterations at a home fitting",
+     "price": "quoted at the visit, item by item",
+     "place": "at the customer's place; sewn at the shop and brought back on a booked return"
+    },
+    {
+     "name": "Dress hem",
+     "price": "one price, $55 at the shop; $65 at a home fitting",
+     "length": "a 30-minute fitting",
+     "place": "at the shop, or at the customer's place"
+    },
+    {
+     "name": "Bridal party fittings",
+     "price": "quoted at the visit, per dress; half when the written price is OK'd",
+     "place": "at the customer's place or a venue, only with Nadia"
+    },
+    {
+     "name": "Custom sewing",
+     "price": "$120 an hour, 1-hour minimum ($140 with Nadia)",
+     "place": "added to a job, never booked alone"
+    },
+    {
+     "name": "Wedding-day dressing (steaming and bustling)",
+     "price": "one price, $199 ($249 when Sam goes himself), for up to 4 hours at the venue",
+     "place": "at the venue, at a set start time"
+    }
+   ],
+   "turnaround": "days until ready, per service: a hem in 5 days; bridal work planned back from the wedding date",
+   "included": "one more adjustment after a fitting; a free fix of anything that comes loose before the event, or within 30 days of a house call's return",
+   "capacity": "one tailor per fitting; the fitting room with the mirror and the stand is saved for bridal fittings",
+   "nobody_home": "no: a fitting needs the customer there; a returned garment can be handed to an adult the customer named",
+   "online": "no"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What needs changing: hem, take in, let out, sleeves, bustle, a repair, or other",
+    "The garment and the fabric, in the customer's words",
+    "The date it's needed by, like a wedding",
+    "How many items"
+   ],
+   "after_time": [
+    "Anything the tailor should know, like the shoes for the day",
+    "Someone else who may OK the price or pay, like a parent"
+   ],
+   "secure_page_only": [
+    "A photo of the garment, if the customer wants to send one",
+    "For a house call: the street address and how to get in"
+   ],
+   "who_may_book": "an adult; a parent or guardian books for a child, and for a teen's prom or formal wear"
+  },
+  "pf.safety": {
+   "stop_words": [],
+   "stop_action": "no danger words of its own: the generic screen (danger to life, fire, gas, a medical emergency, crisis words) is always on",
+   "house_calls": "a tailor who feels unsafe at a home leaves, and the owner is told",
+   "can_continue": "yes, after the generic steps"
+  },
+  "pf.first_steps": {
+   "required": "none",
+   "prep_for_reminder": [
+    "Bring the garment, and the shoes and undergarments worn on the day",
+    "For a house call: have the clothes and shoes ready, and room to stand in front of a mirror"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "the check-in code at the counter at the fitting; a walk-in drop-off is checked in at the counter at once; at a house call, the code at the door",
+   "intake": "a ticket per garment: its condition with photos, the pins and chalk marks, and the date it's needed by",
+   "estimate": "written, item by item, before any work; the customer says yes to all, to some items, or not today; good for 7 days",
+   "added_work": "anything new found while sewing is texted with its price; nothing extra without a yes; no answer in 2 days: it's left for the next fitting",
+   "second_fitting": "a second fitting checks the fit; one more adjustment is included",
+   "status_words": [
+    "IN",
+    "IN WORK",
+    "WAITING ON A YES",
+    "READY"
+   ],
+   "ready": "READY texts the pick-up hours, anything due and the held-until date",
+   "pick_up": "the final fitting is the pick-up: a try-on in the garment with the shoes, and how a bustle hooks; handed over once paid",
+   "done_proof": "the fitting's code checks the visit in; READY and the pick-up close it",
+   "late": "more than 15 minutes late: a shorter fitting, or the next open time",
+   "house_call": "the tailor fits and pins at the home; the clothes go to the shop and come back on a booked return, with a try-on"
+  },
+  "pf.money": {
+   "before": "nothing taken at the shop: fittings are free, and a missed or cancelled fitting has no fee",
+   "deposit": "50% for bridal work and jobs over $200, paid when the written price is OK'd at the fitting; deposit cap: from the state form",
+   "after": "the rest at the counter at pick-up; or the bill Rosie texts at pick-up, for a Saturday morning",
+   "house_call": "the $89 house-call fee held; the bill after the clothes come back",
+   "rush": "+30% on every item when needed within 4 weeks, inside the first price",
+   "cancel_after_ok": "the deposit back, less work already done; money kept: from the state form",
+   "storage": "finished items held 90 days after READY; no storage fee to start",
+   "materials": "lace, zippers or buttons bought for a job are added at cost, with a yes first",
+   "tips": "no tip line",
+   "tax": "the shop's tax rate, where the state taxes the work",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "Body measurements",
+    "A photo of the customer in the garment",
+    "A gate or door code"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a child's or a teen's clothes go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "alterations",
+    "bridal",
+    "suits",
+    "repairs",
+    "house calls",
+    "makeup"
+   ],
+   "licenses": "none for tailoring; a makeup license for makeup work, where the state's rules require one",
+   "supervision": "none",
+   "who_oks": "the owner OKs bridal prices, prices over $200, rush work within 10 days and any fee",
+   "stand_in": "a hem or a repair: any tailor; bridal fittings: only the master tailor"
+  },
+  "pf.rules": {
+   "written_price": "switch: a written price before work, above an amount: from the state form; the shop writes every item anyway",
+   "fees_in_first_price": "switch: every required fee, like a rush fee, inside the first price: from the state form",
+   "money_kept_on_cancel": "switch: what may be kept when a customer cancels after OK'ing the price: from the state form",
+   "unclaimed_items": "switch: how long finished items are held, the written notice, and the waiting time before they're given away or sold: from the state form; the owner decides, and Rosie sends only the notices the owner OKs",
+   "right_to_cancel_at_home": "switch: a right to cancel work sold at the customer's home: from the state form",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A no-show or a late cancel: no fee at the shop; at a house call, up to the $89 held, only if Sam confirms",
+    "More than 15 minutes late: a shorter fitting, or the next open time",
+    "Needed too soon: the rush price, or the owner's OK within 10 days",
+    "Yes to some items only",
+    "More work found while the garment is in, with no answer",
+    "Still not right at the second fitting: one more adjustment, included",
+    "The garment isn't picked up",
+    "A garment damaged at the shop",
+    "A fix asked before the event"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Linh and Marisol (tailors)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Nadia and Ivan (tailors who make house calls)",
+   "other": "Others (a bank, a venue, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Linh"
+  },
+  "B": {
+   "staff": "Nadia"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Riley: barber, color, house calls",
+    "Linh: tailor, bridal, house calls"
+   ],
+   [
+    "Color and cut · $90",
+    "Bridesmaid dress · $90"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Nadia and Ivan do tailoring house calls; Nadia does makeup too, at $140 an hour. Linh and Marisol sew at the shop; Linh also does bridal work and house calls. Pat is my office manager, for prices over $500. Jules rents a sewing station, with their own customers."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "Lee's Tailor Shop: you now have two pants hems on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go."
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's employer for a uniform. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Riley at the chair. That shows Riley really came.",
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Linh at the counter. That shows Linh really came."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Linh can do a shorter fitting in the time left, or you can move to a later time. No reply by 11:00am means the shorter fitting."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex asks for a leather jacket repair, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair. {{pay.asks}}. The rest is quoted at the chair, before any work.",
+    "Lee's Tailor Shop prices a gown's alterations at the fitting, once Linh sees it on. {{pay.asks}}. The rest is quoted at the fitting, before any work."
+   ],
+   [
+    "At a drop-off, READY and the pick-up come once the work is done. At the chair, the customer is already there, so the shop takes the first branch.",
+    "At a drop-off, READY and the pick-up come once the work is done. The gown stays at the shop to be sewn, so the shop takes the drop-off branch."
+   ],
+   [
+    "From Riley's phone, or the portal's Today page at the desk. This confirms the visit. No text goes to the customer: they're at the chair.",
+    "From Linh's phone, or the portal's Today page at the desk. This confirms the visit. No text goes to the customer: they're at the counter."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Alex tries the gown on in the mirror. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "Alex M.'s price: $110 gown hem and $15 bustle, $125 in all. It goes to Sam first."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the counter, at a drop-off, or at the start of a video call."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A bridal example: 'Bridal work starts with a first fitting. Had one here in the last 3 months?'"
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Means 'Matched': the request fits a listed service, in any words. 'Shorten my pants' or 'take up a hem' fits a pants hem."
+   ],
+   [
+    "Here they OK the $110 color correction and skip the $15 gloss. The $25 consult is part of the $110.",
+    "Here they OK the $110 gown hem and skip the $15 bustle. The first fitting was free."
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer has a cold before the fitting, and they ask if they can still come in."
+   ],
+   [
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Done. The gown hem, $110, is on the work order. The $15 bustle price is good until Sat Oct 31."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Tailoring at home in Springfield. Fittings and suit packages, within 25 miles."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee's Tailor Shop about your Sat 11:00am visit: please bring the wedding shoes."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood tailor shop on Lake St. Hems, fittings and bridal alterations."
+   ],
+   [
+    "Alex M. asks for a toner instead of the gloss. What's the new price?",
+    "Alex M. asks for a steam and press instead of the bustle. What's the new price?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: hem 1 inch for 3-inch heels; take in the waist 1/2 inch."
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the gown hem only, $110. No bustle for now."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Bridal prices come to you first. Board prices never need one"
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a pants hem on Saturday."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "I have a bad cold. Can I still come in for my fitting?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the wedding shoes on Saturday."
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 gown hem + 15 bustle Alex M."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Linh add a steam and press instead of the bustle?"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Gown hem $110 · bustle $15"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this uniform."
+   ],
+   [
+    "Gloss to finish · $15",
+    "Bustle · $15"
+   ],
+   [
+    "A water heater job",
+    "A fitting at a customer's home"
+   ],
+   [
+    "A chair, ready",
+    "A fitting room, ready"
+   ],
+   [
+    "Color and cut",
+    "Bridesmaid dress"
+   ],
+   [
+    "Style consult",
+    "Free first fitting"
+   ],
+   [
+    "Panel upgrade",
+    "Bridal party makeup"
+   ],
+   [
+    "EC22871",
+    "Yes, none for the company"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, bridal and house calls"
+   ],
+   [
+    "Avery · license not found",
+    "Jordan · makeup license not found"
+   ],
+   [
+    "Not offered to customers until it matches",
+    "Not offered for makeup until it matches"
+   ],
+   [
+    "The lookup shows the license as expired. Avery stays on the team, and can be booked again once it shows renewed.",
+    "The lookup shows the makeup license as expired. Jordan stays on the team for tailoring, and is booked for makeup again once it shows renewed."
+   ],
+   [
+    "Avery · license expired",
+    "Jordan · makeup license expired"
+   ],
+   [
+    "Not bookable until it shows renewed",
+    "No makeup bookings until it shows renewed"
+   ],
+   [
+    "Avery's license is checked again when the lookup answers.",
+    "Jordan's makeup license is checked again when the lookup answers."
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: tailoring and makeup"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: tailoring"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: the shop, bridal and house calls"
+   ],
+   [
+    "Avery: barber",
+    "Avery: the shop"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Tailoring takes none, at home or at the shop."
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Color correction can work this way, with only the $25 consult promised.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A bridal fitting works this way: the first fitting is free."
+   ],
+   [
+    "a skin fade",
+    "jacket sleeves"
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The garment wasn't brought."
+   ],
+   [
+    "1 color quote",
+    "1 bridal price"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken to book"
+   ],
+   [
+    "A deposit is taken when the customer books, and comes off the price.",
+    "The deposit is taken when the written price is OK'd at the fitting, and comes off the price."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a free first fitting; priced there"
+   ],
+   [
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Riley's price for your gown is with the owner. You can wait for it, or have the fitting only today."
+   ],
+   [
+    "Consult only",
+    "Fitting only"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the fitting; the price stays open"
+   ],
+   [
+    "Copy: you said yes to a color correction, $125, at 11:20am on Riley's phone.",
+    "Copy: you said yes to Riley's $440 price for your gown, at 11:45am on the shop's phone."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero que me cosan el dobladillo de un pantalón el sábado."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Linh, so Linh's next times show. Bridal work always stays with Linh."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A hem could mean a tailor or a dry cleaner."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Other work adds its own, like 'leave the home' for a gas smell."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A tailor shop books a tailor's time for a fitting."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do leather repairs."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A groom books suit fittings for himself and four groomsmen on one morning. Rosie finds fittings back to back across Riley and Avery."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the shop show photos of the finished work?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during my fitting?"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley can do a shorter fitting in the time left, or you can move to a later time."
+   ],
+   [
+    "The customer's side: an ID, a paper or a form they were asked to bring.",
+    "The customer's side: the garment, or a paper they were asked to bring."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A tailor shop takes drop-offs: a garment left at the counter, checked in at once."
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped letting out Alex M.'s bodice: no seam allowance left. Note and photo on the page."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Riley stopped part of Alex M.'s work."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A pin snagged the lace on my gown."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a pin snagged the lace on her gown today."
+   ],
+   [
+    "Riley finishes the work",
+    "Riley writes the work order"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "Alterations are rated, so the shop takes the first branch."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next visit at the counter"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The hem came loose on one side."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the gown's hem came loose on one side."
+   ],
+   [
+    "Priced from your photos",
+    "Priced at your fitting"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 bridal price."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds makeup to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW makeup"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Makeup for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the fitting"
+   ],
+   [
+    "priced at the chair",
+    "priced at the fitting"
+   ],
+   [
+    "quote at the chair",
+    "quote at the fitting"
+   ],
+   [
+    "set at the chair",
+    "set at the fitting"
+   ],
+   [
+    "added at the chair",
+    "added at the fitting"
+   ],
+   [
+    "code at the chair",
+    "code at the counter"
+   ],
+   [
+    "paid at the chair",
+    "paid at the counter"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "pays at the chair",
+    "pays at the counter"
+   ],
+   [
+    "rest at the chair",
+    "rest at the counter"
+   ],
+   [
+    "tip at the chair",
+    "tip at the counter"
+   ],
+   [
+    "is at the chair",
+    "is at the shop"
+   ],
+   [
+    "already in the chair",
+    "already at the fitting"
+   ],
+   [
+    "happens at the chair",
+    "happens at the fitting"
+   ],
+   [
+    "visit at the chair",
+    "visit at the fitting"
+   ],
+   [
+    "as at the chair",
+    "as at a fitting"
+   ],
+   [
+    "rents a chair",
+    "rents a sewing station"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Dress hem"
+   ],
+   [
+    "Signature cut and shave",
+    "Dress hem"
+   ],
+   [
+    "Groom's package",
+    "Suit package"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' hem (12 and under)"
+   ],
+   [
+    "kids cuts",
+    "kids' hems"
+   ],
+   [
+    "a kids cut",
+    "a kids' hem"
+   ],
+   [
+    "Kids cut",
+    "Kids' hem"
+   ],
+   [
+    "kids cut",
+    "kids' hem"
+   ],
+   [
+    "Skin fade",
+    "Jacket sleeves"
+   ],
+   [
+    "skin fade",
+    "jacket sleeves"
+   ],
+   [
+    "Beard trim",
+    "Seam repair"
+   ],
+   [
+    "a beard trim",
+    "a seam repair"
+   ],
+   [
+    "beard trim",
+    "seam repair"
+   ],
+   [
+    "Color correction",
+    "Bridal fitting"
+   ],
+   [
+    "A color correction",
+    "A bridal fitting"
+   ],
+   [
+    "a color correction",
+    "a bridal fitting"
+   ],
+   [
+    "color correction",
+    "bridal fitting"
+   ],
+   [
+    "Haircut plans",
+    "Hem plans"
+   ],
+   [
+    "Haircut plan",
+    "Hem plan"
+   ],
+   [
+    "Haircuts",
+    "Pants hems"
+   ],
+   [
+    "haircuts",
+    "pants hems"
+   ],
+   [
+    "A haircut",
+    "A pants hem"
+   ],
+   [
+    "a haircut",
+    "a pants hem"
+   ],
+   [
+    "Haircut",
+    "Pants hem"
+   ],
+   [
+    "haircut",
+    "pants hem"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Tailor Shop LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile Tailoring and Lee Bridal Makeup"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bridal Makeup"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Tailoring"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tailoring's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tailoring"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Tailor Shop"
+   ],
+   [
+    "plumbing and electrical",
+    "tailoring and makeup"
+   ],
+   [
+    "Plumbing and electrical",
+    "Tailoring and makeup"
+   ],
+   [
+    "electrical license",
+    "makeup license"
+   ],
+   [
+    "Electrical",
+    "Makeup"
+   ],
+   [
+    "electrical",
+    "makeup"
+   ],
+   [
+    "A plumber",
+    "A tailor"
+   ],
+   [
+    "plumber",
+    "tailor"
+   ],
+   [
+    "Plumber",
+    "Tailor"
+   ],
+   [
+    "Plumbing",
+    "Tailoring"
+   ],
+   [
+    "plumbing",
+    "tailoring"
+   ],
+   [
+    "Barbershop",
+    "Tailor shop"
+   ],
+   [
+    "barbershops",
+    "tailor shops"
+   ],
+   [
+    "a barbershop",
+    "a tailor shop"
+   ],
+   [
+    "A barbershop",
+    "A tailor shop"
+   ],
+   [
+    "barbershop",
+    "tailor shop"
+   ],
+   [
+    "Barbering",
+    "Tailoring"
+   ],
+   [
+    "a barber",
+    "a tailor"
+   ],
+   [
+    "A barber",
+    "A tailor"
+   ],
+   [
+    "barbers",
+    "tailors"
+   ],
+   [
+    "Barbers",
+    "Tailors"
+   ],
+   [
+    "barber",
+    "tailor"
+   ],
+   [
+    "Barber",
+    "Tailor"
+   ],
+   [
+    "Riley Chen",
+    "Linh Tran"
+   ],
+   [
+    "Avery Diaz",
+    "Marisol Ortiz"
+   ],
+   [
+    "Jordan Price",
+    "Nadia Price"
+   ],
+   [
+    "Casey Moore",
+    "Ivan Moore"
+   ],
+   [
+    "Riley",
+    "Linh"
+   ],
+   [
+    "Avery",
+    "Marisol"
+   ],
+   [
+    "Jordan",
+    "Nadia"
+   ],
+   [
+    "Casey",
+    "Ivan"
+   ],
+   [
+    "88 Elm St",
+    "64 Lake St"
+   ],
+   [
+    "Elm St",
+    "Lake St"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "1200 Main St",
+    "500 Grand Ave"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Only the consult",
+    "Only the fitting"
+   ],
+   [
+    "only the consult",
+    "only the fitting"
+   ],
+   [
+    "the consult only",
+    "the fitting only"
+   ],
+   [
+    "the consult",
+    "the fitting"
+   ],
+   [
+    "1-year labor warranty",
+    "30-day free fix"
+   ]
+  ],
+  "B": [
+   [
+    "Riley: barber, color, house calls",
+    "Linh: tailor, bridal, house calls"
+   ],
+   [
+    "Water heater replacement · $640",
+    "Bridesmaid dresses · $640"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Mobile Tailoring. Sam named you their emergency contact. May we call or text you if they miss a safety check? We'd share only where they're working, only after a missed check."
+   ],
+   [
+    "No live waiting line. Work like towing or a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time.",
+    "No live waiting line. Work like a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Nadia and Ivan do tailoring house calls; Nadia does makeup too, at $140 an hour. Linh and Marisol sew at the shop; Linh also does bridal work and house calls. Pat is my office manager, for prices over $500. Jules rents a sewing station, with their own customers."
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like sewing a fake designer label into a coat. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note."
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that the event moved up a week. Rosie runs the plug-in's danger check again, then asks the pro. Ivan can come sooner, so that's offered."
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Mobile Tailoring asks: is the fitting at a home, an office or somewhere else? And how many pieces, and what needs changing?"
+   ],
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, arriving 3–5pm, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Mobile Tailoring. It's a suit fitting, today, arriving 3–5pm, with Nadia. The house call is $89. Accept it?"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Nadia's steamer leaves a water mark on the rug and Nadia texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The hem comes loose 2 weeks later. It's inside the shop's 30-day free fix, so Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "Reminder: your visit is tomorrow, arriving 8–10am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Reminder: your visit is tomorrow, arriving 8–10am, with Nadia. {{pay.cancel}}. Please have the clothes and the shoes you'll wear ready."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My suit needs taking in' fits a suit fitting."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds costume fittings to Lee Mobile Tailoring. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 suit package needs none."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Tailoring at home in Springfield. Fittings and suit packages, within 25 miles."
+   ],
+   [
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Lee Mobile Tailoring can start a fitting at a set time. {{pay.asks}}:"
+   ],
+   [
+    "Lee Home Services can clear the drain: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}.",
+    "Lee Mobile Tailoring can fit your suit at home: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 bridal party job is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a pants hem? Say so.'"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood tailor shop on Lake St. Hems, fittings and bridal alterations."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Costume fittings for Lee Mobile Tailoring: is it the same company?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about hemming a suit at home. A text back is fine."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a pin left in the jacket lining this morning."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Suit and dress alterations · $540"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my suit."
+   ],
+   [
+    "Water heater replacement",
+    "Bridal party alterations"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW costume fittings"
+   ],
+   [
+    "Water pressure check",
+    "Free first fitting"
+   ],
+   [
+    "Yes, it won't drain",
+    "A suit and a dress, both need hemming"
+   ],
+   [
+    "A water heater job",
+    "A fitting at a customer's home"
+   ],
+   [
+    "A chair, ready",
+    "A fitting room, ready"
+   ],
+   [
+    "Sam adds a plumber",
+    "Sam adds a makeup artist"
+   ],
+   [
+    "Panel upgrade",
+    "Bridal party makeup"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, credited to the work"
+   ],
+   [
+    "EC22871",
+    "Yes, none for the company"
+   ],
+   [
+    "Not offered to customers until it matches",
+    "Not offered for makeup until it matches"
+   ],
+   [
+    "Not bookable until it shows renewed",
+    "No makeup bookings until it shows renewed"
+   ],
+   [
+    "Every plumbing job, and electrical",
+    "Every house call, and makeup"
+   ],
+   [
+    "Every plumbing job",
+    "Every tailoring house call"
+   ],
+   [
+    "Labor",
+    "Custom sewing"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: tailoring and makeup"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: tailoring"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: the shop, bridal and house calls"
+   ],
+   [
+    "Avery: barber",
+    "Avery: the shop"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Tailoring takes none, at home or at the shop."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "No license for tailoring · makeup MU30417"
+   ],
+   [
+    "Alex M. asked for money back for the Thu Oct 22 visit.",
+    "Alex M. asked for money back for the Thu Oct 29 visit."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can hem your pants at the shop for $35, or at your home for $75."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A fitting at the shop is in the other flow."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services does tailoring and makeup work, not leather repairs. Nothing was saved. You can look for a leather specialist near you."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say a bride books fittings for 4 bridesmaids at one venue. It's one booking with one code, given by whoever lets the tailor in."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each bridesmaid's notes go to the tailor, one line each."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a gas smell, gets the safety steps first."
+   ],
+   [
+    "like a move-out day",
+    "like a wedding day"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START the clothes aren't here"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a pest control company first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting the steamer from the van, back 9:15"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is getting the steamer from her van and will be back about 9:15am. The fitting should be done by 10am."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE steamer left a water mark on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Rug, water mark"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan's steamer left a water mark on Alex M.'s rug. The before photo shows none."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My suit needs the sleeves and pants fitted. Can a tailor come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito acortar un vestido para el sábado."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need a dress shortened for Saturday."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a tailor come to hem four bridesmaid dresses this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa suit Thu 12-2 Casey"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can my grandmother's silk dress be washed before you alter it?"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A home fitting happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a leather jacket repair."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what needs changing, the garment and fabric, and the date it's needed by."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: none of its own. The general danger check is always on."
+   ],
+   [
+    "Just the kitchen sink.",
+    "The sleeves and the pants. By Sat Nov 7."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The wedding is Saturday. Can someone come tomorrow?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about a coat that needs a new zipper. Both jobs go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also look at my coat's zipper?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The zipper is priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like wedding-day dressing."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the suit for a set date?"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On a bridal party job, only Jordan's times show: she's the one who does bridal work."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I put the suit on before you come?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The wedding moved up a week. Can you come sooner?"
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Casey can come sooner, at the same price. The suit still comes back before the wedding."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also hem a dress?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Dress hem · $65"
+   ],
+   [
+    "Yard drain",
+    "Dress hems"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE small stain on the suit's left cuff"
+   ],
+   [
+    "Under the sink, before",
+    "Suit cuff, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Dress hem, before"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan pins the suit and the dress, and texts each item's price."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 suit 165 dress hem 80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan pinned your clothes. Here's the price for each item."
+   ],
+   [
+    "Leak repair · $245",
+    "Alterations · $245"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Suit: sleeves and pants · $165"
+   ],
+   [
+    "Supply line · $80",
+    "Dress hem · $80"
+   ],
+   [
+    "No problem. Today's visit is the $89 service call. The repair price is good for 7 days.",
+    "No problem. Today's visit is the $89 house call. The price is good for 7 days."
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the suit only, $165. Leave the dress."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Jordan takes the suit to the shop today, $165. The $80 dress hem stays good until Thu Oct 29."
+   ],
+   [
+    "Reminder: Jordan is waiting on your OK for the leak repair, $245.",
+    "Reminder: Jordan is waiting on your OK for the alterations, $245."
+   ],
+   [
+    "Alex M. hasn't answered Jordan's $245 leak repair quote in 30 minutes.",
+    "Alex M. hasn't answered Jordan's $245 price in 30 minutes."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds the suit jacket's lining torn."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace the torn jacket lining"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: replace the jacket lining, $160. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the jacket lining"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 lining price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to replacing the jacket lining for $160."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds bed bugs in the closet where the clothes hang. The plug-in says a tailor stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD bed bugs in the closet, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Bed bugs in the closet"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found bed bugs where your clothes hang and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: bed bugs in the closet"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: taking the clothes to the shop"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE suit sleeves shortened. Measurements on the page."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 dress hem stays good until Thu Oct 29."
+   ],
+   [
+    "the shutoff valve",
+    "the suit"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 suit package"
+   ],
+   [
+    "the kitchen drain",
+    "the suit package"
+   ],
+   [
+    "the leak repair",
+    "the alterations"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your bridal party"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A seam on my suit came loose."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s suit, back Thu Oct 29, has a loose seam. It's inside the 30-day free fix."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It's inside the free fix, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free fix lasts."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left pins on the carpet."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan hem another pair of pants next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a pants hem."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Jordan to come back next fall to fit a winter coat."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: winter coat fitting, 12 months"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the coat fitting you asked Jordan about in late Aug 2027."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the bridal party price before booking."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise suit package to 199"
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the suit package to $199 for visits from Mon Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Suit packages already booked keep $179, even after Nov 2."
+   ],
+   [
+    "A deposit is taken when the customer books, and comes off the price.",
+    "A hold is set aside when the customer books, and released at check-in."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a suit package at $150, an old price."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A suit package with Lee Home Services is $179, not $150."
+   ],
+   [
+    "Drain clearing · $179",
+    "Suit package · $179"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Suit package"
+   ],
+   [
+    "Kitchen drain",
+    "Suit package"
+   ],
+   [
+    "Drain clearings",
+    "Suit fittings"
+   ],
+   [
+    "drain clearings",
+    "suit fittings"
+   ],
+   [
+    "Drain clearing",
+    "Suit fitting"
+   ],
+   [
+    "drain clearing",
+    "suit fitting"
+   ],
+   [
+    "Water heater flush",
+    "Dress hem"
+   ],
+   [
+    "A leak repair",
+    "A home fitting"
+   ],
+   [
+    "a leak repair",
+    "a home fitting"
+   ],
+   [
+    "Leak repair",
+    "Home fitting"
+   ],
+   [
+    "leak repair",
+    "home fitting"
+   ],
+   [
+    "$89 service call",
+    "$89 house call"
+   ],
+   [
+    "the service call",
+    "the house call"
+   ],
+   [
+    "service call",
+    "house call"
+   ],
+   [
+    "Service call",
+    "House call"
+   ],
+   [
+    "Sewer camera inspection",
+    "Wedding-day dressing"
+   ],
+   [
+    "paid at the chair",
+    "paid at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a sewing station"
+   ],
+   [
+    "beard trim",
+    "seam repair"
+   ],
+   [
+    "A haircut",
+    "A pants hem"
+   ],
+   [
+    "a haircut",
+    "a pants hem"
+   ],
+   [
+    "Haircut",
+    "Pants hem"
+   ],
+   [
+    "haircut",
+    "pants hem"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Tailoring LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile Tailoring and Lee Bridal Makeup"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bridal Makeup"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Tailoring"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tailoring's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tailoring"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Tailor Shop"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobiletailoring.com"
+   ],
+   [
+    "plumbing and electrical",
+    "tailoring and makeup"
+   ],
+   [
+    "Plumbing and electrical",
+    "Tailoring and makeup"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "electrical license",
+    "makeup license"
+   ],
+   [
+    "Electrical license",
+    "Makeup license"
+   ],
+   [
+    "Electrical",
+    "Makeup"
+   ],
+   [
+    "electrical",
+    "makeup"
+   ],
+   [
+    "a plumber",
+    "a tailor"
+   ],
+   [
+    "A plumber",
+    "A tailor"
+   ],
+   [
+    "plumber",
+    "tailor"
+   ],
+   [
+    "Plumber",
+    "Tailor"
+   ],
+   [
+    "Plumbing",
+    "Tailoring"
+   ],
+   [
+    "plumbing",
+    "tailoring"
+   ],
+   [
+    "Barbershop",
+    "Tailor shop"
+   ],
+   [
+    "barbershops",
+    "tailor shops"
+   ],
+   [
+    "a barbershop",
+    "a tailor shop"
+   ],
+   [
+    "barbershop",
+    "tailor shop"
+   ],
+   [
+    "a barber",
+    "a tailor"
+   ],
+   [
+    "barbers",
+    "tailors"
+   ],
+   [
+    "Barbers",
+    "Tailors"
+   ],
+   [
+    "barber",
+    "tailor"
+   ],
+   [
+    "Barber",
+    "Tailor"
+   ],
+   [
+    "Riley Chen",
+    "Linh Tran"
+   ],
+   [
+    "Avery Diaz",
+    "Marisol Ortiz"
+   ],
+   [
+    "Jordan Price",
+    "Nadia Price"
+   ],
+   [
+    "Casey Moore",
+    "Ivan Moore"
+   ],
+   [
+    "Riley",
+    "Linh"
+   ],
+   [
+    "Avery",
+    "Marisol"
+   ],
+   [
+    "Jordan",
+    "Nadia"
+   ],
+   [
+    "Casey",
+    "Ivan"
+   ],
+   [
+    "88 Elm St",
+    "64 Lake St"
+   ],
+   [
+    "Elm St",
+    "Lake St"
+   ],
+   [
+    "42 Oak St",
+    "17 Cedar Ln"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "1200 Main St",
+    "500 Grand Ave"
+   ],
+   [
+    "1-year labor warranty",
+    "30-day free fix"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a free first fitting for a wedding gown with Linh at Lee's Tailor Shop, Sat Oct 24 at 11:00am, for a wedding on Sat Dec 12. Linh pins it and prices each item in writing. The gown is READY Thu Dec 3 and picked up at the final fitting Sat Dec 5. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Tailoring for a fitting at home, 17 Cedar Ln, and Nadia comes Thu Oct 22 between 8 and 10am. Nadia pins the clothes, takes them to the shop to sew, and brings them back Thu Oct 29. The job depends on the money choice you pick: alterations priced at the fitting, or a suit package from the list."
+ },
+ "money": {
+  "A": {
+   "main": "visit|none|counter",
+   "combos": [
+    "visit|none|counter",
+    "list|none|counter",
+    "visit|none|bill",
+    "list|none|bill"
+   ],
+   "examples": {
+    "visit|none|counter": "The main story: a wedding gown. The first fitting is free and nothing is taken to book. Linh prices each item in writing; Alex pays a 50% deposit when she OKs it, and the rest at the counter at pick-up.",
+    "list|none|counter": "A $35 pants hem from the shop's board. Nothing is taken: a YES books it. It's ready in 5 days, and Alex pays at the counter at pick-up.",
+    "visit|none|bill": "The wedding gown, picked up on a Saturday morning: Linh texts DONE at the final fitting, and Alex pays the rest by the bill Rosie texts.",
+    "list|none|bill": "The $35 pants hem, picked up on a Saturday morning: Linh texts DONE at pick-up, and Alex pays by the bill Rosie texts."
+   },
+   "amounts": {
+    "*": {
+     "name": "Pants hem"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Pants hem"
+    },
+    "visit|*|*": {
+     "fee": "free",
+     "name": "Wedding gown alterations"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|card|bill",
+   "combos": [
+    "visit|card|bill",
+    "list|card|bill"
+   ],
+   "examples": {
+    "visit|card|bill": "The main story: a fitting at home for a suit and a dress. Only the $89 house call is promised, with a card saved for it. Nadia prices each item at the fitting. The clothes come back Thu Oct 29, and Rosie texts the bill.",
+    "list|card|bill": "A $179 suit package at home, from the price list. A card is saved for the $89 house call. The suit comes back Thu Oct 29, and Rosie texts the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Suit package"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Suit package"
+    },
+    "visit|*|*": {
+     "name": "Alterations at home"
+    }
+   }
+  }
+ },
+ "keep": [
+  "steamer",
+  "house call",
+  "leak"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A fitting needs the garment on, so nothing is fitted by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "Alterations aren't booked as a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for alterations."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The shop books a tailor's time for a fitting."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The shop books a tailor's time for a fitting."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Alterations are never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "Alterations have no form to sign first."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The shop sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The shop sells no packs or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "Alterations aren't booked as a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "Alterations need no contract: the written price, OK'd at the fitting, is the record."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A fitting has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "Alterations aren't booked as a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "Alterations aren't booked as a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "Alterations aren't booked as a plan."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A tailor shop runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child is never left at the shop: a parent stays for the fitting."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "Every garment is left at the shop after its fitting, so the shop takes the next branch."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "The deposit is paid when the written price is OK'd, and the rest at pick-up. Nothing else is billed in stages."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each job is paid at its own pick-up."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for alterations."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Alterations are rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Work booked at the shop has no right to cancel to send."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The shop sends no proposals: a new job is booked as its own fitting."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "Alterations are booked when there's a garment to alter, not at checkout."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "The garment's ready date is in READY, during the visit's drop-off."
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "For a garment, the counter makes a ticket: the item, its condition with photos, and what needs changing.",
+     "A pants hem from the board is ready in 5 days. Anything priced at a fitting waits for the customer's yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "The confirmation says what to bring: the garment, and the shoes and undergarments worn on the day.",
+     "For bridal work, it shows the date it's needed by. The other fittings are planned back from it."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-11",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "type": "split",
+      "line": [
+       "4.19",
+       "8.22"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Is there a second fitting?",
+      "q": "Does the job have a second fitting?",
+      "does": "Bridal work has a second fitting about 4 weeks before the wedding. A hem from the list has none, so it goes straight to READY.",
+      "needs": [
+       "pf.services"
+      ],
+      "branches": [
+       {
+        "label": "Yes: bridal, 4 weeks out",
+        "when": {
+         "price": [
+          "visit",
+          "photos"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x02",
+          "type": "split",
+          "line": [
+           "8.3",
+           "8.22"
+          ],
+          "who": "cust",
+          "to": "staff",
+          "via": "visit",
+          "t": "Sat Nov 14, 11:00am",
+          "title": "Alex tries the gown at the second fitting",
+          "q": "Does it fit?",
+          "does": "Alex gives the fitting's code at the counter and puts the gown on with the wedding shoes. Linh checks the hem and pins the bustle.",
+          "more": [
+           "The code checks this fitting in. It's the same booking, so no new $2.",
+           "One more adjustment after a fitting is included, at no charge.",
+           "A missed fitting has no fee. Alex picks a new time before the ready date."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "8216"
+           ],
+           [
+            "san",
+            "staff",
+            "Checked in: Alex M.'s second fitting, Sat Nov 14, 11:00am."
+           ]
+          ],
+          "needs": [
+           "pf.visit"
+          ],
+          "tells": [
+           "staff"
+          ],
+          "branches": [
+           {
+            "label": "Fits; the bustle is pinned",
+            "end": "merge",
+            "steps": []
+           },
+           {
+            "label": "Still a little loose",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "A8-x03",
+              "line": [
+               "8.22"
+              ],
+              "who": "staff",
+              "to": "san",
+              "via": "msg",
+              "t": "Sat Nov 14, 11:40am",
+              "title": "Linh pins it again, at no charge",
+              "does": "The waist is still a little loose, so Linh pins it again. One more adjustment is included, so the price stays $440.",
+              "more": [
+               "The ready date stays Thu Dec 3.",
+               "Anything beyond the OK'd items needs Alex's yes and its price first."
+              ],
+              "say": [
+               [
+                "staff",
+                "san",
+                "NOTE Alex M.: waist pinned again, included. Ready date stays Thu Dec 3."
+               ],
+               [
+                "san",
+                "cust",
+                "Linh pinned the waist again today. It's included, so your price stays $440. Your gown is still ready Thu Dec 3."
+               ]
+              ],
+              "needs": [
+               "pf.services"
+              ],
+              "tells": [
+               "cust"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No: a hem from the list",
+        "when": {
+         "price": [
+          "list"
+         ]
+        },
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Tailoring needs no state license: the company gives its business registration (the next branch). Makeup's license comes later, with its makeup artist."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Tailoring and makeup pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The tailoring plug-in adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Tailoring books a tailor's time, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Tailoring runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Tailoring is never sent now: an urgent fix gets the soonest open time, with Sam's OK."
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "label": "Safety steps, then go on",
+    "why": "Tailoring has no safety steps of its own: the general check stops a booking, or it goes on."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A fitting needs the clothes on, so nothing is fitted by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "Alterations aren't booked as a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for alterations."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Alterations are never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Tailoring sells no seats in a session."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Tailoring is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "Alterations have no form to sign first."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "Alterations need no contract: the written price, OK'd at the fitting, is the record."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "Alterations aren't booked as a plan."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Tailoring is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Tailoring is never sent now, so every house call is a set time with a reminder."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "A fitting has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "Alterations aren't booked as a plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "Alterations aren't booked as a plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "Alterations aren't booked as a plan."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Tailoring is never sent now, so the day list and OMW always come first."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the tailor's care: an adult on the booking is there."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A fitting needs the customer there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A fitting needs the customer there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "Alterations priced at a fitting are done as part of this job, never as their own project."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "The house call's work is billed once, when the clothes come back."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each job is billed on its own."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for alterations."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for alterations."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A new job is booked as its own house call, with no proposal."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Alterations have no report to send later."
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "label": "Safety steps, then go on",
+    "why": "Tailoring has no safety steps of its own: the general check stops a booking, or it goes on."
+   },
+   {
+    "op": "after",
+    "at": "B8-22",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.16",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 22, 9:00am",
+      "title": "Nadia takes the clothes to the shop",
+      "does": "Nadia signs out the pinned clothes, with photos, and books their return. Alex checks the list and signs for it on the secure page.",
+      "more": [
+       "The return is part of the same job: one booking, one $2.",
+       "It gets its own check-in code and a reminder the day before, like any visit.",
+       "If Alex said not today, nothing goes to the shop: Nadia texts DONE for the $89 house call (the bill, below).",
+       "Clothes are held 90 days after they're ready. Written notice comes before anything else is done."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "TAKEN suit and dress to the shop, back Thu Oct 29",
+        {
+         "photos": [
+          "Suit, as taken",
+          "Dress, as taken"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Nadia took your suit and dress to the shop to sew. Please check the photos and sign for them.",
+        {
+         "card": {
+          "title": "Taken to the shop · 2 items",
+          "lines": [
+           "Suit and dress, pinned",
+           "Back Thu Oct 29 · arriving 8–10am · Nadia"
+          ],
+          "button": "Check and sign",
+          "link": "rosfield.com/t/r4"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "vary": {
+       "price:list": {
+        "say": [
+         [
+          "staff",
+          "san",
+          "TAKEN suit to the shop, back Thu Oct 29",
+          {
+           "photos": [
+            "Suit, as taken"
+           ]
+          }
+         ],
+         [
+          "san",
+          "cust",
+          "Nadia took your suit to the shop to sew. Please check the photo and sign for it.",
+          {
+           "card": {
+            "title": "Taken to the shop · Suit",
+            "lines": [
+             "Jacket and pants, pinned",
+             "Back Thu Oct 29 · arriving 8–10am · Nadia"
+            ],
+            "button": "Check and sign",
+            "link": "rosfield.com/t/r4"
+           }
+          }
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "id": "B8-x02",
+      "line": [
+       "8.2",
+       "8.3"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 29, 8:15am",
+      "title": "Nadia brings the clothes back",
+      "does": "A week later, the clothes are sewn and pressed. Nadia texts OMW, and Alex gives the return visit's code at the door.",
+      "more": [
+       "The code checks the return in. It's the same job, so there's no new $2.",
+       "Alex isn't home: it's handled like any missed visit, and the clothes go back to the shop."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "OMW"
+       ],
+       [
+        "san",
+        "cust",
+        "Nadia is on the way with your clothes, about 15 minutes. Give your return code at the door.",
+        {
+         "code": "6624"
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "6624"
+       ],
+       [
+        "san",
+        "cust",
+        "Nadia from Lee Mobile Tailoring is checked in with your clothes."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Tailoring needs no state license: the company gives its business registration (the next branch). Makeup's license comes later, with its makeup artist."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Tailoring and makeup pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The tailoring plug-in adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Tailoring books a tailor's time, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Tailoring runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Tailoring is never sent now: an urgent fix gets the soonest open time, with Sam's OK."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Tailoring is rated like any visit."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S2-28",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "S2-28"
+  ]
+ },
+ "notes": "REFIT Oct 27 (REDESIGN 2, agent R03): facts dropoff, extrawork; no switches; settings arrive A setstart (fitting time), B window, cutoff 24 hours before. Money amounts per path with names (A: $35 pants hem, the first fitting free on the visit paths, nothing taken anywhere; B: $179 suit package, $89 house call as the fee with a card saved (no holds since D66), alterations priced at the home fitting). Every legacy words op deleted; money, storage and S13-22 more ops deleted; trade more ops kept (the counter ticket, what to bring); own steps kept (A8-x01 a second bridal fitting, B8-x01 / B8-x02 clothes taken to the shop and brought back). The estimate example is now a $110 gown hem + $15 bustle; the warranty is the shop's 30-day free fix. The story is carried by sentence rename pairs. The notes below are the pre-refit history.\nFrom auto-repair (from: auto-repair): tailoring runs like a drop-off. The garment is priced after a look (a written price, item by item, at the fitting), it's left at the shop, Marisol texts READY, and it's picked up. That is the auto-repair pilot's shape (A8-53's drop-off branch, OK some lines, READY, the pick-up, an item not picked up). The fitting itself is a tailor's own time by name (Linh only for bridal), so flow A keeps A4-66's 'A person's time' and turns off the drop-off slot auto-repair used.\nNames: Sam Lee's main company is Lee Mobile Tailoring LLC (house-call tailoring, with makeup as its second kind of work; trade names Lee Mobile Tailoring and Lee Bridal Makeup). His second company is Lee's Tailor Shop LLC. Flow A's story is at the shop, flow B's at the main company, as in the master.\nPeople: Linh Tran (master tailor, bridal only with her) and Marisol Ortiz (seamstress) at the shop, for the master's Riley and Avery; Nadia Price (tailoring and makeup) and Ivan Moore make house calls, for Jordan and Casey. The master's Spanish caller in flow B is already named Rosa, so the house-call tailor is Nadia. Sam, Pat and Alex M. stay.\nPlaces: the shop 64 Lake St, the main company 500 Grand Ave, Alex's home 17 Cedar Ln (the master already uses Birch Tower as a host place).\nLicenses: tailoring has no state license in the example, so both companies give their registration (S1-60 and S1-63 keep 'No license: registration only'). Makeup licenses each makeup artist where the state's rules require it, so S2-28 keeps both branches (splitsKept): only Nadia is checked. No state, law or number from one state is named.\nMoney paths, flow A: visit|none|counter (main: a wedding gown, a free 60-minute first fitting, each item priced in writing, a 50% deposit on the secure page when Alex OKs it, the rest at the counter at pick-up), list|none|counter (a $35 pants hem from the board), visit|none|bill (the gown picked up on a Saturday morning, when Linh works alone, paid by the bill Rosie texts: the old flowchart's pay link). The shop takes no card, hold or deposit at booking: fittings are free and a miss has no fee.\nMoney paths, flow B: visit|hold|bill (main: a fitting at home, the $89 house call held and credited, each item priced at the fitting, the clothes sewn at the shop and brought back Thu Oct 29, the bill after) and list|hold|bill (a $179 suit package from the list). No photo pricing, no deposit or full price at booking, so those paths aren't listed.\nThe 50% deposit is taken when the written price is OK'd at the fitting, not when booking, so it lives in A8-29, A8-48, A9-03, A9-04, A9-21 and A10-01 words, not in a money path. Listed as a gap ('A deposit when a quote at the visit is OK'd').\nThe rush fee (+30% within 4 weeks, the owner's OK within 10 days) is a price rule inside the first price, in plugin pf.services and A4-29's words (the branch is relabeled 'A rush: needed soon'). It's not a money path of its own.\nTimeline, flow A main: booked Wed Oct 21, first fitting Sat Oct 24 11:00am (pinned 11:40am, OK'd 11:45am, work order at noon, fittings 2 and 3 booked at the counter), IN WORK Wed Nov 4, second fitting Sat Nov 14, READY Thu Dec 3, final fitting and pick-up Sat Dec 5, rated that afternoon, for a wedding Sat Dec 12. The hem path: ready Thu Oct 29, picked up Sat Oct 31. Side what-ifs after the pick-up (a fix Tue Dec 8, a refund, a text weeks later Sat Jan 9) follow it.\nTimeline, flow B main: booked Mon Oct 19, fitting at home Thu Oct 22 8-10am (quote 8:45am, the clothes signed out 9:00am), return Thu Oct 29 (OMW 8:15am, try-on 8:30am, DONE 9:10am, bill 9:12am, receipt 9:15am, rating 11am). The day after a return with nothing entered is Fri Oct 30. The clothes' 90 days end Wed Jan 27.\nSections 11 to 13 keep the master's own week (Oct 19 to Oct 30): they're the business's running days and other customers' what-ifs, not Alex's story.\nOwn steps: A8-x01 (a money split by price: bridal has a second fitting, a hem from the list has none), A8-x02 (the second fitting, Sat Nov 14) and A8-x03 (pinned again, one adjustment included). B8-x01 (the clothes signed out to the shop, the return booked) and B8-x02 (the return, with its own code), on flow B's trunk; B8-22's 'A part goes to the shop' and 'The job runs several days' branches are off for them. Gaps 'A fitting partway through a drop-off' and 'Pick-up and return as the main path in flow B'.\nNeed-by date: asked in A4-50 (the wedding date) and B4-05, carried in A6-15 and A8-43 (fittings planned back, an inside due date). Listed as the gap 'Need-by date and ready date' (sameAs the general proposal).\nFlow B keeps 2-hour arrival windows (B4-83 1) and a set start for wedding-day dressing (B4-83 2); never sent now (S2-30, B4-81, B6-03, B7-55, B8-58 off their sent-now branches). Nobody needs to be home is off: a fitting needs the customer.\nOff in flow A: walk-in lines, seats, spaces and 'no walk-ins' (A3-32 keeps 'Checked in at once': a garment left at the counter), video, plans, insurance and the plan check (A4-28, A4-54, A7-02, A9-15), first steps (A4-43, A7-02, A7-04), packages, contracts, damage holds, an expert's read, crews, fixed dates, minimums, a class roster, a visit over several days, a child left, goods sold, stages, pay over time, named-only, the right to cancel at the shop, proposals, results later, rentals, aftercare, the next visit at checkout.\nOff in flow B: the live line, video, plans, warranty plans, stock, first steps, the owner/renter question (B4-78 keeps 'No: nobody asks'), contracts, damage holds, an expert's read, landlord branches, crews' smallest group, the outside check, the delivery and setup (B8-71 keeps 'No delivery'), the tip line, stages, monthly bills, pay over time, insurance, proposals, permits, reports, rentals, aftercare, and B3-17's 'Safety steps, then go on' (tailoring has no safety steps of its own).\nKept: 'steamer' (a garment steamer is a tailor's own tool; the master's word was a towel steamer).\nSign-up words (S1-12, S1-13, S1-16, S1-41, S1-42, S1-45, S1-46, S1-47) are rewritten to tailoring's real money: nothing taken at the shop, the house call held for home fittings, half when a bridal price is OK'd, no tip line. S11-56's what-if now changes the deposit line (flow A) and a hold to nothing taken (flow B), never a deposit or full price at booking.\nEvery listed path's screens read for tailoring: the team table (S2-21), the portal preview (S11-57: nothing taken, no license), the secure page forms in flow B.\nReview, Oct 23: list|none|bill is listed too (a pants hem picked up on a Saturday morning, paid by the bill Rosie texts): the plug-in's own after rule says every Saturday-morning pick-up is billed, so the hem uses it as well as the gown.\nReview, Oct 23: the 50% deposit is now told before the yes (A4-14, A6-14). Tailoring licenses nobody at the shop, so the S11 license what-ifs speak of the shop's registration (S11-48, S11-50, S11-51, S12-19); in flow B the licensed person is a makeup artist (S2-12 to S2-14, S11-48, S11-50, S11-77). The return visit has no hold left (B8-46, B8-47, B8-66). Leftovers fixed: heating and cooling (B S11-58), 'tailors or tailors' (B S1-58), the $20 fee and full price at the shop (S1-51), a membership (S11-72), a payment at booking (S12-26), stage billing (B9-26), a 25% photo deposit for Morgan (B S11-08, S11-09).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Riley: barber, color, house calls",
+    "Color and cut · $90",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Riley at the chair. That shows Riley really came.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair. {{pay.asks}}. The rest is quoted at the chair, before any work.",
+    "At a drop-off, READY and the pick-up come once the work is done. At the chair, the customer is already there, so the shop takes the first branch.",
+    "From Riley's phone, or the portal's Today page at the desk. This confirms the visit. No text goes to the customer: they're at the chair.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Here they OK the $110 color correction and skip the $15 gloss. The $25 consult is part of the $110.",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex M. asks for a toner instead of the gloss. What's the new price?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Color quotes come to you first. Board prices never need one",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Could Riley use a toner instead of the gloss?",
+    "Color correction $110 · gloss $15",
+    "My employer pays for this cut.",
+    "Gloss to finish · $15",
+    "A water heater job",
+    "A chair, ready",
+    "Color and cut",
+    "Style consult",
+    "Panel upgrade",
+    "EC22871",
+    "Every shop service, color and house calls",
+    "Avery · license not found",
+    "Not offered to customers until it matches",
+    "The lookup shows the license as expired. Avery stays on the team, and can be booked again once it shows renewed.",
+    "Avery · license expired",
+    "Not bookable until it shows renewed",
+    "Avery's license is checked again when the lookup answers.",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Color correction can work this way, with only the $25 consult promised.",
+    "a skin fade",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "1 color quote",
+    "A card saved for the $20 fee",
+    "A deposit is taken when the customer books, and comes off the price.",
+    "Promises the $25 consult; priced at the chair",
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Consult only",
+    "Only the consult; the price stays open",
+    "Copy: you said yes to a color correction, $125, at 11:20am on Riley's phone.",
+    "Quiero un corte el sábado.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A haircut could mean a salon or a barbershop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop doesn't do perms.",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "May the shop show photos of your hair?",
+    "Can my son wait in the shop during my cut?",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "The customer's side: an ID, a paper or a form they were asked to bring.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Riley stopped Alex M.'s cut.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Riley finishes the work",
+    "A cut is rated, so the shop takes the first branch.",
+    "Books the next visit at the chair",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Priced from your photos",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Priced at the chair",
+    "priced at the chair",
+    "quote at the chair",
+    "set at the chair",
+    "added at the chair",
+    "code at the chair",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "rest at the chair",
+    "tip at the chair",
+    "is at the chair",
+    "already in the chair",
+    "happens at the chair",
+    "visit at the chair",
+    "as at the chair",
+    "rents a chair",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Groom's package",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "a beard trim",
+    "beard trim",
+    "Color correction",
+    "A color correction",
+    "a color correction",
+    "color correction",
+    "Haircut plans",
+    "Haircut plan",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "Lee's Barbershop LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee Electric",
+    "Lee Plumbing",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "A plumber",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "a barbershop",
+    "A barbershop",
+    "barbershop",
+    "Barbering",
+    "a barber",
+    "A barber",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "Only the consult",
+    "only the consult",
+    "the consult only",
+    "the consult"
+   ],
+   "B": [
+    "Riley: barber, color, house calls",
+    "Water heater replacement · $640",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "No live waiting line. Work like towing or a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "One request waits for Lee Home Services. It's a leak under the sink, today, arriving 3–5pm, with Jordan. The service call is $89. Accept it?",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Reminder: your visit is tomorrow, arriving 8–10am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Lee Home Services can clear the drain: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "I found water damage under the sink this morning.",
+    "Shutoff valve and wall pipe · $540",
+    "Me, and yes. It's my kitchen.",
+    "Water heater replacement",
+    "NEW heating and cooling",
+    "Water pressure check",
+    "Yes, it won't drain",
+    "A water heater job",
+    "A chair, ready",
+    "Sam adds a plumber",
+    "Panel upgrade",
+    "$89, credited to the repair",
+    "EC22871",
+    "Not offered to customers until it matches",
+    "Not bookable until it shows renewed",
+    "Every plumbing job, and electrical",
+    "Every plumbing job",
+    "Labor",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Alex M. asked for money back for the Thu Oct 22 visit.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a move-out day",
+    "CANT START no proof Alex may have this work done",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Is the sink still full of water?",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Can I run the dishwasher before you come?",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Yard drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Leak repair · $245",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "No problem. Today's visit is the $89 service call. The repair price is good for 7 days.",
+    "Book the repair",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Reminder: Jordan is waiting on your OK for the leak repair, $245.",
+    "Alex M. hasn't answered Jordan's $245 leak repair quote in 30 minutes.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "the shutoff valve",
+    "DONE 179 drain",
+    "the kitchen drain",
+    "the leak repair",
+    "stage 2 of your repipe",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "raise drain clearing to 199",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "A deposit is taken when the customer books, and comes off the price.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Drain clearing · $179",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "A leak repair",
+    "a leak repair",
+    "Leak repair",
+    "leak repair",
+    "$89 service call",
+    "the service call",
+    "service call",
+    "Service call",
+    "Sewer camera inspection",
+    "paid at the chair",
+    "rents a chair",
+    "beard trim",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "Lee Home Services LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee Electric",
+    "Lee Plumbing",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "leehomeservices.com",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing license",
+    "Plumbing license",
+    "electrical license",
+    "Electrical license",
+    "Electrical",
+    "electrical",
+    "a plumber",
+    "A plumber",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "a barbershop",
+    "barbershop",
+    "a barber",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "Oak St",
+    "1200 Main St",
+    "1-year labor warranty"
+   ]
+  },
+  "A": {
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-03": "7accda6f86",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A3-20": "b8251d2535",
+   "A6-14": "b17b52115e",
+   "A8-11": "d5522790d9",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A3-22": "0057d8fc9f"
+  },
+  "B": {
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-93": "c1406fd6bc",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-38": "867fe1ab7c",
+   "B3-17": "3eb7d7f259",
+   "B8-22": "50d78f1af0",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B10-32": "7713bff255"
+  }
+ }
+}

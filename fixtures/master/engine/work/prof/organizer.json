@@ -1,0 +1,4333 @@
+{
+ "id": "organizer",
+ "name": "Professional organizer",
+ "style": "Project",
+ "pattern": "project",
+ "from": "interior",
+ "plugin": {
+  "pf.license": {
+   "need": "if: most states license no home organizing. Only the business registration and insurance are kept. Where the state's form asks for more (a business license, or a certificate for a specific task), it comes from the state's form.",
+   "ask": [
+    "The business registration, where the state's form asks for one",
+    "General liability insurance; bonding only if the owner chooses to offer it",
+    "Each organizer's own card or number, only where the state's form asks"
+   ],
+   "holder": "The business. Organizers work under it. A licensed cleanup service, or a pro the client hires, holds its own license for cleanup, hauling or any repair.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "A home with a blocked exit, pests, mold or waste is not booked for organizing until it is cleaned or cleared",
+    "Cleanup, hauling of trash, repairs and any legal, tax or financial advice are never booked, quoted or billed as Lee Organizing's own"
+   ],
+   "renewals": "Registration and insurance dates kept; reminded 30 days out; a lapse pauses the work that needs it",
+   "background": "Background checks only where the state's form asks, or where the owner chooses them for staff who enter homes"
+  },
+  "pf.services": {
+   "pattern": "Consult, then project: an organizing project is booked only after a written plan with a price and a signed agreement. Small fixed jobs book straight from the list.",
+   "B": [
+    {
+     "name": "In-home organizing consult",
+     "price": "$89 (the example business's own price), counted toward the project price if Alex signs; a free first consult is a starting option",
+     "length": "about 90 minutes",
+     "where": "at the customer's home; an adult 18 or older must be there",
+     "before": "a card saved, for the late-cancel or no-show fee",
+     "after": "billed only if no agreement follows; the owner may have the saved card charged at DONE instead"
+    },
+    {
+     "name": "Home organizing project (kitchen, pantry, closets, garage, home office, move-in unpacking)",
+     "price": "quoted after the consult: a written plan with a flat price within 1 business day, good for 14 days (the example: a $1,200 kitchen and pantry project, two 5-hour sessions at $120 an hour)",
+     "length": "sessions of about 4 to 6 hours, on days the plan sets",
+     "where": "at the customer's home",
+     "before": "nothing more at booking; half the project price as a deposit once the agreement is signed",
+     "after": "the rest after the last session, on the bill Rosie texts (or the business's own way)"
+    },
+    {
+     "name": "Closet or pantry reset",
+     "price": "$179, from the list: one closet or pantry, up to 2 hours",
+     "length": "about 2 hours",
+     "where": "at the customer's home; an adult must be home",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Paper filing setup",
+     "price": "$150, from the list: one filing system, about 90 minutes; the papers are never read aloud or photographed",
+     "where": "at the customer's home; an adult must be home",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Garage organizing, priced from photos",
+     "price": "priced from the customer's photos (the example: $640, about 6 hours); over $500, Sam OKs it",
+     "length": "one session",
+     "where": "at the customer's home",
+     "before": "a signed agreement, then a 25% deposit",
+     "after": "the rest on the bill Rosie texts"
+    },
+    {
+     "name": "Written organizing plan",
+     "price": "$199, ready in 3 business days: a room-by-room plan and shopping list for the customer to follow",
+     "where": "after the consult; the plan goes on the secure page",
+     "before": "a card saved",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Donation drop-off run",
+     "price": "$60 a run, an add-on when the customer asks: only the items the customer marked; the charity's receipt goes to the customer",
+     "where": "added at a session, paid at the visit or on the bill with the rest"
+    },
+    {
+     "name": "Extra organizing time",
+     "price": "$120 an hour, 1-hour minimum",
+     "where": "added to a project for work beyond the agreement, only by a signed change order, never booked alone"
+    },
+    {
+     "name": "Change order",
+     "price": "an added room or more hours: priced, written and signed before the work; added to the final bill"
+    },
+    {
+     "name": "Bins, labels and shelving",
+     "price": "bought by the customer from the organizer's shopping list; Rosfield takes no product money"
+    },
+    {
+     "name": "Yearly refresh visit",
+     "price": "$150 a visit (the example), booked each year; each visit is booked and paid like a single one",
+     "where": "at the customer's home; an adult must be home",
+     "before": "a card saved",
+     "after": "Rosie texts the bill"
+    }
+   ],
+   "A": [
+    {
+     "name": "Planning session",
+     "price": "$35, 45 minutes",
+     "where": "at the organizing studio, with a studio organizer",
+     "before": "a card saved for the $20 missed-session fee",
+     "after": "paid at the studio desk"
+    },
+    {
+     "name": "Storage and label review",
+     "price": "$40, 30 minutes",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the studio desk"
+    },
+    {
+     "name": "Shopping list",
+     "price": "$20, an add-on to take home",
+     "where": "at the studio"
+    },
+    {
+     "name": "Room checklist",
+     "price": "$15, an add-on to take home",
+     "where": "at the studio"
+    },
+    {
+     "name": "Kids' room session",
+     "price": "$25",
+     "where": "at the studio",
+     "who": "booked by the parent, who stays; the child is never the one served"
+    },
+    {
+     "name": "Virtual organizing session",
+     "price": "$55, 45 minutes, by video (counts as at the studio); credited toward a project if Alex signs",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Whole-room plan package (layout, labels, shopping list)",
+     "price": "$140, 2 hours",
+     "where": "at the studio",
+     "before": "a card saved for its $40 fee",
+     "after": "at the studio desk"
+    },
+    {
+     "name": "Room plan from photos",
+     "price": "priced from the customer's photos (the example: $90); Sam OKs each one",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the studio desk"
+    },
+    {
+     "name": "Planning session at home",
+     "price": "$75, paid in full when booked: a studio organizer comes to the home",
+     "where": "at the customer's home",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Custom storage plan",
+     "price": "priced at the studio after a $25 consult (the example: $110)",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the studio desk"
+    },
+    {
+     "name": "Intro call",
+     "price": "15 minutes, free, by phone: a call with a studio organizer before booking; nothing taken and nothing owed"
+    }
+   ],
+   "capacity": "One organizer per consult or session; big sessions take a lead organizer and a helper, and a time shows only when both are free. The studio's planning table is saved for each studio booking.",
+   "skills": "Consults and projects: the lead organizers. Studio sessions: the studio organizers. Heavy lifting and high shelves: two people.",
+   "nobody_home": "No. An adult 18 or older who owns the things must be home at each session, to decide what stays, goes or is donated. A child at home is never the one who lets the organizer in.",
+   "online": "A virtual organizing session by video counts as at the studio; consults and sessions are in person",
+   "smallest_job": "A switch the owner sets: the smallest project taken. Smaller requests are offered a closet or pantry reset or a paper filing setup instead."
+  },
+  "pf.questions": {
+   "before_times": [
+    "Which rooms or areas do you want organized?",
+    "A house, an apartment or an office?",
+    "About how full is the space: a little, a lot, or hard to walk through?",
+    "When would you like it done?"
+   ],
+   "after_time": [
+    "Is any path, stair or exit blocked? (a blocked exit is a safety matter first)",
+    "Any pests, mold or waste in the space? (that needs a cleanup service first)",
+    "Do you own the home or rent? Who lives here and decides what stays? They should be at the consult",
+    "Heavy items, or high shelves?",
+    "Parking, and how to get in",
+    "Pets and children at home"
+   ],
+   "secure_page_only": [
+    "Photos of the rooms (before photos)",
+    "Door or key codes",
+    "Anything private about what is stored",
+    "Budget range"
+   ],
+   "who_may_book": "An adult 18 or older who lives in the home or runs the space, or someone they authorize. The things belong to the person served: they decide what is kept, moved, donated or thrown away. A relative's say alone is not enough.",
+   "studio": [
+    "Which room, and a rough budget (on the secure page)",
+    "Photos and rough sizes of the room (optional)",
+    "What gives you the most trouble"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a gas smell, sparking or smoking wires, a carbon monoxide alarm",
+     "says": "Leave now. Then call 911 and the gas or power company.",
+     "booking": "no booking until it's safe"
+    },
+    {
+     "words": "a blocked exit or stairway, or piles that are tipping or could fall on someone",
+     "says": "Stay out of that area, and call 911 if anyone is trapped or hurt.",
+     "booking": "no booking until the way is clear"
+    },
+    {
+     "words": "animal or human waste, rodents, needles or other sharps, or mold across a room",
+     "says": "Don't touch it, and keep people and pets away. A licensed cleanup service comes first.",
+     "booking": "no booking until it is cleaned up"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "worry about heavy boxes on a high shelf",
+     "says": "Keep heavy boxes low and clear the floor under the shelf. The organizer brings a second person and a step stool, never a chair.",
+     "booking": "goes on"
+    },
+    {
+     "words": "a family member who doesn't want things moved",
+     "says": "Nothing is moved or thrown away without the owner of the things saying yes. The session can pause or move.",
+     "booking": "goes on once the owner of the things agrees"
+    },
+    {
+     "words": "old boxes with a musty smell",
+     "says": "Don't open them. The organizer lists them for the owner, wearing a mask.",
+     "booking": "goes on"
+    }
+   ],
+   "business_line": "Anything about cleanup, pests, mold or whether items are safe to keep goes to a licensed service and the business's own line, never Rosie"
+  },
+  "pf.first_steps": {
+   "before_plan": "The organizing consult at the home, with everyone who decides what stays there",
+   "after_agreement": [
+    "The cancel window ends before the first session, where the state's rules give one",
+    "A licensed cleanup service or the family clears any blocked path first",
+    "Valuables, cash, medicines, IDs and firearms are set aside by the owner before the first session",
+    "Session days are booked once the window ends and the deposit is paid"
+   ],
+   "prep": [
+    "Clear a path to the rooms and set aside anything you want kept first",
+    "Set aside valuables, cash, medicines, IDs and firearms",
+    "Leave parking near the door for the crew",
+    "Have everyone who decides at home",
+    "Put any entry code on the secure page"
+   ],
+   "studio_prep": [
+    "Bring photos and rough sizes of the room",
+    "Bring a list of what gives you trouble"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Consult: the check-in code at the door. Each session: that day's code at the door. Studio: the code at the desk. Video: the code read out at the start.",
+   "at_the_visit": "The organizer walks the rooms, asks what stays, goes and is donated, takes before photos with the owner's OK and measures shelves where needed. A written plan with a price follows the same day or the next business day, good for 14 days.",
+   "changes": "Changes after signing are change orders: a new price and a new yes, signed before the added work",
+   "outside_checks": "None by the organizer. Cleanup, hauling and repairs belong to the licensed services the client hires.",
+   "done": "The walk-through: shelves, bins and labels checked against the plan, with any fix list noted, then DONE on the last session",
+   "studio_done": "DONE after the session, with the notes and picks saved",
+   "before_photos": "Each room as it is, only with the owner's OK, and never of papers, IDs or people"
+  },
+  "pf.money": {
+   "visit": "The example's $89 organizing consult counts toward the project price if Alex signs, and is billed alone only if no agreement follows. The owner may have the saved card charged at DONE instead of texting the bill. A free first consult is the owner's choice.",
+   "no_money_before_agreement": "On a project, nothing beyond the consult is taken before the agreement is signed",
+   "deposit": "Half the project price once the agreement is signed (the example's own terms). Any cap on money paid before the work comes from the state's form.",
+   "final": "The rest after the last session, with any change orders, on the bill Rosie texts (or the business's own way)",
+   "change_orders": "Added to the final bill, as signed",
+   "supplies": "Bins, labels and shelving are bought by the client from the organizer's shopping list. Rosfield takes no product money and nothing is added without a yes.",
+   "donations": "A donation run is an add-on with the client's yes; the charity's receipt goes to the client, not through Rosie",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the organizer texts 'paid check'.",
+   "late_cancel": "Free to cancel until the business's cutoff; later, up to the fee agreed at booking, only if Sam OKs it. A move the business makes is never charged.",
+   "kept_apart": "Money paid before the work is kept apart only where the state's rules require it (a switch from the state's form)",
+   "tips": "Off by default. A tip line shows on the bills Rosie texts only if the owner turns it on; Rosie never asks for a tip.",
+   "tax": "Tax on the work follows the state's form",
+   "studio": "Studio sessions: a card saved for the $20 fee, paid at the studio desk. The virtual session is paid when booked ($55) and counts toward a project if signed."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Entry or key codes",
+    "The budget",
+    "What is stored, and anything found: papers, medicines, valuables or IDs",
+    "Plans, agreements and change orders (secure page only, with a copy by email)"
+   ],
+   "photos": "Room photos only on the secure page, and shown to others only with the client's OK; never photos of papers, IDs or people",
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who lets the organizer in"
+  },
+  "pf.staff": {
+   "roles": "Lead organizers (Sanjay, Marcus) for consults and sessions at the client's home; studio organizers (Hana, Rafael) at the studio",
+   "licenses": "No person license unless the state's form asks. Organizers work under the business.",
+   "who_oks": "Sam OKs plans and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another organizer may take a consult if Alex agrees; a project keeps its lead organizer unless Sam moves it",
+   "assistants": "A helper may carry, haul to the donation bags and hold a ladder with a lead organizer; never sorts papers or valuables alone"
+  },
+  "pf.rules": {
+   "agreement": "A written agreement for project work, signed by the client and the business before any deposit: the rooms, the sessions and hours, the project price and how it is paid, who decides what stays, and the change-order rule",
+   "decides": "Nothing is thrown away, donated or shredded without the owner of the things saying yes at that moment; papers that may be legal, tax or medical are set aside for the owner, never discarded",
+   "never_handled": "Valuables, cash, medicines, IDs and firearms are set aside by the owner; the organizer never handles them",
+   "agreement_parts": "Any parts the state's form lists, like a registration number or the cancel notice for an agreement that began at the home",
+   "cancel_window": "Where the rules give a cancel window for a sale made at the home, nothing starts until it ends",
+   "unsafe_homes": "A home with a blocked exit, pests, mold or waste is not an organizing job until it is cleaned or cleared by a licensed service or the family",
+   "show": "A registration number on the listing, the plan and the agreement, where the state's rules require it",
+   "warranty": "No guarantee of results. A free fix visit for a label or bin put in the wrong place within 14 days (the owner's setting)",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "family_booker": "A relative books for an older parent: the parent is the person served and decides what stays; the relative cannot decide for them unless papers on file say so",
+   "upset_owner": "The owner gets upset or changes their mind: the session pauses or moves, with no fee for the business's side",
+   "found_item": "Cash, medicines, IDs, firearms or something that looks unsafe is set aside for the owner and never handled or described in a text",
+   "organizer_cannot_come": "The business moves the session or offers another organizer, with no fee",
+   "customer_not_ready": "Paths or things are not set aside as agreed: the session can't start; whose side it is decides the fee",
+   "walk_through_dispute": "Goes to Sam; the last bill waits",
+   "renter": "A renter's fixed shelves or hooks need the landlord's OK",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "multiday",
+   "extrawork",
+   "photos",
+   "video",
+   "banktransfer"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Hana and Rafael (studio organizers)"
+  },
+  "B": {
+   "staff": "Sanjay and Marcus (organizers)",
+   "other": "Others (a landlord, a relative who helps)"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "Seats cut:",
+    "Seats reduced:"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither organizing nor the studio takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "$140 an hour",
+    "$120 an hour"
+   ],
+   [
+    "can clear the drain",
+    "can do the closet or pantry reset"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A room plan' or 'a label review' fits a planning session."
+   ],
+   [
+    "Lee's Barbershop would like to see your hair before pricing it.",
+    "Lee Organizing Studio would like to see your photos before pricing it."
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, make it a storage review'"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say heavy boxes are stacked on a high shelf at the customer's home, and they ask if they can still come in."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring photos of the room on Saturday."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee Organizing Studio about your Sat 11:00am visit: please bring photos of the room."
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on a wall or a floor"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the shelves against the plan"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my kitchen."
+   ],
+   [
+    "like new pipes put in one day and finished another",
+    "like a pantry sorted one day and labeled another"
+   ],
+   [
+    "Sewer camera inspection",
+    "Measured drawing"
+   ],
+   [
+    "sewer camera inspection",
+    "measured drawing"
+   ],
+   [
+    "camera inspection",
+    "written organizing plan"
+   ],
+   [
+    "the free style consult",
+    "the free intro call"
+   ],
+   [
+    "like the 15-minute style consult",
+    "like the 15-minute intro call"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "toner",
+    "shopping list"
+   ],
+   [
+    "Toner",
+    "Shopping list"
+   ],
+   [
+    "The chairs",
+    "The planning table"
+   ],
+   [
+    "A chair, ready",
+    "A label board, ready"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Move-in unpacking: an $89 in-home organizing consult, then a quote"
+   ],
+   [
+    "chair renter",
+    "self-employed pro"
+   ],
+   [
+    "a step-free chair",
+    "a step-free door"
+   ],
+   [
+    "Its money card is set the way most plumbing businesses start.",
+    "Its money card is set the way most organizing companies start."
+   ],
+   [
+    "Here are the rules plumbing businesses often set.",
+    "Here are the rules organizing companies often set."
+   ],
+   [
+    "service-call fee",
+    "consult fee"
+   ],
+   [
+    "A water heater job",
+    "A pantry job"
+   ],
+   [
+    "Every plumbing service",
+    "Every organizing service"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Home organizing in Springfield. Consults, resets and full organizing projects, within 25 miles."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Hana and Rafael are studio organizers; Hana also does custom storage plans and home visits"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check, or can't be reached?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds garage storage to Lee Organizing."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Garage storage for Lee Organizing: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW garage storage"
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 custom storage plan + 15 room checklist Alex M."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all",
+    "Alex M.'s price: $110 custom storage plan and a $15 room checklist, $125 in all"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Custom storage plan $110 · room checklist $15"
+   ],
+   [
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Done. Today: the custom storage plan, $110. The $15 room checklist price is good until Sat Oct 31."
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the custom storage plan only, $110. No room checklist today."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Hana also does custom storage plans and home visits"
+   ],
+   [
+    "Color always stays with Riley",
+    "Custom storage plans always stay with Hana"
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Hana's room plan after a session"
+   ],
+   [
+    "Riley's color plan",
+    "Hana's room plan"
+   ],
+   [
+    "Proposal · Color plan",
+    "Plan · Room plan"
+   ],
+   [
+    "your first color plan visit",
+    "your first room plan visit"
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps",
+    "Some jobs take several visits, like a custom storage plan done in two steps"
+   ],
+   [
+    "Color and cut",
+    "Room plan from photos"
+   ],
+   [
+    "color and cut",
+    "room plan from photos"
+   ],
+   [
+    "Color correction",
+    "Custom storage plan"
+   ],
+   [
+    "color correction",
+    "custom storage plan"
+   ],
+   [
+    "color quote",
+    "custom storage plan quote"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Hana sees the space"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like the virtual organizing session"
+   ],
+   [
+    "Gloss to finish",
+    "Room checklist to take home"
+   ],
+   [
+    "gloss",
+    "room checklist"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Organizing Studio doesn't haul trash or clean up."
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a kids' room session is $25"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una sesión de planificación el sábado."
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A storage and label review at Lee Organizing Studio is $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for a storage and label review at $35"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a display door fell and scratched a bag today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A display door fell and scratched my bag."
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Alder St"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you help with kids' rooms? My daughter is 8."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A planning session could mean an organizing studio or a storage store."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's rooms together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books planning sessions for three rooms on one morning. Rosie finds times side by side across Hana and Rafael."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A planning session and a kids' room session work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your room"
+   ],
+   [
+    "patch test",
+    "measure check"
+   ],
+   [
+    "skin-test result",
+    "measure check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the studio during my review?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "Heavy boxes are stacked on a high shelf at home. Can I still come in?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: pantry first, then the hall closet, labels in blue"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "A bin label is on the wrong shelf."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's bin labels are on the wrong shelf"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Organizing · move-in help EX-5041"
+   ],
+   [
+    "Plumbing MP045210",
+    "Contractor EX-1042"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Organizing'"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An organizer's example: worry about heavy boxes on a high shelf gets 'keep them low, and bring a second person'."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Closet and pantry resets have a set price. Organizing projects are quoted after the consult. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A contractor license above the job-size limit, and only the registration below it."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "No license in most states, only the registration. Planning sessions and storage reviews at the studio; home visits go through Lee Organizing."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "EC22871",
+    "EX-2218"
+   ],
+   [
+    "BS20981",
+    "EX-3097"
+   ],
+   [
+    "estimate visit",
+    "in-home organizing consult"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed to the firm, not to each person."
+   ],
+   [
+    "rents a chair",
+    "is self-employed"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Organizing"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Organizing Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Organizing Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Organizing"
+   ],
+   [
+    "Lee Electric",
+    "Lee Move-In Help"
+   ],
+   [
+    "1200 Main St",
+    "215 Hollis Rd"
+   ],
+   [
+    "88 Elm St",
+    "74 Alder St"
+   ],
+   [
+    "Jordan Price",
+    "Sanjay Rao"
+   ],
+   [
+    "Casey Moore",
+    "Marcus Bell"
+   ],
+   [
+    "Riley",
+    "Hana"
+   ],
+   [
+    "Avery",
+    "Rafael"
+   ],
+   [
+    "Jordan",
+    "Sanjay"
+   ],
+   [
+    "Casey",
+    "Marcus"
+   ],
+   [
+    "plumbing and electrical",
+    "organizing and move-in help"
+   ],
+   [
+    "electrical",
+    "move-in help"
+   ],
+   [
+    "Electrical",
+    "Move-in help"
+   ],
+   [
+    "Panel upgrade",
+    "Move-in unpacking"
+   ],
+   [
+    "Plumber",
+    "Organizer"
+   ],
+   [
+    "plumber",
+    "organizer"
+   ],
+   [
+    "plumbing",
+    "organizing"
+   ],
+   [
+    "Plumbing",
+    "Organizing"
+   ],
+   [
+    "barbershop",
+    "organizing studio"
+   ],
+   [
+    "Barbershop",
+    "Organizing studio"
+   ],
+   [
+    "Barbering",
+    "The studio's work"
+   ],
+   [
+    "barbers",
+    "studio organizers"
+   ],
+   [
+    "barber",
+    "studio organizer"
+   ],
+   [
+    "Barber",
+    "Studio organizer"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Virtual organizing session"
+   ],
+   [
+    "Signature cut and shave",
+    "Virtual organizing session"
+   ],
+   [
+    "signature cut",
+    "virtual organizing session"
+   ],
+   [
+    "Groom's package",
+    "Whole-room plan package"
+   ],
+   [
+    "Kids cut",
+    "Kids' room session"
+   ],
+   [
+    "kids cut",
+    "kids' room session"
+   ],
+   [
+    "Skin fade",
+    "Storage and label review"
+   ],
+   [
+    "skin fade",
+    "storage and label review"
+   ],
+   [
+    "Beard trim",
+    "Shopping list"
+   ],
+   [
+    "beard trim",
+    "shopping list"
+   ],
+   [
+    "Haircuts",
+    "Planning sessions"
+   ],
+   [
+    "haircuts",
+    "planning sessions"
+   ],
+   [
+    "Haircut",
+    "Planning session"
+   ],
+   [
+    "haircut",
+    "planning session"
+   ],
+   [
+    "cuts",
+    "sessions"
+   ],
+   [
+    "cut",
+    "session"
+   ],
+   [
+    "the chair",
+    "the studio"
+   ],
+   [
+    "Drain clearing",
+    "Closet or pantry reset"
+   ],
+   [
+    "Water heater flush",
+    "Paper filing setup"
+   ],
+   [
+    "water heater",
+    "garage organizing from photos"
+   ],
+   [
+    "Drain",
+    "Closet or pantry reset"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most organizing companies set it."
+   ],
+   [
+    "A neighborhood organizing studio on Elm St. Classic sessions, fades and hot towel shaves.",
+    "An organizing studio on Alder St. Planning sessions, storage reviews and virtual organizing."
+   ],
+   [
+    "Organizing for homes in Springfield. Closet or pantry reset and water heaters, within 25 miles.",
+    "Home and move-in unpacking in Springfield. Consults, garage organizing jobs and full organizing projects, within 25 miles."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the studio's list.",
+    "Alex asks for a stone countertop, which isn't on the studio's list."
+   ],
+   [
+    "like a roofer",
+    "like a general contractor"
+   ],
+   [
+    "two skin fades on Sat Nov 7",
+    "two planning sessions on Sat Nov 7"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Which room is it for? (optional)"
+   ],
+   [
+    "Style consult",
+    "Intro call"
+   ],
+   [
+    "repipe",
+    "kitchen and pantry"
+   ],
+   [
+    "a organizer",
+    "an organizer"
+   ],
+   [
+    "A organizer",
+    "An organizer"
+   ],
+   [
+    "The state licenses the organizing studio itself, and each studio organizer.",
+    "Most states license no organizing. The business registration is enough."
+   ],
+   [
+    "Elm St",
+    "Alder St"
+   ]
+  ],
+  "B": [
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "Seats cut:",
+    "Seats reduced:"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither organizing nor the studio takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "$140 an hour",
+    "$120 an hour"
+   ],
+   [
+    "can clear the drain",
+    "can do the closet or pantry reset"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A room plan' or 'a label review' fits a planning session."
+   ],
+   [
+    "Lee's Barbershop would like to see your hair before pricing it.",
+    "Lee Organizing Studio would like to see your photos before pricing it."
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, make it a storage review'"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say heavy boxes are stacked on a high shelf at the customer's home, and they ask if they can still come in."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring photos of the room on Saturday."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee Organizing Studio about your Sat 11:00am visit: please bring photos of the room."
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on a wall or a floor"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the shelves against the plan"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my kitchen."
+   ],
+   [
+    "like new pipes put in one day and finished another",
+    "like a pantry sorted one day and labeled another"
+   ],
+   [
+    "Sewer camera inspection",
+    "Measured drawing"
+   ],
+   [
+    "sewer camera inspection",
+    "measured drawing"
+   ],
+   [
+    "camera inspection",
+    "written organizing plan"
+   ],
+   [
+    "the free style consult",
+    "the free intro call"
+   ],
+   [
+    "like the 15-minute style consult",
+    "like the 15-minute intro call"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "toner",
+    "shopping list"
+   ],
+   [
+    "Toner",
+    "Shopping list"
+   ],
+   [
+    "The chairs",
+    "The planning table"
+   ],
+   [
+    "A chair, ready",
+    "A label board, ready"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Move-in unpacking: an $89 in-home organizing consult, then a quote"
+   ],
+   [
+    "chair renter",
+    "self-employed pro"
+   ],
+   [
+    "a step-free chair",
+    "a step-free door"
+   ],
+   [
+    "The state licenses plumbing for the company and each plumber.",
+    "Most states license no organizing. The business registration is enough."
+   ],
+   [
+    "Its money card is set the way most plumbing businesses start.",
+    "Its money card is set the way most organizing companies start."
+   ],
+   [
+    "Here are the rules plumbing businesses often set.",
+    "Here are the rules organizing companies often set."
+   ],
+   [
+    "service-call fee",
+    "consult fee"
+   ],
+   [
+    "A water heater job",
+    "A pantry job"
+   ],
+   [
+    "Every plumbing service",
+    "Every organizing service"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Home organizing in Springfield. Consults, resets and full organizing projects, within 25 miles."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Hana and Rafael are studio organizers; Hana also does custom storage plans and home visits"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check, or can't be reached?"
+   ],
+   [
+    "Free until 7am on the visit day.",
+    "Free until 24 hours before."
+   ],
+   [
+    "Alex books on the shop's booking page",
+    "Alex books on the company's booking page"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Tells Alex it's with the shop",
+    "Tells Alex it's with the company"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Hana also does custom storage plans and home visits"
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Sanjay's phone, you said yes to adding the support post for $160."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 add a second helper and a step stool, the shelves are high"
+   ],
+   [
+    "replace both shutoff valves",
+    "add a second helper and a step stool, the shelves are high"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your room, and an organizer will price the refresh."
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the plan ready on time?"
+   ],
+   [
+    "The report is ready on the date Alex was told.",
+    "The plan is ready on the date Alex was told."
+   ],
+   [
+    "Texts the report link on the new date",
+    "Texts the plan link on the new date"
+   ],
+   [
+    "The report is ready on the new date.",
+    "The plan is ready on the new date."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE written organizing plan Mon Oct 26"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Sanjay strains a back and texts HURT."
+   ],
+   [
+    "Jordan texts the quote",
+    "Sanjay sends the plan"
+   ],
+   [
+    "Signed: the deposit, then the work days",
+    "Signed: the deposit, then measuring"
+   ],
+   [
+    "Jordan found more work.",
+    "Here's the price for the extra work you asked Sanjay about."
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Sanjay needs a sample from the office."
+   ],
+   [
+    "cracks the cabinet floor",
+    "scratches the floor"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the floor in the hall"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched floor"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Sanjay scratched the floor at Alex M.'s. The before photo shows no scratch."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs your building's OK first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a building's OK it needed that isn't in"
+   ],
+   [
+    "an estimate visit",
+    "a measuring visit"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting samples, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Sanjay went to get more samples and will be back about 9:30am. The visit should be done by 10am."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can an organizer sort my kitchen and pantry this Thursday? What does it cost?"
+   ],
+   [
+    "Kim L.'s yard drain",
+    "Kim L.'s closet or pantry reset"
+   ],
+   [
+    "Yard drain",
+    "Closet or pantry reset"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a refresh at two rentals every 3 months, between tenants."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's rental refresh?"
+   ],
+   [
+    "plumbing visit",
+    "design visit"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I put the kitchen things back before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Sanjay says no. Please wait until the session is done."
+   ],
+   [
+    "The on-call plumber",
+    "The on-call pro"
+   ],
+   [
+    "on-call plumber",
+    "on-call pro"
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "A free check is part of the service."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "The organizer's notes are on the page too."
+   ],
+   [
+    "It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A free check is part of the service, so Sam OKs a return visit at $0, with its own code."
+   ],
+   [
+    "Jordan texts OMW as he leaves",
+    "Sanjay texts OMW when leaving"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Sanjay's times show: Sanjay is the one who does garage organizing."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Consults are 2-hour times, as Sam set at sign-up."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the studio's organizers does home visits."
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Organizing has a yearly refresh visit, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly refresh visit"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about the hall closet."
+   ],
+   [
+    "Both jobs go in one booking, with one arrival window and one code.",
+    "Both go in one booking, with one time and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Sanjay also look at the hall closet?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The hall closet can join the project, quoted after the consult. Both fit in the same time."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero organizar mi cocina, y hay cajas pesadas en un estante alto."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I want my kitchen organized, and there are heavy boxes on a high shelf."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep the heavy boxes low, and to leave and call 911 if there's a gas smell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantenga las cajas pesadas abajo. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep the heavy boxes low. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to keep old paint cans and chemicals in my garage?"
+   ],
+   [
+    "Arrival times:",
+    "Open times:"
+   ],
+   [
+    "1 Arrival windows",
+    "1 Two-hour times"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Home organizing books a 2-hour consult."
+   ],
+   [
+    "arriving 8–10am",
+    "8–10am"
+   ],
+   [
+    "arriving 10am–12pm",
+    "10am–12pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "12–2pm"
+   ],
+   [
+    "arriving 2–4pm",
+    "2–4pm"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Sanjay's notes"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the agreement"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the agreement; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$600 move-in unpacking"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like adding the hall closet that Sanjay noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a plan for the hall closet, from Sanjay's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Plan · Hall closet"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "We move in Saturday. Can someone help with the layout this week?"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Organizing doesn't do, like moving a wall."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Organizing designs rooms, but doesn't build them. Nothing was saved. You can look for a licensed contractor near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which rooms, what should change, how big they are, and if it's a home or an office."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, sparking wires, or a wall or ceiling giving way."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE water stain on the kitchen ceiling"
+   ],
+   [
+    "Under the sink, before",
+    "Kitchen, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A organizing project is quoted after the consult: only the $89 consult was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Sanjay finds mold on a box in the pantry. The plug-in says an organizer stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold on a box in the pantry"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold on a box in the pantry"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Sanjay found mold on a box in the pantry and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the pantry boxes"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"Sanjay's team left boxes in the garage.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Sanjay's team left boxes in the garage."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Sanjay look at my garage next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Sanjay's next times for a garage."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the in-home organizing consult for today"
+   ],
+   [
+    "$245",
+    "$960"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I want my kitchen and pantry organized. Can someone come look at them Thursday morning? I'm in Springfield."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And which rooms, and what do you want to keep?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "The kitchen and the pantry."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is anything in them going to be thrown away?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, both stay"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that heavy boxes are now stacked on a high shelf."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Heavy boxes are stacked on a high shelf now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep the heavy boxes low, and clear the floor under the shelf."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come back every year to refresh the shelves?"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a refresh visit every year."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE kitchen: daily plates low, baking up high. Pantry: cans by use. Donation run Fri Nov 13."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The pantry gets crowded again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The pantry shelves are crowded again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s closet reset from Thu Oct 22: two bins are in the wrong place."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your closet or pantry reset includes a free check"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Sanjay finds the shelves are too high to reach."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Add a second helper"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 helper quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 helper"
+   ],
+   [
+    "the shutoff valves",
+    "the helper"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Sanjay also make a written organizing plan?"
+   ],
+   [
+    "Sewer camera report",
+    "Written organizing plan"
+   ],
+   [
+    "sewer camera report",
+    "written organizing plan"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the written organizing plan link"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your move-in unpacking"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The studio is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Organizing Studio does planning sessions at the studio for $35, or at your home for $75."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds garage storage to Lee Organizing."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW home staging"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Garage storage for Lee Organizing: is it the same company?"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Organizing · move-in help EX-5041"
+   ],
+   [
+    "Casey · license not found",
+    "Sanjay · license not found"
+   ],
+   [
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "The lookup shows the license as expired. Sanjay stays on the team for home organizing, and takes move-in unpacking again once it shows renewed."
+   ],
+   [
+    "Casey · license expired",
+    "Sanjay · license expired"
+   ],
+   [
+    "Casey's license is checked again when the lookup answers.",
+    "Sanjay's license is checked again when the lookup answers."
+   ],
+   [
+    "so Casey's license isn't checked yet",
+    "so Sanjay's license isn't checked yet"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, toward the project price"
+   ],
+   [
+    "Plumbing license",
+    "Contractor license"
+   ],
+   [
+    "Plumbing MP045210",
+    "Contractor EX-1042"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Organizing'"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An organizer's example: worry about heavy boxes on a high shelf gets 'keep them low, and bring a second person'."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Closet and pantry resets have a set price. Organizing projects are quoted after the consult. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A contractor license above the job-size limit, and only the registration below it."
+   ],
+   [
+    "leehomeservices.com",
+    "leeorganizing.com"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "No license in most states, only the registration. Planning sessions and storage reviews at the studio; home visits go through Lee Organizing."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "EC22871",
+    "EX-2218"
+   ],
+   [
+    "BS20981",
+    "EX-3097"
+   ],
+   [
+    "estimate visit",
+    "in-home organizing consult"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed to the firm, not to each person."
+   ],
+   [
+    "rents a chair",
+    "is self-employed"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Organizing LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Organizing"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Organizing Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Organizing"
+   ],
+   [
+    "Lee Electric",
+    "Lee Move-In Help"
+   ],
+   [
+    "1200 Main St",
+    "215 Hollis Rd"
+   ],
+   [
+    "88 Elm St",
+    "74 Alder St"
+   ],
+   [
+    "42 Oak St",
+    "17 Juniper Way"
+   ],
+   [
+    "Jordan Price",
+    "Sanjay Rao"
+   ],
+   [
+    "Casey Moore",
+    "Marcus Bell"
+   ],
+   [
+    "Riley",
+    "Hana"
+   ],
+   [
+    "Avery",
+    "Rafael"
+   ],
+   [
+    "Jordan",
+    "Sanjay"
+   ],
+   [
+    "Casey",
+    "Marcus"
+   ],
+   [
+    "plumbing and electrical",
+    "organizing and move-in help"
+   ],
+   [
+    "electrical",
+    "move-in help"
+   ],
+   [
+    "Electrical",
+    "Move-in help"
+   ],
+   [
+    "Panel upgrade",
+    "Move-in unpacking"
+   ],
+   [
+    "Plumber",
+    "Organizer"
+   ],
+   [
+    "plumber",
+    "organizer"
+   ],
+   [
+    "plumbing",
+    "organizing"
+   ],
+   [
+    "Plumbing",
+    "Organizing"
+   ],
+   [
+    "barbershop",
+    "organizing studio"
+   ],
+   [
+    "Barbershop",
+    "Organizing studio"
+   ],
+   [
+    "barber",
+    "studio organizer"
+   ],
+   [
+    "Barber",
+    "Studio organizer"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Virtual organizing session"
+   ],
+   [
+    "Beard trim",
+    "Shopping list"
+   ],
+   [
+    "Haircut",
+    "Planning session"
+   ],
+   [
+    "haircut",
+    "planning session"
+   ],
+   [
+    "cuts",
+    "sessions"
+   ],
+   [
+    "cut",
+    "session"
+   ],
+   [
+    "the chair",
+    "the studio"
+   ],
+   [
+    "$89 service call",
+    "$89 in-home organizing consult"
+   ],
+   [
+    "service call",
+    "in-home organizing consult"
+   ],
+   [
+    "Service call",
+    "In-home organizing consult"
+   ],
+   [
+    "$55",
+    "$150"
+   ],
+   [
+    "Water heater replacement",
+    "Garage organizing from photos"
+   ],
+   [
+    "water heater replacement",
+    "garage organizing from photos"
+   ],
+   [
+    "Leak repair",
+    "Home organizing project"
+   ],
+   [
+    "leak repair",
+    "home organizing project"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Closet or pantry reset"
+   ],
+   [
+    "Drain clearings",
+    "Closet or pantry resets"
+   ],
+   [
+    "Drain clearing",
+    "Closet or pantry reset"
+   ],
+   [
+    "drain clearing",
+    "closet or pantry reset"
+   ],
+   [
+    "the kitchen drain",
+    "the closet or pantry reset"
+   ],
+   [
+    "Kitchen drain",
+    "Closet or pantry reset"
+   ],
+   [
+    "kitchen drain",
+    "closet or pantry reset"
+   ],
+   [
+    "Water heater flush",
+    "Paper filing setup"
+   ],
+   [
+    "water heater flush",
+    "paper filing setup"
+   ],
+   [
+    "water heaters",
+    "garage organizing jobs"
+   ],
+   [
+    "Water heater",
+    "Garage organizing from photos"
+   ],
+   [
+    "water heater",
+    "garage organizing from photos"
+   ],
+   [
+    "Drain",
+    "Closet or pantry reset"
+   ],
+   [
+    "drain",
+    "closet or pantry reset"
+   ],
+   [
+    "Labor",
+    "Extra organizing time"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most organizing companies start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules organizing companies often set."
+   ],
+   [
+    "A neighborhood organizing studio on Elm St. Classic sessions, fades and hot towel shaves.",
+    "An organizing studio on Alder St. Planning sessions, storage reviews and virtual organizing."
+   ],
+   [
+    "like a roofer",
+    "like a general contractor"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about organizing our kitchen and pantry. A text back is fine."
+   ],
+   [
+    "'My sink won't closet or pantry reset' fits a closet or pantry reset.",
+    "'My pantry is a mess' fits a closet or pantry reset."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a path to the rooms and set aside anything you want kept first."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "A shelf of boxes fell in the hall closet this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a closet that is stuffed full, today,"
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: your kitchen is sorted."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a label refresh? Say so.'"
+   ],
+   [
+    "Lee Organizing · Estimate visit",
+    "Lee Organizing · In-home organizing consult"
+   ],
+   [
+    "Sanjay opens Alex's page on his own phone",
+    "Sanjay opens Alex's page on their own phone"
+   ],
+   [
+    "Lee Organizing · Closet or pantry reset",
+    "Lee Organizing · In-home organizing consult"
+   ],
+   [
+    "Alex M. · Closet or pantry reset",
+    "Alex M. · In-home organizing consult"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "the $175 service-call fee",
+    "the $89 late-cancel fee"
+   ],
+   [
+    "Water pressure check",
+    "Intro call"
+   ],
+   [
+    "repipe",
+    "kitchen and pantry"
+   ],
+   [
+    "a organizer",
+    "an organizer"
+   ],
+   [
+    "A organizer",
+    "An organizer"
+   ],
+   [
+    "The state licenses the organizing studio itself, and each studio organizer.",
+    "Most states license no organizing. The business registration is enough."
+   ],
+   [
+    "Elm St",
+    "Alder St"
+   ]
+  ]
+ },
+ "keep": [
+  "organizer",
+  "organizing",
+  "pantry",
+  "water line",
+  "leak",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Organizing Studio, Sam's organizing studio, for a planning session with Hana on Sat Oct 24 at 11:00am. The session depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Organizing to organize a kitchen and pantry at 17 Juniper Way. Sanjay comes for an in-home organizing consult Thu Oct 22 from 8 to 10am, sends a written plan, and runs two sessions once the agreement is signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Planning session, $35 at the studio; a card saved for the $20 missed-session fee; paid at the studio desk.",
+    "list|full|none": "Virtual organizing session, $55, paid in full when booking; credited toward a project if Alex signs.",
+    "photos|card|counter": "Room plan priced from Alex's photos at $90, OK'd by Sam; a card saved; paid at the studio desk.",
+    "visit|card|counter": "Custom storage plan, priced at the studio after a $25 consult; a card saved; paid at the desk."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Shopping list",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Virtual organizing session",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Planning session"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Planning session"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Virtual organizing session"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Room plan from photos"
+    },
+    "visit|*|*": {
+     "name": "Custom storage plan"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|card|bill",
+   "combos": [
+    "visit|card|bill",
+    "visit|card|own",
+    "list|card|bill",
+    "list|full|none",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "visit|card|bill": "Kitchen and pantry: the $89 in-home organizing consult, a card saved for the late-cancel fee; Sanjay's written plan; the agreement, a $600 deposit, a $360 change order; the last $960 on the bill Rosie texts.",
+    "visit|card|own": "The same project, but Sam bills the deposit and the last payment the business's own way; Rosie sends nothing about money.",
+    "list|card|bill": "Closet or pantry reset, $179 from the list; a card saved for the $89 fee; Rosie texts the bill after.",
+    "list|full|none": "Paper filing setup, $150, paid in full when booking.",
+    "photos|deposit|bill": "Garage organizing priced from photos at $640 (over $500, so Sam OKs it); a signed agreement; a 25% deposit of $160; the rest on the bill."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra organizing hour",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$120",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Paper filing setup",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "In-home organizing consult"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Closet or pantry reset"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Paper filing setup"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Garage organizing from photos"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Garage organizing from photos"
+    },
+    "visit|*|*": {
+     "name": "In-home organizing consult"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15"
+  ],
+  "B": [
+   "S1-38",
+   "B5-34",
+   "B8-71"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Home organizing needs only the business registration in most states; any license the state form asks for comes from its form."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Organizers work under the business; no person license is checked unless the state form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Lee Organizing and Lee Organizing Studio both pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Organizers are booked, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "No classes: consults, projects and studio sessions.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Organizing is never sent now: every consult and session is booked ahead.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "why": "A planning session is for the home's owner or someone they send. A child is never the one served.",
+    "label": "A child"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The studio books a studio organizer's time.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The studio books a studio organizer's time.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The studio books a studio organizer's time.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "A planning session has no form to sign first. A project's agreement comes after its plan, in the other flow.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Alex stays for the session; nothing is left at the studio.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "A session is rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No health, vision or pet plan pays for organizing.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "No insurance pays for organizing.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "why": "The studio requires nothing brought: photos and sizes are optional, and a session has no form, ID or permit to check.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "The studio takes no drop-offs (A8-53), so nothing waits to be picked up."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "The kids' room session is booked by the parent, who stays; no child is ever left at the studio."
+   },
+   {
+    "op": "more",
+    "at": "A5-16",
+    "more": [
+     "A virtual organizing session is always paid when booked: there's no studio desk on a video call. It counts toward a project if Alex signs."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the in-home organizing consult",
+      "does": "Hana saves Alex's notes. If Alex wants rooms organized, Hana books Sanjay's organizing consult at Lee Organizing.",
+      "more": [
+       "That consult belongs to Lee Organizing, Sam's other company. It runs in the other flow.",
+       "The notes and photos go with it, so Sanjay's plan can use them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: in-home organizing consult for the kitchen and pantry. Notes saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Hana saved your notes. Want Lee Organizing to come see your home and send a plan?",
+        {
+         "buttons": [
+          "Book the consult",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Home organizing needs only the business registration in most states; any license the state form asks for comes from its form."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Organizers work under the business; no person license is checked unless the state form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Lee Organizing and Lee Organizing Studio both pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Organizers are booked, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "No classes: consults, projects and studio sessions.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Organizing is never sent now: every consult and session is booked ahead.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "why": "An organizing project never starts at the consult: Alex signs a written agreement first, in the branch below.",
+    "label": "1 Yes, do it"
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "why": "A plan is signed whole, as one agreement. Changes go to Sanjay, who sends a new version to sign.",
+    "label": "3 OK some lines"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "A consult has no form to sign first; a project's agreement is signed with the plan (B8-62).",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Consults are booked in 2-hour arrival windows; session days are set by the plan.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Organizing books visits, never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Organizing books an organizer's time, never a seat.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never in the organizer's care; an adult on the booking lets the organizer in (pf.messages).",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Organizing is never sent now (B4-81).",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Organizing is never sent now (B4-81).",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No plan or warranty pays for organizing.",
+    "label": "A plan or warranty pays"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "No insurance pays for organizing.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "Organizing is never sent now (B4-81).",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Organizing is never sent now (B4-81).",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "A landlord never pays for organizing (B4-35).",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after a project, as in flow A."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "An adult 18 or older who owns the things is always home at a session: nobody-home work is not offered."
+   },
+   {
+    "op": "words",
+    "at": "B4-14",
+    "does": "An organizing project is quoted after the consult. Only the $89 in-home organizing consult is promised now. Sanjay walks the rooms, then sends a written plan with a price. Nothing starts before a signed agreement.",
+    "more": [
+     "The $89 counts toward the project price if Alex signs.",
+     "A card is saved when Alex books, for the late-cancel or no-show fee. Nothing is charged now.",
+     "No full price can be taken, since the price isn't known yet. The deposit comes with the signed agreement.",
+     "Some organizers give a free first consult. The plug-in starts there, and Sam set $89.",
+     "Alex is told before booking: the $89 is owed even if Alex doesn't sign."
+    ],
+    "vary": {
+     "before:card": {
+      "more": [
+       "The $89 counts toward the project price if Alex signs.",
+       "A card is saved when Alex books, for the late-cancel or no-show fee. Nothing is charged now.",
+       "No full price can be taken, since the price isn't known yet. The deposit comes with the signed agreement.",
+       "Some organizers give a free first consult. The plug-in starts there, and Sam set $89.",
+       "Alex is told before booking: the $89 is owed even if Alex doesn't sign."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "vary": {
+     "price:visit+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Lee Organizing can come to your home for an $89 in-home organizing consult. It counts toward the project price, and it's owed even if you don't sign. A card is saved for an $89 fee if you cancel late. Open times:",
+        {
+         "times": [
+          "Thu Oct 22 · 8–10am · Sanjay",
+          "Thu Oct 22 · 12–2pm · Marcus",
+          "Fri Oct 23 · 8–10am · Sanjay"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "does": "Sanjay walks the rooms with Alex, asks what stays, and takes before photos. The same day or the next business day, Sanjay sends the written plan and its price for Alex's secure page.",
+    "more": [
+     "The plan is good for 14 days. The $89 consult counts toward the project price.",
+     "It lists the rooms, the sessions and their hours, what Alex decides at each one, and the 2 payments.",
+     "Bins, labels and shelves are bought by Alex from a shopping list. Nothing is added without Alex's yes.",
+     "Any fact the state's rules require is on the plan."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 1200 kitchen and pantry organizing, 2 sessions of 5 hours",
+      {
+       "photos": [
+        "Kitchen, before",
+        "Pantry, before"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "does": "Alex doesn't sign now. Only the $89 in-home organizing consult is owed, and the quote stays good until Thu Nov 5.",
+    "more": [
+     "Sanjay texts DONE 89 in-home organizing consult. Only the $89 is owed: on the bill, the saved card or the business's own bill.",
+     "Alex can sign later from the same page, until the quote's date.",
+     "Alex can ask for a call first. Sanjay calls, and the quote stays open.",
+     "Rosie never argues about the price. Questions go to Sanjay, who can send a new version."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your quote stays good until Thu Nov 5. For now, only the $89 in-home organizing consult is billed.",
+      {
+       "card": {
+        "title": "Kitchen and pantry · $1,200",
+        "lines": [
+         "Good until Thu Nov 5"
+        ],
+        "button": "Sign it later",
+        "link": "rosfield.com/q/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-62",
+    "does": "Alex taps Sign the agreement on the plan's page. Rosie builds it from the plan and the parts the state's rules require. Alex signs, then Sam does.",
+    "more": [
+     "Anyone else who decides signs on a link Alex forwards. Rosie never texts them itself.",
+     "Sam signs within 24 hours. Each one gets a copy by text and email.",
+     "Nothing is taken before everyone has signed.",
+     "Not signed by Thu Nov 5: one reminder 3 days before, then the plan lapses. Only the $89 is owed.",
+     "The agreement says nothing is thrown away, donated or shredded without Alex's yes, and that changes need a signed change order."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 1200 kitchen and pantry organizing, 2 payments"
+     ],
+     [
+      "san",
+      "cust",
+      "Here's Lee Organizing's plan for your kitchen and pantry. Read it and sign on your secure page.",
+      {
+       "card": {
+        "title": "Kitchen and pantry · $1,200",
+        "lines": [
+         "Two 5-hour sessions · $120 an hour",
+         "$600 to start, $600 after the last session",
+         "OK'd by Sam · good until Thu Nov 5",
+         "Sign to book the sessions"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/h1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-63",
+    "does": "With both signatures in, Alex pays the $600 deposit on the secure page, into Lee Organizing's own Stripe. The sessions start after the cancel window ends, and Alex picks the session days.",
+    "more": [
+     "The deposit is half the project price, as the agreement set. Any cap on money before the work comes from the state's rules.",
+     "The $600 lands less Stripe's card fee.",
+     "Where the rules say money paid before the work is kept apart, it goes to the account Sam named.",
+     "Not paid in 2 days: one reminder. A day later, Sam is asked to call Alex.",
+     "Nothing starts until the cancel window ends."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your agreement is signed. The next step is the deposit.",
+      {
+       "pay": {
+        "amount": "$600",
+        "what": "your deposit",
+        "link": "rosfield.com/p/r4d"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Paid: your $600 deposit to Lee Organizing. The receipt is on the page. Your sessions start after your cancel window ends. Then you pick your session days."
+     ]
+    ],
+    "vary": {
+     "price:visit+after:own": {
+      "does": "With both signatures in, Sam bills the $600 deposit the business's own way, as the agreement set. Rosie sends nothing about money. The sessions start after the cancel window ends.",
+      "more": [
+       "The deposit and the last payment are billed by Sam the business's own way.",
+       "Nothing is ordered until the cancel window ends."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your agreement is signed. Lee Organizing bills the deposit its own way. Your sessions start after your cancel window ends. Then you pick your session days."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "does": "Alex hasn't answered the quote in 7 days. Rosie sends one reminder. Still no answer 2 days later: Sam picks to have Sanjay call Alex, or let it run to its date.",
+    "t": "Thu Oct 29, 10:00am",
+    "more": [
+     "Nothing is ordered or built without the signed agreement.",
+     "Let it run: only the $89 in-home organizing consult is owed, the same as Not now.",
+     "Alex can still sign from the page until Thu Nov 5.",
+     "Rosie sends no more texts about it.",
+     "No answer from Sam in 2 days: the quote runs to its date, as with Let it run."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "A reminder: your quote from Lee Organizing is good until Thu Nov 5.",
+      {
+       "card": {
+        "title": "Kitchen and pantry · $1,200",
+        "lines": [
+         "Good until Thu Nov 5"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered Sanjay's $1,200 quote in 7 days. It's good until Thu Nov 5.",
+      {
+       "buttons": [
+        "Sanjay will call",
+        "Let it run"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-92",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sanjay's quote for Alex M.'s kitchen and pantry organizing is $1,200, over your $500 limit. No answer in 30 minutes: Alex is told it's with you.",
+      {
+       "card": {
+        "title": "Kitchen and pantry · $1,200",
+        "lines": [
+         "Two 5-hour sessions, kitchen and pantry",
+         "Half when signed, half after the last session",
+         "The $89 consult is included"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-93",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Here's your quote from Lee Organizing. It's good until Thu Nov 5.",
+      {
+       "card": {
+        "title": "Kitchen and pantry · $1,200",
+        "lines": [
+         "Kitchen and pantry · 2 sessions of 5 hours",
+         "$600 deposit once the agreement is signed",
+         "$600 after the last session",
+         "The $89 consult is included"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/r4"
+       },
+       "buttons": [
+        "Sign the agreement",
+        "Not now",
+        "Ask for changes"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "vary": {
+     "price:visit": {
+      "t": "Wed Oct 28, 9:30am",
+      "does": "The cancel window ended with no cancel. Alex gets the project plan: session 1 is Mon Nov 2 and session 2 is Mon Nov 9, 9am to 2pm each.",
+      "more": [
+       "Each session gets its own code, sent the night before. An adult must be home.",
+       "Alex decides at each session what stays, goes or is donated. Nothing leaves the home without Alex's yes.",
+       "If a session moves, only that session moves, and Alex is told. One booking, so one $2 for the whole project.",
+       "Each session time is confirmed by text. Another time, or no reply in 2 days: Sanjay calls Alex."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your organizing project is on its way. Here's the plan.",
+        {
+         "card": {
+          "title": "Project plan · Kitchen and pantry",
+          "lines": [
+           "Thu Oct 22 · organizing consult (done)",
+           "Mon Nov 2 · 9am–2pm · session 1 · Sanjay",
+           "Mon Nov 9 · 9am–2pm · session 2 · Sanjay",
+           "Mon Nov 9 · 2:30pm · walk-through"
+          ],
+          "button": "Add an entry note",
+          "link": "rosfield.com/s/r4k"
+         }
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "UPDATE sessions set for Alex M.: Nov 2 and Nov 9. Pantry first"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "vary": {
+     "price:visit": {
+      "t": "Mon Nov 9, 2:30pm",
+      "does": "At the end of session 2, Sanjay and Alex check every shelf, bin and label against the plan. Anything wrong goes on the fix list before Sanjay texts DONE.",
+      "more": [
+       "A bin label ended up on the wrong shelf. It goes on the fix list, and Sanjay fixes it on the spot.",
+       "Items Alex set aside to donate or discard stay in the bags Alex marked until Alex says go.",
+       "The plug-in names what's checked: each bin has a label, daily things are within reach, and nothing is blocking a path.",
+       "After photos are taken from the same angles as the before photos.",
+       "If Alex disputes the work, Sam is told, and the last bill waits.",
+       "If Alex didn't sign, there's nothing to check. Sanjay texts DONE for the consult."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "FIXLIST one bin label on the wrong shelf, fixed. All else OK"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "vary": {
+     "price:visit+after:bill": {
+      "t": "Mon Nov 9, 3:15pm",
+      "does": "The walk-through is done, and the fix list is noted. Sanjay texts DONE with the last payment, so Rosie can text the bill.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 960 final payment, with change order 1"
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Mon Nov 9, 3:15pm",
+      "does": "The walk-through is done, and the fix list is noted. Sanjay texts DONE. Sam bills the last payment the business's own way.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE"
+       ],
+       [
+        "san",
+        "staff",
+        "Done: Alex M., kitchen and pantry organizing."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE kitchen: daily plates low, baking up high. Pantry: cans by use. Donation run Fri Nov 13."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-05",
+    "vary": {
+     "price:visit": {
+      "does": "Rosie reads Sanjay's DONE back. The $960 is the last payment in the signed agreement, with the change order, so it needs no OK.",
+      "more": [
+       "A bill that matches the agreement or an OK'd quote never needs an OK.",
+       "The last payment is the $600 rest plus the $360 change order.",
+       "If Alex didn't sign, the bill is the $89 in-home organizing consult.",
+       "A different total over Sam's $500 goes to Sam first."
+      ],
+      "say": [
+       [
+        "san",
+        "staff",
+        "Alex M.: $960, the last payment for the kitchen and pantry organizing. It matches the agreement. Sending Alex the bill.",
+        {
+         "buttons": [
+          "Change it"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "vary": {
+     "price:visit": {
+      "t": "Mon Nov 9, 3:20pm",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Organizing: the last payment for your kitchen and pantry organizing. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$960",
+          "what": "the last payment on your organizing project",
+          "link": "rosfield.com/p/r4"
+         },
+         "buttons": [
+          "Pay with my saved card"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-07",
+    "vary": {
+     "price:visit": {
+      "does": "The $960 lands in Lee Organizing's own Stripe, less Stripe's card fee.",
+      "more": [
+       "Stripe's card fee goes to Stripe.",
+       "Paid by bank transfer, it counts once it clears, in a few business days.",
+       "The receipt goes out once the money is in."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-26",
+    "does": "Sam turned on bank transfer for bills over $500. The last $960 is over it, so the pay link offers it. It counts as paid only once it clears.",
+    "more": [
+     "The deposit link offered it the same way.",
+     "Clearing takes a few business days. Alex is told it's on the way, and again when it clears.",
+     "The receipt waits until it clears.",
+     "If it bounces, Alex gets one pay link, and Sam is told."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Organizing: the last payment for your kitchen and pantry organizing. Pay by card, or by bank transfer.",
+      {
+       "pay": {
+        "amount": "$960",
+        "what": "the last payment on your organizing project",
+        "link": "rosfield.com/p/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your $960 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then."
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "does": "Sam turned on bank transfer for bills over $500. The last $960 is over it, so the pay link offers it. It counts as paid only once it clears.",
+      "more": [
+       "The deposit link offered it the same way.",
+       "Clearing takes a few business days. Alex is told it's on the way, and again when it clears.",
+       "The receipt waits until it clears.",
+       "If it bounces, Alex gets one pay link, and Sam is told."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Organizing: the last payment for your kitchen and pantry organizing. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$960",
+          "what": "the last payment on your organizing project",
+          "link": "rosfield.com/p/r4"
+         }
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your $960 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-09",
+    "vary": {
+     "price:visit": {
+      "does": "Alex pays the last $960 by check to Sanjay.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "paid check 960"
+       ],
+       [
+        "san",
+        "staff",
+        "Recorded: $960 check from Alex M."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-10",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Organizing: your card didn't go through for the last $960.",
+        {
+         "pay": {
+          "amount": "$960",
+          "what": "the last payment on your organizing project",
+          "link": "rosfield.com/p/r4"
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s card declined for the last $960 on the organizing project. Alex has one pay link."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-11",
+    "vary": {
+     "price:visit": {
+      "t": "Fri Nov 13, 11:00am",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Alex M. hasn't paid the last $960 for the organizing project after 4 days. Rosie sends no reminders of its own.",
+        {
+         "buttons": [
+          "Send one more link",
+          "I'll call Alex"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-14",
+    "t": "Fri Nov 13, 11:00am",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Organizing: your saved card didn't go through for the last payment on your organizing project.",
+        {
+         "pay": {
+          "amount": "$960",
+          "what": "the organizing project",
+          "link": "rosfield.com/p/r4"
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s saved card declined at DONE (Mon Nov 9, Sanjay). Alex has one pay link."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-15",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE paid check 960"
+       ],
+       [
+        "san",
+        "staff",
+        "Recorded: a $960 check from Alex M. The card isn't charged."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-08",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "staff",
+        "Alex M.'s pay page is open on your phone. Hand it to Alex to pay.",
+        {
+         "card": {
+          "title": "Alex M.'s pay page",
+          "lines": [
+           "Lee Organizing · Mon Nov 9 · $960"
+          ],
+          "button": "Open",
+          "link": "rosfield.com/p/r4"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "vary": {
+     "price:visit": {
+      "t": "Mon Nov 9, 3:40pm",
+      "does": "The receipt goes out once the last payment is in, by text and email. It lists the project price, the change order and both payments.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "Donation receipts come from the charity, and Sanjay gives Alex the paper. They are on the secure page too.",
+       "Any fact the state's rules require, like a license number, is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your kitchen and pantry organizing. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $1,560",
+          "lines": [
+           "Project price $1,200 · change order $360",
+           "Deposit and last payment, both paid",
+           "Donation receipts from the charity"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/r4"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Mon Nov 9, 3:40pm",
+      "does": "Lee Organizing sends its own receipt. Rosie sends only a thank-you note.",
+      "more": [
+       "Rosie sends no receipt here. The business's own receipt carries any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Organizing. Sanjay has your donation receipts. If anything looks wrong, reply here."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "vary": {
+     "price:visit": {
+      "t": "Mon Nov 9, 6:00pm",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Organizing! How was working with Sanjay?",
+        {
+         "card": {
+          "title": "Rate your organizing project",
+          "lines": [
+           "Kitchen and pantry · Sanjay"
+          ],
+          "button": "Rate it",
+          "link": "rosfield.com/r/r4"
+         },
+         "stars": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "vary": {
+     "price:visit": {
+      "does": "Two bins end up in the wrong place 2 weeks later. A free fix visit is part of the project for 14 days, so Sam OKs one to put them right.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "Two of the bins in my pantry ended up in the wrong place."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s organizing project, finished Mon Nov 9: two bins are in the wrong place. A free fix visit is part of the project.",
+        {
+         "buttons": [
+          "Book a free visit",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. A fix visit is part of your project, and this visit is free.",
+        {
+         "times": [
+          "Mon Nov 23 · 8–10am · Sanjay",
+          "Tue Nov 24 · 8–10am · Sanjay"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-10",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Organizing refunded your last payment.",
+        {
+         "card": {
+          "title": "Refund · $960",
+          "lines": [
+           "Kitchen and pantry · paid Mon Nov 9",
+           "Back on your card in 5 to 10 days"
+          ]
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-04",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Sorry to hear that. What went wrong?"
+       ],
+       [
+        "cust",
+        "san",
+        "Sanjay was late and rushed."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. rated the project 2 stars: \"Sanjay was late and rushed.\"",
+        {
+         "card": {
+          "title": "Rating · 2 of 5",
+          "lines": [
+           "Kitchen and pantry with Sanjay",
+           "Only you see this"
+          ]
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-09",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "cust",
+        "san",
+        "Can I get some money back? Sanjay came late and rushed."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. asked for money back for the organizing project.",
+        {
+         "buttons": [
+          "Refund it",
+          "Keep it"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "does": "Rosie never decides a refund itself. Lee Organizing was paid its own way, so Sam refunds it the same way.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "Can I get some money back? Sanjay came late and rushed."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. asked for money back for the organizing project. You were paid your own way.",
+        {
+         "buttons": [
+          "I'll refund it",
+          "Keep it"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-12",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Reminder: Alex M. asked for money back for the organizing project.",
+        {
+         "buttons": [
+          "Refund it",
+          "Keep it"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your request is still with Lee Organizing. We've asked Sam to get back to you."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-13",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "cust",
+        "san",
+        "The crew left bags by the door."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. isn't happy with the organizing project: \"The crew left bags by the door.\"",
+        {
+         "buttons": [
+          "Book a free fix",
+          "Call Alex"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-14",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Alex M.'s bank opened a dispute about the organizing project's last payment. Rosie's record is ready.",
+        {
+         "card": {
+          "title": "Dispute · Alex M.",
+          "lines": [
+           "The booking, the check-in and every text"
+          ],
+          "button": "See the record",
+          "link": "rosfield.com/d/r4"
+         },
+         "buttons": [
+          "Send the record",
+          "Let Alex keep it"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "does": "Alex's bank disputes a payment Lee Organizing took its own way. That goes through the business's own payment company. Rosie's record is ready if Sam needs it.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Alex M.'s bank is disputing the organizing project's last payment you took your own way. Rosie's record is ready if you need it.",
+        {
+         "card": {
+          "title": "Record · Alex M.",
+          "lines": [
+           "The booking, the check-in and every text"
+          ],
+          "button": "See the record",
+          "link": "rosfield.com/d/r4"
+         },
+         "buttons": [
+          "Send me the record",
+          "No need"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B4-34",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.26"
+      ],
+      "who": "agent",
+      "to": "cust",
+      "via": "chat",
+      "title": "Asks if a path, stair or exit is blocked",
+      "q": "Is any path, stair or exit blocked?",
+      "does": "The plug-in asks about blocked paths, pests, mold and waste before any session. Alex says the home is crowded but clear, so Rosie notes it for Sanjay.",
+      "more": [
+       "A blocked exit, pests, mold or waste is a safety matter first. A licensed cleanup service, or the family, clears it before any organizing.",
+       "Rosie never judges how a home looks. It asks only what keeps the crew and Alex safe.",
+       "A crowded home with clear paths is booked as usual."
+      ],
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Is any path, stair or exit blocked? Any pests, mold or waste?"
+       ],
+       [
+        "cust",
+        "agent",
+        "No. It's crowded, but you can walk through every room."
+       ],
+       [
+        "agent",
+        "cust",
+        "Noted for Sanjay. Thank you. If that changes before the visit, tell us."
+       ]
+      ],
+      "needs": [
+       "pf.questions",
+       "pf.safety"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "No: crowded but clear",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "A path is blocked or unsafe",
+        "end": "end",
+        "endText": "Not booked yet: the way must be clear first. Alex hears the safe next step, and Sam is told.",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.7",
+           "3.9"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "chat",
+          "title": "Says the way must be clear first",
+          "does": "A blocked exit or unsafe pile is not an organizing job yet. Rosie says so kindly and names who can help first.",
+          "more": [
+           "A licensed cleanup service or the family clears the way. Rosie books the consult once Alex says it is clear.",
+           "Nothing is taken, and nothing about the home goes in a text."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Thank you for telling us. For your safety, the way out has to be clear before anyone organizes. Once it is, reply here and we'll book the consult."
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-78",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 11:30am",
+      "title": "Alex adds the hall closet: a change order first",
+      "q": "Does Alex sign the change order?",
+      "does": "Reading the plan, Alex asks Sanjay to add the hall closet. The agreement can't change by text alone, so Alex and Sam sign a change order first.",
+      "more": [
+       "It's over Sam's $500, so Sam OKs the price first.",
+       "It gives the price and any time added. It goes on the final bill.",
+       "It's signed on the secure page, like the agreement.",
+       "The added hours go into session 2.",
+       "Other work goes on while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 360 add the hall closet, 3 more hours in session 2"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's the change order for the hall closet you asked Sanjay about.",
+        {
+         "card": {
+          "title": "Change order 1 · $360",
+          "lines": [
+           "Organize the hall closet too",
+           "Adds 3 hours to session 2",
+           "Added to the final bill"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/r4c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Keep the plan as is"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Keeps the plan, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x12",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "title": "Keeps the plan; tells Sanjay",
+          "does": "Alex keeps the plan as signed, or doesn't answer in 3 days. The hall closet isn't added, and Sanjay is told. Alex can ask again later.",
+          "more": [
+           "Nothing is added to the bill without a signed change order."
+          ],
+          "say": [
+           [
+            "san",
+            "owner",
+            "Alex M. didn't sign change order 1, the $360 hall closet. The plan stays as signed."
+           ],
+           [
+            "san",
+            "cust",
+            "No change: your organizing plan stays as signed."
+           ]
+          ],
+          "tells": [
+           "owner",
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x06",
+      "type": "split",
+      "line": [
+       "9.13",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Wed Oct 28, 9:00am",
+      "title": "Offers the session days",
+      "q": "Does Alex pick the days in 2 days?",
+      "does": "The cancel window ended with no cancel. Rosie offers Sanjay's open days for the two sessions. Alex picks, and each session gets its own code.",
+      "more": [
+       "Nothing starts until the window ends and the deposit is paid.",
+       "Alex decides at each session what stays, goes or is donated. Nothing leaves the home without Alex's yes.",
+       "Valuables, cash, medicines, IDs and firearms are never handled: Alex sets them aside first.",
+       "Sanjay can't come for a session: the business moves it or offers another organizer, with no fee."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your cancel window has ended. Pick your two session days with Sanjay:",
+        {
+         "times": [
+          "Mon Nov 2 · 9am–2pm · Sanjay",
+          "Mon Nov 9 · 9am–2pm · Sanjay",
+          "Tue Nov 10 · 9am–2pm · Sanjay"
+         ]
+        }
+       ]
+      ],
+      "rule": "Rosie's rule: nothing is thrown away, donated or shredded without the owner of the things saying yes. Why: organizing means choices about someone's belongings, and only their owner can make them.",
+      "needs": [
+       "pf.rules",
+       "pf.messages"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Picks the days",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 No pick in 2 days",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "9.13",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "staff",
+          "via": "msg",
+          "t": "Fri Oct 30, 9:00am",
+          "title": "Asks Sanjay to call Alex",
+          "does": "Nobody picked session days in 2 days. Sanjay gets a to-do to call Alex. The deposit stays.",
+          "more": [
+           "No session is booked for Alex on silence."
+          ],
+          "say": [
+           [
+            "san",
+            "staff",
+            "Alex M. hasn't picked session days for the kitchen and pantry project. Please call Alex.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me Monday"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "staff"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "notes": "Started from the refitted interior.json (pattern project): a paid consult at the home, a written plan with a price, a signed agreement, money only after signing, a cancel window before any session, a change order, a walk-through and a last payment. Reworked for a professional organizer: the consult sees the rooms (not a design proposal), the project is a flat price for planned hours at $120 an hour, supplies are bought by the client from a shopping list (nothing billed outside Rosie), an adult who owns the things is always home, and the organizer never decides what is thrown away.\nNames: flow B is Lee Organizing (215 Hollis Rd), lead organizers Sanjay Rao and Marcus Bell; flow A is Lee Organizing Studio (74 Alder St), Sam's second company, with studio organizers Hana Ito and Rafael Cruz. Alex lives at 17 Juniper Way. License and registration numbers use the obviously fake EX-1042 style.\nMoney, flow B (master numbers kept so sums stay right): the in-home organizing consult is $89 (also the late-cancel and no-show fee), credited to the project if Alex signs, billed alone only if no agreement follows. Example project: a $1,200 kitchen and pantry project (two 5-hour sessions at $120 an hour); $600 deposit when the agreement is signed; a $360 change order (the hall closet, 3 more hours, signed before the work); the last $960 after the last session on the bill Rosie texts (or the business's own way). Total $1,560. Paths B: visit|card|bill (main), visit|card|own, list|card|bill (closet or pantry reset $179, 2 hours), list|full|none (paper filing setup $150, fee $89), photos|deposit|bill (garage organizing from photos $640, deposit $160, rest $480, Sam OKs over $500).\nMoney, flow A: planning session $35 at the studio (card saved for the $20 fee, paid at the desk, main), virtual organizing session $55 paid in full (credited to a project), room plan from photos $90, custom storage plan priced at the studio after a $25 consult. Also in pf.services: planning session at home $75 paid in full, storage and label review $40, shopping list $20, kids' room session $25, whole-room plan package $140 ($40 fee), intro call (free).\nCancel right: switch cancelright in flow B only (an agreement signed at the customer's home); the master's B8-78 notice names the real last day, and no session starts before it. Settings: arrive A a set start, B a 2-hour window for the consult; cutoff 24 hours before (the master's literal '7am on the visit day' in S1-21 is renamed to match). The stage-bill fact is not listed: this project pays a deposit and a last payment, not three stages.\nNever sent now: S2-30's yes branch is off and the 'Jobs sent now' rule rows and S2-30's example line say none. Nobody-home work is not offered (B8-69 off): an adult who owns the things is home at every session.\nOwn steps B: B4-x01 / B4-x02 (asks if a path, stair or exit is blocked, or pests, mold or waste: a safety matter that is cleared by a licensed service or the family before any booking), B8-x11 / B8-x12 (change order for the hall closet, signed before the work, Sat Oct 24), B8-x06 / B8-x07 (offers the session days after the window; no pick in 2 days: the organizer calls; a rule that nothing is thrown away, donated or shredded without the owner's yes). Own step A: A8-x01 (the studio offers the in-home consult; it runs in flow B). Dates run forward: consult Thu Oct 22, plan signed Thu Oct 22, deposit Fri Oct 23, cancel window to Tue Oct 27, session days offered Wed Oct 28, sessions Mon Nov 2 and Mon Nov 9, walk-through 2:30pm, DONE 3:15pm, receipt 3:40pm, a free fix visit Mon Nov 23.\nSafety: stop words are a gas smell or sparking wires, a blocked exit or stairway or piles that could fall on someone, and animal or human waste, rodents, sharps or mold across a room (no booking until cleared); steps-then-go-on are heavy boxes on a high shelf, a family member who does not want things moved, and musty old boxes. The Spanish danger call (B3-11 / B3-18) and the after-booking danger check (B7-17) use heavy boxes on a high shelf, a go-on item, never a stop word. Valuables, cash, medicines, IDs and firearms are never handled: the owner sets them aside. Papers are never read aloud or photographed; nothing found goes in a text.\nWho may book: an adult 18 or older who lives in the home or runs the space; the things belong to the person served, who decides what is kept, moved, donated or thrown away; a relative booking for an older parent does not decide for them unless papers on file say so (S13-31). Licenses: most states license no organizing; the business registration and insurance are kept; a cleanup service or any repair is the client's own licensed pro.\nRename: only the pairs that still hit the frozen master were carried from interior (131 A / 224 B were live); every right side was rewritten for organizing; the sentences the word pairs would damage ('cut' as a verb) have front pairs; B's 'shop' titles say 'company'. Keep list: organizer, organizing, pantry, water line, leak.\nNot sure (for the verifier): (1) the project words on B8-37..B10-14 are the organizing project's own story on price:visit; (2) the master's booking cards name one list service on every path (MASTER R02/R08); (3) A's S1-13 'Planning session at their home $75' is the master's two-places example and is true here (pf.services lists it); (4) the yearly refresh visit in pf.services is only an example inside the repeat-visit what-if (B4-44), not a plan the plug-in lists as a fact.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "One question cuts the most",
+    "Those words are cut from the recording",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "$140 an hour",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Lee's Barbershop would like to see your hair before pricing it.",
+    "'Yes, make it a fade'",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "like a mark on an item or the skin",
+    "like the cut in the mirror",
+    "the free style consult",
+    "like the 15-minute style consult",
+    "like a skin reading",
+    "toner",
+    "Toner",
+    "The chairs",
+    "A chair, ready",
+    "Panel upgrade: a free estimate, then a quote",
+    "chair renter",
+    "a step-free chair",
+    "Its money card is set the way most plumbing businesses start.",
+    "Here are the rules plumbing businesses often set.",
+    "service-call fee",
+    "A water heater job",
+    "Every plumbing service",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all",
+    "Color correction $110 · gloss $15",
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Riley also does color and house calls",
+    "Color always stays with Riley",
+    "like Riley's color plan after a consult",
+    "Riley's color plan",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "Some jobs take several visits, like a color correction done in two steps",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "once Riley sees the hair",
+    "like a 15-minute style consult",
+    "Gloss to finish",
+    "gloss",
+    "Lee's Barbershop doesn't do perms.",
+    "a Kids cut (12 and under) is $25",
+    "Quiero un corte el sábado.",
+    "A repair shop, a tailor or a groomer does.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "Step-free door on Elm St",
+    "Do you do kids cuts? My son is 8.",
+    "A haircut could mean a salon or a barbershop.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Plumbing JP031552 · electrical JE30417",
+    "Plumbing MP045210",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "takes jobs sent now, like a burst pipe",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "estimate visit",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "Drain clearing",
+    "water heater",
+    "Drain",
+    "shops",
+    "shop",
+    "Shop",
+    "Each service starts the way most barbershops set it.",
+    "like a roofer",
+    "two skin fades on Sat Nov 7",
+    "House calls",
+    "house calls",
+    "house call",
+    "How would you like it on top? (optional)",
+    "Style consult",
+    "Elm St"
+   ],
+   "B": [
+    "One question cuts the most",
+    "Those words are cut from the recording",
+    "Seats cut:",
+    "HURT cut my hand, need to stop",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "$140 an hour",
+    "can clear the drain",
+    "Me, and yes. It's my kitchen.",
+    "like new pipes put in one day and finished another",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "camera inspection",
+    "The chairs",
+    "A chair, ready",
+    "Panel upgrade: a free estimate, then a quote",
+    "chair renter",
+    "service-call fee",
+    "A water heater job",
+    "Every plumbing service",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Free until 7am on the visit day.",
+    "Alex books on the shop's booking page",
+    "Gives the shop's own line",
+    "Tells Alex it's with the shop",
+    "shop-added",
+    "Riley also does color and house calls",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Is the report ready on time?",
+    "The report is ready on the date Alex was told.",
+    "Texts the report link on the new date",
+    "The report is ready on the new date.",
+    "LATE camera report Mon Oct 26",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan texts the quote",
+    "Signed: the deposit, then the work days",
+    "Jordan found more work.",
+    "Jordan needs a part from the supply house.",
+    "cracks the cabinet floor",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "like a permit it needed that isn't in",
+    "an estimate visit",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Kim L.'s yard drain",
+    "Yard drain",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "plumbing visit",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "The on-call plumber",
+    "on-call plumber",
+    "It's under the 1-year labor warranty.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Jordan texts OMW as he leaves",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "One of the shop's barbers does house calls.",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yearly water heater flush plan",
+    "Say Alex also asks about a dripping faucet.",
+    "Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Arrival times:",
+    "1 Arrival windows",
+    "Plumbing books a 2-hour window.",
+    "arriving 8–10am",
+    "arriving 10am–12pm",
+    "arriving 12–2pm",
+    "arriving 2–4pm",
+    "Video and Jordan's notes",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "It's overflowing. Can someone come tonight?",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "$245",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Say Alex asks for a water heater flush every year.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Jordan finds corroded shutoff valves.",
+    "Replace both shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "the shutoff valves",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "sewer camera report",
+    "Texts the camera report link",
+    "stage 2 of your repipe",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Plumbing JP031552 · electrical JE30417",
+    "Casey · license not found",
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "Casey · license expired",
+    "Casey's license is checked again when the lookup answers.",
+    "so Casey's license isn't checked yet",
+    "$89, credited to the repair",
+    "Plumbing license",
+    "Plumbing MP045210",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "takes jobs sent now, like a burst pipe",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "leehomeservices.com",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "estimate visit",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barber",
+    "Barber",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "$89 service call",
+    "service call",
+    "Service call",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "the kitchen drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Drain",
+    "drain",
+    "Labor",
+    "shop",
+    "Shop",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "like a roofer",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "'Adding a faucet check? Say so.'",
+    "house calls",
+    "Water pressure check",
+    "repipe",
+    "Elm St"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-24": "0a292df05b",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-02": "15f418fec4",
+   "A10-06": "a9f01f141d",
+   "A8-67": "e9fd748fc5",
+   "A5-16": "8045a6b80c",
+   "A8-44": "4410a4860c"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B8-93": "c1406fd6bc",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B9-06": "f091432f2d",
+   "B10-32": "7713bff255",
+   "B8-69": "5d0e4c0045",
+   "B4-14": "bea6443957",
+   "B4-15": "f13240b9c6",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "B8-49": "4fcfdeb80b",
+   "B8-92": "ccc2dc877b",
+   "B8-37": "3ce85cf051",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B9-05": "6cbce323ed",
+   "B9-07": "310f930c3b",
+   "B9-26": "d356566ab1",
+   "B9-09": "832947585f",
+   "B9-10": "4ec0979e1a",
+   "B9-11": "9525d5f9c9",
+   "B9-14": "63b87042d1",
+   "B9-15": "35e619ed4f",
+   "B9-08": "40919b5ca4",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B10-08": "01bac94fd8",
+   "B10-10": "30b382ad47",
+   "B10-04": "b25044fa47",
+   "B10-09": "b0bde2b7fe",
+   "B10-12": "ded576c8bc",
+   "B10-13": "584c827fda",
+   "B10-14": "b0840c40ca",
+   "B4-34": "74ff52d83d",
+   "B8-78": "628ca6843e"
+  }
+ }
+}

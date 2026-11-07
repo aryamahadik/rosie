@@ -1,0 +1,3310 @@
+{
+ "id": "immigration-services",
+ "name": "Immigration and paralegal services",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "lawyer",
+ "plugin": {
+  "pf.license": {
+   "what the business is (a switch set at sign-up)": "1) A document preparer or immigration consultant who is not a lawyer (the example business): fills in forms only from the customer's own answers, translates, and mails what the customer signed; never gives legal advice, never picks a form, never represents anyone before the immigration agencies. 2) A law firm: legal advice by its lawyers. 3) A recognized nonprofit with accredited representatives: legal advice by those representatives.",
+   "need": "Non-lawyer: a business registration, plus an immigration consultant registration and a bond where the state's rules require them. Law firm: each lawyer's active license in good standing in any state (immigration is federal law), plus the state's rules for law firms. Nonprofit: the organization's federal recognition and each representative's current federal accreditation (the federal rule: only a lawyer or an accredited representative of a recognized organization may give immigration legal advice or represent someone).",
+   "ask": "The registration number and bond where the state form asks; for a law firm each lawyer's bar number; for a nonprofit its recognition and each representative's accreditation and end date.",
+   "who holds it": "The business (registration, bond); each lawyer; each accredited representative.",
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, registration, accreditation or bond (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license or registration (D96): the business goes live once set up and the owner says yes. A business that says it is a law firm or a recognized nonprofit lists legal consultations; any other business lists only form help at the customer's direction and translation. A job the owner says needs a registration they don't have isn't booked.",
+   "renewals": "The owner may give end dates for a registration, bond or accreditation; Rosie reminds Sam before they pass and pauses new bookings for that work if the owner says it lapsed. It looks nothing up.",
+   "background check": "None.",
+   "insurance or bond": "A bond in the amount the state's rules set, where they require one, and errors and omissions insurance, are the business's own; Rosie shows them only as the business gives them."
+  },
+  "pf.services": {
+   "shape": "Consult: appointments to fill in immigration forms from the customer's own answers, certified translation of documents, and (only where the business has a lawyer or an accredited representative) legal consultations. The case, the filing and any agency appointment stay outside Rosie.",
+   "examples": "The example business's own prices, not a standard.",
+   "at the business (flow A)": [
+    {
+     "name": "Forms appointment: a form package filled in from your answers",
+     "length": "60 to 90 minutes",
+     "price": "$150 a form package (a card renewal or replacement, a work permit renewal, a naturalization application, a fee waiver request)",
+     "kind": "one price",
+     "where": "the office, or by video",
+     "before": "nothing taken; a written contract signed first where the state's rules require it",
+     "after": "paid at the front desk when the forms are signed; by video, the bill is texted",
+     "note": "the government's filing fee is separate and paid by the customer straight to the government"
+    },
+    {
+     "name": "Extra form added at the appointment",
+     "price": "$60 a form",
+     "kind": "one price",
+     "rule": "priced and OK'd by the customer before it's typed; paid at the front desk with the rest"
+    },
+    {
+     "name": "Certified translation of a document",
+     "length": "ready in 3 business days",
+     "price": "$35 a page (3 pages: $105)",
+     "kind": "per page",
+     "where": "dropped off at the desk as a copy, or uploaded on the secure page",
+     "before": "paid in full at drop-off or upload",
+     "after": "nothing more; READY by text, the translation on the secure page or picked up with the code",
+     "note": "originals are looked at and handed back, never kept"
+    },
+    {
+     "name": "Legal consultation with a lawyer or an accredited representative",
+     "length": "30 to 60 minutes",
+     "price": "the business's own price",
+     "where": "only at a law firm or a recognized nonprofit (switch); not offered by the example business"
+    }
+   ],
+   "at the customer's place (flow B)": [
+    {
+     "name": "Forms appointment at your home",
+     "length": "90 minutes",
+     "price": "$190: a $150 form package plus a $40 travel fee",
+     "kind": "one price",
+     "where": "the customer's home, for someone who can't travel",
+     "before": "nothing taken, or a card saved for the $40 fee the business sets for a late cancel or a no-show",
+     "after": "the bill texted after, or the saved card charged at DONE"
+    },
+    {
+     "name": "Forms day at a community center (a host's place)",
+     "length": "60-minute slots",
+     "price": "$150 a form package",
+     "where": "a church or community center that hosts set days, with its OK",
+     "before": "nothing taken",
+     "after": "the bill texted after"
+    },
+    {
+     "name": "Extra form added at the visit",
+     "price": "$60 a form",
+     "kind": "one price",
+     "rule": "priced and OK'd by the customer before it's typed; on the bill with the rest"
+    }
+   ],
+   "capacity": "one preparer per appointment; translations by a translator, no customer time",
+   "skills": "the languages each preparer speaks; which form packages each prepares; certified translation per language pair",
+   "online": "forms appointments by video; translations by upload"
+  },
+  "pf.questions": {
+   "before times": [
+    "What kind of help: forms for a card renewal or replacement, a work permit, naturalization, a fee waiver, a translation, or something else. Only the kind, no details.",
+    "Is there a date your papers must reach the government by, like a date on a notice, a card that expires, or a hearing? The date only.",
+    "In the office, by video, at your home, or at a forms day?",
+    "Which language would you like to use?",
+    "For a translation: how many pages, and from which language?"
+   ],
+   "after a time is picked": [
+    "Anything that helps the visit, like a step-free way in or an interpreter for a language the preparers don't speak.",
+    "Which documents you have, from the plug-in's list for that form package (copies are fine; originals are handed back)."
+   ],
+   "only on the secure page": [
+    "Full legal name and any other names used; date of birth",
+    "Country of birth and citizenship; immigration status; the government's person number and receipt or case numbers",
+    "Passport and card numbers; address and work history the form asks for",
+    "Any arrest or court case, only where the form asks, and only here",
+    "A tick: this business is not a law firm and can't give legal advice; the forms are filled in from your own answers (non-lawyer switch)",
+    "A tick: the fee, and that the government's filing fee is paid separately, straight to the government",
+    "Is it safe to text, email or call you? If not, how should the business reach you?",
+    "18 or older"
+   ],
+   "who may book": "An adult books for themselves. A family member may book for a parent or a relative who can't, but the person the forms are for gives their own answers on their own secure page and signs their own forms. A child's forms: a parent or legal guardian books and signs."
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone is in danger or being hurt right now, or a medical emergency",
+     "say": "Call 911 now.",
+     "booking": "no booking in that chat"
+    },
+    {
+     "words": "crisis words",
+     "say": "the 988 line and 911",
+     "booking": "no booking in that chat"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "an immigration arrest or detention happening now, or a relative just detained",
+     "what": "not 911 unless someone is in danger. A non-lawyer business says plainly it can't help with a detention or a court case, and that an immigration lawyer or an accredited representative can (the federal government lists accredited representatives; the state bar runs a lawyer referral line), naming nobody. A law firm gives its own urgent line."
+    },
+    {
+     "words": "abuse, or fear of a partner or family member",
+     "what": "if in danger, 911; the National Domestic Violence Hotline, 1-800-799-7233; the booking goes on, and Rosie asks how it's safe to reach the customer"
+    },
+    {
+     "words": "a notice with a deadline in days, or a hearing notice",
+     "what": "the date is put on the booking for the owner, and only times before it are offered; a non-lawyer business tells the customer plainly that a lawyer or an accredited representative should see a hearing notice"
+    }
+   ],
+   "legal questions": "Which form do I need, am I eligible, what should I say at my interview, will this hurt my status: never answered by the AI, and never by a non-lawyer at the business. At a non-lawyer business the answer is that this business can't give legal advice, and only form help the customer directs is booked. Where the business has a lawyer or an accredited representative, the question waits for that person's consultation.",
+   "never said": "No promise of a result or a faster answer, and no claim of ties to the government."
+  },
+  "pf.first_steps": {
+   "required": [
+    {
+     "name": "Written contract",
+     "when": "before any paid service, where the state's rules require it",
+     "who": "the customer signs on the secure page",
+     "what": "each service and fee, the government's fees kept separate, in English and the customer's language; a copy to the customer; the state's cancel period, with a full refund, runs from signing",
+     "result": "signed: the appointment stands; not signed by the due date: Sam decides"
+    },
+    {
+     "name": "Deadline check",
+     "when": "at booking, when a date is given",
+     "who": "Sam OKs it first",
+     "what": "the request goes to Sam so nobody books a form package that can't be done before the due date",
+     "result": "OK: booked before the date; not possible: said plainly, nothing owed"
+    }
+   ],
+   "documents": "The plug-in's list per form package (the notice, the current card, the passport page, prior forms), uploaded on the secure page or brought as copies. Originals are looked at and handed back the same visit.",
+   "prep for the reminder": "Bring every notice you got from the government, a photo ID, and the documents on your list. Originals are handed back."
+  },
+  "pf.visit": {
+   "check-in": "At the office: the code at the front desk. By video: the preparer asks for the code at the start. At a forms day: the code at the host's table. At home: the code at the door.",
+   "at the visit": "The preparer types the forms from the customer's own answers, reads every answer back in the customer's language, and the customer signs. The preparer signs as the preparer where the form asks. Copies go to the customer; originals are handed back.",
+   "work changes": "An extra form is priced and OK'd before it's typed. A question that needs legal advice stops that part: the business can't advise, and nothing is charged for it.",
+   "what proves it's done": "DONE once the forms are signed and the copies given. If the customer asks the business to mail them, the tracking number goes on the secure page.",
+   "translation": "A copy is dropped off with the code, or uploaded. READY when the certified translation is done: on the secure page, or picked up with the code."
+  },
+  "pf.money": {
+   "before": "Forms appointments: nothing taken (the starting answer). Translation: paid in full at drop-off or upload. A home appointment may save a card for the travel-fee amount the business sets as its late-cancel or no-show fee. Where the state's rules require a written contract before any money, nothing is taken until it's signed. A deposit only where the state's rules allow it, up to the state's cap.",
+   "after": "Paid at the front desk when the forms are signed; by video or at home, the bill is texted, or a saved card is charged at DONE. An extra form is priced and OK'd first, and paid with the rest at the visit.",
+   "government fees": "Never through Rosie: the customer pays the government directly, the agency's own way. The business never holds them.",
+   "fees": "No late-cancel or no-show fee by default. A business may set one (the example: the $40 travel fee at a home visit); it's shown before booking, and Sam confirms each. A fee is never more than what was paid now.",
+   "tips": "None.",
+   "tax": "None by default; where the state's rules tax the service, the rate comes from the state form.",
+   "rosfield": "the $2 per confirmed booking applies, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, paid by the business, never added to the customer's price; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee.",
+   "law firm switch": "A law firm or a nonprofit: money paid before legal work is an advance fee for the firm's trust account, never through Rosie, so legal consultations take nothing before. Its translation and form help follow the lines above."
+  },
+  "pf.messages": {
+   "never in a text": [
+    "immigration status, the government's person number, receipt or case numbers",
+    "country of birth, passport or card numbers",
+    "any arrest, court case or hearing",
+    "which form or what the forms are for"
+   ],
+   "texts say": "only the business's plain name, the date, the time and the place; the owner may set a plain display name for texts and card statements",
+   "staff texts": "initials and 'forms appointment', never the form type or status",
+   "others asking": "Rosie never confirms to anyone but the customer that a person is a customer or has a booking: not a relative, an employer or an officer. A request from law enforcement goes to the owner.",
+   "safe to text": "If texts aren't safe, only the way the customer picks.",
+   "languages": "English and Spanish, plus any languages the owner adds (often Chinese, Vietnamese, Tagalog, Haitian Creole, Arabic, Portuguese); any required notice in the customer's language.",
+   "minors": "A parent or legal guardian books; texts go to them.",
+   "no nudges": "No follow-up texts selling more forms."
+  },
+  "pf.staff": {
+   "roles": "Document preparers (not lawyers), translators, an office manager. At a law firm: lawyers and paralegals working under them. At a nonprofit: accredited representatives.",
+   "licenses": "No person license at the example business. Translators certify their own translations. Lawyers and accredited representatives, where the business has them, are listed as the business gives them; Rosie doesn't look them up or check them.",
+   "supervision": "A non-lawyer never gives legal advice, never picks a form, never represents anyone. A paralegal at a law firm works under a lawyer.",
+   "skills": "languages spoken; form packages; translation language pairs",
+   "who OKs": "Sam OKs any deadline request and any price made for one customer.",
+   "stand-ins": "Another preparer who speaks the customer's language. A customer who asked for a person by name is asked first, and nobody moves on silence."
+  },
+  "pf.rules": {
+   "legal advice": "Only a lawyer or an accredited representative of a recognized organization gives immigration legal advice (the federal rule, as a switch). Rosie never gives legal advice. Everyone else fills in forms only from the customer's own answers.",
+   "words never used": "Never call the business or anyone in it a lawyer, an attorney, 'notario' or 'notario público', or an immigration expert, unless that is true. No promises of results or speed; no claim of ties to the government.",
+   "notice": "Where the state's rules require it: a notice that the business isn't a lawyer and can't give legal advice, in English and the customer's language, shown at booking and posted at the office. Rosie shows it as the business gives it.",
+   "written contract": "Before paid services where the state's rules require it, with the state's cancel period and a full refund inside it.",
+   "originals": "Never kept; copies of everything filed go to the customer.",
+   "government fees": "Separate, paid by the customer to the government.",
+   "records": "7 years, or longer where the state's rules for consultants require it. The forms themselves stay in the business's own files.",
+   "no referral fees": "The business never pays or takes a fee for sending someone to a lawyer."
+  },
+  "pf.edges": {
+   "matter most": {
+    "a legal question at a non-lawyer business": "Never answered; the business can't advise; only form help the customer directs is booked.",
+    "a deadline in days": "Sam's OK first; only times before the date; if nothing fits, said plainly.",
+    "a relative books for someone detained": "A non-lawyer business can't help with detention; a law firm's own urgent line.",
+    "someone else asks about a customer": "Neither confirmed nor denied.",
+    "texts aren't safe": "Only the way the customer picks.",
+    "the forms need a lawyer (a past removal, an arrest)": "That part stops at the visit; nothing is charged for it.",
+    "originals brought in": "Handed back the same visit.",
+    "a no-show": "No fee unless the business set one and the customer agreed.",
+    "the government changes an agency appointment": "Not booked by Rosie."
+   },
+   "the rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "forms",
+   "firststeps",
+   "documents",
+   "dropoff",
+   "video",
+   "children",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "One question cuts the most",
+    "One question comes up the most"
+   ],
+   [
+    "Rosfield takes no cut of them",
+    "Rosie keeps none of them"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are left out of the recording"
+   ],
+   [
+    "It takes no cut of card payments",
+    "It keeps none of card payments"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Necesito ayuda con unos formularios el sábado."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "My name is spelled wrong on one of the forms."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Can you help with a child's forms? My son is 8."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a parent books a child's forms and signs for them."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Translation for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds translation to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW translation"
+   ],
+   [
+    "Health details stay on the secure page, never in a text.",
+    "Private details stay on the secure page, never in a text."
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like an urgent same-day visit"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: forms work is booked ahead."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video forms appointment"
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "Here: a form on the secure page, for every new customer."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "Immigration work is private, so no rating is asked and the office takes the second branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say an appointment leads to more appointments, like Ana's follow-up forms."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your office, paid at the front desk, your own way"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the front desk"
+   ],
+   [
+    "pays at the chair",
+    "pays at the front desk"
+   ],
+   [
+    "code at the chair",
+    "code at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the appointment"
+   ],
+   [
+    "At the chair",
+    "At the appointment"
+   ],
+   [
+    "the chair",
+    "the front desk"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Form Help LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Form Help"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Forms"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Forms"
+   ],
+   [
+    "Lee Electric",
+    "Lee Translation"
+   ],
+   [
+    "88 Elm St",
+    "27 Mill St"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "1200 Main St",
+    "410 Lake St"
+   ],
+   [
+    "Oak St",
+    "Cedar Ct"
+   ],
+   [
+    "electrical jobs",
+    "translation jobs"
+   ],
+   [
+    "electrical license",
+    "translation certificate"
+   ],
+   [
+    "Electrical",
+    "Translation"
+   ],
+   [
+    "electrical",
+    "translation"
+   ],
+   [
+    "plumbing jobs",
+    "forms jobs"
+   ],
+   [
+    "plumber",
+    "preparer"
+   ],
+   [
+    "Plumber",
+    "Preparer"
+   ],
+   [
+    "plumbing",
+    "form preparation"
+   ],
+   [
+    "Plumbing",
+    "Form preparation"
+   ],
+   [
+    "barbershops",
+    "form offices"
+   ],
+   [
+    "barbershop",
+    "form office"
+   ],
+   [
+    "Barbershop",
+    "Form office"
+   ],
+   [
+    "barbers",
+    "preparers"
+   ],
+   [
+    "barber",
+    "preparer"
+   ],
+   [
+    "Barber",
+    "Preparer"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Certified translation, 3 pages"
+   ],
+   [
+    "Signature cut and shave",
+    "Certified translation, 3 pages"
+   ],
+   [
+    "signature cut",
+    "certified translation"
+   ],
+   [
+    "Groom's package",
+    "Naturalization forms"
+   ],
+   [
+    "Color and cut",
+    "Work permit renewal"
+   ],
+   [
+    "color and cut",
+    "work permit renewal"
+   ],
+   [
+    "Color correction",
+    "Fee waiver request"
+   ],
+   [
+    "color correction",
+    "fee waiver request"
+   ],
+   [
+    "Skin fade",
+    "Card renewal forms"
+   ],
+   [
+    "skin fade",
+    "card renewal forms"
+   ],
+   [
+    "Beard trim",
+    "Extra form"
+   ],
+   [
+    "beard trim",
+    "extra form"
+   ],
+   [
+    "Kids cut",
+    "Child's forms"
+   ],
+   [
+    "kids cut",
+    "child's forms"
+   ],
+   [
+    "Haircuts",
+    "Forms appointments"
+   ],
+   [
+    "haircuts",
+    "forms appointments"
+   ],
+   [
+    "Haircut",
+    "Forms appointment"
+   ],
+   [
+    "haircut",
+    "forms appointment"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "patch test",
+    "document check"
+   ],
+   [
+    "Drain clearing",
+    "Forms appointment at home"
+   ],
+   [
+    "Water heater flush",
+    "Second person's forms"
+   ],
+   [
+    "water heaters",
+    "naturalization forms"
+   ],
+   [
+    "water heater",
+    "naturalization forms"
+   ],
+   [
+    "Color quotes",
+    "Renewal quotes"
+   ],
+   [
+    "color quote",
+    "renewal quote"
+   ],
+   [
+    "Color",
+    "Renewal forms"
+   ],
+   [
+    "color",
+    "renewal forms"
+   ],
+   [
+    "cut hair",
+    "help customers"
+   ],
+   [
+    "cuts",
+    "appointments"
+   ],
+   [
+    "cut",
+    "appointment"
+   ],
+   [
+    "Riley",
+    "Ana"
+   ],
+   [
+    "Avery",
+    "Minh"
+   ],
+   [
+    "Jordan",
+    "Luis"
+   ],
+   [
+    "Casey",
+    "Nora"
+   ],
+   [
+    "Book me a forms appointment at Lee Form Help on Saturday.",
+    "Book me a forms appointment with Ana Torres at Lee Form Help on Saturday."
+   ],
+   [
+    "A forms appointment could mean a salon or a form office.",
+    "A forms appointment could mean a preparer or a tax preparer."
+   ],
+   [
+    "Lee Form Help prices a fee waiver request at the appointment, once Ana sees the hair.",
+    "Lee Form Help prices a fee waiver request at the forms appointment, once Ana sees the papers."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's forms together"
+   ],
+   [
+    "A groom books appointments for himself and four friends on one morning. Rosie finds chairs side by side across Ana and Minh.",
+    "A family books forms appointments for three relatives on one morning. Rosie finds back-to-back times across Ana and Minh."
+   ],
+   [
+    "A form office takes no drop-offs. A repair office, a tailor or a groomer does.",
+    "A form office takes drop-offs only for a translation. A repair shop, a tailor or a groomer takes more."
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free fix to a typo on a form."
+   ],
+   [
+    "A form office's plug-in adds no danger words of its own.",
+    "A form office's plug-in adds danger words, like a detention happening now."
+   ],
+   [
+    "If the plug-in asks for something to bring, the desk checks it first. A forms appointment needs nothing.",
+    "If the plug-in asks for something to bring, the desk checks it first. A forms appointment asks for the papers on its list."
+   ],
+   [
+    "Ana finishes the work",
+    "Ana finishes the forms"
+   ],
+   [
+    "Drains have a set price.",
+    "A form package has a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "A form not on the list is priced at the visit."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone in danger right now stops the booking."
+   ],
+   [
+    "Forms appointment, fade and extra form at the office.",
+    "Forms appointments and extra forms at the office."
+   ],
+   [
+    "Panel upgrade",
+    "Translation of a long document"
+   ],
+   [
+    "Why: many preparers, salons and groomers are licensed to their office.",
+    "Why: some kinds of work, like salons and groomers, are licensed to one place."
+   ],
+   [
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "E nothing before. A at their home too, 75, paid after the visit"
+   ],
+   [
+    "Lee Home Forms'",
+    "Lee Home Forms's"
+   ],
+   [
+    "photos of your hair",
+    "a short note on the kind of help"
+   ],
+   [
+    "15 gloss",
+    "60 extra form"
+   ],
+   [
+    "gloss $15",
+    "extra form $60"
+   ],
+   [
+    "Gloss to finish",
+    "Extra form"
+   ],
+   [
+    "No gloss today",
+    "No extra form today"
+   ],
+   [
+    "A neighborhood form office on Mill St. Classic appointments, fades and hot towel shaves.",
+    "A neighborhood form office on Mill St. Form packages and translation."
+   ],
+   [
+    "The chairs",
+    "The waiting room"
+   ],
+   [
+    "A chair, ready",
+    "A desk, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a preparer who rents a desk here,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a desk here, with their own customers."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "A preparer's example: water near outlets gets 'shut off the main valve'.",
+    "A preparer's example: fear of someone at home gets the hotline first."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the office's list.",
+    "Alex asks for a tax return, which isn't on the office's list."
+   ],
+   [
+    "Lee Form Help doesn't do perms.",
+    "Lee Form Help doesn't do tax returns."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free entrance:"
+   ],
+   [
+    "You told us the child's forms is for your son, and that you're his parent. His details go on the secure page.",
+    "You told us the forms are for your child, and that you're their parent. Their details go on the secure page."
+   ],
+   [
+    "like 'How would you like it on top?'",
+    "like 'Do you need an interpreter?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Do you need an interpreter? (optional)"
+   ],
+   [
+    "Could Ana use a toner instead of the gloss?",
+    "Could Ana add one more form?"
+   ],
+   [
+    "A.M. asks for a toner instead of the gloss. What's the new price?",
+    "A.M. asks to add a second question. What's the new price?"
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: prefers a video forms appointment next time"
+   ],
+   [
+    "A chair renter asked for by name:",
+    "A desk renter asked for by name:"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A chair in the waiting room ripped my coat."
+   ],
+   [
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "A.M. says a waiting room chair ripped a coat today."
+   ],
+   [
+    "May the office show a short note on the kind of help? Yes / No",
+    "May the office leave a voicemail? Yes / No"
+   ],
+   [
+    "BS20981",
+    "EX-3180"
+   ],
+   [
+    "BS20918",
+    "EX-3108"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "JP031552",
+    "EX-1552"
+   ],
+   [
+    "$35",
+    "$150"
+   ],
+   [
+    "$55",
+    "$105"
+   ],
+   [
+    "$75",
+    "$190"
+   ],
+   [
+    "$140",
+    "$150"
+   ],
+   [
+    "$25",
+    "$150"
+   ],
+   [
+    "$90",
+    "$150"
+   ],
+   [
+    "raises the forms appointment to $40 for visits from Mon Nov 2",
+    "raises the forms appointment to $160 for visits from Mon Nov 2"
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $160 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "Saved: forms appointment $40 for visits from Mon Nov 2.",
+    "Saved: forms appointment $160 for visits from Mon Nov 2."
+   ],
+   [
+    "Forms appointment plans go to $40 from Wed Nov 25",
+    "Forms appointment plans go to $160 from Wed Nov 25"
+   ],
+   [
+    "Reading it back: the forms appointment goes to $40 for new bookings.",
+    "Reading it back: the forms appointment goes to $160 for new bookings."
+   ],
+   [
+    "Forms appointment $150 ($40 from Nov 2) · Card renewal forms $40 · Extra form $20",
+    "Forms appointment $150 ($160 from Nov 2) · Card renewal forms $150 · Extra form $60"
+   ],
+   [
+    "Rosie answers with the real price, $40.",
+    "Rosie answers with the real price, $160."
+   ],
+   [
+    "A card renewal forms at Lee Form Help is $40, not $150. Here are the open times at $40.",
+    "A forms appointment at Lee Form Help is $160, not $150. Here are the open times at $160."
+   ],
+   [
+    "asks for a card renewal forms at $150",
+    "asks for a forms appointment at $150"
+   ],
+   [
+    "Sam switches the forms appointment from a card saved for the $20 fee to a $20 deposit.",
+    "Sam switches the forms appointment from paid at the front desk to a bill texted after the visit."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "Nothing taken · paid at the front desk"
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so no fee"
+   ],
+   [
+    "Late or no-show: the $20 fee, if you confirm",
+    "Late or no-show: no fee unless you set one"
+   ],
+   [
+    "To save cards for the $20 fee, connect Stripe",
+    "To save cards for a late-cancel fee, connect Stripe"
+   ],
+   [
+    "After that, or a no-show: a $20 fee ($40 for the Naturalization forms), only if a card, a deposit or the full price was taken and you say yes",
+    "After that, or a no-show: no fee unless you set one, only if a card, a deposit or the full price was taken and you say yes"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken. A translation is paid in full"
+   ],
+   [
+    "Free on your board:",
+    "Free on your price list:"
+   ],
+   [
+    "Board prices never need one",
+    "Price list prices never need one"
+   ],
+   [
+    "Alex wants it at home: a home visit, $190, paid in full when booking.",
+    "Alex wants it at home: a home visit, $190, with nothing taken when booking."
+   ],
+   [
+    "Adding a extra form, +$20? Say so.",
+    "Adding an extra form, +$60? Say so."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one preparer, and adds the prices: $150 and $20.",
+    "Rosie finds one time long enough for both, with one preparer, and adds the prices: $150 and $60."
+   ],
+   [
+    "Alex adds a extra form.",
+    "Alex adds an extra form."
+   ],
+   [
+    "A extra form is on the price list: $20.",
+    "An extra form is on the price list: $60."
+   ],
+   [
+    "It's a extra form today at 2:00pm with Minh, for a new customer. It's $20. Accept it?",
+    "It's an extra form today at 2:00pm with Minh, for a new customer. It's $60. Accept it?"
+   ],
+   [
+    "D.W.'s $20 payment through Rosie was charged twice.",
+    "D.W.'s $105 payment through Rosie was charged twice."
+   ],
+   [
+    "Nia K. asked to talk about the $150 renewal quote.",
+    "Nia K. asked to talk about the $150 forms quote."
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: nothing taken"
+   ],
+   [
+    "The Naturalization forms can take a $40 deposit when booked. The other $100 is paid at the front desk.",
+    "The certified translation is paid in full when booked. The forms appointment is paid at the front desk."
+   ],
+   [
+    "The Naturalization forms can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The certified translation is paid in full when booked. The forms appointment is on the bill after the visit."
+   ],
+   [
+    "Luis and Nora do form preparation; Luis does translation too, at $150 an hour.",
+    "Luis and Nora do form preparation; Luis does translation too, at $35 a page."
+   ],
+   [
+    "Luis: form preparation and translation, $150 an hour",
+    "Luis: form preparation and translation, $35 a page"
+   ],
+   [
+    "OKs Lee Home Forms prices over $500",
+    "OKs Lee Home Forms prices over $300"
+   ],
+   [
+    "Pat is my office manager, for prices over $500.",
+    "Pat is my office manager, for prices over $300."
+   ],
+   [
+    "The state licenses the form office itself, and each preparer.",
+    "A registration may be needed where the state's rules require it."
+   ],
+   [
+    "come with dry hair",
+    "bring your notices and a photo ID"
+   ],
+   [
+    "extra 20 extra form",
+    "extra 60 extra form"
+   ],
+   [
+    "A form office's services need none.",
+    "A form office's services need one only where the state's rules require it."
+   ],
+   [
+    "Walk-in for a forms appointment",
+    "Walk-in to drop off a translation"
+   ],
+   [
+    "says Saturday's appointment is uneven on one side",
+    "says a form from Saturday has a mistake"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer's notice now has an earlier date, and they ask if they can still come in."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My notice now has an earlier date. Can I still come in?"
+   ],
+   [
+    "suggests moving your visit until it clears, with no fee.",
+    "suggests moving your visit sooner, with no fee."
+   ],
+   [
+    "'A trim' or 'a fade' fits a forms appointment",
+    "'Help with my work permit papers' fits a forms appointment"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times",
+    "'Yes, but make it the video one' goes back to the times"
+   ],
+   [
+    "Like a membership signed at the business.",
+    "Like a contract signed at the business."
+   ],
+   [
+    "Say the customer signed a membership at the business today.",
+    "Say the customer signed a contract at the office today."
+   ],
+   [
+    "What you paid for the membership is refunded the way you paid it.",
+    "What you paid for it is refunded the way you paid it."
+   ],
+   [
+    "cancelled the membership signed today",
+    "cancelled the contract signed today"
+   ],
+   [
+    "refund for the cancelled membership",
+    "refund for the cancelled booking"
+   ],
+   [
+    "Style consult",
+    "Free first call"
+   ],
+   [
+    "style consult",
+    "free first call"
+   ],
+   [
+    "From photos",
+    "$150"
+   ],
+   [
+    "$20",
+    "$60"
+   ],
+   [
+    "$40",
+    "$150"
+   ],
+   [
+    "a extra form",
+    "an extra form"
+   ]
+  ],
+  "B": [
+   [
+    "One question cuts the most",
+    "One question comes up the most"
+   ],
+   [
+    "Rosfield takes no cut of them",
+    "Rosie keeps none of them"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are left out of the recording"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra form · $60"
+   ],
+   [
+    "It takes no cut of card payments",
+    "It keeps none of card payments"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Translation for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds translation to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW translation"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a form check every year."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly form check plan"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say a manager books forms help for 4 people at one address. It's one booking with one code, given by whoever lets the preparer in."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the preparer, one line each."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan slips on the front steps and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped on the steps, need to stop"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no notice or card to work from"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Copies and Jordan's notes"
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Jordan does the form package today, $150. The $60 extra form stays good until Thu Oct 29."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like an urgent same-day visit"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I need help with a notice today. Can someone come tonight?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: forms work is booked ahead."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A large job is over the plug-in's amount, so it gets a written contract to sign."
+   ],
+   [
+    "like a move-out day",
+    "like a filing deadline"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said someone is hurting them. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "Someone hurting the customer now"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to get somewhere safe and call 911"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a second form package Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a second form package, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Second form package"
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the translation ready on time?"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE translation Mon Oct 26"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your office, paid at the front desk, your own way"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the appointment"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Forms LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Form Help"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Forms"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Forms"
+   ],
+   [
+    "Lee Electric",
+    "Lee Translation"
+   ],
+   [
+    "88 Elm St",
+    "27 Mill St"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "1200 Main St",
+    "410 Lake St"
+   ],
+   [
+    "42 Oak St",
+    "31 Cedar Ct"
+   ],
+   [
+    "plumbing and electrical work",
+    "form preparation and translation"
+   ],
+   [
+    "electrical jobs",
+    "translation jobs"
+   ],
+   [
+    "electrical license",
+    "translation certificate"
+   ],
+   [
+    "Electrical license",
+    "Translation certificate"
+   ],
+   [
+    "electrical prices",
+    "translation prices"
+   ],
+   [
+    "Electrical",
+    "Translation"
+   ],
+   [
+    "electrical",
+    "translation"
+   ],
+   [
+    "plumbing license",
+    "registration"
+   ],
+   [
+    "Plumbing license",
+    "Registration"
+   ],
+   [
+    "plumbing jobs",
+    "forms jobs"
+   ],
+   [
+    "plumber",
+    "preparer"
+   ],
+   [
+    "Plumber",
+    "Preparer"
+   ],
+   [
+    "plumbing",
+    "form preparation"
+   ],
+   [
+    "Plumbing",
+    "Form preparation"
+   ],
+   [
+    "barbershops",
+    "form offices"
+   ],
+   [
+    "barbershop",
+    "form office"
+   ],
+   [
+    "Barbershop",
+    "Form office"
+   ],
+   [
+    "barbers",
+    "preparers"
+   ],
+   [
+    "barber",
+    "preparer"
+   ],
+   [
+    "Barber",
+    "Preparer"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Certified translation"
+   ],
+   [
+    "Beard trim",
+    "Extra form"
+   ],
+   [
+    "beard trim",
+    "extra form"
+   ],
+   [
+    "Haircut",
+    "Forms appointment"
+   ],
+   [
+    "haircut",
+    "forms appointment"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Forms appointment at home"
+   ],
+   [
+    "Drain clearings",
+    "Home forms visits"
+   ],
+   [
+    "Drain clearing",
+    "Forms appointment at home"
+   ],
+   [
+    "drain clearing",
+    "forms appointment at home"
+   ],
+   [
+    "Water heater replacement",
+    "Naturalization forms at home"
+   ],
+   [
+    "water heater replacement",
+    "naturalization forms at home"
+   ],
+   [
+    "Water heater flush",
+    "Second person's forms"
+   ],
+   [
+    "water heater flush",
+    "second person's forms"
+   ],
+   [
+    "water heaters",
+    "naturalization forms"
+   ],
+   [
+    "Water heater",
+    "Naturalization forms"
+   ],
+   [
+    "water heater",
+    "naturalization forms"
+   ],
+   [
+    "Leak repair",
+    "Extra form"
+   ],
+   [
+    "leak repair",
+    "extra form"
+   ],
+   [
+    "service call",
+    "travel fee"
+   ],
+   [
+    "Service call",
+    "Travel fee"
+   ],
+   [
+    "color",
+    "renewal forms"
+   ],
+   [
+    "cut hair",
+    "help customers"
+   ],
+   [
+    "cuts",
+    "appointments"
+   ],
+   [
+    "cut",
+    "appointment"
+   ],
+   [
+    "Riley",
+    "Ana"
+   ],
+   [
+    "Avery",
+    "Minh"
+   ],
+   [
+    "Jordan",
+    "Luis"
+   ],
+   [
+    "Casey",
+    "Nora"
+   ],
+   [
+    "My kitchen drain is clogged. Can a preparer come Thursday morning? I'm in Springfield.",
+    "I can't travel to an office. Can Luis Ortiz from Lee Home Forms come Thursday morning to fill in my forms? I'm in Springfield."
+   ],
+   [
+    "Can a preparer clear a yard drain this Thursday? What does it cost?",
+    "Can Nora Silva from Lee Home Forms come to a community center this Thursday to help with forms? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Nora",
+    "BOOK Tessa forms Thu 12-2 Nora"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the naturalization forms.",
+    "Hello, do you speak Spanish? I need help with my forms at home."
+   ],
+   [
+    "For form preparation, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For forms work, someone hurting the customer right now stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurting you or in danger, get somewhere safe and call 911 now."
+   ],
+   [
+    "Lee Home Forms does form preparation and translation, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Forms does form preparation and translation, not legal advice or court cases. Nothing was saved. You can look for a lawyer or an accredited representative yourself."
+   ],
+   [
+    "The request turns out to be for work Lee Home Forms doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Forms doesn't do, like a court case."
+   ],
+   [
+    "Can you flush my naturalization forms every year, too?",
+    "Can you check my forms every year, too?"
+   ],
+   [
+    "Yes. Lee Home Forms has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Home Forms has a yearly form check plan, $150 a visit."
+   ],
+   [
+    "Can Luis also look at a dripping faucet?",
+    "Can Luis also do one more form?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for one more form."
+   ],
+   [
+    "Yes. The faucet is a extra form, quoted at the visit.",
+    "Yes. The extra form is priced at the visit, and Alex OKs it first."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone hurting the customer, gets the safety steps first."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Nora can come sooner, at the same price.",
+    "If it's an emergency, call 911. Nora can come sooner, at the same price."
+   ],
+   [
+    "Can Luis also run a camera down my sewer line?",
+    "Can Luis also help with one more form?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's visit?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a form check every 3 months."
+   ],
+   [
+    "Luis finds the leak and texts the price with its lines.",
+    "Luis looks over the papers and texts the price with its lines."
+   ],
+   [
+    "Luis found the leak. Here's the price to fix it today.",
+    "Luis looked over your papers. Here's the price to finish them today."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 210 forms 150 extra form 60"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Form package · $150"
+   ],
+   [
+    "Supply line · $80",
+    "Extra form · $60"
+   ],
+   [
+    "Shutoff valve",
+    "Form package"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 one more form"
+   ],
+   [
+    "Luis finds corroded shutoff valves.",
+    "Luis finds one more form is needed."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more form · $60"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more form"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $60 quote is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to one more form for $60."
+   ],
+   [
+    "Luis needs a part from the supply house.",
+    "Luis needs a page printed at the office."
+   ],
+   [
+    "Luis went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Luis went to print a page and will be back about 9:30am. The visit should be done by 10am."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE printing a page, back 9:30"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 190 forms"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE forms signed. Copies given, originals handed back."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My name is spelled wrong on one form."
+   ],
+   [
+    "kitchen drain",
+    "forms appointment at home"
+   ],
+   [
+    "the shutoff valves",
+    "the extra form"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your form package"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It was our miss, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "For forms work, the business fixes its own mistakes for free."
+   ],
+   [
+    "Luis left a mess under the sink.",
+    "Luis came late and rushed me."
+   ],
+   [
+    "Can Luis look at my bathroom sink next week?",
+    "Can Luis come back next week to fix a form?"
+   ],
+   [
+    "Sure. Here are Luis's next times for a bathroom drain.",
+    "Sure. Here are Luis's next times for a follow-up."
+   ],
+   [
+    "Sewer camera report",
+    "Copies of your forms"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the link to your copies"
+   ],
+   [
+    "Lee Form Help can appointment your hair at the office for $35, or at your home for $75.",
+    "Lee Form Help can fill in your forms at the office for $150, or at your home for $190."
+   ],
+   [
+    "The office's chair is in the other flow.",
+    "The office visit is in the other flow."
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my friend answer the questions for me?"
+   ],
+   [
+    "Luis says no. Please wait until the job is done.",
+    "Luis says no. You give your own answers, and your friend can wait with you."
+   ],
+   [
+    "Sewer camera inspection",
+    "Forms appointment at home"
+   ],
+   [
+    "sewer camera inspection",
+    "forms appointment at home"
+   ],
+   [
+    "Drains have a set price.",
+    "Form packages have a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "An extra form is priced at the visit."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone in danger right now stops the booking."
+   ],
+   [
+    "Forms appointment, fade and extra form at the office.",
+    "Forms appointments and extra forms at the office."
+   ],
+   [
+    "Panel upgrade",
+    "Translation of a long document"
+   ],
+   [
+    "$89, credited to the repair",
+    "$40, part of the $190 visit"
+   ],
+   [
+    "Why: many preparers, salons and groomers are licensed to their office.",
+    "Why: some kinds of work, like salons and groomers, are licensed to one place."
+   ],
+   [
+    "replaces naturalization forms",
+    "prepares naturalization forms"
+   ],
+   [
+    "Labor",
+    "Translation"
+   ],
+   [
+    "after the job",
+    "after the visit"
+   ],
+   [
+    "Lee Home Forms' own",
+    "Lee Home Forms's own"
+   ],
+   [
+    "Lee Home Forms'",
+    "Lee Home Forms's"
+   ],
+   [
+    "travel fee fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee fee",
+    "Travel fee"
+   ],
+   [
+    "A neighborhood form office on Mill St. Classic appointments, fades and hot towel shaves.",
+    "A neighborhood form office on Mill St. Form packages and translation."
+   ],
+   [
+    "The chairs",
+    "The waiting room"
+   ],
+   [
+    "A chair, ready",
+    "A desk, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a preparer who rents a desk here,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a desk here, with their own customers."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "A preparer's example: water near outlets gets 'shut off the main valve'.",
+    "A preparer's example: fear of someone at home gets the hotline first."
+   ],
+   [
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Add an extra form, priced at the visit. E nothing before. C paid after"
+   ],
+   [
+    "Warranty fix",
+    "Extra form"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about help with my forms at home. A text back is fine."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if she's in danger, and given the National Domestic Violence Hotline."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If you're in danger, call 911. The National Domestic Violence Hotline is 1-800-799-7233, any time."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿está usted en peligro ahora?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Estoy a salvo."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si está en peligro, llame al 911. También puede llamar a la Línea Nacional de Violencia Doméstica, 1-800-799-7233."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito ayuda con unos formularios en casa."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what kind of help, and any due date."
+   ],
+   [
+    "'My sink won't drain' fits a forms appointment at home.",
+    "'I need help with my work permit forms' fits a forms appointment at home."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like filling in someone's forms without their yes."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. They're my own forms."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "The written contract is signed first. The first open times are after it is signed."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding an extra form? Say so.'"
+   ],
+   [
+    "Lee Home Forms asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Forms asks: is the visit at a home or somewhere else? And what kind of forms: a card, a work permit, a naturalization or a fee waiver?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. A work permit renewal."
+   ],
+   [
+    "Lee Home Forms can clear the drain:",
+    "Lee Home Forms can come for the forms:"
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is there a table to sit at?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a table to sit at?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, the kitchen table"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The state's rules may add one for the $190 home visit."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your papers ready, and a quiet place to sit."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a notice has a new date."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The notice has a new date now. Can someone come sooner?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stain on the table"
+   ],
+   [
+    "Under the sink, before",
+    "Table, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor, before"
+   ],
+   [
+    "A.M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "A.M. OK'd the form package only, $150. Leave the extra form."
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: one more form, $60. Sent to Alex."
+   ],
+   [
+    "Luis finds mold behind the sink wall. The plug-in says a preparer stops there, so Alex gets a written note and the photo.",
+    "Luis finds a part that needs a lawyer. The plug-in says a preparer stops there, so Alex gets a written note."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD part needs a lawyer, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "A part that needs a lawyer"
+   ],
+   [
+    "Luis found mold behind the wall under your sink and stopped that part of the work.",
+    "Luis found a part that needs a lawyer and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a part that needs a lawyer"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: that part of the forms"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See a lawyer or an accredited representative first"
+   ],
+   [
+    "Say Luis cracks the cabinet floor and texts a photo.",
+    "Say Luis spills coffee on a rug and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE coffee spilled on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Coffee stain on the rug"
+   ],
+   [
+    "Luis cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "Luis spilled coffee on a rug at A.M.'s. The before photo shows no stain."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A question about your forms? Call the office."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Two weeks later, Alex finds a typo on a signed form. Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M.'s forms from Thu Oct 22 need a fix. It's on the business."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a coffee stain on the rug this morning."
+   ],
+   [
+    "It's a leak under the sink, today, starts at 3:00pm, with Luis.",
+    "It's a forms appointment at home, today, starts at 3:00pm, with Luis."
+   ],
+   [
+    "BS20981",
+    "EX-3180"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "MP045201",
+    "EX-1024"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "JP031552",
+    "EX-1552"
+   ],
+   [
+    "$179",
+    "$190"
+   ],
+   [
+    "$89",
+    "$40"
+   ],
+   [
+    "$640",
+    "$190"
+   ],
+   [
+    "$160",
+    "$60"
+   ],
+   [
+    "$500",
+    "$300"
+   ],
+   [
+    "$140",
+    "$35"
+   ],
+   [
+    "raises the forms appointment at home to $199 for visits from Mon Nov 2",
+    "raises the forms appointment at home to $200 for visits from Mon Nov 2"
+   ],
+   [
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $200 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "Saved: forms appointment at home $199 for visits",
+    "Saved: forms appointment at home $200 for visits"
+   ],
+   [
+    "Forms appointment at home plans go to $199 from Wed Nov 25",
+    "Forms appointment at home plans go to $200 from Wed Nov 25"
+   ],
+   [
+    "Reading it back: forms appointment at home goes to $199 for new bookings.",
+    "Reading it back: forms appointment at home goes to $200 for new bookings."
+   ],
+   [
+    "Forms appointment at home $190 ($199 from Nov 2) · Second person's forms $150",
+    "Forms appointment at home $190 ($200 from Nov 2) · Second person's forms $150"
+   ],
+   [
+    "Rosie answers with the real price, $190.",
+    "Rosie answers with the real price, $200."
+   ],
+   [
+    "asks for a forms appointment at home at $150, an old price.",
+    "asks for a forms appointment at home at $190, an old price."
+   ],
+   [
+    "is $190, not $150. Here are the open times at $190.",
+    "is $200, not $190. Here are the open times at $200."
+   ],
+   [
+    "Sam switches the forms appointment at home from a card saved for the $40 fee to a $40 deposit.",
+    "Sam switches the forms appointment at home from nothing taken to a card saved for the $40 fee."
+   ],
+   [
+    "A card saved for the $40 fee · paid after the visit",
+    "Nothing taken · the bill comes after the visit"
+   ],
+   [
+    "Morgan P. asked to talk about the $190 quote.",
+    "Morgan P. asked to talk about the $190 forms quote."
+   ],
+   [
+    "N.S.'s $20 payment through Rosie was charged twice.",
+    "N.S.'s $190 payment through Rosie was charged twice."
+   ],
+   [
+    "Refund · $20",
+    "Refund · $190"
+   ],
+   [
+    "Luis does translation too, at $35 an hour.",
+    "Luis does translation too, at $35 a page."
+   ],
+   [
+    "form preparation and translation, $35 an hour",
+    "form preparation and translation, $35 a page"
+   ],
+   [
+    "The on-call preparer · a STOP before they set out: they call first",
+    "No jobs sent now: forms work is booked ahead"
+   ],
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first"
+   ],
+   [
+    "A tip line · bank transfer over $300",
+    "No tip line · bank transfer over $300"
+   ],
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $40 travel fee, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or nobody home: up to the $40 travel fee, only if a card was saved and you say yes"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Mon–Fri 7:30am–5:30pm · set start times · 1 hour's notice · up to 60 days ahead"
+   ],
+   [
+    "Most jobs have a price before the visit. A extra form is priced at the visit: only the $40 travel fee was promised.",
+    "Most jobs have a price before the visit. An extra form is priced at the visit: the customer OKs the price first."
+   ],
+   [
+    "When they book: a card saved for the $40 service-call fee you OK",
+    "When they book: nothing taken, or a card saved for the $40 travel fee you OK"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, or a card saved for the $40 travel fee you OK"
+   ],
+   [
+    "A card is saved for the $40 service-call fee. Nothing is taken. It's charged only for a fee Sam confirms, like a no-show, and never more than $40.",
+    "A card is saved for the $40 travel fee. Nothing is taken. It's charged only for a fee Sam confirms, like a no-show, and never more than $40."
+   ],
+   [
+    "Free on your list: nothing taken, nothing after",
+    "Free on your price list: nothing taken, nothing after"
+   ],
+   [
+    "Priced from photos",
+    "$190"
+   ],
+   [
+    "From photos",
+    "$190"
+   ],
+   [
+    "Water pressure check",
+    "Free first call"
+   ],
+   [
+    "$120 an hour",
+    "$35 a page"
+   ],
+   [
+    "$199",
+    "$190"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hurting a person right now, or a medical emergency."
+   ],
+   [
+    "could mean a salon or a form office",
+    "could mean a tax office or a form office"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: are you in danger right now?"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I'm safe."
+   ],
+   [
+    "come back next fall for a second person's forms",
+    "come back next fall for card renewal forms"
+   ],
+   [
+    "Contract · Naturalization forms at home · $190",
+    "Contract · Forms appointment at home · $190"
+   ],
+   [
+    "Naturalization forms at home · $190",
+    "Forms appointment at home · $190"
+   ],
+   [
+    "Your naturalization forms contract is waiting for your signature.",
+    "Your forms contract is waiting for your signature."
+   ],
+   [
+    "Your naturalization forms visit wasn't booked",
+    "Your forms visit wasn't booked"
+   ],
+   [
+    "didn't sign the naturalization forms contract in time",
+    "didn't sign the forms contract in time"
+   ],
+   [
+    "second person's forms, 12 months",
+    "card renewal forms, 12 months"
+   ],
+   [
+    "times for the second person's forms you asked Luis about",
+    "times for the card renewal forms you asked Luis about"
+   ],
+   [
+    "a extra form",
+    "an extra form"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books a forms appointment with Ana Torres at Lee Form Help, Sat Oct 24 at 11:00am, to renew a work permit. Nothing is taken to book; Ana fills in the forms from Alex's own answers, and Alex pays at the front desk. The filing fee goes straight to the government. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Home Forms to fill in forms at 31 Cedar Ct, and Luis Ortiz comes Thu Oct 22 at a set start time. Nothing is taken to book, and Rosie texts the bill after. The filing fee goes straight to the government. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|full|none",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $150 forms appointment at the office. Nothing is taken, and a YES books it. Alex pays at the front desk when the forms are signed.",
+    "list|full|none": "A certified translation, 3 pages at $35 a page ($105). Paid in full when it is dropped off or uploaded; nothing more to pay.",
+    "list|none|bill": "A $150 forms appointment by video. There is no front desk, so Rosie texts the bill when Ana texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$0",
+     "name": "Forms appointment"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "name": "Forms appointment"
+    },
+    "list|full|*": {
+     "price": "$105",
+     "paid": "$105",
+     "name": "Certified translation, 3 pages"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra form",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$60"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Certified translation, 3 pages",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$105",
+      "paid": "$105"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|bill",
+   "combos": [
+    "list|none|bill",
+    "list|card|card"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|none|bill": "The main story: a forms appointment at the customer's home, $190 ($150 form package plus the $40 travel fee). Nothing is taken; Rosie texts the bill after.",
+    "list|card|card": "The same home appointment with a card saved for the $40 fee the business sets for a late cancel or a no-show. The $190 is charged when Luis texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Forms appointment at home"
+    },
+    "list|*|*": {
+     "price": "$190",
+     "name": "Forms appointment at home"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Second person's forms, same visit",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$150",
+      "fee": "$40"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Extra form at the visit",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$60"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A4-43",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People are booked, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Forms work is booked ahead; urgent detention help goes to a law firm's own line."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Immigration work is private (sensitive), so no rating request goes out."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A preparer's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A preparer's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted from photos first",
+    "why": "Forms are priced from the list; papers are uploaded as copies, not photos for a quote."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays with a child."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "vary": {
+     "before:none+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "A nothing before, and at their home too, 190, paid after the visit. E paid when they book"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. For a forms appointment, the customer picks the place and sees both prices first. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Forms appointment at the office",
+            "$150",
+            "Nothing taken",
+            "At the front desk"
+           ],
+           [
+            "Forms appointment at their home",
+            "$190",
+            "Nothing taken",
+            "The bill I send"
+           ],
+           [
+            "Certified translation",
+            "$105",
+            "Paid in full",
+            "Nothing more"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, the forms appointment at the office takes nothing before: the customer's YES books it."
+      ]
+     },
+     "before:full": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "E paid when they book. A at their home too, 190, nothing before"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. For a forms appointment, the customer picks the place and sees both prices first. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Forms appointment at the office",
+            "$150",
+            "Nothing taken",
+            "At the front desk"
+           ],
+           [
+            "Forms appointment at their home",
+            "$190",
+            "Nothing taken",
+            "The bill I send"
+           ],
+           [
+            "Certified translation",
+            "$105",
+            "Paid in full",
+            "Nothing more"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "A nothing before, and at their home too, 190, paid after the visit. E paid when they book. Video visits have no front desk: send the bill then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. For a forms appointment, the customer picks the place and sees both prices first. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Forms appointment at the office",
+            "$150",
+            "Nothing taken",
+            "At the front desk"
+           ],
+           [
+            "Forms appointment at their home",
+            "$190",
+            "Nothing taken",
+            "The bill I send"
+           ],
+           [
+            "Certified translation",
+            "$105",
+            "Paid in full",
+            "Nothing more"
+           ],
+           [
+            "Any video visit",
+            "As above",
+            "As above",
+            "The bill I send"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, the forms appointment at the office takes nothing before: the customer's YES books it.",
+       "On this path, video visits are paid by the bill Rosie sends."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-14",
+    "vary": {
+     "before:full": {
+      "does": "The certified translation, $105 for 3 pages, is paid in full when booked. Nothing more is owed after.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Services paid when booked work like this:",
+        {
+         "card": {
+          "title": "Paid in full when booked",
+          "lines": [
+           "Certified translation, 3 pages · $105",
+           "Cancel in time: a full refund",
+           "Late or no-show: no fee unless you set one",
+           "The rest is refunded"
+          ]
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "We can't advise on legal questions. A lawyer or an accredited representative can help. For anything else, call Lee Form Help at (555) 010-0177. Call 911 if anyone is in danger."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "A form preparer's plug-in: forms from the customer's own answers, translation, and no legal advice.",
+     "A law firm or a recognized nonprofit adds legal consultations."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "Example: 'Am I eligible for a green card?' gets 'This business can't answer that. A lawyer can.'"
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "A form office takes a walk-in only to drop off a translation. A forms appointment is booked ahead."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-22",
+    "more": [
+     "A form office's plug-in adds a detention now, abuse or fear at home, and a hearing notice.",
+     "The business says it can't help with a detention or a court case. A lawyer or an accredited representative can.",
+     "Someone hurting Alex right now gets 911, and no booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-12",
+    "more": [
+     "A question about which form, eligibility or an interview is never answered by text.",
+     "The business can't give legal advice."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "Someone in care goes missing",
+    "why": "Nobody is left in the office's care: a parent stays with a child."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People are booked, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Forms work is booked ahead; never sent now."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Forms appointments run at a set start time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A preparer's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Forms work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Forms work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "An adult is always there; a child is never left with the preparer."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Immigration work is private (sensitive), so no rating request goes out."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "vary": {
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "B nothing before. D nothing before. All paid on the bill after"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Here's what changed for forms. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "When they book",
+           "After"
+          ],
+          "rows": [
+           [
+            "Forms appointment at home",
+            "$190",
+            "Nothing taken",
+            "The bill after"
+           ],
+           [
+            "Second person's forms",
+            "$150",
+            "Nothing taken",
+            "The bill after"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "B card saved for the $40 fee. D card saved for the $40 fee. After the job: charge the saved card at DONE"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Here's what changed for forms. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "When they book",
+           "After"
+          ],
+          "rows": [
+           [
+            "Forms appointment at home",
+            "$190",
+            "Card saved for the $40 fee",
+            "Card at DONE"
+           ],
+           [
+            "Second person's forms",
+            "$150",
+            "Card saved for the $40 fee",
+            "Card at DONE"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, every service paid after is charged to the saved card at DONE."
+      ]
+     }
+    }
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "A form preparer's plug-in: forms from the customer's own answers, translation, and no legal advice.",
+     "A law firm or a recognized nonprofit adds legal consultations."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "Example: 'Am I eligible for a green card?' gets 'This business can't answer that. A lawyer can.'"
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "A form office's plug-in adds a detention now, abuse or fear at home, and a hearing notice.",
+     "The business says it can't help with a detention or a court case. A lawyer or an accredited representative can.",
+     "Someone hurting Alex right now gets 911, and no booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-16",
+    "more": [
+     "A question about which form, eligibility or an interview is never answered by text.",
+     "The business can't give legal advice."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Which form should I file? Am I eligible?"
+     ],
+     [
+      "san",
+      "agent",
+      "We can't advise on legal questions. A lawyer or an accredited representative can help. For anything else, call Lee Home Forms at (555) 010-0142. Call 911 if anyone is in danger."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-97",
+    "label": "Someone in care goes missing",
+    "why": "Nobody is left in the preparer's care: an adult stays with a child."
+   },
+   {
+    "op": "off",
+    "at": "B4-26",
+    "label": "3 Nobody will be home",
+    "why": "The person the forms are for must be there to answer and to sign."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "The customer answers and signs; nobody is let in to work alone."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "An extra form is priced and OK'd at the visit; no staged job."
+   }
+  ]
+ },
+ "keep": [
+  "travel fee",
+  "Travel fee",
+  "Consult",
+  "consult",
+  "lawyer",
+  "Lawyer",
+  "law office",
+  "Law office",
+  "Grace",
+  "leak"
+ ],
+ "notes": "Built Tue Oct 27 2026 (REDESIGN 2 master, N3b) from the lawyer overlay (\"from\": \"lawyer\") merged with the verified test-drive plug-in (immigration-services, Oct 25: its pf.* text, services, prices and rules kept; the backup is in the batch scratch folder). Its old off ops named steps the master no longer has (A3-32, A4-43 labels, A5-24, A7-62, A7-63, A7-70, B4-81, B4-83 labels, B4-78, B5-26, B7-56, B8-65, B8-71, B8-72, B10-29): dropped. The testdrive flag is removed.\nWho the business is is a switch set at sign-up: a non-lawyer document preparer (the example), a law firm, or a recognized nonprofit with accredited representatives (pf.license). S1-60 and S2-28 keep both branches (registration only, or a license) as splitsKept. The federal rule (only a lawyer or an accredited representative gives immigration legal advice) is named only as that switch. Rosie never gives legal advice and never checks a license, registration, accreditation or bond (D96): pf.license says so.\nPrices (the example business's own, from the verified plug-in): forms appointment $150 a form package; extra form $60; certified translation $35 a page ($105 for 3 pages, paid in full); a home appointment $190 = $150 + the $40 travel fee (one price, so the bill adds up). The $40 travel fee is also the late-cancel / no-show fee on the one card path (a card saved, charged at DONE). Government filing fees never go through Rosie.\nMoney paths. A: list|none|counter (main), list|full|none (translation), list|none|bill (video). B: list|none|bill (main), list|card|card. No deposit, no hold. money.A.services: Extra form ($60, counter), Certified translation ($105, paid in full); money.B.services: Second person's forms ($150, card saved, charged at DONE), Extra form at the visit ($60, bill). The $2 applies (D97): S1-62's \"No $2\" branch is off.\nSwitch sensitive (immigration work: no service name in a text, no rating). Facts: forms, firststeps, documents (the written contract where the state requires it), dropoff (translations), video, children (a parent books and signs a child's forms), extrawork. Settings: arrive set start (both flows), cutoff 24 hours before.\nRename: lawyer's pairs re-pointed (office: Lee Form Help, 27 Mill St, preparers Ana Torres and Minh Tran; home: Lee Home Forms, 410 Lake St, preparers Luis Ortiz and Nora Silva; customer address 31 Cedar Ct); master numbers mapped by role (the haircut is the forms appointment, the signature cut the translation, the home visit $190); license numbers in the master examples shown as EX-1042 style. Pairs protect master sentences that use the word \"cut\" in other senses (no cut of card payments, cuts the most, cut from the recording).\nOff: sent-now, seats, spaces, stays, classes, photo quotes, a child left behind, \"nobody home\", an estimate that becomes a staged job, someone in care missing, ratings (sensitive). Own steps: none; `more` lines for the plug-in (S1-11, S13-04, A3-20, A3-22 / B3-17, A7-12 / B7-16); words ops for the legal-question reply (A3-26, B3-21) and the sign-up money read-backs (S1-13, S1-14).\nNot sure (for the verifier): the sign-up card keeps the master's nine rows, so some rows are example services (Card renewal forms, Child's forms, Naturalization forms, Free first call) with the same $150 / free prices; a walk-in line says walk-ins only drop off a translation; the rating is off because sensitive is on (the base kept it as a switch).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "One question cuts the most",
+    "Rosfield takes no cut of them",
+    "Those words are cut from the recording",
+    "It takes no cut of card payments",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "The cut is uneven on one side.",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Health details stay on the secure page, never in a text.",
+    "price board",
+    "Price board",
+    "shop's board",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "like a 15-minute style consult",
+    "A barbershop's plug-in has none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "At your shop, paid at the chair, your own way",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "code at the chair",
+    "at the chair",
+    "At the chair",
+    "the chair",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop front",
+    "Shop",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Oak St",
+    "electrical jobs",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumbing jobs",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "patch test",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Color quotes",
+    "color quote",
+    "Color",
+    "color",
+    "cut hair",
+    "cuts",
+    "cut",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Books the groom's party together",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Panel upgrade",
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "photos of your hair",
+    "15 gloss",
+    "gloss $15",
+    "Gloss to finish",
+    "No gloss today",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "We'd share only where they're working, only after a missed check.",
+    "Access, like a step-free chair:",
+    "like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "A.M. asks for a toner instead of the gloss. What's the new price?",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "A chair renter asked for by name:",
+    "The cape clip ripped my shirt collar.",
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "BS20981",
+    "BS20918",
+    "MP045210",
+    "EC22871",
+    "JE30417",
+    "JP031552",
+    "$35",
+    "$55",
+    "$75",
+    "$140",
+    "$25",
+    "$90",
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "Rosie answers with the real price, $40.",
+    "A card saved for the $20 fee · paid after the visit",
+    "No card, so no $20 fee",
+    "Late or no-show: the $20 fee, if you confirm",
+    "To save cards for the $20 fee, connect Stripe",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Free on your board:",
+    "Board prices never need one",
+    "D.W.'s $20 payment through Rosie was charged twice.",
+    "When they book: a card saved for the $89 service-call fee",
+    "Pat is my office manager, for prices over $500.",
+    "come with dry hair",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "suggests moving your visit until it clears, with no fee.",
+    "'Yes, make it a fade' goes back to the times",
+    "Like a membership signed at the business.",
+    "Say the customer signed a membership at the business today.",
+    "What you paid for the membership is refunded the way you paid it.",
+    "cancelled the membership signed today",
+    "refund for the cancelled membership",
+    "Style consult",
+    "style consult",
+    "From photos",
+    "$20",
+    "$40"
+   ],
+   "B": [
+    "One question cuts the most",
+    "Rosfield takes no cut of them",
+    "Those words are cut from the recording",
+    "Sewer camera inspection · $199",
+    "It takes no cut of card payments",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "CANT START no proof Alex may have this work done",
+    "Video and Jordan's notes",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "like a burst pipe or a lockout",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "like a move-out day",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "Is the report ready on time?",
+    "LATE camera report Mon Oct 26",
+    "at the shop",
+    "At the shop",
+    "the shop's",
+    "the shop",
+    "At your shop, paid at the chair, your own way",
+    "paid at the chair",
+    "at the chair",
+    "The shop's",
+    "The shop",
+    "shop",
+    "Shop front",
+    "Lee Home Services LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "plumbing and electrical work",
+    "electrical jobs",
+    "electrical license",
+    "Electrical license",
+    "electrical prices",
+    "Electrical",
+    "electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumbing jobs",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Leak repair",
+    "leak repair",
+    "service call",
+    "Service call",
+    "color",
+    "cut hair",
+    "cuts",
+    "cut",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Say Alex also asks about a dripping faucet.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Can I skip next week's drain cleaning?",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "Shutoff valve",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "UPDATE getting a part, back 9:30",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The kitchen drain is clogged again.",
+    "kitchen drain",
+    "the shutoff valves",
+    "stage 2 of your repipe",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Book the repair",
+    "The repair price is good for 7 days.",
+    "Can I run the dishwasher before you come?",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Panel upgrade",
+    "$89, credited to the repair",
+    "Labor",
+    "after the job",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "We'd share only where they're working, only after a missed check.",
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Warranty fix",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "No. No huele a gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Like tapping a neighbor's water line without asking.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "A.M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "I found water damage under the sink this morning.",
+    "BS20981",
+    "MP045210",
+    "MP045201",
+    "EC22871",
+    "JE30417",
+    "JP031552",
+    "$179",
+    "$89",
+    "$640",
+    "$160",
+    "$500",
+    "$140",
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "N.S.'s $20 payment through Rosie was charged twice.",
+    "Refund · $20",
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Free on your list: nothing taken, nothing after",
+    "Priced from photos",
+    "From photos",
+    "Water pressure check",
+    "$120 an hour",
+    "$199",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. It doesn't smell like gas."
+   ]
+  },
+  "A": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-62": "c4f497de12",
+   "A10-34": "78c2d9a6a3",
+   "A4-66": "f622d7fe12",
+   "A4-05": "8b3e838019",
+   "A8-67": "e9fd748fc5",
+   "S1-13": "eca22651fd",
+   "S1-14": "c6cd09f2c0",
+   "A3-26": "9e3630dc0b",
+   "S1-11": "99370bb016",
+   "S13-04": "91031a684a",
+   "A3-20": "b8251d2535",
+   "A3-22": "0057d8fc9f",
+   "A7-12": "05f64179a4",
+   "A8-86": "c989a99e52"
+  },
+  "B": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-62": "c4f497de12",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "S1-13": "6964bfbe60",
+   "S1-11": "d11de5da2e",
+   "S13-04": "13e60b9248",
+   "B3-17": "3eb7d7f259",
+   "B7-16": "3177c3701b",
+   "B3-21": "ad48326ac5",
+   "B8-97": "1e3f69ef38",
+   "B4-26": "912686f788",
+   "B8-03": "ac9d404766",
+   "B8-93": "c1406fd6bc"
+  }
+ }
+}

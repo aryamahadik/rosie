@@ -1,0 +1,4092 @@
+{
+ "id": "image-consultant",
+ "name": "Image consultant and personal stylist",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "coach",
+ "plugin": {
+  "pf.license": {
+   "need": "No license is needed for this work in most places. A registration or certificate the state asks for is the business's own to add. It is optional, and nothing is looked up.",
+   "ask": "Any registration, certificate or insurance the business wants shown, as the business's own word.",
+   "who holds it": "The business. No person license is needed by default.",
+   "how it's checked": "Rosie checks none of it and never says it was checked. Anything shown is the business's own word.",
+   "blocks going live": "Nothing. Licenses and insurance are optional and never block going live.",
+   "never claimed": "Rosie never says a license, certificate or insurance is confirmed; anything shown is the business's own word.",
+   "renewals": "None tracked by Rosie.",
+   "insurance or bond": "The business's own choice, shown only as its own word.",
+   "background check": "None."
+  },
+  "pf.services": {
+   "shape": "Image consulting and personal styling: style sessions by video, by phone or at the studio (flow A), and at a client's home or a company's office (flow B). Every new client starts with a free intro call. Clothes and products are bought by the client from the stores; Rosie never takes money for goods.",
+   "examples": "The example studio's own prices, not a standard.",
+   "at the business (flow A)": [
+    {
+     "name": "Free intro call",
+     "length": "20 minutes, by video or phone",
+     "price": "free",
+     "kind": "free",
+     "before": "nothing taken",
+     "after": "nothing"
+    },
+    {
+     "name": "Style session",
+     "length": "60 minutes",
+     "price": "$55",
+     "kind": "one price",
+     "where": "video or the studio",
+     "before": "paid in full when booking; refunded if cancelled 24 hours or more before",
+     "after": "nothing more"
+    },
+    {
+     "name": "Follow-up session",
+     "length": "30 minutes",
+     "price": "$35",
+     "kind": "one price",
+     "where": "video or the studio",
+     "before": "a card saved for the $20 late-cancel fee",
+     "after": "the saved card charged when the stylist texts DONE"
+    },
+    {
+     "name": "Quick outfit review",
+     "length": "30 minutes, 18 and up",
+     "price": "$25",
+     "kind": "one price",
+     "where": "the studio",
+     "before": "nothing taken",
+     "after": "paid at the front desk"
+    },
+    {
+     "name": "Wardrobe edit",
+     "length": "2 hours",
+     "price": "$90, priced from closet photos first",
+     "where": "the studio",
+     "before": "a $20 deposit when booking",
+     "after": "the $70 rest on the saved card when the stylist texts DONE"
+    }
+   ],
+   "at the customer's place (flow B)": [
+    {
+     "name": "Home style session",
+     "length": "90 minutes, within 20 miles",
+     "price": "$179",
+     "kind": "one price",
+     "before": "a card saved for the $89 visit fee",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Wardrobe edit at your home",
+     "length": "half a day",
+     "price": "$640, priced from closet photos first",
+     "before": "a $160 deposit when booking",
+     "after": "the $480 rest on the bill after"
+    },
+    {
+     "name": "Team style workshop at a company's office",
+     "length": "90 minutes, up to 8 people",
+     "price": "$179",
+     "kind": "one price",
+     "before": "nothing taken",
+     "after": "the bill texted after"
+    },
+    {
+     "name": "Closet check at home",
+     "length": "60 minutes",
+     "price": "$150",
+     "kind": "one price",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    }
+   ],
+   "capacity": "one stylist per visit",
+   "skills": "color, shape, wardrobe, work and event dressing, personal style (the stylist's own list)",
+   "online": "The intro call and style sessions by video or phone."
+  },
+  "pf.questions": {
+   "before times": [
+    "What do you want: a new look, a wardrobe edit, colors, or a look for work or an event?",
+    "Roughly when, and how many people?",
+    "At the studio, by video or phone, or at your home?"
+   ],
+   "after a time is picked": [
+    "Your budget for clothes, if you want to share it, and the styles you like.",
+    "Anything that helps the visit, like a step-free way in."
+   ],
+   "only on the secure page": [
+    "Sizes, fit notes, the clothes you already own, and any colors or fabrics you avoid",
+    "Body measurements, only if you choose to share them",
+    "Your goals for how you want to be seen, at work, at events or at home",
+    "The studio's terms, and whether the studio may keep a photo of a look (no by default)",
+    "18 or older"
+   ],
+   "who may book": "An adult for themselves. Adults only: a client under 18 is not booked."
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone in danger or hurt right now, at home or in the studio",
+     "say": "If anyone is in danger, call 911, or the local emergency number.",
+     "booking": "no booking in that chat"
+    },
+    {
+     "words": "crisis words",
+     "say": "the 988 line and 911",
+     "booking": "no booking in that chat"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a home visit where the stylist feels unsafe",
+     "what": "the stylist leaves at once; 911 if anyone is in danger. The visit is not kept going."
+    }
+   ],
+   "never answered": "Medical, skin, body-image or mental-health questions: the stylist says styling isn't that, and points to a doctor or a therapist.",
+   "never said": "No promise of how a look will be judged, of a sale, or of a store's discount."
+  },
+  "pf.first_steps": {
+   "required": [
+    {
+     "name": "The studio's terms and the style profile",
+     "when": "before the first style session",
+     "who": "the client, on the secure page",
+     "goodFor": "until the terms change",
+     "result": "signed: on file for later visits"
+    }
+   ],
+   "prep for the reminder": "Have your closet photos ready, the clothes for the visit, your budget, and the day's schedule."
+  },
+  "pf.visit": {
+   "check-in": "At the studio: the code at the desk. By video or phone: the stylist asks for the code at the start. At home: the code at the door.",
+   "at the visit": "The stylist shows looks and prices. Clothes are bought by the client at the stores, never through Rosie.",
+   "work changes": "Extra time (a second hour, more of the closet) is priced and OK'd before it's added.",
+   "what proves it's done": "The code, or DONE when the visit ends."
+  },
+  "pf.money": {
+   "before": "A style session: paid in full when booked (refunded 24 hours or more before). A follow-up or a home visit: a card saved. A wardrobe edit: a deposit now, the rest after. Team workshops: nothing taken.",
+   "after": "The saved card is charged when the stylist texts DONE; the wardrobe edit's rest goes on the saved card or the bill; a follow-up paid at the counter pays at the front desk; a workshop's bill is texted after.",
+   "clothes": "Never through Rosie: the client pays the stores for clothes and products.",
+   "fees": "Late-cancel fee: $20 (a follow-up or a wardrobe edit) or $89 (a home visit), only with the stylist's OK; no fee on silence.",
+   "tips": "None.",
+   "tax": "None by default; the state form says if the service is taxed there.",
+   "rosfield": "$2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never in a text": "Body measurements, sizes, health or skin concerns, the clothes or budget a client shares, and when a home will be empty.",
+   "card or photo texted by mistake": "Not kept or passed on; the client is told once where it goes instead (the secure page).",
+   "staff texts": "the client's name and the kind of visit; details on the secure page",
+   "languages": "English and Spanish.",
+   "minors": "Adults only."
+  },
+  "pf.staff": {
+   "roles": "Stylists (some with color or wardrobe training), a front desk person.",
+   "licenses": "None needed. Training is the stylist's own word, shown as stated.",
+   "who OKs": "Sam OKs any price made for one client.",
+   "stand-ins": "Another stylist who knows the kind of look; a client who asked for their stylist by name is asked first; nobody moves on silence.",
+   "after hours": "None: bookings are by text or on the page."
+  },
+  "pf.rules": {
+   "styling": "Styling isn't therapy or medical advice; the stylist says so when asked. Clothes and products are never sold through Rosie. A photo of a look is kept only with the client's yes.",
+   "records": "7 years."
+  },
+  "pf.edges": {
+   "matter most": {
+    "a medical, skin or body concern": "Rosie says styling isn't that and points to a doctor or a therapist.",
+    "a stylist's home visit that feels unsafe": "The stylist leaves; 911 if anyone is in danger.",
+    "a discount on clothes": "Rosfield takes no store payments; Sam decides any discount on the studio's own service.",
+    "a late cancel": "The fee only with Sam's yes; no fee on silence.",
+    "closet photos sent": "Used only for the quote; not shared."
+   },
+   "the rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "video",
+   "firststeps",
+   "forms",
+   "documents",
+   "photos",
+   "groups",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Mia and Hugo style at companies; Mia runs team workshops too. Nina and Leo style clients; Nina also does home visits. Pat is my office manager, for prices over $500. Jules rents a room in the studio, with their own clients."
+   ],
+   [
+    "Haircut at their home",
+    "Closet check at home"
+   ],
+   [
+    "$75",
+    "$150"
+   ],
+   [
+    "$140 an hour",
+    "$120 an hour"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Nina: stylist, color, home visits"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nina: stylist, color and home visits"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "New clients come to you first. Returning clients never need one"
+   ],
+   [
+    "Style consult",
+    "Intro call"
+   ],
+   [
+    "free style consult",
+    "free intro call"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a facial peel, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Style Studio doesn't do facial peels."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The stylist's pin tore my shirt collar."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says the stylist's pin tore a shirt collar today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "Likes warm colors, soft lines at the sides, and no logos."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a color analysis for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "two skin fades on",
+    "two style sessions on"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Styling for people in Springfield. Color, closet reviews and home visits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A wardrobe edit"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most style studios set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood style studio on Elm St. Color, closet reviews and style sessions."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most style studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules style studios often set."
+   ],
+   [
+    "From the list, from photos, or at the visit?",
+    "From the list, from closet photos, or at the visit?"
+   ],
+   [
+    "color quote",
+    "closet quote"
+   ],
+   [
+    "Give your check-in code at the chair.",
+    "Give your check-in code at the start."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next visit at a session's end"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una sesión de estilo el sábado."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A style session could mean a studio visit or a stylist at your home."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some work takes several visits, like a wardrobe edit done in two steps. Where the plug-in says so, all the times are picked now."
+   ],
+   [
+    "You're booked! Give this code at the chair when you arrive.",
+    "You're booked! Give this code at the studio desk when you arrive."
+   ],
+   [
+    "Done. Your Sat 11:00am visit is now with Avery. Give this code at the chair.",
+    "Done. Your Sat 11:00am session is now with Leo. Give this code at the desk."
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at the desk."
+   ],
+   [
+    "The problem gets worse",
+    "Alex's plans change"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 14 · 10:00am"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A studio takes no drop-offs. A tailor or a shoe repair does."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens in the session?"
+   ],
+   [
+    "Stops, and sends a written note",
+    "Points to other help, in a note"
+   ],
+   [
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. Styling is for adults only, so nothing more happens."
+   ],
+   [
+    "Riley finishes the work",
+    "Riley finishes the session"
+   ],
+   [
+    "Riley adds notes for next time",
+    "Riley keeps their own notes"
+   ],
+   [
+    "Anything added at the chair is paid there, the shop's own way.",
+    "Anything added in a session is paid when the session ends, the studio's own way."
+   ],
+   [
+    "A tip at the chair is the shop's own way too.",
+    "Styling takes no tips."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A session is rated, with only the score kept, so the studio takes the first branch."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The color came out patchy on one side."
+   ],
+   [
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Lee Style Studio will make up the time for free. Pick a time:"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do student sessions? My son is 19, in college."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds group styling to Lee Style Studio. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "NEW massage",
+    "NEW group styling"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Group styling for Lee Style Studio: is it the same company?"
+   ],
+   [
+    "Paid at the chair",
+    "Charged after the session"
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley, so Riley's next times show."
+   ],
+   [
+    "Other days, the customer pays at the chair, the shop's own way.",
+    "Anything more needs the client's yes first."
+   ],
+   [
+    "No bill is texted, so there's no tip line. A tip at the chair is the shop's own.",
+    "No bill is texted, so there's no tip line. Styling takes no tips."
+   ],
+   [
+    "2 At my home",
+    "2 At my workplace"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a follow-up every 2 weeks"
+   ],
+   [
+    "A no-show is marked 15 minutes after the start.",
+    "A no-show: nobody joins a video session within 10 minutes, or 15 at the office."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "No work here is sent now, so nobody is put on call."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The studio takes no jobs sent now: styling is booked ahead."
+   ],
+   [
+    "From the price list or photos, the price is set. A service priced at the chair gets its price now.",
+    "From the price list, or from closet photos, the price is set. A service priced at the session gets its price now."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, color and home visits"
+   ],
+   [
+    "Hours: the shop's hours",
+    "Hours: the studio's hours"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: styling and workshops"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: styling"
+   ],
+   [
+    "Avery: barber",
+    "Avery: image stylist"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Style Studio can book you from now on, by video, at the office and for home visits. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop. Your day list comes at the time you picked.",
+    "You're all set: Lee Style Studio can book you from now on, by video and at the office. Your day list comes at the time you picked."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Services's"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Style Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Style Studio"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Wardrobe Visits"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Color Lab"
+   ],
+   [
+    "Lee Electric",
+    "Lee Style Workshops"
+   ],
+   [
+    "88 Elm St",
+    "14 Park Ave"
+   ],
+   [
+    "1200 Main St",
+    "400 Main St"
+   ],
+   [
+    "every 4 weeks",
+    "every 2 weeks"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Style session"
+   ],
+   [
+    "Signature cut and shave",
+    "Style session"
+   ],
+   [
+    "signature cut",
+    "style session"
+   ],
+   [
+    "$55",
+    "$55"
+   ],
+   [
+    "Groom's package",
+    "Full-day makeover"
+   ],
+   [
+    "Color and cut",
+    "Wardrobe edit"
+   ],
+   [
+    "color and cut",
+    "wardrobe edit"
+   ],
+   [
+    "Color correction",
+    "Style assessment"
+   ],
+   [
+    "color correction",
+    "style assessment"
+   ],
+   [
+    "Skin fade",
+    "Color analysis"
+   ],
+   [
+    "skin fade",
+    "color analysis"
+   ],
+   [
+    "Beard trim",
+    "Closet review"
+   ],
+   [
+    "beard trim",
+    "closet review"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Quick outfit review (30 minutes, 18 and up)"
+   ],
+   [
+    "kids cut",
+    "quick look"
+   ],
+   [
+    "Haircut plans",
+    "Follow-up plans"
+   ],
+   [
+    "haircut plan",
+    "follow-up plan"
+   ],
+   [
+    "Haircut plan",
+    "Follow-up plan"
+   ],
+   [
+    "Haircuts",
+    "Follow-up sessions"
+   ],
+   [
+    "haircuts",
+    "follow-up sessions"
+   ],
+   [
+    "Haircut",
+    "Follow-up session"
+   ],
+   [
+    "haircut",
+    "follow-up session"
+   ],
+   [
+    "a patch test",
+    "an intro call"
+   ],
+   [
+    "patch test",
+    "intro call"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "barbershop",
+    "style studio"
+   ],
+   [
+    "Barbershop",
+    "Style studio"
+   ],
+   [
+    "Barbering",
+    "Styling"
+   ],
+   [
+    "barbers",
+    "stylists"
+   ],
+   [
+    "barber",
+    "stylist"
+   ],
+   [
+    "Barber",
+    "Stylist"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "studio's price list"
+   ],
+   [
+    "at the shop",
+    "at the studio"
+   ],
+   [
+    "At the shop",
+    "At the studio"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Drain clearing",
+    "Style session"
+   ],
+   [
+    "Panel upgrade",
+    "Full-day makeover"
+   ],
+   [
+    "plumbing jobs",
+    "styling sessions"
+   ],
+   [
+    "electrical jobs",
+    "workshops"
+   ],
+   [
+    "Electrical",
+    "Workshops"
+   ],
+   [
+    "electrical",
+    "workshops"
+   ],
+   [
+    "plumber",
+    "stylist"
+   ],
+   [
+    "Plumber",
+    "Stylist"
+   ],
+   [
+    "Plumbing",
+    "Styling"
+   ],
+   [
+    "plumbing",
+    "styling"
+   ],
+   [
+    "Riley Chen",
+    "Nina Park"
+   ],
+   [
+    "Avery Diaz",
+    "Leo Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Mia Ross"
+   ],
+   [
+    "Casey Moore",
+    "Hugo Stein"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Leo"
+   ],
+   [
+    "Jordan",
+    "Mia"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "priced from photos",
+    "priced from closet photos"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your closet photos"
+   ],
+   [
+    "a interview practice",
+    "a color analysis"
+   ],
+   [
+    "A interview practice",
+    "A color analysis"
+   ],
+   [
+    "with the code at the chair",
+    "with the code at the desk"
+   ],
+   [
+    "Kids cut",
+    "Quick look"
+   ]
+  ],
+  "B": [
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Mia and Hugo style at companies; Mia runs team workshops too. Nina and Leo style clients; Nina also goes to clients' homes. Pat is my office manager, for prices over $500. Jules rents a room in the studio, with their own clients."
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Wardrobe Visits has a yearly color plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 3 months?"
+   ],
+   [
+    "Under the sink, before",
+    "Mirror area, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Rug, before"
+   ],
+   [
+    "$140 an hour",
+    "$120 an hour"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Nina: stylist, color, home visits"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nina: stylist, color and home visits"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "New clients come to you first. Returning clients never need one"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home style session"
+   ],
+   [
+    "Yard drain",
+    "Quick look at home"
+   ],
+   [
+    "Kitchen drain",
+    "Home style session"
+   ],
+   [
+    "the kitchen drain",
+    "the home style session"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about the session wasn't right, reply here."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about styling for my new managers. A text back is fine."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can styling help with my anxiety medication?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a stylist come to our office this Thursday? What does it cost?"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like reporting on what an employee said."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Help my new managers' fits a team workshop."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a color check? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many people, and what should the session cover?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At our office. Just me, for now."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a color check every year."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some work takes more than one visit, like a half-day split over two mornings."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you do a color check every year, too?"
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a wardrobe edit at your home is priced from closet photos, so Rosie's first text asks for them."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your closet, and a stylist will price the edit."
+   ],
+   [
+    "couldn't price your water heater this time.",
+    "couldn't price your wardrobe edit this time."
+   ],
+   [
+    "Your water heater price is with",
+    "Your wardrobe edit price is with"
+   ],
+   [
+    "Your water heater contract is waiting for your signature.",
+    "Your wardrobe edit agreement is waiting for your signature."
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Agreement · Wardrobe edit at your home · $640"
+   ],
+   [
+    "Your water heater visit wasn't booked",
+    "Your wardrobe edit wasn't booked"
+   ],
+   [
+    "didn't sign the water heater contract in time",
+    "didn't sign the wardrobe edit agreement in time"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home session needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the closet and the mirror area."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Say Morgan has a repeat plan: a team style check at two offices every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's style check?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my manager sit in on the session?"
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Home style session|Visit}}"
+   ],
+   [
+    "{{svc.intext:Yard drain|Visit}}",
+    "{{svc.intext:Quick look at home|Visit}}"
+   ],
+   [
+    "{{svc.intext:Water heater flush|Visit}}",
+    "{{svc.intext:Closet check at home|Visit}}"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $640 quote is good for 7 days."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Add a color check · $160"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the color check for $160."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Mia spots a fit issue."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 color check"
+   ],
+   [
+    "replace both shutoff valves, $160.",
+    "a color check, $160."
+   ],
+   [
+    "the shutoff valves",
+    "the color check"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Mia spills a drink on the studio's rug and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE coffee spilled on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Coffee on the rug"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "spilled coffee on the rug at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows a clean rug."
+   ],
+   [
+    "Harper J.'s $2,400 repipe is over it, so the link offers a bank transfer too.",
+    "Harper J.'s $2,400 leadership program is over it, so the link offers a bank transfer too."
+   ],
+   [
+    "$800 for stage 2 of your repipe.",
+    "$800 for stage 2 of your leadership program."
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your leadership program"
+   ],
+   [
+    "the {{svc.intext:kitchen drain|visit}}",
+    "the {{svc.intext:home style session|visit}}"
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The session's plan wasn't sent 2 weeks later. Sam OKs a free follow-up visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "I never got the action plan from the session."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "'s session on Thu Oct 22 had no action plan sent."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. Your follow-up visit is free."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My coat was missing after the session this morning."
+   ],
+   [
+    "like replacing the old pipes Jordan noted.",
+    "like a team program Mia noted."
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a team program, from Mia's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Team program"
+   ],
+   [
+    "your sewer camera report from Thursday is ready.",
+    "your session summary from Thursday is ready."
+   ],
+   [
+    "Sewer camera report",
+    "Session summary"
+   ],
+   [
+    "your sewer camera report needs a little more time.",
+    "your session summary needs a little more time."
+   ],
+   [
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "your session summary from Thu Oct 22 is ready."
+   ],
+   [
+    "that a sewer camera report comes Fri Oct 23.",
+    "that a session summary comes Fri Oct 23."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a home style session, today,"
+   ],
+   [
+    "The service call is $89.",
+    "The visit fee is $89."
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the wardrobe edit quote before booking."
+   ],
+   [
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Ivy C. books a home style session for Mon Nov 9 in the morning."
+   ],
+   [
+    "two {{svc.intext:drain clearings|visits}}",
+    "two {{svc.intext:home style sessions|visits}}"
+   ],
+   [
+    "you have two drain clearings on",
+    "you have two home style sessions on"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Styling for homes in Springfield. Home style sessions and wardrobe edits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A wardrobe edit at your home"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most style studios set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A style studio on Elm St. Color, closet reviews and style sessions."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most style studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules style studios often set."
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both managers' sessions go on one bill on the 1st."
+   ],
+   [
+    "7am Thu",
+    "6pm Wed"
+   ],
+   [
+    "7am on the visit day",
+    "6pm the day before"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "No license needed for styling"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for closet photos"
+   ],
+   [
+    "Prices it: the list, photos or the visit",
+    "Prices it: the list, closet photos or the visit"
+   ],
+   [
+    "Quoted from photos first",
+    "Quoted from closet photos first"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A sign of danger gets 988 or 911 first."
+   ],
+   [
+    "Lee Electric.",
+    "Lee Style Workshops."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Mia also bring a team style report?"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Store 1 manager · Tue Oct 20 · $179"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Store 2 manager · Wed Oct 21 · $179"
+   ],
+   [
+    "Jordan from Lee Home Services is on the way, about 15 minutes. When Jordan arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in.",
+    "Mia from Lee Wardrobe Visits is on the way, about 15 minutes. When Mia arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in."
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code at the meeting room"
+   ],
+   [
+    "Jordan couldn't enter your code. If the person at your door isn't Jordan, don't let them in.",
+    "Mia couldn't enter your code. If the person at your door isn't Mia, don't let them in."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped on the stairs, need to stop"
+   ],
+   [
+    "Sam bills Alex the business's own way",
+    "Sam bills the company its own way"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Color check"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Mia left a mess in the fitting room."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can I see Jordan again next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the report link"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE team report Mon Oct 26"
+   ],
+   [
+    "The problem gets worse",
+    "Alex's plans change"
+   ],
+   [
+    "Jordan found more work.",
+    "Jordan suggests one more thing."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE nothing to note"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 session"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE session held. My notes are in my own files."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "It's Sam's call each time."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds color consulting to Lee Wardrobe Visits. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW color consulting"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Color consulting for Lee Wardrobe Visits: is it the same company?"
+   ],
+   [
+    "Nora can ask to be next for that window. If Ivy's saved time runs out, it's saved for Nora at once.",
+    "Nora can ask to be next for that time. If Ivy's saved time runs out, it's saved for Nora at once."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'd like a style session for two people."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero una sesión de estilo para dos personas."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa styling Thu 12pm Casey"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A home style session happens only at the client's home, so nothing is asked."
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your closet photos"
+   ],
+   [
+    "Add photos",
+    "Add closet photos"
+   ],
+   [
+    "Photos and answers added",
+    "Closet photos and answers added"
+   ],
+   [
+    "From the photos and answers",
+    "From the closet photos and answers"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Styling books a set start time."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Mia's times show: Mia does the wardrobe edits."
+   ],
+   [
+    "1 At my home",
+    "1 At my workplace"
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Each session has a set start time. The stylist comes 10 minutes early to set up."
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "10am–12pm",
+    "10:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "No work here is sent now, so nobody is put on call."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The studio takes no jobs sent now: styling is booked ahead."
+   ],
+   [
+    "A plug-in holds what one kind of work needs. The steps around it stay the same. Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "A plug-in holds what one kind of work needs. The steps around it stay the same. Rosie loads styling's now, and the others when Sam gets to them."
+   ],
+   [
+    "After that, or nobody home",
+    "After that, or a no-show"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Electrical and Lee's Barbershop are saved, about 10 minutes from live. Text MORE anytime to finish.",
+    "Workshops and Lee Style Studio are saved, about 10 minutes from live. Text MORE anytime to finish."
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: styling and workshops"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: styling"
+   ],
+   [
+    "Avery: barber",
+    "Avery: image stylist"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Style Studio can book you from now on, by video, at the office and for home visits. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop. Your day list comes at the time you picked.",
+    "You're all set: Lee Style Studio can book you from now on, by video and at the office. Your day list comes at the time you picked."
+   ],
+   [
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "Workshops and Lee Style Studio now show to AI assistants too."
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "A drain clearing",
+    "A home style session"
+   ],
+   [
+    "a drain clearing",
+    "a home style session"
+   ],
+   [
+    "a water heater replacement",
+    "a wardrobe edit at your home"
+   ],
+   [
+    "a water heater flush",
+    "a closet check at home"
+   ],
+   [
+    "A leak repair",
+    "A style debrief"
+   ],
+   [
+    "a leak repair",
+    "a style debrief"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Wardrobe Visits'"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Wardrobe Visits LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Style Studio"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Wardrobe Visits"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Color Lab"
+   ],
+   [
+    "88 Elm St",
+    "14 Park Ave"
+   ],
+   [
+    "1200 Main St",
+    "400 Main St"
+   ],
+   [
+    "leehomeservices.com",
+    "leewardrobevisits.com"
+   ],
+   [
+    "42 Oak St",
+    "500 Harbor Ave"
+   ],
+   [
+    "beard trim",
+    "closet review"
+   ],
+   [
+    "Haircut",
+    "Follow-up session"
+   ],
+   [
+    "haircut",
+    "follow-up session"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "barbershop",
+    "style studio"
+   ],
+   [
+    "Barbershop",
+    "Style studio"
+   ],
+   [
+    "barbers",
+    "stylists"
+   ],
+   [
+    "barber",
+    "stylist"
+   ],
+   [
+    "Barber",
+    "Stylist"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Drain clearings",
+    "Home style sessions"
+   ],
+   [
+    "Drain clearing",
+    "Home style session"
+   ],
+   [
+    "drain clearing",
+    "home style session"
+   ],
+   [
+    "Water heater replacement",
+    "Wardrobe edit at your home"
+   ],
+   [
+    "water heater replacement",
+    "wardrobe edit at your home"
+   ],
+   [
+    "Water heater flush",
+    "Closet check at home"
+   ],
+   [
+    "water heater flush",
+    "closet check at home"
+   ],
+   [
+    "Leak repair",
+    "Style debrief"
+   ],
+   [
+    "leak repair",
+    "style debrief"
+   ],
+   [
+    "Sewer camera inspection",
+    "Team style report"
+   ],
+   [
+    "sewer camera inspection",
+    "team style report"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "Service call",
+    "Visit fee"
+   ],
+   [
+    "Panel upgrade",
+    "Full-day makeover"
+   ],
+   [
+    "plumbing and electrical work",
+    "styling and workshops"
+   ],
+   [
+    "plumbing jobs",
+    "styling sessions"
+   ],
+   [
+    "electrical jobs",
+    "workshops"
+   ],
+   [
+    "electrical prices",
+    "workshop prices"
+   ],
+   [
+    "Electrical",
+    "Workshops"
+   ],
+   [
+    "electrical",
+    "workshops"
+   ],
+   [
+    "plumber",
+    "stylist"
+   ],
+   [
+    "Plumber",
+    "Stylist"
+   ],
+   [
+    "Plumbing",
+    "Styling"
+   ],
+   [
+    "plumbing",
+    "styling"
+   ],
+   [
+    "Riley Chen",
+    "Nina Park"
+   ],
+   [
+    "Avery Diaz",
+    "Leo Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Mia Ross"
+   ],
+   [
+    "Casey Moore",
+    "Hugo Stein"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Leo"
+   ],
+   [
+    "Jordan",
+    "Mia"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "nobody home",
+    "a no-show"
+   ],
+   [
+    "Rental 1",
+    "Store 1 manager"
+   ],
+   [
+    "Rental 2",
+    "Store 2 manager"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Styling needs no state license by default, so the company gives only its registration (S1-61). It's a switch: a state's form can name one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Styling pays Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Styling adds no agreement before going live, so nothing is left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Styling books a stylist's time, never a room on its own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Styling is one-to-one or a team session booked by the company; no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No stylist needs a person license by default; credentials are the stylist's own word."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Styling is never sent now: sessions are booked ahead."
+   },
+   {
+    "op": "more",
+    "at": "S13-10",
+    "more": [
+     "Styling: crisis words get 988 and 911, and nothing else. Sam's flag never carries the words, and the AI never counsels."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "Styling isn't therapy or legal advice. Those questions wait for the stylist, who points to a licensed pro."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Styling: what a client shares about their job, health or money stays on the secure page. Texts to the owner or staff carry none of it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "The styling plug-in brings a free intro call, the stylist's client check and the studio's terms.",
+     "It needs no license by default, and gives 988 for crisis words."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Every session is a stylist's time (A4-14)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Styling books a stylist, not a space."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A session is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every new client has the intro call, the intake and the agreement; a returning client has them on file."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Adults only: no child is left with a stylist."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with a stylist."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked after a session, as in the old flowchart. Only the score is kept."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Clients pay for styling themselves: no insurance plan is billed."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A package is paid in full when booked; nothing is billed in stages."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance plan pays for styling."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left with a stylist."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A session has no result that comes later; the stylist's notes stay with the stylist."
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "label": "Safety steps, then go on",
+    "why": "Styling has no safety steps to send before booking: danger gets 911, crisis words get 988 and 911."
+   },
+   {
+    "op": "after",
+    "at": "A3-22",
+    "steps": [
+     {
+      "id": "A3-x01",
+      "line": [
+       "3.9"
+      ],
+      "who": "san",
+      "via": "auto",
+      "type": "split",
+      "title": "Checks it's styling, not therapy",
+      "q": "Asking for therapy, not styling?",
+      "does": "The plug-in's scope check, right after the danger check. Words like 'therapy', 'treat my anxiety' or 'my depression' get a plain answer about what styling is.",
+      "more": [
+       "Rosie never judges how anyone is doing, and never names a condition.",
+       "It goes by meaning, whatever words are used. A career or life goal goes straight on.",
+       "Crisis words never come here: they get 988 and 911 first, above."
+      ],
+      "needs": [
+       "request",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "No: styling goals",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Asks for therapy",
+        "steps": [
+         {
+          "id": "A3-x02",
+          "line": [
+           "3.9"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "sync",
+          "type": "split",
+          "title": "Says what styling is; Alex picks",
+          "q": "Still want styling?",
+          "does": "Rosie says plainly that styling isn't therapy, and that a licensed therapist is the right person for that. Then Alex picks. Rosie doesn't push either way.",
+          "more": [
+           "The AI can help Alex look for a therapist, outside Rosie.",
+           "Styling for career or life goals can still be booked."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Nina is a stylist, not a therapist. Styling doesn't diagnose or treat mental health conditions. For that, a licensed therapist is the right person. Would you still like styling for your goals?",
+            {
+             "buttons": [
+              "Styling goals",
+              "Look for a therapist"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Styling goals",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Look for a therapist",
+            "steps": [],
+            "end": "end",
+            "endText": "No booking. Alex looks for a therapist; nobody at the studio is told."
+           }
+          ]
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-03",
+    "more": [
+     "Here: the free intro call first, the intake on the secure page, Nina's client check, the studio terms, and the scope notice."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "A team session is booked by a company, in flow B. One more person, like a partner, is added on the secure page (A4-71)."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "An adult the booker acts for",
+    "why": "Styling needs the client's own consent and goals; a guardian doesn't book it for another adult."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The package is booked as its own service: its $55 is this booking's full price (A5-16). Nothing else is sold on the page."
+   },
+   {
+    "op": "more",
+    "at": "A7-03",
+    "more": [
+     "On a package, only this session moves. The others keep their times."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-51",
+    "label": "The customer's to bring",
+    "why": "A styling session asks the client to bring nothing; what it needs was done at booking. Only the studio's side, like a conflict, can stop it (A8-61)."
+   },
+   {
+    "op": "more",
+    "at": "A10-02",
+    "more": [
+     "Only the score is kept, never what the session was about."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Nina replies YES, then checks what Sam set. One reply covers every kind of work Nina does.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Leo, Mia and Hugo join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES"
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Style Studio! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Nina Park · Lee Style Studio",
+        "lines": [
+         "Color and closet styling, wardrobe edits and home visits",
+         "No license needed for this work",
+         "Hours: the studio's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Wardrobe Visits",
+       "At the client's office",
+       "None needed · registration 2019-0451",
+       "Yes"
+      ],
+      [
+       "Mia Ross",
+       "Lee Wardrobe Visits",
+       "At the client's office",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Hugo Stein",
+       "Lee Wardrobe Visits",
+       "At the client's office",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Wardrobe Visits",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Nina Park",
+       "Lee Style Studio",
+       "Video, the office, home visits",
+       "None needed · registration 2020-1187",
+       "Once Sam says yes"
+      ],
+      [
+       "Leo Diaz",
+       "Lee Style Studio",
+       "Video and the office",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "A3-22",
+    "more": [
+     "The general check looks for danger to life, fire, gas, a medical emergency or self-harm.",
+     "Every answer later in the booking is checked the same way, in any wording.",
+     "On a call, the voice AI says any safety words out loud.",
+     "The plug-in adds its own: anyone who says they may hurt themselves or someone else gets 988 and 911 at once."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-25",
+    "does": "Words about suicide, self-harm, hurting someone else or a mental health crisis get 988 and 911 at once. There's no booking in that chat.",
+    "more": [
+     "This is always on, for every kind of work, whatever words are used.",
+     "The AI never counsels: no comfort as a counselor, no questions about it, no advice.",
+     "Sam sees only that the crisis lines were given, never the words. Nobody else is told, unless Alex asks.",
+     "On a call, Rosie says the same words out loud.",
+     "Alex can come back and book any time later."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "If you're thinking about hurting yourself or someone else, call or text 988 now. If anyone is in danger right now, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "more": [
+     "Sam set this line at sign-up: the number customers call for what only a stylist should answer.",
+     "911 or 988 come first when they're needed.",
+     "The plug-in lists which words go to this line. Sam can add more.",
+     "Styling isn't legal, financial or medical advice, so those questions are never answered here.",
+     "Where the plug-in says those words stop a booking, nothing is booked. Otherwise Alex can go on."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the stylists themselves. Nina can go over it in your session. For anything sooner, call Lee Style Studio at (555) 010-0177."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-36",
+    "does": "Alex picks video. Styling can be done by video or phone. It counts as at the business, so Nina asks for the code at the start.",
+    "more": [
+     "The plug-in says which services can be done by video or phone. The customer picks it here, like a place.",
+     "Styling needs no license, so no state is asked first.",
+     "The confirmation and the reminder carry Nina's own video link from the Team page.",
+     "Nobody joins within 10 minutes: it's handled like a no-show."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "more": [
+     "It's one booking, with one code.",
+     "If no one stylist has time for both, the times show two stylists back to back.",
+     "A session for Alex and a quick outfit review for Alex's daughter, 19, are booked the same way. Both are asked before the times."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "more": [
+     "A named stylist is the client's choice. Rosie never suggests, ranks or rates stylists."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "The first one, please."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-16",
+    "does": "Alex asked for Nina by name, so only Nina's times show, at Nina's price. A named stylist is offered only if they pass the same tests.",
+    "more": [
+     "If Nina can't take it, the AI says so. It offers Nina's next open day, or the studio's other stylists, listed with no ranking."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-26",
+    "does": "Alex books a session for their adult brother, as a gift, and pays for it. The code goes to the brother.",
+    "more": [
+     "The brother gets texts only once Alex says the brother agreed to them.",
+     "The brother answers the private questions and signs the studio terms on their own secure page.",
+     "Alex gets the receipt, as the one who pays. Alex never sees what the brother shares."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "It's a gift for my brother. Can I pay for it?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-55",
+    "does": "A what-if: Alex's employer pays from its learning budget. Alex forwards the payer a link. The payer pays on the secure page, and gives their own OK to texts there.",
+    "more": [
+     "Rosie texts the payer only after that OK.",
+     "The receipt goes to the one who paid. It shows only the date, the length and the price.",
+     "The payer never sees Alex's answers or what's said in a session.",
+     "The plug-in says if someone else may pay at all."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-41",
+    "does": "The plug-in's scope notice is due when booking, so the AI says it before Alex's yes. The secure page and the confirmation repeat it.",
+    "more": [
+     "It's the stylist's own scope text, from the plug-in.",
+     "The booking records that the notice was said.",
+     "Any paper owed after booking becomes a to-do for the studio, with its due date."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Before you book: styling with Nina isn't therapy, and isn't legal, financial or medical advice. What you share stays on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says a new client needs first steps: a free intro call with the stylist, and the intake form. Rosie checks before the secure link, so the page knows what to ask."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "does": "On the secure page, Alex answers one short question: are texts to this phone safe? Styling shows no photos of clients, so there's no photo question.",
+    "more": [
+     "A work phone or a shared one: Alex picks this page, email or a call. Rosie then reaches Alex only that way.",
+     "A job search can be private from an employer, so a work phone is a good reason to say no.",
+     "Here, Alex says texts are safe."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "One quick question.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-03",
+    "does": "Say Alex books session 3 of the package as its own booking. It uses one of the 6, so it's already paid. The page shows 3 left after it.",
+    "more": [
+     "So nothing more is taken for it.",
+     "A cancel in time puts the session back on the package.",
+     "A late cancel or a no-show can use the session up. Sam confirms it. No answer in 24 hours: it stays on the package.",
+     "Rosie never offers a package in a booking text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-21",
+    "more": [
+     "The terms say how often, the price a session, when each is paid, and how to skip, pause or end.",
+     "A follow-up plan saves a card, like a follow-up session.",
+     "Saving the card takes nothing. A fee is charged only if Sam says yes.",
+     "Repeat charges need this yes of their own. A yes to the booking isn't enough.",
+     "Alex gets a copy of the terms the way Alex picked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-19",
+    "does": "Back to Alex's booking. The plug-in's job rules need the studio's terms before a client's first paid session, signed before any money is taken.",
+    "more": [
+     "A returning client's agreement is on file, so a follow-up needs none. A new package gets a new one.",
+     "Its deposit limit and cancel window come from the state's form."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-20",
+    "does": "Rosie builds the studio terms from Nina's own text and the package. Alex signs on the secure page. Sam signed the studio's side at sign-up, and each gets a copy.",
+    "form": [
+     [
+      "Studio terms · Lee Style Studio",
+      "Full text shown"
+     ],
+     [
+      "What styling is",
+      "Styling for your goals. Not therapy, and not legal, financial or medical advice"
+     ],
+     [
+      "Confidentiality",
+      "What you share stays between you and Nina, unless the law requires otherwise or someone is in danger"
+     ],
+     [
+      "Package",
+      "6 sessions of 60 minutes · $55"
+     ],
+     [
+      "Cancel",
+      "Free until 24 hours before a session. Later, it may be used up"
+     ],
+     [
+      "Ending",
+      "Either of you may end it. Sessions left are refunded"
+     ],
+     [
+      "Signed",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-23",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your booking at Lee Style Studio wasn't made, since the studio terms wasn't signed in time. Nothing was charged."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-01",
+    "more": [
+     "Rosie checked this before the secure page too.",
+     "Here it books right away: Alex is a returning client, and it isn't for today.",
+     "A request also waits if it has an answer only Sam, or the stylist, should read.",
+     "Pat, the office manager, gets the same requests. Sam's answer wins."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "does": "Nina is running late. Rosie tells Alex the new start. Alex can keep it, or move the session with no fee.",
+    "more": [
+     "2, Move my visit: Alex gets open times, with no fee.",
+     "With no reply, the later start stands.",
+     "A late stylist still gives the full session."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 10"
+     ],
+     [
+      "san",
+      "cust",
+      "Nina is running about 10 minutes late, so your 11:00am starts about 11:10am. You still get your full session.",
+      {
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Nina opens the video call at 10:58am. The plug-in asks nothing to bring, so the session can start.",
+    "more": [
+     "The intake and the studio terms were done at booking.",
+     "The code is taken only once nothing required is missing."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex's session, Sat 11:00am. Styling keeps no before record, so Nina goes straight on.",
+    "more": [
+     "Nothing about what's said is ever noted in Rosie.",
+     "At a drop-off, before photos of the item are the record."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Alex starts talking about something styling can't cover, like a health worry or a legal question. Nina says so, suggests a licensed pro, and goes on with Alex's goals.",
+    "more": [
+     "Danger first: if anyone may be hurt, Nina gives 988 or 911.",
+     "Nina's note names the kind of pro to see, like a therapist or a lawyer, never a named one.",
+     "The note goes on the secure page, never in a text.",
+     "The session goes on, so nothing is refunded for it."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: suggested other help. Note on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Nina left you a note from today's session.",
+      {
+       "card": {
+        "title": "A note from Lee Style Studio",
+        "lines": [
+         "The kind of help Nina suggested"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "The session ends on time: what was booked, and anything Alex said yes to."
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "Before the session ends, Nina and Alex agree on next steps for the two weeks ahead. Nothing is charged for it.",
+    "more": [
+     "What they discuss stays between them. Rosie only knows the session happened.",
+     "Anything new needs Alex's yes and its price first.",
+     "Work with no walk-through, like a class or a table, skips this."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-32",
+    "does": "Say a single session leads to more, like Nina's style session after a follow-up. It goes on the secure page, to sign or decline.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Style Studio sent you a proposal: Nina's style session. Read it, then sign or decline on the secure page.",
+      {
+       "card": {
+        "title": "Proposal · style session",
+        "lines": [
+         "6 sessions with Nina · $55",
+         "Good until Sat Nov 7"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/p/a15"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A9-02",
+    "does": "Alex paid the $55 in full after the intro call. Rosie sends no bill."
+   },
+   {
+    "op": "words",
+    "at": "A10-26",
+    "does": "Say Alex bought a package from Nina at a talk at Alex's workplace. Where the state's rules give a cancel period, Rosie sends it in writing."
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Styling and workshops license nobody by default, so nobody on Sam's team is checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "does": "Nina's day is blocked, and each customer picks: Leo by name, new times with Nina, or a free cancel. Anything paid is refunded. With no reply in 24 hours, nobody moves: Sam calls."
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee Style Studio. Quinn gets one invite and replies YES. Styling needs no license, so Quinn can be booked once Sam says yes.",
+    "more": [
+     "No reply in 48 hours: one reminder, then Sam is told.",
+     "Where a state's form names a license for this work, it's asked and checked then."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Style Studio. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Styling needs no person license, so only the business's registration comes due. Dates come from what Sam sent. Reminders go 30 days and 7 days before.",
+    "more": [
+     "Insurance works the same way, where a company client asks for proof.",
+     "Where a state's form names a license for styling, it comes due the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Style Studio's registration 2020-1187 has lapsed.",
+      {
+       "card": {
+        "title": "Registration renewal",
+        "lines": [
+         "Not renewed by then: new bookings pause"
+        ],
+        "button": "Upload the receipt",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches color analysis from a saved card, charged at DONE, to paid in full when booked. It's for new bookings only, and read back first.",
+    "more": [
+     "Color analyses already booked keep their saved card.",
+     "Paid in full is taken when the customer books, so no card stays saved for it.",
+     "A late cancel then follows the rules for paid sessions.",
+     "The price-OK limit changes the same way: from now on, and read back first."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Styling needs no state license by default, so the company gives only its registration (S1-61). It's a switch: a state's form can name one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Styling pays Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Styling adds no agreement before going live, so nothing is left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Styling books a stylist's time, never a room on its own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Styling is one-to-one or a team session booked by the company; no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No stylist needs a person license by default; credentials are the stylist's own word."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Styling is never sent now: sessions are booked ahead."
+   },
+   {
+    "op": "more",
+    "at": "S13-10",
+    "more": [
+     "Styling: crisis words get 988 and 911, and nothing else. Sam's flag never carries the words, and the AI never counsels."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "Styling isn't therapy or legal advice. Those questions wait for the stylist, who points to a licensed pro."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Styling: what a client shares about their job, health or money stays on the secure page. Texts to the owner or staff carry none of it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "The styling plug-in brings a free intro call, the stylist's client check and the studio's terms.",
+     "It needs no license by default, and gives 988 for crisis words."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A session starts at a set time (B4-84): the stylist is in the meeting room before it."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A session is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A company books the whole session; no seats are sold one by one."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Styling is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Styling is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Only a child answers",
+    "why": "The stylist meets adults at a company's office, never a child at a door."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for styling; the company pays under its contract."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "An adult the booker acts for",
+    "why": "Styling needs the person's own consent and goals; a guardian doesn't book it."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A session needs the person coached there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A session needs the person coached there, so no gate code is used."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Alex is in the session with the stylist; there's nothing to update him on."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Each session is billed on its own, or once a month for a company (B9-22)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for styling."
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "label": "Safety steps, then go on",
+    "why": "Styling has no safety steps to send before booking: danger gets 911, crisis words get 988 and 911."
+   },
+   {
+    "op": "after",
+    "at": "B3-17",
+    "steps": [
+     {
+      "id": "B3-x01",
+      "line": [
+       "3.9"
+      ],
+      "who": "san",
+      "via": "auto",
+      "type": "split",
+      "title": "Checks it's styling, not therapy",
+      "q": "Asking for therapy, not styling?",
+      "does": "The plug-in's scope check, right after the danger check. Words like 'therapy', 'treat my anxiety' or 'my depression' get a plain answer about what styling is.",
+      "more": [
+       "Rosie never judges how anyone is doing, and never names a condition.",
+       "It goes by meaning, whatever words are used. A work or life goal goes straight on.",
+       "Crisis words never come here: they get 988 and 911 first, above."
+      ],
+      "needs": [
+       "request",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "No: styling goals",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Asks for therapy",
+        "steps": [
+         {
+          "id": "B3-x02",
+          "line": [
+           "3.9"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "sync",
+          "type": "split",
+          "title": "Says what styling is; Alex picks",
+          "q": "Still want styling?",
+          "does": "Rosie says plainly that styling isn't therapy, and that a licensed therapist is the right person for that. Then the person picks. Rosie doesn't push either way.",
+          "more": [
+           "Many companies also offer a confidential help line for staff. The person can ask their company about it.",
+           "Styling for work goals can still be booked."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Lee Wardrobe Visits's stylists are stylists, not therapists. Styling doesn't diagnose or treat mental health conditions. For that, a licensed therapist is the right person. Would you still like styling for your work goals?",
+            {
+             "buttons": [
+              "Styling goals",
+              "Look for a therapist"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Styling goals",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Look for a therapist",
+            "steps": [],
+            "end": "end",
+            "endText": "No booking. The person looks for a therapist; nobody at the business or the company is told."
+           }
+          ]
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Styling is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord: the company that books is the one that pays."
+   },
+   {
+    "op": "more",
+    "at": "B10-02",
+    "more": [
+     "Only the score is kept, never what the session was about. The company never sees it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Work done at the session has no cancel period (B8-24); only a program sold at the office gets one."
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Mia replies YES, then checks what Sam set. One reply covers every kind of work Mia does.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Hugo, Nina and Leo join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES"
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Wardrobe Visits! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Mia Ross · Lee Wardrobe Visits",
+        "lines": [
+         "Styling, and workshops",
+         "No license needed for this work",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Wardrobe Visits",
+       "At the client's office",
+       "None needed · registration 2019-0451",
+       "Yes"
+      ],
+      [
+       "Mia Ross",
+       "Lee Wardrobe Visits",
+       "At the client's office",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Hugo Stein",
+       "Lee Wardrobe Visits",
+       "At the client's office",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Wardrobe Visits",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Nina Park",
+       "Lee Style Studio",
+       "Video, the office, home visits",
+       "None needed · registration 2020-1187",
+       "Once Sam says yes"
+      ],
+      [
+       "Leo Diaz",
+       "Lee Style Studio",
+       "Video and the office",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "My company pays for styling for new managers with Lee Wardrobe Visits. Can a stylist meet me at our office Thursday morning? We're in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For styling, someone in danger right now, or a medical emergency, stops the booking.",
+    "more": [
+     "The message is the general one: get to safety and call 911.",
+     "On a call, the caller hears it, and Sam gets the call summary.",
+     "Sam's text says only that there was a safety stop, never the words."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If anyone is in danger right now, call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI described an emergency. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "Told to call 911",
+         "Nothing booked"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-20",
+    "does": "Words about suicide, self-harm, hurting someone else or a mental health crisis get 988 and 911 at once. No booking happens in that chat.",
+    "more": [
+     "This is always on, for every kind of work, whatever words are used.",
+     "The AI never counsels: no comfort as a counselor, no questions about it, no advice.",
+     "Sam sees only that the crisis lines were given, never the words. No stylist or company is told, unless the person asks.",
+     "The customer can come back and book later, like anyone."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "If you're thinking about hurting yourself or someone else, call or text 988 now. If anyone is in danger right now, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "does": "The request turns out to be for work Lee Wardrobe Visits doesn't do, like an HR investigation. Rosie says so plainly, and the AI can look for another business.",
+    "more": [
+     "Rosie never hands a customer to a business on its own. The AI looks again, ranked fairly.",
+     "The plug-in can name the kind of work to suggest."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Wardrobe Visits does styling and workshops, not HR investigations. Nothing was saved. You can look for an HR investigator."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: one-to-one or a team session, how many people, and what it's about, in a few words.",
+     "Its danger words: anyone who may hurt themselves or someone else gets 988 and 911 at once.",
+     "Its first steps: a free intro call for a new client, the intake on the secure page, and the studio terms.",
+     "Stand-ins: another stylist only by name. Check-in: the code to the stylist at the meeting room.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-77",
+    "more": [
+     "The plug-in names the kinds of place: a home, an office, a venue, a roadside, or where a car is parked.",
+     "Lee Wardrobe Visits goes 25 miles from 400 Main St. Alex's office in Springfield is inside it.",
+     "The kind of place decides what's asked later, like who meets the stylist there.",
+     "If Sam set a trip charge for farther towns, the price shows with it."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Wardrobe Visits comes to you in Springfield. Is it at a home, an office or somewhere else?"
+     ],
+     [
+      "cust",
+      "agent",
+      "At my company's office."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Wardrobe Visits asks: one-to-one styling, or a session for a team? And what's it about, in a few words?"
+     ],
+     [
+      "cust",
+      "agent",
+      "One-to-one, for me. Leading a new team."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-46",
+    "does": "Say the company's HR lead books sessions for 4 new managers on one morning at the office. It's one booking with one code, given by whoever meets the stylist at reception.",
+    "more": [
+     "The plug-in sets the group's size limits and its price.",
+     "Each manager answers the private questions on their own secure page. The HR lead never sees them."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-48",
+    "does": "Say Alex also asks for a team style report. Both go in one booking, with one start time and one code.",
+    "more": [
+     "Each service keeps its own price kind and money.",
+     "If both don't fit one person's day, the AI offers another time."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can Mia also bring a team style report?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. A team style report is $199, and Mia goes over it in the same visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-27",
+    "does": "Say the HR lead books a session for a manager. The manager's name and mobile go on the secure page, and they get the visit texts and the code. The HR lead gets a copy without the code.",
+    "more": [
+     "Rosie texts the manager only on the HR lead's word that they agreed to texts.",
+     "The HR lead never sees the manager's answers, or what's said.",
+     "At a venue or an office, it's the day-of contact, not the customer."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "Rosie checks this before the secure page, so the page knows what to ask. The plug-in says a new client needs a free intro call, the intake and the studio terms."
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "does": "The plug-in's scope notice is due at booking, so the AI says it before Alex's yes. The secure page and the confirmation repeat it.",
+    "more": [
+     "It's the stylist's own scope text, from the plug-in.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Before you book: styling with Mia isn't therapy, and isn't legal, financial or medical advice. Your company pays, but it never sees what you say."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "more": [
+     "Building rules, like an office's sign-in or proof of insurance, go to Sam to check.",
+     "The plug-in adds its own question: a private room for the session."
+    ],
+    "form": [
+     [
+      "Parking",
+      "Visitor spots by the front door"
+     ],
+     [
+      "Front desk",
+      "Sign in; the stylist gets a visitor badge"
+     ],
+     [
+      "Room",
+      "Small meeting room, 3rd floor"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "more": [
+     "Here it books right away: it isn't for today, and Maple Row's contract covers it.",
+     "Mia checked for conflicts when the contract was signed: Mia doesn't stylist Alex's own manager.",
+     "A new company's first client can ask Sam first, or the stylist's read (the third branch)."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Say Alex's hard team meeting moves to Wednesday, and Alex would like to meet sooner. Alex's words are checked for danger first, then an earlier time is offered if one is free.",
+    "more": [
+     "A sign of danger gets 988 or 911 first.",
+     "An earlier time shows its price first. No reply: the session stays as booked.",
+     "If Alex picks the earlier time, Mia is told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "My hard meeting moved to Wednesday. Can we meet sooner?"
+     ],
+     [
+      "san",
+      "cust",
+      "Mia can come sooner, at the same price. Or keep Thursday.",
+      {
+       "times": [
+        "Wed Oct 21 · starts at 8:00am · Mia"
+       ],
+       "buttons": [
+        "Keep Thursday"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "more": [
+     "The offer comes first, since Alex picked Mia and a new stylist needs Alex's yes.",
+     "No reply by 8pm Wed: nobody moves, and Sam calls Alex.",
+     "For styling, the default is a call from Sam, never a swap."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-22",
+    "does": "No reply from Alex. A stylist is never swapped without Alex's yes, so nobody moves. Sam is asked to call Alex.",
+    "more": [
+     "If they can't reach each other by the morning, the session is cancelled with no fee.",
+     "Mia's Thursday stays blocked."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered about tomorrow, and no stylist is swapped without Alex's yes. Please call Alex."
+     ],
+     [
+      "san",
+      "cust",
+      "Mia can't make tomorrow. Sam will call you to sort it out, with no fee."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 7:35am"
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 7:55am"
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "does": "Back at the office, 7:55am. Mia checks what the plug-in asked Alex to have ready: a private room. The small meeting room is free, so the session starts.",
+    "more": [
+     "Examples: a private room, a sign-in at the front desk.",
+     "Missing, but the plug-in lets the visit go on: Mia notes it, and the session starts.",
+     "No private room at all: it goes as 'Can't go ahead', on the company's side."
+    ],
+    "t": "Thu Oct 22, 7:55am"
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Styling keeps no before record, so Mia goes straight on.",
+    "more": [
+     "Nothing about what's said is ever noted in Rosie.",
+     "A damage claim at the office is checked against Sam's own records."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Alex starts talking about something styling can't cover, like a health worry or a legal question. Mia says so, suggests a licensed pro, and goes on with Alex's goals.",
+    "more": [
+     "Danger first: if anyone may be hurt, Mia gives 988 or 911.",
+     "Mia's note names the kind of pro to see, never a named one.",
+     "The note goes on the secure page, never in a text, and never to the company.",
+     "The session goes on, so it's billed as booked."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: suggested other help. Note on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Mia left you a note from today's session.",
+      {
+       "card": {
+        "title": "A note from Lee Wardrobe Visits",
+        "lines": [
+         "The kind of help Mia suggested"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Mia and Alex agree on next steps for the weeks ahead. Nothing is charged for it.",
+    "more": [
+     "What they discuss stays between them. Rosie only knows the session happened.",
+     "The company never sees it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 9:00am"
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Styling and workshops license nobody by default, so nobody on Sam's team is checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "does": "Hugo's day is blocked, and each customer picks: Mia by name, new times with Hugo, or a free cancel. Anything paid is refunded. With no reply in 24 hours, nobody moves: Sam calls."
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Reese K. to Lee Wardrobe Visits. Reese gets one invite and replies YES. Styling needs no license, so Reese can be booked once Sam says yes.",
+    "more": [
+     "No reply in 48 hours: one reminder, then Sam is told.",
+     "Where a state's form names a license for this work, it's asked and checked then."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Wardrobe Visits. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Styling needs no person license, so only the business's registration comes due. Dates come from what Sam sent. Reminders go 30 days and 7 days before.",
+    "more": [
+     "Insurance works the same way, where a company client asks for proof.",
+     "Where a state's form names a license for styling, it comes due the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Wardrobe Visits's registration 2019-0451 has lapsed.",
+      {
+       "card": {
+        "title": "Registration renewal",
+        "lines": [
+         "Not renewed by then: new bookings pause"
+        ],
+        "button": "Upload the receipt",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-09",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Alex M. sent answers about a wardrobe edit at your home. Price it on the secure page.",
+      {
+       "card": {
+        "title": "Wardrobe edit at your home · Alex M.",
+        "lines": [
+         "8 shift leads · goals and room added",
+         "Price it before anyone says yes"
+        ],
+        "button": "Open and price it",
+        "link": "rosfield.com/q/r3j"
+       },
+       "as": "Mia"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-39",
+    "say": [
+     [
+      "staff",
+      "san",
+      "I'm running about 30 minutes late for my 1 o'clock.",
+      {
+       "as": "Mia"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Reading it back: you'll start your 1:00pm session about 30 minutes late. Say yes to tell the customer.",
+      {
+       "as": "Mia"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "Yes.",
+      {
+       "as": "Mia"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches the team style report from Sam's own invoice to the bill Rosie texts. It's for new bookings only, and read back first.",
+    "more": [
+     "Reports already booked keep Sam's own way.",
+     "The bill goes out once the stylist texts DONE.",
+     "The price-OK limit changes the same way: from now on, and read back first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Wardrobe Visits: your card was charged twice for the same payment. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $179",
+        "lines": [
+         "Home style session bill · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Nora S."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nora S.'s $179 bill for an home style session was charged twice. The second charge is refunded, and Nora is told."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-15",
+    "more": [
+     "The word CANCEL also means 'stop texting me', never 'cancel my visit'.",
+     "To cancel the visit, Alex taps Cancel the visit, or calls.",
+     "With no code, Mia texts DONE when the session is finished."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-24",
+    "does": "Mia does the assessment at the session. Work done at the session has no cancel period. Only a program or package sold at the office gets a written right to cancel, where the state's rules require it.",
+    "more": [
+     "It's billed with the rest, the way this session is paid.",
+     "Mia tells Alex out loud too."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Added to today's session.",
+      {
+       "card": {
+        "title": "Work-style assessment · $160",
+        "lines": [
+         "Done today, with a short debrief",
+         "Billed with the rest of the session"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "A session, and extra work done at it, has no cancel period. Only a program or package sold at the office does, where the state's rules give one."
+   },
+   {
+    "op": "words",
+    "at": "B10-19",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your team style report from Thursday is ready.",
+      {
+       "card": {
+        "title": "Team style report",
+        "lines": [
+         "Your team's survey results",
+         "Thu Oct 22 · Maple Row Logistics"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/v/r4c"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-30",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your team style report from Thu Oct 22 is ready.",
+      {
+       "card": {
+        "title": "Team style report",
+        "lines": [
+         "Your team's survey results",
+         "Thu Oct 22 · Maple Row Logistics"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/v/r4c"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A styling session is rated, like any visit."
+   },
+   {
+    "op": "words",
+    "at": "S1-78",
+    "say": [
+     [
+      "san",
+      "other",
+      "This is Rosie, an automated assistant for Lee Wardrobe Visits. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check.",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ],
+       "stop": "first",
+       "as": "Morgan Lee"
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "story": {
+  "A": "A client books a $55 style session by video, paid in full when booking; the stylist builds the looks after, and the clothes are bought at the stores by the client.",
+  "B": "A client books a $179 home session; a card is saved for the $89 visit fee and the $179 is charged when the stylist texts DONE."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|card",
+    "photos|deposit|card",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a $55 style session by video, paid in full when booking.",
+    "list|card|card": "A $35 follow-up session: a card is saved for the $20 late-cancel fee, and the $35 is charged when the stylist texts DONE.",
+    "photos|deposit|card": "A $90 wardrobe edit, priced from the client's closet photos: a $20 deposit now, and the $70 rest on the saved card at DONE.",
+    "list|none|counter": "A $25 quick outfit review: nothing is taken, and the client pays at the front desk."
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from closet photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Follow-up session"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Follow-up session"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Style session"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Follow-up session"
+    },
+    "list|none|*": {
+     "price": "$25",
+     "name": "Quick outfit review"
+    },
+    "photos|deposit|*": {
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "fee": "$20",
+     "name": "Wardrobe edit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "photos|deposit|bill",
+    "list|none|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 home session; a card is saved for the $89 visit fee and the $179 is charged when the stylist texts DONE.",
+    "photos|deposit|bill": "A $640 wardrobe edit at the client's home, priced from closet photos: a $160 deposit now, and the $480 rest on the bill after.",
+    "list|none|bill": "A $179 team style workshop at a company's office: nothing is taken, and the bill is texted after.",
+    "list|full|none": "A $150 closet check at the client's home, paid in full when booking; a late cancel may keep the $89 visit fee."
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from closet photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Home style session"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Home style session"
+    },
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Home style session"
+    },
+    "list|none|*": {
+     "price": "$179",
+     "name": "Team style workshop"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Closet check at home"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "Wardrobe edit at your home"
+    }
+   }
+  }
+ },
+ "keep": [
+  "therapy",
+  "color",
+  "lawyer",
+  "Workshops",
+  "visit fee",
+  "Follow-up session",
+  "14 Park Ave",
+  "400 Main St",
+  "500 Harbor Ave",
+  "facial",
+  "leak"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ },
+ "notes": "Stylist's training and certificates are the stylist's own word (D96); no license check, nothing looked up, no 'checked' wording.\nPrices are the master's example numbers by role (a $55 style session, $35 follow-up with a $20 fee, $90 wardrobe edit with $20 and $70, $25 quick review; home $179 with $89 fee, $640 wardrobe edit with $160 and $480, $179 team workshop, $150 closet check paid in full). Sums hold; a re-price is an owner's sign-up change.\nFlow B's team workshop at a company's office is the master's list|none|bill; the photos path asks for closet photos for a quote (B4-06, B4-69 kept on).\nCoach's words are carried through the lexicon: 'Lee Coaching' names, coach names (Renee, Tom, Simone, Victor) renamed to Nina, Leo, Mia, Hugo; coaching agreement is the studio terms; the 3-month package is the style session.\nPacks and plans are not used (no packs or plans fact): the 3-session package is not offered; a repeat plan would need its own path.\nSensitive is off: no health or grief work here; a closet is not private work by the master's list.\nAdults only (18+); a parent may not book for an adult; no children fact.\nThe own step A3-x01 / B3-x01 (scope check: not therapy) stays, in the stylist's words.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Haircut at their home",
+    "$75",
+    "$140 an hour",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Color quotes come to you first. Board prices never need one",
+    "Style consult",
+    "free style consult",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "two skin fades on",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "From the list, from photos, or at the visit?",
+    "color quote",
+    "Give your check-in code at the chair.",
+    "Books the next visit at the chair",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "A haircut could mean a salon or a barbershop.",
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "You're booked! Give this code at the chair when you arrive.",
+    "Done. Your Sat 11:00am visit is now with Avery. Give this code at the chair.",
+    "Give this code at the chair.",
+    "The problem gets worse",
+    "Next: Sat Nov 28 · 10:00am",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "What happens at the chair?",
+    "Stops, and sends a written note",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Riley finishes the work",
+    "Riley adds notes for next time",
+    "Anything added at the chair is paid there, the shop's own way.",
+    "A tip at the chair is the shop's own way too.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "The cut is uneven on one side.",
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Do you do kids cuts? My son is 8.",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Paid at the chair",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Other days, the customer pays at the chair, the shop's own way.",
+    "No bill is texted, so there's no tip line. A tip at the chair is the shop's own.",
+    "2 At my home",
+    "Books a cut every 4 weeks",
+    "A no-show is marked 15 minutes after the start.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "From the price list or photos, the price is set. A service priced at the chair gets its price now.",
+    "Every shop service, color and house calls",
+    "Hours: the shop's hours",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Avery: barber",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop. Your day list comes at the time you picked.",
+    "Lee Home Services'",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "1200 Main St",
+    "every 4 weeks",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "$55",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut (12 and under)",
+    "kids cut",
+    "Haircut plans",
+    "haircut plan",
+    "Haircut plan",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "a patch test",
+    "patch test",
+    "house calls",
+    "House calls",
+    "house call",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "barber",
+    "Barber",
+    "price board",
+    "Price board",
+    "shop's board",
+    "at the shop",
+    "At the shop",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Drain clearing",
+    "Panel upgrade",
+    "plumbing jobs",
+    "electrical jobs",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "priced from photos",
+    "Priced from your photos",
+    "with the code at the chair",
+    "Kids cut"
+   ],
+   "B": [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "$140 an hour",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Kitchen drain clearing",
+    "Yard drain",
+    "Kitchen drain",
+    "the kitchen drain",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Like tapping a neighbor's water line without asking.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Say Alex asks for a water heater flush every year.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "couldn't price your water heater this time.",
+    "Your water heater price is with",
+    "Your water heater contract is waiting for your signature.",
+    "Contract · Water heater replacement · $640",
+    "Your water heater visit wasn't booked",
+    "didn't sign the water heater contract in time",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Can I run the dishwasher before you come?",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Replace both shutoff valves · $160",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160.",
+    "the shutoff valves",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "Harper J.'s $2,400 repipe is over it, so the link offers a bank transfer too.",
+    "$800 for stage 2 of your repipe.",
+    "stage 2 of your repipe",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "I found water damage under the sink this morning.",
+    "like replacing the old pipes Jordan noted.",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "your sewer camera report from Thursday is ready.",
+    "Sewer camera report",
+    "your sewer camera report needs a little more time.",
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "that a sewer camera report comes Fri Oct 23.",
+    "It's a leak under the sink, today,",
+    "The service call is $89.",
+    "would like to talk about the water heater quote before booking.",
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "you have two drain clearings on",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Both rentals' visits go on one bill on the 1st.",
+    "7am on the visit day",
+    "Plumbing JP031552 · electrical JE30417",
+    "Asks Alex for photos",
+    "Prices it: the list, photos or the visit",
+    "Quoted from photos first",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Lee Electric.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "Jordan from Lee Home Services is on the way, about 15 minutes. When Jordan arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in.",
+    "Alex gives the code at the door",
+    "Jordan couldn't enter your code. If the person at your door isn't Jordan, don't let them in.",
+    "HURT cut my hand, need to stop",
+    "Sam bills Alex the business's own way",
+    "Replace both shutoff valves",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Texts the camera report link",
+    "LATE camera report Mon Oct 26",
+    "The problem gets worse",
+    "Jordan found more work.",
+    "BEFORE old water stain on the cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The plug-in says how long the warranty lasts.",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Nora can ask to be next for that window. If Ivy's saved time runs out, it's saved for Nora at once.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Priced from your photos",
+    "Add photos",
+    "Photos and answers added",
+    "From the photos and answers",
+    "Plumbing books a 2-hour window.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "1 At my home",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Arrival times:",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A plug-in holds what one kind of work needs. The steps around it stay the same. Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "After that, or nobody home",
+    "Plumbing license",
+    "Electrical and Lee's Barbershop are saved, about 10 minutes from live. Text MORE anytime to finish.",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Avery: barber",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop. Your day list comes at the time you picked.",
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "service call fee",
+    "Service call fee",
+    "A drain clearing",
+    "a drain clearing",
+    "a water heater replacement",
+    "a water heater flush",
+    "A leak repair",
+    "a leak repair",
+    "Lee Home Services'",
+    "Lee Home Services LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "88 Elm St",
+    "1200 Main St",
+    "leehomeservices.com",
+    "42 Oak St",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Price board",
+    "at the shop",
+    "At the shop",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shop",
+    "Shop",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call",
+    "Service call",
+    "Panel upgrade",
+    "plumbing and electrical work",
+    "plumbing jobs",
+    "electrical jobs",
+    "electrical prices",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "nobody home",
+    "Rental 1",
+    "Rental 2"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S13-10": "cffb81336c",
+   "S13-04": "91031a684a",
+   "S13-05": "ffcae1a1b0",
+   "S1-11": "99370bb016",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A10-45": "855be6050a",
+   "A3-22": "0057d8fc9f",
+   "A4-03": "c24298dc38",
+   "A4-24": "0a292df05b",
+   "A5-01": "6c5c5c2f87",
+   "A7-03": "13bfc32bcb",
+   "A8-51": "71142aa1fa",
+   "A10-02": "c9223be948",
+   "S2-06": "6b01a08c94",
+   "S2-21": "bf6617b6d3",
+   "A3-25": "c5e67f2b42",
+   "A3-26": "9e3630dc0b",
+   "A4-36": "f261af1660",
+   "A4-34": "9f322d96aa",
+   "A4-15": "db5792db95",
+   "A4-16": "753b207e16",
+   "A4-26": "add3e44476",
+   "A4-55": "c4555e49e7",
+   "A4-41": "15813954ee",
+   "A4-65": "fa7ec0389d",
+   "A5-03": "f143c87f27",
+   "A5-21": "15fe900660",
+   "A5-19": "5d5db6f3c1",
+   "A5-20": "0c987999e1",
+   "A5-23": "0d420f541b",
+   "A6-01": "df3c5778ea",
+   "A7-14": "6a57738a17",
+   "A8-02": "15f418fec4",
+   "A8-23": "e3a35f7f9e",
+   "A8-35": "a67e890a5b",
+   "A8-43": "7b0f73c701",
+   "A8-44": "4410a4860c",
+   "A10-32": "9f84638bce",
+   "A9-02": "0fe7d0286c",
+   "A10-26": "2a3edf9a4c",
+   "S11-46": "ed1e14ee9c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-56": "bd841a4732"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S13-10": "3bbf7d9a80",
+   "S13-04": "13e60b9248",
+   "S13-05": "164ce06368",
+   "S1-11": "d11de5da2e",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B4-43": "fc9855955a",
+   "B4-32": "fcfe092e37",
+   "B8-69": "5d0e4c0045",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B3-17": "3eb7d7f259",
+   "B6-03": "dcc1eb310c",
+   "B9-06": "f091432f2d",
+   "B10-02": "eaf53a5e74",
+   "B10-05": "a326ea3c0b",
+   "S2-06": "b78d25d6e2",
+   "S2-21": "bf6617b6d3",
+   "B3-02": "74ad1f98f2",
+   "B3-19": "2f53161fb2",
+   "B3-20": "86aca4ccb5",
+   "B4-03": "1126d68737",
+   "B4-04": "df3ea4b2f5",
+   "B4-77": "67ff953065",
+   "B4-05": "fb3a9061c8",
+   "B4-46": "cac59291a3",
+   "B4-48": "8a955b9849",
+   "B4-27": "4b45128d2c",
+   "B4-38": "9539521dc7",
+   "B4-28": "506d267aaf",
+   "B4-34": "74ff52d83d",
+   "B7-17": "ac1fd212f3",
+   "B7-20": "364245afef",
+   "B7-22": "c8a4abe80b",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B8-30": "a1ef4983e4",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "S11-46": "ed17f66a63",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "B4-09": "d50a5d4d5e",
+   "S11-39": "d58c48939f",
+   "S11-56": "8b6c6c101f",
+   "S12-26": "8368479b9d",
+   "B7-15": "a00f0c64fb",
+   "B8-24": "bd5fb0ef0b",
+   "B10-19": "4806f6eed8",
+   "B10-30": "5ecd3ded96",
+   "B10-32": "7713bff255",
+   "S1-78": "8d0e25526e"
+  }
+ }
+}

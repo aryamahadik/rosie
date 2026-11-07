@@ -1,0 +1,2925 @@
+{
+ "id": "ophthalmologist",
+ "name": "Ophthalmologist",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "optometrist",
+ "plugin": {
+  "pf.license": {
+   "need": "each ophthalmologist holds their own medical license from the state's medical board; an ophthalmic technician holds one only where the state licenses technicians",
+   "who": "each person; the practice too where the state's form registers eye practices or their owners",
+   "ask": "each person's license number in their invite reply, or the owner sends it; the practice's registration and any mobile permit number come from the owner. The owner may leave a number out",
+   "check": "Rosie does not look up, check or verify a license number. The owner gives it, and it is shown where the state asks",
+   "blocks": "no booking is held or refused because of a license: the owner states it, and that is the record",
+   "away": "eye visits at a care home, a school or a home only where the state's rules allow mobile or portable eye care; a mobile or portable permit where the state's form asks for one (a switch)",
+   "sedation": "no sedation or general anesthesia is booked by Rosie. The practice plans any sedation itself, with the patient, by phone; Rosie never prices, confirms or moves it",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "if the owner records an expiry date, Rosie reminds the owner 30 days before it; Rosie does not check the license",
+   "insurance": "malpractice insurance where the state's form asks for it; the owner states it, and Rosie does not check it"
+  },
+  "pf.services": {
+   "shape": "visit types in an exam room, each with a set length; a first visit has a technician's tests, then the ophthalmologist's exam; a procedure is planned after the tests and booked as its own visit; every visit needs a free exam room",
+   "examples": "the example practices' own prices (Lee Eye Clinic and Lee Home Eye Care), not a standard; a plan pays its own share for eye care, up to its yearly limit, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "New patient eye consult (pressure and retina checks, then the ophthalmologist's exam)",
+     "price": "$35",
+     "kind": "one price; the plan's estimate is shown when a plan pays",
+     "length": "60 min: 30 with the technician (tests and photos), then 30 with the ophthalmologist",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "the patient's share at the front desk",
+     "note": "new-patient times are kept apart (Sam's booking rules)"
+    },
+    {
+     "name": "Laser treatment (one eye, planned after the tests)",
+     "price": "$140 (the example practice's price)",
+     "kind": "one price",
+     "length": "45 min, with drops and a check after",
+     "where": "at the office",
+     "before": "a $40 deposit when booked",
+     "after": "the $100 rest at the chair, after the treatment",
+     "note": "no sedation here: sedation is planned by phone and is never booked by Rosie"
+    },
+    {
+     "name": "Eye injection visit (the medicine is ordered by the ophthalmologist)",
+     "price": "$55, paid in full when booked",
+     "kind": "one price",
+     "length": "30 min, with a check after",
+     "where": "at the office",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "no plan pays the injection visit in full; the plan's share is shown first"
+    },
+    {
+     "name": "Eye imaging, quoted from photos first (a scan of the retina or the optic nerve)",
+     "price": "$90 (quoted from the photos first)",
+     "kind": "quoted from photos first",
+     "length": "2 visits: the photos, then the scan",
+     "where": "at the office",
+     "before": "a $20 deposit once the ophthalmologist's quote is OK'd",
+     "after": "the rest ($70) at the front desk, at the scan",
+     "note": "the ophthalmologist OKs the quote before any deposit"
+    },
+    {
+     "name": "Eye problem visit (red, sore, itchy or watery eyes, or a new floater)",
+     "price": "the $25 check is promised; any test or drops are priced at the chair (the example: $110 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min, same day",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "the owner OKs same-day times first"
+    },
+    {
+     "name": "Lens check during an eye visit",
+     "price": "$40",
+     "kind": "one price",
+     "length": "+10 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "a medical plan may not pay it, so the share is shown first"
+    },
+    {
+     "name": "Eye pressure check, paid in full when booked",
+     "price": "$55",
+     "kind": "one price, paid in full",
+     "length": "20 min",
+     "where": "at the office",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "no plan pays it"
+    },
+    {
+     "name": "Eye check and follow-up at a care home",
+     "price": "$179",
+     "kind": "one price; the plan's share when a plan pays",
+     "length": "45 min, with a portable exam kit",
+     "where": "at the customer's place (a care home or a home)",
+     "before": "nothing taken when a plan pays; private pay gets Rosfield's bill after the visit",
+     "after": "the office bills the plan its own way; private pay: Rosie texts the bill"
+    },
+    {
+     "name": "Eye problem at a care home",
+     "price": "the $89 eye check is promised; any test or drops are priced at the visit (the example: $245 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min",
+     "where": "at the customer's place",
+     "before": "nothing taken",
+     "after": "the office's own way"
+    },
+    {
+     "name": "Low-vision aids (magnifiers and special glasses), quoted after a first exam",
+     "price": "$640 (the example practice's price, quoted from the first exam's notes)",
+     "kind": "quoted from photos first",
+     "length": "2 visits: the exam and the fitting",
+     "where": "at the customer's place",
+     "before": "a $160 deposit when the quote is OK'd (25%)",
+     "after": "Rosie texts the bill for the $480 rest when the ophthalmologist texts DONE"
+    },
+    {
+     "name": "School eye screening day",
+     "price": "set with the school: free to families, or billed to each child's plan",
+     "kind": "one price per child",
+     "length": "a whole morning, one portable kit",
+     "where": "at the school (the host's place)",
+     "before": "nothing taken",
+     "after": "the office bills plans its own way",
+     "note": "each child needs a parent's or guardian's signed consent on the secure page"
+    }
+   ],
+   "capacity": "one patient per exam room; the portable exam kit is booked like a person",
+   "nobodyHome": "never: the patient is always there",
+   "online": "none: an eye exam, a test or a procedure needs the office's own equipment; a question by video is answered by the office, not booked as a visit"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, your child, or someone you help (a care home resident)",
+    "new or returning patient",
+    "which visit: the practice's own visit types only (a new patient consult, a laser treatment, an injection, an imaging scan, or an eye problem visit), never a symptom typed into the AI",
+    "a vision or medical plan (its name only) or paying yourself",
+    "early morning, midday or afternoon"
+   ],
+   "afterTime": [
+    "anything the practice should know to help, like a wheelchair or needing an interpreter",
+    "for a care home visit: the place's name, the room, and who meets the ophthalmologist"
+   ],
+   "securePage": [
+    "birth date",
+    "plan member ID, the plan holder and a photo of the plan card",
+    "health history: medicines, blood thinners, allergies, eye conditions, diabetes",
+    "consent and the privacy notice",
+    "a parent's or guardian's consent for anyone under 18, or the consent of the person who decides for an adult who can't"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18; a guardian or health care agent for an adult who can't consent; the care home's staff for a resident, with the decider's consent on the secure page; a minor alone only where the state's rules let minors consent to eye care (a switch)",
+   "neverAsked": "symptoms, reasons or results are never asked or typed in the AI chat"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "sudden vision loss, sudden flashes of light, or a shadow or curtain across the vision",
+     "say": "This needs care now. Go to the nearest emergency room or call 911. Don't wait for an eye visit.",
+     "booking": "no booking; the same words are repeated if a same-day request is declined, and if it starts before a booked visit (the visit stays booked and the owner is told)"
+    },
+    {
+     "words": "a chemical splash in the eye, or something stuck in it",
+     "say": "Rinse a chemical splash with clean running water right away, and call Poison Help at 1-800-222-1222 or 911. Don't rub something stuck in the eye: go to the emergency room or call 911.",
+     "booking": "no booking; the words are fixed and the same for everyone"
+    },
+    {
+     "words": "an eye hit hard or cut, or sudden bad eye pain with a headache or throwing up",
+     "say": "This needs care now. Go to the nearest emergency room or call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "red, itchy, sore or dry eyes with nothing else",
+     "what": "matched to the practice's own eye problem visit; Rosie never judges how urgent it is, and same-day times need the owner's OK"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history, consent and the plan's papers",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+     "who": "every new patient; returning patients once a year, or when their health changes",
+     "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or the door, before any test), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day (the example practice's rule), or sooner where the rules require it",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "A signed procedure consent",
+     "when": "on the secure page, before the laser or injection visit, with the price and the deposit shown first",
+     "who": "every procedure patient, and the parent or guardian for a child",
+     "result": "not signed by the procedure visit: the visit waits; Sam moves it or cancels with no fee"
+    },
+    {
+     "name": "The care home's OK",
+     "when": "before any visit there",
+     "who": "the host place agrees to host the visits",
+     "result": "no OK: no times at that place"
+    }
+   ],
+   "prep": "bring your glasses, your medicine list and a photo ID; a dilated exam blurs the eyes for a few hours, so a ride home is needed; at a care home: the medicine list ready with the nurse"
+  },
+  "pf.visit": {
+   "checkIn": "at the office: the check-in code at the front desk; at a care home or school: the code from the patient, or from the nurse or staff member named on the booking",
+   "beforeWork": "the technician does the pre-tests (vision, eye pressure, imaging) first; the ophthalmologist reads the health history and checks for changes before any procedure",
+   "dilation": "only the ophthalmologist decides on dilating drops; they take about 20 minutes to work, and the eyes stay blurry and light-sensitive for a few hours, so a ride home is required",
+   "changes": "an extra test or drops are priced and OK'd before they're done; a medical problem found at a routine exam may move the visit to the medical plan, with the share shown first; a laser or an injection is booked as its own visit only with the patient's yes",
+   "done": "the check-in code or DONE; the ophthalmologist's notes, scans and prescriptions stay in the practice's own records, never in Rosie or a text",
+   "away": "a portable exam kit (a light, a chair and a camera); the care home's nurse is told when the visit is done"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking for a new patient consult or an eye problem visit (the practice bills vision and medical plans); a card saved only where the practice turns on its missed-visit fee; a laser treatment: a $40 deposit when booked, and the rest at the chair; an injection visit: paid in full when booked; imaging from photos: a $20 deposit once the quote is OK'd; at a care home: nothing taken when a plan pays, a $160 deposit for low-vision aids once the quote is OK'd, the rest on Rosfield's bill",
+   "plans": "the plans the practice takes (its own list); the front desk checks each plan by hand and records it: active or not, what it pays for eye care and up to what yearly limit; the patient's share is an estimate, not a promise",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "fees": "the missed-visit fee: $20 at the example practice, only when the owner turns it on; a card is saved for it, and the same fee applies to every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "claims sent by the practice; the patient pays their share at the front desk, its own way; a balance after the plan pays is billed by the practice, not by Rosie's text; at a care home, the practice bills its own way, and private pay gets the bill Rosie texts",
+   "rosfield": "the business pays Rosfield's $2 per confirmed booking, as every business does (the $2 is counted when the visit's check-in code is entered; no visit, no $2); card payments also cost Stripe's own card fee",
+   "caps": "deposit cap: from the state form; fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the results, the medicines or the ophthalmologist's name (when the ophthalmologist comes to a care home, school or home, the name stays, for the door check); scans and results never go through Rosie",
+   "staff": "texts to the owner and staff use the patient's initials only (A.M., never Alex M.)",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian; a minor who may consent alone gets texts only on their own phone, with no visit type",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the ophthalmologist"
+  },
+  "pf.staff": {
+   "licenses": "each ophthalmologist's own medical license, per state; an ophthalmic technician's own license only where the state licenses technicians",
+   "skills": "ophthalmologists: exams, laser treatments, injections, eye surgery referrals, low-vision aids and prescriptions; ophthalmic technicians: pre-tests, imaging, drop teaching and the work the state allows; only people cleared for mobile visits go to care homes and schools",
+   "supervision": "a technician's pre-tests are read by the ophthalmologist; which tests a technician may run comes from the state form (a switch)",
+   "oks": "the owner OKs same-day eye problem times, quotes over $500, and anything a technician flags",
+   "standIn": "a technician out: the ophthalmologist runs the pre-tests, or new times; the ophthalmologist out: another ophthalmologist takes the visit, or new times with no fee",
+   "away": "the team at a care home or school is the people cleared for mobile visits, with the portable exam kit; sedation is never given at a care home or a home"
+  },
+  "pf.rules": {
+   "records": "eye records are kept by the practice for as long as the state's rules require (a child's records may be kept longer); a delete request removes only Rosie's own booking details, never the practice's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "the license shown where the state asks: posted at the practice, and on a visit away from it",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "host": "a visit at a care home or school only under the host's written OK, and the host's sign-in rules; visit days at a host's place (S1-58) need the host's standing OK on file; the example's care home visits are booked one resident at a time under the care home's OK, so no visit days are set",
+   "ads": "no free-exam or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "more than 15 minutes late: still seen, but part of the visit may move to another day (the practice decides; Rosie never changes the booking itself)",
+   "standIn": "an ophthalmologist or technician out: a stand-in who may do that part, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any test), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "noRide": "a patient with no ride home after dilating drops: the ophthalmologist may use a retina photo instead, or the patient waits until the drops wear off; Rosie only puts the ride note in the reminder",
+   "twoBookings": "a patient with a procedure and a check both open: Rosie asks which one before any change",
+   "healthQuestion": "a question about medicine or eye drops before the visit goes to the ophthalmologist; Rosie gives no advice",
+   "careHome": "the resident is out (at the hospital, or asleep): the nurse says so, and the visit moves with no fee",
+   "other": "all other edge cases the generic way",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): an eye problem gets the soonest same-day time, with the owner's OK; vision loss, flashes or a curtain over the vision get the 911 words"
+  },
+  "pf.facts": [
+   "planbill",
+   "forms",
+   "children",
+   "incare",
+   "photos",
+   "extrawork",
+   "documents",
+   "aftercare"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Eye Clinic",
+   "staff": "Hana (ophthalmologist) and Ivan (ophthalmic technician)",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Home Eye",
+   "staff": "Tomas (ophthalmologist) and Gia (ophthalmic technician), who travel with a portable exam kit",
+   "cust": "Alex M. (patient, lives at Riverside care home) · other patients",
+   "other": "Others (the care home's nurse, a school nurse, a parent or guardian, a family member who pays, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Hana"
+  },
+  "B": {
+   "staff": "Tomas"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "A card is saved when the customer books, and nothing is charged. For the clear aligners, it's charged only for the office's $20 fee, and only after Sam says yes.",
+    "A card is saved when the customer books, and nothing is charged. It's charged only for the office's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "A laser treatment can take a $40 deposit when booked. The other $100 is charged to the saved card after the treatment."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Go to the emergency room or call 911 now."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "A laser treatment can take a $40 deposit when booked. The other $100 is on the bill after the treatment."
+   ],
+   [
+    "Ben's AI asks for a clear aligner at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for an eye imaging scan at $85, an old price. Rosie answers with the real price, $90."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the laser treatment takes a $40 deposit; the $100 rest is paid after the treatment."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "A laser treatment can take a $40 deposit when booked. The other $100 is paid at the chair, after the treatment."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which eye, when it started, and whether the vision has changed."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if she sees a sudden shadow over her vision."
+   ],
+   [
+    "The clear aligners can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90.",
+    "An eye imaging scan can take a $20 deposit once Hana's photo quote is OK'd, like $20 of $90."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Vaya a la sala de urgencias más cercana o llame al 911 ahora. No espere una cita."
+   ],
+   [
+    "Saved: adjustment $40 for visits from Mon Nov 2. Adjustments already booked keep $35.",
+    "Saved: new patient consult $40 for visits from Mon Nov 2. Consults already booked keep $35."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Go to the nearest emergency room or call 911 now. Don't wait for an eye visit."
+   ],
+   [
+    "A clear aligner at Lee Eye Clinic is $40, not $35. Here are the open times at $40.",
+    "An eye imaging scan at Lee Eye Clinic is $90, not $85. Here are the open times at $90."
+   ],
+   [
+    "The clear aligners can be paid in full once Nina's photo quote is OK'd, like $90.",
+    "An eye imaging scan can be paid in full once Hana's photo quote is OK'd, like $90."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like sudden flashes or a shadow over the vision, gets the safety steps first."
+   ],
+   [
+    "Prices: Adjustment $35 ($40 from Nov 2) · Clear aligner $40 · Retainer check $20",
+    "Prices: New patient consult $35 · Laser treatment $140 · Eye imaging $90"
+   ],
+   [
+    "Set. For a adjustment, the customer picks the place and sees both prices first.",
+    "Set. For a new patient consult, the customer picks the place and sees both prices first."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The eye pressure check, $55, is paid in full when booked. So is a home visit, $75."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's eye test for a son, so the times fit it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An ophthalmologist's example: sudden flashes get 'go to the emergency room now'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I see flashes and a shadow in my eye."
+   ],
+   [
+    "Alex wants it at home: a home visit, $75, paid in full when booking.",
+    "Alex wants it at home: a care-home visit, $75, paid in full when booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: sudden vision loss, flashes, or a curtain over the vision."
+   ],
+   [
+    "can cut your hair at the office for $35, or at your home for $75",
+    "can see you at the office for $35, or at your home for $179"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A visit is rated, so the office takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Eye care takes no jobs sent now. The office takes none."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times",
+    "Alex picked a child's eye test for a son first"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Veo destellos y una sombra en la vista."
+   ],
+   [
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "sudden vision loss, flashes, or a curtain over the vision"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a check plan with Hana, every 6 months."
+   ],
+   [
+    "Reading it back: the adjustment goes to $40",
+    "Reading it back: the new patient consult goes to $40"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Ha perdido la vista de repente?"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Retina visits, lasers and eye care."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Did you lose vision suddenly?"
+   ],
+   [
+    "a $40 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show photos of your eyes?"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Eye pressure check"
+   ],
+   [
+    "Drain clearing and water heaters",
+    "Retina visits and laser treatments"
+   ],
+   [
+    "Sam raises the adjustment to $40",
+    "Sam raises the new patient consult to $40"
+   ],
+   [
+    "clear aligners at $85, not $90?",
+    "eye imaging at $85, not $90?"
+   ],
+   [
+    "Color quotes come to you first",
+    "Quotes come to you first"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly retina visit plan"
+   ],
+   [
+    "Adjustment at the office · $35",
+    "New patient consult at the office · $35"
+   ],
+   [
+    "Adjustment at their home · $75",
+    "New patient consult at their home · $75"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I haven't lost my vision."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Eye and Lee Eye Clinic"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Laser treatment · $40 deposit"
+   ],
+   [
+    "C $40 deposit when they book.",
+    "C $160 deposit when they book."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Check plan · every 6 months"
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Eye imaging · $20 deposit"
+   ],
+   [
+    "Adjustment plans go to $40",
+    "Check plans go to $40"
+   ],
+   [
+    "Is this Elm Street Dental?",
+    "Is this Elm Street Eye Clinic?"
+   ],
+   [
+    "$40 taken when they book",
+    "$40 taken when they book"
+   ],
+   [
+    "Water heater replacement",
+    "Low-vision aids"
+   ],
+   [
+    "water heater replacement",
+    "low-vision aids"
+   ],
+   [
+    "plumbing and electrical",
+    "eye care and eye surgery"
+   ],
+   [
+    "Plumbing and electrical",
+    "Eye care and eye surgery"
+   ],
+   [
+    "Signature cut and shave",
+    "Eye pressure check"
+   ],
+   [
+    "signature cut and shave",
+    "eye pressure check"
+   ],
+   [
+    "Color always stays with",
+    "Eye imaging quotes always stay with"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute eye check"
+   ],
+   [
+    "the $40, if you confirm",
+    "the $20, if you confirm"
+   ],
+   [
+    "or at your home for $75",
+    "or at your home for $179"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Eye LLC"
+   ],
+   [
+    "color and house calls",
+    "home visits"
+   ],
+   [
+    "1-year labor warranty",
+    "1-year warranty on the work"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Eye Clinic LLC"
+   ],
+   [
+    "a eye doctor license",
+    "an ophthalmologist license"
+   ],
+   [
+    "$100 after the visit",
+    "$100 after the treatment"
+   ],
+   [
+    "Retainer check · $20",
+    "Lens check · $40"
+   ],
+   [
+    "photos of your hair",
+    "photos of your eyes"
+   ],
+   [
+    "The $110 rest after",
+    "The $480 rest after"
+   ],
+   [
+    "Clear aligner · $40",
+    "Eye imaging · $90"
+   ],
+   [
+    "checks what it pays",
+    "reviews what it pays"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Mi vista no ha cambiado."
+   ],
+   [
+    "said they smell gas",
+    "said they see sudden flashes"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Eye'"
+   ],
+   [
+    "eye doctor license",
+    "ophthalmologist license"
+   ],
+   [
+    "color, house calls",
+    "home visits"
+   ],
+   [
+    "home warranty plan",
+    "eye care plan"
+   ],
+   [
+    "Water heater flush",
+    "Retina visit"
+   ],
+   [
+    "water heater flush",
+    "retina visit"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Eye"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Clinic"
+   ],
+   [
+    "Lee Family Dental",
+    "Lee Eye Clinic"
+   ],
+   [
+    "can cut your hair",
+    "can see you"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Eye Clinic"
+   ],
+   [
+    "plumbing license",
+    "ophthalmologist license"
+   ],
+   [
+    "Plumbing license",
+    "Ophthalmologist license"
+   ],
+   [
+    "hot towel shaves",
+    "eye pressure checks"
+   ],
+   [
+    "Color correction",
+    "Red eye visit"
+   ],
+   [
+    "color correction",
+    "red eye visit"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do eyelash lifts"
+   ],
+   [
+    "Service call fee",
+    "Emergency fee"
+   ],
+   [
+    "service call fee",
+    "emergency fee"
+   ],
+   [
+    "Gloss to finish",
+    "Lens cleaning"
+   ],
+   [
+    "gloss to finish",
+    "lens cleaning"
+   ],
+   [
+    "Groom's package",
+    "Laser treatment"
+   ],
+   [
+    "asks for a perm",
+    "asks for an eyelash lift"
+   ],
+   [
+    "Drain clearing",
+    "Retina visit"
+   ],
+   [
+    "drain clearing",
+    "retina visit"
+   ],
+   [
+    "Retainer check",
+    "Lens check"
+   ],
+   [
+    "Glasses check",
+    "Lens check"
+   ],
+   [
+    "glasses check",
+    "lens check"
+   ],
+   [
+    "Groom's party",
+    "family"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "signature cut",
+    "eye pressure check"
+   ],
+   [
+    "Color and cut",
+    "Eye imaging"
+   ],
+   [
+    "color and cut",
+    "eye imaging"
+   ],
+   [
+    "water heaters",
+    "laser treatments"
+   ],
+   [
+    "Panel upgrade",
+    "Laser upgrade"
+   ],
+   [
+    "panel upgrade",
+    "laser upgrade"
+   ],
+   [
+    "home warranty",
+    "eye care plan"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "Jordan Price",
+    "Tomas Reid"
+   ],
+   [
+    "water heater",
+    "laser treatment"
+   ],
+   [
+    "Water heater",
+    "Laser treatment"
+   ],
+   [
+    "service call",
+    "emergency visit"
+   ],
+   [
+    "Service call",
+    "Emergency visit"
+   ],
+   [
+    "Casey Moore",
+    "Gia Morgan"
+   ],
+   [
+    "electrician",
+    "ophthalmic technician"
+   ],
+   [
+    "barbershops",
+    "eye clinics"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "color quote",
+    "treatment quote"
+   ],
+   [
+    "Color quote",
+    "Treatment quote"
+   ],
+   [
+    "optometrist",
+    "ophthalmologist"
+   ],
+   [
+    "Optometrist",
+    "Ophthalmologist"
+   ],
+   [
+    "use a drops",
+    "use drops"
+   ],
+   [
+    "my cleaning",
+    "my visit"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Toner · $20",
+    "Drops · $20"
+   ],
+   [
+    "drying fans",
+    "a portable exam kit"
+   ],
+   [
+    "Riley Chen",
+    "Hana Sato"
+   ],
+   [
+    "Avery Diaz",
+    "Ivan Cruz"
+   ],
+   [
+    "Electrical",
+    "Eye surgery"
+   ],
+   [
+    "electrical",
+    "eye surgery"
+   ],
+   [
+    "Barbershop",
+    "Eye clinic"
+   ],
+   [
+    "barbershop",
+    "eye clinic"
+   ],
+   [
+    "skin fades",
+    "retina checks"
+   ],
+   [
+    "Beard trim",
+    "Lens check"
+   ],
+   [
+    "beard trim",
+    "lens check"
+   ],
+   [
+    "patch test",
+    "retina visit"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color plan",
+    "treatment plan"
+   ],
+   [
+    "burst pipe",
+    "red eye"
+   ],
+   [
+    "88 Elm St",
+    "520 Harbor Ave"
+   ],
+   [
+    "42 Oak St",
+    "64 Linden Rd"
+   ],
+   [
+    "kids cuts",
+    "children's eye tests"
+   ],
+   [
+    "Skin fade",
+    "Retina check"
+   ],
+   [
+    "skin fade",
+    "retina check"
+   ],
+   [
+    "hot towel",
+    "eye pressure"
+   ],
+   [
+    "Cape clip",
+    "Shield clip"
+   ],
+   [
+    "cape clip",
+    "shield clip"
+   ],
+   [
+    "plumbers",
+    "ophthalmologists"
+   ],
+   [
+    "Plumbing",
+    "Eye surgery"
+   ],
+   [
+    "plumbing",
+    "eye surgery"
+   ],
+   [
+    "Haircuts",
+    "Checks"
+   ],
+   [
+    "haircuts",
+    "checks"
+   ],
+   [
+    "this cut",
+    "this check"
+   ],
+   [
+    "Kids cut",
+    "Child's eye test"
+   ],
+   [
+    "kids cut",
+    "child's eye test"
+   ],
+   [
+    "cut hair",
+    "check eyes"
+   ],
+   [
+    "optician",
+    "ophthalmic technician"
+   ],
+   [
+    "the leak",
+    "the eye problem"
+   ],
+   [
+    "plumber",
+    "ophthalmologist"
+   ],
+   [
+    "barbers",
+    "ophthalmologists"
+   ],
+   [
+    "Haircut",
+    "Check"
+   ],
+   [
+    "haircut",
+    "check"
+   ],
+   [
+    "Glasses",
+    "Lenses"
+   ],
+   [
+    "glasses",
+    "lenses"
+   ],
+   [
+    "Eyewear",
+    "Eye surgery"
+   ],
+   [
+    "eyewear",
+    "eye surgery"
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "Massage",
+    "Drops"
+   ],
+   [
+    "massage",
+    "drops"
+   ],
+   [
+    "dentist",
+    "ophthalmologist"
+   ],
+   [
+    "Dentist",
+    "Ophthalmologist"
+   ],
+   [
+    "a drops",
+    "drops"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Barber",
+    "Ophthalmologist"
+   ],
+   [
+    "barber",
+    "ophthalmologist"
+   ],
+   [
+    "my cut",
+    "my check"
+   ],
+   [
+    "shaves",
+    "checks"
+   ],
+   [
+    "a pipe",
+    "an eye"
+   ],
+   [
+    "Riley",
+    "Hana"
+   ],
+   [
+    "Avery",
+    "Ivan"
+   ],
+   [
+    "Casey",
+    "Gia"
+   ],
+   [
+    "a cut",
+    "a check"
+   ],
+   [
+    "beard",
+    "lens"
+   ],
+   [
+    "gloss",
+    "lens cleaning"
+   ],
+   [
+    "Gloss",
+    "Lens cleaning"
+   ],
+   [
+    "shave",
+    "check"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "toner",
+    "drops"
+   ],
+   [
+    "cape",
+    "shield"
+   ],
+   [
+    "perm",
+    "eyelash lift"
+   ],
+   [
+    "Perm",
+    "Eyelash lift"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ]
+  ],
+  "B": [
+   [
+    "A card is saved when the customer books, and nothing is charged. For the clear aligners, it's charged only for the office's $20 fee, and only after Sam says yes.",
+    "A card is saved when the customer books, and nothing is charged. It's charged only for the office's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "A laser treatment can take a $40 deposit when booked. The other $100 is charged to the saved card after the treatment."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Go to the emergency room or call 911 now."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "A laser treatment can take a $40 deposit when booked. The other $100 is on the bill after the treatment."
+   ],
+   [
+    "Ben's AI asks for a clear aligner at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for an eye imaging scan at $85, an old price. Rosie answers with the real price, $90."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the laser treatment takes a $40 deposit; the $100 rest is paid after the treatment."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "A laser treatment can take a $40 deposit when booked. The other $100 is paid at the chair, after the treatment."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which eye, when it started, and whether the vision has changed."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if she sees a sudden shadow over her vision."
+   ],
+   [
+    "The clear aligners can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90.",
+    "An eye imaging scan can take a $20 deposit once Hana's photo quote is OK'd, like $20 of $90."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Vaya a la sala de urgencias más cercana o llame al 911 ahora. No espere una cita."
+   ],
+   [
+    "Saved: adjustment $40 for visits from Mon Nov 2. Adjustments already booked keep $35.",
+    "Saved: new patient consult $40 for visits from Mon Nov 2. Consults already booked keep $35."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Go to the nearest emergency room or call 911 now. Don't wait for an eye visit."
+   ],
+   [
+    "A clear aligner at Lee Eye Clinic is $40, not $35. Here are the open times at $40.",
+    "An eye imaging scan at Lee Eye Clinic is $90, not $85. Here are the open times at $90."
+   ],
+   [
+    "The clear aligners can be paid in full once Nina's photo quote is OK'd, like $90.",
+    "An eye imaging scan can be paid in full once Hana's photo quote is OK'd, like $90."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like sudden flashes or a shadow over the vision, gets the safety steps first."
+   ],
+   [
+    "Prices: Adjustment $35 ($40 from Nov 2) · Clear aligner $40 · Retainer check $20",
+    "Prices: New patient consult $35 · Laser treatment $140 · Eye imaging $90"
+   ],
+   [
+    "Set. For a adjustment, the customer picks the place and sees both prices first.",
+    "Set. For a new patient consult, the customer picks the place and sees both prices first."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The eye pressure check, $55, is paid in full when booked. So is a home visit, $75."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's eye test for a son, so the times fit it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An ophthalmologist's example: sudden flashes get 'go to the emergency room now'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I see flashes and a shadow in my eye."
+   ],
+   [
+    "Alex wants it at home: a home visit, $75, paid in full when booking.",
+    "Alex wants it at home: a care-home visit, $75, paid in full when booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: sudden vision loss, flashes, or a curtain over the vision."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning?",
+    "My eye is red and sore. Can an ophthalmologist come Thursday morning?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE eye pressure high on the left. Old scans: bring them next time."
+   ],
+   [
+    "can cut your hair at the office for $35, or at your home for $75",
+    "can see you at the office for $35, or at your home for $179"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "which eye is sore, and is the other eye sore too?"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like giving a neighbor's drops without asking."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A visit is rated, so the office takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Eye care takes no jobs sent now. The office takes none."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times",
+    "Alex picked a child's eye test for a son first"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Tomas also check my eye pressure?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can an ophthalmologist check a red eye this Thursday?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Veo destellos y una sombra en la vista."
+   ],
+   [
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "sudden vision loss, flashes, or a curtain over the vision"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a check plan with Hana, every 6 months."
+   ],
+   [
+    "new pipes put in one day and finished another",
+    "lenses fitted over two visits"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a sore eye at my care home."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My eye is sore' fits a red eye visit."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the eye is now bleeding."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The eye is bleeding now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stain on the chair floor"
+   ],
+   [
+    "Reading it back: the adjustment goes to $40",
+    "Reading it back: the new patient consult goes to $40"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Ha perdido la vista de repente?"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Retina visits, lasers and eye care."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I eat before you come?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the space in front of the chair."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Did you lose vision suddenly?"
+   ],
+   [
+    "a $40 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show photos of your eyes?"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The eye gets sore again 2 weeks later."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 drops 165 check 80"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Eye pressure check"
+   ],
+   [
+    "Drain clearing and water heaters",
+    "Retina visits and laser treatments"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the eye still watering?"
+   ],
+   [
+    "Sam raises the adjustment to $40",
+    "Sam raises the new patient consult to $40"
+   ],
+   [
+    "clear aligners at $85, not $90?",
+    "eye imaging at $85, not $90?"
+   ],
+   [
+    "Color quotes come to you first",
+    "Quotes come to you first"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly retina visit plan"
+   ],
+   [
+    "Adjustment at the office · $35",
+    "New patient consult at the office · $35"
+   ],
+   [
+    "Adjustment at their home · $75",
+    "New patient consult at their home · $75"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I haven't lost my vision."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Eye and Lee Eye Clinic"
+   ],
+   [
+    "an overflowing drain at night",
+    "a red eye at night"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Laser treatment · $40 deposit"
+   ],
+   [
+    "C $40 deposit when they book.",
+    "C $160 deposit when they book."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Check plan · every 6 months"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Drops and a check"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both drop refills"
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Eye imaging · $20 deposit"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 check needs none."
+   ],
+   [
+    "Harper J.'s estimate visit",
+    "Harper J.'s eye visit"
+   ],
+   [
+    "Adjustment plans go to $40",
+    "Check plans go to $40"
+   ],
+   [
+    "Is this Elm Street Dental?",
+    "Is this Elm Street Eye Clinic?"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Red eye"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · low-vision aids"
+   ],
+   [
+    "$40 taken when they book",
+    "$40 taken when they book"
+   ],
+   [
+    "Water heater replacement",
+    "Low-vision aids"
+   ],
+   [
+    "water heater replacement",
+    "low-vision aids"
+   ],
+   [
+    "plumbing and electrical",
+    "eye care and eye surgery"
+   ],
+   [
+    "Plumbing and electrical",
+    "Eye care and eye surgery"
+   ],
+   [
+    "Signature cut and shave",
+    "Eye pressure check"
+   ],
+   [
+    "signature cut and shave",
+    "eye pressure check"
+   ],
+   [
+    "Color always stays with",
+    "Eye imaging quotes always stay with"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute eye check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Eye pressure check"
+   ],
+   [
+    "sewer camera inspection",
+    "eye pressure check"
+   ],
+   [
+    "the $40, if you confirm",
+    "the $20, if you confirm"
+   ],
+   [
+    "or at your home for $75",
+    "or at your home for $179"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Retina visit and follow-up"
+   ],
+   [
+    "kitchen drain clearing",
+    "retina visit and follow-up"
+   ],
+   [
+    "Under the sink, before",
+    "Under the chair, before"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Eye LLC"
+   ],
+   [
+    "color and house calls",
+    "home visits"
+   ],
+   [
+    "1-year labor warranty",
+    "1-year warranty on the work"
+   ],
+   [
+    "Cabinet floor, before",
+    "Chair floor, before"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Eye Clinic LLC"
+   ],
+   [
+    "a eye doctor license",
+    "an ophthalmologist license"
+   ],
+   [
+    "$100 after the visit",
+    "$100 after the treatment"
+   ],
+   [
+    "Retainer check · $20",
+    "Lens check · $40"
+   ],
+   [
+    "photos of your hair",
+    "photos of your eyes"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it's still watering"
+   ],
+   [
+    "Sewer camera report",
+    "Scan report"
+   ],
+   [
+    "sewer camera report",
+    "scan report"
+   ],
+   [
+    "Heating and cooling",
+    "Eye imaging"
+   ],
+   [
+    "heating and cooling",
+    "eye imaging"
+   ],
+   [
+    "The $110 rest after",
+    "The $480 rest after"
+   ],
+   [
+    "Clear aligner · $40",
+    "Eye imaging · $90"
+   ],
+   [
+    "checks what it pays",
+    "reviews what it pays"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Mi vista no ha cambiado."
+   ],
+   [
+    "said they smell gas",
+    "said they see sudden flashes"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Eye'"
+   ],
+   [
+    "eye doctor license",
+    "ophthalmologist license"
+   ],
+   [
+    "color, house calls",
+    "home visits"
+   ],
+   [
+    "home warranty plan",
+    "eye care plan"
+   ],
+   [
+    "Water heater flush",
+    "Retina visit"
+   ],
+   [
+    "water heater flush",
+    "retina visit"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Eye"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Clinic"
+   ],
+   [
+    "Lee Family Dental",
+    "Lee Eye Clinic"
+   ],
+   [
+    "the cabinet floor",
+    "the chair floor"
+   ],
+   [
+    "a dripping faucet",
+    "a sore eye"
+   ],
+   [
+    "can cut your hair",
+    "can see you"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Eye Clinic"
+   ],
+   [
+    "plumbing license",
+    "ophthalmologist license"
+   ],
+   [
+    "Plumbing license",
+    "Ophthalmologist license"
+   ],
+   [
+    "hot towel shaves",
+    "eye pressure checks"
+   ],
+   [
+    "Color correction",
+    "Red eye visit"
+   ],
+   [
+    "color correction",
+    "red eye visit"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do eyelash lifts"
+   ],
+   [
+    "Service call fee",
+    "Emergency fee"
+   ],
+   [
+    "service call fee",
+    "emergency fee"
+   ],
+   [
+    "a drain cleaning",
+    "a retina visit"
+   ],
+   [
+    "Gloss to finish",
+    "Lens cleaning"
+   ],
+   [
+    "gloss to finish",
+    "lens cleaning"
+   ],
+   [
+    "Groom's package",
+    "Laser treatment"
+   ],
+   [
+    "asks for a perm",
+    "asks for an eyelash lift"
+   ],
+   [
+    "the water valve",
+    "the drops"
+   ],
+   [
+    "Repipe · $2,400",
+    "Low-vision aids · $640"
+   ],
+   [
+    "Drain clearing",
+    "Retina visit"
+   ],
+   [
+    "drain clearing",
+    "retina visit"
+   ],
+   [
+    "shutoff valves",
+    "drop refills"
+   ],
+   [
+    "drain cleaning",
+    "retina visit"
+   ],
+   [
+    "Retainer check",
+    "Lens check"
+   ],
+   [
+    "Glasses check",
+    "Lens check"
+   ],
+   [
+    "glasses check",
+    "lens check"
+   ],
+   [
+    "Groom's party",
+    "family"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "signature cut",
+    "eye pressure check"
+   ],
+   [
+    "Color and cut",
+    "Eye imaging"
+   ],
+   [
+    "color and cut",
+    "eye imaging"
+   ],
+   [
+    "water heaters",
+    "laser treatments"
+   ],
+   [
+    "Panel upgrade",
+    "Laser upgrade"
+   ],
+   [
+    "panel upgrade",
+    "laser upgrade"
+   ],
+   [
+    "home warranty",
+    "eye care plan"
+   ],
+   [
+    "shutoff valve",
+    "drop refill"
+   ],
+   [
+    "Shutoff valve",
+    "Drop refill"
+   ],
+   [
+    "camera report",
+    "scan report"
+   ],
+   [
+    "cabinet floor",
+    "chair floor"
+   ],
+   [
+    "$2,400 repipe",
+    "$640 low-vision aids"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "Jordan Price",
+    "Tomas Reid"
+   ],
+   [
+    "water heater",
+    "laser treatment"
+   ],
+   [
+    "Water heater",
+    "Laser treatment"
+   ],
+   [
+    "service call",
+    "emergency visit"
+   ],
+   [
+    "Service call",
+    "Emergency visit"
+   ],
+   [
+    "faucet check",
+    "retina visit"
+   ],
+   [
+    "Casey Moore",
+    "Gia Morgan"
+   ],
+   [
+    "electrician",
+    "ophthalmic technician"
+   ],
+   [
+    "barbershops",
+    "eye clinics"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "color quote",
+    "treatment quote"
+   ],
+   [
+    "Color quote",
+    "Treatment quote"
+   ],
+   [
+    "optometrist",
+    "ophthalmologist"
+   ],
+   [
+    "Optometrist",
+    "Ophthalmologist"
+   ],
+   [
+    "use a drops",
+    "use drops"
+   ],
+   [
+    "my cleaning",
+    "my visit"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Leak repair",
+    "Eye problem repair"
+   ],
+   [
+    "leak repair",
+    "eye problem repair"
+   ],
+   [
+    "Supply line",
+    "Drops"
+   ],
+   [
+    "supply line",
+    "drops"
+   ],
+   [
+    "overflowing",
+    "watering"
+   ],
+   [
+    "Toner · $20",
+    "Drops · $20"
+   ],
+   [
+    "drying fans",
+    "a portable exam kit"
+   ],
+   [
+    "Riley Chen",
+    "Hana Sato"
+   ],
+   [
+    "Avery Diaz",
+    "Ivan Cruz"
+   ],
+   [
+    "Electrical",
+    "Eye surgery"
+   ],
+   [
+    "electrical",
+    "eye surgery"
+   ],
+   [
+    "Barbershop",
+    "Eye clinic"
+   ],
+   [
+    "barbershop",
+    "eye clinic"
+   ],
+   [
+    "skin fades",
+    "retina checks"
+   ],
+   [
+    "Beard trim",
+    "Lens check"
+   ],
+   [
+    "beard trim",
+    "lens check"
+   ],
+   [
+    "patch test",
+    "retina visit"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color plan",
+    "treatment plan"
+   ],
+   [
+    "burst pipe",
+    "red eye"
+   ],
+   [
+    "water line",
+    "eye"
+   ],
+   [
+    "88 Elm St",
+    "520 Harbor Ave"
+   ],
+   [
+    "42 Oak St",
+    "64 Linden Rd"
+   ],
+   [
+    "kids cuts",
+    "children's eye tests"
+   ],
+   [
+    "Skin fade",
+    "Retina check"
+   ],
+   [
+    "skin fade",
+    "retina check"
+   ],
+   [
+    "hot towel",
+    "eye pressure"
+   ],
+   [
+    "Cape clip",
+    "Shield clip"
+   ],
+   [
+    "cape clip",
+    "shield clip"
+   ],
+   [
+    "plumbers",
+    "ophthalmologists"
+   ],
+   [
+    "Plumbing",
+    "Eye surgery"
+   ],
+   [
+    "plumbing",
+    "eye surgery"
+   ],
+   [
+    "Haircuts",
+    "Checks"
+   ],
+   [
+    "haircuts",
+    "checks"
+   ],
+   [
+    "this cut",
+    "this check"
+   ],
+   [
+    "Kids cut",
+    "Child's eye test"
+   ],
+   [
+    "kids cut",
+    "child's eye test"
+   ],
+   [
+    "cut hair",
+    "check eyes"
+   ],
+   [
+    "optician",
+    "ophthalmic technician"
+   ],
+   [
+    "the leak",
+    "the eye problem"
+   ],
+   [
+    "plumber",
+    "ophthalmologist"
+   ],
+   [
+    "barbers",
+    "ophthalmologists"
+   ],
+   [
+    "Haircut",
+    "Check"
+   ],
+   [
+    "haircut",
+    "check"
+   ],
+   [
+    "Glasses",
+    "Lenses"
+   ],
+   [
+    "glasses",
+    "lenses"
+   ],
+   [
+    "Eyewear",
+    "Eye surgery"
+   ],
+   [
+    "eyewear",
+    "eye surgery"
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "Massage",
+    "Drops"
+   ],
+   [
+    "massage",
+    "drops"
+   ],
+   [
+    "dentist",
+    "ophthalmologist"
+   ],
+   [
+    "Dentist",
+    "Ophthalmologist"
+   ],
+   [
+    "a drops",
+    "drops"
+   ],
+   [
+    "cabinet",
+    "chair"
+   ],
+   [
+    "clogged",
+    "watering"
+   ],
+   [
+    "shutoff",
+    "drops"
+   ],
+   [
+    "Shutoff",
+    "Drops"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Barber",
+    "Ophthalmologist"
+   ],
+   [
+    "barber",
+    "ophthalmologist"
+   ],
+   [
+    "my cut",
+    "my check"
+   ],
+   [
+    "shaves",
+    "checks"
+   ],
+   [
+    "a pipe",
+    "an eye"
+   ],
+   [
+    "valves",
+    "drops"
+   ],
+   [
+    "faucet",
+    "eye"
+   ],
+   [
+    "repipe",
+    "low-vision"
+   ],
+   [
+    "heater",
+    "lens"
+   ],
+   [
+    "Heater",
+    "Lens"
+   ],
+   [
+    "Riley",
+    "Hana"
+   ],
+   [
+    "Avery",
+    "Ivan"
+   ],
+   [
+    "Casey",
+    "Gia"
+   ],
+   [
+    "a cut",
+    "a check"
+   ],
+   [
+    "beard",
+    "lens"
+   ],
+   [
+    "gloss",
+    "lens cleaning"
+   ],
+   [
+    "Gloss",
+    "Lens cleaning"
+   ],
+   [
+    "shave",
+    "check"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "valve",
+    "drop"
+   ],
+   [
+    "pipes",
+    "eyes"
+   ],
+   [
+    "clogs",
+    "waters"
+   ],
+   [
+    "drain",
+    "eye"
+   ],
+   [
+    "Drain",
+    "Eye"
+   ],
+   [
+    "flush",
+    "check"
+   ],
+   [
+    "sewer",
+    "eye"
+   ],
+   [
+    "Sewer",
+    "Eye"
+   ],
+   [
+    "toner",
+    "drops"
+   ],
+   [
+    "cape",
+    "shield"
+   ],
+   [
+    "perm",
+    "eyelash lift"
+   ],
+   [
+    "Perm",
+    "Eyelash lift"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "pipe",
+    "eye"
+   ],
+   [
+    "Pipe",
+    "Eye"
+   ],
+   [
+    "clog",
+    "watering"
+   ],
+   [
+    "sink",
+    "chair"
+   ],
+   [
+    "Sink",
+    "Chair"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "Visit fee",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee, an ophthalmologist, signs up two companies by text. Then Alex books a new patient eye consult with Hana at Lee Eye Clinic for Sat Oct 24 at 11:00am. The desk checks Alex's plan by hand, keeps the health forms on the secure page, and takes Alex's share at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who lives at Riverside care home, books an eye check and follow-up there with Lee Home Eye Care. Tomas brings a portable exam kit Thu Oct 22, arriving 8 to 10am. The practice bills Alex's plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|deposit|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 new patient eye consult with the retina checks. Nothing is taken. The desk checks Alex's plan, and Alex pays the share at the front desk.",
+    "list|card|counter": "The same consult where the practice turns on its $20 missed-visit fee. A card is saved for it, never for a fee-free patient.",
+    "list|deposit|counter": "A laser treatment for one eye, $140: a $40 deposit when booked, and the $100 rest paid at the chair after the treatment.",
+    "list|full|none": "An eye pressure check, paid in full when booked: $55. Nothing more is owed after.",
+    "photos|deposit|counter": "An eye imaging scan quoted from Alex's photos at $90. A $20 deposit once the quote is OK'd, and the $70 rest at the scan.",
+    "visit|none|counter": "A red, sore eye the same day. Only the $25 check is promised; any test or drops are priced first, with Alex's yes."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "New patient eye consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "New patient eye consult with retina checks"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "New patient eye consult with retina checks"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$20",
+     "name": "Laser treatment (one eye)"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Eye pressure check"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Eye imaging, quoted from photos"
+    },
+    "photos|deposit|*": {
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "fee": "$20",
+     "name": "Eye imaging, quoted from photos"
+    },
+    "visit|*|*": {
+     "name": "Eye problem visit"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Lens check",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$40"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Eye pressure check, paid in full when booked",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|none|bill",
+    "visit|none|own",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a $179 eye check and follow-up at Riverside care home. Nothing is taken. The practice bills Alex's plan its own way.",
+    "list|none|bill": "The same check, paid privately: nothing is taken when booking, and Rosie texts the bill when Tomas texts DONE.",
+    "visit|none|own": "An eye problem at the care home. Only the $89 eye check is promised; any test or drops are priced at the visit, with Alex's yes first.",
+    "photos|deposit|bill": "Low-vision aids, quoted by Tomas after a first exam at $640. A $160 deposit once the quote is OK'd, and Rosie texts the bill for the $480 rest."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Eye check and follow-up at a care home"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Eye check and follow-up at a care home"
+    },
+    "visit|*|*": {
+     "name": "Eye problem at a care home"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Low-vision aids"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$40",
+     "name": "Low-vision aids"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Second patient's eye check at the same care home",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$179"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Glasses adjustment, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "An ophthalmologist always holds a license: the owner states it, and Rosie doesn't check it. Registration-only is not this work.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Eye care pays the $2 like every business: no health exemption (D97).",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Eye care books people (an ophthalmologist or a technician), never spaces.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Eye care runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each ophthalmologist and technician holds their own license.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "No eye care is sent now, and nobody is on call (pf.edges.urgent).",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit or a procedure books a person's time.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit or a procedure books a person's time.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit or a procedure books a person's time, never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left at the practice: the patient is in the chair.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "An adult stays for a child's eye visit (pf.questions.whoMayBook).",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Health work is sensitive (the switch is on), so no rating is asked.",
+    "label": "Yes, a rating is asked"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "The patient is always there for a visit at a care home.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Mobile eye care takes no jobs sent now (S2-30), so this is never offered.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "Nobody is on call for eye care (S2-30).",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "A visit always needs the patient there, so there's no visit with nobody home.",
+    "label": "The way in fails"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never left in the ophthalmologist's care at home: an adult on the booking is there (B8-09).",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "An ophthalmologist always holds a license: the owner states it, and Rosie doesn't check it.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Eye care pays the $2 like every business: no health exemption (D97).",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Eye care books people, never spaces.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Eye care runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each ophthalmologist and technician holds their own license.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "No eye care is sent now, and nobody is on call (pf.edges.urgent).",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Mobile eye care books a 2-hour arrival window.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "An eye visit is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Mobile eye care sells no seats in a session: each patient has their own visit.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "No eye visit is sent now (S2-30).",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "No eye visit is sent now (S2-30).",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Health work is sensitive (the switch is on), so no rating is asked.",
+    "label": "Yes, a rating is asked"
+   }
+  ]
+ },
+ "notes": "Start: the optometrist (clinic), itself built on the dentist; refitted to the ophthalmologist's care (Oct 27). Names: Sam Lee, an ophthalmologist, owns Lee Home Eye Care LLC (the master's main company: mobile eye care at care homes and schools, 75 Mill Rd) and Lee Eye Clinic LLC (the second company: the office, 520 Harbor Ave). Flow A is at the office; flow B at Riverside care home, 64 Linden Rd, where Alex lives. Staff: Hana (ophthalmologist) and Ivan (technician) at the office; Tomas (ophthalmologist) and Gia (technician) on the mobile team. Prices keep the master's own numbers: consult $35, fee $20, laser treatment $140 ($40 deposit, $100 rest), eye pressure check $55 paid in full, eye imaging from photos $90 ($20 deposit, $70 rest), eye problem check $25 ($110 in all), care-home check $179, care-home eye visit $89 ($245 in all), low-vision aids $640 ($160 deposit, $480 rest). Sedation and anesthesia are never booked, priced or confirmed by Rosie. The $2 applies (D97): the 'No $2' branch of S1-62 stays off in the plug-in (no no-$2 pairs). Licenses are optional and never checked (D96). Health work: sensitive on, so no rating is asked.",
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex picked a kids cut for a son before the times",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Classic cuts, fades and hot towel shaves.",
+    "May the shop show photos of your hair?",
+    "Signature cut and hot towel shave",
+    "Drain clearing and water heaters",
+    "Color quotes come to you first",
+    "Lee Plumbing and Lee Electric",
+    "Groom's package · $40 deposit",
+    "Haircut plan · every 4 weeks",
+    "Color and cut · $20 deposit",
+    "Is this Elm Street Dental?",
+    "$40 taken when they book",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "Color always stays with",
+    "15-minute style consult",
+    "the $40, if you confirm",
+    "color and house calls",
+    "Lee's Barbershop LLC",
+    "$100 after the visit",
+    "photos of your hair",
+    "checks what it pays",
+    "Lee Home Services'",
+    "color, house calls",
+    "home warranty plan",
+    "Lee Home Services",
+    "Elm Street Dental",
+    "Lee's Barbershop",
+    "hot towel shaves",
+    "Color correction",
+    "color correction",
+    "doesn't do perms",
+    "Gloss to finish",
+    "Groom's package",
+    "asks for a perm",
+    "Drain clearing",
+    "groom's party",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "water heaters",
+    "Panel upgrade",
+    "home warranty",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Casey Moore",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "color quote",
+    "Color quote",
+    "my cleaning",
+    "Price board",
+    "price board",
+    "Toner · $20",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "house call",
+    "color plan",
+    "burst pipe",
+    "88 Elm St",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "hot towel",
+    "cape clip",
+    "Plumbing",
+    "plumbing",
+    "Haircuts",
+    "haircuts",
+    "this cut",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Massage",
+    "massage",
+    "dentist",
+    "Dentist",
+    "Jordan",
+    "Barber",
+    "barber",
+    "my cut",
+    "shaves",
+    "Riley",
+    "Avery",
+    "Casey",
+    "a cut",
+    "beard",
+    "gloss",
+    "Gloss",
+    "shave",
+    "shops",
+    "toner",
+    "cape",
+    "perm",
+    "shop",
+    "Shop"
+   ],
+   "B": [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Like tapping a neighbor's water line without asking.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "new pipes put in one day and finished another",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Classic cuts, fades and hot towel shaves.",
+    "Can I run the dishwasher before you come?",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "The drain clogs again 2 weeks later.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Drain clearing and water heaters",
+    "Is the sink still full of water?",
+    "Yearly water heater flush plan",
+    "No. It doesn't smell like gas.",
+    "Lee Plumbing and Lee Electric",
+    "an overflowing drain at night",
+    "C $40 deposit when they book.",
+    "Shutoff valve and wall pipe",
+    "Replace both shutoff valves",
+    "The $179 drain needs none.",
+    "Is this Elm Street Dental?",
+    "Overflowing kitchen drain",
+    "Right to cancel · repipe",
+    "Water heater replacement",
+    "water heater replacement",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "or at your home for $75",
+    "Kitchen drain clearing",
+    "Under the sink, before",
+    "Lee Home Services LLC",
+    "color and house calls",
+    "1-year labor warranty",
+    "Cabinet floor, before",
+    "Yes, it won't drain",
+    "Sewer camera report",
+    "sewer camera report",
+    "Heating and cooling",
+    "heating and cooling",
+    "The $110 rest after",
+    "checks what it pays",
+    "No. No huele a gas.",
+    "said they smell gas",
+    "Lee Home Services'",
+    "color, house calls",
+    "home warranty plan",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services",
+    "Elm Street Dental",
+    "the cabinet floor",
+    "a dripping faucet",
+    "can cut your hair",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "hot towel shaves",
+    "Service call fee",
+    "service call fee",
+    "a drain cleaning",
+    "the water valve",
+    "Repipe · $2,400",
+    "Drain clearing",
+    "drain clearing",
+    "shutoff valves",
+    "drain cleaning",
+    "water heaters",
+    "Panel upgrade",
+    "home warranty",
+    "shutoff valve",
+    "Shutoff valve",
+    "camera report",
+    "cabinet floor",
+    "$2,400 repipe",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Water heater",
+    "service call",
+    "Service call",
+    "faucet check",
+    "Casey Moore",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "my cleaning",
+    "Price board",
+    "Leak repair",
+    "leak repair",
+    "Supply line",
+    "supply line",
+    "overflowing",
+    "drying fans",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "beard trim",
+    "house call",
+    "burst pipe",
+    "water line",
+    "88 Elm St",
+    "42 Oak St",
+    "hot towel",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "the leak",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "dentist",
+    "Dentist",
+    "cabinet",
+    "clogged",
+    "shutoff",
+    "Shutoff",
+    "Jordan",
+    "Barber",
+    "barber",
+    "shaves",
+    "valves",
+    "faucet",
+    "repipe",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "shave",
+    "shops",
+    "valve",
+    "pipes",
+    "clogs",
+    "drain",
+    "Drain",
+    "flush",
+    "sewer",
+    "Sewer",
+    "perm",
+    "shop",
+    "Shop",
+    "pipe",
+    "clog",
+    "sink"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "B8-03": "ac9d404766",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B10-32": "7713bff255"
+  }
+ }
+}

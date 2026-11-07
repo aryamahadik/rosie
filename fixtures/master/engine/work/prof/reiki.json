@@ -1,0 +1,3934 @@
+{
+ "id": "reiki",
+ "name": "Reiki and energy healer",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "massage",
+ "plugin": {
+  "pf.license": {
+   "need": "none checked by Rosie: reiki has no state license in most places; a certificate or training is the practitioner's own word, optional, and never checked (D96)",
+   "who": "the business, for any registration it chooses to show; each practitioner's certificate is their own word",
+   "ask": "optional: a registration number or a certificate the business wants shown; nothing is asked of each practitioner",
+   "check": "none: Rosie never checks a license, certificate or insurance for this work (not on any lookup, not by the team)",
+   "certificates": "a reiki level certificate is shown as the practitioner's own word, never as a license",
+   "blocks": "nothing: no license or certificate blocks a booking here",
+   "renewals": "none checked; a date on a certificate is only a reminder the business sets itself",
+   "insurance": "liability insurance is optional: the business's own word; shown only if the business chooses",
+   "background": "any background check is the business's own policy, not checked by Rosie",
+   "claims": "no medical claims: reiki is offered as a relaxing session, never as treatment, a cure or a diagnosis"
+  },
+  "pf.services": {
+   "shape": "one-to-one sessions of 60 minutes, with a practitioner the client picks or any free one; distance sessions by video or phone; packs of sessions; a home visit",
+   "examples": "the example businesses' own prices (Lee Reiki Studio and Lee Mobile Reiki), not a standard",
+   "list": [
+    {
+     "name": "60-min reiki session",
+     "price": "$85",
+     "kind": "one price",
+     "length": "60 min, plus 15 min to reset the room",
+     "where": "at the studio",
+     "before": "a card saved for the $40 fee",
+     "after": "at the front desk",
+     "note": "clothes stay on; the client lies or sits, covered by a blanket"
+    },
+    {
+     "name": "5-session pack (60 min each)",
+     "price": "$340 (the example's price)",
+     "kind": "a pack",
+     "length": "5 sessions",
+     "where": "at the studio",
+     "before": "paid in full when booked, on the secure page or at the desk",
+     "after": "each session uses one"
+    },
+    {
+     "name": "Distance reiki (45 min)",
+     "price": "$70",
+     "kind": "one price",
+     "length": "45 min by video or phone",
+     "where": "by video or phone",
+     "before": "a card saved for the $35 fee",
+     "after": "charged when the practitioner texts DONE, after the call"
+    },
+    {
+     "name": "60-min reiki at home",
+     "price": "$140",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the client's home",
+     "before": "a card saved for the $70 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "3-session pack at home (60 min each)",
+     "price": "$330",
+     "kind": "a pack",
+     "length": "3 sessions",
+     "where": "at the client's home",
+     "before": "paid in full when booked",
+     "after": "each session uses one"
+    },
+    {
+     "name": "Crystal add-on",
+     "price": "$20",
+     "kind": "one price",
+     "length": "added to a session, same time",
+     "where": "at the studio or at home",
+     "before": "with the session",
+     "after": "at the front desk, or on the bill"
+    },
+    {
+     "name": "Gift card",
+     "price": "any amount",
+     "kind": "a gift card",
+     "length": "",
+     "where": "both",
+     "before": "typed on the secure page",
+     "after": "comes off what's paid"
+    }
+   ],
+   "travel": "included in the price at home inside the 25-mile area (the example's setting); a travel fee for farther towns where Sam sets one",
+   "capacity": "one practitioner per session; a two-person session needs two practitioners free at once; a group is one booking with several people",
+   "skills": "reiki levels I and II, hands-on and distance sessions, crystal add-ons; only practitioners with the level a booking names are offered",
+   "online": "distance sessions by video or phone are a booking like any other; the video link is on the secure page",
+   "nobodyHome": "never: the client must be there for a home session"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "the kind of session (at the studio, at home, or by video or phone)",
+    "a practitioner by name, or a woman or a man, only if the client asks",
+    "for a teen (16 or 17): the age; a parent or guardian books",
+    "at home: what kind of place (a home or an office) and the town, before any times"
+   ],
+   "afterTime": [
+    "what the client would like to focus on, in their own words (calm, sleep, pain, a change)",
+    "at home: parking, stairs, pets, and a quiet space with room for a chair or a table"
+   ],
+   "securePage": [
+    "18 or older, or 16 or 17 with a parent or guardian's consent on the page",
+    "the wellness form: current health concerns, a heart condition, epilepsy, pregnancy, recent surgery, medicines, skin conditions, and any doctor's care",
+    "for a teen: the parent's consent, and that the parent stays on site"
+   ],
+   "whoMayBook": "an adult, for themselves or another adult; a parent or guardian for a 16 or 17 year old, who stays on site; no one under 16 (the example's setting)"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, fainting, sudden weakness or numbness, or a seizure",
+     "say": "This could be an emergency. Call 911 now. A session can wait.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a new lump, bleeding that won't stop, or a symptom a doctor hasn't checked",
+     "say": "Please see a doctor first. Reiki doesn't replace medical care.",
+     "booking": "no booking until a doctor says it's OK"
+    }
+   ],
+   "refuse": {
+    "words": "a request for sexual services, or to skip the covering that keeps the client covered",
+    "say": "This practice offers reiki sessions only. This request can't be booked.",
+    "what": "the exact words go to the business's safety log; Sam picks: refuse and block that chat or number, or it was innocent and a session may be booked (every later message is checked again); no reply in 2 of Sam's text hours: nothing is booked"
+   },
+   "goOn": [
+    {
+     "words": "a sore muscle or a small bruise",
+     "what": "the practitioner works around it; the session goes on"
+    },
+    {
+     "words": "a cold or the flu",
+     "what": "the visit moves with no fee"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Wellness form",
+     "when": "on the secure page before the first session (due when booking, inside the saved 10 minutes); a returning client confirms or updates it by the day before (the studio: 6pm; the mobile business: 10am)",
+     "goodFor": "12 months, or until the client's health changes",
+     "result": "most answers change nothing; a flag (a heart condition, epilepsy, a recent surgery) goes to the practitioner to read before it books"
+    },
+    {
+     "name": "Practitioner's read of a flag",
+     "when": "before the booking is written, in the practitioner's text hours; no answer in 1 hour: Sam reads it",
+     "result": "OK as booked; OK with a note (a lighter touch, an area skipped); a doctor's OK first; or no, with the reason kept private"
+    },
+    {
+     "name": "A teen's consent",
+     "when": "on the secure page, from the parent or guardian who books",
+     "result": "the parent shows an ID at check-in and stays on site"
+    }
+   ],
+   "prep": "come 5 minutes early; wear loose clothes; drink water; tell the studio on the secure page about any health change; at home: a quiet room with space for a chair or table, pets in another room"
+  },
+  "pf.visit": {
+   "checkIn": "at the studio: the check-in code at the front desk; at home: the code at the door, from the client who booked; by video or phone: the link on the secure page",
+   "beforeWork": "the practitioner goes over the wellness form and what the client wants with the client before starting; the client keeps their clothes on and is covered by a blanket; the client can stop at any time",
+   "changes": "a crystal add-on or extra time is priced and OK'd before it's done",
+   "stop": "the practitioner may end a session that crosses a line and leave the room; Sam decides any charge (only what the client agreed to) and any block; it goes in the safety log",
+   "away": "only practitioners Sam allows go to homes or offices; the practitioner's DONE is the check-out: no DONE 15 minutes after the booked end, Rosie texts, then calls the practitioner, then tells Sam with the address",
+   "done": "the check-in code, or DONE from the practitioner; the practitioner's notes (what was focused on, what helped) go in the client's private record"
+  },
+  "pf.money": {
+   "before": "at the studio: a card saved for the $40 late-cancel and no-show fee; a 5-session pack paid in full when bought; by video or phone: a card saved for the $35 fee and charged at DONE; at home: a card saved for the $70 fee, or a 3-session pack paid in full",
+   "caps": "no deposits are taken for reiki; the business's own fee is never more than what was paid now or what the card covers",
+   "cancel": "free to cancel until 24 hours before at the studio or by video, and until 8pm the evening before for a visit at home (the owner's settings)",
+   "fees": "late cancel or no-show: $40 at the studio; $35 for a distance session; $70 at home; a pack session used up if Sam confirms; Sam confirms each fee, never more than what was agreed; a late arrival keeps the time booked at full price",
+   "conduct": "a session ended for the client's conduct: charged only what the booking page said, and only if Sam says so",
+   "packs": "packs of sessions and gift cards: sold at the studio, or on the secure page where Sam turns it on; a visit uses one session",
+   "tips": "on: at the front desk, or a tip line on the bill Rosie texts; tips go to the practitioner in full",
+   "tax": "a tax line where the state's rules tax the service",
+   "insurance": "none: the business bills no health plan or insurance; a practice that bills a plan would turn it on",
+   "fee2": "Rosfield's $2 applies (D97)"
+  },
+  "pf.messages": {
+   "never": "health answers, pregnancy, medicines, a doctor's note and the practitioner's notes never go in a text or through the AI: only the secure page and the client's private record",
+   "tone": "no words in any text that could read as medical care, a cure or a diagnosis; a reiki session is a relaxing session",
+   "languages": "English and Spanish",
+   "minors": "a teen's booking texts go only to the parent or guardian; Rosie never texts the teen"
+  },
+  "pf.staff": {
+   "licenses": "no state license for reiki in most places; a certificate or training is each practitioner's own word, shown only if they choose; never checked by Rosie (D96)",
+   "skills": "reiki levels I and II, hands-on and distance sessions, crystal add-ons; only practitioners with the level a booking names are offered",
+   "gender": "each practitioner's gender is set only so a client can ask for a woman or a man; a filter used only when the client asks",
+   "supervision": "a student works only with a named practitioner in the room, where the business sets it (none in the example)",
+   "oks": "Sam OKs same-day sessions and new clients at the studio; he can set every home visit to ask him first; a health flag goes to the booked practitioner, then to Sam after 1 hour",
+   "standIn": "a stand-in must fit what the client asked (a woman, if asked) and the level booked, and gets the wellness form and notes",
+   "away": "only practitioners Sam allows are offered for homes and offices"
+  },
+  "pf.rules": {
+   "showLicense": "no license claim on listings, times or confirmations; the business's own registration shows only if it has one",
+   "draping": "the client stays covered as the practice does; a request to skip the covering is refused",
+   "hours": "no sessions in hours the business has not set (the example's own hours)",
+   "away": "home visits only inside the 25-mile area, and only where Sam allows the practitioner",
+   "minors": "a parent or guardian's written consent on the secure page for a 16 or 17 year old, and a parent on site",
+   "reset": "15 minutes between clients to reset the room (the example studio's setting)",
+   "records": "wellness forms and session notes kept 7 years"
+  },
+  "pf.edges": {
+   "improper": "a request for sexual services: refused, logged and sent to Sam (pf.safety)",
+   "lateArrival": "the session ends on time at full price; at the studio, no word 15 minutes after the start is a no-show",
+   "runsLate": "the practitioner runs late: the client keeps the full time if the next booking and the 15-minute reset still fit; if not, a new time with no fee",
+   "standIn": "a stand-in who fits what the client asked and the level booked, with the form and notes; or new times with no fee",
+   "healthChange": "a new health change before the session: the client updates the form; the practitioner decides; a move has no fee",
+   "conduct": "a session ended for the client's conduct: Sam decides any charge (only what was agreed) and any block",
+   "awaySafety": "the safety check-out after visits at a home or an office",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "packs",
+   "firststeps",
+   "forms",
+   "video",
+   "aftercare",
+   "children",
+   "tips"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Mira and Jun (reiki practitioners)",
+   "cust": "Alex M. (client) · other clients"
+  },
+  "B": {
+   "staff": "Owen and Tess (practitioners who travel)",
+   "cust": "Alex M. (client) · other clients",
+   "other": "Others (a parent, a host)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Mira"
+  },
+  "B": {
+   "staff": "Owen"
+  }
+ },
+ "keep": [
+  "session",
+  "visit fee",
+  "Visit fee",
+  "leak",
+  "no-show fee",
+  "No-show fee",
+  "late-cancel"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a 60-min reiki session with Mira at Lee Reiki Studio, for Sat Oct 24 at 11:00am. Alex fills in the wellness form on the secure page, and a card is saved for the studio's $40 fee. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a 60-min reiki session at home, 9 Birch Ct, with Owen from Lee Mobile Reiki, Thu Oct 22 at 8:00am. The wellness form is on the secure page. The money choice at the top picks the path: a card saved for the $70 fee and a bill after, or a 3-session pack paid in full."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|full|none",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a 60-minute reiki session at Lee Reiki Studio with Mira, $85. A card is saved for the studio's $40 fee, and Alex pays at the front desk.",
+    "list|full|none": "A 5-session pack, $340, paid in full when booking. Each session uses one, and a no-show can use one up, if Sam confirms.",
+    "list|card|card": "A distance session by video or phone, $70. A card is saved, and charged when Mira texts DONE after the call."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "60-min reiki session"
+    },
+    "list|*|*": {
+     "price": "$85",
+     "name": "60-min reiki session"
+    },
+    "list|full|*": {
+     "price": "$340",
+     "paid": "$340",
+     "fee": "$40",
+     "name": "60-min reiki session (5-session pack)"
+    },
+    "list|card|card": {
+     "price": "$70",
+     "fee": "$35",
+     "name": "distance reiki (45 min)"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Crystal add-on",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "60-min reiki session (5-session pack)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$68",
+      "paid": "$68",
+      "fee": "$40"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a 60-minute reiki session at Alex's home with Owen, $140. A card is saved for the $70 fee, and Rosie texts the bill after the visit.",
+    "list|full|none": "A 3-session pack at home, $330, paid in full when booking. Each session uses one, and a no-show can use one up, if Sam confirms."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$70",
+     "name": "60-min reiki at home"
+    },
+    "list|*|*": {
+     "price": "$140",
+     "name": "60-min reiki at home"
+    },
+    "list|full|*": {
+     "price": "$330",
+     "paid": "$330",
+     "fee": "$70",
+     "name": "60-min reiki at home (3-session pack)"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Crystal add-on",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$20",
+      "fee": "$70"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "60-min reiki at home (3-session pack)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$110",
+      "paid": "$110",
+      "fee": "$70"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "60-min reiki at home (pack session)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No state license for this work: the business gives only its own registration (S1-61); nothing is looked up (D96)."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The plug-in names no license to check for this work, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license, certificate or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license is checked for this work (D96): a certificate is the person's own word, optional."
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the person's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the person's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "A7-54",
+    "why": "Reiki sells packs, not monthly plans: no plan charge, renewal or price-change text (a pack is paid in full when bought)."
+   },
+   {
+    "op": "off",
+    "at": "A7-91",
+    "why": "No monthly plan renews here (reiki sells packs)."
+   },
+   {
+    "op": "off",
+    "at": "A7-55",
+    "why": "No monthly plan price changes here (reiki sells packs)."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "Each session's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+     "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one session.",
+     "A home session is paid the way its card says: a card saved for the fee, and the bill after.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your studio, paid at the front desk, your own way",
+         "A card saved when they book, for the fee you OK"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Keep it"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Each session shows its price and its place before the client picks.",
+      {
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:counter": {
+      "more": [
+       "The card is saved for the fee, and the rest is paid at the front desk, the studio's own way."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Each studio session is paid at the front desk after the visit, your own way.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:counter": {
+      "more": [
+       "A deposit is never more than the price, and a fee is never more than what was paid now."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A deposit is taken when they book, and the rest is paid at the front desk.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "more": [
+       "A card is charged only after the practitioner texts DONE, and only what was agreed."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A saved card is charged at DONE, after the session or the call, for what was agreed.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "more": [
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one session."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A paid-in-full session shows its price, its place and 'paid in full' before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:bill": {
+      "more": [
+       "On this path, the bill Rosie texts after the visit is the way the rest is paid."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Rosie texts the bill after each home visit, with a tip line. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "more": [
+       "A deposit is never more than the price, and a fee is never more than what was paid now."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A deposit is taken when they book, and the rest is paid as the card says.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "more": [
+       "A deposit is never more than the price, and a fee is never more than what was paid now."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A deposit is taken when they book, and the rest is billed after the visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Session and energy work pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Session adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Session books practitioners. A room is saved with the practitioner, never booked alone."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Session runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Session is never sent now: every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The studio bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books a practitioner's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books a practitioner's time. The room comes with it."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Session is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A session runs with one client."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays in the room for a teen session, as the plug-in's who-may-book says."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio: the client is on the table."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A session is paid once, after the visit."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The studio bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A session needs no proposal: regular visits are a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "A session has no fix or warranty. A complaint or a refund goes to Sam."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A session has no results to send later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A session is rated."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "The studio runs no classes: each client gives their own code.",
+    "label": "A class: names on a roster"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "Nothing is left at the studio: the client is on the table.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "The studio books new clients too: the health form is the first step, not a list of its own customers."
+   },
+   {
+    "op": "off",
+    "at": "A8-85",
+    "label": "It needs another day",
+    "why": "A session ends on time in one visit: more time is a new booking."
+   },
+   {
+    "op": "more",
+    "at": "A4-66",
+    "more": [
+     "Each session keeps 15 minutes after it free, to reset the room."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-16",
+    "more": [
+     "Gender is only a filter, used when the client asks. Nobody is shown or hidden for it otherwise."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A3-22",
+    "branch": {
+     "label": "Asks for sexual services",
+     "end": "merge",
+     "steps": [
+      {
+       "type": "split",
+       "id": "A3-x01",
+       "line": [
+        "3.9",
+        "11.24"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "chat",
+       "title": "Refuses it, then asks Sam",
+       "q": "What does Sam pick?",
+       "does": "A what-if: the words ask for sexual services. Rosie refuses in one plain line and books nothing. The exact words go to the studio's safety log, and Sam decides.",
+       "more": [
+        "Rosie refuses and reports. It never decides alone.",
+        "A note asking to skip the sheet that covers the client is refused the same way.",
+        "Sam's 2 hours count only in Sam's text hours.",
+        "Every later message is checked again."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "Lee Reiki Studio offers reiki sessions only. This request can't be booked."
+        ],
+        [
+         "san",
+         "owner",
+         "A request was refused, and nothing is booked. Its exact words are in the safety log. It came by AI chat, with no name yet.",
+         {
+          "card": {
+           "title": "Refused request",
+           "lines": [
+            "Therapeutic session only",
+            "Nothing booked"
+           ],
+           "button": "See the words",
+           "link": "rosfield.com/s/a1"
+          },
+          "buttons": [
+           "Refuse and block",
+           "It was innocent"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.safety"
+       ],
+       "tells": [
+        "agent",
+        "owner"
+       ],
+       "branches": [
+        {
+         "label": "1 Refuse and block",
+         "end": "end",
+         "endText": "That chat can't book the studio. The report stays in the safety log."
+        },
+        {
+         "label": "2 It was innocent",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "A3-x02",
+           "line": [
+            "3.9"
+           ],
+           "who": "san",
+           "to": "agent",
+           "via": "chat",
+           "title": "Lets a therapeutic booking go on",
+           "does": "Sam says it was innocent. The AI hears that the studio can book a therapeutic session, and every new message is checked again.",
+           "say": [
+            [
+             "san",
+             "agent",
+             "Lee Reiki Studio can book a therapeutic session. What would you like?"
+            ]
+           ],
+           "tells": [
+            "agent"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "No reply in 2 hours",
+         "end": "end",
+         "endText": "Nothing is booked. Sam gets one reminder, and the report stays in the log.",
+         "steps": [
+          {
+           "id": "A3-x03",
+           "line": [
+            "3.9"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "title": "Reminds Sam once; books nothing",
+           "does": "Sam hasn't answered in 2 of their text hours. Nothing is booked, and Sam gets one reminder.",
+           "say": [
+            [
+             "san",
+             "owner",
+             "Still waiting on the refused request from earlier. Nothing is booked until you pick.",
+             {
+              "buttons": [
+               "Refuse and block",
+               "It was innocent"
+              ]
+             }
+            ]
+           ],
+           "tells": [
+            "owner"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "after",
+    "at": "A4-65",
+    "steps": [
+     {
+      "type": "split",
+      "id": "A4-x01",
+      "line": [
+       "4.11",
+       "4.14",
+       "13.5"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex checks the health form",
+      "q": "Do the answers change the booking?",
+      "does": "On the same secure page, Alex checks the health form on file and says what changed. The answers stay on the page and in the studio's record, never in a text or through the AI.",
+      "more": [
+       "Most answers change nothing, like a bit of stress and poor sleep.",
+       "A new client fills in the whole form here.",
+       "Each answer gets the danger check too.",
+       "Mira reads the form in the room before the session."
+      ],
+      "form": [
+       [
+        "Anything changed since your last visit?",
+        "Poor sleep, stress at work"
+       ],
+       [
+        "A surgery in the last 6 months?",
+        "No"
+       ],
+       [
+        "Pregnant?",
+        "No"
+       ],
+       [
+        "A heart condition, epilepsy, or a blood pressure problem?",
+        "No"
+       ],
+       [
+        "Medicines you take now?",
+        "None"
+       ],
+       [
+        "What would you like to focus on?",
+        "Calm and sleep"
+       ]
+      ],
+      "needs": [
+       "contact",
+       "pf.questions",
+       "pf.first_steps",
+       "pf.messages",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "Nothing that changes it",
+        "end": "merge"
+       },
+       {
+        "label": "A flag for the practitioner",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A4-x03",
+          "line": [
+           "6.1",
+           "4.14"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Marks it for the practitioner's read",
+          "does": "A what-if: Ben says they have a heart condition. The booking waits for the practitioner's read after the money step, as the plug-in says. Ben's answer stays on the page.",
+          "more": [
+           "Other flags: a surgery in the last 6 months, or a heart or blood pressure problem.",
+           "The read comes next, as 'An expert reads the answers'.",
+           "Nothing is taken until the practitioner says OK."
+          ],
+          "needs": [
+           "pf.first_steps"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Danger on the form",
+        "end": "end",
+        "endText": "No booking. The page shows the safety words, and nothing is taken.",
+        "steps": [
+         {
+          "id": "A4-x04",
+          "line": [
+           "3.9",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "page",
+          "title": "Stops the booking; says see a doctor",
+          "does": "A what-if: Kim writes that she has a new lump she hasn't had checked. Reiki isn't medical care, so the page stops the booking and shows the plug-in's safety words.",
+          "more": [
+           "Chest pain or trouble breathing gets 'call 911 now' instead.",
+           "Nothing is booked or taken. The saved time is let go.",
+           "Kim can book again once a doctor says a session is OK."
+          ],
+          "form": [
+           [
+            "Please see a doctor today",
+            "A session can wait until your doctor says it's OK"
+           ],
+           [
+            "Chest pain or trouble breathing?",
+            "Call 911 now"
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No state license for this work: the business gives only its own registration (S1-61); nothing is looked up (D96)."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The plug-in names no license to check for this work, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license, certificate or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license is checked for this work (D96): a certificate is the person's own word, optional."
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the person's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the person's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "Each session's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+     "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one session.",
+     "A home session is paid the way its card says: a card saved for the fee, and the bill after.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your studio, paid at the front desk, your own way",
+         "A card saved when they book, for the fee you OK"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Keep it"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Each session shows its price and its place before the client picks.",
+      {
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:counter": {
+      "more": [
+       "The card is saved for the fee, and the rest is paid at the front desk, the studio's own way."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Each studio session is paid at the front desk after the visit, your own way.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:counter": {
+      "more": [
+       "A deposit is never more than the price, and a fee is never more than what was paid now."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A deposit is taken when they book, and the rest is paid at the front desk.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "more": [
+       "A card is charged only after the practitioner texts DONE, and only what was agreed."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A saved card is charged at DONE, after the session or the call, for what was agreed.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "more": [
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one session."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A paid-in-full session shows its price, its place and 'paid in full' before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:bill": {
+      "more": [
+       "On this path, the bill Rosie texts after the visit is the way the rest is paid."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Rosie texts the bill after each home visit, with a tip line. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "more": [
+       "A deposit is never more than the price, and a fee is never more than what was paid now."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A deposit is taken when they book, and the rest is paid as the card says.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "more": [
+       "A deposit is never more than the price, and a fee is never more than what was paid now."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. A deposit is taken when they book, and the rest is billed after the visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that they feel faint and dizzy now. Rosie runs the plug-in's danger check again, then asks the practitioner. Owen can come sooner, so that's offered.",
+    "more": [
+     "The plug-in's danger words are checked first. Then the practitioner is asked: come in, come in sooner, or move it with no fee.",
+     "Real danger, like chest pain or trouble breathing, gets the safety steps first. If anyone is at risk, the text says to call 911.",
+     "The plug-in's urgent words ring the on-call person at once, at any hour.",
+     "An earlier time shows its price first. No reply: the session stays as booked. A pick: Owen and Tess are told.",
+     "Safe default: the session stays as booked."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "I feel faint and dizzy right now."
+     ],
+     [
+      "san",
+      "cust",
+      "Stop and sit up slowly. If you have chest pain or trouble breathing, call 911 now. Owen can offer an earlier time, at the same price.",
+      {
+       "buttons": [
+        "Keep my time",
+        "See the earlier one"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Session and energy work pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Session adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Session books practitioners. A room is saved with the practitioner, never booked alone."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Session runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Session is never sent now: every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Session is done in person."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Lee Mobile Reiki bills no health plan, insurance or warranty."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A session starts at a set time, not in a window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Session is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile session sells no seats: each booking has its own practitioner."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Session is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Session is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Mobile session runs no group classes."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Session is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "The client is always there for a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "The client is always there for a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the practitioner's care: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B8-97",
+    "label": "A finding stops the work",
+    "why": "A practitioner who feels unsafe leaves (the branch above)."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "The client is on the table, so no update is needed."
+   },
+   {
+    "op": "off",
+    "at": "B9-03",
+    "label": "Yes: one pay link",
+    "why": "No extra work is sold at the visit, so nothing is added after a paid-in-full session."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A session is paid once, after the visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Lee Mobile Reiki bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "A landlord never pays for a session."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at the visit, so there's nothing to keep or cancel."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at the visit, so there's nothing to cancel."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A session has no warranty. A complaint or a refund goes to Sam."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A session needs no proposal: regular visits are a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A session has no report to send later."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A session is rated."
+   },
+   {
+    "op": "off",
+    "at": "B8-96",
+    "label": "It needs another day",
+    "why": "A session ends on time in one visit: more time is a new booking."
+   },
+   {
+    "op": "branch",
+    "at": "B3-17",
+    "branch": {
+     "label": "Asks for sexual services",
+     "end": "merge",
+     "steps": [
+      {
+       "type": "split",
+       "id": "B3-x01",
+       "line": [
+        "3.9",
+        "11.24"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "chat",
+       "title": "Refuses it, then asks Sam",
+       "q": "What does Sam pick?",
+       "does": "A what-if: the words ask for sexual services. Rosie refuses in one plain line and books nothing. The exact words go to the business's safety log, and Sam decides.",
+       "more": [
+        "Rosie refuses and reports. It never decides alone.",
+        "A note asking to skip the sheet that covers the client is refused the same way.",
+        "A practitioner goes alone into a home, so Sam can also block an address later, on the Customers page.",
+        "Sam's 2 hours count only in Sam's text hours. Every later message is checked again."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "Lee Mobile Reiki offers reiki sessions only. This request can't be booked."
+        ],
+        [
+         "san",
+         "owner",
+         "A request was refused, and nothing is booked. Its exact words are in the safety log. It came by AI chat, with no name yet.",
+         {
+          "card": {
+           "title": "Refused request",
+           "lines": [
+            "Therapeutic session only",
+            "Nothing booked"
+           ],
+           "button": "See the words",
+           "link": "rosfield.com/s/b1"
+          },
+          "buttons": [
+           "Refuse and block",
+           "It was innocent"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.safety"
+       ],
+       "tells": [
+        "agent",
+        "owner"
+       ],
+       "branches": [
+        {
+         "label": "1 Refuse and block",
+         "end": "end",
+         "endText": "That chat can't book. The report stays in the safety log."
+        },
+        {
+         "label": "2 It was innocent",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B3-x02",
+           "line": [
+            "3.9"
+           ],
+           "who": "san",
+           "to": "agent",
+           "via": "chat",
+           "title": "Lets a therapeutic booking go on",
+           "does": "Sam says it was innocent. The AI hears that Lee Mobile Reiki can book a therapeutic session, and every new message is checked again.",
+           "say": [
+            [
+             "san",
+             "agent",
+             "Lee Mobile Reiki can book a therapeutic session at home. What would you like?"
+            ]
+           ],
+           "tells": [
+            "agent"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "No reply in 2 hours",
+         "end": "end",
+         "endText": "Nothing is booked. Sam gets one reminder, and the report stays in the log.",
+         "steps": [
+          {
+           "id": "B3-x03",
+           "line": [
+            "3.9"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "title": "Reminds Sam once; books nothing",
+           "does": "Sam hasn't answered in 2 of their text hours. Nothing is booked, and Sam gets one reminder.",
+           "say": [
+            [
+             "san",
+             "owner",
+             "Still waiting on the refused request from earlier. Nothing is booked until you pick.",
+             {
+              "buttons": [
+               "Refuse and block",
+               "It was innocent"
+              ]
+             }
+            ]
+           ],
+           "tells": [
+            "owner"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B4-77",
+    "branch": {
+     "label": "A kind of place that's off",
+     "end": "end",
+     "endText": "Nothing saved. The AI hears which places are allowed, like the studio.",
+     "steps": [
+      {
+       "id": "B4-x05",
+       "line": [
+        "4.12"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "chat",
+       "title": "Says which places are allowed",
+       "does": "A what-if: Vera asks for a session in a hotel room, and hotel visits are off there. Rosie says so plainly before any times, and names the places it can go.",
+       "more": [
+        "Hotel visits are off by default. Sam turns them on where the state's rules allow it.",
+        "With hotels on, the visit is paid in full when booking, and the practitioner checks out with DONE.",
+        "The list of places comes from Sam's settings and the plug-in."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "Lee Mobile Reiki doesn't go to hotel rooms. It can come to a home or an office, or Vera can book at Lee Reiki Studio."
+        ]
+       ],
+       "needs": [
+        "pf.visit",
+        "pf.rules"
+       ],
+       "tells": [
+        "agent"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "after",
+    "at": "B4-34",
+    "steps": [
+     {
+      "type": "split",
+      "id": "B4-x01",
+      "line": [
+       "4.11",
+       "4.14",
+       "13.5"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex fills in the health form",
+      "q": "Do the answers change the booking?",
+      "does": "On the same secure page, Alex fills in the plug-in's health form. The answers stay on the page and in Alex's record, never in a text or through the AI.",
+      "more": [
+       "Most answers change nothing, like a bit of stress and poor sleep.",
+       "A new client fills in the whole form here.",
+       "Each answer gets the danger check too.",
+       "Mira reads the form in the room before the session."
+      ],
+      "form": [
+       [
+        "Anything changed since your last visit?",
+        "Poor sleep, stress at work"
+       ],
+       [
+        "A surgery in the last 6 months?",
+        "No"
+       ],
+       [
+        "Pregnant?",
+        "No"
+       ],
+       [
+        "A heart condition, epilepsy, or a blood pressure problem?",
+        "No"
+       ],
+       [
+        "Medicines you take now?",
+        "None"
+       ],
+       [
+        "What would you like to focus on?",
+        "Calm and sleep"
+       ]
+      ],
+      "needs": [
+       "link",
+       "pf.questions",
+       "pf.first_steps",
+       "pf.messages",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "Nothing that changes it",
+        "end": "merge"
+       },
+       {
+        "label": "A flag for the practitioner",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "6.1",
+           "4.14"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Marks it for the practitioner's read",
+          "does": "A what-if: Ben says they had surgery last month. The booking waits for the practitioner's read after the money step, as the plug-in says. Ben's answer stays on the page.",
+          "more": [
+           "Other flags: blood thinners, or a heart or blood pressure problem.",
+           "The read comes next, as 'An expert reads answers first'.",
+           "Nothing is taken until the practitioner says OK."
+          ],
+          "needs": [
+           "pf.first_steps"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Danger on the form",
+        "end": "end",
+        "endText": "No booking. The page shows the safety words, and nothing is taken.",
+        "steps": [
+         {
+          "id": "B4-x04",
+          "line": [
+           "3.9",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "page",
+          "title": "Stops the booking; says see a doctor",
+          "does": "A what-if: Gail writes that she has a new lump she hasn't had checked. Reiki isn't medical care, so the page stops the booking and shows the plug-in's safety words.",
+          "more": [
+           "Chest pain or trouble breathing gets 'call 911 now' instead.",
+           "Nothing is booked or taken. The saved time is let go.",
+           "Gail can book again once a doctor says a session is OK."
+          ],
+          "form": [
+           [
+            "Please see a doctor today",
+            "A session can wait until your doctor says it's OK"
+           ],
+           [
+            "Chest pain or trouble breathing?",
+            "Call 911 now"
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-51",
+    "why": "Reiki sells packs, not monthly plans: no plan price change text."
+   },
+   {
+    "op": "off",
+    "at": "B7-52",
+    "why": "No plan charges here (reiki sells packs)."
+   },
+   {
+    "op": "off",
+    "at": "B7-86",
+    "why": "No plan renews here (reiki sells packs)."
+   }
+  ]
+ },
+ "notes": "Built from massage (Chair; the sibling's refitted overlay), Oct 27 2026. Reiki has no state license in most places: license steps off, the registration line says nothing is looked up (D96, golf-instructor pattern).\nVideo or phone counts as flow A (the distance session, card charged at DONE). Flow B is a home visit only; no hotel rooms (the sibling's off).\nMoney: A card at the studio (main), 5-session pack paid in full, distance session card at DONE. B home visit with a card saved and the bill after (main), 3-session pack paid in full. $2 applies to every profession (D97); no2 never on.\nFacts: packs, firststeps, forms, video, aftercare, children (16-17 with a parent's consent), tips. No switches: sensitive off (wellness, not health care; health answers stay on the secure page).",
+ "rename": {
+  "A": [
+   [
+    "a house call, $75, paid in full when booking",
+    "a home visit, $85, with a card saved for the $70 fee and the bill after"
+   ],
+   [
+    "service-call fee",
+    "fee"
+   ],
+   [
+    "at $140 an hour",
+    "at $85 a session"
+   ],
+   [
+    "cut hair",
+    "do reiki"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Board prices never need one. A health form flag goes to the practitioner first"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Session at homes, hotels and offices in Springfield, within 25 miles."
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Relaxing, energy and pregnancy-friendly session."
+   ],
+   [
+    "A water heater job",
+    "A session room"
+   ],
+   [
+    "asks for a perm",
+    "asks for physical therapy"
+   ],
+   [
+    "like a color correction done in two steps",
+    "like a series of weekly sessions after an injury"
+   ],
+   [
+    "books a skin fade for",
+    "books a 60-min energy for"
+   ],
+   [
+    "skin fades",
+    "60-min energy sessions"
+   ],
+   [
+    "skin fade",
+    "60-min energy"
+   ],
+   [
+    "Skin fade",
+    "60-min energy"
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "It's a teen session today at 2:00pm with Avery, for a new client. It's $85."
+   ],
+   [
+    "accept the beard trim today at 2:00pm with Avery",
+    "accept the teen session today at 2:00pm with Avery"
+   ],
+   [
+    "Color and cut · $90",
+    "Team chair session · $85"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "1 color quote",
+    "1 quote"
+   ],
+   [
+    "the $90 color quote",
+    "the $85 quote for her team"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the lobby during my session?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My lower back got worse since I booked. Can I still come in?"
+   ],
+   [
+    "until it clears, with no fee",
+    "until it settles, with no fee"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Riley still ends at 11:30am, so you'd get about 15 minutes, at the same price. Or move to a later time."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the session?"
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair.",
+    "It's 11:00am, and Alex is at the front desk."
+   ],
+   [
+    "A service priced at the chair gets its price now.",
+    "A session always has its price before the visit."
+   ],
+   [
+    "in the chair",
+    "on the table"
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped Alex M.'s session. I put a note on the page."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Riley stopped Alex M.'s session. The note is on the secure page."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Session oil stained my good shirt."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says session oil stained a shirt today."
+   ],
+   [
+    "Examples: an ID for an 18+ service, a signed form, or gear for a class.",
+    "Example: a teen session needs the parent there, with an ID."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M.'s son. No parent is here to stay in the room."
+   ],
+   [
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "A reiki studio runs no classes. A yoga studio, a gym or a school does."
+   ],
+   [
+    "DONE 35 haircut",
+    "DONE 35 session"
+   ],
+   [
+    "A cut is rated",
+    "A session is rated"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do teen sessions? My son is 15."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a teen session (16 and 17) is $85, with you in the room."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero un masaje el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a session every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a session every 4 weeks."
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds times across Riley and Avery, two at a time, in rooms side by side."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A 60-min session for Alex and a teen session for a son work the same way."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do physical therapy."
+   ],
+   [
+    "Anything Riley should know?",
+    "Pressure: light, medium or firm? Any areas to focus on or skip?"
+   ],
+   [
+    "A barbershop sells its packages only at the shop.",
+    "The studio sells packs and its 5-session pack here too. A pack visit uses one session."
+   ],
+   [
+    "Haircut plan",
+    "Session plan"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Another practitioner is offered only if Alex asks."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds acupuncture to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Acupuncture for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW acupuncture"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The studio's plug-in adds its own: chest pain, or sudden numbness or weakness in the legs."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the pressure and the areas that helped."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's 60-min session needs none, so nothing is sent here."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group's sessions together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A bride books sessions for herself and three friends on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: firm pressure, low back and hips, skip the feet"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A session could mean a studio or a practitioner who comes to you"
+   ],
+   [
+    "A booked window stays right",
+    "A booked time stays right"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: studio session, crystal extra, house calls"
+   ],
+   [
+    "Avery: barber",
+    "Avery: studio session and pregnancy-friendly"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio session, crystal extra and house calls"
+   ],
+   [
+    "An apprentice",
+    "A session student"
+   ],
+   [
+    "an apprentice",
+    "a session student"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: every session has a set time."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states allow session only in a licensed place, or ask for an extra permit away from it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A session example: a swollen, painful calf gets 'see a doctor before any session'."
+   ],
+   [
+    "Panel upgrade",
+    "Energy work series"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "like a burst pipe",
+    "like a lockout"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Reiki's"
+   ],
+   [
+    "Drain clearing",
+    "90-min session"
+   ],
+   [
+    "written estimate",
+    "contract"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Reiki Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Reiki Studio"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Reiki"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Reiki"
+   ],
+   [
+    "Lee Electric",
+    "Lee Energy Works"
+   ],
+   [
+    "JP031552",
+    "MT031552"
+   ],
+   [
+    "MP045210",
+    "MB045210"
+   ],
+   [
+    "BS20981",
+    "ME20981"
+   ],
+   [
+    "EC22871",
+    "SC22871"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "Electrical",
+    "Energy work"
+   ],
+   [
+    "electrical",
+    "energy work"
+   ],
+   [
+    "Plumbing",
+    "Mobile session"
+   ],
+   [
+    "plumbing",
+    "mobile session"
+   ],
+   [
+    "plumber",
+    "practitioner"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "60-min session"
+   ],
+   [
+    "Signature cut and shave",
+    "60-min session"
+   ],
+   [
+    "signature cut",
+    "60-min session"
+   ],
+   [
+    "Groom's package",
+    "Balance package"
+   ],
+   [
+    "a beard trim",
+    "crystal extra"
+   ],
+   [
+    "A beard trim",
+    "Crystal extra"
+   ],
+   [
+    "Beard trim",
+    "Crystal extra"
+   ],
+   [
+    "beard trim",
+    "crystal extra"
+   ],
+   [
+    "Kids cut",
+    "Teen session"
+   ],
+   [
+    "kids cut",
+    "teen session"
+   ],
+   [
+    "Haircuts",
+    "Sessions"
+   ],
+   [
+    "haircuts",
+    "sessions"
+   ],
+   [
+    "Haircut",
+    "60-min session"
+   ],
+   [
+    "haircut",
+    "60-min session"
+   ],
+   [
+    "Barbershop",
+    "Reiki studio"
+   ],
+   [
+    "barbershops",
+    "reiki studios"
+   ],
+   [
+    "barbershop",
+    "reiki studio"
+   ],
+   [
+    "barbers",
+    "practitioners"
+   ],
+   [
+    "Barber",
+    "Practitioner"
+   ],
+   [
+    "barber",
+    "practitioner"
+   ],
+   [
+    "Barbering",
+    "Session"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Riley Chen",
+    "Mira Ortiz"
+   ],
+   [
+    "Riley",
+    "Mira"
+   ],
+   [
+    "Avery Diaz",
+    "Jun Park"
+   ],
+   [
+    "Avery",
+    "Jun"
+   ],
+   [
+    "Jordan Price",
+    "Owen Cole"
+   ],
+   [
+    "Jordan",
+    "Owen"
+   ],
+   [
+    "Casey Moore",
+    "Tess Grant"
+   ],
+   [
+    "Casey",
+    "Tess"
+   ],
+   [
+    "88 Elm St",
+    "41 Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "18 Harbor Rd"
+   ],
+   [
+    "Elm St",
+    "Cedar Ave"
+   ],
+   [
+    "Oak St",
+    "Birch Ct"
+   ],
+   [
+    "A repair studio, a tailor",
+    "A repair shop, a tailor"
+   ],
+   [
+    "$35",
+    "$85"
+   ],
+   [
+    "$55",
+    "$85"
+   ],
+   [
+    "$75",
+    "$85"
+   ],
+   [
+    "$89",
+    "$40"
+   ],
+   [
+    "$90",
+    "$85"
+   ],
+   [
+    "$25",
+    "$85"
+   ],
+   [
+    "$110",
+    "$85"
+   ],
+   [
+    "$125",
+    "$85"
+   ],
+   [
+    "$130",
+    "$85"
+   ],
+   [
+    "$15",
+    "$20"
+   ]
+  ],
+  "B": [
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood reiki studio on Birch St. Relaxing sessions and energy work."
+   ],
+   [
+    "Barber license: on file, checked Oct 19",
+    "Practitioner's own word: a certificate, if they have one"
+   ],
+   [
+    "service-call fee",
+    "fee"
+   ],
+   [
+    "at $140 an hour",
+    "at $140 a session"
+   ],
+   [
+    "Yard drain",
+    "Walk-in session"
+   ],
+   [
+    "cut hair",
+    "do reiki"
+   ],
+   [
+    "found more work. Add it today?",
+    "can add the extra time. Add it today?"
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "can clear the drain",
+    "can come for your session"
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can come for your session at a set time"
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam."
+   ],
+   [
+    "like new pipes put in one day and finished another",
+    "like a series of weekly sessions after an injury"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Session at homes, hotels and offices in Springfield, within 25 miles."
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "A water heater job",
+    "A session room set up at a home"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a session at my home this week."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A energy session could mean a reiki practitioner or a physical practitioner."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My back is so tight' fits a 90-min session."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like asking to skip the sheet over the client."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how long a session, and any area to skip?"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding 30 more minutes? Say so.'"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $140 session needs none."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Any area the practitioner should skip?"
+   ],
+   [
+    "Yes, it won't drain",
+    "My feet, please"
+   ],
+   [
+    "finds corroded shutoff valves",
+    "is asked for 30 more minutes"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 30 more minutes, the client asked"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "30 more minutes, $20"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "30 more minutes · $20"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $20 price for 30 more minutes is good for 7 days."
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "30 more minutes for $20"
+   ],
+   [
+    "the shutoff valves",
+    "the 30 more minutes"
+   ],
+   [
+    "Replace both shutoff valves",
+    "30 more minutes"
+   ],
+   [
+    "cracks the cabinet floor",
+    "scratches the floor with the table"
+   ],
+   [
+    "Cabinet floor, before",
+    "Bedroom floor, before"
+   ],
+   [
+    "Under the sink, before",
+    "Session spot, before"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My shoulder is bruised this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a 90-min session at home, today"
+   ],
+   [
+    "two drain clearings",
+    "two 90-min sessions"
+   ],
+   [
+    "A repair is rated",
+    "A session is rated"
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "A session is never quoted at the visit."
+   ],
+   [
+    "the cancelled extra work",
+    "the cancelled pack"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "It's $140. Accept it?"
+   ],
+   [
+    "Nora can ask to be next for that window",
+    "Nora can ask to be next for that time"
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "can do a 60-min session at the studio for $85, or at your home for $140"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The studio is in the other flow."
+   ],
+   [
+    "with one arrival window and one code",
+    "with one start time and one code"
+   ],
+   [
+    "Both fit in the same arrival window.",
+    "Jordan does both, one after the other."
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "A session books a set start time."
+   ],
+   [
+    "Written estimate and terms",
+    "Contract and terms"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "60-min session at home, every 4 weeks"
+   ],
+   [
+    "Every 12 months",
+    "Every 4 weeks"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Another practitioner is offered only if they fit what Alex asked."
+   ],
+   [
+    "Rental 1",
+    "Morgan"
+   ],
+   [
+    "Rental 2",
+    "Jamie"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:00am"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START a teen's session, and no parent is home"
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like Jordan's table breaking at the door"
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Every session has a set price, so nothing is priced here."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan strains a wrist and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT strained my wrist, need to stop"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no stain."
+   ],
+   [
+    "for today's work",
+    "for today's session"
+   ],
+   [
+    "stage 2 of your repipe",
+    "day 2 of your wellness week"
+   ],
+   [
+    "Book a free fix",
+    "Book a free visit"
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Jordan to come back in 3 months, after a long trip."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: 90-min session at home, in 3 months"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the 90-min session you asked Jordan about in mid-Dec."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds stretch sessions to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Stretch sessions for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW stretch sessions"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I take a hot shower before you come?"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a client's AI said they have chest pain."
+   ],
+   [
+    "A gas smell at the home",
+    "Chest pain at the home"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now; a session can wait"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $330 pack is under the plug-in's amount, so it needs no estimate to sign."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does session and energy work, not physical therapy."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a physical practitioner near you."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My back is killing me. Can someone come tonight?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say an office manager books chair session for 4 people at one office."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the practitioner, one line each."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE oil stain on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Oil stain on the rug"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan's session oil stained Alex M.'s rug."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene dolor en el pecho, o le falta el aire?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: do you have chest pain, or trouble breathing?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo me duele la pantorrilla."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Just my calf hurts."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No se dé masaje en esa pierna. Vea a un médico hoy. Si le falta el aire, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't have that leg sessiond. See a doctor today. If you get short of breath, call 911."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to see a doctor today before any session, and to call 911 if she gets short of breath."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For session, chest pain, trouble breathing or sudden weakness in the legs stops the booking."
+   ],
+   [
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Call 911 now. A session can wait."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: chest pain, trouble breathing, or sudden numbness or weakness in the legs."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like a session at home."
+   ],
+   [
+    "Sale agua del calentador.",
+    "Me duele la pantorrilla y está hinchada."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "My calf hurts and it's swollen."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a practitioner come for a session this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa 90min Thu 12pm Casey"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "I hurt my back lifting yesterday. Is a energy session safe?"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like physical therapy."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the length and kind of session, the pressure, and any areas to focus on or skip."
+   ],
+   [
+    "Just the kitchen sink.",
+    "90 minutes, energy."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a session at home every 4 weeks."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every 4 weeks, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Home Services has a plan every 4 weeks, $140 a visit."
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every 4 weeks?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 4 weeks"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a 30-min session for a partner."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also give my partner a 30-min session?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "It's added as its own line, at the list price."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a quiet room with space for the table, and pets in another room."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like chest pain or sudden weakness in the legs, gets the safety steps first."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also teach my partner and me some session?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan for two: a 90-min session at home each, every 4 weeks."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's session?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scratch on the floor by the window"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE firm pressure, tight low back and hips, skip the feet. Bring the bolster next time."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left oil on my couch."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come back next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a 90-min session."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the office event quote before booking."
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Back pain, tonight"
+   ],
+   [
+    "plumbing license MP045210",
+    "session business license MP045210"
+   ],
+   [
+    "Plumbing license",
+    "Session business license"
+   ],
+   [
+    "A booked window stays right",
+    "A booked time stays right"
+   ],
+   [
+    "arriving 8–10am",
+    "starting at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starting at 12:00pm"
+   ],
+   [
+    "arriving 10am–12pm",
+    "starting at 10:00am"
+   ],
+   [
+    "arriving 2–4pm",
+    "starting at 2:00pm"
+   ],
+   [
+    "10am–12pm window",
+    "10:00am time"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "10am–12pm",
+    "10:00am"
+   ],
+   [
+    "7am Thu",
+    "8pm Wed"
+   ],
+   [
+    "7am on the visit day",
+    "8pm the evening before"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: studio session, crystal extra, house calls"
+   ],
+   [
+    "Avery: barber",
+    "Avery: studio session and pregnancy-friendly"
+   ],
+   [
+    "An apprentice",
+    "A session student"
+   ],
+   [
+    "an apprentice",
+    "a session student"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: every session has a set time."
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "Nothing is priced at the visit: every session has a set price."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states allow session only in a licensed place, or ask for an extra permit away from it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A session example: a swollen, painful calf gets 'see a doctor before any session'."
+   ],
+   [
+    "Panel upgrade",
+    "Energy work series"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "like a burst pipe",
+    "like a lockout"
+   ],
+   [
+    "after the job",
+    "after the visit"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Reiki's"
+   ],
+   [
+    "Kitchen drain clearing",
+    "90-min session at home"
+   ],
+   [
+    "Water heater replacement",
+    "Office chair session event"
+   ],
+   [
+    "water heater replacement",
+    "office chair session event"
+   ],
+   [
+    "Water heater flush",
+    "60-min session at home"
+   ],
+   [
+    "Leak repair",
+    "Sports session"
+   ],
+   [
+    "leak repair",
+    "sports session"
+   ],
+   [
+    "Sewer camera inspection",
+    "Two-person session lesson"
+   ],
+   [
+    "sewer camera inspection",
+    "two-person session lesson"
+   ],
+   [
+    "Service call fee",
+    "No-show fee"
+   ],
+   [
+    "service call fee",
+    "no-show fee"
+   ],
+   [
+    "Service call",
+    "No-show fee"
+   ],
+   [
+    "service call",
+    "no-show fee"
+   ],
+   [
+    "credited to the repair",
+    "only if you say so"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "the kitchen drain",
+    "the 90-min session"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 90min session"
+   ],
+   [
+    "Kitchen drain",
+    "90-min session"
+   ],
+   [
+    "kitchen drain",
+    "90-min session"
+   ],
+   [
+    "Drain clearings",
+    "90-min sessions"
+   ],
+   [
+    "Drain clearing",
+    "90-min session"
+   ],
+   [
+    "drain clearing",
+    "90-min session"
+   ],
+   [
+    "water heater contract",
+    "office event contract"
+   ],
+   [
+    "written estimate",
+    "contract"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Reiki Studio"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Reiki LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Reiki"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilesession.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Reiki"
+   ],
+   [
+    "Lee Electric",
+    "Lee Energy Works"
+   ],
+   [
+    "JP031552",
+    "MT031552"
+   ],
+   [
+    "MP045210",
+    "MB045210"
+   ],
+   [
+    "BS20981",
+    "ME20981"
+   ],
+   [
+    "EC22871",
+    "SC22871"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "Electrical",
+    "Energy work"
+   ],
+   [
+    "electrical",
+    "energy work"
+   ],
+   [
+    "Plumbing",
+    "Mobile session"
+   ],
+   [
+    "plumbing",
+    "mobile session"
+   ],
+   [
+    "plumber",
+    "practitioner"
+   ],
+   [
+    "haircut",
+    "30-min session"
+   ],
+   [
+    "barbershops",
+    "reiki studios"
+   ],
+   [
+    "barbershop",
+    "reiki studio"
+   ],
+   [
+    "barbers",
+    "practitioners"
+   ],
+   [
+    "Barber",
+    "Practitioner"
+   ],
+   [
+    "barber",
+    "practitioner"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Riley Chen",
+    "Mira Ortiz"
+   ],
+   [
+    "Riley",
+    "Mira"
+   ],
+   [
+    "Avery Diaz",
+    "Jun Park"
+   ],
+   [
+    "Avery",
+    "Jun"
+   ],
+   [
+    "Jordan Price",
+    "Owen Cole"
+   ],
+   [
+    "Jordan",
+    "Owen"
+   ],
+   [
+    "Casey Moore",
+    "Tess Grant"
+   ],
+   [
+    "Casey",
+    "Tess"
+   ],
+   [
+    "88 Elm St",
+    "41 Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "18 Harbor Rd"
+   ],
+   [
+    "42 Oak St",
+    "9 Birch Ct"
+   ],
+   [
+    "Elm St",
+    "Cedar Ave"
+   ],
+   [
+    "$2,400",
+    "$330"
+   ],
+   [
+    "$640",
+    "$330"
+   ],
+   [
+    "$620",
+    "$330"
+   ],
+   [
+    "$540",
+    "$330"
+   ],
+   [
+    "$700",
+    "$330"
+   ],
+   [
+    "$800",
+    "$330"
+   ],
+   [
+    "$600",
+    "$330"
+   ],
+   [
+    "$358",
+    "$280"
+   ],
+   [
+    "$179",
+    "$140"
+   ],
+   [
+    "$199",
+    "$140"
+   ],
+   [
+    "$150",
+    "$140"
+   ],
+   [
+    "$169",
+    "$140"
+   ],
+   [
+    "$165",
+    "$140"
+   ],
+   [
+    "$245",
+    "$140"
+   ],
+   [
+    "$120",
+    "$140"
+   ],
+   [
+    "$100",
+    "$140"
+   ],
+   [
+    "$90",
+    "$140"
+   ],
+   [
+    "$160",
+    "$70"
+   ],
+   [
+    "$89",
+    "$70"
+   ],
+   [
+    "$35",
+    "$70"
+   ],
+   [
+    "$75",
+    "$140"
+   ],
+   [
+    "$80",
+    "$70"
+   ],
+   [
+    "$60",
+    "$20"
+   ]
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "a house call, $75, paid in full when booking",
+    "service-call fee",
+    "at $140 an hour",
+    "cut hair",
+    "Color quotes come to you first. Board prices never need one",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Sam named you their emergency contact.",
+    "Classic cuts, fades and hot towel shaves.",
+    "A water heater job",
+    "asks for a perm",
+    "like a color correction done in two steps",
+    "books a skin fade for",
+    "skin fades",
+    "skin fade",
+    "Skin fade",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "accept the beard trim today at 2:00pm with Avery",
+    "Color and cut · $90",
+    "Priced from your photos",
+    "1 color quote",
+    "the $90 color quote",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "until it clears, with no fee",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "What happens at the chair?",
+    "It's 11:00am, and Alex is at the chair.",
+    "A service priced at the chair gets its price now.",
+    "in the chair",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Examples: an ID for an 18+ service, a signed form, or gear for a class.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "DONE 35 haircut",
+    "A cut is rated",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Lee's Barbershop doesn't do perms.",
+    "Anything Riley should know?",
+    "A barbershop sells its packages only at the shop.",
+    "Haircut plan",
+    "Color always stays with Riley.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A barbershop has none, so nothing is sent here.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "A haircut could mean a salon or a barbershop",
+    "A booked window stays right",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Every shop service, color and house calls",
+    "An apprentice",
+    "an apprentice",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Panel upgrade",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "like a burst pipe",
+    "Lee Home Services'",
+    "Drain clearing",
+    "written estimate",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "a beard trim",
+    "A beard trim",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "Barbering",
+    "shops",
+    "Shop",
+    "shop",
+    "at the chair",
+    "At the chair",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "$35",
+    "$55",
+    "$75",
+    "$89",
+    "$90",
+    "$25",
+    "$110",
+    "$125",
+    "$130",
+    "$15"
+   ],
+   "B": [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "service-call fee",
+    "at $140 an hour",
+    "Yard drain",
+    "cut hair",
+    "found more work. Add it today?",
+    "Arrival times:",
+    "can clear the drain",
+    "can start the sewer camera inspection at a set time",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "like new pipes put in one day and finished another",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Sam named you their emergency contact.",
+    "A water heater job",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "'Adding a faucet check? Say so.'",
+    "The $179 drain needs none.",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "finds corroded shutoff valves",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "replacing both shutoff valves for $160",
+    "the shutoff valves",
+    "Replace both shutoff valves",
+    "cracks the cabinet floor",
+    "Cabinet floor, before",
+    "Under the sink, before",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "two drain clearings",
+    "A repair is rated",
+    "A job quoted at the visit promises only the service call now.",
+    "the cancelled extra work",
+    "The service call is $89. Accept it?",
+    "Nora can ask to be next for that window",
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "The shop's chair is in the other flow.",
+    "with one arrival window and one code",
+    "Both fit in the same arrival window.",
+    "Plumbing books a 2-hour window.",
+    "Written estimate and terms",
+    "Yearly water heater flush plan",
+    "Every 12 months",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Rental 1",
+    "Rental 2",
+    "Thu Oct 22, 8:20am",
+    "CANT START no proof Alex may have this work done",
+    "like a permit it needed that isn't in",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "The before photo shows no crack.",
+    "for today's work",
+    "stage 2 of your repipe",
+    "Book a free fix",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "You can look for a roofer near you.",
+    "It's overflowing. Can someone come tonight?",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes go to the plumber, one line each.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "My kitchen drain is clogged.",
+    "Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Just the kitchen sink.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Please clear the cabinet under the sink.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "BEFORE old water stain on the cabinet floor",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Overflowing kitchen drain",
+    "plumbing license MP045210",
+    "Plumbing license",
+    "A booked window stays right",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "7am on the visit day",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "An apprentice",
+    "an apprentice",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A job priced at the visit never takes more than the visit fee.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Panel upgrade",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "like a burst pipe",
+    "after the job",
+    "Lee Home Services'",
+    "Kitchen drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call fee",
+    "service call fee",
+    "Service call",
+    "service call",
+    "credited to the repair",
+    "Labor",
+    "the kitchen drain",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "water heater contract",
+    "written estimate",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "Shop",
+    "shop",
+    "at the chair",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "$2,400",
+    "$640",
+    "$620",
+    "$540",
+    "$700",
+    "$800",
+    "$600",
+    "$358",
+    "$179",
+    "$199",
+    "$150",
+    "$169",
+    "$165",
+    "$245",
+    "$120",
+    "$100",
+    "$90",
+    "$160",
+    "$89",
+    "$35",
+    "$75",
+    "$80",
+    "$60"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-61": "7421d186d5",
+   "S2-28": "549fd7ae22",
+   "S2-29": "974ca3a481",
+   "S1-32": "60f59eda70",
+   "S1-33": "eeaadba298",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-99": "efed1e4f4d",
+   "S11-57": "a3996ae84e",
+   "S12-19": "07db0515b2",
+   "S13-41": "18b280aaa2",
+   "S13-43": "a1049201f6",
+   "S13-11": "4345036419",
+   "A7-54": "1c3b16257d",
+   "A7-91": "a3b4e45617",
+   "A7-55": "6f2143030d",
+   "S1-13": "eca22651fd",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A7-93": "46cca94e45",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A8-03": "7accda6f86",
+   "A4-43": "c17d56f766",
+   "A8-85": "708cf3f73f",
+   "A4-16": "753b207e16",
+   "A3-22": "0057d8fc9f",
+   "A4-65": "fa7ec0389d"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-61": "e30e71f65d",
+   "S2-28": "549fd7ae22",
+   "S2-29": "974ca3a481",
+   "S1-32": "60f59eda70",
+   "S1-33": "2b5d1fa4ab",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S11-99": "a97de4ca58",
+   "S11-57": "2f34f23d8a",
+   "S12-19": "176d3d2beb",
+   "S13-41": "fb75fbb382",
+   "S13-43": "55206e4cb1",
+   "S13-11": "6561316ed7",
+   "S1-13": "6964bfbe60",
+   "B7-17": "ac1fd212f3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B8-97": "1e3f69ef38",
+   "B8-22": "50d78f1af0",
+   "B9-03": "df9548d13f",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-05": "a326ea3c0b",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255",
+   "B8-96": "8d7fd18ef5",
+   "B3-17": "3eb7d7f259",
+   "B4-77": "67ff953065",
+   "B4-34": "74ff52d83d",
+   "B7-51": "7910e2fa9f",
+   "B7-52": "62f5c3d1b4",
+   "B7-86": "c347b72e3a"
+  }
+ }
+}

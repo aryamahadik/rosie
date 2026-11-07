@@ -1,0 +1,3210 @@
+{
+ "id": "iv-hydration",
+ "name": "IV hydration clinic",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "medspa",
+ "plugin": {
+  "pf.license": {
+   "need": "the owner's word: each nurse, nurse practitioner and the medical director holds their own license, and the clinic its registration, where the state's form asks; Rosie never looks a license up",
+   "who": "each person; the clinic too, where the state's form asks",
+   "ask": "each nurse's and nurse practitioner's license number in their invite reply, or from the owner; the clinic's registration from the owner (optional)",
+   "check": "none: Rosie does not look up, check or confirm any license, registration, certificate or insurance (D96); the owner's word stands",
+   "blocks": "nothing is blocked by Rosie: a kind of work the state requires a license for stays the owner's to keep, on the owner's word",
+   "video": "a video screening only with a clinician licensed in the state where the client is that day; the client says the state before any times",
+   "cosmetic": "who may start an IV, and under whose standing order: the state's own rule, from the owner's form; only the nurses the clinic lists are offered",
+   "away": "IV visits at home only where the state's rules allow care away from the clinic, with any permit the state's form asks for",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "renewal dates the owner enters are reminded 30 days before; Rosie never checks a renewal itself",
+   "insurance": "malpractice insurance: the owner's word, never checked by Rosie"
+  },
+  "pf.services": {
+   "shape": "self-pay visits, each with a nurse by name and a set length; a first IV starts with a screening call; add-ins are added at the visit only with the client's yes; a pack is paid in full; a membership is charged monthly only after the member's yes",
+   "examples": "the example clinic's own prices (Lee Hydration and Lee Mobile IV), not a standard; no health plan pays for an IV",
+   "list": [
+    {
+     "name": "Screening call (before the first IV)",
+     "price": "free",
+     "kind": "one price ($0)",
+     "length": "15 min",
+     "where": "by phone or video",
+     "before": "nothing taken",
+     "after": "nothing to pay",
+     "note": "a health questionnaire on the secure page, then the nurse practitioner's call; no IV is booked until the screening is clear"
+    },
+    {
+     "name": "Hydration IV (one bag of fluids and electrolytes)",
+     "price": "$175 self-pay",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the clinic",
+     "before": "a card saved for the $20 missed-visit fee",
+     "after": "paid at the front desk after the IV",
+     "note": "a nurse starts the IV under the medical director's standing order"
+    },
+    {
+     "name": "Vitamin IV (one blend from the clinic's list)",
+     "price": "$225 self-pay",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "paid at the front desk after the IV",
+     "note": "one blend per visit; the blend's name and what it holds are on the secure page"
+    },
+    {
+     "name": "IV add-in (a vitamin shot added to a drip)",
+     "price": "$40, added at the visit",
+     "kind": "one price, added at the visit",
+     "length": "10 min, with the IV",
+     "where": "at the clinic, or at a home visit",
+     "before": "a card saved for the $20 fee",
+     "after": "with the visit",
+     "note": "only with the client's yes after the nurse explains it"
+    },
+    {
+     "name": "IV membership (4 visits a month)",
+     "price": "$99 a month",
+     "kind": "one price per month",
+     "length": "as booked",
+     "where": "at the clinic",
+     "before": "a card saved",
+     "after": "charged monthly to the saved card after the member's yes, with a reminder first",
+     "note": "a membership charges again only after its own yes and a reminder"
+    },
+    {
+     "name": "5-IV pack",
+     "price": "$850, paid in full",
+     "kind": "one price for the pack",
+     "length": "as booked, valid 6 months",
+     "where": "at the clinic",
+     "before": "paid in full when booked",
+     "after": "nothing more is owed",
+     "note": "the pack's visits are booked one at a time"
+    }
+   ],
+   "capacity": "one client per chair at a time; a chair for each nurse",
+   "nobodyHome": "never: the client is always there",
+   "online": "the screening call by phone or video; an IV is never booked by video"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new or returning client",
+    "a hydration IV, a vitamin IV, an add-in or a pack",
+    "which visit: the clinic's own list only, never a symptom typed into the AI",
+    "paying yourself (every visit is self-pay; no health plan pays)",
+    "for a video screening: the state the client will be in",
+    "join the list for a sooner time"
+   ],
+   "afterTime": [
+    "anything the clinic should know to help, like needing a wheelchair or an interpreter",
+    "for a home visit: the room the visit will be in, and whether an adult is there"
+   ],
+   "securePage": [
+    "birth date",
+    "a health questionnaire: medicines, allergies, kidney or heart conditions, pregnancy or nursing, recent illness",
+    "a consent form for IV therapy, signed before the first IV",
+    "a photo ID",
+    "for a home visit: the address, the room, and where to park"
+   ],
+   "whoMayBook": "an adult for themselves (18 and older; nobody under 18 is booked for an IV); a pregnant or nursing client is booked only after the nurse practitioner's OK on the secure page; anyone the screening finds not a fit is not booked",
+   "neverAsked": "symptoms, medicines, conditions and results are never asked or typed in the AI chat or a text"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, a racing or irregular heartbeat, fainting, or trouble breathing",
+     "say": "This needs care now. Call 911. Don't wait for an IV visit.",
+     "booking": "no booking"
+    },
+    {
+     "words": "swelling of the face, lips, tongue or throat, hives with wheezing, or a seizure",
+     "say": "Please call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a fever of 100.4 or more, or vomiting today",
+     "say": "An IV isn't booked today. Rest, sip fluids by mouth, and call your own doctor today. If you feel faint or can't keep fluids down, call 911.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a swallowed medicine, or too much of one",
+     "say": "Call Poison Help now at 1-800-222-1222, or 911 if they're not awake or not breathing.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "pain, redness or swelling where the IV was, or a bruise that spreads",
+     "what": "the safety steps first: go to urgent care today, or call the clinic's own line; the booking can go on after"
+    },
+    {
+     "words": "a question about a blend, a dose or a result, with nothing else",
+     "what": "matched to the clinic's own list; Rosie never gives a dose, a diagnosis or how soon to be seen"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Screening questionnaire and call",
+     "when": "on the secure page first; the nurse practitioner's call before the first IV; due before the booking is final",
+     "who": "every new client",
+     "result": "not done by its due date: the clinic keeps the booking only once it's done, or moves it, or cancels with no fee"
+    },
+    {
+     "name": "Consent for IV therapy",
+     "when": "on the secure page; signed before the first IV",
+     "who": "every client; the consent stays on file for a year",
+     "result": "not signed: no IV is started"
+    },
+    {
+     "name": "Standing order check",
+     "when": "by the nurse before each first IV, under the medical director's standing order",
+     "who": "every first-time IV client",
+     "result": "a screen that isn't clear sends the client to the nurse practitioner before any IV"
+    }
+   ],
+   "prep": "drink water before the visit and eat a light meal; bring a photo ID; for a home visit, have a quiet room with a chair and a power outlet ready"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the check-in code at the front desk; at a home visit: the code at the door of the room",
+   "beforeWork": "the nurse reads the screening answers, checks blood pressure, and checks for any changes before the IV starts",
+   "changes": "an add-in or a bigger bag is only with the client's yes after the nurse explains it; its price comes from the list",
+   "done": "the check-in code or DONE; the nurse's notes stay in the clinic's own record, never in a text",
+   "results": "no lab work is done in an IV visit, so no result comes later",
+   "away": "at a home visit: a quiet room with a chair; the nurse stays until the IV is finished and the client is well; an IV is never left running alone"
+  },
+  "pf.money": {
+   "before": "IV visits: a card saved only where the clinic turns on its missed-visit fee; a pack is paid in full; a membership is a card charged monthly after the member's yes; a home visit: an $89 house-call deposit now, counted toward the price, or a card saved for the missed-visit fee",
+   "plans": "no health plan pays for an IV; every visit is self-pay, and the price list is shown before any yes",
+   "selfPay": "every client is told the price before any yes; nothing is charged that was not shown first",
+   "fees": "the missed-visit fee: $20 at the clinic, $89 at a home visit, only when the owner confirms it; a home deposit is the fee for a no-show or a late cancel, as the owner's own refund rule sets it (Rosie never refunds)",
+   "feeFree": "a fee-free client is never charged a fee: the owner marks them fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "paid at the front desk, or charged to the saved card at DONE after the client's yes to the price; a membership is charged monthly after the member's yes and a reminder",
+   "rosfield": "the $2 per booking applies, as for every kind of work (D97), and a membership charged through Rosfield pays 1% of each monthly charge; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form",
+   "tips": "none",
+   "tax": "sales tax on IV visits only where the state taxes them, as its form asks"
+  },
+  "pf.messages": {
+   "never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the treatment, the blend, a symptom, a medicine or a condition; flow A's texts drop the nurse's name; at a home visit the nurse's name stays, for the door check",
+   "results": "no results come by text; Rosie's text says only that the clinic will call",
+   "channels": "health texts by plain SMS and email (Rosie's rule); a client who says texts aren't safe is reached only the way they pick",
+   "staff": "texts to the owner and staff use the client's initials only, with no health detail",
+   "languages": "English and Spanish",
+   "minors": "nobody under 18 is booked"
+  },
+  "pf.staff": {
+   "licenses": "each nurse's, nurse practitioner's and the medical director's own license, per state; the owner's word, never looked up by Rosie",
+   "skills": "Tessa (registered nurse): IV starts and drips at the clinic; Owen (nurse practitioner): screening calls and first-visit checks; Jade (registered nurse) and Kai (nurse practitioner): mobile IVs at home under the medical director's standing order; the front desk: no clinical OKs",
+   "supervision": "a nurse starts an IV only under the medical director's standing order, with a nurse practitioner or the medical director reachable, as the state sets",
+   "oks": "the owner OKs fees and same-day times; every price is on the list, so no quote waits for him",
+   "standIn": "a nurse may stand in for a nurse, only with the client's yes; no stand-in for a first-visit screen; with no yes, nobody is moved: the time stays, and the desk calls",
+   "away": "at home: only nurses cleared for home IVs under the standing order, each licensed in that state where the state asks"
+  },
+  "pf.rules": {
+   "records": "clinical notes are kept by the clinic for as long as the state's rules require; a delete request removes only Rosie's own booking details, never the clinic's records",
+   "copies": "a client's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "language": "free language help where the rules require it; the secure page asks about an interpreter and passes it to the clinic",
+   "consent": "a signed consent before the first IV; nobody under 18 is treated",
+   "estimate": "the price list is shown before any yes; a written estimate for a pack where the rules require it",
+   "telehealth": "a video screening follows the rules of the state the client is in",
+   "host": "home visits only where the state's rules allow care away from the clinic; the home's own rules are followed",
+   "ads": "no claims that an IV treats an illness or prevents one; no before-and-after photos in any message",
+   "privacy": "health privacy rules for every message and form",
+   "adultRide": "a client who feels faint is kept seated and the nurse decides on care; 911 is called for danger words",
+   "children": "nobody under 18 is booked; a child is never left with a nurse at home"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen, in the time left; later: the clinic may offer a new time (the clinic decides; Rosie never changes the booking itself)",
+   "standIn": "a nurse out: another nurse may do the visit with the client's yes; with no yes, the time moves with no fee",
+   "referral": "not used: every visit is self-pay",
+   "forms": "a form not done by its due date: one reminder, then the clinic keeps the visit only once it's signed on the secure page, moves it, or cancels with no fee",
+   "planChange": "not used: every visit is self-pay",
+   "results": "not used: no results come later from an IV visit",
+   "spotQuestion": "a client texts about a reaction or a symptom: pointed to the clinic's own line, and nothing is saved or passed on; danger words get the safety message first",
+   "sooner": "the list for a sooner time: each opening is offered in order, 30 minutes each",
+   "reaction": "a reaction during or after an IV: the nurse stops the drip; 911 for danger words; then the clinic's own line",
+   "feeFree": "a fee-free client is never asked for a card or a fee",
+   "minors": "nobody under 18 is booked",
+   "twoBookings": "a client with two open bookings: Rosie asks which one before any change",
+   "video": "the client is out of state that day: a visit at the clinic, or a video time on a day they're back"
+  },
+  "pf.facts": [
+   "packs",
+   "plans",
+   "firststeps",
+   "forms",
+   "video",
+   "extrawork",
+   "waitlist"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Hydration",
+   "staff": "Tessa (registered nurse) and Owen (nurse practitioner, who does the screening calls)",
+   "cust": "Alex M. (client) · other clients"
+  },
+  "B": {
+   "business": "Lee Mobile IV",
+   "staff": "Jade (registered nurse) and Kai (nurse practitioner, who does the video screening)",
+   "cust": "Alex M. (client, at home at 12 Juniper Ln) · other clients"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Tessa"
+  },
+  "B": {
+   "staff": "Jade"
+  }
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "visit charge",
+  "Visit charge",
+  "clinician",
+  "Clinician",
+  "child's visit",
+  "Child's visit",
+  "treatment",
+  "Treatment",
+  "consult",
+  "Consult",
+  "house call",
+  "House call",
+  "IV hydration"
+ ],
+ "story": {
+  "A": "Sam Lee, a physician and the medical director, signs up two companies by text. Then Alex books a hydration IV at Lee Hydration for Sat Oct 24 at 11:00am, after a free screening call with Owen. The health questionnaire and consent go only on the secure page, and Alex pays at the front desk after the IV. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a hydration IV at home with Lee Mobile IV. Kai does the video screening the evening before, Sam OKs the home visit, and Jade comes to 12 Juniper Ln on Thu Oct 22 at 8:00am. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|none",
+    "list|none|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $175 hydration IV at the clinic. A card is saved for the $20 missed-visit fee, which the owner confirms before any charge, and Alex pays at the front desk after the IV.",
+    "list|none|none": "A free screening call before a first IV. Nothing is taken, and there's nothing to pay.",
+    "list|none|counter": "A $225 vitamin IV, paid at the front desk after the visit. Nothing is taken at booking.",
+    "list|full|none": "A 5-IV pack, $850, paid in full when booked. Nothing more is owed."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Hydration IV"
+    },
+    "list|card|*": {
+     "price": "$175",
+     "fee": "$20",
+     "name": "Hydration IV"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Screening call"
+    },
+    "list|none|*": {
+     "price": "$225",
+     "name": "Vitamin IV"
+    },
+    "list|full|*": {
+     "price": "$850",
+     "paid": "$850",
+     "fee": "$20",
+     "name": "5-IV pack"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "IV add-in (vitamin shot)",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$40",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Vitamin IV, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$225",
+      "paid": "$225",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "IV membership visit (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|deposit|card"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: a $275 hydration IV at Alex's home. A card is saved for the $89 missed-visit fee, and the card is charged when Jade texts DONE, after Alex says yes to the price.",
+    "list|deposit|card": "The same visit with an $89 house-call deposit now, counted toward the $275 price; the $186 rest is charged to the saved card when Jade texts DONE, after Alex's yes."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Mobile IV at home"
+    },
+    "list|card|*": {
+     "price": "$275",
+     "fee": "$89",
+     "name": "Mobile IV at home"
+    },
+    "list|deposit|*": {
+     "price": "$275",
+     "deposit": "$89",
+     "rest": "$186",
+     "fee": "$89",
+     "name": "Mobile IV at home"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Vitamin add-in at home",
+     "price": "list",
+     "before": "none",
+     "after": "own",
+     "amounts": {
+      "price": "$40"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "5-IV pack at home",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$1150",
+      "paid": "$1150"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Mobile IV member visit (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "IV clinic work always needs a license: each medical director and nurse, and the medical director."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A IV clinic books people (a medical director or an nurse), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "A IV clinic runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each medical director and nurse holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No IV clinic work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "Lee Hydration treats clients only at the IV clinic. Home visits are Lee Mobile IV' own, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Each client books their own visit, with their own exam, forms and consent, so a group is never booked as one."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Every treatment is self-pay: no health plan is billed."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A IV clinic visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A IV clinic visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A IV clinic visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "An adult the booker acts for",
+    "why": "Each client consents for themselves to a wellness treatment, so a guardian never books one."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A IV clinic treatment needs no written contract: the consent is signed on the secure page, and a membership's terms get their own yes."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A IV clinic visit has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A IV clinic runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "A IV clinic takes no drop-offs or mail-ins."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the IV clinic: the client is in the treatment room."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Nobody under 18 is treated, so no child is left here."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "Every treatment is self-pay: no plan pays part."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "Lee Hydration books treatments at checkout (A10-07). It sends no proposals to sign."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing goes to a lab from a IV clinic treatment, so no result comes later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the IV clinic."
+   },
+   {
+    "op": "off",
+    "at": "A8-26",
+    "why": "Bags come from the list price, within the medical director's order, so no price waits for Sam's OK (pf.staff.oks)."
+   },
+   {
+    "op": "off",
+    "at": "A8-29",
+    "label": "No reply: not there to answer",
+    "why": "Alex is always in the room at the IV clinic, so a price never waits for someone who isn't there."
+   },
+   {
+    "op": "off",
+    "at": "A4-80",
+    "label": "A teen may agree alone",
+    "why": "Nobody under 18 is booked for IVs or IV (pf.questions whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "A4-80",
+    "label": "A teen books alone",
+    "why": "Nobody under 18 is booked for IVs or IV: no parent link either."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A IV clinic never treats children."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every kind of work pays the $2 per booking, health included (D97)."
+   },
+   {
+    "op": "more",
+    "at": "A8-71",
+    "more": [
+     "Here: a first IV starts with the nurse practitioner's screening call, right before it. The screen stays good for 12 months.",
+     "Not clear: no IV today, and the client hears what happens next."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "For swelling of the face, lips or throat, trouble breathing, or a racing heartbeat during or after an IV: call 911 now.",
+     "A fever of 100.4 or more, or vomiting today: no IV is booked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For an IV visit, they sign the consent and the health questionnaire on the secure page.",
+     "The code goes to whoever brings the client to the clinic."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-20",
+    "more": [
+     "Lee Hydration takes only self-pay: no plan is billed, and nothing goes to a claim."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "IV clinic work always needs a license: each medical director and nurse, and the medical director."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A IV clinic books people (a medical director or an nurse), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "A IV clinic runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each medical director and nurse holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No IV clinic work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "No Lee Mobile IV service is offered in two places: home visits are its whole work."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Every treatment is self-pay: no plan or warranty pays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A home visit gives a set start time, not an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A treatment is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Each client has their own visit, not a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "No home visit is sent now (S2-30), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B4-26",
+    "label": "2 Someone else meets the pro",
+    "why": "Alex is the one treated, so Alex meets Jade at the door."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "An adult the booker acts for",
+    "why": "Each client consents for themselves to a wellness treatment, so a guardian never books one."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A treatment needs no signed contract. The consent is signed on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call at a IV clinic (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No home visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Each guest at a home books their own visit, so no group needs a smallest size."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A home plan's visits are billed like single ones, never charged to a card on a schedule."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No home visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A treatment always needs the client there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A treatment always needs the client there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the nurse's care: Alex, the adult being treated, must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Updates go in person: Alex is in the room for the whole visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A treatment is billed once, after the visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each home visit gets its own bill."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Every treatment is self-pay: no plan pays part."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Lee Mobile IV books treatments at checkout. It sends no proposals to sign."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing goes to a lab from a home treatment, so no report comes later."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "No reply: not there to answer",
+    "why": "Alex is the one treated, so Alex is always there to answer."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "A treatment priced at the visit never becomes a big job of its own at the home."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam left bank transfer off for home visits: the bills are small."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord or other payer pays for a treatment."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "Nothing sold at a home visit is still to be given: a treatment done that day has no cancel period."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Nothing sold at a home visit is still to be given: a treatment done that day has no cancel period."
+   },
+   {
+    "op": "off",
+    "at": "B4-92",
+    "label": "A teen may agree alone",
+    "why": "Nobody under 18 is booked for IVs (pf.questions whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "B4-92",
+    "label": "A teen books alone",
+    "why": "Nobody under 18 is booked for IVs: no parent link either."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "A IV clinic never treats children."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every kind of work pays the $2 per booking, health included (D97)."
+   },
+   {
+    "op": "more",
+    "at": "B8-89",
+    "more": [
+     "Here: a first home IV needs the nurse practitioner's video screening the evening before. The screen stays good for 12 months.",
+     "Not clear: no IV at home, and the client gets the clinic's line."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-24",
+    "more": [
+     "For swelling of the face, lips or throat, trouble breathing, or a racing heartbeat during or after an IV: call 911 now.",
+     "A fever of 100.4 or more, or vomiting today: no IV is booked at home."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a home IV, they sign the consent and the health questionnaire on the secure page.",
+     "The code goes to whoever is with the client at home, if a phone is given for them."
+    ]
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": [
+  "Built Tue Oct 27 2026 (K5) from medspa (R12). Clinic style, health work (IV therapy: self-pay; no health plan; nobody under 18).",
+  "Names: Sam Lee, a physician and the medical director, owns Lee Hydration LLC (the clinic, 505 Hollis Way) and Lee Mobile IV LLC (IVs at home, 720 Main St). Flow A is at the clinic. Flow B is a hydration IV at Alex's home, 12 Juniper Ln.",
+  "People: at the clinic Tessa (registered nurse, IV starts) and Owen (nurse practitioner, screening calls); at home Jade (registered nurse) and Kai (nurse practitioner, video screening), under the medical director's standing order.",
+  "Switches: sensitive on in both flows (health care: no treatment or blend names in texts, initials to staff, no rating). welfare on in B only (a client at home may feel unwell). No $2 is off: the $2 applies (D97); S1-62 keeps '1 Yes, $2 a booking'. A membership charged through Rosfield pays 1% (D97).",
+  "Settings: set start times in both flows; free cancel until 24 hours before.",
+  "Facts: packs (5-IV pack, the IV membership), plans (monthly membership charges, after the member's yes), firststeps (the screening call and consent), forms (questionnaire, consent), video (screening by video), extrawork (an add-in only after a yes), waitlist.",
+  "Money A: list|card|counter main ($175 hydration IV, card saved for the $20 fee, paid at the desk after the IV); list|none|none (a free screening call); list|none|counter ($225 vitamin IV, paid at the desk); list|full|none (a $850 5-IV pack paid in full).",
+  "Money B: list|card|card main ($275 IV at home, card saved for the $89 fee, charged at DONE); list|deposit|card ($89 house-call deposit counted toward the $275, the $186 rest charged at DONE after the yes).",
+  "License words: pf.license says the owner's word; Rosie never looks a license up (D96). The sign-up license lines are rewritten by the shared pairs; the rest of the license chain is a master issue (see the log, MASTER)."
+ ],
+ "rename": {
+  "A": [
+   [
+    "77 Market St",
+    "505 Hollis Way"
+   ],
+   [
+    "Then the travel area, jobs sent now, the phone line and bills Rosie sends.",
+    "Then the travel area, the phone line and bills Rosie sends."
+   ],
+   [
+    "Jobs sent now: who takes them (a solo owner: Sam, in open hours).",
+    "Jobs sent now: none here; every job is booked ahead."
+   ],
+   [
+    "A job sent now is booked by the on-call person's yes, not Sam's (S2-27).",
+    "No job is sent now here, so nobody is on call (S2-30)."
+   ],
+   [
+    "Does it match the state's lookup?",
+    "Is the number the owner's word?"
+   ],
+   [
+    "the $25 consult included",
+    "the $25 exam fee included"
+   ],
+   [
+    "The $25 consult included",
+    "The $25 exam fee included"
+   ],
+   [
+    "A no to the price: the $25 pays for the consult",
+    "A no to the price: the $25 pays for the exam"
+   ],
+   [
+    "The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "The IV clinic offers a plan. Rosie books the first visit and saves the next ones on the same day and time."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "A IV package is paid in full when booked."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "IV package, 6 sessions · $750"
+   ],
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "An treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a nurse who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own clients."
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A touch-up' or 'my forehead lines' fits a treatment."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free treatment room:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "How would you like it on top?",
+    "Which area would you like treated?"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No.",
+    "Photos for the chart only, never for ads? Yes / No."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "Photos for the chart only, never for ads?"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, make it a full-face treatment' goes back to the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter visit in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter visit."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during my visit?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please come without makeup on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please come without makeup."
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped part of A.M.'s visit."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the visit and answers questions."
+   ],
+   [
+    "A.M. says Saturday's cut is uneven on one side.",
+    "A.M. asks for a recheck after Saturday's visit."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The treated area is still swollen."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An nurse's example: skin turning white or gray after vitamin add-in gets 'call the medical director's line now'."
+   ],
+   [
+    "Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+    "Sam taps 1: the two mobile kinds share Lee Mobile IV, and the IV clinic is its own company."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some care takes several visits, like IV hydration."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most IV clinics set it."
+   ],
+   [
+    "Signature cut and shave",
+    "IV package"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Treatments, IV sessions and vitamin add-in care."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Treatments and follow-up visits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A touch-up visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see clients at the IV clinic; Riley also does vitamin add-in care and home visits."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for IV add-in, which isn't on the IV clinic's list."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: 14 bags, recheck in 2 weeks"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a treatment at the IV clinic or at home"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: in many states, IVs away from a clinic need the medical director's OK."
+   ],
+   [
+    "is already in the chair",
+    "is already in the treatment room"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for a self-pay IV session at $130, an old price. Rosie answers with the real price, $140."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A self-pay IV session at Lee Hydration is $140, not $130. Here are the open times at $140."
+   ],
+   [
+    "for a new customer. It's $20. Accept it?",
+    "for a new client, self-pay. Accept it?"
+   ],
+   [
+    "MP045210",
+    "MD045210"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A treatment could mean a IV clinic or a nurse practitioner."
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds times side by side with Tessa and Owen."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A parent books visits for three children on one morning."
+   ],
+   [
+    "like a color correction done in two steps",
+    "like IV hydration, placed Monday and read Wednesday and Friday"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Hydration doesn't do IV add-in."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books IV drip and a toner"
+   ],
+   [
+    "Riley couldn't start today's visit",
+    "The IV clinic couldn't start today's visit"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex asks for a little more"
+   ],
+   [
+    "like a skin-test result",
+    "like the date of the last full-face treatment"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "IV add-in for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds IV add-in to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW IV add-in"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A treatment is rated, so the shop takes the first branch."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a IV drip plan with Riley, every 3 months."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat May 1 · 10:00am"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's IV clinic takes no jobs sent now, at the IV clinic or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "IV drip plan · every 3 months"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Lip balm · $15"
+   ],
+   [
+    "gloss",
+    "lip balm"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Hydration LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile IV'"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Hydration"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile IV"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home IV visits and Lee IV Hydration"
+   ],
+   [
+    "plumbing and electrical",
+    "home IV visits and IV hydration"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home IV visits and IV hydration"
+   ],
+   [
+    "1200 Main St",
+    "505 Hollis Way"
+   ],
+   [
+    "88 Elm St",
+    "505 Hollis Way"
+   ],
+   [
+    "Riley Chen",
+    "Tessa Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Owen Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Jade Price"
+   ],
+   [
+    "Casey Moore",
+    "Kai Moore"
+   ],
+   [
+    "Riley",
+    "Tessa"
+   ],
+   [
+    "Avery",
+    "Owen"
+   ],
+   [
+    "Jordan",
+    "Jade"
+   ],
+   [
+    "Casey",
+    "Kai"
+   ],
+   [
+    "electrical",
+    "IV hydration"
+   ],
+   [
+    "Electrical",
+    "IV hydration"
+   ],
+   [
+    "plumber",
+    "nurse"
+   ],
+   [
+    "Plumber",
+    "Nurse"
+   ],
+   [
+    "plumbing",
+    "home IV visits"
+   ],
+   [
+    "Plumbing",
+    "Home IV visits"
+   ],
+   [
+    "barbershop",
+    "IV clinic"
+   ],
+   [
+    "Barbershop",
+    "IV clinic"
+   ],
+   [
+    "barbers",
+    "nurses"
+   ],
+   [
+    "Barbers",
+    "Nurses"
+   ],
+   [
+    "barber",
+    "nurse"
+   ],
+   [
+    "Barber",
+    "Nurse"
+   ],
+   [
+    "Groom's package",
+    "Vitamin add-in visit"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "IV package"
+   ],
+   [
+    "Color and cut",
+    "IV package"
+   ],
+   [
+    "color correction",
+    "IV drip"
+   ],
+   [
+    "Color correction",
+    "IV drip"
+   ],
+   [
+    "kids cuts",
+    "consults"
+   ],
+   [
+    "Kids cut",
+    "Consult"
+   ],
+   [
+    "kids cut",
+    "consult"
+   ],
+   [
+    "skin fade",
+    "new client IV drip"
+   ],
+   [
+    "Skin fade",
+    "New client IV drip"
+   ],
+   [
+    "beard trim",
+    "toner"
+   ],
+   [
+    "Beard trim",
+    "Toner"
+   ],
+   [
+    "haircuts",
+    "treatments"
+   ],
+   [
+    "Haircuts",
+    "Treatments"
+   ],
+   [
+    "haircut",
+    "treatment"
+   ],
+   [
+    "Haircut",
+    "Treatment"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "color",
+    "vitamin add-in"
+   ],
+   [
+    "Color",
+    "Vitamin add-in"
+   ],
+   [
+    "a patch test",
+    "a good-faith exam"
+   ],
+   [
+    "patch test",
+    "good-faith exam"
+   ],
+   [
+    "Consult",
+    "Exam"
+   ],
+   [
+    "shops",
+    "IV clinics"
+   ],
+   [
+    "shop",
+    "IV clinic"
+   ],
+   [
+    "Shop",
+    "IV clinic"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "set at the chair",
+    "set in the treatment room"
+   ],
+   [
+    "quote at the chair",
+    "quote in the treatment room"
+   ],
+   [
+    "is at the chair",
+    "is in the treatment room"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "Treatment"
+   ],
+   [
+    "home warranty plan",
+    "membership"
+   ],
+   [
+    "home warranty",
+    "membership"
+   ],
+   [
+    "warranty plan",
+    "membership"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a treatment on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books IV drip every 3 months"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for IV drip every 3 months."
+   ],
+   [
+    "staff cut",
+    "staff treatment"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una revisión de la piel el sábado."
+   ],
+   [
+    "A step-free door on Elm St",
+    "A step-free door on Birch Ave"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Birch Ave"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bib clip ripped my shirt collar."
+   ],
+   [
+    "says the cape clip ripped",
+    "says the bib clip ripped"
+   ],
+   [
+    "Nora",
+    "Tessa"
+   ]
+  ],
+  "B": [
+   [
+    "77 Market St",
+    "720 Main St"
+   ],
+   [
+    "the shutoff valves",
+    "the added care"
+   ],
+   [
+    "Then the travel area, jobs sent now, the phone line and bills Rosie sends.",
+    "Then the travel area, the phone line and bills Rosie sends."
+   ],
+   [
+    "Jobs sent now: who takes them (a solo owner: Sam, in open hours).",
+    "Jobs sent now: none here; every job is booked ahead."
+   ],
+   [
+    "A job sent now is booked by the on-call person's yes, not Sam's (S2-27).",
+    "No job is sent now here, so nobody is on call (S2-30)."
+   ],
+   [
+    "Does it match the state's lookup?",
+    "Is the number the owner's word?"
+   ],
+   [
+    "Human health practices and law firms pay no $2 by default, and the plug-in says so.",
+    "Every kind of work pays the $2, health care and law included (D97)."
+   ],
+   [
+    "Safe default: the $2 applies, unless the work is human health care or law. Then Rosie's team decides before go-live.",
+    "Safe default: the $2 applies, for every kind of work."
+   ],
+   [
+    "A person checks the official license lookup, and every service against the license rules, within 1 business day.",
+    "A person checks every service's wording against the owner's own words within 1 business day. Licenses are the owner's word, never looked up."
+   ],
+   [
+    "The state licenses the barbershop itself, and each barber.",
+    "The state's form may ask for the practice's license, and for each clinician's own."
+   ],
+   [
+    "Its lookup starts at once and runs in the background while Sam goes on.",
+    "Nothing is looked up here: the owner's word stands while Sam goes on."
+   ],
+   [
+    "Safe default: ask for the license the business holds. Rosie's team checks the official lookup within 1 business day.",
+    "Safe default: ask for the license the business holds, if it has one. Rosie never looks it up or checks it."
+   ],
+   [
+    "The state licenses the shop itself, and each barber. What's the shop's license number?",
+    "What's the business's license number, if it has one?"
+   ],
+   [
+    "Thanks. I'll check it on the state's lookup: minutes where the state shares its records, or within the day. Let's keep going.",
+    "Thanks. I've saved it as your word; nothing is looked up. Let's keep going."
+   ],
+   [
+    "Whose license it is comes from the lookup's name, never asked: the business's, the owner's, or a license holder's.",
+    "Whose license it is comes from the owner's answer: the business's, the owner's, or a license holder's."
+   ],
+   [
+    "A license holder confirms it on their own secure page when they join, or Rosie's team checks. S11-99 re-checks if they leave.",
+    "A license holder confirms it on their own secure page when they join. S11-99 asks the owner again if they leave."
+   ],
+   [
+    "Where a lookup has no data feed, a person on Rosie's team checks the official site and keeps a screenshot.",
+    "Rosie looks nothing up, so no screenshot is kept."
+   ],
+   [
+    "Licenses: S13-43. A license claim shows only once it checks out: S13-11.",
+    "Licenses: S13-43. A license claim shows as the owner gave it: S13-11."
+   ],
+   [
+    "Never: let a license stand for control (S1-75), or show a license claim before it checks out.",
+    "Never: let a license stand for control (S1-75), or show a license claim as more than the owner's word."
+   ],
+   [
+    "It's checked on the official lookup the plug-in names.",
+    "It's the owner's word; Rosie looks nothing up."
+   ],
+   [
+    "Rosie's rule: a kind of work goes live on the business's own license. Each person is offered once their own license checks out and the owner says yes. Why: nothing goes live on a guess.",
+    "Rosie's rule: a kind of work is offered on the owner's word about its license. Each person is offered once the owner says yes. Why: Rosie looks no license up."
+   ],
+   [
+    "Safe default: not checked, and that work stays offline.",
+    "Safe default: the owner's word is kept, and nothing is looked up."
+   ],
+   [
+    "Decides which check runs on what each person added on their secure page. Some work licenses each person, some only the business, and some nobody.",
+    "Decides what each person added on their secure page counts as. Some work needs each person's license, some only the business's, and some nobody's."
+   ],
+   [
+    "The plug-in says which, and which official lookup checks it.",
+    "The plug-in says which licenses each person has, if any. Nothing is looked up."
+   ],
+   [
+    "Safe default: no person license, unless the business's license form names one. Rosie's team confirms within 1 business day.",
+    "Safe default: no person license, unless the plug-in names one. Nothing is looked up."
+   ],
+   [
+    "Checks each license",
+    "Saves each license number as given"
+   ],
+   [
+    "Each license is checked the moment it's added on the secure page, after the person's YES. Rosie checks the name, kind, status, services, places and end date.",
+    "Each license number is saved the moment it's added on the secure page, after the person's YES, as the owner's word. Rosie looks nothing up."
+   ],
+   [
+    "It uses the official lookup the plug-in names: a state, a city or the federal government.",
+    "Nothing is looked up: the number is the owner's word."
+   ],
+   [
+    "Where a lookup has no data feed, a person on Rosie's team checks within 1 business day.",
+    "Nothing is looked up, so there is no lookup to wait for."
+   ],
+   [
+    "Someone who needs no license, like an office manager, isn't checked. The owner's own was checked at sign-up.",
+    "Someone who needs no license, like an office manager, gives nothing. The owner's word was taken at sign-up."
+   ],
+   [
+    "A background check or certificate the plug-in names is checked too, with a record: who ran it, the date and renew-by.",
+    "A background check or certificate the plug-in names is kept as the owner's word, with the date and renew-by."
+   ],
+   [
+    "Means 'Doesn't match': the lookup has no license with that number and name.",
+    "Means 'Doesn't match': the owner fixes the number."
+   ],
+   [
+    "Safe default: not bookable for that work until it matches.",
+    "Safe default: not offered for that work until the owner says it's right."
+   ],
+   [
+    "Rosie's rule: nobody is offered for work their license doesn't cover. Why: what a missing or expired license blocks comes from the plug-in's official rules.",
+    "Rosie's rule: nobody is offered for work their license doesn't cover, on the owner's word. Why: a license is the owner's to keep."
+   ],
+   [
+    "Nora is a new customer",
+    "Tessa is a new customer"
+   ],
+   [
+    "Nora S.",
+    "Tessa S."
+   ],
+   [
+    "Nora hears",
+    "Tessa hears"
+   ],
+   [
+    "like a cheaper part or one line only",
+    "like fewer bags or one line only"
+   ],
+   [
+    "Can Jordan use a cheaper part?",
+    "Can Jade use fewer bags?"
+   ],
+   [
+    "asks for a cheaper part",
+    "asks for fewer bags"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached during care?"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jade sets the bags and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jade checked the areas. Here's the price for today."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 first area 165 second area 80"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "First area, more bags · $540"
+   ],
+   [
+    "Shutoff valve · $165",
+    "First area · $165"
+   ],
+   [
+    "Supply line · $80",
+    "Second area · $80"
+   ],
+   [
+    "OK'd the shutoff valve only, $165.",
+    "OK'd the first area only, $165."
+   ],
+   [
+    "Leave the supply line.",
+    "Leave the second area."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "OK: Jade treats the first area today, $165."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 for the second area stays good until Thu Oct 29."
+   ],
+   [
+    "can clear the drain:",
+    "can do a treatment at home:"
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "A IV package is paid in full when booked."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "IV package · $90"
+   ],
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "An treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a nurse who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own clients."
+   ],
+   [
+    "Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+    "Sam taps 1: the two mobile kinds share Lee Mobile IV, and the IV clinic is its own company."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some care takes several visits, like IV hydration."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A recheck within 30 days is free: just reply here."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jade finds an infection at the area to treat."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a nurse stops there, so Alex gets a written note on the secure page."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most IV clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules IV clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Treatments, IV sessions and vitamin add-in care."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Treatments and follow-up visits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A touch-up visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see clients at the IV clinic; Riley also does vitamin add-in care and home visits."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like IV drip for my forehead lines."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Tengo un sarpullido que me pica mucho."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "My lip is swelling after yesterday's vitamin add-in."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about IV drip for my forehead."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An nurse's example: skin turning white or gray after vitamin add-in gets 'call the medical director's line now'."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene la cara o la boca hinchada, o le cuesta respirar?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face or mouth swollen, or is it hard to breathe?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo me pica."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It just itches."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No se rasque. Si se le hincha la cara o le cuesta respirar, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't scratch it. If your face swells or it's hard to breathe, call 911."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told not to scratch, and to call 911 if her face swells or it's hard to breathe."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Should I stop my blood thinner before the visit?"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is that safe?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a nurse do a treatment at my home this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa treatment Thu 12pm Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My forehead lines' fits IV drip at home."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a prescription for someone who won't be seen."
+   ],
+   [
+    "'Adding a faucet check?",
+    "'Adding the frown lines too?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is it the forehead only, or the frown lines too?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "The forehead only."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a treatment every year."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes more than one visit, like a IV series, 4 to 6 weeks apart."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you do my treatment every year, too?"
+   ],
+   [
+    "has a yearly flush plan, $150 a visit.",
+    "has a yearly check-up plan, $179 a visit."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly check-up plan"
+   ],
+   [
+    "Each visit: $150",
+    "Each visit: $179"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about the frown lines."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jade also do my frown lines?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The frown lines are priced at the visit, by the bags used."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount",
+    "The $640 lip vitamin add-in is over the plug-in's amount"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the swelling getting worse?"
+   ],
+   [
+    "Yes, it won't drain",
+    "No, it looks the same"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 treatment needs none."
+   ],
+   [
+    "he's the one who replaces water heaters.",
+    "Jade is the one who does vitamin add-in."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jade also do my lips?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months.",
+    "a treatment every 3 months, at home."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's treatment?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the swelling is getting worse."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The swelling is getting worse now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Press on it with a clean cloth for 20 minutes. If it won't stop, call 911."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A IV drip at home is priced at the visit: only the $89 house-call fee was promised."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jade finds an area that needs a prescriber's look first."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 4 bags between the brows"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Extra for A.M.: added care, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Added care · $160"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the added care for $160."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD infection at one area, stopped that part"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan stopped part of today's visit for your safety. The note is on your secure page."
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · today's visit"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: one area to treat first"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the check of that area"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your own doctor first"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Area not checked"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked A.M.'s glasses with the lamp stand"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked glasses"
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's lamp stand cracked A.M.'s glasses."
+   ],
+   [
+    "The before photo shows no crack.",
+    "The photo shows the crack."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's lamp stand knocks Alex's glasses off a table, and Jordan texts a photo."
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE 14 bags, recheck in 2 weeks."
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Bring the cooling pack next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The treated area is still uneven 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "One side looks uneven. Can someone look at it?"
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M. asks for a recheck after the Thu Oct 22 visit. A recheck within 30 days is free."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "A recheck within 30 days is free, so this visit is free."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan rushed and didn't explain anything."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My glasses were cracked at the visit."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jade do my frown lines next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a IV session."
+   ],
+   [
+    "for a water heater flush.",
+    "for a touch-up visit."
+   ],
+   [
+    "water heater flush",
+    "touch-up visit"
+   ],
+   [
+    "Water heater flush",
+    "Touch-up visit"
+   ],
+   [
+    "Water heater replacement",
+    "Lip vitamin add-in"
+   ],
+   [
+    "water heater replacement",
+    "lip vitamin add-in"
+   ],
+   [
+    "water heater quote",
+    "lip vitamin add-in price"
+   ],
+   [
+    "Leak repair",
+    "IV drip at home"
+   ],
+   [
+    "leak repair",
+    "IV drip at home"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a IV drip at home, today,"
+   ],
+   [
+    "Say Alex was told at DONE that a sewer camera report comes Fri Oct 23.",
+    "Say Alex was told at DONE that the 2-week check is Fri Oct 23."
+   ],
+   [
+    "your sewer camera report from Thursday is ready.",
+    "the IV clinic has news about Thursday's visit. See the note on your secure page."
+   ],
+   [
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "the IV clinic has news about your Thu Oct 22 visit. See the note on your secure page."
+   ],
+   [
+    "your sewer camera report needs a little more time.",
+    "the IV clinic needs a little more time."
+   ],
+   [
+    "Sewer camera report",
+    "Visit note"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Jordan's note"
+   ],
+   [
+    "Sewer camera inspection",
+    "Added treatment"
+   ],
+   [
+    "sewer camera inspection",
+    "added treatment"
+   ],
+   [
+    "service call fee",
+    "house-call fee"
+   ],
+   [
+    "Service call fee",
+    "House-call fee"
+   ],
+   [
+    "Drain clearings already booked",
+    "Treatments already booked"
+   ],
+   [
+    "Drain clearing plans",
+    "Check-up plans"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a treatment at the IV clinic or at home"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilewellness.com"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: in many states, IVs away from a clinic need the medical director's OK."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the one for home IV visits now, and the others when Sam gets to them."
+   ],
+   [
+    "MP045210",
+    "MD045210"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A treatment could mean a IV clinic or a nurse practitioner."
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Tessa can ask to be next for that time."
+   ],
+   [
+    "under different names, and nobody was home for any of them.",
+    "under different names, and missed them all."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "IV hydration for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds IV hydration to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW IV hydration"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "One booking, so one $2 for the whole job.",
+    "It's one booking for the whole job."
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the try-in is done, $800 at the finish"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "no proof Alex may have this work done",
+    "no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's IV clinic takes no jobs sent now, at the IV clinic or away."
+   ],
+   [
+    "The work never started, so there's no $2.",
+    "The work never started."
+   ],
+   [
+    "One booking, so no second $2.",
+    "The extra stays part of the one booking."
+   ],
+   [
+    "No visit, so no $2.",
+    "No visit."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "like a move-out day",
+    "like a move to another home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile IV LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile IV'"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Hydration"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile IV"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home IV visits and Lee IV Hydration"
+   ],
+   [
+    "plumbing and electrical",
+    "home IV visits and IV hydration"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home IV visits and IV hydration"
+   ],
+   [
+    "1200 Main St",
+    "505 Hollis Way"
+   ],
+   [
+    "88 Elm St",
+    "505 Hollis Way"
+   ],
+   [
+    "42 Oak St",
+    "12 Juniper Ln"
+   ],
+   [
+    "Riley Chen",
+    "Tessa Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Owen Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Jade Price"
+   ],
+   [
+    "Casey Moore",
+    "Kai Moore"
+   ],
+   [
+    "Riley",
+    "Tessa"
+   ],
+   [
+    "Avery",
+    "Owen"
+   ],
+   [
+    "Jordan",
+    "Jade"
+   ],
+   [
+    "Casey",
+    "Kai"
+   ],
+   [
+    "electrical",
+    "IV hydration"
+   ],
+   [
+    "Electrical",
+    "IV hydration"
+   ],
+   [
+    "plumbing license",
+    "medical license"
+   ],
+   [
+    "Plumbing license",
+    "Medical license"
+   ],
+   [
+    "plumber",
+    "nurse"
+   ],
+   [
+    "Plumber",
+    "Nurse"
+   ],
+   [
+    "plumbing",
+    "home IV visits"
+   ],
+   [
+    "Plumbing",
+    "Home IV visits"
+   ],
+   [
+    "barbershop",
+    "IV clinic"
+   ],
+   [
+    "Barbershop",
+    "IV clinic"
+   ],
+   [
+    "barbers",
+    "nurses"
+   ],
+   [
+    "Barbers",
+    "Nurses"
+   ],
+   [
+    "barber",
+    "nurse"
+   ],
+   [
+    "Barber",
+    "Nurse"
+   ],
+   [
+    "beard trim",
+    "toner"
+   ],
+   [
+    "Beard trim",
+    "Toner"
+   ],
+   [
+    "haircut",
+    "treatment"
+   ],
+   [
+    "Haircut",
+    "Treatment"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "color",
+    "vitamin add-in"
+   ],
+   [
+    "shops",
+    "IV clinics"
+   ],
+   [
+    "shop",
+    "IV clinic"
+   ],
+   [
+    "Shop",
+    "IV clinic"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Treatment"
+   ],
+   [
+    "drain clearing",
+    "treatment"
+   ],
+   [
+    "Drain clearing",
+    "Treatment"
+   ],
+   [
+    "service call fee",
+    "house-call fee"
+   ],
+   [
+    "service call",
+    "house call"
+   ],
+   [
+    "Service call fee",
+    "House-call fee"
+   ],
+   [
+    "Service call",
+    "House call"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if her face swells with a fever."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene la cara hinchada o fiebre?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face swollen, or do you have a fever?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tengo fiebre."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't have a fever."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se le hincha la cara con fiebre, vaya a urgencias o llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If your face swells with a fever, go to the emergency room or call 911."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a IV clinic visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like braces"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: new or returning, which areas, and a private room at home."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: swelling of the face, lips or throat, trouble breathing, or bleeding that won't stop."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which membership should pay?"
+   ],
+   [
+    "home warranty plan",
+    "membership"
+   ],
+   [
+    "home warranty",
+    "membership"
+   ],
+   [
+    "warranty plan",
+    "membership"
+   ],
+   [
+    "the warranty company",
+    "the card on file"
+   ],
+   [
+    "Alex says yes before any work",
+    "Alex says yes first"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID ready."
+   ],
+   [
+    "Rental 1",
+    "Resident 1"
+   ],
+   [
+    "Rental 2",
+    "Resident 2"
+   ],
+   [
+    "Kitchen drain",
+    "Treatment"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD no safe outlet for the chair, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: no safe outlet for the chair"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your own doctor first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the wall by the bed"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed wall"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 treatment"
+   ],
+   [
+    "The kitchen drain",
+    "The treatment"
+   ],
+   [
+    "with the store's receipt",
+    "with the receipt"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "The repair price",
+    "The treatment price"
+   ],
+   [
+    "the repair price",
+    "the treatment price"
+   ],
+   [
+    "Book the repair",
+    "Book the treatment"
+   ],
+   [
+    "to the repair",
+    "to the treatment"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It hurts a lot. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back in my room 30 minutes late, sorry!"
+   ],
+   [
+    "arriving 8–10am",
+    "at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "at 12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "2–4pm",
+    "2:00pm"
+   ],
+   [
+    "Alex M.'s",
+    "A.M.'s"
+   ],
+   [
+    "Nora",
+    "Tessa"
+   ]
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Then the travel area, jobs sent now, the phone line and bills Rosie sends.",
+    "Jobs sent now: who takes them (a solo owner: Sam, in open hours).",
+    "A job sent now is booked by the on-call person's yes, not Sam's (S2-27).",
+    "Does it match the state's lookup?",
+    "the $25 consult included",
+    "The $25 consult included",
+    "A no to the price: the $25 pays for the consult",
+    "The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "The signature cut, $55, is paid in full when booked.",
+    "Signature cut and hot towel shave · $55",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "A chair renter asked for by name",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Access, like a step-free chair:",
+    "My employer pays for this cut.",
+    "How would you like it on top?",
+    "May the shop show photos of your hair?",
+    "'Yes, make it a fade' goes back to the times.",
+    "Riley can do a shorter cut in the time left",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "Stopped A.M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "A.M. says Saturday's cut is uneven on one side.",
+    "The cut is uneven on one side.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "Each service starts the way most barbershops set it.",
+    "Signature cut and shave",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "like a haircut at the shop or at home",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "is already in the chair",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "for a new customer. It's $20. Accept it?",
+    "MP045210",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Elm Street Dental",
+    "A haircut could mean a salon or a barbershop.",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "like a color correction done in two steps",
+    "Lee's Barbershop doesn't do perms.",
+    "Books a haircut and a beard trim",
+    "Riley couldn't start today's visit",
+    "Alex adds a beard trim",
+    "like a skin-test result",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "Consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "quote at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "home warranty plan",
+    "home warranty",
+    "warranty plan",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "staff cut",
+    "Quiero un corte el sábado.",
+    "A step-free door on Elm St",
+    "Step-free door on Elm St",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped"
+   ],
+   "B": [
+    "the shutoff valves",
+    "Then the travel area, jobs sent now, the phone line and bills Rosie sends.",
+    "Jobs sent now: who takes them (a solo owner: Sam, in open hours).",
+    "A job sent now is booked by the on-call person's yes, not Sam's (S2-27).",
+    "Does it match the state's lookup?",
+    "Nora is a new customer",
+    "Nora S.",
+    "Nora hears",
+    "like a cheaper part or one line only",
+    "Can Jordan use a cheaper part?",
+    "asks for a cheaper part",
+    "or can't be reached while care is due?",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "OK'd the shutoff valve only, $165.",
+    "Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "can clear the drain:",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Jordan finds mold behind the sink wall.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "My kitchen drain is clogged.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "My gas water heater got wet in a flood.",
+    "Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Just the kitchen sink.",
+    "Say Alex asks for a water heater flush every year.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "has a yearly flush plan, $150 a visit.",
+    "Yearly water heater flush plan",
+    "Each visit: $150",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "The $640 water heater is over the plug-in's amount",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "he's the one who replaces water heaters.",
+    "Can Jordan also run a camera down my sewer line?",
+    "a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Safety note · your home",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "The before photo shows no crack.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "NOTE grease clog 12 ft in.",
+    "Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Your drain is under warranty, so this visit is free.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "for a water heater flush.",
+    "water heater flush",
+    "Water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heater quote",
+    "Leak repair",
+    "leak repair",
+    "It's a leak under the sink, today,",
+    "Say Alex was told at DONE that a sewer camera report comes Fri Oct 23.",
+    "your sewer camera report from Thursday is ready.",
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "your sewer camera report needs a little more time.",
+    "Sewer camera report",
+    "Video and Jordan's notes",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "Drain clearings already booked",
+    "Drain clearing plans",
+    "like a haircut at the shop or at home",
+    "leehomeservices.com",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "MP045210",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Elm Street Dental",
+    "A haircut could mean a salon or a barbershop.",
+    "Nora can ask to be next for that window.",
+    "under different names, and nobody was home for any of them.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "One booking, so one $2 for the whole job.",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "CANT START no proof Alex may have this work done",
+    "no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The work never started, so there's no $2.",
+    "One booking, so no second $2.",
+    "No visit, so no $2.",
+    "LATE camera report Mon Oct 26",
+    "like a move-out day",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "color",
+    "shops",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "credited to the repair",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Which home warranty plan should pay?",
+    "home warranty plan",
+    "home warranty",
+    "warranty plan",
+    "the warranty company",
+    "Alex says yes before any work",
+    "Please clear the cabinet under the sink.",
+    "Rental 1",
+    "Rental 2",
+    "Kitchen drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "The kitchen drain",
+    "with the store's receipt",
+    "The plug-in says how long the warranty lasts.",
+    "The repair price",
+    "the repair price",
+    "Book the repair",
+    "to the repair",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "2–4pm",
+    "Alex M.'s",
+    "Nora"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A5-19": "5d5db6f3c1",
+   "A7-93": "46cca94e45",
+   "A8-03": "7accda6f86",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A8-26": "1e164bc165",
+   "A8-29": "6b776f2a37",
+   "A4-80": "624ec2e303",
+   "A10-34": "78c2d9a6a3",
+   "S1-62": "c4f497de12",
+   "A8-71": "99bb99f6fa",
+   "A3-24": "78e61fd50f",
+   "A4-64": "b98f95b738",
+   "A9-20": "0cfe0e1776"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B4-26": "912686f788",
+   "B4-32": "fcfe092e37",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B8-93": "c1406fd6bc",
+   "B9-06": "f091432f2d",
+   "B10-05": "a326ea3c0b",
+   "B4-92": "36a6823417",
+   "B10-32": "7713bff255",
+   "S1-62": "c4f497de12",
+   "B8-89": "bbc8171a22",
+   "B3-24": "a31b436ff1",
+   "B4-74": "bae5529af9"
+  }
+ }
+}

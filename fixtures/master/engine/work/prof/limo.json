@@ -1,0 +1,2582 @@
+{
+ "id": "limo",
+ "name": "Limo, chauffeur and party bus",
+ "style": "Event",
+ "pattern": "event",
+ "from": "rentals",
+ "plugin": {
+  "pf.license": {
+   "need": "where the state's or the local for-hire authority's rules require it: a for-hire passenger carrier permit for the business (a livery, limousine or charter-party permit), each vehicle registered and inspected for for-hire use; a business registration everywhere",
+   "federal": "federal operating authority and a USDOT number where federal rules require them (trips across state lines; larger vehicles): a generic federal switch",
+   "who": "the business holds the permit, the vehicles' papers and the insurance; each chauffeur holds the driver's license the vehicle needs and, where the state's or local rules issue one, a for-hire driver permit",
+   "ask": [
+    "the business registration",
+    "the carrier permit number, where one applies",
+    "any USDOT number",
+    "each vehicle: type, legal seat count, plate, inspection date",
+    "proof of commercial auto insurance"
+   ],
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "a required permit that the owner says the business lacks keeps the business offline; a vehicle past its inspection is never offered; a party bus is never offered without a chauffeur holding the license it needs",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "commercial auto liability at the level the state's rules, or federal rules for interstate carriers, set by seat count; proof before going live",
+   "drivers": "a commercial driver's license with a passenger endorsement where federal rules require it (vehicles built for 16 or more people, driver included); background and driving-record checks where the state's or local rules require them; drug and alcohol testing where federal rules require it",
+   "otherwise": "identity checked; customers see no permit claim until it's confirmed",
+   "how it's checked": "Not checked by Rosie. The owner keeps each permit, each chauffeur's license and check, and the insurance; shown as given (D96)."
+  },
+  "pf.services": {
+   "shape": "event: a vehicle and a chauffeur for a date and a span of hours, along a route of a pickup, stops and a drop-off; hourly with a minimum, or a flat transfer; the vehicle is the capacity, with a chauffeur licensed for it. Flow A: tour seats from the company's own lot, and a free vehicle viewing",
+   "examples": "the example company's own prices, not a standard",
+   "list": [
+    {
+     "name": "Wedding package, stretch limo (up to 10)",
+     "price": "$150 an hour, 4-hour minimum on Saturdays ($600), plus the 20% driver gratuity ($120) (example)",
+     "kind": "one price from the list",
+     "where": "pickup at the customer's place, the ceremony, photos, the reception",
+     "before": "a 25% deposit when the contract is signed",
+     "after": "the rest charged to the saved card when the chauffeur texts DONE; overtime, tolls and parking after"
+    },
+    {
+     "name": "Party bus (up to 30)",
+     "price": "$250 an hour, 4-hour minimum, plus the 20% driver gratuity (example)",
+     "kind": "one price from the list",
+     "before": "a 25% deposit when the contract is signed",
+     "after": "the rest charged to the saved card when the chauffeur texts DONE"
+    },
+    {
+     "name": "Prom package",
+     "price": "$850 flat for 5 hours, gratuity included (example)",
+     "kind": "one price",
+     "before": "paid in full when a parent signs the prom agreement",
+     "after": "nothing more, unless overtime or cleaning",
+     "note": "no alcohol; the route set ahead; students dropped only at the listed address"
+    },
+    {
+     "name": "Airport transfer, sedan (up to 3) or SUV (up to 6)",
+     "price": "$95 / $125 flat each way to the regional airport (example)",
+     "kind": "one price",
+     "before": "a card saved",
+     "after": "the saved card charged at drop-off, with tolls and parking",
+     "note": "arrivals: the flight is tracked; 30 minutes of waiting after landing included, then $15 per 15 minutes"
+    },
+    {
+     "name": "Hourly chauffeur, sedan or SUV",
+     "price": "$85 / $105 an hour, 2-hour minimum, plus 20% gratuity (example)",
+     "before": "a card saved",
+     "after": "the saved card charged at drop-off"
+    },
+    {
+     "name": "Funeral family car",
+     "price": "$450 flat for up to 3 hours (example)",
+     "note": "booked by the family or the funeral home; a date that can't move; no sales texts and no rating request"
+    },
+    {
+     "name": "Custom itinerary (a multi-stop night, a long trip)",
+     "price": "quoted from the route first",
+     "kind": "quoted from the customer's answers first",
+     "before": "a 25% deposit with the signed contract",
+     "after": "the rest charged to the saved card when the chauffeur texts DONE"
+    },
+    {
+     "name": "Brewery tour seat (flow A)",
+     "price": "$69 a seat (example)",
+     "where": "from the company's own lot, Saturdays 12pm to 5pm, three stops",
+     "before": "paid in full",
+     "after": "nothing more",
+     "note": "21 and over only, ID at boarding; tasting fees are paid at each stop, not through Rosie; runs with 8 seats sold by 48 hours before"
+    },
+    {
+     "name": "Vehicle viewing (flow A)",
+     "price": "free, 20 minutes (example)",
+     "where": "at the company's garage",
+     "before": "nothing taken",
+     "after": "nothing to pay"
+    },
+    {
+     "name": "Overtime",
+     "price": "per 30 minutes past the booked hours, at the hourly rate plus gratuity",
+     "note": "only with the booker's yes, within the chauffeur's legal hours and before the vehicle's next booking"
+    },
+    {
+     "name": "Extras",
+     "price": "an extra stop on a flat transfer $20; a child car seat $15; cleaning fee $250 when a passenger is sick or a spill needs cleaning (in the contract, charged only with photos and the owner's yes); damage at cost (example)"
+    }
+   ],
+   "capacity": "one booking per vehicle at a time, with 30 minutes between bookings for cleaning and travel (example); never more passengers than the vehicle's legal seat count; a chauffeur whose license fits the vehicle",
+   "nobody_home": "no: a passenger meets the chauffeur at pickup",
+   "online": "no"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "the date, the pickup time, and how many hours (or one way)",
+    "the kind of trip: a wedding, a prom, a birthday, an airport ride, a night out, a funeral",
+    "how many passengers (it sets the vehicle)",
+    "the pickup town and kind of place, the stops, and the last drop-off",
+    "whether any passenger is under 21 (no alcohol on the trip) or under 18 (the prom rules, car seats)",
+    "for an airport pickup: the flight number"
+   ],
+   "afterTime": [
+    "the day-of contact's name and mobile",
+    "the name for the chauffeur's sign at arrivals",
+    "child car seats needed",
+    "decorations or music"
+   ],
+   "securePage": [
+    "the full street addresses of the pickup, stops and drop-off",
+    "the prom passenger list: names, ages and each parent's mobile",
+    "a passenger's accessibility needs (a wheelchair, a step that's too high)",
+    "a child's age and size for a car seat"
+   ],
+   "whoMayBook": "an adult; 21 or older when alcohol may be brought on the trip (the example company's rule); a prom is booked by a parent or guardian, who signs the prom agreement"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone hurt or in danger right now",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    }
+   ],
+   "refuse": "drugs, alcohol for anyone under 21, more passengers than seats, or riding outside the windows or the sunroof: refused, and the owner is told",
+   "alcohol": "passengers 21 and over may bring their own drinks only where the state's and local rules allow alcohol in a for-hire vehicle; the chauffeur never serves or sells it unless the business holds the license for it; no glass on the party bus (the company's rule); anyone under 21 aboard means no alcohol on the whole trip",
+   "endTrip": "the chauffeur may end a trip early, with no refund, for alcohol or drugs with a minor aboard, fighting, damage on purpose, or riding outside a window (the contract's rule); an emergency: pull over and call 911, then the owner",
+   "seats": "every passenger has a seat and a belt where fitted; never more than the legal seat count",
+   "driverHours": "a chauffeur never drives past the hours federal or state rules allow (the federal hours-of-service rules for commercial-license drivers) or the company's own limit; overtime that would break them is refused",
+   "weather": "snow, ice or a storm: the owner may move or shorten a trip; the chauffeur may stop when it's unsafe to go on",
+   "canContinue": "yes, after the generic steps"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Signed contract",
+     "when": "before the deposit (weddings, party buses, custom quotes, funerals)",
+     "who": "the booker, then the owner",
+     "result": "signed by both: it books; not signed in 24 hours: the time is let go"
+    },
+    {
+     "name": "Prom agreement",
+     "when": "before payment",
+     "who": "each student's parent or guardian signs: no alcohol, no drugs, the route and the drop-off",
+     "result": "signed: the student rides; not signed: that student doesn't ride"
+    },
+    {
+     "name": "Final passenger count and itinerary",
+     "when": "7 days before (with the rest due)",
+     "who": "the booker",
+     "result": "the vehicle and the hours are confirmed; a bigger group may need a bigger vehicle (the owner decides)"
+    },
+    {
+     "name": "Flight number",
+     "when": "at booking, for an airport pickup",
+     "who": "the booker",
+     "result": "the pickup follows the flight"
+    },
+    {
+     "name": "Vehicle viewing",
+     "when": "optional, before a wedding or prom booking",
+     "who": "anyone",
+     "result": "nothing required"
+    }
+   ],
+   "prepForReminder": [
+    "The chauffeur arrives 15 minutes before the pickup time",
+    "Anyone who will drink brings an ID (21 and over)",
+    "Car seats: bring the child's own, or we bring the ones you booked"
+   ]
+  },
+  "pf.visit": {
+   "checkIn": "the chauffeur arrives 15 minutes early; the booker or the day-of contact gives the check-in code at the vehicle; at the airport, at the meeting point; tour guests give their own code at boarding, with an ID for 21 and over",
+   "during": "the route in the contract; extra stops or more time only with the booker's yes, priced first, within the chauffeur's legal hours and before the next booking",
+   "waiting": "an airport arrival includes 30 minutes after landing, then waiting is billed per 15 minutes; hourly trips run from the pickup time to the last drop-off",
+   "done": "DONE at the last drop-off; the chauffeur checks the vehicle with the booker for left items, cleaning or damage, with photos",
+   "extraWork": "overtime, an extra stop, tolls and parking: billed after on the saved card, line by line",
+   "lostItems": "items left in the vehicle are held at the garage, and the booker is told"
+  },
+  "pf.money": {
+   "before": "weddings, party buses and custom trips: a 25% deposit when the contract is signed (a deposit cap where the state's rules set one); proms: paid in full when the parent signs; airport transfers: a card saved, charged when the chauffeur texts DONE; tour seats: paid in full; the viewing: free",
+   "after": "the rest of a wedding or party bus is charged to the saved card when the chauffeur texts DONE, never on a set day; overtime, tolls, parking and any cleaning or damage fee go on the saved card after the trip, with photos and the owner's yes",
+   "gratuity": "the 20% driver gratuity on hourly bookings is a mandatory charge: named in the first price, the contract and the bill, never called optional; any extra tip is the customer's choice (tips line on)",
+   "cancel": "the contract's schedule: the deposit is kept when cancelled under 30 days before, the full price under 72 hours (example); transfers: free cancel until 24 hours before",
+   "noShow": "nobody at pickup 30 minutes after the time, and no answer: the booked minimum is owed, per the contract",
+   "tax": "sales or transport tax where the state's or local rules charge one (the owner's setting)",
+   "two_dollars": "$2 per confirmed booking; a wedding with several pickups is one booking"
+  },
+  "pf.messages": {
+   "never": "a prom passenger list, ages, a child's details, a passenger's health or accessibility needs and any money details never go in a text: only the secure page",
+   "staffTexts": "chauffeur texts: the booker's name, the vehicle, the pickup time and street, and the route; the passenger list opens on the secure link",
+   "sensitive": "a funeral booking: no sales texts, no offers, no rating request",
+   "languages": "English and Spanish",
+   "minors": "a prom's texts go to the parent who booked"
+  },
+  "pf.staff": {
+   "licenses": "each chauffeur: the driver's license the vehicle needs (a commercial license with a passenger endorsement for vehicles built for 16 or more people, a federal rule); a for-hire driver permit where the state's or local rules issue one; background and driving-record checks where required; drug and alcohol testing where federal rules require it",
+   "skills": "sedan and SUV, stretch limo, party bus, airport meet and greet, weddings, proms (two years with the company, its own rule), funerals",
+   "supervision": "a prom party bus carries an attendant besides the chauffeur (the company's rule)",
+   "oks": "the owner OKs proms, party buses, trips over 100 miles, custom itineraries and any alcohol question",
+   "standIn": "a chauffeur may be swapped for another with the right license for the vehicle, and the booker is told; a wedding, prom or funeral date can't move: a stand-in or a full refund",
+   "hours": "the chauffeur's legal hours decide whether overtime or a second trip that day can be taken"
+  },
+  "pf.rules": {
+   "permit": "the carrier permit number shown on the vehicle and the contract where the state's or local rules require it",
+   "contract": "a written contract for charters where the state's rules require it, with the route, hours and price",
+   "alcohol": "open alcohol in a for-hire vehicle only where the state's and local rules allow it; never with anyone under 21 aboard",
+   "federal": "federal hours-of-service, drug and alcohol testing and commercial-license rules, where they apply",
+   "seats": "never more than the legal seat count; belts where fitted; child car seats where the state's rules require them",
+   "records": "trip records (times, chauffeur, vehicle) kept 7 years by default",
+   "cancel": "the cancel schedule as signed in the contract"
+  },
+  "pf.edges": {
+   "flightLate": "a late flight: the pickup moves with the flight; waiting charges start only 30 minutes after it lands",
+   "moreTime": "the booker asks for more time during the trip: priced first, the booker says yes, only within the chauffeur's legal hours and before the next booking",
+   "sick": "a passenger is sick in the vehicle: the contract's cleaning fee, with photos and the owner's yes",
+   "minorsAlcohol": "alcohol or drugs found with a minor aboard: the trip ends, the parent who signed is called; no refund (the contract)",
+   "tooMany": "more passengers than seats at pickup: only the seats ride",
+   "breakdown": "a backup vehicle, or a refund for the time lost",
+   "driverOut": "another chauffeur with the right license; a wedding, prom or funeral date can't move",
+   "weather": "the owner may move or shorten a trip; a wedding date can't move: a shorter route or a refund",
+   "lostItem": "held at the garage; the booker is told",
+   "traffic": "a road closure or traffic: the route changes; the booked time still counts",
+   "funeral": "no rating request, no offers"
+  },
+  "pf.facts": [
+   "documents",
+   "photos",
+   "extrawork",
+   "forms",
+   "groups",
+   "children"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7 days before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "cabinet",
+    "storage bay"
+   ],
+   [
+    "Cabinet",
+    "Storage bay"
+   ],
+   [
+    "Shop's",
+    "Garage's"
+   ],
+   [
+    "Color quotes",
+    "Route quotes"
+   ],
+   [
+    "Color quote",
+    "Route quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "valves",
+    "bays"
+   ],
+   [
+    "Valves",
+    "Bays"
+   ],
+   [
+    "clogs",
+    "delays"
+   ],
+   [
+    "Clogs",
+    "Delays"
+   ],
+   [
+    "water heaters",
+    "party buses"
+   ],
+   [
+    "Water heaters",
+    "Party buses"
+   ],
+   [
+    "heaters",
+    "buses"
+   ],
+   [
+    "Heaters",
+    "Buses"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Airport transfer"
+   ],
+   [
+    "kitchen drain clearing",
+    "airport transfer"
+   ],
+   [
+    "Drain clearing",
+    "Airport transfer"
+   ],
+   [
+    "drain clearing",
+    "airport transfer"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Limo Garage LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Limo Garage"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Chauffeurs"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Party Buses"
+   ],
+   [
+    "Lee Electric",
+    "Lee Event Rides"
+   ],
+   [
+    "Riley Chen",
+    "Hugo Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Lina Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Marco Price"
+   ],
+   [
+    "Casey Moore",
+    "Dev Moore"
+   ],
+   [
+    "Riley",
+    "Hugo"
+   ],
+   [
+    "Avery",
+    "Lina"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Dev"
+   ],
+   [
+    "barbershops",
+    "limo garages"
+   ],
+   [
+    "barbershop",
+    "limo garage"
+   ],
+   [
+    "Barbershop",
+    "Limo garage"
+   ],
+   [
+    "barbers",
+    "chauffeurs"
+   ],
+   [
+    "barber chair",
+    "tour bench"
+   ],
+   [
+    "barber",
+    "chauffeur"
+   ],
+   [
+    "Barber",
+    "Chauffeur"
+   ],
+   [
+    "the shop's",
+    "the garage's"
+   ],
+   [
+    "The shop's",
+    "The garage's"
+   ],
+   [
+    "shop's",
+    "garage's"
+   ],
+   [
+    "the shop",
+    "the garage"
+   ],
+   [
+    "The shop",
+    "The garage"
+   ],
+   [
+    "shops",
+    "garages"
+   ],
+   [
+    "shop",
+    "garage"
+   ],
+   [
+    "Shop",
+    "Garage"
+   ],
+   [
+    "Haircuts",
+    "Rides"
+   ],
+   [
+    "haircuts",
+    "rides"
+   ],
+   [
+    "Haircut",
+    "Ride"
+   ],
+   [
+    "haircut",
+    "ride"
+   ],
+   [
+    "Beard trim",
+    "Extra hour"
+   ],
+   [
+    "beard trim",
+    "extra hour"
+   ],
+   [
+    "beard line",
+    "route line"
+   ],
+   [
+    "beard",
+    "route"
+   ],
+   [
+    "Skin fades",
+    "Tour seats"
+   ],
+   [
+    "skin fades",
+    "tour seats"
+   ],
+   [
+    "Skin fade",
+    "Tour seat"
+   ],
+   [
+    "skin fade",
+    "tour seat"
+   ],
+   [
+    "Kids cuts",
+    "Youth rides"
+   ],
+   [
+    "kids cuts",
+    "youth rides"
+   ],
+   [
+    "Kids cut",
+    "Youth ride"
+   ],
+   [
+    "kids cut",
+    "youth ride"
+   ],
+   [
+    "Color and cut",
+    "Prom package"
+   ],
+   [
+    "color and cut",
+    "prom package"
+   ],
+   [
+    "Color correction",
+    "Custom itinerary"
+   ],
+   [
+    "color correction",
+    "custom itinerary"
+   ],
+   [
+    "Color touch-up",
+    "Extra hour"
+   ],
+   [
+    "color touch-up",
+    "extra hour"
+   ],
+   [
+    "color plan",
+    "route plan"
+   ],
+   [
+    "Color plan",
+    "Route plan"
+   ],
+   [
+    "Color",
+    "Route"
+   ],
+   [
+    "color",
+    "route"
+   ],
+   [
+    "patch test",
+    "route check"
+   ],
+   [
+    "cut hair",
+    "drive"
+   ],
+   [
+    "Groom's package",
+    "Wedding package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Wedding package"
+   ],
+   [
+    "Signature cut and shave",
+    "Wedding package"
+   ],
+   [
+    "hot towel shaves",
+    "tour seats"
+   ],
+   [
+    "hot towel",
+    "tour"
+   ],
+   [
+    "shaves",
+    "rides"
+   ],
+   [
+    "shave",
+    "ride"
+   ],
+   [
+    "perms",
+    "party bus rides"
+   ],
+   [
+    "perm",
+    "party bus ride"
+   ],
+   [
+    "cape clip",
+    "seat belt"
+   ],
+   [
+    "cape",
+    "seat"
+   ],
+   [
+    "massage",
+    "airport transfer"
+   ],
+   [
+    "Massage",
+    "Airport transfer"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "pickup line"
+   ],
+   [
+    "facial",
+    "tour"
+   ],
+   [
+    "house calls",
+    "pickups"
+   ],
+   [
+    "house call",
+    "pickup"
+   ],
+   [
+    "House calls",
+    "Pickups"
+   ],
+   [
+    "House call",
+    "Pickup"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Plumbing and electrical",
+    "Wedding and party bus rides"
+   ],
+   [
+    "plumbing and electrical",
+    "wedding and party bus rides"
+   ],
+   [
+    "plumber",
+    "chauffeur"
+   ],
+   [
+    "Plumber",
+    "Chauffeur"
+   ],
+   [
+    "plumbing",
+    "ride"
+   ],
+   [
+    "Plumbing",
+    "Ride"
+   ],
+   [
+    "electrician",
+    "chauffeur"
+   ],
+   [
+    "electrical",
+    "party bus"
+   ],
+   [
+    "Electrical",
+    "Party bus"
+   ],
+   [
+    "clogged drain",
+    "late pickup"
+   ],
+   [
+    "drain",
+    "route"
+   ],
+   [
+    "Drain",
+    "Route"
+   ],
+   [
+    "water heater flush",
+    "party bus hire"
+   ],
+   [
+    "Water heater flush",
+    "Party bus hire"
+   ],
+   [
+    "water heater replacement",
+    "custom route quote"
+   ],
+   [
+    "Water heater replacement",
+    "Custom route quote"
+   ],
+   [
+    "water heater",
+    "party bus"
+   ],
+   [
+    "Water heater",
+    "Party bus"
+   ],
+   [
+    "heater",
+    "bus"
+   ],
+   [
+    "flush",
+    "hire"
+   ],
+   [
+    "service call",
+    "pickup"
+   ],
+   [
+    "Service call",
+    "Pickup"
+   ],
+   [
+    "faucet",
+    "bus"
+   ],
+   [
+    "dishwasher",
+    "bar cart"
+   ],
+   [
+    "garbage disposal",
+    "storage bay"
+   ],
+   [
+    "sewer",
+    "storage bay"
+   ],
+   [
+    "toilet",
+    "storage bay"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "delay"
+   ],
+   [
+    "pipes",
+    "buses"
+   ],
+   [
+    "pipe",
+    "bus"
+   ],
+   [
+    "valve",
+    "bay"
+   ],
+   [
+    "shutoff",
+    "wait"
+   ],
+   [
+    "repipe",
+    "re-route"
+   ],
+   [
+    "supply line",
+    "fuel line"
+   ],
+   [
+    "water line",
+    "fuel line"
+   ],
+   [
+    "heating and cooling",
+    "climate control"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "delay"
+   ],
+   [
+    "leaks",
+    "delays"
+   ],
+   [
+    "Short on the sides",
+    "Short on the route"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "300 Garage Rd"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "14 Cedar Ln"
+   ],
+   [
+    "Elm St",
+    "Garage Rd"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "Barbershops",
+    "Limo garages"
+   ],
+   [
+    "Barbers",
+    "Chauffeurs"
+   ],
+   [
+    "Barber chair",
+    "Tour bench"
+   ],
+   [
+    "Shops",
+    "Garages"
+   ],
+   [
+    "Beard line",
+    "Route line"
+   ],
+   [
+    "Beard",
+    "Route"
+   ],
+   [
+    "Patch test",
+    "Route check"
+   ],
+   [
+    "Cut hair",
+    "Drive"
+   ],
+   [
+    "Hot towel shaves",
+    "Tour seats"
+   ],
+   [
+    "Hot towel",
+    "Tour"
+   ],
+   [
+    "Shaves",
+    "Rides"
+   ],
+   [
+    "Shave",
+    "Ride"
+   ],
+   [
+    "Perms",
+    "Party bus rides"
+   ],
+   [
+    "Perm",
+    "Party bus ride"
+   ],
+   [
+    "Cape clip",
+    "Seat belt"
+   ],
+   [
+    "Cape",
+    "Seat"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Pickup line"
+   ],
+   [
+    "Facial",
+    "Tour"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Chauffeur"
+   ],
+   [
+    "Clogged drain",
+    "Late pickup"
+   ],
+   [
+    "Heater",
+    "Bus"
+   ],
+   [
+    "Flush",
+    "Hire"
+   ],
+   [
+    "Faucet",
+    "Bus"
+   ],
+   [
+    "Dishwasher",
+    "Bar cart"
+   ],
+   [
+    "Garbage disposal",
+    "Storage bay"
+   ],
+   [
+    "Sewer",
+    "Storage bay"
+   ],
+   [
+    "Toilet",
+    "Storage bay"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Delay"
+   ],
+   [
+    "Pipes",
+    "Buses"
+   ],
+   [
+    "Pipe",
+    "Bus"
+   ],
+   [
+    "Valve",
+    "Bay"
+   ],
+   [
+    "Shutoff",
+    "Wait"
+   ],
+   [
+    "Repipe",
+    "Re-route"
+   ],
+   [
+    "Supply line",
+    "Fuel line"
+   ],
+   [
+    "Water line",
+    "Fuel line"
+   ],
+   [
+    "Heating and cooling",
+    "Climate control"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Delay"
+   ],
+   [
+    "Leaks",
+    "Delays"
+   ],
+   [
+    "$35",
+    "@@0@@"
+   ],
+   [
+    "$55",
+    "@@1@@"
+   ],
+   [
+    "$75",
+    "@@2@@"
+   ],
+   [
+    "$140",
+    "@@3@@"
+   ],
+   [
+    "$90",
+    "@@4@@"
+   ],
+   [
+    "$25",
+    "@@5@@"
+   ],
+   [
+    "$40",
+    "@@6@@"
+   ],
+   [
+    "$89",
+    "@@7@@"
+   ],
+   [
+    "@@0@@",
+    "$69"
+   ],
+   [
+    "@@1@@",
+    "$69"
+   ],
+   [
+    "@@2@@",
+    "$125"
+   ],
+   [
+    "@@3@@",
+    "$150"
+   ],
+   [
+    "@@4@@",
+    "$125"
+   ],
+   [
+    "@@5@@",
+    "$20"
+   ],
+   [
+    "@@6@@",
+    "$20"
+   ],
+   [
+    "@@7@@",
+    "$60"
+   ]
+  ],
+  "B": [
+   [
+    "Jordan may price a range, like $80 to $100, set at the visit inside it.",
+    "Marco may give a price range, set at the visit inside it."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like parking in a neighbor's drive without asking."
+   ],
+   [
+    "cabinet",
+    "storage bay"
+   ],
+   [
+    "Cabinet",
+    "Storage bay"
+   ],
+   [
+    "Shop's",
+    "Garage's"
+   ],
+   [
+    "Color quotes",
+    "Route quotes"
+   ],
+   [
+    "Color quote",
+    "Route quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "valves",
+    "bays"
+   ],
+   [
+    "Valves",
+    "Bays"
+   ],
+   [
+    "clogs",
+    "delays"
+   ],
+   [
+    "Clogs",
+    "Delays"
+   ],
+   [
+    "water heaters",
+    "party buses"
+   ],
+   [
+    "Water heaters",
+    "Party buses"
+   ],
+   [
+    "heaters",
+    "buses"
+   ],
+   [
+    "Heaters",
+    "Buses"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Airport transfer"
+   ],
+   [
+    "kitchen drain clearing",
+    "airport transfer"
+   ],
+   [
+    "Drain clearing",
+    "Airport transfer"
+   ],
+   [
+    "drain clearing",
+    "airport transfer"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Limo Garage LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Limo Garage"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Chauffeurs"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Party Buses"
+   ],
+   [
+    "Lee Electric",
+    "Lee Event Rides"
+   ],
+   [
+    "Riley Chen",
+    "Hugo Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Lina Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Marco Price"
+   ],
+   [
+    "Casey Moore",
+    "Dev Moore"
+   ],
+   [
+    "Riley",
+    "Hugo"
+   ],
+   [
+    "Avery",
+    "Lina"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Dev"
+   ],
+   [
+    "barbershops",
+    "limo garages"
+   ],
+   [
+    "barbershop",
+    "limo garage"
+   ],
+   [
+    "Barbershop",
+    "Limo garage"
+   ],
+   [
+    "barbers",
+    "chauffeurs"
+   ],
+   [
+    "barber chair",
+    "tour bench"
+   ],
+   [
+    "barber",
+    "chauffeur"
+   ],
+   [
+    "Barber",
+    "Chauffeur"
+   ],
+   [
+    "the shop's",
+    "the garage's"
+   ],
+   [
+    "The shop's",
+    "The garage's"
+   ],
+   [
+    "shop's",
+    "garage's"
+   ],
+   [
+    "the shop",
+    "the garage"
+   ],
+   [
+    "The shop",
+    "The garage"
+   ],
+   [
+    "shops",
+    "garages"
+   ],
+   [
+    "shop",
+    "garage"
+   ],
+   [
+    "Shop",
+    "Garage"
+   ],
+   [
+    "Haircuts",
+    "Rides"
+   ],
+   [
+    "haircuts",
+    "rides"
+   ],
+   [
+    "Haircut",
+    "Ride"
+   ],
+   [
+    "haircut",
+    "ride"
+   ],
+   [
+    "Beard trim",
+    "Extra hour"
+   ],
+   [
+    "beard trim",
+    "extra hour"
+   ],
+   [
+    "beard line",
+    "route line"
+   ],
+   [
+    "beard",
+    "route"
+   ],
+   [
+    "Skin fades",
+    "Tour seats"
+   ],
+   [
+    "skin fades",
+    "tour seats"
+   ],
+   [
+    "Skin fade",
+    "Tour seat"
+   ],
+   [
+    "skin fade",
+    "tour seat"
+   ],
+   [
+    "Kids cuts",
+    "Youth rides"
+   ],
+   [
+    "kids cuts",
+    "youth rides"
+   ],
+   [
+    "Kids cut",
+    "Youth ride"
+   ],
+   [
+    "kids cut",
+    "youth ride"
+   ],
+   [
+    "Color and cut",
+    "Prom package"
+   ],
+   [
+    "color and cut",
+    "prom package"
+   ],
+   [
+    "Color correction",
+    "Custom itinerary"
+   ],
+   [
+    "color correction",
+    "custom itinerary"
+   ],
+   [
+    "Color touch-up",
+    "Extra hour"
+   ],
+   [
+    "color touch-up",
+    "extra hour"
+   ],
+   [
+    "color plan",
+    "route plan"
+   ],
+   [
+    "Color plan",
+    "Route plan"
+   ],
+   [
+    "Color",
+    "Route"
+   ],
+   [
+    "color",
+    "route"
+   ],
+   [
+    "patch test",
+    "route check"
+   ],
+   [
+    "cut hair",
+    "drive"
+   ],
+   [
+    "Groom's package",
+    "Wedding package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Wedding package"
+   ],
+   [
+    "Signature cut and shave",
+    "Wedding package"
+   ],
+   [
+    "hot towel shaves",
+    "tour seats"
+   ],
+   [
+    "hot towel",
+    "tour"
+   ],
+   [
+    "shaves",
+    "rides"
+   ],
+   [
+    "shave",
+    "ride"
+   ],
+   [
+    "perms",
+    "party bus rides"
+   ],
+   [
+    "perm",
+    "party bus ride"
+   ],
+   [
+    "cape clip",
+    "seat belt"
+   ],
+   [
+    "cape",
+    "seat"
+   ],
+   [
+    "massage",
+    "airport transfer"
+   ],
+   [
+    "Massage",
+    "Airport transfer"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "pickup line"
+   ],
+   [
+    "facial",
+    "tour"
+   ],
+   [
+    "house calls",
+    "pickups"
+   ],
+   [
+    "house call",
+    "pickup"
+   ],
+   [
+    "House calls",
+    "Pickups"
+   ],
+   [
+    "House call",
+    "Pickup"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Plumbing and electrical",
+    "Wedding and party bus rides"
+   ],
+   [
+    "plumbing and electrical",
+    "wedding and party bus rides"
+   ],
+   [
+    "plumber",
+    "chauffeur"
+   ],
+   [
+    "Plumber",
+    "Chauffeur"
+   ],
+   [
+    "plumbing",
+    "ride"
+   ],
+   [
+    "Plumbing",
+    "Ride"
+   ],
+   [
+    "electrician",
+    "chauffeur"
+   ],
+   [
+    "electrical",
+    "party bus"
+   ],
+   [
+    "Electrical",
+    "Party bus"
+   ],
+   [
+    "clogged drain",
+    "late pickup"
+   ],
+   [
+    "drain",
+    "route"
+   ],
+   [
+    "Drain",
+    "Route"
+   ],
+   [
+    "water heater flush",
+    "party bus hire"
+   ],
+   [
+    "Water heater flush",
+    "Party bus hire"
+   ],
+   [
+    "water heater replacement",
+    "custom route quote"
+   ],
+   [
+    "Water heater replacement",
+    "Custom route quote"
+   ],
+   [
+    "water heater",
+    "party bus"
+   ],
+   [
+    "Water heater",
+    "Party bus"
+   ],
+   [
+    "heater",
+    "bus"
+   ],
+   [
+    "flush",
+    "hire"
+   ],
+   [
+    "service call",
+    "pickup"
+   ],
+   [
+    "Service call",
+    "Pickup"
+   ],
+   [
+    "faucet",
+    "bus"
+   ],
+   [
+    "dishwasher",
+    "bar cart"
+   ],
+   [
+    "garbage disposal",
+    "storage bay"
+   ],
+   [
+    "sewer",
+    "storage bay"
+   ],
+   [
+    "toilet",
+    "storage bay"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "delay"
+   ],
+   [
+    "pipes",
+    "buses"
+   ],
+   [
+    "pipe",
+    "bus"
+   ],
+   [
+    "valve",
+    "bay"
+   ],
+   [
+    "shutoff",
+    "wait"
+   ],
+   [
+    "repipe",
+    "re-route"
+   ],
+   [
+    "supply line",
+    "fuel line"
+   ],
+   [
+    "water line",
+    "fuel line"
+   ],
+   [
+    "heating and cooling",
+    "climate control"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "delay"
+   ],
+   [
+    "leaks",
+    "delays"
+   ],
+   [
+    "Short on the sides",
+    "Short on the route"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "300 Garage Rd"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "14 Cedar Ln"
+   ],
+   [
+    "Elm St",
+    "Garage Rd"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "Barbershops",
+    "Limo garages"
+   ],
+   [
+    "Barbers",
+    "Chauffeurs"
+   ],
+   [
+    "Barber chair",
+    "Tour bench"
+   ],
+   [
+    "Shops",
+    "Garages"
+   ],
+   [
+    "Beard line",
+    "Route line"
+   ],
+   [
+    "Beard",
+    "Route"
+   ],
+   [
+    "Patch test",
+    "Route check"
+   ],
+   [
+    "Cut hair",
+    "Drive"
+   ],
+   [
+    "Hot towel shaves",
+    "Tour seats"
+   ],
+   [
+    "Hot towel",
+    "Tour"
+   ],
+   [
+    "Shaves",
+    "Rides"
+   ],
+   [
+    "Shave",
+    "Ride"
+   ],
+   [
+    "Perms",
+    "Party bus rides"
+   ],
+   [
+    "Perm",
+    "Party bus ride"
+   ],
+   [
+    "Cape clip",
+    "Seat belt"
+   ],
+   [
+    "Cape",
+    "Seat"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Pickup line"
+   ],
+   [
+    "Facial",
+    "Tour"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Chauffeur"
+   ],
+   [
+    "Clogged drain",
+    "Late pickup"
+   ],
+   [
+    "Heater",
+    "Bus"
+   ],
+   [
+    "Flush",
+    "Hire"
+   ],
+   [
+    "Faucet",
+    "Bus"
+   ],
+   [
+    "Dishwasher",
+    "Bar cart"
+   ],
+   [
+    "Garbage disposal",
+    "Storage bay"
+   ],
+   [
+    "Sewer",
+    "Storage bay"
+   ],
+   [
+    "Toilet",
+    "Storage bay"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Delay"
+   ],
+   [
+    "Pipes",
+    "Buses"
+   ],
+   [
+    "Pipe",
+    "Bus"
+   ],
+   [
+    "Valve",
+    "Bay"
+   ],
+   [
+    "Shutoff",
+    "Wait"
+   ],
+   [
+    "Repipe",
+    "Re-route"
+   ],
+   [
+    "Supply line",
+    "Fuel line"
+   ],
+   [
+    "Water line",
+    "Fuel line"
+   ],
+   [
+    "Heating and cooling",
+    "Climate control"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Delay"
+   ],
+   [
+    "Leaks",
+    "Delays"
+   ],
+   [
+    "$600",
+    "@@0@@"
+   ],
+   [
+    "$179",
+    "@@1@@"
+   ],
+   [
+    "$199",
+    "@@2@@"
+   ],
+   [
+    "$89",
+    "@@3@@"
+   ],
+   [
+    "$160",
+    "@@4@@"
+   ],
+   [
+    "$640",
+    "@@5@@"
+   ],
+   [
+    "$358",
+    "@@6@@"
+   ],
+   [
+    "$120",
+    "@@7@@"
+   ],
+   [
+    "$140",
+    "@@8@@"
+   ],
+   [
+    "$75",
+    "@@9@@"
+   ],
+   [
+    "$35",
+    "@@10@@"
+   ],
+   [
+    "$40",
+    "@@11@@"
+   ],
+   [
+    "$110",
+    "@@12@@"
+   ],
+   [
+    "$169",
+    "@@13@@"
+   ],
+   [
+    "$1,200",
+    "@@14@@"
+   ],
+   [
+    "@@0@@",
+    "$1100"
+   ],
+   [
+    "@@1@@",
+    "$125"
+   ],
+   [
+    "@@2@@",
+    "$150"
+   ],
+   [
+    "@@3@@",
+    "$60"
+   ],
+   [
+    "@@4@@",
+    "$180"
+   ],
+   [
+    "@@5@@",
+    "$1200"
+   ],
+   [
+    "@@6@@",
+    "$250"
+   ],
+   [
+    "@@7@@",
+    "$150"
+   ],
+   [
+    "@@8@@",
+    "$150"
+   ],
+   [
+    "@@9@@",
+    "$125"
+   ],
+   [
+    "@@10@@",
+    "$69"
+   ],
+   [
+    "@@11@@",
+    "$180"
+   ],
+   [
+    "@@12@@",
+    "$540"
+   ],
+   [
+    "@@13@@",
+    "$115"
+   ],
+   [
+    "@@14@@",
+    "$1200"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books a brewery tour seat from Lee Limo Garage for Sat Oct 24 at 11:00am, for a sister's birthday. Lina checks the seat at the garage desk, and Alex pays $69 when booking.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Chauffeurs for a wedding stretch limo, 4 hours, from 14 Cedar Ln. Marco arrives Thu Oct 22 at 2:00pm, drives the party, and the rest is charged to Alex's saved card when Marco texts DONE."
+ },
+ "cast": {
+  "A": {
+   "staff": "Hugo and Lina (desk)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a school, a wedding planner)"
+  },
+  "B": {
+   "staff": "Marco and Dev (chauffeurs)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a venue, a parent, a planner)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Hugo"
+  },
+  "B": {
+   "staff": "Marco"
+  }
+ },
+ "keep": [],
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a brewery tour seat from the garage lot, $69, paid in full when booking.",
+    "list|none|counter": "A free vehicle viewing at the garage: nothing taken, nothing to pay."
+   },
+   "amounts": {
+    "list|full|*": {
+     "price": "$69",
+     "paid": "$69",
+     "fee": "$20",
+     "name": "Brewery tour seat (21+)"
+    },
+    "list|none|*": {
+     "price": "$0",
+     "fee": "$0",
+     "name": "Free vehicle viewing"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|card|card",
+    "list|full|none",
+    "photos|deposit|card"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: a wedding stretch limo, 4 hours: $720 with the 20% gratuity. A 25% deposit ($180) with the contract; the $540 rest is charged to the saved card when Marco texts DONE.",
+    "list|card|card": "An airport transfer, $125 flat: a card saved for a $60 late-cancel fee; the $125 charged when the chauffeur texts DONE.",
+    "list|full|none": "A prom package, $850, paid in full when the parent signs and books.",
+    "photos|deposit|card": "A custom party bus night, quoted from the route at $1,200: a $300 deposit with the contract, the $900 rest charged to the saved card at DONE."
+   },
+   "amounts": {
+    "list|deposit|*": {
+     "price": "$720",
+     "deposit": "$180",
+     "rest": "$540",
+     "fee": "$180",
+     "name": "Wedding stretch limo, 4 hours"
+    },
+    "list|card|*": {
+     "price": "$125",
+     "fee": "$60",
+     "name": "Airport transfer, flat"
+    },
+    "list|full|*": {
+     "price": "$850",
+     "paid": "$850",
+     "fee": "$150",
+     "name": "Prom package"
+    },
+    "photos|deposit|*": {
+     "price": "$1200",
+     "deposit": "$300",
+     "rest": "$900",
+     "fee": "$300",
+     "name": "Custom party bus night"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02",
+   "A8-67"
+  ],
+  "B": [
+   "S1-38",
+   "B5-34",
+   "B10-32"
+  ]
+ },
+ "notes": "Limo, chauffeur and party bus (event style; from rentals, with the verified sample plug-in as the base, work/testdrive/limo.md). Refit for the rebuilt master (N4, Oct 27): the sample's money words are gone and money is the amounts rows. Flow B (Lee Chauffeur Service comes to the customer): a wedding stretch limo, 4 hours, $720 with the 20% gratuity, a $180 deposit when the contract is signed, the $540 rest charged to the saved card when the chauffeur texts DONE ($180 kept on a late cancel); an airport transfer, $125 flat, a card saved for a $60 late-cancel fee, charged at DONE; a prom package, $850 paid in full when the parent signs, $150 kept on a late cancel; a custom party-bus night quoted from the route at $1,200, a $300 deposit, the $900 rest at DONE. Flow A (Lee Limo Garage, the customer comes): a brewery tour seat for 21+, $69 paid in full ($20 kept on a late cancel), and a free vehicle viewing with nothing taken. The rest of a wedding or bus is never charged on a set day (the sample's 7-days-before line is removed). Licenses: permits, chauffeur papers and insurance are the owner's own, shown as given, never checked (D96). $2 applies to every booking (D97). Sensitive is off; children are covered by the children fact, and a prom's students' details stay on the secure page. The verified sample findings (work/gaps/limo.json) stand.",
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup (D96): the owner's own permits, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license lookup (D96): the owner's own chauffeur papers."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "a vehicle and a chauffeur are booked, not a space"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "rides are booked ahead, never sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "no spaces"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "no children"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "nothing is left"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "tours are rated"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes at a limo company."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup (D96): the owner's own permits, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license lookup (D96): the owner's own chauffeur papers."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "a vehicle and a chauffeur are booked, not a space"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "rides are booked ahead, never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "a pickup is a set time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "flow B trips are private"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "a parent hands students over at a prom pickup"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "a passenger must be there"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes at a limo company."
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "We'd share only where they're working, only after a missed check.",
+    "Shop's",
+    "Color quotes",
+    "Color quote",
+    "At the chair",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Drain clearing",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "beard",
+    "skin fades",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Color touch-up",
+    "color touch-up",
+    "color plan",
+    "Color plan",
+    "Color",
+    "color",
+    "patch test",
+    "cut hair",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perms",
+    "perm",
+    "cape clip",
+    "cape",
+    "massage",
+    "Massage",
+    "gloss",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain",
+    "water heater",
+    "heater",
+    "pipe",
+    "valve",
+    "leak",
+    "Springfield",
+    "2020-1187",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Beard",
+    "Gloss",
+    "Leak",
+    "Leaks",
+    "$35",
+    "$55",
+    "$75",
+    "$140",
+    "$90",
+    "$25",
+    "$40",
+    "$89"
+   ],
+   "B": [
+    "Jordan may price a range, like $80 to $100, set at the visit inside it.",
+    "We'd share only where they're working, only after a missed check.",
+    "Like tapping a neighbor's water line without asking.",
+    "cabinet",
+    "Cabinet",
+    "valves",
+    "clogs",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircut",
+    "haircut",
+    "beard trim",
+    "beard",
+    "color",
+    "cut hair",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perm",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "drain",
+    "Drain",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater",
+    "Water heater",
+    "heater",
+    "flush",
+    "service call",
+    "Service call",
+    "faucet",
+    "dishwasher",
+    "sewer",
+    "overflowing",
+    "sink",
+    "clog",
+    "pipes",
+    "pipe",
+    "valve",
+    "shutoff",
+    "repipe",
+    "supply line",
+    "water line",
+    "heating and cooling",
+    "leak",
+    "Springfield",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Sewer",
+    "Overflowing",
+    "Shutoff",
+    "Repipe",
+    "Supply line",
+    "Heating and cooling",
+    "Leak",
+    "Leaks",
+    "$600",
+    "$179",
+    "$199",
+    "$89",
+    "$160",
+    "$640",
+    "$358",
+    "$120",
+    "$140",
+    "$75",
+    "$35",
+    "$40",
+    "$110",
+    "$169"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "S1-82": "5fac7742c5"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "S1-82": "5fac7742c5"
+  }
+ }
+}

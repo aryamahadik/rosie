@@ -1,0 +1,4253 @@
+{
+ "id": "wildlife",
+ "name": "Wildlife and animal removal",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "pest",
+ "plugin": {
+  "pf.license": {
+   "need": "Yes, where the state's form says so (nearly every state): a nuisance wildlife control license or permit for the company and for each technician who traps or removes animals. Extra permits can apply to protected species (bats, nesting birds), to moving or releasing animals, and to animals that carry rabies. Exclusion work that repairs a building can need a contractor registration where the state requires one. The desk (reading photos) needs a business registration only.",
+   "ask": "The company's license or registration number at sign-up. Each technician's license number and species permits in their invite reply.",
+   "who_holds": "Both: the business, and each technician. Where a state lets a helper work under a licensed technician, the state's form says how.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "insurance_bond": "General liability and workers' comp are common, and a state may ask for a bond. 'Insured' is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Crews work inside homes: the business's own word that they are checked, or a check Rosie holds where the state's rules require one.",
+   "rabies_and_training": "Where the state requires training or a vaccine record for handling certain animals, the form asks for it. It is shown as given by the business, not checked by Rosie.",
+   "not_this_work": "Pest control (insects, rodents, termites) is its own licensed kind of work. Bears, deer, big cats and coyotes belong to the state's wildlife agency or animal control. Lost or stray pets belong to animal control."
+  },
+  "pf.services": {
+   "pattern": "Set service: a fixed service at the customer's place, priced by the answers, with trap checks on following days.",
+   "list": [
+    {
+     "name": "Inspection (find the animal and the entry points)",
+     "price_kind": "one price",
+     "example": "$89, credited to the work if the customer books it",
+     "length": "about 1 hour",
+     "where": "at the customer's place",
+     "money": "card saved at booking for the fee; charged at DONE if booked alone"
+    },
+    {
+     "name": "Trapping and removal (one animal)",
+     "price_kind": "set by the customer's answers (the animal, how many, where)",
+     "example": "$179 with up to 3 trap checks (the example business's own price); each extra check $45",
+     "length": "about 1 hour to set up, then short trap checks on following days",
+     "where": "at the customer's place",
+     "money": "card saved at booking for the fee; the saved card is charged when the job is finished (DONE)"
+    },
+    {
+     "name": "Entry point sealing",
+     "price_kind": "set by the customer's answers (how many entry points)",
+     "example": "$150 for one entry point",
+     "length": "about 2 hours",
+     "where": "at the customer's place",
+     "money": "nothing taken, or the full price when booking, Sam's choice (the sign-up example pays it in full)"
+    },
+    {
+     "name": "Dead animal removal",
+     "price_kind": "from the list",
+     "example": "$199, with the entry point checked",
+     "length": "about 1 hour",
+     "where": "at the customer's place",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Attic cleanup and insulation",
+     "price_kind": "quoted from the customer's photos first",
+     "example": "$640 for a small attic (droppings removed, insulation replaced)",
+     "length": "half a day",
+     "where": "at the customer's place",
+     "money": "a 25% deposit once the quote is OK'd, where the state's caps allow ($160 in the example); the rest charged at DONE"
+    },
+    {
+     "name": "Attic exclusion and repair",
+     "price_kind": "quoted at the inspection, before any work",
+     "example": "only the $89 inspection is promised",
+     "length": "1 to 2 days",
+     "where": "at the customer's place",
+     "money": "card saved; a deposit where the state's caps allow; the rest charged at DONE",
+     "note": "A signed service agreement with the exclusion guarantee (the example: 1 year on each sealed entry point)."
+    },
+    {
+     "name": "Animal ID from a photo",
+     "price_kind": "free",
+     "example": "send a photo or a recording; a technician names the animal and says what the visit would be",
+     "where": "by text, or at the desk",
+     "money": "nothing taken, nothing after"
+    },
+    {
+     "name": "By the hour",
+     "price_kind": "per hour",
+     "example": "$120 an hour, 1-hour minimum",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Add-ons",
+     "price_kind": "one price each, added only when the customer asks",
+     "example": "sealing a second entry point $160; a chimney cap $180; droppings cleanup of one room $120"
+    },
+    {
+     "name": "Inspection fee",
+     "price_kind": "one price",
+     "example": "$89: the late-cancel and nobody-home fee when the owner confirms it, and owed when a quoted job isn't booked",
+     "where": "not booked alone as a fee"
+    },
+    {
+     "name": "Photo and plan services at the desk (Lee Wildlife Desk)",
+     "price_kind": "one price by service, from photos, or at the counter",
+     "example": "animal ID from photos $35, entry point photo check $40, deterrent advice $20, nest and den check $25, exclusion plan $55, wildlife-proofing plan $140, attic damage check from photos $90, a complex case priced at the counter after a $25 look",
+     "where": "at the desk; no animal, alive or dead, is ever brought in",
+     "money": "nothing taken; paid at the counter"
+    }
+   ],
+   "capacity": "One technician for trapping, ID and checks. Two for exclusion and cleanup. The desk needs one person at the counter.",
+   "nobody_home": "The first visit needs an adult at home. A trap check outside or on the roof, with no need to enter the home, can be done with nobody home, and DONE comes with a photo.",
+   "online": "No removal by video or phone. A photo or recording ID is free by text.",
+   "not_offered": "Pest control, poison baits, bears, deer, big cats, coyotes, venomous snakes, stray or lost pets, and any animal that is sick or hurt (animal control).",
+   "season": "Spring and summer: young animals may be in the nest. Bats: no exclusion while young can't fly, where the state sets a season. Nesting birds: no removal of an active nest."
+  },
+  "pf.questions": {
+   "before_times": [
+    "What you saw or heard: scratching, droppings, a smell, or the animal itself",
+    "Where: the attic, a wall, the chimney, a crawl space, the garage, a vent or the yard",
+    "Since when, and whether it is day or night",
+    "Whether young animals might be there (spring and summer)",
+    "Any holes you can see, and the roof's height",
+    "Own or rent: the landlord's OK for exclusion and repairs",
+    "At the desk: which photos or recordings you have"
+   ],
+   "after_a_time": [
+    "Who will be home: the customer, or someone else (their name and mobile go on the secure page)",
+    "Where the attic access is, and which side the ladder goes on",
+    "Pets, and where they'll be",
+    "Parking"
+   ],
+   "secure_page_only": [
+    "The street address",
+    "Gate or lock codes",
+    "The landlord's name and mobile",
+    "Photos inside the home",
+    "Any bite, scratch or exposure details",
+    "The card"
+   ],
+   "who_may_book": "An adult who owns or rents the home. A renter books the inspection and trapping; the landlord's OK is needed for exclusion and repairs."
+  },
+  "pf.safety": {
+   "words": [
+    "someone bitten or scratched by a wild animal",
+    "a bat in a room where someone slept, or near a child or pet",
+    "an animal that is sick, hurt or acting aggressive",
+    "a bear, a coyote, a big cat or another dangerous animal",
+    "a venomous snake",
+    "a gas smell",
+    "smoke or fire",
+    "a roof or attic floor that isn't safe"
+   ],
+   "what_happens": [
+    "A bite or scratch: wash the wound with soap and water, then call a doctor or the local health department now, and 911 if it's serious. Don't touch the animal. No booking until they've been cared for.",
+    "A bat in a room where someone slept, or near a child or pet: don't touch it, shut the door of the room, and call the local health department today. No booking in that chat until they have called.",
+    "A sick, hurt or aggressive animal, a bear, a coyote, a big cat or a venomous snake: stay away, keep people and pets inside, and call local animal control. Call 911 if anyone is at risk. This business doesn't take those; Rosie points to animal control.",
+    "A gas smell, smoke or fire: leave and call 911. Rosie never places the call. No booking until it's safe.",
+    "An unsafe roof or attic floor: stay out of that area; no booking for it until it's fixed.",
+    "Noises in the attic or a wall, or a calm animal loose in the house: stay out of the attic, keep pets away, don't block any hole, and shut the door of the room. The booking goes on.",
+    "Questions about whether an animal carries a disease, or about an exposure, are answered only by a doctor or the health department. Rosie never answers them."
+   ],
+   "booking_goes_on": "Yes, after the safety steps, for noises, droppings, a calm animal in the house or a dead animal. No, for a bite or scratch, a bat in a room where someone slept, a sick or dangerous animal, a gas smell or smoke, until everyone is safe."
+  },
+  "pf.first_steps": {
+   "before_the_visit": [
+    {
+     "step": "The inspection",
+     "for": "Exclusion and repair jobs and cleanup",
+     "timing": "Before the quote; the owner picks photos first or a visit"
+    },
+    {
+     "step": "A species and season check",
+     "for": "Bats (no exclusion while young can't fly, where the state sets a season) and nesting birds (no removal of an active nest)",
+     "timing": "Before any booking for them; the booking can move with no fee"
+    },
+    {
+     "step": "Young animals",
+     "for": "A mother with young: she isn't removed alone",
+     "timing": "At the inspection; the owner decides the plan"
+    },
+    {
+     "step": "The landlord's OK",
+     "for": "A renter's exclusion or repairs",
+     "timing": "Before the quote is booked"
+    },
+    {
+     "step": "A signed service agreement",
+     "for": "Exclusion and repair over the plug-in's amount, with the guarantee",
+     "timing": "Signed on the secure page before the work"
+    }
+   ],
+   "prep_for_reminder": [
+    "Keep pets inside and away from the attic door",
+    "Clear the way to the attic access and the ladder side",
+    "Leave the entry code on the secure page, not in a text",
+    "Don't block, fill or poke any hole yourself"
+   ],
+   "desk": "At the desk: photos and recordings on a phone. No animal, alive or dead, and no droppings are brought in."
+  },
+  "pf.visit": {
+   "check_in": "The check-in code at the door, entered by the technician. The on-my-way text names the technician, with a photo.",
+   "desk": "At Lee Wildlife Desk: the code at the counter when the visit starts. Photos are looked at there. Nothing is taken in.",
+   "what_a_visit_covers": "The technician finds the animal's way in, sets traps or one-way doors where the state's rules allow, and tells the customer what was done. Trap checks follow on the days the state's rules require, and each check gets a short text: empty, or caught. Entry points are sealed after the animals are out.",
+   "release": "What happens to an animal after it is caught follows the state's rules. Texts say only that the animal was removed.",
+   "weather": "Roof and ladder work only when it's dry and not windy. Otherwise the visit moves with no fee.",
+   "findings": "Nothing is sealed or repaired unless it's quoted and OK'd. A second entry point found is priced before it's done. Over the owner's limit (the example: $500), the owner OKs it first.",
+   "a_hazard_found": "Young animals, a bat colony in its protected season, a sick animal or a nest of an active bird: that part stops at once, and a written note goes to the customer, kept with the photos.",
+   "work_sold_at_the_home": "A written right to cancel, where the rules require it.",
+   "proof_done": "DONE with the bill's lines and the after photos: the entry points sealed and the animals removed. The report goes with the receipt."
+  },
+  "pf.money": {
+   "start": "At the customer's place: a card saved at booking for the $89 inspection and late-cancel fee, and the saved card is charged when the technician texts DONE; or nothing taken and Rosie texts the bill. Desk visits: nothing taken, paid at the counter.",
+   "deposits": "Exclusion and cleanup from a quote: the owner may take a 25% deposit once the quote is OK'd, within the state's caps. The rest is charged at DONE. Deposit cap: from the state form.",
+   "fees": "Late cancel and nobody home: the $89 inspection fee, never more than what was paid now when money was paid now. Needs a saved card. The owner confirms each one; no answer, no fee. No card saved, no fee.",
+   "trap_checks": "The trapping price covers up to 3 trap checks. Each extra check is an added service, paid at the visit.",
+   "plans": "None by default.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "insurance_claims": "A home insurance claim for animal damage is the customer's own; the customer gets the receipt and the photo report.",
+   "rosfield_fee": "The usual $2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate or lock codes, and where a key is kept",
+    "Card details",
+    "Photos from inside the home. The report and photos open on the secure page.",
+    "A bite, a scratch or an exposure, and any health reason. Those go on the secure page only."
+   ],
+   "languages": "English and Spanish.",
+   "danger_words": "Bite, bat, gas and smoke words always get the safety message first, before anything else.",
+   "minors": "Nobody under 18 books."
+  },
+  "pf.staff": {
+   "skills": [
+    "Trapping and removal (a licensed wildlife control technician)",
+    "Exclusion and sealing, with roof and ladder work (a crew of two)",
+    "Attic cleanup and insulation",
+    "Bat work, outside the protected season only",
+    "Desk work: naming animals from photos and recordings"
+   ],
+   "crews": "One technician for trapping and checks; two for exclusion and cleanup: a lead, who holds the entry code and texts DONE, and a helper. A person who works alone adds an emergency contact, and a missed safety check gives that contact the job's address only.",
+   "licenses": "Each technician's own license where the state licenses people, with any species permit. It shows as given by the business, not checked by Rosie.",
+   "new_person_ok": "A technician the customer hasn't booked is offered by text first, never sent without an OK.",
+   "who_oks": "The owner OKs fees, quotes over the limit, same-day jobs and anything with a protected species. The office manager may OK prices if the owner sets it.",
+   "stand_ins": "Another technician with the same license and permits, at the same window and price."
+  },
+  "pf.rules": {
+   "written_estimate": "A written estimate before exclusion and repair work above an amount: from the state form.",
+   "add_on_at_home": "A written right to cancel for work sold at the home, where the rules require it.",
+   "methods": "Only the methods the state's rules allow, and release or relocation as those rules say. The business never offers poison.",
+   "protected_species": "Bats in their protected season and active bird nests: no exclusion or removal until the state's season or the nest allows it.",
+   "young_animals": "A mother with young isn't removed alone.",
+   "landlord": "A renter books inspection and trapping; the landlord's OK is needed for exclusion and repairs.",
+   "warranty": "The owner's own exclusion guarantee, shown on the receipt (the example: 1 year on each sealed entry point).",
+   "records": "7 years, with the before and after photos and any species permit."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "A bite, a scratch or a bat where someone slept at any point: the safety steps first, then the health department; the owner is told",
+    "A sick, hurt, aggressive or dangerous animal: animal control, not a booking",
+    "Young animals found: the mother isn't removed alone; the owner decides and the visit can move with no fee",
+    "A bat colony in the protected season: that part stops; the booking can move with no fee",
+    "An active bird nest: no removal until it is empty",
+    "A pet or another animal caught by mistake: released and noted; the customer is told",
+    "A second entry point found: priced before it is sealed",
+    "A dead animal inside a wall or attic: a smell that stays until it is found; the owner prices the opening",
+    "Wet or windy on a roof day: the visit moves with no fee",
+    "Noises again after sealing: tell the business; a free return visit under the guarantee",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee"
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "firststeps",
+   "photos",
+   "documents",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Pilar and Jonas (desk techs at the wildlife desk)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Dmitri and Alma (wildlife technicians)",
+   "cust": "Alex M. (customer) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Pilar"
+  },
+  "B": {
+   "staff": "Dmitri"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex goes to Lee Wildlife Desk, Sat Oct 24 at 11:00am, with photos of a hole at the roofline, and Pilar names the animal at the counter. The visit depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Wildlife Control for scratching in the attic at 56 Willow Ln: trapping and removal, Thu Oct 22, arriving between 8 and 10am with Dmitri, then trap checks on the days after. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|full|none",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|none|counter": "The main story: a $35 animal ID from photos. Nothing is taken: a YES books the visit. Alex pays at the counter.",
+    "list|card|counter": "A $35 animal ID from photos. A card is saved for the desk's $20 fee. Alex pays at the counter.",
+    "list|full|none": "An exclusion plan, $55, paid in full when booking.",
+    "photos|none|counter": "An attic damage check, priced from Alex's photos at $90. Booked once it's OK'd; paid at the counter.",
+    "visit|none|counter": "A complex case, priced at the counter. Only the $25 look is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Animal ID"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Animal ID"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Exclusion plan"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Attic damage check"
+    },
+    "visit|*|*": {
+     "name": "Complex case review"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Deterrent advice",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Exclusion plan",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Animal ID (check-in)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "photos|deposit|card",
+    "visit|card|card"
+   ],
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: trapping and removal of one animal, $179 with up to 3 trap checks. A card is saved for the $89 inspection fee and charged $179 when Dmitri texts DONE.",
+    "list|none|bill": "The same $179 trapping and removal. Nothing is taken. Rosie texts the bill after the job.",
+    "photos|deposit|card": "An attic cleanup and insulation, priced from photos at $640. Sam OKs it. A $160 deposit now, and the $480 rest is charged to the card at DONE.",
+    "visit|card|card": "An attic exclusion and repair, priced at the inspection before any work. A card is saved for the $89 fee."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Trapping and removal"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Trapping and removal"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Attic cleanup and insulation"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Attic cleanup and insulation"
+    },
+    "visit|*|*": {
+     "name": "Attic exclusion and repair"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Entry point sealing",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Dead animal removal",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$199",
+      "paid": "$199",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Trap check (extra)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "color",
+  "visit fee",
+  "Visit fee"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your desk, paid at the counter, your own way"
+   ],
+   [
+    "A haircut at",
+    "An animal ID at"
+   ],
+   [
+    "a haircut at",
+    "an animal ID at"
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "This work takes no jobs sent now."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither wildlife control nor the desk takes jobs sent now."
+   ],
+   [
+    "Service call fee",
+    "Inspection fee"
+   ],
+   [
+    "service call fee",
+    "inspection fee"
+   ],
+   [
+    "Service call",
+    "Inspection"
+   ],
+   [
+    "service call",
+    "inspection"
+   ],
+   [
+    "Water pressure check",
+    "Animal ID from a photo"
+   ],
+   [
+    "Labor",
+    "By the hour"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, credited to the work"
+   ],
+   [
+    "A nothing before, and at their home too, 75, paid when they book.",
+    "A nothing before, and D paid when they book too."
+   ],
+   [
+    "A at their home too, 75, paid when they book",
+    "D paid when they book too"
+   ],
+   [
+    "Set. For a haircut, the customer picks the place and sees both prices first. The rest stays as on the card.",
+    "Set. Here's what changed for the desk. The rest stays as on the card."
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Only at your desk: no work at a customer's place"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the desk"
+   ],
+   [
+    "a house call, $75",
+    "a nest and den check, $25"
+   ],
+   [
+    "Haircut at their home",
+    "Nest and den check"
+   ],
+   [
+    "Haircut at home · $75",
+    "Nest and den check · $25"
+   ],
+   [
+    "Haircut at the shop",
+    "Animal ID"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning visit"
+   ],
+   [
+    "Faucet",
+    "Soffit"
+   ],
+   [
+    "BS20981",
+    "WC-20981"
+   ],
+   [
+    "EC22871",
+    "WC-20871"
+   ],
+   [
+    "Electric.",
+    "Exclusion work."
+   ],
+   [
+    "Barbering",
+    "Wildlife desk work"
+   ],
+   [
+    "Color plan",
+    "Proofing plan"
+   ],
+   [
+    "Avery Diaz",
+    "Jonas Berg"
+   ],
+   [
+    "Riley Chen",
+    "Pilar Soto"
+   ],
+   [
+    "the consult",
+    "the look"
+   ],
+   [
+    "a skin fade",
+    "an entry point check"
+   ],
+   [
+    "Casey Moore",
+    "Alma Reyes"
+   ],
+   [
+    "Dryer vents.",
+    "Exclusion work."
+   ],
+   [
+    "consult only",
+    "look only"
+   ],
+   [
+    "Consult only",
+    "Look only"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "a beard trim",
+    "a deterrent advice"
+   ],
+   [
+    "Haircut plans",
+    "Check-in plans"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s check"
+   ],
+   [
+    "plumbing jobs",
+    "wildlife jobs"
+   ],
+   [
+    "plumbing job",
+    "wildlife job"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm · Pilar"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm · Pilar"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm · Jonas"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am · Pilar"
+   ],
+   [
+    "Shorter is fine",
+    "Quick is fine"
+   ],
+   [
+    "No gloss today.",
+    "No follow-up check today."
+   ],
+   [
+    "gloss",
+    "follow-up check"
+   ],
+   [
+    "Gloss to finish",
+    "Follow-up check"
+   ],
+   [
+    "The Groom's package",
+    "The wildlife-proofing plan"
+   ],
+   [
+    "Plumbing price list",
+    "Wildlife trapping price list"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Pilar sees the photos"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a animal ID every 3 months"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Jan 23 · 10:00am"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything Pilar should know?"
+   ],
+   [
+    "Saturdays · 11:00am · Riley",
+    "Saturdays · 11:00am drop-off"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am · Pilar"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Check-in plan · every 3 months"
+   ],
+   [
+    "Haircut plan",
+    "Check-in plan"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Animal ID, entry point check and deterrent advice"
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Wildlife Desk · drop-in"
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Animal ID every 3 months · Pilar"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "One hole at the roofline was missed."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video look at a roofline"
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your report is ready for pick-up."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a property manager's photo checks together"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a photo check every spring."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A wildlife desk books a person's time."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. animal ID Sat 11am Pilar"
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's check missed one hole at the roofline"
+   ],
+   [
+    "After the job: Rosie sends the bill",
+    "After the job: the saved card is charged at DONE"
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a care pack of three photo checks at the desk."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 look; priced at the counter"
+   ],
+   [
+    "$25 consult",
+    "$25 look"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Pilar?"
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "The photos this check needs are missing."
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24, 11:00am · animal ID with Pilar"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am visit with Pilar? It's free."
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved for the $89 inspection fee"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your animal ID is part of a plan, every 3 months."
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a check-in plan with Pilar, every 3 months."
+   ],
+   [
+    "haircut plan",
+    "check-in plan"
+   ],
+   [
+    "Alex M. says a stain is still there after Saturday's wash.",
+    "Alex M. says a hole was missed in Saturday's check."
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds counter spots side by side across Pilar and Jonas."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A property manager brings photos from five units on one morning."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "The desk takes no drop-offs, and never takes an animal. A repair shop, a tailor or a groomer takes items."
+   ],
+   [
+    "It's on file under Jordan Price, a license holder. Now send your electrical prices.",
+    "It's on file under Dmitri Volkov, a license holder. Now send your exclusion work prices."
+   ],
+   [
+    "Jordan Price",
+    "Dmitri Volkov"
+   ],
+   [
+    "Vent washing needs no state license where Sam works, so only the registration is asked.",
+    "Where the state licenses wildlife work, the desk shows it here. Reading photos needs no license."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Rosie finds one time long enough for both, with one desk tech, and adds the prices: $35 and $20."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like Pilar's wildlife-proofing plan after a look, or a lawyer's engagement letter."
+   ],
+   [
+    "color plan",
+    "proofing plan"
+   ],
+   [
+    "Thanks. Duct cleaning needs no state license where you work. What's the business registration Lee Duct Care works under?",
+    "Thanks. The state licenses wildlife control. What's the license number Lee Wildlife Control works under?"
+   ],
+   [
+    "The desk's plug-in adds its own danger words: a bite or a scratch from a wild animal, or a bat in a room where someone slept.",
+    "The desk's plug-in adds its own danger words: a bite or scratch, or a bat where someone slept."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Pilar can still look at the photos in the time left, at the same price, or you can move. No reply by 11:00am keeps the shorter time."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Humane wildlife trapping, exclusion and cleanup for homes in Springfield, within 25 miles."
+   ],
+   [
+    "water heaters",
+    "attics"
+   ],
+   [
+    "A water heater job",
+    "A trapping job"
+   ],
+   [
+    "water heater",
+    "attic"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood wildlife desk on Mill St. Animal ID from photos, entry point checks and wildlife-proofing plans."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Animal ID from photos, entry point checks and wildlife-proofing plans."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Pilar and Jonas read photos at the desk; Pilar also does complex cases and plans."
+   ],
+   [
+    "cut hair",
+    "read photos"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Pilar also does complex case reviews and plans"
+   ],
+   [
+    "does color",
+    "does complex cases"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Pilar: desk tech, complex cases, plans"
+   ],
+   [
+    "color, house calls",
+    "complex cases, plans"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules runs their own crew, with their own customers."
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "like a chair renter",
+    "like a technician with their own customers"
+   ],
+   [
+    "A chair renter asked for by name",
+    "A technician with their own customers, asked for by name"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most wildlife desks start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules wildlife desks often set."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most wildlife desks set it."
+   ],
+   [
+    "Color quotes come to you first.",
+    "Complex case quotes come to you first."
+   ],
+   [
+    "Color quote",
+    "Complex case quote"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'What animal is in my attic?' or 'a hole in the soffit' fits an animal ID."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a pet to be trained, which isn't on the desk's list."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't train pets."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A complex case's example: 'A case like this needs a quick look at the photos first."
+   ],
+   [
+    "like a step-free chair",
+    "like a step-free entrance"
+   ],
+   [
+    "Add photos of your hair,",
+    "Add photos of the roofline,"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of the roofline"
+   ],
+   [
+    "would like to see your hair before pricing it.",
+    "would like to see your photos before pricing it."
+   ],
+   [
+    "sees the hair.",
+    "sees the photos."
+   ],
+   [
+    "sees the hair",
+    "sees the photos"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My property manager pays for this animal ID."
+   ],
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's property manager for a rental."
+   ],
+   [
+    "How would you like it on top?",
+    "Where did you see or hear the animal?"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, and add the roofline photos'"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am keeps the shorter time."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring photos on your phone on Saturday, not the animal."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring photos on your phone, not the animal."
+   ],
+   [
+    "like a patch test with a wait, or a screening.",
+    "like a species check before the visit."
+   ],
+   [
+    "patch test",
+    "size check"
+   ],
+   [
+    "like the cut in the mirror.",
+    "like the photos laid out at the counter."
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "The chairs",
+    "The photo wall"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "A chair, ready",
+    "A report, ready"
+   ],
+   [
+    "two skin fades",
+    "two entry point checks"
+   ],
+   [
+    "for the Groom's package",
+    "for the wildlife-proofing plan"
+   ],
+   [
+    "the Groom's package",
+    "the wildlife-proofing plan"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every desk service and complex cases"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout. The plug-in says which services. Wildlife work is never sent now, so nobody is set on call."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Pilar: desk tech, complex cases and plans"
+   ],
+   [
+    "color and house calls",
+    "complex cases and plans"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds bird proofing to Lee Wildlife Desk. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds bird proofing to Lee Wildlife Desk."
+   ],
+   [
+    "NEW massage",
+    "NEW bird proofing"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Bird proofing for Lee Wildlife Desk: is it the same company?"
+   ],
+   [
+    "1 color quote",
+    "1 complex case quote"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $90 attic damage check. Sam taps Call, and the call goes out from the desk's number."
+   ],
+   [
+    "color quote",
+    "complex case quote"
+   ],
+   [
+    "Color and cut · $90",
+    "Attic damage check · $90"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero que miren unas fotos el sábado."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero limpiar mis filtros de campana el sábado."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like my photos looked at on Saturday."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like an animal looked at from photos on Saturday."
+   ],
+   [
+    "a cut",
+    "a check"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A wildlife technician's example: a noise in the attic gets 'stay out of the attic, and don't block any hole'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "For the desk: no animal, alive or dead, is ever brought in. Photos and recordings only."
+   ],
+   [
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A noise in the attic could mean a trapping job or a photo check. Why: each kind asks its own questions, and nothing is guessed."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A animal ID could mean a wildlife desk or a laundry"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of the work? Yes / No"
+   ],
+   [
+    "photos of your hair",
+    "photos of your fan"
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Pilar, so Pilar's next times show. Complex cases always stay with Pilar."
+   ],
+   [
+    "Alex picked Riley",
+    "Alex picked Pilar"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Complex cases always stay with Pilar."
+   ],
+   [
+    "Alex M. asks: Can my son wait in the shop during my cut?",
+    "Alex M. asks: Can I send the photos by text and come in later?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I send the photos by text and come in later?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "I saw a bat in the hall last night. Can I still come in?"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Pilar can still look at the photos in the time left, at the same price, or you can move."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Pilar can still look at the photos in the time left, at the same price, or you can move."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The laptop stand scratched my phone."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the desk's laptop stand scratched a phone today."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the laptop stand scratched a phone"
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like what the animal was and where it got in."
+   ],
+   [
+    "like a skin-test result",
+    "like a species and where it came from"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: squirrel tracks, hole at the east soffit, droppings near the chimney"
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A photo check is rated, so the desk takes the first branch."
+   ],
+   [
+    "A cut",
+    "A check"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you check nests too?"
+   ],
+   [
+    "kids cuts",
+    "nest and den checkes"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a nest and den check is $25. Want a time?"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a nest and den check is $25"
+   ],
+   [
+    "If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "If the plug-in asks for something to bring, the desk checks it first. An animal ID needs photos on a phone."
+   ],
+   [
+    "A haircut needs nothing.",
+    "An animal ID needs only the photos, on your phone."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two photo checks for one home work the same way. Both are asked before the times."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The desk's plug-in adds its own danger words: a bite or scratch, or a bat where someone slept."
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Wildlife Desk LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Wildlife Control's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Wildlife Control"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Wildlife Desk"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Wildlife"
+   ],
+   [
+    "Lee Electric",
+    "Lee Exclusion"
+   ],
+   [
+    "1200 Main St",
+    "260 Ridge Rd"
+   ],
+   [
+    "88 Elm St",
+    "14 Mill St"
+   ],
+   [
+    "on Elm St",
+    "on Mill St"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "plumbing and electrical",
+    "wildlife trapping and exclusion work"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Wildlife trapping WC-10417 · exclusion work WC-20871"
+   ],
+   [
+    "MP045210",
+    "WC-0188"
+   ],
+   [
+    "JP031552",
+    "WC-10417"
+   ],
+   [
+    "JE30417",
+    "WC-10417"
+   ],
+   [
+    "Drain clearing",
+    "Trapping and removal"
+   ],
+   [
+    "Drain",
+    "Wildlife"
+   ],
+   [
+    "Water heater flush",
+    "Entry point sealing"
+   ],
+   [
+    "flush",
+    "trapping"
+   ],
+   [
+    "Water heater",
+    "Attic"
+   ],
+   [
+    "Panel upgrade",
+    "Attic exclusion work"
+   ],
+   [
+    "Plumbing for homes in Springfield.",
+    "Humane wildlife trapping, exclusion and cleanup for homes in Springfield."
+   ],
+   [
+    "Plumbing",
+    "Wildlife trapping"
+   ],
+   [
+    "plumbing",
+    "wildlife trapping"
+   ],
+   [
+    "Electrical",
+    "Exclusion work"
+   ],
+   [
+    "electrical",
+    "exclusion work"
+   ],
+   [
+    "A plumber",
+    "A wildlife technician"
+   ],
+   [
+    "Plumber",
+    "Wildlife technician"
+   ],
+   [
+    "plumber",
+    "wildlife technician"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Exclusion plan"
+   ],
+   [
+    "Signature cut and shave",
+    "Exclusion plan"
+   ],
+   [
+    "Signature cut",
+    "Exclusion plan"
+   ],
+   [
+    "signature cut",
+    "exclusion plan"
+   ],
+   [
+    "Groom's package",
+    "Wildlife-proofing plan"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Nest and den check"
+   ],
+   [
+    "Kids cut",
+    "Nest and den check"
+   ],
+   [
+    "kids cut",
+    "nest and den check"
+   ],
+   [
+    "Skin fade",
+    "Entry point photo check"
+   ],
+   [
+    "skin fade",
+    "entry point check"
+   ],
+   [
+    "Beard trim",
+    "Deterrent advice"
+   ],
+   [
+    "beard trim",
+    "deterrent advice"
+   ],
+   [
+    "Color and cut",
+    "Attic damage check"
+   ],
+   [
+    "color and cut",
+    "attic damage check"
+   ],
+   [
+    "Color correction",
+    "Complex case review"
+   ],
+   [
+    "color correction",
+    "complex case review"
+   ],
+   [
+    "Haircuts",
+    "Animal IDes"
+   ],
+   [
+    "haircuts",
+    "animal IDes"
+   ],
+   [
+    "cuts",
+    "checks"
+   ],
+   [
+    "Haircut",
+    "Animal ID"
+   ],
+   [
+    "haircut",
+    "animal ID"
+   ],
+   [
+    "Barbershop",
+    "Wildlife desk"
+   ],
+   [
+    "barbershop",
+    "wildlife desk"
+   ],
+   [
+    "Barbers",
+    "Desk techs"
+   ],
+   [
+    "barbers",
+    "desk techs"
+   ],
+   [
+    "Barber",
+    "Desk tech"
+   ],
+   [
+    "barber",
+    "desk tech"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "house calls",
+    "visits at the customer's place"
+   ],
+   [
+    "House calls",
+    "Visits at the customer's place"
+   ],
+   [
+    "house call",
+    "visit at the customer's place"
+   ],
+   [
+    "House call",
+    "Visit at the customer's place"
+   ],
+   [
+    "Jordan",
+    "Dmitri"
+   ],
+   [
+    "Casey",
+    "Alma"
+   ],
+   [
+    "Riley",
+    "Pilar"
+   ],
+   [
+    "Avery",
+    "Jonas"
+   ],
+   [
+    "Style consult",
+    "Photo check"
+   ],
+   [
+    "style consult",
+    "photo check"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "service-call",
+    "inspection"
+   ],
+   [
+    "$75",
+    "$25"
+   ],
+   [
+    "house calls",
+    "visits at the customer's place"
+   ],
+   [
+    "House calls",
+    "Visits at the customer's place"
+   ],
+   [
+    "house call",
+    "visit at the customer's place"
+   ],
+   [
+    "House call",
+    "Visit at the customer's place"
+   ]
+  ],
+  "B": [
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "This work takes no jobs sent now."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither wildlife control nor the desk takes jobs sent now."
+   ],
+   [
+    "Free until 7am on the visit day",
+    "Free until 24 hours before the visit"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "Card link, or the saved card"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, credited to the work"
+   ],
+   [
+    "Service call fee",
+    "Inspection fee"
+   ],
+   [
+    "service call fee",
+    "inspection fee"
+   ],
+   [
+    "Water pressure check",
+    "Animal ID from a photo"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules runs their own crew, with their own customers."
+   ],
+   [
+    "Faucet",
+    "Soffit"
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "BS20981",
+    "WC-20981"
+   ],
+   [
+    "EC22871",
+    "WC-20871"
+   ],
+   [
+    "The chairs",
+    "The photo wall"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "flush plan",
+    "attic plan"
+   ],
+   [
+    "Avery Diaz",
+    "Jonas Berg"
+   ],
+   [
+    "Riley Chen",
+    "Pilar Soto"
+   ],
+   [
+    "Casey Moore",
+    "Alma Reyes"
+   ],
+   [
+    "Dryer vents.",
+    "Exclusion work."
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "plumbing jobs",
+    "wildlife jobs"
+   ],
+   [
+    "plumbing job",
+    "wildlife job"
+   ],
+   [
+    "A chair, ready",
+    "A report, ready"
+   ],
+   [
+    "today's repair",
+    "today's work"
+   ],
+   [
+    "plumbing visit",
+    "wildlife trapping"
+   ],
+   [
+    "plumbing plug-in",
+    "wildlife plug-in"
+   ],
+   [
+    "home warranty plan",
+    "home plan"
+   ],
+   [
+    "warranty plan",
+    "home plan"
+   ],
+   [
+    "home warranty",
+    "home plan"
+   ],
+   [
+    "Sewer camera report",
+    "Dead animal report"
+   ],
+   [
+    "Plumbing price list",
+    "Wildlife trapping price list"
+   ],
+   [
+    "the warranty company",
+    "the home plan company"
+   ],
+   [
+    "Drain clearing plans",
+    "Seal-up plans"
+   ],
+   [
+    "The $89 service call",
+    "The $89 inspection"
+   ],
+   [
+    "Jordan found more work.",
+    "Dmitri found a second hole at the soffit."
+   ],
+   [
+    "Casey · license expired",
+    "Alma · license expired"
+   ],
+   [
+    "cracks the cabinet floor",
+    "scuffs the siding"
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the work"
+   ],
+   [
+    "Casey · license not found",
+    "Alma · license not found"
+   ],
+   [
+    "cancelled the $160 valve work",
+    "cancelled the $160 second entry point"
+   ],
+   [
+    "Your water heater price is with",
+    "Your post-remodel duct price is with"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Dmitri hurts a hand and texts HURT."
+   ],
+   [
+    "cuts a hand",
+    "hurts a hand"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Home Plan, the basic plan."
+   ],
+   [
+    "Call a licensed asbestos company first",
+    "Call a bat specialist first"
+   ],
+   [
+    "Alex M.'s second return vent was missed",
+    "Alex M.'s attic has noises again"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with the attic left alone until the visit."
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your attic cleanup this time"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A animal ID could mean a wildlife desk or a laundry"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you check my attic every spring, too?"
+   ],
+   [
+    "like new pipes put in one day and finished another.",
+    "like a big job started one day and finished another."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos",
+    "The plug-in says an attic cleanup is priced from photos"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Dmitri finds where the animal gets in and texts the price with its lines."
+   ],
+   [
+    "Casey's license is checked again when the lookup answers.",
+    "Alma's license is checked again when the lookup answers."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your roofline, and a wildlife technician will price the job."
+   ],
+   [
+    "your water heater",
+    "your attic"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a entry point sealing at two rentals every year."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For wildlife work, a bite or scratch, a bat where someone slept, a sick or dangerous animal or a gas smell stops the booking."
+   ],
+   [
+    "Jordan Price",
+    "Dmitri Volkov"
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the entry point sealing from a card saved for the $89 fee to a $40 deposit."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Wildlife Control doesn't do, like removing a bear."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "The lookup shows Alma's wildlife control license as expired. Alma stays on the team, and can be booked again once it shows renewed."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "The desk looks at photos, recordings and plans. It never takes an animal, alive or dead. Work at a home is done by Lee Wildlife Control."
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Animal ID, entry point check and deterrent advice"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each technician where the state asks. Trapping has a set price. Exclusion is priced at the visit. A bite, a bat in a bedroom or a gas smell stops the booking."
+   ],
+   [
+    "Its danger words: a bite or scratch from a wild animal, a bat where someone slept, an animal that is sick or aggressive, a dangerous animal, a gas smell, or a roof that isn't safe.",
+    "Its danger words: a bite or scratch, a bat where someone slept, a sick or dangerous animal, or a gas smell."
+   ],
+   [
+    "two drain clearings",
+    "two trapping jobs"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Humane wildlife trapping, exclusion and cleanup for homes in Springfield, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A trapping job"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood wildlife desk on Mill St. Animal ID from photos, entry point checks and wildlife-proofing plans."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Animal ID from photos, entry point checks and wildlife-proofing plans."
+   ],
+   [
+    "cuts",
+    "checks"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Pilar and Jonas read photos at the desk; Pilar also does complex cases and plans."
+   ],
+   [
+    "cut hair",
+    "read photos"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Pilar also does complex case reviews and plans"
+   ],
+   [
+    "does color",
+    "does complex cases"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Pilar: desk tech, complex cases, plans"
+   ],
+   [
+    "color, house calls",
+    "complex cases, plans"
+   ],
+   [
+    "like a chair renter",
+    "like a technician with their own customers"
+   ],
+   [
+    "A chair renter asked for by name",
+    "A technician with their own customers, asked for by name"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most wildlife desks start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules wildlife desks often set."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a technician look at my attic this Thursday? What does it cost?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a technician check my attic this Thursday?"
+   ],
+   [
+    "clear a yard drain",
+    "check an attic"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about an animal in my attic."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Something is scratching in my attic' fits a trapping and removal."
+   ],
+   [
+    "like a roof leak",
+    "like a roof repair"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like trapping on a neighbor's land without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding the attic? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And what did you see or hear, and where, and since when?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "what did you see or hear, and where, and since when?"
+   ],
+   [
+    "can clear the drain:",
+    "can trap and remove the animal:"
+   ],
+   [
+    "Yes, it won't drain",
+    "The dog stays inside"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 trapping job needs none."
+   ],
+   [
+    "$179 drain",
+    "$179 wildlife trapping"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 attic cleanup is over the plug-in's amount, so it gets a service agreement to sign."
+   ],
+   [
+    "$640 water heater",
+    "$640 attic cleanup"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please keep pets away from the attic door, and clear the way to it."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a seasonal check at two rentals every 3 months"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that smoke is coming from the attic now."
+   ],
+   [
+    "the sink is now overflowing",
+    "smoke is now coming from the attic"
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Say Kim L.'s outside trap check needs nobody home."
+   ],
+   [
+    "yard drain",
+    "attic"
+   ],
+   [
+    "finds the leak and texts the price with its lines.",
+    "finds where the animal gets in and texts the price with its lines."
+   ],
+   [
+    "finds corroded shutoff valves.",
+    "finds a second hole at the soffit."
+   ],
+   [
+    "finds corroded shutoff valves",
+    "finds a second hole at the soffit"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 seal a second entry point, soffit gap"
+   ],
+   [
+    "replace both shutoff valves, $160. Sent to Alex.",
+    "sealing a second entry point, $160. Sent to Alex."
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "sealing a second entry point, $160"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Seal a second entry point · $160"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Attic cleanup and insulation, heavy droppings · $540"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 second entry point"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 attic exclusion and repair"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · wildlife trapping"
+   ],
+   [
+    "your new pipes are in.",
+    "your attic is sealed."
+   ],
+   [
+    "your new pipes are in",
+    "your attic is sealed"
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty,",
+    "Noises come back in the attic 2 weeks later. It's inside the 1-year exclusion guarantee,"
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty",
+    "Noises come back in the attic 2 weeks later. It's inside the 1-year exclusion guarantee"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found droppings by the chimney this morning."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the exclusion work Dmitri noted"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an animal in the house, today,"
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's an animal loose in the house, today"
+   ],
+   [
+    "Labor",
+    "By the hour"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout. The plug-in says which services. Wildlife work is never sent now, so nobody is set on call."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Pilar: desk tech, complex cases and plans"
+   ],
+   [
+    "color and house calls",
+    "complex cases and plans"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds gutter cleaning to Lee Wildlife Control. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds gutter cleaning to Lee Wildlife Control."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW gutter cleaning"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Gutter cleaning for Lee Wildlife Control: is it the same company?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "We hear scratching in the attic. Can someone come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "We hear scratching in the attic at night, and we've seen a squirrel on the roof."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Oímos rasguños en el ático por la noche."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? We hear scratching in the attic at night."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa attic Thu 12-2 Alma"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A wildlife technician's example: a noise in the attic gets 'stay out of the attic, and don't block any hole'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to stay out of the attic and not block any hole. If anyone was bitten or scratched, she is told to call a doctor or the health department."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien fue mordido o arañado? ¿Hay un animal suelto en la casa?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: was anyone bitten or scratched? Is an animal loose in the house?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo se oye en el ático."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It's only heard in the attic."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No entre al ático y no tape ningún hueco. Si alguien fue mordido o arañado, llame a un médico o al departamento de salud."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay out of the attic and keep pets away. If anyone was bitten or scratched, call a doctor or the health department."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is a one-way door safe for the babies in the nest?"
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. The desk's counter is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Wildlife Desk can look at your photos at the desk for $35."
+   ],
+   [
+    "can cut your hair at the shop for $35",
+    "can look at your photos at the desk for $35"
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Wildlife Control traps and excludes wildlife. It doesn't remove bears. Nothing was saved. You can try animal control."
+   ],
+   [
+    "plumbing and electrical work",
+    "wildlife trapping and exclusion work"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what you saw or heard, where, since when, and whether anyone was bitten or scratched."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a bite or scratch, a bat where someone slept, a sick or dangerous animal, or a gas smell."
+   ],
+   [
+    "Just the kitchen sink.",
+    "A squirrel in the attic, for about a week."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "We'd like it done before guests come. Can someone come sooner?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about droppings in the garage. Both jobs go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about droppings in the garage."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Dmitri also look at the garage?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A garage check is priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. A entry point sealing is $150, from the list."
+   ],
+   [
+    "faucet",
+    "soffit"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is an animal loose in the house?"
+   ],
+   [
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Your attic exclusion agreement is waiting for your signature. Your Thu time is saved until 7:45pm today."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Dmitri's times show: Dmitri does attic cleanup."
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "the one who does attic exclusion"
+   ],
+   [
+    "replaces water heaters",
+    "does attic exclusion"
+   ],
+   [
+    "water heaters",
+    "attics"
+   ],
+   [
+    "Alex M. asks: Can I run the dishwasher before you come?",
+    "Alex M. asks: Can I keep the attic door shut before you come?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I keep the attic door shut before you come?"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a bite from a wild animal or a gas smell, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Smoke is coming from the attic now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Stay out of the attic, and keep pets away from it. Alma can come sooner, at the same price."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay out of the attic, keep pets away from it, and don't block any hole. If anyone was bitten or scratched, call a doctor or the health department."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Dmitri also look at the chimney for animals?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip this year's entry point sealing?"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's entry point sealing"
+   ],
+   [
+    "Under the sink, before",
+    "East soffit, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Roofline, before"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE gap at the east soffit"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 east soffit 165 chimney cap 80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Dmitri has found where the animal gets in. Here's the price to seal it today."
+   ],
+   [
+    "Shutoff valve · $165",
+    "East soffit · $165"
+   ],
+   [
+    "Supply line · $80",
+    "Chimney cap · $80"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the east soffit only, $165. Leave the chimney cap."
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the east soffit only, $165. Leave the chimney cap."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Dmitri seals the east soffit today, $165. The $80 chimney cap stays good until Thu Oct 29."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good",
+    "seals the east soffit today, $165. The $80 chimney cap stays good"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 attic exclusion, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe. Read it and sign on your secure page.",
+    "Here's Lee Wildlife Control's quote and service agreement for your attic exclusion. Read it and sign on your secure page."
+   ],
+   [
+    "quote for your repipe",
+    "quote for your wildlife trapping"
+   ],
+   [
+    "Repipe · $2,400",
+    "Attic exclusion · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the supply side is done, $800 at the finish"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 second entry point quote is good for 7 days."
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 second entry point quote"
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Dmitri's phone, you said yes to sealing a second entry point for $160."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160",
+    "you said yes to sealing a second entry point for $160"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Dmitri finds a bat colony in the attic. The plug-in says a technician stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Dmitri finds a bat colony in the attic. The plug-in says a technician stops there"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD bat colony in the attic, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "A bat colony in the attic"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Dmitri found a bat colony in the attic and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a bat colony in the attic"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: sealing the bat entry"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT my hand is hurt, need to stop"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 trapping and removal"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE two squirrels out, one nest. Gap at the east soffit: bring the long ladder next time."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 chimney cap stays good until Thu Oct 29."
+   ],
+   [
+    "The $80 supply line stays good",
+    "The $80 chimney cap stays good"
+   ],
+   [
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "Lee Wildlife Control: $800 for stage 2 of your attic exclusion. Pay by card, or by bank transfer."
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your wildlife trapping"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The noises are back in the attic."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s attic, sealed Thu Oct 22, has noises again. It's under the 1-year exclusion guarantee."
+   ],
+   [
+    "1-year labor warranty",
+    "1-year guarantee"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. That's under our exclusion guarantee, so this visit is free."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "That's under our guarantee, so the return visit is free."
+   ],
+   [
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Dmitri left insulation on the lawn.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Dmitri left insulation on the lawn."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Dmitri look at my attic next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Dmitri's next times for a return visit."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Dmitri's next times for a entry point sealing."
+   ],
+   [
+    "for a bathroom drain",
+    "for a entry point sealing"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Wildlife Control sent you a proposal for sealing the attic, from Dmitri's notes."
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes",
+    "sent you a proposal for sealing the attic, from Dmitri's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Exclusion work"
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the attic cleanup quote before booking."
+   ],
+   [
+    "the water heater quote",
+    "the attic cleanup quote"
+   ],
+   [
+    "Jordan checks anything the plug-in asked Alex to have ready. This job needs nothing,",
+    "Dmitri checks the plug-in's prep list: pets away from the attic door, the way to the attic clear. It's all done,"
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush. Jordan texts NEXT.",
+    "At DONE, Alex asks Dmitri to come back next spring for a roofline check. Dmitri texts NEXT."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: roofline check, next spring"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the roofline check you asked Dmitri about in early Mar 2027."
+   ],
+   [
+    "the water heater",
+    "the attic"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Visit 1 · Tue Oct 20 · $179"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Visit 2 · Wed Oct 21 · $179"
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs a species and permit check first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the siding"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed siding"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Dmitri's ladder scuffed the siding at Alex M.'s. The before photo shows no scuff."
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no dent."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Dmitri's ladder scuffed the siding at Alex M.'s."
+   ],
+   [
+    "cracked the cabinet floor",
+    "scuffed the siding"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting a longer brush, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Dmitri went to get a longer ladder and will be back about 9:30am. The job should be done by 10am."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Dmitri went to get a longer brush and will be back about 9:30am."
+   ],
+   [
+    "No problem. Today's visit is the $89 service call. The repair price is good for 7 days.",
+    "No problem. Today's visit is the $89 inspection. The price is good for 7 days."
+   ],
+   [
+    "The repair price is good",
+    "The price is good"
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a bat specialist first"
+   ],
+   [
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Today's estimate visit owes only what was promised for it, like the $89 inspection."
+   ],
+   [
+    "the $89 service call",
+    "the $89 inspection"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the exclusion guarantee lasts."
+   ],
+   [
+    "A leak repair",
+    "An attic exclusion"
+   ],
+   [
+    "a leak repair",
+    "an attic exclusion"
+   ],
+   [
+    "the shutoff valves",
+    "the second entry point"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Wildlife Control LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Wildlife Control's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Wildlife Control"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Wildlife Desk"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Wildlife"
+   ],
+   [
+    "Lee Electric",
+    "Lee Exclusion"
+   ],
+   [
+    "leehomeservices.com",
+    "leewildlife.com"
+   ],
+   [
+    "1200 Main St",
+    "260 Ridge Rd"
+   ],
+   [
+    "88 Elm St",
+    "14 Mill St"
+   ],
+   [
+    "on Elm St",
+    "on Mill St"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "42 Oak St",
+    "56 Willow Ln"
+   ],
+   [
+    "plumbing and electrical",
+    "wildlife trapping and exclusion work"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Wildlife trapping WC-10417 · exclusion work WC-20871"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "to the repair",
+    "to the work"
+   ],
+   [
+    "MP045210",
+    "WC-0188"
+   ],
+   [
+    "JP031552",
+    "WC-10417"
+   ],
+   [
+    "JE30417",
+    "WC-10417"
+   ],
+   [
+    "Service call",
+    "Inspection"
+   ],
+   [
+    "service call",
+    "inspection"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Trapping and removal"
+   ],
+   [
+    "Drain clearings",
+    "Trapping jobs"
+   ],
+   [
+    "Drain clearing",
+    "Trapping and removal"
+   ],
+   [
+    "Drain",
+    "Wildlife"
+   ],
+   [
+    "drain clearing",
+    "trapping and removal"
+   ],
+   [
+    "Water heater replacement",
+    "Attic cleanup and insulation"
+   ],
+   [
+    "water heater replacement",
+    "attic cleanup and insulation"
+   ],
+   [
+    "Water heater flush",
+    "Entry point sealing"
+   ],
+   [
+    "Water heater",
+    "Attic"
+   ],
+   [
+    "water heater flush",
+    "entry point sealing"
+   ],
+   [
+    "flush",
+    "trapping"
+   ],
+   [
+    "Leak repair",
+    "Sealing"
+   ],
+   [
+    "leak repair",
+    "sealing"
+   ],
+   [
+    "Sewer camera inspection",
+    "Dead animal removal"
+   ],
+   [
+    "sewer camera inspection",
+    "dead animal removal"
+   ],
+   [
+    "sewer camera",
+    "attic camera"
+   ],
+   [
+    "Panel upgrade",
+    "Attic exclusion work"
+   ],
+   [
+    "plumbing license",
+    "wildlife control license"
+   ],
+   [
+    "Plumbing license",
+    "Wildlife control license"
+   ],
+   [
+    "Plumbing for homes in Springfield.",
+    "Humane wildlife trapping, exclusion and cleanup for homes in Springfield."
+   ],
+   [
+    "Plumbing",
+    "Wildlife trapping"
+   ],
+   [
+    "plumbing",
+    "wildlife trapping"
+   ],
+   [
+    "Electrical",
+    "Exclusion work"
+   ],
+   [
+    "electrical",
+    "exclusion work"
+   ],
+   [
+    "Can a plumber",
+    "Can a technician"
+   ],
+   [
+    "a plumber",
+    "a technician"
+   ],
+   [
+    "A plumber",
+    "A technician"
+   ],
+   [
+    "Plumber",
+    "Wildlife technician"
+   ],
+   [
+    "plumber",
+    "wildlife technician"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Exclusion plan"
+   ],
+   [
+    "Signature cut",
+    "Exclusion plan"
+   ],
+   [
+    "Beard trim",
+    "Deterrent advice"
+   ],
+   [
+    "beard trim",
+    "deterrent advice"
+   ],
+   [
+    "Haircut",
+    "Animal ID"
+   ],
+   [
+    "haircut",
+    "animal ID"
+   ],
+   [
+    "Barbershop",
+    "Wildlife desk"
+   ],
+   [
+    "barbershop",
+    "wildlife desk"
+   ],
+   [
+    "Barbers",
+    "Desk techs"
+   ],
+   [
+    "barbers",
+    "desk techs"
+   ],
+   [
+    "Barber",
+    "Desk tech"
+   ],
+   [
+    "barber",
+    "desk tech"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "house calls",
+    "visits at the customer's place"
+   ],
+   [
+    "House calls",
+    "Visits at the customer's place"
+   ],
+   [
+    "house call",
+    "visit at the customer's place"
+   ],
+   [
+    "House call",
+    "Visit at the customer's place"
+   ],
+   [
+    "Jordan",
+    "Dmitri"
+   ],
+   [
+    "Casey",
+    "Alma"
+   ],
+   [
+    "Riley",
+    "Pilar"
+   ],
+   [
+    "Avery",
+    "Jonas"
+   ],
+   [
+    "Kitchen drain",
+    "Trapping and removal"
+   ],
+   [
+    "Yard drain",
+    "Attic"
+   ],
+   [
+    "the kitchen drain",
+    "the trapping and removal"
+   ],
+   [
+    "kitchen drain",
+    "trapping and removal"
+   ],
+   [
+    "drain",
+    "wildlife"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Seal a second entry point"
+   ],
+   [
+    "the shutoff valve",
+    "the east soffit"
+   ],
+   [
+    "shutoff valve",
+    "east soffit"
+   ],
+   [
+    "Electric.",
+    "Exclusion work."
+   ],
+   [
+    "water heater contract",
+    "attic exclusion agreement"
+   ],
+   [
+    "Your water heater visit",
+    "Your trapping visit"
+   ],
+   [
+    "water heater",
+    "attic"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "service-call",
+    "inspection"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "The desk needs a business registration only. Reading photos needs no license.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Photo checks are done at the desk only: Lee Wildlife Desk takes no work at a customer's place.",
+     "Trapping, removal and sealing are done at the customer's place.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until their license is confirmed and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The licenses are on file as given. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Dmitri: wildlife trapping and exclusion",
+         "Alma: wildlife trapping and exclusion",
+         "Pilar: the desk and complex cases",
+         "Jonas: the desk"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: what the customer saw or heard, and where. The photos come with the visit.",
+     "No animal, alive or dead, and no droppings are brought in.",
+     "Questions that only add detail come later, once a time is saved."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "What did you see or hear, and where?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Scratching in the attic at night, and a hole at the roofline."
+     ]
+    ],
+    "vary": {
+     "price:list+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What did you see or hear, and where?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Droppings by the chimney, and noises in the wall."
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Which photos do you have of the holes?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Four, of the east soffit."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What damage do the photos show?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Torn insulation and droppings in the attic."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What is the case, in a few words?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Noises in two walls, and a smell we can't place."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "At Lee Wildlife Desk, a time is a visit with a desk tech. Photos are looked at at the counter.",
+     "Complex cases show only the days Pilar works."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex comes to the counter with photos on a phone. Alex reads the code from the confirmation or the reminder, and Pilar texts it in.",
+    "more": [
+     "At Lee Wildlife Desk, the visit is at the counter: the code is given when it starts.",
+     "No animal, alive or dead, is brought in."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Pilar goes through the photos and names the animal. Pilar says where it likely gets in and what would keep it out.",
+    "more": [
+     "Nothing is trapped or sealed at the counter.",
+     "If Alex wants the work done at home, that is a new booking with Lee Wildlife Control."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "At Lee Wildlife Desk, Alex pays at the counter."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Wildlife control and the desk both pay Rosfield's $2, so the bill branch applies.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The plug-in adds no agreement for Sam to sign with Rosie before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Wildlife control is licensed in nearly every state: the company's, and each technician's (pf.license).",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each technician holds a state license where the state's form says so (pf.staff).",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Technicians and desk techs are booked, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "No classes: visits and photo checks, one customer at a time.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Wildlife work is booked ahead; nobody is on call and nothing is sent now. A bite or a gas smell is a safety message, not a booking.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A photo check books a desk tech's time.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "Photos are read at the desk; no removal or ID by video.",
+    "label": "By video or phone"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "The desk's plug-in names no form to sign.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "A photo check is rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "Lee Wildlife Desk bills no plan or insurance: the customer pays at the counter.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "Lee Wildlife Desk bills no plan or insurance: the customer pays at the counter.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "No child is left at the desk.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "why": "A desk visit is never booked for a child.",
+    "label": "A child"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "Lee Wildlife Desk works at the desk only; the 'Only at the shop' branch is the one used.",
+    "label": "1 At the shop"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "Lee Wildlife Desk takes no work at a customer's place.",
+    "label": "2 At my home"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "Lee Wildlife Desk has no other place to offer.",
+    "label": "Wants the other place"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-38",
+    "more": [
+     "The desk needs a business registration only. Reading photos needs no license.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Trapping, removal and sealing are done at the customer's place.",
+     "Photo checks are done at the desk only.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until their license is confirmed and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The licenses are on file as given. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Dmitri: wildlife trapping and exclusion",
+         "Alma: wildlife trapping and exclusion",
+         "Pilar: the desk and complex cases",
+         "Jonas: the desk"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, with the attic left alone until the visit. It's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A wildlife technician's example: a noise in the attic gets 'stay out of the attic, and don't block any hole'.",
+     "Rosa is told to stay out of the attic and keep pets away."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿alguien fue mordido o arañado? ¿Hay un animal suelto en la casa?",
+      {
+       "lang": "es",
+       "en": "First: was anyone bitten or scratched? Is an animal loose in the house?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Solo se oye en el ático.",
+      {
+       "lang": "es",
+       "en": "No. It's only heard in the attic.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "No entre al ático, aleje a las mascotas y no tape ningún hueco.",
+      {
+       "lang": "es",
+       "en": "Stay out of the attic, keep pets away, and don't block any hole.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For wildlife work, a bite or scratch, a bat where someone slept, or a sick or dangerous animal stops the booking.",
+    "more": [
+     "The message is the plug-in's for that danger, or the general one: get to safety and call 911.",
+     "On a call, the caller hears it, and Sam gets the call summary.",
+     "A visit can be booked once everyone is safe and the health department or animal control has been called."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If anyone was bitten or scratched, wash the wound with soap and water and call a doctor or the health department now. Call 911 if it is serious."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said a bat was in a bedroom. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A bat in a room at the home",
+         "Told to shut the door and call the health department"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-05",
+    "more": [
+     "The plug-in's questions here: what the customer saw or heard, where, and since when.",
+     "Young animals may be there in spring and summer; a mother with young isn't removed alone.",
+     "Bats and active bird nests get the plug-in's season steps first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "Trapping and removal of one animal is $179, with up to 3 trap checks.",
+     "Each extra trap check is $45, paid at the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "The attic access and the ladder side are typed here.",
+     "A bite, a scratch or any health reason is typed only on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B5-34",
+    "more": [
+     "An exclusion job always gets a signed service agreement with the guarantee, after its inspection and quote."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-13",
+    "more": [
+     "The first visit needs an adult home. The text says so before Alex taps."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-07",
+    "more": [
+     "A roof day that is wet or windy offers only dry days."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "The technician finds the way in, then sets the traps or one-way doors the state's rules allow.",
+     "Trap checks follow on the days the state's rules require, and each gets a short text: empty, or caught."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Dmitri finds a bat colony in the attic. The plug-in says that part stops, so Alex gets a written note and the photo.",
+    "more": [
+     "The note says what was found, that the roost must not be disturbed, and who can help.",
+     "It goes out whatever Alex decides, and stays with the photos.",
+     "Sam is told. The rest of the job can still go on.",
+     "Bat work waits for the state's season, where the state sets one."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD bat colony in the attic, stopped",
+      {
+       "photos": [
+        "Bats in the attic"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Dmitri found a bat colony in the attic and left that part alone.",
+      {
+       "card": {
+        "title": "Safety note · 56 Willow Ln",
+        "lines": [
+         "Found: a bat colony in the attic",
+         "Not done: sealing the bat entry",
+         "Call a bat specialist first"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "The report opens on the secure page: the entry points sealed, what was removed, and the photos."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-08",
+    "more": [
+     "A return visit under the exclusion guarantee is a redo, never money from Rosie."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Wildlife control and the desk both pay Rosfield's $2, so the bill branch applies.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The plug-in adds no agreement for Sam to sign with Rosie before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Wildlife control is licensed in nearly every state: the company's, and each technician's (pf.license).",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each technician holds a state license where the state's form says so (pf.staff).",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Technicians and desk techs are booked, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "No classes: visits and photo checks, one customer at a time.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Wildlife work is booked ahead; nobody is on call and nothing is sent now. A bite or a gas smell is a safety message, not a booking.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Wildlife work books a 2-hour arrival window.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Nothing here is booked as a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Visits book a technician's time, never a seat.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A technician never looks after a child: the visit waits for an adult on the booking.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "Wildlife work bills no warranty plan or insurance: the customer pays, and gets the receipt and photo report for any claim.",
+    "label": "A plan or warranty pays"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "Wildlife work bills no insurance: the customer pays, and a claim is the customer's own.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "A visit is rated, like most home services.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "Wildlife work is done at the customer's place only; the desk (Lee Wildlife Desk) is the other flow.",
+    "label": "Both places: the customer picks"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Lee Wildlife Control has no shop to offer.",
+    "label": "Wants the other place"
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Parking",
+      "In the driveway"
+     ],
+     [
+      "Pets",
+      "A dog, kept inside"
+     ],
+     [
+      "Attic access",
+      "A hatch in the hallway ceiling"
+     ],
+     [
+      "Ladder side",
+      "The east side of the house"
+     ],
+     [
+      "Gate or lock code",
+      "None"
+     ],
+     [
+      "Anything that helps at the visit?",
+      "Optional"
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "Pilot: pest (from), refitted Oct 27. Wildlife removal runs like pest control: a licensed technician at the home in a 2-hour window, a card saved and charged at DONE, a signed agreement for the bigger jobs, and a desk. What pest lacks is added: a bite, a scratch or a bat in a room where someone slept as stop words (the safety steps, then the health department or animal control, never a booking), a sick or dangerous animal sent to animal control, the season rules for bats and active bird nests, a mother with young not removed alone, trap checks on following days, and an exclusion guarantee.\nFlow B is the usual side: Lee Wildlife Control (humane trapping and removal, plus exclusion work as its second kind of work). Flow A is the less usual side: Lee Wildlife Desk, Sam's second company, where a customer comes with photos or a recording to have an animal named and a plan made. No animal, alive or dead, and no droppings are ever brought in. Photo checks are done at the desk only: the both-places and other-place branches are off in both flows.\nMoney (B): main list|card|card (card saved for the $89 inspection and late-cancel fee, charged $179 when the technician texts DONE; up to 3 trap checks are in the price, each extra check $45 paid at the visit). Also list|none|bill, photos|deposit|card (attic cleanup and insulation $640 from photos: a 25% deposit $160 now, $480 at DONE), visit|card|card (attic exclusion and repair priced at the inspection). The $89 inspection is credited to the work. Money (A): list|none|counter (main), list|card|counter, list|full|none, photos|none|counter, visit|none|counter. A fee is never more than what was paid now. An added service is paid at the visit. Nothing is charged without a yes; no hold.\nThe sign-up money card (S1-13) keeps the master's example reply (some services paid in full): sealing one entry point is the one the example pays in full. It is an example, the owner decides.\nNever sent now: wildlife work is booked ahead. S2-30 branch 1 is off and the booking choices are limited (B: a set time in a window; A: a set start); the rows and lines that said 'takes jobs sent now' (S2-30, S1-21) are re-worded.\nNo plan fact: trap checks are part of one job, not a plan. Documents is on: exclusion and repair over an amount get a signed service agreement with the guarantee (B5-34). cancelright is on in flow B: exclusion contracts are sold at the home.\nDanger: a bite or scratch, a bat where someone slept, a sick or dangerous animal, a gas smell or smoke, or an unsafe roof stop the booking. Noises in the attic, droppings or a calm animal in the house are not an emergency: stay out of the attic, keep pets away, don't block any hole; the booking goes on. The danger example in B3-11 and B3-18 is scratching in the attic at night; B3-19 uses a bat in a bedroom; the visit-time hazard (B8-30) is a bat colony. Health details, bites and exposure are on the secure page only, never in a text.\nOwn steps: none (the master's steps carry it: B8-30 for a finding that stops the work, B8-23 for a second entry point priced first).\nLicenses: wildlife control is licensed in nearly every state: S1-60 '2 No license' and S2-28 '2 No person license' are off. Pest control, poison, bears, deer, big cats, coyotes, venomous snakes and stray pets are not offered.\nNames: technicians Dmitri and Alma (flow B), desk techs Pilar and Jonas (flow A). Addresses: 56 Willow Ln (the home), 14 Mill St (the desk), 260 Ridge Rd (the travel area). Company registration WC-0188 and license numbers WC-10417 / WC-20871 use an obviously fake format. The example times (8 to 10am windows) are the master's; Sam sets the real hours.\nKept words: 'leak' (the privacy leak in the shared rules), 'color' (race, color), 'visit fee' (the master's own words for a fee owed after a no to a price).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "At your shop, paid at the chair, your own way",
+    "A haircut at",
+    "a haircut at",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A nothing before, and at their home too, 75, paid when they book.",
+    "A at their home too, 75, paid when they book",
+    "Set. For a haircut, the customer picks the place and sees both prices first. The rest stays as on the card.",
+    "House calls: allowed where you are, for those cleared",
+    "at the shop and for house calls",
+    "a house call, $75",
+    "Haircut at their home",
+    "Haircut at home · $75",
+    "Haircut at the shop",
+    "One question cuts the most",
+    "Wants Saturday morning, with Riley",
+    "BS20981",
+    "EC22871",
+    "Electric.",
+    "Barbering",
+    "Color plan",
+    "Avery Diaz",
+    "Riley Chen",
+    "the consult",
+    "a skin fade",
+    "Casey Moore",
+    "consult only",
+    "Consult only",
+    "in the chair",
+    "a beard trim",
+    "Haircut plans",
+    "Alex M.'s cut",
+    "plumbing jobs",
+    "plumbing job",
+    "3:00pm · Riley",
+    "2:00pm · Riley",
+    "12:30pm · Avery",
+    "10:00am · Riley",
+    "Shorter is fine",
+    "No gloss today.",
+    "gloss",
+    "Gloss to finish",
+    "The Groom's package",
+    "Plumbing price list",
+    "once Riley sees the hair",
+    "Books a cut every 4 weeks",
+    "Next: Sat Nov 28 · 10:00am",
+    "Anything Riley should know?",
+    "Saturdays · 11:00am · Riley",
+    "11:00am · Riley",
+    "Haircut plan · every 4 weeks",
+    "Haircut plan",
+    "Haircut, fade and beard trim",
+    "Lee's Barbershop · with Riley",
+    "Haircut every 4 weeks · Riley",
+    "The cut is uneven on one side.",
+    "like a 15-minute style consult",
+    "Your item is ready for pick-up.",
+    "Books the groom's party together",
+    "Alex asks for a cut every 4 weeks.",
+    "A barbershop books a person's time.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "Saturday's cut is uneven on one side",
+    "After the job: Rosie sends the bill",
+    "Alex bought a package of cuts at the shop.",
+    "Promises the $25 consult; priced at the chair",
+    "$25 consult",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "The signed form this service needs is missing.",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "When they book: a card saved for the $89 service-call fee",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "haircut plan",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A groom books cuts for himself and four friends on one morning.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Jordan Price",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "color plan",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "water heaters",
+    "A water heater job",
+    "water heater",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "cut hair",
+    "Riley also does color and house calls",
+    "does color",
+    "Riley: barber, color, house calls",
+    "color, house calls",
+    "Jules rents a chair, with their own customers.",
+    "rents a chair",
+    "like a chair renter",
+    "A chair renter asked for by name",
+    "Each service starts the way most barbershops set it.",
+    "Color quotes come to you first.",
+    "Color quote",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "doesn't do perms.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "like a step-free chair",
+    "Add photos of your hair,",
+    "Add photos of your hair",
+    "would like to see your hair before pricing it.",
+    "sees the hair.",
+    "sees the hair",
+    "My employer pays for this cut.",
+    "like Alex's employer for a staff cut.",
+    "How would you like it on top?",
+    "'Yes, make it a fade'",
+    "No reply by 11:00am means the shorter cut.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "like a patch test with a wait, or a screening.",
+    "patch test",
+    "like the cut in the mirror.",
+    "the cut",
+    "The chairs",
+    "chairs",
+    "A chair, ready",
+    "two skin fades",
+    "for the Groom's package",
+    "the Groom's package",
+    "Every shop service, color and house calls",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "like a burst pipe or a lockout",
+    "Riley: barber, color and house calls",
+    "color and house calls",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "1 color quote",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "color quote",
+    "Color and cut · $90",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Quiero un corte el sábado.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "I'd like a cut on Saturday.",
+    "a cut",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "A haircut could mean a salon or a barbershop",
+    "May the shop show photos of your hair? Yes / No",
+    "photos of your hair",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley",
+    "Color always stays with Riley.",
+    "Alex M. asks: Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "says the cape clip ripped a shirt collar today",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "like a skin-test result",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "A cut",
+    "Do you do kids cuts? My son is 8.",
+    "kids cuts",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "a Kids cut (12 and under) is $25",
+    "If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "A haircut needs nothing.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "on Elm St",
+    "Elm St",
+    "plumbing and electrical",
+    "Plumbing JP031552 · electrical JE30417",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "Drain clearing",
+    "Drain",
+    "Panel upgrade",
+    "Plumbing for homes in Springfield.",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "A plumber",
+    "Plumber",
+    "plumber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "Groom's package",
+    "Kids cut (12 and under)",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Haircuts",
+    "haircuts",
+    "cuts",
+    "Haircut",
+    "haircut",
+    "Barbershop",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "at the chair",
+    "At the chair",
+    "the chair",
+    "chair",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "Style consult",
+    "style consult",
+    "service-call",
+    "$75",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call"
+   ],
+   "B": [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Free until 7am on the visit day",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "$89, credited to the repair",
+    "Service call fee",
+    "service call fee",
+    "Water pressure check",
+    "One question cuts the most",
+    "Jules rents a chair, with their own customers.",
+    "the cut",
+    "BS20981",
+    "EC22871",
+    "The chairs",
+    "chairs",
+    "flush plan",
+    "Avery Diaz",
+    "Riley Chen",
+    "Casey Moore",
+    "rents a chair",
+    "plumbing jobs",
+    "plumbing job",
+    "A chair, ready",
+    "today's repair",
+    "plumbing visit",
+    "plumbing plug-in",
+    "home warranty plan",
+    "warranty plan",
+    "home warranty",
+    "Sewer camera report",
+    "Plumbing price list",
+    "the warranty company",
+    "Drain clearing plans",
+    "The $89 service call",
+    "Jordan found more work.",
+    "Casey · license expired",
+    "cracks the cabinet floor",
+    "covers part of the repair",
+    "Casey · license not found",
+    "cancelled the $160 valve work",
+    "Your water heater price is with",
+    "Jordan cuts a hand and texts HURT.",
+    "cuts a hand",
+    "Willow Home Warranty, the basic plan.",
+    "Then the booking goes on, marked urgent.",
+    "couldn't price your water heater this time",
+    "A haircut could mean a salon or a barbershop",
+    "Can you flush my water heater every year, too?",
+    "like new pipes put in one day and finished another.",
+    "The plug-in says a water heater is priced from photos",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Casey's license is checked again when the lookup answers.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "your water heater",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan Price",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Haircut, fade and beard trim",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "two drain clearings",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Classic cuts, fades and hot towel shaves.",
+    "cuts",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "cut hair",
+    "Riley also does color and house calls",
+    "does color",
+    "Riley: barber, color, house calls",
+    "color, house calls",
+    "like a chair renter",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "clear a yard drain",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "like a roof leak",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "can clear the drain:",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "$179 drain",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "$640 water heater",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals every 3 months",
+    "Alex texts that the sink is now overflowing.",
+    "the sink is now overflowing",
+    "Say Kim L.'s yard drain needs nobody home.",
+    "yard drain",
+    "finds the leak and texts the price with its lines.",
+    "finds corroded shutoff valves.",
+    "finds corroded shutoff valves",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160. Sent to Alex.",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Shutoff valve and wall pipe · $540",
+    "the $160 valve work",
+    "$2,400 repipe",
+    "Right to cancel · repipe",
+    "your new pipes are in.",
+    "your new pipes are in",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty,",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty",
+    "I found water damage under the sink this morning.",
+    "like replacing the old pipes Jordan noted",
+    "It's a leak under the sink, today,",
+    "It's a leak under the sink, today",
+    "Labor",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "like a burst pipe or a lockout",
+    "Riley: barber, color and house calls",
+    "color and house calls",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My kitchen drain is clogged.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "can cut your hair at the shop for $35",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "plumbing and electrical work",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "faucet",
+    "Is the sink still full of water?",
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "he's the one who replaces water heaters",
+    "replaces water heaters",
+    "water heaters",
+    "Alex M. asks: Can I run the dishwasher before you come?",
+    "Can I run the dishwasher before you come?",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can I skip next week's drain cleaning?",
+    "next week's drain cleaning",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "BEFORE old water stain on the cabinet floor",
+    "QUOTE 245 valve 165 supply line 80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe. Read it and sign on your secure page.",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "The $160 valve quote",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "you said yes to replacing both shutoff valves for $160",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "HURT cut my hand, need to stop",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 supply line stays good",
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "stage 2 of your repipe",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "1-year labor warranty",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Your drain is under warranty, so this visit is free.",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "for a bathroom drain",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "the water heater quote",
+    "Jordan checks anything the plug-in asked Alex to have ready. This job needs nothing,",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush. Jordan texts NEXT.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "the water heater",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "The before photo shows no crack.",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "cracked the cabinet floor",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "No problem. Today's visit is the $89 service call. The repair price is good for 7 days.",
+    "The repair price is good",
+    "Book the repair",
+    "Call a mold cleanup company first",
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "the $89 service call",
+    "The plug-in says how long the warranty lasts.",
+    "A leak repair",
+    "a leak repair",
+    "the shutoff valves",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "leehomeservices.com",
+    "1200 Main St",
+    "88 Elm St",
+    "on Elm St",
+    "Elm St",
+    "42 Oak St",
+    "plumbing and electrical",
+    "Plumbing JP031552 · electrical JE30417",
+    "credited to the repair",
+    "to the repair",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "Service call",
+    "service call",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "Drain",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "Water heater",
+    "water heater flush",
+    "flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "sewer camera",
+    "Panel upgrade",
+    "plumbing license",
+    "Plumbing license",
+    "Plumbing for homes in Springfield.",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "Can a plumber",
+    "a plumber",
+    "A plumber",
+    "Plumber",
+    "plumber",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "Barbershop",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "at the chair",
+    "the chair",
+    "chair",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "Kitchen drain",
+    "Yard drain",
+    "the kitchen drain",
+    "kitchen drain",
+    "drain",
+    "Replace both shutoff valves",
+    "the shutoff valve",
+    "shutoff valve",
+    "Electric.",
+    "water heater contract",
+    "Your water heater visit",
+    "water heater",
+    "Rental 1",
+    "Rental 2",
+    "service-call"
+   ]
+  },
+  "A": {
+   "S1-61": "7421d186d5",
+   "S1-43": "e16d5048f3",
+   "S2-22": "6fe11c094c",
+   "A4-50": "6f43775326",
+   "A4-14": "95c7ffcfab",
+   "A8-03": "7accda6f86",
+   "A8-43": "7b0f73c701",
+   "A9-03": "219c966588",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-01": "7e7a61082c",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5",
+   "A4-24": "0a292df05b",
+   "A4-15": "db5792db95"
+  },
+  "B": {
+   "S1-38": "6301c86637",
+   "S1-43": "dd3ae2a1a9",
+   "S2-22": "6fe11c094c",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B4-05": "fb3a9061c8",
+   "B4-07": "9d0dbc90ad",
+   "B4-34": "74ff52d83d",
+   "B5-34": "917f89b62f",
+   "B6-13": "ed1f412f7d",
+   "B7-07": "954270db4b",
+   "B8-18": "530038d2b8",
+   "B8-30": "a1ef4983e4",
+   "B10-01": "814aa1fde7",
+   "B10-08": "01bac94fd8",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255",
+   "B4-01": "15f683e6cb",
+   "B4-16": "37cd99137d"
+  }
+ }
+}

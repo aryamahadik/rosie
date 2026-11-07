@@ -1,0 +1,5200 @@
+{
+ "id": "groomer",
+ "name": "Pet groomer",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "auto-repair",
+ "plugin": {
+  "pf.license": {
+   "need": "if: where the state licenses grooming businesses (some do, vans and trailers too); none where the state has no grooming license",
+   "ask": [
+    "The salon's grooming license number, where the state has one",
+    "The van's or trailer's own license or permit, where the state's rules require one",
+    "A local business or kennel permit, where only a city or county asks for one"
+   ],
+   "who": "the business: the salon and each van; groomers need none of their own unless the state's form says so",
+   "check": "the state's license lookup; where there's none, a person on Rosie's team checks within 1 business day",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "never_offered": "keeping a pet overnight: that needs a boarding license, so the plug-in never books a stay",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "groomer's liability and care of the pets in its keeping, as the business says; shown as given by the business, not checked by Rosie",
+   "shown": "where the state's rules require it, the license number shows on the listing, the times and the confirmation, for that state's bookings only",
+   "otherwise": "identity checked, and 'license: what the business says'"
+  },
+  "pf.services": {
+   "pattern": "drop-off: the pet is left at the salon and picked up after the READY text; or the van grooms it outside the owner's home",
+   "priced_by": "the pet's size and coat: the plug-in's answers (dog or cat, breed, weight, coat, mats) pick the service and its price before any times",
+   "list": [
+    {
+     "name": "Bath and brush, by size (small, medium, large)",
+     "price": "one price per size, from the salon's board (the example: small $35, medium $40)",
+     "length": "about 2 hours at the salon, ready by text",
+     "place": "at the salon, or in the van",
+     "before": "a card saved for the fees",
+     "after": "at the counter at pick-up; in the van, the saved card at DONE"
+    },
+    {
+     "name": "Full groom (bath, haircut, nails), by size and coat",
+     "price": "one price per size; doodle and poodle coats cost more (the example: small $55, large doodle $140; in the van, $179)",
+     "length": "2 to 3 hours of table time; the ready time is set from it",
+     "place": "at the salon, or in the van",
+     "before": "a card saved for the fees",
+     "after": "at the counter; in the van, the saved card at DONE"
+    },
+    {
+     "name": "De-shed bath, for double coats",
+     "price": "one price (the example: $40)",
+     "length": "about 2 hours",
+     "place": "at the salon, or added to a van groom"
+    },
+    {
+     "name": "Cat groom",
+     "price": "one price (the example: $139 in the van)",
+     "length": "about 1½ hours, in the quiet cat room or the van",
+     "place": "at the salon, or in the van",
+     "staff": "only a groomer cleared for cats"
+    },
+    {
+     "name": "Nail trim",
+     "price": "one price (the example: $20)",
+     "length": "15 minutes; the owner can wait",
+     "place": "at the salon, or added to a van groom",
+     "before": "a card saved, or nothing for a walk-in",
+     "after": "at the counter"
+    },
+    {
+     "name": "Puppy's first groom (under 6 months)",
+     "price": "one price (the example: $25)",
+     "length": "about 1 hour, gently",
+     "place": "at the salon"
+    },
+    {
+     "name": "Dematting",
+     "price": "a set price per 15 minutes, agreed at drop-off before any brushing (the example: $20 for 15 minutes), up to the cap the owner sets",
+     "place": "added to a groom"
+    },
+    {
+     "name": "Matted coat: shave-down or dematting",
+     "price": "quoted at the visit: the groomer checks the coat with the owner at drop-off or at the van door, then prices it; only the coat check is promised (the example: $25 at the salon, the $89 van visit)",
+     "place": "at the salon, or in the van",
+     "before": "a card saved for the fees",
+     "after": "at the counter; in the van, the saved card at DONE"
+    },
+    {
+     "name": "Flea bath",
+     "price": "one price, only if fleas are found and the owner says yes (the example: $20)",
+     "place": "added to a groom"
+    },
+    {
+     "name": "Teeth brushing",
+     "price": "one price (the example: $10); a cleaning under the gums is vet work, never offered",
+     "place": "added to a groom"
+    }
+   ],
+   "not_offered": "sedation or calming drugs, cleanings under the gums, and overnight stays: Rosie points the owner to their vet or a licensed boarding kennel",
+   "repeat": "a repeat groom every few weeks (the example: every 6 weeks), by the owner's own yes, same day, time and groomer",
+   "capacity": "one groomer per pet; table time set by size and coat, plus 30 minutes for a pet with a bite history; the big tub and the cat room are saved like equipment",
+   "drop_off_window": "drop-off times with each groomer through the day (the example salon: 9am to 3pm), ready by text",
+   "touch_up": "a free touch-up within the days the owner sets (the example: 3 days), the business's own policy",
+   "van": "one groomer per van; the van parks at the home and the pet is groomed inside it; arrival in a 2-hour window",
+   "nobody_home": "no: an adult on the booking hands the pet over and takes it back",
+   "online": "no",
+   "example_prices": "every price, fee and window in the example flows is the example business's own: the $25 coat check, the $89 van visit, the $20 fee ($40 for the large doodle groom), the late pick-up window and fee (30 minutes, then $10 for each 15 minutes, up to $40), the 3-day free touch-up, and every groom price"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Dog or cat, the breed, and about how much the pet weighs",
+    "The coat: when it was last groomed, and any mats (a few spots, or tight to the skin)",
+    "Has the pet ever bitten or snapped at a groomer?",
+    "For the van: the town or ZIP, and a place to park a 24-foot van"
+   ],
+   "after_time": [
+    "The style wanted, like a teddy bear face or ears left long",
+    "Trouble with nails, dryers or being handled?",
+    "Anything the groomer should know, like a sore hip"
+   ],
+   "secure_page_only": [
+    "The pet's rabies certificate, or a vet's written exemption",
+    "The pet's private health notes, like seizures or a heart murmur",
+    "An emergency contact the salon may call (never texted)",
+    "The matted-coat release, and a muzzle OK for a pet with a bite history",
+    "Someone else who may pick the pet up, named in writing"
+   ],
+   "who_may_book": "an adult: the pet's owner, or someone the owner names; a teen sends it to a parent"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "a person hurt, or a fire",
+    "a pet that's bleeding, can't breathe, collapsed or had a seizure"
+   ],
+   "stop_action": "a person in danger: 'call 911' and the generic emergency steps. A pet in danger: the nearest emergency vet the salon named, and no booking",
+   "not_groomed_words": [
+    "a pet that's hurt or sick",
+    "a wound, a hot spot, or limping",
+    "just home from surgery"
+   ],
+   "not_groomed_action": "Rosie never judges how sick a pet is. It says the pet's vet should see it first, and no groom is booked until the vet says it's OK",
+   "visit_stops": "a pet that panics or gets too stressed, or a skin problem found on the table: the groomer stops, and the owner is called to pick up",
+   "can_continue": "no for a hurt or sick pet; yes for everything else"
+  },
+  "pf.first_steps": {
+   "required": "before a first groom: the pet's rabies proof, good on the groom day, on the secure page; or a vet's written exemption",
+   "on_file": "a rabies certificate on file is checked for each later booking, repeat grooms too; asked again only if it runs out before the visit",
+   "forms": [
+    "The matted-coat release: dematting up to the salon's cap, or a shave-down, with the risks spelled out (red skin, small nicks, itching)",
+    "A muzzle OK, for a pet with a bite history"
+   ],
+   "owner_ok": "a new pet with mats or a bite history waits for the owner's OK",
+   "prep_for_reminder": [
+    "Bring the rabies certificate if it isn't on file yet",
+    "Walk the dog before drop-off",
+    "Tell us about any new lumps, sores or health changes",
+    "For the van: a parking space, and the pet ready on a leash"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "a drop-off: the owner gives the check-in code at the counter when leaving the pet. The van: the code at the van door, as at any door",
+   "coat_check": "at drop-off, the groomer and the owner look at the coat together: mats, skin, lumps, fleas, with photos; the plan is confirmed against what the owner chose on the page",
+   "matted_coat": "dematting is capped and priced per 15 minutes; a coat matted tight to the skin gets the shave-down the owner chose, never a painful brush-out",
+   "added_work": "anything not agreed at drop-off, like a flea bath, needs the owner's yes by text with its price; no answer in 15 minutes: the owner calls; still no yes: finished without it",
+   "status_words": [
+    "IN",
+    "IN THE BATH",
+    "DRYING",
+    "READY"
+   ],
+   "ready": "READY texts the owner the total and the pick-up window; the late pick-up fee starts only after the window",
+   "pick_up": "the pet goes only to its owner or the person named on the secure page; the groomer shows the groom and any notes",
+   "late_drop_off": "up to 20 minutes late, the groom goes ahead and the ready time moves; later, the next open time",
+   "late_pick_up": "a window after READY, then a fee per 15 minutes up to a cap, only if the owner confirms (the example: 30 minutes, then $10 for each 15 minutes, up to $40); not there by closing: the owner calls the customer, then the emergency contact; a pet is never kept overnight",
+   "done_proof": "the drop-off code checks the pet in; READY and the pick-up close it; in the van, the code at the door and DONE"
+  },
+  "pf.money": {
+   "before": "the starting answer is a card saved for the fees, nothing charged; the owner can set nothing taken, like for a returning pet",
+   "after": "paid at the counter at pick-up, the salon's own way, with a tip if the customer likes; in the van, the saved card at DONE, or the bill Rosie texts",
+   "fees": "late cancel or no-show: a set fee (the example: $20 at the salon, $89 for the van), only if the owner confirms; late pick-up: per 15 minutes after the window, up to a cap",
+   "deposit": "none to start; deposit cap: from the state form",
+   "after_a_no": "a no to a matted-coat price: only the coat check is owed",
+   "tips": "a tip line, to the groomer: at the counter, or on the bill Rosie texts",
+   "tax": "the business's tax rate, where the state taxes grooming",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "The pet's health notes",
+    "An injury or a nick: the owner calls",
+    "The emergency contact's number",
+    "A gate or door code"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a pet a teen asked for go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "bath and brush",
+    "full grooms and breed cuts",
+    "doodle and poodle coats",
+    "cats",
+    "dematting and shave-downs",
+    "nervous or biting pets",
+    "van grooming",
+    "dog walking"
+   ],
+   "licenses": "none for each groomer unless the state's form says so; the business holds the grooming license where the state has one",
+   "supervision": "a groomer in training works only while a groomer who may supervise them is on, where the owner sets it",
+   "who_oks": "the owner OKs new pets with mats or a bite history, matted-coat prices, fees, and anything priced at the visit",
+   "stand_in": "only a groomer with the skill for that coat or pet, like cats or a bite history"
+  },
+  "pf.rules": {
+   "rabies_proof": "switch: proof of rabies before a groom, and what counts (a certificate or a vet's letter): from the state's or the city's form",
+   "license_shown": "switch: the grooming license number on ads and confirmations: from the state form",
+   "vet_work": "switch: what only a vet may do, like sedation or cleaning under the gums: from the state form; the plug-in never offers them",
+   "overnight": "switch: keeping a pet overnight needs a boarding license: from the state form; the plug-in never books a stay",
+   "van_rules": "switch: a separate license or permit for a van or trailer, and where it may park and drain water: from the state's and the city's forms",
+   "repeat_plans": "Rosie's rule: a repeat groom starts only with the owner's own yes; one reply ends it; a yearly reminder",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A pet that's hurt or sick: sent to its vet, no groom",
+    "No rabies proof by drop-off: no groom; any fee is the owner's call",
+    "A matted coat: dematting up to the cap, or the shave-down chosen ahead",
+    "Fleas found: a flea bath only with a yes; no yes, finished without it and kept apart",
+    "A small nick: the groomer stops, the owner calls the customer; no text, no fault admitted",
+    "A pet too stressed to go on: the groom stops, early pick-up, the owner sets the price",
+    "A late pick-up: a fee only if the owner confirms; never kept overnight",
+    "Unhappy with a shave-down: the owner shows the mats and the signed release",
+    "A no-show or a late cancel: the fee the customer agreed to, only if the owner confirms"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee; Rosie never offers money"
+  },
+  "pf.facts": [
+   "animals",
+   "dropoff",
+   "extrawork",
+   "firststeps",
+   "forms",
+   "plans",
+   "tips"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Jamal and Mei (groomers)",
+   "other": "Others (a parent, a dog walker, the pet's vet)"
+  },
+  "B": {
+   "staff": "Nico and Hana (van groomers)",
+   "other": "Others (a parent, a neighbor)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Jamal"
+  },
+  "B": {
+   "staff": "Nico"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "This is Rosie, an automated assistant for Lee's Barbershop. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee's Grooming Salon. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood grooming salon on Cedar Ave. Baths, full grooms and nail trims for dogs and cats."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mobile grooming at homes in Springfield. Full grooms and baths in the van, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "The van, parked for a groom"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks to board a dog overnight, which isn't on the salon's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Grooming Salon doesn't board pets overnight."
+   ],
+   [
+    "Here they OK the $110 color correction and skip the $15 gloss.",
+    "Here they OK the $110 shave-down and skip the $15 tidy."
+   ],
+   [
+    "Gloss to finish · $15",
+    "Face and paw tidy · $15"
+   ],
+   [
+    "The $15 gloss price is good until Sat Oct 31.",
+    "The $15 tidy price is good until Sat Oct 31."
+   ],
+   [
+    "No gloss today.",
+    "No tidy today."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Jamal leave the ears long instead of the tidy?"
+   ],
+   [
+    "Alex M. asks for a toner instead of the gloss.",
+    "Alex M. asks to leave the ears long instead of the tidy."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7",
+    "Ben T. books a bath and brush for Sat Nov 7"
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7",
+    "you now have two baths and brushes on Sat Nov 7"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Matted coat quotes come to you first. Board prices never need one"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Jamal: groomer, matted coats, van grooms"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A new pet's example: 'A first groom needs the rabies proof first. Is it on file at Lee's?'"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Alex books Biscuit and a neighbor's two dogs for one morning. Rosie finds tables side by side across Riley and Avery."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "It's 11:00am, and Alex brings Biscuit to the counter. Alex reads the code from the confirmation or the reminder, and Riley texts it in."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a nail trim. Rosie finds one time long enough for both, with one groomer, and adds the prices: $35 and $20."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "Alex M.'s price: $110 shave-down and $15 paw and face tidy, $125 in all, the $25 coat check included. It goes to Sam first."
+   ],
+   [
+    "A nothing before, and at their home too, 75, paid when they book. E paid when they book",
+    "A nothing before, and at their home too, 75, card charged when it's done"
+   ],
+   [
+    "The color correction alone is the $110 starting price, so no choice comes in under it.",
+    "The shave-down alone is the $110 starting price, so no choice comes in under it."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Lee's Barbershop prices a matted coat at drop-off, once Riley sees the coat."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley, so Riley's next times show. Matted coats always stay with Riley."
+   ],
+   [
+    "Set. For a haircut, the customer picks the place and sees both prices first.",
+    "Set. For a bath and brush, the customer picks the place and sees both prices first."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A grooming salon takes drop-offs: the pet is left at the counter, and picked up after READY."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A groomer's example: skunk spray near the eyes gets 'rinse the eyes with plain water'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a car that won't start."
+   ],
+   [
+    "Booking for a pet works the same way, where the plug-in books pets.",
+    "A pet is always booked under its owner, who books, pays and gets the texts."
+   ],
+   [
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "A at their home too, 75, card charged when it's done"
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The pet's rabies proof isn't on file, and Alex has none today."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Two pets, like Biscuit and a new puppy, work the same way."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Biscuit: short body, round face. Mats behind the ears again. Hates the dryer: towel dry first."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Bath and brush, small dog $35 ($40 from Nov 2) · De-shed bath $40 · Nail trim $20"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many grooming salons are licensed to one address"
+   ],
+   [
+    "The shop's money terms apply per person, as Sam set them.",
+    "The salon's money terms apply per pet, as Sam set them."
+   ],
+   [
+    "A color correction can't be priced before Riley sees it.",
+    "A matted coat can't be priced before Riley sees it."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a bath for my dog on Saturday."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A grooming salon's plug-in adds pet danger words, like a pet that's bleeding or had a seizure."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Dog training for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Riley quotes the rest at the chair, before any work.",
+    "Riley prices the rest at drop-off, before any grooming."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "Biscuit has a red, itchy spot that got worse. Can he still come in?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A groom is rated, so the salon takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No groom or walk is sent now: a hurt or sick pet goes to its vet."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book a bath and brush for my dog Biscuit at Lee's Barbershop on Saturday."
+   ],
+   [
+    "A service priced at the chair gets its price now.",
+    "A coat priced at drop-off gets its price now."
+   ],
+   [
+    "the item, its condition and the customer's mobile",
+    "the pet, its coat and the owner's mobile"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A grooming salon's are for the pet: a pet that's hurt or sick goes to its vet before any groom."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the salon show photos of Biscuit's groom? Yes / No"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 shave-down."
+   ],
+   [
+    "Alex says yes or no to the quote at the chair.",
+    "Alex says yes or no to the price at drop-off."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says Biscuit's collar came back with a broken clip today"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A groom could mean a pet groomer or a hair salon."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 coat check; priced at drop-off"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your salon, paid at pick-up, your own way"
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 shave-down + 15 paw and face tidy Alex M."
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code at the counter when you drop your pet off."
+   ],
+   [
+    "Riley's price for Alex M., at the chair now.",
+    "Riley's price for Alex M.'s Biscuit, at the counter now."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I wait at the salon during Biscuit's groom?"
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Biscuit's face is uneven on one side after Saturday's groom"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every salon service, shave-downs and house calls"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a puppy's first groom, for puppies under 6 months, is $25."
+   ],
+   [
+    "Lee's Barbershop will fix it for free.",
+    "Lee's Barbershop will touch it up for free."
+   ],
+   [
+    "Give your check-in code at the chair.",
+    "Give your check-in code at the counter."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Riley also does shave-downs and house calls"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Biscuit's collar came back with a broken clip."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds dog training to Lee's Barbershop."
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Grooms at the salon work like this:"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A grooming salon books a groomer's time. The pet is then left at the salon."
+   ],
+   [
+    "Picks it up with the code or an ID",
+    "Picks the pet up with the code or an ID"
+   ],
+   [
+    "A barbershop's services need none.",
+    "A groom needs none."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a bath and brush every 4 weeks."
+   ],
+   [
+    "I waited 25 minutes past my time.",
+    "Biscuit was ready 40 minutes later than I was told."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do puppy grooms? We just got a puppy."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next groom at pick-up"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Shave-down $110 · paw and face tidy $15"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Full groom, small dog"
+   ],
+   [
+    "Books the groom's party together",
+    "Books two dogs from one home"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Biscuit's face is uneven on one side."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Barbershop · drop-off with Riley"
+   ],
+   [
+    "barber, color and house calls",
+    "groomer, shave-downs and house calls"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile Grooming and Lee Dog Walking"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Bath and brush plan · every 4 weeks"
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at the counter."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Riley stopped Alex M.'s groom for Biscuit."
+   ],
+   [
+    "Anything added at the chair",
+    "Anything added at the salon"
+   ],
+   [
+    "extra 20 beard trim Alex M.",
+    "extra 20 dematting Alex M."
+   ],
+   [
+    "Saturdays · 11:00am · Riley",
+    "Saturdays · 11:00am drop-off · Riley"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like your grooms?"
+   ],
+   [
+    "Lee's Barbershop · Haircut",
+    "Lee's Barbershop · Biscuit's bath and brush"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the groom?"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero un baño para mi perro el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a bath every 4 weeks"
+   ],
+   [
+    "Color correction · $110",
+    "Shave-down · $110"
+   ],
+   [
+    "Color correction · $125",
+    "Matted coat groom · $125"
+   ],
+   [
+    "Add a beard trim today?",
+    "Add dematting today?"
+   ],
+   [
+    "Riley finishes the work",
+    "Riley finishes the groom"
+   ],
+   [
+    "Priced from your photos",
+    "Priced at drop-off"
+   ],
+   [
+    "Haircuts work like this",
+    "Grooms work like this"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile grooming and dog walking"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile grooming and dog walking"
+   ],
+   [
+    "Signature cut and shave",
+    "Full groom, small dog"
+   ],
+   [
+    "A barbershop has none.",
+    "A grooming salon has none, unless the state's rules require one."
+   ],
+   [
+    "Alex pays at the chair",
+    "Alex pays at pick-up"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Biscuit's groom."
+   ],
+   [
+    "Walk-in for a haircut",
+    "Walk-in for a nail trim"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Grooming Salon LLC"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at drop-off"
+   ],
+   [
+    "priced at the chair",
+    "priced at drop-off"
+   ],
+   [
+    "photos of your hair",
+    "photos of your pet's groom"
+   ],
+   [
+    "Color and cut · $90",
+    "Shave-down, matted poodle · $90"
+   ],
+   [
+    "A tip at the chair",
+    "A tip at pick-up"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Grooming's"
+   ],
+   [
+    "electrical license",
+    "pet-care license"
+   ],
+   [
+    "Alex M. · Haircut",
+    "Alex M. · Biscuit · Bath and brush"
+   ],
+   [
+    "paid at the chair",
+    "paid at pick-up"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at pick-up"
+   ],
+   [
+    "pays at the chair",
+    "pays at pick-up"
+   ],
+   [
+    "a package of cuts",
+    "a package of baths"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Grooming"
+   ],
+   [
+    "Beard trim · $20",
+    "Nail trim · $20"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Grooming Salon"
+   ],
+   [
+    "Color correction",
+    "Matted coat groom"
+   ],
+   [
+    "color correction",
+    "matted coat groom"
+   ],
+   [
+    "Only the consult",
+    "Only the coat check"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off · Riley"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off · Riley"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off · Avery"
+   ],
+   [
+    "11:00am · Avery",
+    "11:00am drop-off · Avery"
+   ],
+   [
+    "for a staff cut",
+    "for a groom for the office dog"
+   ],
+   [
+    "Groom's package",
+    "Large doodle groom"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off · Riley"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off · Riley"
+   ],
+   [
+    "Haircut · $35",
+    "Bath and brush, small dog · $35"
+   ],
+   [
+    "rents a chair",
+    "rents a table"
+   ],
+   [
+    "1 color quote",
+    "1 matted-coat price"
+   ],
+   [
+    "signature cut",
+    "small dog's full groom"
+   ],
+   [
+    "Color and cut",
+    "Breed cut"
+   ],
+   [
+    "color and cut",
+    "breed cut"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Consult only",
+    "Coat check only"
+   ],
+   [
+    "1200 Main St",
+    "780 Ridge Rd"
+   ],
+   [
+    "NEW massage",
+    "NEW dog training"
+   ],
+   [
+    "barbershops",
+    "grooming salons"
+   ],
+   [
+    "$25 consult",
+    "$25 coat check"
+   ],
+   [
+    "the consult",
+    "the coat check"
+   ],
+   [
+    "Electrical",
+    "Dog walking"
+   ],
+   [
+    "electrical",
+    "dog walking"
+   ],
+   [
+    "Barbershop",
+    "Grooming salon"
+   ],
+   [
+    "barbershop",
+    "grooming salon"
+   ],
+   [
+    "a kids cut",
+    "a puppy's first groom"
+   ],
+   [
+    "Beard trim",
+    "Nail trim"
+   ],
+   [
+    "beard trim",
+    "nail trim"
+   ],
+   [
+    "88 Elm St",
+    "64 Cedar Ave"
+   ],
+   [
+    "Skin fade",
+    "De-shed bath"
+   ],
+   [
+    "skin fade",
+    "de-shed bath"
+   ],
+   [
+    "A haircut",
+    "A bath and brush"
+   ],
+   [
+    "a haircut",
+    "a bath and brush"
+   ],
+   [
+    "the shop",
+    "the salon"
+   ],
+   [
+    "The shop",
+    "The salon"
+   ],
+   [
+    "cut hair",
+    "groom at the salon"
+   ],
+   [
+    "MP045210",
+    "GR045210"
+   ],
+   [
+    "Plumbing",
+    "Mobile grooming"
+   ],
+   [
+    "plumbing",
+    "mobile grooming"
+   ],
+   [
+    "Kids cut",
+    "Puppy groom"
+   ],
+   [
+    "kids cut",
+    "puppy groom"
+   ],
+   [
+    "Haircuts",
+    "Baths"
+   ],
+   [
+    "haircuts",
+    "baths"
+   ],
+   [
+    "BS20981",
+    "GS20981"
+   ],
+   [
+    "plumber",
+    "van groomer"
+   ],
+   [
+    "Plumber",
+    "Van groomer"
+   ],
+   [
+    "barbers",
+    "groomers"
+   ],
+   [
+    "Haircut",
+    "Bath and brush"
+   ],
+   [
+    "haircut",
+    "bath and brush"
+   ],
+   [
+    "Elm St",
+    "Cedar Ave"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "barber",
+    "groomer"
+   ],
+   [
+    "Barber",
+    "Groomer"
+   ],
+   [
+    "Jordan",
+    "Nico"
+   ],
+   [
+    "Riley",
+    "Jamal"
+   ],
+   [
+    "Avery",
+    "Mei"
+   ],
+   [
+    "Casey",
+    "Hana"
+   ],
+   [
+    "$500",
+    "$300"
+   ]
+  ],
+  "B": [
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my dog, Maple."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A first groom needs the pet's rabies proof first. Add it on the secure page before the visit."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on the porch step this morning."
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Mobile Grooming. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam. A problem with the groom? A free touch-up within 3 days."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood grooming salon on Cedar Ave. Baths, full grooms and nail trims for dogs and cats."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mobile grooming at homes in Springfield. Full grooms and baths in the van, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "The van, parked for a groom"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A big job over the plug-in's amount gets an estimate to sign."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a groom for my dog. A text back is fine."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a groom every 6 weeks."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Maple come every 6 weeks, too?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a matted coat brushed out over two grooms."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Maple is all shaggy' fits a full groom."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like grooming a neighbor's dog without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a nail trim? Say so.'"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Mobile Grooming can groom Maple in the van:"
+   ],
+   [
+    "Work like towing or a lockout is sent now",
+    "Work like a lockout is sent now"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 full groom needs none."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Full dematting, two doodles · $540"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Nico finds Maple's coat badly matted under the collar."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 dematting, 2 hours, matted under the collar"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: dematting, 2 hours, $160. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Dematting, 2 hours · $160"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Nico scuffs the porch step with the grooming table and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the porch step"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed porch step"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Nico scuffed the porch step at Alex M.'s. The before photo shows no scuff."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Maple's back leg looks uneven 2 days later. It's inside the 3-day touch-up window, so Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Maple's back leg looks uneven."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It's inside the free touch-up window, so this visit is free."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Jamal: groomer, matted coats, van grooms"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Home Services has a repeat groom, $179 a visit. Each visit is booked and paid like a single one. Want it every 6 weeks?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds a hot spot on Maple's back: red, wet skin. The plug-in says a groomer stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services grooms pets in its van and walks dogs. It never keeps a pet overnight. Nothing was saved. You can look for a licensed boarding kennel."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for her cat's nails. Both go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can bathe your dog at the salon for $35, or at your home for $75. Where would you like it?"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency for your pet. Go to the nearest emergency vet now. Springfield Pet ER is open 24 hours: (555) 010-0188."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said their dog collapsed. They got the emergency vet's number, and nothing was booked."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Jordan does the shave-down today, $165. The $80 bath price stays good until Thu Oct 29."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the pet's breed, weight and coat, any mats, and any bite history."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M. says Maple's back leg is uneven after Thu Oct 22's groom. It's inside the 3-day touch-up window."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to rinse the dog's eyes with plain water, and to call her vet if they stay red."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A cat's nail trim is $20, added to the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Enjuáguele los ojos con agua limpia. Si siguen rojos, llame a su veterinario."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to a flea bath for $20."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Don't cut it out, and keep paint thinner and gas off her paws."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is refilling the van's water and will be back about 9:30am. Maple should be done by about 10:45am."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "For a cat groom, only Jordan's times show: he's the one who grooms cats."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My goldendoodle Maple needs a full groom. Can a grooming van come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like keeping a dog overnight."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a hot spot on Maple's back and didn't clip around it."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rinse his eyes with clean water. If they stay red, call your vet."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a pet that's bleeding or had a seizure, goes to the emergency vet first."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For grooming, a pet that's bleeding, can't breathe, collapsed or had a seizure stops the booking."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "We couldn't find grooming license MP045210 for Lee Home Services on the state's lookup."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. The salon is in the other flow."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A full groom in the van happens only at the customer's home, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: grooms for her two dogs every 6 weeks."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the two-dog price before booking."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A groomer's example: skunk spray near the eyes gets 'rinse the eyes with plain water'."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a family books van grooms for its 4 dogs at one address."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A skunk sprayed my dog."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a car that won't start."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to bathe my dog the day after her flea drops?"
+   ],
+   [
+    "Booking for a pet works the same way, where the plug-in books pets.",
+    "A pet is always booked under its owner, who books, pays and gets the texts."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Dog training for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a pet that's bleeding, can't breathe, collapsed or had a seizure."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can the grooming van do a full groom this Thursday? What does it cost?"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the shave-down only, $165. No skin-soothing bath."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE Maple: #5 blade on the body, teddy face. Nervous with nails: go slow."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "what kind of dog is she, about how much does she weigh, and any mats?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many grooming salons are licensed to one address"
+   ],
+   [
+    "If the person at your door isn't Jordan, don't let them in.",
+    "If the person at your door isn't Jordan, don't hand your pet over."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan checks Maple's coat at the van door with Alex, and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan checked Maple's coat. Here's the price for today."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a second dog."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. Maple is finished without it, and kept apart from other pets."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no need: the van has everything for her bath."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds dog training to Lee Home Services."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No groom or walk is sent now: a hurt or sick pet goes to its vet."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no rabies proof for the pet"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do a de-shed treatment?"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Sent to the emergency vet"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Un zorrillo roció a mi perro."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan groom my other dog next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the touch-up window lasts."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A groom could mean a pet groomer or a hair salon."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your salon, paid at pick-up, your own way"
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "Every van groomer: none needs a license of their own there"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that Maple rolled in tar on a trail."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Maple rolled in something awful. Can someone come tonight?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Maple rolled in tar. It's stuck in her paws."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE no mats. Small scab on her back left leg."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Tiene el perro los ojos rojos?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan needs to refill the van's water tank."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also trim my cat's nails?"
+   ],
+   [
+    "If someone else comes, don't let them in.",
+    "If someone else comes, don't hand your pet over."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I bathe Maple before you come?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD hot spot on her back, didn't clip there"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please keep a parking spot for the van."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Are the dog's eyes red?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's groom?"
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like the van's warm water failing"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Riley also does shave-downs and house calls"
+   ],
+   [
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Mon Oct 26 · arriving 8–10am · Jordan"
+   ],
+   [
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "Tue Oct 27 · arriving 8–10am · Jordan"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "Jordan's price is good for 7 days."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 shave-down 165 skin-soothing bath 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the clipping around it. Show it to your vet."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "A nervous dog nips Jordan's hand, and he texts HURT."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left dog hair all over my driveway."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your vet before the next groom"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE refilling the van's water, back 9:30"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Any trouble with nails, dryers or being handled?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a hot spot on her back"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa groom Thu 12-2 Casey"
+   ],
+   [
+    "Water heater replacement · $640",
+    "Two doodles, one visit · $320"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "De-shed treatment · $40"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT dog nipped my hand, need to stop"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. He just smells bad."
+   ],
+   [
+    "barber, color and house calls",
+    "groomer, shave-downs and house calls"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile Grooming and Lee Dog Walking"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Flea bath"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Hot spot on her back"
+   ],
+   [
+    "Water heater replacement",
+    "Cat groom in the van"
+   ],
+   [
+    "water heater replacement",
+    "cat groom in the van"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW dog training"
+   ],
+   [
+    "A gas smell at the home",
+    "A dog that collapsed"
+   ],
+   [
+    "Priced from your photos",
+    "Priced at drop-off"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile grooming and dog walking"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile grooming and dog walking"
+   ],
+   [
+    "Sewer camera inspection",
+    "Puppy groom in the van"
+   ],
+   [
+    "sewer camera inspection",
+    "puppy groom in the van"
+   ],
+   [
+    "Just the kitchen sink.",
+    "A goldendoodle, about 52 lb. Brushed every week, no mats."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Full groom in the van"
+   ],
+   [
+    "Under the sink, before",
+    "Coat, before"
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Full groom in the van"
+   ],
+   [
+    "Cabinet floor, before",
+    "Back left leg, before"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Grooming LLC"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Shave-down · $165"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo huele mal."
+   ],
+   [
+    "Priced at the chair",
+    "Priced at drop-off"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilegrooming.com"
+   ],
+   [
+    "paid after the job",
+    "paid after the groom"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Grooming's"
+   ],
+   [
+    "electrical license",
+    "pet-care license"
+   ],
+   [
+    "Electrical license",
+    "Pet-care license"
+   ],
+   [
+    "Water heater flush",
+    "Bath and tidy in the van"
+   ],
+   [
+    "water heater flush",
+    "bath and tidy in the van"
+   ],
+   [
+    "for today's work.",
+    "for today's groom."
+   ],
+   [
+    "Supply line · $80",
+    "Skin-soothing bath · $80"
+   ],
+   [
+    "the kitchen drain",
+    "Maple's full groom"
+   ],
+   [
+    "paid at the chair",
+    "paid at pick-up"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Grooming"
+   ],
+   [
+    "the repair price",
+    "the price"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Grooming Salon"
+   ],
+   [
+    "plumbing license",
+    "grooming license"
+   ],
+   [
+    "Plumbing license",
+    "Grooming license"
+   ],
+   [
+    "Service call fee",
+    "Van visit fee"
+   ],
+   [
+    "service call fee",
+    "van visit fee"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 6 weeks"
+   ],
+   [
+    "Book the repair",
+    "Book the groom"
+   ],
+   [
+    "Drain clearings",
+    "Full grooms in the van"
+   ],
+   [
+    "drain clearings",
+    "full grooms in the van"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 full groom"
+   ],
+   [
+    "Drain clearing",
+    "Full groom in the van"
+   ],
+   [
+    "drain clearing",
+    "full groom in the van"
+   ],
+   [
+    "after the job",
+    "after the groom"
+   ],
+   [
+    "Kitchen drain",
+    "Full groom"
+   ],
+   [
+    "rents a chair",
+    "rents a table"
+   ],
+   [
+    "1200 Main St",
+    "780 Ridge Rd"
+   ],
+   [
+    "Service call",
+    "Van visit"
+   ],
+   [
+    "service call",
+    "van visit"
+   ],
+   [
+    "barbershops",
+    "grooming salons"
+   ],
+   [
+    "Leak repair",
+    "Matted coat in the van"
+   ],
+   [
+    "leak repair",
+    "matted coat groom in the van"
+   ],
+   [
+    "Yard drain",
+    "Full groom"
+   ],
+   [
+    "yard drain",
+    "van groom"
+   ],
+   [
+    "Electrical",
+    "Dog walking"
+   ],
+   [
+    "electrical",
+    "dog walking"
+   ],
+   [
+    "Barbershop",
+    "Grooming salon"
+   ],
+   [
+    "barbershop",
+    "grooming salon"
+   ],
+   [
+    "beard trim",
+    "nail trim"
+   ],
+   [
+    "88 Elm St",
+    "64 Cedar Ave"
+   ],
+   [
+    "42 Oak St",
+    "29 Willow Ct"
+   ],
+   [
+    "a haircut",
+    "a bath and brush"
+   ],
+   [
+    "Rental 1",
+    "Bear"
+   ],
+   [
+    "Rental 2",
+    "Daisy"
+   ],
+   [
+    "the shop",
+    "the salon"
+   ],
+   [
+    "The shop",
+    "The salon"
+   ],
+   [
+    "cut hair",
+    "groom at the salon"
+   ],
+   [
+    "MP045210",
+    "GR045210"
+   ],
+   [
+    "Plumbing",
+    "Mobile grooming"
+   ],
+   [
+    "plumbing",
+    "mobile grooming"
+   ],
+   [
+    "LATE 30",
+    "LATE 60"
+   ],
+   [
+    "BS20981",
+    "GS20981"
+   ],
+   [
+    "plumber",
+    "van groomer"
+   ],
+   [
+    "Plumber",
+    "Van groomer"
+   ],
+   [
+    "barbers",
+    "groomers"
+   ],
+   [
+    "Haircut",
+    "Bath and brush"
+   ],
+   [
+    "barber",
+    "groomer"
+   ],
+   [
+    "Barber",
+    "Groomer"
+   ],
+   [
+    "Jordan",
+    "Nico"
+   ],
+   [
+    "Riley",
+    "Jamal"
+   ],
+   [
+    "Avery",
+    "Mei"
+   ],
+   [
+    "Casey",
+    "Hana"
+   ],
+   [
+    "$500",
+    "$300"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a bath and brush for Biscuit, a 14-lb shih tzu, at Lee's Grooming Salon: an 11:00am drop-off with Jamal, Sat Oct 24. His rabies proof is on file, Jamal checks his coat with Alex at the counter, and READY comes at 1:00pm for pick-up and payment. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Grooming's van for Maple, a 52-lb goldendoodle, at home at 29 Willow Ct. Nico parks the van Thu Oct 22, arriving 8 to 10am, and grooms her inside it. The groom depends on the money choice you pick: a full groom, or a matted coat priced at the van door."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 bath and brush for Biscuit, priced by his size and coat. A card is saved for the salon's $20 fee and the late pick-up fee. Alex pays at the counter at pick-up.",
+    "list|none|counter": "The same $35 bath and brush for a pet the salon knows. Nothing is taken: a YES books it. Alex pays at the counter at pick-up.",
+    "visit|card|counter": "A matted coat, priced at drop-off once Jamal sees it: a $110 shave-down and a $15 tidy. Only the $25 coat check is promised. A card is saved for the $20 fee."
+   },
+   "labels": {
+    "price": {
+     "visit": "Priced at drop-off"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Bath and brush"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Bath and brush"
+    },
+    "visit|*|*": {
+     "name": "Matted coat groom"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|card|bill",
+    "visit|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 full groom in the van for Maple. A card is saved for the $89 fee, and charged $179 when Nico texts DONE.",
+    "list|card|bill": "The same $179 van groom. A card is saved for the $89 fee. Rosie texts the bill after, with a tip line.",
+    "visit|card|card": "A matted coat, priced at the van door: a $165 shave-down and an $80 skin-soothing bath. Only the $89 van visit is promised. The card is charged at DONE."
+   },
+   "labels": {
+    "price": {
+     "visit": "Priced at the van door"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Full groom in the van"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Full groom in the van"
+    },
+    "visit|*|*": {
+     "name": "Matted coat groom in the van"
+    }
+   }
+  }
+ },
+ "keep": [
+  "shave",
+  "leak"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Hana Moore"
+     ],
+     [
+      "Company",
+      "Lee Mobile Grooming"
+     ],
+     [
+      "Kinds of work",
+      "Mobile grooming"
+     ],
+     [
+      "Jobs",
+      "Full grooms, matted coats, bath and tidy"
+     ],
+     [
+      "Hours",
+      "Tue–Sat 8am–5pm"
+     ],
+     [
+      "Hana agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Dematting, 15 minutes",
+          "Nico",
+          "$25"
+         ],
+         [
+          "Dematting, 15 minutes",
+          "Anyone else",
+          "$20"
+         ],
+         [
+          "Cat groom in the van",
+          "You",
+          "$159"
+         ],
+         [
+          "Cat groom in the van",
+          "Anyone else",
+          "$139"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "A matted coat is never one price. The groomer checks it at the van door and prices it there."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your mobile grooming services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Mobile grooming prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Van price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Van visit",
+          "$89, the van's least charge, counted toward the groom"
+         ],
+         [
+          "Full groom in the van",
+          "$179"
+         ],
+         [
+          "Bath and tidy in the van",
+          "$150"
+         ],
+         [
+          "Matted coat in the van",
+          "Priced at the van door"
+         ],
+         [
+          "Cat groom in the van",
+          "$139"
+         ],
+         [
+          "Dematting",
+          "$20 for 15 minutes"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "A matted coat is priced for each pet, at drop-off, after a $25 coat check.",
+     "Prices go by the pet's size and coat. A doodle or poodle coat costs more.",
+     "The long grooms show how much table time they take, so the groomer is saved for all of it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the salon's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Bath and brush, small dog",
+          "$35 · ready in about 2 hours"
+         ],
+         [
+          "De-shed bath",
+          "$40"
+         ],
+         [
+          "Nail trim",
+          "$20 · 15 min, while you wait"
+         ],
+         [
+          "Puppy's first groom (under 6 months)",
+          "$25"
+         ],
+         [
+          "Full groom, small dog",
+          "$55 · 2 hours"
+         ],
+         [
+          "Full groom, large doodle (bath, clip, nails)",
+          "$140 · 3 hours"
+         ],
+         [
+          "Dematting",
+          "$20 for 15 minutes, agreed at drop-off"
+         ],
+         [
+          "Matted coat (shave-down or dematting)",
+          "Priced at drop-off · $25 coat check"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in says where the state licenses grooming salons. Where Sam works, it does, so Sam may give the salon's number. It's optional, and Rosie doesn't check it.",
+    "more": [
+     "Groomers need no license of their own unless the state's form says so.",
+     "Each groomer can link their own calendar when they join."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state licenses the salon itself. What's the salon's license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "GS20981"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile grooming",
+          "Now"
+         ],
+         [
+          "Dog walking",
+          "Once your walker joins and you say yes"
+         ],
+         [
+          "Lee's Grooming Salon",
+          "Its license is on file as given, not checked. It shows once a groomer joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Mei gets the same invite. Nico and Hana get theirs from Lee Mobile Grooming.",
+     "Pat gets one too, to OK prices for Lee Mobile Grooming.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Grooming Salon. Sam Lee added you to the salon's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Jamal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Grooming. Sam Lee added you to the team for van grooms and dog walks. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Nico"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Jamal replies YES, then checks what Sam set. One reply covers everything Jamal does for the salon.",
+    "more": [
+     "No license number is asked: groomers need none of their own where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Mei, Nico and Hana join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Jamal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee's Grooming Salon! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Jamal Chen · Lee's Grooming Salon",
+        "lines": [
+         "Every salon service, shave-downs and house calls",
+         "No license number needed",
+         "Hours: the salon's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Jamal"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Jamal"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Jamal Chen · my profile",
+        "lines": [
+         "No license needed for groomers here",
+         "Every salon service, shave-downs and house calls",
+         "The salon's hours"
+        ]
+       },
+       "as": "Jamal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Jamal"
+      }
+     ]
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for groomers, unless the state's form says so"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "more": [
+     "Only Sam sets who takes bookings and who may OK them.",
+     "A skill or OK someone adds later waits for Sam's OK.",
+     "Supervisor needed: the plug-in can mark someone, like a groomer in training, who may work only while a supervisor is working.",
+     "Nobody on Sam's team is in training, so nobody needs one.",
+     "Only Jamal is cleared for house calls, so only Jamal is offered for them.",
+     "Only Jamal does shave-downs, so matted coats offer only Jamal's times.",
+     "Pat takes no visits, so Pat adds nothing to Rosfield's $2.",
+     "Fees, refunds and what a business keeps are Sam's alone. Pat answers only requests and those prices."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's your team, as you set it. Change anything here or on the Team page.",
+      {
+       "list": {
+        "head": [
+         "Person",
+         "Takes",
+         "May OK"
+        ],
+        "rows": [
+         [
+          "Sam",
+          "Every van groom",
+          "May OK: everything; your answer wins"
+         ],
+         [
+          "Nico",
+          "Every van groom, and dog walks",
+          "May OK: nothing"
+         ],
+         [
+          "Hana",
+          "Van grooms, doodles and baths",
+          "May OK: nothing"
+         ],
+         [
+          "Pat",
+          "No visits",
+          "May OK: Lee Mobile Grooming prices over $300"
+         ],
+         [
+          "Jamal",
+          "Every salon service, shave-downs, house calls",
+          "May OK: nothing"
+         ],
+         [
+          "Mei",
+          "Every salon service but shave-downs",
+          "May OK: nothing"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does anyone work only while a supervisor is working, like a groomer in training?",
+      {
+       "buttons": [
+        "Nobody",
+        "Yes, set one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Grooming",
+       "In the van, at the customer's home",
+       "The company's grooming license GR045210",
+       "Yes"
+      ],
+      [
+       "Nico Price",
+       "Lee Mobile Grooming",
+       "In the van, and dog walks",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Hana Moore",
+       "Lee Mobile Grooming",
+       "In the van",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Grooming",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Jamal Chen",
+       "Lee's Grooming Salon",
+       "At the salon, and house calls",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Mei Diaz",
+       "Lee's Grooming Salon",
+       "At the salon",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Groomers need no license of their own where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Nico: van grooms and dog walks",
+         "Hana: van grooms",
+         "Jamal: the salon, shave-downs and house calls",
+         "Mei: the salon"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Grooming Salon can book you from now on, at the salon and for house calls. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Jamal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Grooming Salon can book you from now on, at the salon. Your day list comes at the time you picked.",
+      {
+       "as": "Mei"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Grooming can book you for van grooms and dog walks from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Nico"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Dog walking and Lee's Grooming Salon now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the search goes on, marked urgent.",
+    "more": [
+     "A grooming salon's example: skunk spray in the eyes gets 'rinse them with plain water'.",
+     "A pet that's hurt or sick never goes on to a groom: its vet sees it first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now. If it's your pet, go to the nearest emergency vet now. Springfield Pet ER is open 24 hours: (555) 010-0188."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "The grooming plug-in adds the emergency vet the salon named at sign-up.",
+     "It's for a pet that's bleeding, can't breathe, collapsed or had a seizure."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "more": [
+     "Sam set this line at sign-up: the number customers call for what only a groomer should answer.",
+     "911 or 988 come first when they're needed. A pet in danger gets the emergency vet first.",
+     "The plug-in lists which words go to this line. Sam can add more.",
+     "A question about a pet's health or medicine goes to the pet's own vet, never to Rosie.",
+     "A pet that's hurt or sick isn't booked. Otherwise Alex can go on."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the groomers themselves. Jamal can go over it at your visit. For anything sooner, call Lee's Grooming Salon at (555) 010-0177. If your pet seems sick or hurt, call your vet."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "A walk-in pet needs its rabies proof too, before any groom."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says what a groom needs first: the pet's rabies proof, good on the groom day, and the coat release. Rosie checks before the secure link, so the page knows what to ask.",
+    "more": [
+     "Biscuit's rabies certificate is on file and good on Sat Oct 24, so it isn't asked again: the second branch.",
+     "A new pet gets the rabies proof and the coat release on the secure page: the last branch.",
+     "A pet with a bite history waits for Sam's OK: the bite history branch."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in's forms go on the secure page: the rabies proof for a new pet, and the matted-coat release. Each says when it's due.",
+    "more": [
+     "The rabies proof is a photo of the certificate, or a vet's written exemption. Its dates must cover the groom day.",
+     "The coat release lets Alex choose ahead: dematting up to 30 minutes, at $20 for 15, or a shave-down.",
+     "The release spells out the risks of a shave-down, like red skin, small nicks and itching.",
+     "Due by drop-off: one reminder before it. Not done by then, Sam decides to keep, move or cancel with no fee.",
+     "A signed release and a good certificate stay on file, so a later booking skips them.",
+     "Its answers stay on the page, never in a text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-32",
+    "more": [
+     "One person books for all the pets and agrees to the terms.",
+     "The booking has one code, sent to the person who booked. The desk can tick each pet on the Today page.",
+     "The salon's money terms apply per pet, as Sam set them.",
+     "It's one booking with one code, so Rosfield's $2 counts once."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-07",
+    "does": "Only for the salon's fees: $20 for a no-show or a cancel within 24 hours, and the late pick-up fee. Alex ticks them, and Sam confirms any charge.",
+    "form": [
+     [
+      "Name",
+      "Alex M."
+     ],
+     [
+      "Card",
+      "•••• 4242 · saved, not charged"
+     ],
+     [
+      "I agree",
+      "$20 if I don't show, or cancel within 24 hours"
+     ],
+     [
+      "And",
+      "$10 for each 15 minutes past my pick-up window, up to $40"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "A drop-off's confirmation shows when the pet should be ready. READY comes by text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-03",
+    "does": "If the booking moves, the rabies proof is checked against the new date. A certificate that runs out before then is asked for again.",
+    "more": [
+     "Biscuit's certificate is good until Jun 2027, so any new date before then keeps it.",
+     "A coat release on file counts for the new time, even with another groomer.",
+     "The 'Moved' text says if anything is needed, and Jamal is told."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-13",
+    "more": [
+     "A spot that's open, wet or bleeding gets 'please show it to your vet first'. The groom waits until the vet says it's OK."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "does": "Jamal is behind, so Biscuit's groom starts later. The drop-off time stays, and Alex hears the new ready time.",
+    "more": [
+     "2, Move my visit: Alex gets open times, with no fee.",
+     "With no reply, the drop-off stays and the later ready time stands."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 20"
+     ],
+     [
+      "san",
+      "cust",
+      "Jamal is running about 20 minutes behind. You can still drop Biscuit off at 11:00am. He'll be ready about 1:20pm.",
+      {
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-70",
+    "does": "The salon's late rule: up to 20 minutes late, the groom goes ahead and the ready time moves. Say Ruth P. is 40 minutes late: Ruth picks the next open time.",
+    "more": [
+     "No fee for the move, unless the plug-in's late rule says so and the owner confirms.",
+     "No reply in 30 minutes: the first time offered is kept, and Ruth is told."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry, it's past the 20 minutes we can wait for a drop-off. Pick the next open time, with no fee:",
+      {
+       "times": [
+        "Today · 3:30pm drop-off",
+        "Tomorrow · 9:00am drop-off"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex arrives at the salon with Biscuit. The desk checks what the plug-in requires first: Biscuit's rabies proof is on file, and good today.",
+    "more": [
+     "A new pet with no rabies proof by drop-off isn't groomed: the missing branch.",
+     "The reminder already said what to bring.",
+     "The code is taken only once nothing required is missing."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "Say a dog walker Alex named on the secure page drops Biscuit off. The walker gives Alex's code at the counter, like Alex would.",
+    "more": [
+     "No code: Jamal texts IN once he has the pet and its leash, and Alex is told.",
+     "Without Alex there, the coat release on the page decides what's done for mats.",
+     "Next come the coat check, the price or the OK, and the groom. READY and the pick-up come after the groom."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "t": "Sat Oct 24, 11:05am",
+    "does": "Back to Alex at the counter, Sat 11:05am. Before Alex leaves, Jamal and Alex look at Biscuit's coat together: mats, skin, ears and any fleas.",
+    "more": [
+     "Jamal notes what's already there, with photos. It's the before record.",
+     "It's kept with the booking, and Alex can see it on the secure page.",
+     "A complaint or a claim later is checked against it.",
+     "The plan is checked against what Alex chose on the page, like the coat release."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-33",
+    "say": [
+     [
+      "staff",
+      "san",
+      "extra 20 dematting Alex M."
+     ],
+     [
+      "san",
+      "cust",
+      "Add dematting today?",
+      {
+       "card": {
+        "title": "Dematting, 15 minutes · $20",
+        "lines": [
+         "Behind both ears",
+         "Done before the bath, if you say yes"
+        ]
+       },
+       "buttons": [
+        "Yes, add it",
+        "No thanks"
+       ]
+      }
+     ]
+    ],
+    "does": "At the coat check, Jamal finds small mats behind Biscuit's ears. Dematting is on the board: $20 for 15 minutes. Alex hears the price and says yes before any brushing.",
+    "more": [
+     "It's paid at pick-up with the rest, the salon's own way.",
+     "A coat matted tight gets the shave-down Alex chose on the release, never a painful brush-out.",
+     "No, or no answer: the mats are clipped out short instead, at no extra cost.",
+     "One booking means one $2."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Say Jamal finds a hot spot on Biscuit's back: red, wet skin. The plug-in says to stop there. Nothing more is done there, and nothing is charged for that part.",
+    "more": [
+     "The note says what was found, what wasn't done, and why.",
+     "It says to show it to a vet, never a named one.",
+     "Health details stay on the secure page, never in a text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-37",
+    "does": "Biscuit panics at the dryer, so Jamal stops for his safety. Jamal texts the part done with its price, read back like a bill. Only that is charged.",
+    "more": [
+     "Sam calls Alex to pick Biscuit up early. Sam sets the price for what was done.",
+     "A price under the booked one needs no OK.",
+     "Nothing more is done without Alex's yes.",
+     "Rosie never offers money on its own."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Biscuit is too stressed at the dryer, so I stopped. Only part of the groom was done."
+     ],
+     [
+      "san",
+      "staff",
+      "Noted. Text PART and the price of what was done. It's read back like a bill."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "Say Jamal nicks Biscuit's ear tip. Jamal stops, and it stops with pressure. Sam is told at once and calls Alex himself.",
+    "more": [
+     "A pet that's badly hurt goes to the emergency vet first.",
+     "Rosie sends Alex no text about it, and never says whose fault it was.",
+     "Sam offers a vet visit if Alex wants one, and decides who pays.",
+     "A record is kept on the secure page, never in a text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-39",
+    "more": [
+     "Rosie never admits fault or offers money on its own.",
+     "A payment from Sam is typed on the portal and read back first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-30",
+    "does": "Alex says no for now and takes Biscuit home. Alex pays only the $25 coat check. Jamal's price stays good for 7 days."
+   },
+   {
+    "op": "more",
+    "at": "A7-11",
+    "more": [
+     "After STOP, a drop-off's READY comes by a call from the salon instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "t": "Sat Oct 24, 12:50pm",
+    "does": "Jamal finishes Biscuit's groom: what was booked, and anything Alex said yes to.",
+    "more": [
+     "Next: READY, the pick-up, and payment at the counter."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-85",
+    "branch": {
+     "label": "Fleas found during the groom",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "type": "split",
+       "line": [
+        "8.8",
+        "8.16"
+       ],
+       "who": "staff",
+       "to": "cust",
+       "via": "msg",
+       "t": "Sat Oct 24, 11:40am",
+       "title": "Asks Alex to OK a flea bath",
+       "q": "Does Alex OK the flea bath?",
+       "does": "In the bath, Jamal finds fleas on Biscuit. A flea bath wasn't booked, so Alex is asked first, with its price.",
+       "more": [
+        "The flea bath is on the board: $20. It stops fleas spreading to other pets.",
+        "Nothing extra is done without Alex's yes.",
+        "No answer in 15 minutes: Sam calls Alex."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "EXTRA 20 flea bath Biscuit"
+        ],
+        [
+         "san",
+         "cust",
+         "Jamal found fleas on Biscuit in his bath. A flea bath stops them spreading to other pets. Add it?",
+         {
+          "card": {
+           "title": "Flea bath · $20",
+           "lines": [
+            "Added to today's groom",
+            "Paid at pick-up with the rest"
+           ]
+          },
+          "buttons": [
+           "Yes, add it",
+           "Have Sam call me"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.visit",
+        "pf.edges"
+       ],
+       "tells": [
+        "cust"
+       ],
+       "branches": [
+        {
+         "label": "1 Yes, add it",
+         "steps": [],
+         "end": "merge"
+        },
+        {
+         "label": "2, or no reply in 15 minutes",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "A8-x02",
+           "line": [
+            "8.8",
+            "11.22"
+           ],
+           "who": "owner",
+           "to": "cust",
+           "via": "call",
+           "t": "Sat Oct 24, 11:55am",
+           "title": "Sam calls Alex about the flea bath",
+           "does": "Sam calls Alex. With a yes, Jamal gives the flea bath. With no yes, Biscuit is finished without it and kept apart from other pets until pick-up.",
+           "more": [
+            "Nothing extra is done or billed without a yes.",
+            "Rosie sends no reminder of its own: the call is Sam's."
+           ],
+           "needs": [
+            "pf.edges"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "end": "merge"
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-11",
+    "does": "Updates during the groom are drawn here. Jamal texts a status word or a short note, and Rosie tells Alex in the salon's name, inside text hours.",
+    "more": [
+     "The plug-in's status words: IN, IN THE BATH, DRYING and READY.",
+     "A moved ready time is always sent, with the new time.",
+     "A reply from Alex goes to Jamal, like any question.",
+     "More work found while Biscuit is in is texted with its price first, like the flea bath."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "t": "Sat Oct 24, 1:00pm",
+    "does": "Jamal texts READY at 1:00pm, with a photo. Alex hears what was done, the pick-up window and what's due.",
+    "more": [
+     "Pick up within 30 minutes. After that, the late fee Alex agreed to can apply, only if Sam says yes.",
+     "Something wrong? Alex can reply within 24 hours, and Sam is told.",
+     "Sent inside text hours. A late READY waits for 9am."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-50",
+    "steps": [
+     {
+      "id": "A8-x03",
+      "type": "split",
+      "line": [
+       "8.16",
+       "11.4"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks the pick-up window",
+      "q": "Is Biscuit picked up by 1:30pm?",
+      "does": "READY started a 30-minute pick-up window. After it, the late fee Alex agreed to can apply, but only if Sam says yes.",
+      "more": [
+       "The window and the fee were on the secure page and in READY.",
+       "A pet is never kept overnight: that needs a boarding license."
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.money"
+      ],
+      "branches": [
+       {
+        "label": "Yes, inside the window",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Late: Sam decides the fee",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x04",
+          "line": [
+           "11.4",
+           "8.16"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "t": "Sat Oct 24, 2:10pm",
+          "title": "Asks Sam about the late pick-up fee",
+          "does": "Say Alex comes at 2:10pm, 40 minutes after the window. The fee Alex agreed to would be $30. Sam is asked, and here he says no fee.",
+          "more": [
+           "Fees are Sam's alone. No answer by closing means no fee.",
+           "A fee Sam OKs is added at the counter, never more than the $40 cap."
+          ],
+          "say": [
+           [
+            "san",
+            "owner",
+            "Alex M. picked Biscuit up at 2:10pm, 40 minutes after the window. Add the late fee?",
+            {
+             "card": {
+              "title": "Late pick-up · $30",
+              "lines": [
+               "READY 1:00pm · window to 1:30pm",
+               "$10 for each 15 minutes, as Alex agreed"
+              ]
+             },
+             "buttons": [
+              "Add $30",
+              "No fee"
+             ]
+            }
+           ],
+           [
+            "owner",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "staff",
+            "No late fee for Alex M. today."
+           ]
+          ],
+          "needs": [
+           "pf.money"
+          ],
+          "tells": [
+           "owner",
+           "staff"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Not here by closing",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x05",
+          "line": [
+           "8.16",
+           "11.22"
+          ],
+          "who": "owner",
+          "to": "cust",
+          "via": "call",
+          "t": "Sat Oct 24, 6:00pm",
+          "title": "Sam calls Alex, then the emergency contact",
+          "does": "Say Alex isn't back by 6pm closing. Sam calls Alex, then the emergency contact on the secure page. Jamal stays with Biscuit until someone comes.",
+          "more": [
+           "Rosie never texts the emergency contact: they never agreed to texts.",
+           "The salon never keeps a pet overnight: that needs a boarding license.",
+           "The late fee stops at the $40 cap, and only if Sam says yes."
+          ],
+          "needs": [
+           "pf.visit",
+           "pf.edges"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "does": "Alex gives the code at pick-up, inside the window. Jamal brings Biscuit out, and hands him over once anything due is paid.",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: Biscuit stays, and the person is asked to come back with Alex's code.",
+     "A pet goes back only to its owner, or the person named on the secure page.",
+     "Anything due is paid at the counter, the salon's own way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Show Alex the groom, and hand Biscuit over once anything due is paid."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "more": [
+     "A touch-up at pick-up costs nothing extra.",
+     "Anything new needs Alex's yes and its price first.",
+     "Jamal also tells Alex how Biscuit did, like with the dryer."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "more": [
+     "A stand-in sees them too.",
+     "They never go in a text to Alex.",
+     "Alex can get a copy, as with any record.",
+     "The plug-in names what's worth keeping: the style, the blade, behavior with nails and dryers, and any nick."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-08",
+    "more": [
+     "The plug-in's touch-up window comes first: here, free within 3 days.",
+     "Rosie never argues and never offers money on its own."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-42",
+    "does": "The plug-in's aftercare notes go out after the groom. Anything Alex reports, like red skin after a shave-down, is checked for danger first.",
+    "more": [
+     "Danger signs get the emergency vet's number. A sore spot gets 'please show it to your vet'.",
+     "Anything else goes to Sam privately.",
+     "Details stay on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to the salon. Quinn gets one invite and replies YES. Groomers need no license of their own here, so Quinn can be booked once Sam says yes.",
+    "more": [
+     "Where a state's form asks for a groomer's license, it's asked then (optional) and shown as given, not checked.",
+     "No reply in 48 hours: one reminder, then Sam is told."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Grooming Salon. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Dates come from what Sam sent. Reminders go 30 days and 7 days before. Here, the salon's grooming license comes due.",
+    "more": [
+     "Insurance works the same way: a new certificate in the business's name, or 'insured' comes off the listing.",
+     "Groomers need no license of their own here, so only the business's license and insurance come due."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says The salon's grooming license has lapsed.",
+      {
+       "card": {
+        "title": "License renewal · Lee's Grooming Salon",
+        "lines": [
+         "Not renewed by then: the salon goes offline the next day"
+        ],
+        "button": "Upload the receipt",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no license; the owner says when one lapses. Here, Sam says the salon's grooming license is lapsed, so new salon bookings pause at once.",
+    "more": [
+     "Every 30 days by default, and again before each expiry.",
+     "Expired, suspended or revoked all pause new bookings.",
+     "Rosie's team reviews the bookings already made within 1 business day.",
+     "Customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee's Grooming Salon's license is lapsed.",
+      {
+       "card": {
+        "title": "Salon · new bookings paused",
+        "lines": [
+         "Bookings already made: Rosie's team reviews them",
+         "Customers aren't told why"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee's Grooming Salon: your card was charged twice for the same fee. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $20",
+        "lines": [
+         "Late-cancel fee · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Dee W.'s $20 late-cancel fee was charged twice. The second charge is refunded, and Dee is told."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked groom and walk pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The grooming plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Grooming books a groomer's time, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Grooming runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A groom is never sent now: a hurt or sick pet goes to a vet, and every groom has a set time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The salon never keeps a pet overnight: that would need a boarding license."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A groom is booked for a pet, under its adult owner. A teen who books is asked to send it to a parent (the next branches)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "A plan's grooms are paid at pick-up, so no plan charge is texted."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "A pet is never left overnight: a late pick-up is handled the same day (A8-x05), never with storage fees."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A groom is rated like any visit."
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Groomers and walkers need a license of their own only where the state's form says so.",
+     "In this example the form asks for none, so nobody is checked: the second branch. Where a form does, the first branch checks each one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-11",
+    "does": "A what-if: where the state's form licenses groomers, Rosie shows any number as given and doesn't check it. In this example nobody needs one."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Grooming needs one only where the state's form licenses grooming businesses, vans too. In this example it does, for the van and the salon.",
+     "Dog walking needs none here, so it goes live on the company's details."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-30",
+    "more": [
+     "Each visit gets its own code and its own reminder.",
+     "Rosfield's $2 counts once a month for a plan.",
+     "Alex can skip, pause or end the plan by text.",
+     "Where the salon offers no plan, Alex gets a reminder instead.",
+     "Each visit is booked like a single one. The card stays saved for the fees, and each visit is paid at pick-up.",
+     "The plan's terms get their own yes on the secure page, before any card."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-32",
+    "does": "Alex books Biscuit and Alex's second dog, Pepper, for one morning. Rosie finds tables side by side across Jamal and Mei."
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "more": [
+     "The salon's prices stay the same if Alex comes back.",
+     "Alex's AI can ask again any time."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-70",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry, it's past the 20 minutes we can wait for a drop-off. Pick the next open time, with no fee:",
+      {
+       "times": [
+        "Today · 2:30pm drop-off",
+        "Tomorrow · 9:00am drop-off"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "A groom at the salon has no cancel period. Only a contract or extra work that the state's rules cover gets one, like a package of baths bought at the salon."
+   },
+   {
+    "op": "words",
+    "at": "A10-26",
+    "does": "Say Alex bought a package of baths at the salon today. Where the state's rules give a cancel period, Rosie sends it in writing."
+   },
+   {
+    "op": "words",
+    "at": "A10-08",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Biscuit's face is uneven on one side."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says Biscuit's face is uneven on one side after Saturday's groom.",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee's Grooming Salon will touch it up for free. Pick a time:",
+      {
+       "times": [
+        "Tue Oct 27 · 11:00am drop-off · Jamal",
+        "Tue Oct 27 · 1:00pm drop-off · Jamal"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-14",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee's Grooming Salon had to block Thu Oct 29, 2 to 5pm, so your 3:00 bath and brush can't go ahead then. Pick a new time:",
+      {
+       "times": [
+        "Fri Oct 30 · 9:00am",
+        "Fri Oct 30 · 10:00am"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Cancel, no fee"
+        ]
+       ],
+       "as": "Ben T."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A grooming salon takes pets, never children."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Hana Moore"
+     ],
+     [
+      "Company",
+      "Lee Mobile Grooming"
+     ],
+     [
+      "Kinds of work",
+      "Mobile grooming"
+     ],
+     [
+      "Jobs",
+      "Full grooms, matted coats, bath and tidy"
+     ],
+     [
+      "Hours",
+      "Tue–Sat 8am–5pm"
+     ],
+     [
+      "Hana agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Dematting, 15 minutes",
+          "Nico",
+          "$25"
+         ],
+         [
+          "Dematting, 15 minutes",
+          "Anyone else",
+          "$20"
+         ],
+         [
+          "Cat groom in the van",
+          "You",
+          "$159"
+         ],
+         [
+          "Cat groom in the van",
+          "Anyone else",
+          "$139"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "A matted coat is never one price. The groomer checks it at the van door and prices it there."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your mobile grooming services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Mobile grooming prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Van price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Van visit",
+          "$89, the van's least charge, counted toward the groom"
+         ],
+         [
+          "Full groom in the van",
+          "$179"
+         ],
+         [
+          "Bath and tidy in the van",
+          "$150"
+         ],
+         [
+          "Matted coat in the van",
+          "Priced at the van door"
+         ],
+         [
+          "Cat groom in the van",
+          "$139"
+         ],
+         [
+          "Dematting",
+          "$20 for 15 minutes"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile grooming",
+          "Now"
+         ],
+         [
+          "Dog walking",
+          "Once your walker joins and you say yes"
+         ],
+         [
+          "Lee's Grooming Salon",
+          "Its license is on file as given, not checked. It shows once a groomer joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Mei gets the same invite. Nico and Hana get theirs from Lee Mobile Grooming.",
+     "Pat gets one too, to OK prices for Lee Mobile Grooming.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Grooming Salon. Sam Lee added you to the salon's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Jamal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Grooming. Sam Lee added you to the team for van grooms and dog walks. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Nico"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Jamal replies YES, then checks what Sam set. One reply covers everything Jamal does for the salon.",
+    "more": [
+     "No license number is asked: groomers need none of their own where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Mei, Nico and Hana join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Jamal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee's Grooming Salon! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Jamal Chen · Lee's Grooming Salon",
+        "lines": [
+         "Every salon service, shave-downs and house calls",
+         "No license number needed",
+         "Hours: the salon's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Jamal"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Jamal"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Jamal Chen · my profile",
+        "lines": [
+         "No license needed for groomers here",
+         "Every salon service, shave-downs and house calls",
+         "The salon's hours"
+        ]
+       },
+       "as": "Jamal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Jamal"
+      }
+     ]
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for groomers, unless the state's form says so"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "more": [
+     "Only Sam sets who takes bookings and who may OK them.",
+     "A skill or OK someone adds later waits for Sam's OK.",
+     "Supervisor needed: the plug-in can mark someone, like a groomer in training, who may work only while a supervisor is working.",
+     "Nobody on Sam's team is in training, so nobody needs one.",
+     "Only Jamal is cleared for house calls, so only Jamal is offered for them.",
+     "Only Jamal does shave-downs, so matted coats offer only Jamal's times.",
+     "Pat takes no visits, so Pat adds nothing to Rosfield's $2.",
+     "Fees, refunds and what a business keeps are Sam's alone. Pat answers only requests and those prices."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's your team, as you set it. Change anything here or on the Team page.",
+      {
+       "list": {
+        "head": [
+         "Person",
+         "Takes",
+         "May OK"
+        ],
+        "rows": [
+         [
+          "Sam",
+          "Every van groom",
+          "May OK: everything; your answer wins"
+         ],
+         [
+          "Nico",
+          "Every van groom, and dog walks",
+          "May OK: nothing"
+         ],
+         [
+          "Hana",
+          "Van grooms, doodles and baths",
+          "May OK: nothing"
+         ],
+         [
+          "Pat",
+          "No visits",
+          "May OK: Lee Mobile Grooming prices over $300"
+         ],
+         [
+          "Jamal",
+          "Every salon service, shave-downs, house calls",
+          "May OK: nothing"
+         ],
+         [
+          "Mei",
+          "Every salon service but shave-downs",
+          "May OK: nothing"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does anyone work only while a supervisor is working, like a groomer in training?",
+      {
+       "buttons": [
+        "Nobody",
+        "Yes, set one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Grooming",
+       "In the van, at the customer's home",
+       "The company's grooming license GR045210",
+       "Yes"
+      ],
+      [
+       "Nico Price",
+       "Lee Mobile Grooming",
+       "In the van, and dog walks",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Hana Moore",
+       "Lee Mobile Grooming",
+       "In the van",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Grooming",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Jamal Chen",
+       "Lee's Grooming Salon",
+       "At the salon, and house calls",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Mei Diaz",
+       "Lee's Grooming Salon",
+       "At the salon",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Groomers need no license of their own where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Nico: van grooms and dog walks",
+         "Hana: van grooms",
+         "Jamal: the salon, shave-downs and house calls",
+         "Mei: the salon"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Grooming Salon can book you from now on, at the salon and for house calls. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Jamal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Grooming Salon can book you from now on, at the salon. Your day list comes at the time you picked.",
+      {
+       "as": "Mei"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Grooming can book you for van grooms and dog walks from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Nico"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Dog walking and Lee's Grooming Salon now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "The grooming plug-in adds pet danger words. A pet that's bleeding, can't breathe or collapsed goes to the emergency vet."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "does": "Alex adds where the van can park and how Maple comes out to it. A gate or door code shows to Nico only on the day of the visit.",
+    "more": [
+     "Building rules, like a homeowners' group's van rules or proof of insurance, go to Sam to check.",
+     "The plug-in adds its own questions: a 24-foot space for the van, and the pet ready on a leash."
+    ],
+    "form": [
+     [
+      "Parking for the van",
+      "In the driveway, 24 ft clear"
+     ],
+     [
+      "The pet",
+      "Maple, on a leash at the front door"
+     ],
+     [
+      "Gate or door code",
+      "None"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "t": "Thu Oct 22, 8:25am",
+    "does": "At the van door, Nico and Alex look at Maple's coat together. Nico notes what's already there, with photos, before any grooming.",
+    "more": [
+     "The plug-in names the checks: the coat, the skin, the ears and the nails.",
+     "Alex can see them on the secure page.",
+     "A complaint later is checked against them.",
+     "The plan is checked against what Alex chose on the coat release."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-34",
+    "more": [
+     "A pet nicked in the van: Nico stops, and Sam calls Alex himself. No text goes about it, and nobody says whose fault it was."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "t": "Thu Oct 22, 10:30am"
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:35am",
+    "does": "Nico brings Maple back to Alex at 10:35am. He texts DONE with the total and its lines, so Rosie can text the bill."
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 10:37am"
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 10:40am",
+    "does": "Back to Alex, Thu 10:40am: the money is in. The receipt goes out by text and email, with the plug-in's touch-up window."
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 1:00pm"
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "For a groom: the pet's rabies proof and the coat release. Maple's are on file, so the second branch."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "For a new pet, the plug-in's forms go on the secure page: the rabies proof and the matted-coat release. Alex adds them now, or by the day before.",
+    "more": [
+     "The rabies proof is a photo of the certificate, or a vet's written exemption. Its dates must cover the groom day.",
+     "The coat release lets Alex choose ahead: dematting up to 30 minutes, or a shave-down.",
+     "Both stay on file, so a later booking skips them.",
+     "Not done by the day before: one reminder, then Sam decides to keep it, move it, or cancel with no fee."
+    ],
+    "form": [
+     [
+      "Rabies proof",
+      "A photo of the certificate, or a vet's letter"
+     ],
+     [
+      "Coat release",
+      "Dematting up to 30 minutes, or a shave-down"
+     ],
+     [
+      "Due",
+      "By the day before the visit"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Maple's repeat groom in the van",
+        "lines": [
+         "$179 a visit, every 6 weeks",
+         "Each visit is booked and charged like this one",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ],
+    "form": [
+     [
+      "How often",
+      "Every 6 weeks"
+     ],
+     [
+      "Price a visit",
+      "$179"
+     ],
+     [
+      "When it's charged",
+      "At each visit's DONE, like a single booking"
+     ],
+     [
+      "Skip, pause or end",
+      "Any time, by text"
+     ],
+     [
+      "I agree to the plan's terms",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-07",
+    "does": "A groom's first step is the rabies proof, tied to its dates. Only times it stays good for are offered.",
+    "more": [
+     "Maple's certificate is good until Mar 2027, so every free time is offered.",
+     "A certificate or a coat release that's still good stays on file, even with another groomer.",
+     "If it runs out before the new time, Alex is asked for a current one first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "more": [
+     "Over $300, Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+     "The $89 van visit is part of the price.",
+     "No phone at hand: Alex can answer on Nico's phone, the same as for extra work.",
+     "Any fact the state's rules require, like a license number, is on the price."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Nico to come back in 6 weeks for Maple's next groom. Nico texts NEXT, and Alex gets times to pick.",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the customer asks.",
+     "It's inside the 60 days Sam books ahead, so it's booked now, with its own code.",
+     "It's booked with the same money rules as any visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: full groom in 6 weeks"
+     ],
+     [
+      "san",
+      "cust",
+      "You asked Nico about Maple's next groom, in 6 weeks. Pick a time:",
+      {
+       "times": [
+        "Thu Dec 3 · arriving 8–10am · Nico",
+        "Fri Dec 4 · arriving 8–10am · Nico"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-11",
+    "say": [
+     [
+      "owner",
+      "san",
+      "300"
+     ],
+     [
+      "san",
+      "owner",
+      "Send Morgan P. $300 for the two doodles?",
+      {
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Hi Sam, it's Rosie, recording as always. One request waits for Lee Mobile Grooming. It's a bath and tidy in the van, today 3 to 5pm with Nico. It's $150. Accept it?"
+     ],
+     [
+      "owner",
+      "san",
+      "Yeah, take it."
+     ],
+     [
+      "san",
+      "owner",
+      "Reading it back: accept the bath and tidy in the van for today, 3 to 5pm, with Nico. Say yes to go ahead."
+     ],
+     [
+      "owner",
+      "san",
+      "Yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Reese K. to Lee Mobile Grooming. Reese gets one invite and replies YES. Groomers need no license of their own here, so Reese can be booked once Sam says yes.",
+    "more": [
+     "Where a state's form asks for a groomer's license, it's asked then (optional) and shown as given, not checked.",
+     "No reply in 48 hours: one reminder, then Sam is told."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Grooming. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Dates come from what Sam sent. Reminders go 30 days and 7 days before. Here, the van company's grooming license comes due.",
+    "more": [
+     "Insurance works the same way: a new certificate in the business's name, or 'insured' comes off the listing.",
+     "Groomers need no license of their own here, so only the business's license and insurance come due."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Mobile Grooming's grooming license has lapsed.",
+      {
+       "card": {
+        "title": "License renewal · Lee Mobile Grooming",
+        "lines": [
+         "Not renewed by then: van grooms go offline the next day"
+        ],
+        "button": "Upload the receipt",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no license; the owner says when one lapses. Here, Sam says the van company's grooming license is lapsed, so new van bookings pause at once.",
+    "more": [
+     "Every 30 days by default, and again before each expiry.",
+     "Expired, suspended or revoked all pause new bookings.",
+     "Rosie's team reviews the bookings already made within 1 business day.",
+     "Customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Mobile Grooming's grooming license is lapsed.",
+      {
+       "card": {
+        "title": "Van grooms · new bookings paused",
+        "lines": [
+         "Bookings already made: Rosie's team reviews them",
+         "Customers aren't told why"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Grooming: your card was charged twice for the same fee. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $89",
+        "lines": [
+         "Late-cancel fee · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nora S.'s $89 late-cancel fee was charged twice. The second charge is refunded, and Nora is told."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked groom and walk pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The grooming plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Grooming books a groomer's time, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Grooming runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A groom is never sent now: a hurt or sick pet goes to a vet, and every groom has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "The van arrives in a 2-hour window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "The van never keeps a pet overnight."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "The van sells no seats."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "A groom is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "A groom is never sent now: every van groom has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "Each plan visit is charged at DONE like a single groom, so no monthly plan charge is texted."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "A groom is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "An adult on the booking hands the pet to the groomer and takes it back. A pet is never taken from an empty home."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "An adult on the booking hands the pet to the groomer and takes it back. A pet is never taken from an empty home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A groomer never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for a groom."
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Groomers and walkers need a license of their own only where the state's form says so.",
+     "In this example the form asks for none, so nobody is checked: the second branch. Where a form does, the first branch checks each one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-11",
+    "does": "A what-if: where the state's form licenses groomers, Rosie shows any number as given and doesn't check it. In this example nobody needs one."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Grooming needs one only where the state's form licenses grooming businesses, vans too. In this example it does, for the van and the salon.",
+     "Dog walking needs none here, so it goes live on the company's details."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-03",
+    "does": "Another customer, Rosa, calls at 7:12am Tue. Before 8am, the business line rings Rosie, as Sam set. Rosie says first that it's automated and that the call is recorded."
+   },
+   {
+    "op": "words",
+    "at": "B3-15",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I talk to a real person?",
+      {
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Of course. The office opens at 8:00am. Sam or Pat can call you back then. Is that OK?",
+      {
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Call back: a caller asked for a person at 7:12am. Please call them at 8:00am.",
+      {
+       "card": {
+        "title": "Call back · Tue Oct 20 · 8:00am",
+        "lines": [
+         "Asked for a person",
+         "Summary and recording on the portal"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/l/m21"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-30",
+    "form": [
+     [
+      "What the AI sent",
+      "Maple's full groom in the van · Thu Oct 22 · arriving 8–10am · Nico"
+     ],
+     [
+      "Wrong? Fix it here",
+      "Change service · Change time"
+     ],
+     [
+      "Street address (Alex types it)",
+      "29 Willow Ct, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-48",
+    "does": "Say Alex also asks for a nail trim for the cat. Both go in one booking, with one arrival window and one code."
+   },
+   {
+    "op": "words",
+    "at": "B8-58",
+    "more": [
+     "No groom is ever sent now, so every groom gets the day list and an on-my-way text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Grooming. We got your voicemail about a puppy's nail trim. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Mobile Grooming · Puppy nail trim",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about a puppy's nail trim. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants a puppy nail trim this week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Grooms are rated, like every visit."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "A7-15",
+   "A8-53",
+   "A8-02",
+   "S2-28",
+   "A4-43"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28"
+  ]
+ },
+ "notes": "Refit Tue Oct 27 (R09, REDESIGN 2 master): facts animals, dropoff, extrawork, firststeps (the rabies proof before a first groom), forms (the matted-coat release, a muzzle OK), plans (repeat grooms with their own yes), tips. Settings: cutoff 24 hours before at the salon (A), 7am the day of in the van (B, as the old texts said); arrival windows in B. Money: A list|card|counter main ($35 bath and brush, $20 fee), list|none|counter, visit|card|counter (matted coat priced at drop-off); B list|card|card main ($179 full groom in the van, $89 fee), list|card|bill, visit|card|card. Amounts with names per path. Deleted: ops on removed steps (54), the sign-up money words (S1-13, S1-14, S1-21 in both flows), the stacked S1-38 ops (dog walking and the salon are rename pairs and the master now), every words op with money paths, the ops that overrode record-slotted messages (A4-12, A4-42, A6-14 say, A7-01 and A9-01/A9-03 money lines, A7-23 say, B4-13 say, B6-13 line), three stacked A7-74 ops and three stacked B7-61 ops (one had 'any hold is released'), A4-50 (frozen until 9:15am), S11-56, offs made redundant by facts. A8-50 keeps its time and words but not its say (the READY text is the master's). The own branch 'Fleas found during the groom' moved from A8-32 to A8-85 (The work changes). New: off A8-67 [Yes: a child may be left], B10-32 [No: named-only work]; A4-43 in splitsKept.A (No, the form, or not the business's own customer). keep: leak.\nBefore the refit (history):\nStarted from auto-repair (from: auto-repair): a groom at the salon runs like a car at the garage. The pet is dropped off, its condition is checked with the owner at the counter, extra work while it's in needs a text yes, READY sets the pick-up, and it's paid at the counter. hair was the other choice, but a groomer's pet is left, not in a chair.\nWhat the pilot lacked, added: a groomer's time by name (A4-66 'A person's time', A7-59 'Booked by name', S11-87 and S11-90), as hair does, since owners book a groomer. The pet is still left at the salon (A8-53 keeps both: a nail trim while the owner waits takes the first branch).\nNames: Sam's main company is Lee Mobile Grooming LLC (mobile grooming in a van, with dog walking as its second kind of work, 780 Ridge Rd). His second company is Lee's Grooming Salon LLC (the salon, 64 Cedar Ave). Flow A's story is at the salon, flow B's in the van, like the master.\nPeople: Riley and Avery became Jamal and Mei (salon groomers), Jordan and Casey became Nico and Hana (van groomers). Sam, Pat and Alex M. stay. Alex's pets: Biscuit, a 14-lb shih tzu, in flow A; Maple, a 52-lb goldendoodle, in flow B. A pet is always booked under its owner.\nPrices are the example salon's own, and keep the master's numbers so its fee math stays right: bath and brush, small dog $35; de-shed bath $40; nail trim $20; puppy's first groom $25; full groom, small dog $55; full groom, large doodle $140. A matted coat is priced at drop-off after a $25 coat check ($110 shave-down + $15 paw and face tidy = $125). The van: full groom $179, bath and tidy $150, cat groom $139, the $89 van visit (its least charge, and its late-cancel and nobody-home fee), a matted coat priced at the van door ($165 shave-down + $80 skin-soothing bath = $245).\nMoney paths follow how groomers are paid. Flow A: list|card|counter (main: a card saved for the $20 no-show or late-cancel fee and the late pick-up fee, paid at the counter at pick-up with any tip), list|none|counter (a pet the salon knows, nothing taken), visit|card|counter (a matted coat priced at drop-off). Flow B: list|card|card (main: the card charged at DONE), list|card|bill (the bill with a tip line), visit|card|card (a matted coat priced at the van door).\nLeft out on purpose: no hold, deposit or full price (groomers save a card for fees), no photo quotes (a coat is priced by size and coat, or at drop-off). The sign-up example was changed to match (S1-12 to S1-21, S1-38, S1-41, S1-42, S1-57): every service saves a card, nothing is paid in full, no deposits, and cards only for the van's small bills.\nThe matted-coat fee agreed at drop-off is drawn twice: in the list path as dematting, $20 for 15 minutes, agreed at the coat check (A8-33, the branch 'Mats: dematting agreed at drop-off'), and as the visit path, a coat too matted to price ahead.\nFirst steps (pf.first_steps): the rabies proof, good on the groom day, and the matted-coat release. Biscuit's and Maple's proof is on file (A4-44, B4-39). A new pet gets both on the secure page (A4-72, B4-86); not in by the due date goes to Sam (A7-74, A7-75, B7-61); a certificate that ran out is asked again (A7-33, B7-33); no proof at drop-off means no groom (A8-02's missing branch, B8-45). A bite history waits for Sam's OK (A4-49, the branch renamed 'A bite history last time').\nOwn steps in flow A: a flea bath found during the groom needs a yes by text, with 15 minutes, then Sam calls (A8-x01, A8-x02), and the late pick-up window after READY (A8-x03 to A8-x05): a fee only if Sam says yes, never over the cap, and not there by closing means Sam calls the owner, then the emergency contact. A pet is never kept overnight.\nDanger: a pet that's bleeding, can't breathe, collapsed or had a seizure gets the salon's emergency vet (A3-24, B3-19). A pet that's hurt or sick isn't groomed (A3-26, A7-13). The 'safety steps, then go on' example is skunk spray in the eyes (A3-23, B3-18). Sedation is vet work (A4-38).\nLicenses: the plug-in licenses the business where the state licenses grooming (the salon and the van), so S1-60 and S1-63 keep both branches (splitsKept): the example state licenses it. Groomers need no license of their own unless the state's form says so, so S2-28's per-person branch is off and the team steps say no license number is asked (S2-05 to S2-24, S11-48, S11-50, S11-51). Dog walking needs no license (S1-39).\nFlow B is the grooming van: arrival windows (B4-83), the pet handed over at the van door by an adult on the booking (B8-03's nobody-home branches off), the coat checked at the van door (B8-18), extras like a flea bath asked at the door (B8-23), DONE when Maple is back (B8-41). Never sent now, so every sent-now branch is off (S2-30, B4-81, B4-16, B6-03, B7-55, B8-58).\nTimes on the main paths run forward and fit the work: flow A drops off at 11:00am, checks the coat at 11:05am, finishes at 12:50pm, READY at 1:00pm, pick-up by 1:30pm. Flow B arrives 8:20am, coat check 8:25am, about 2 hours in the van, DONE 10:35am, receipt 10:40am, rating at 1:00pm.\nSam's price-OK limit for the van is $300 (S1-20), not $500, so a two-dog price can need his OK (S11-08 in flow B). The salon OKs every matted-coat price (S1-47, S11-08 in flow A).\nOff, as groomers never use them: classes, spaces, stays, video, plans or insurance billing, damage holds, contracts, crews, dates that can't move, minimums, permits, deliveries, items to the shop, rentals, storage of an item not picked up, proposals, results later, day-before holds (no groom takes a hold), plan charges texted the day before (salon plans are paid at pick-up; van plan visits at DONE), and bank transfer for big bills (S1-57: cards only).\nSection 11 and 12 what-ifs use only what the plug-in does: S11-56 switches how a service is paid between listed ways (A: nail trims to nothing taken; B: the cat groom to the texted bill), S12-26's double charge is a fee, S11-58 adds dog training.\nKept word: 'shave' (a shave-down is a groomer's service).\nRename pairs run longest first, deduplicated; sentence pairs that quote a whole master sentence use the master's own names, which the name pairs then rename.\nReview (Oct 23): S2-28 keeps both branches (splitsKept): a groomer's own license is the state form's switch. The example takes the second branch; S2-11's first step says it's the what-if.\nReview: a rename pair ('Lee Home Services · Leak repair' → '... Puppy nail trim', meant for the voicemail B3-04) put 'Puppy nail trim' on Alex's matted-coat booking (B4-29, B6-13, B7-01). The pair now gives 'Matted coat in the van', and B3-04 keeps 'Puppy nail trim' in its own words. The visit path's $95 right to cancel and refund, 'dripping again' and '$89 held' texts are fixed.\nReview: the example salon's drop-off window is 9am to 3pm, so the times Rosie offers (A7-03, A7-19, A10-08) fit it. Example amounts are labeled in pf.services.example_prices.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "This is Rosie, an automated assistant for Lee's Barbershop. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Here they OK the $110 color correction and skip the $15 gloss.",
+    "Gloss to finish · $15",
+    "The $15 gloss price is good until Sat Oct 31.",
+    "No gloss today.",
+    "Could Riley use a toner instead of the gloss?",
+    "Alex M. asks for a toner instead of the gloss.",
+    "Ben T. books a skin fade for Sat Nov 7",
+    "you now have two skin fades on Sat Nov 7",
+    "Color quotes come to you first. Board prices never need one",
+    "Riley: barber, color, house calls",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "A nothing before, and at their home too, 75, paid when they book. E paid when they book",
+    "The color correction alone is the $110 starting price, so no choice comes in under it.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Set. For a haircut, the customer picks the place and sees both prices first.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Booking for a pet works the same way, where the plug-in books pets.",
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "many barbers, salons and groomers are licensed to their shop",
+    "The shop's money terms apply per person, as Sam set them.",
+    "A color correction can't be priced before Riley sees it.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Riley quotes the rest at the chair, before any work.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "A service priced at the chair gets its price now.",
+    "the item, its condition and the customer's mobile",
+    "A barbershop has none, so nothing is sent here.",
+    "May the shop show photos of your hair? Yes / No",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Alex says yes or no to the quote at the chair.",
+    "says the cape clip ripped a shirt collar today",
+    "A haircut could mean a salon or a barbershop.",
+    "Promises the $25 consult; priced at the chair",
+    "At your shop, paid at the chair, your own way",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Give this code at the chair when you arrive.",
+    "Riley's price for Alex M., at the chair now.",
+    "Can my son wait in the shop during my cut?",
+    "says Saturday's cut is uneven on one side",
+    "Every shop service, color and house calls",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Lee's Barbershop will fix it for free.",
+    "Give your check-in code at the chair.",
+    "Riley also does color and house calls",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Haircuts at the shop work like this:",
+    "A barbershop books a person's time.",
+    "Picks it up with the code or an ID",
+    "A barbershop's services need none.",
+    "Alex asks for a cut every 4 weeks.",
+    "I waited 25 minutes past my time.",
+    "Do you do kids cuts? My son is 8.",
+    "Books the next visit at the chair",
+    "Color correction $110 · gloss $15",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Lee's Barbershop · with Riley",
+    "barber, color and house calls",
+    "Lee Plumbing and Lee Electric",
+    "Haircut plan · every 4 weeks",
+    "Give this code at the chair.",
+    "Riley stopped Alex M.'s cut.",
+    "Anything added at the chair",
+    "extra 20 beard trim Alex M.",
+    "Saturdays · 11:00am · Riley",
+    "Does it work like haircuts?",
+    "Lee's Barbershop · Haircut",
+    "What happens at the chair?",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "Color correction · $110",
+    "Color correction · $125",
+    "Add a beard trim today?",
+    "Riley finishes the work",
+    "Priced from your photos",
+    "Haircuts work like this",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "A barbershop has none.",
+    "Alex pays at the chair",
+    "Stopped Alex M.'s cut.",
+    "Walk-in for a haircut",
+    "Lee's Barbershop LLC",
+    "Priced at the chair",
+    "priced at the chair",
+    "photos of your hair",
+    "Color and cut · $90",
+    "A tip at the chair",
+    "Lee Home Services'",
+    "electrical license",
+    "Alex M. · Haircut",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "a package of cuts",
+    "Lee Home Services",
+    "Beard trim · $20",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Only the consult",
+    "11:00am · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "11:00am · Avery",
+    "for a staff cut",
+    "Groom's package",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "Haircut · $35",
+    "rents a chair",
+    "1 color quote",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "in the chair",
+    "at the chair",
+    "At the chair",
+    "Consult only",
+    "1200 Main St",
+    "NEW massage",
+    "barbershops",
+    "$25 consult",
+    "the consult",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "a kids cut",
+    "Beard trim",
+    "beard trim",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "A haircut",
+    "a haircut",
+    "the shop",
+    "The shop",
+    "cut hair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Elm St",
+    "Oak St",
+    "barber",
+    "Barber",
+    "Jordan",
+    "Riley",
+    "Avery",
+    "Casey",
+    "$500"
+   ],
+   "B": [
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "I found water damage under the sink this morning.",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services can clear the drain:",
+    "Work like towing or a lockout is sent now",
+    "The $179 drain needs none.",
+    "Shutoff valve and wall pipe · $540",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves · $160",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Riley: barber, color, house calls",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Booking for a pet works the same way, where the plug-in books pets.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "If the person at your door isn't Jordan, don't let them in.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Jordan says no. Please wait until the job is done.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "CANT START no proof Alex may have this work done",
+    "Can Jordan also run a camera down my sewer line?",
+    "Told to leave, then call 911 and the gas company",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "A haircut could mean a salon or a barbershop.",
+    "At your shop, paid at the chair, your own way",
+    "Jordan only, until others are licensed there",
+    "Alex texts that the sink is now overflowing.",
+    "It's overflowing. Can someone come tonight?",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Jordan needs a part from the supply house.",
+    "Can Jordan also look at a dripping faucet?",
+    "If someone else comes, don't let them in.",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Can I skip next week's drain cleaning?",
+    "like a permit it needed that isn't in",
+    "Riley also does color and house calls",
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "The repair price is good for 7 days.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan left a mess under the sink.",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Water heater replacement · $640",
+    "Sewer camera inspection · $199",
+    "HURT cut my hand, need to stop",
+    "No. It doesn't smell like gas.",
+    "barber, color and house calls",
+    "Lee Plumbing and Lee Electric",
+    "Replace both shutoff valves",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "NEW heating and cooling",
+    "A gas smell at the home",
+    "Priced from your photos",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Just the kitchen sink.",
+    "Kitchen drain clearing",
+    "Under the sink, before",
+    "Tessa · Drain clearing",
+    "Cabinet floor, before",
+    "Lee Home Services LLC",
+    "Shutoff valve · $165",
+    "No. No huele a gas.",
+    "leehomeservices.com",
+    "paid after the job",
+    "Lee Home Services'",
+    "electrical license",
+    "Electrical license",
+    "Water heater flush",
+    "water heater flush",
+    "for today's work.",
+    "Supply line · $80",
+    "the kitchen drain",
+    "paid at the chair",
+    "Lee Home Services",
+    "the repair price",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "Service call fee",
+    "service call fee",
+    "Yes, every year",
+    "Book the repair",
+    "Drain clearings",
+    "drain clearings",
+    "DONE 179 drain",
+    "Drain clearing",
+    "drain clearing",
+    "after the job",
+    "Kitchen drain",
+    "rents a chair",
+    "1200 Main St",
+    "Service call",
+    "service call",
+    "barbershops",
+    "Leak repair",
+    "leak repair",
+    "Yard drain",
+    "yard drain",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "beard trim",
+    "88 Elm St",
+    "42 Oak St",
+    "a haircut",
+    "Rental 1",
+    "Rental 2",
+    "the shop",
+    "The shop",
+    "cut hair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "LATE 30",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "barber",
+    "Barber",
+    "Jordan",
+    "Riley",
+    "Avery",
+    "Casey",
+    "$500"
+   ]
+  },
+  "A": {
+   "S11-48": "03f824b27b",
+   "S2-15": "4a64408afc",
+   "S1-12": "41b86c1e72",
+   "S1-23": "39941a5377",
+   "S1-50": "3167049ceb",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A3-26": "9e3630dc0b",
+   "A3-20": "b8251d2535",
+   "A4-43": "c17d56f766",
+   "A4-32": "d5a284a416",
+   "A5-07": "f0028a1760",
+   "A6-14": "b17b52115e",
+   "A7-03": "13bfc32bcb",
+   "A7-13": "e41528a397",
+   "A7-14": "6a57738a17",
+   "A7-70": "da4cede3e2",
+   "A8-02": "15f418fec4",
+   "A8-10": "6409a62763",
+   "A8-23": "e3a35f7f9e",
+   "A8-33": "561bc291a5",
+   "A8-35": "a67e890a5b",
+   "A8-37": "0a30466995",
+   "A8-38": "5e48b74f3a",
+   "A8-39": "c64da36bdb",
+   "A8-30": "c0f4d7c935",
+   "A7-11": "cba3283efb",
+   "A8-43": "7b0f73c701",
+   "A8-85": "708cf3f73f",
+   "A8-11": "d5522790d9",
+   "A8-50": "0f26abfc87",
+   "A8-54": "bc2f9467fd",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A10-08": "b60e30f285",
+   "A10-42": "4f28189298",
+   "S11-50": "c4536a448c",
+   "S12-26": "7b7e6af034",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A7-94": "6490d5d8e6",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "S2-28": "549fd7ae22",
+   "S2-11": "07b9eace96",
+   "S1-60": "235c90a3c3",
+   "A4-30": "59603c2ded",
+   "A4-15": "db5792db95",
+   "A10-05": "63c3536c7a",
+   "A10-26": "2a3edf9a4c",
+   "S11-14": "8a7a6c24ec",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S11-48": "6fd1c7b7b9",
+   "S2-15": "4a64408afc",
+   "S1-12": "0bea92643b",
+   "S1-50": "daa9091585",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "B3-17": "3eb7d7f259",
+   "B4-34": "74ff52d83d",
+   "B8-18": "530038d2b8",
+   "B8-34": "643812e26f",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B9-06": "f091432f2d",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B4-38": "9539521dc7",
+   "B5-21": "925b7342ed",
+   "B7-07": "954270db4b",
+   "B8-20": "53903a8275",
+   "B10-18": "3d7ba16539",
+   "B4-11": "982f2084f8",
+   "S11-38": "58d27fc71e",
+   "S11-50": "b9d718f51a",
+   "S12-26": "8368479b9d",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S2-28": "549fd7ae22",
+   "S2-11": "07b9eace96",
+   "S1-60": "235c90a3c3",
+   "B3-03": "1426673df8",
+   "B3-15": "bbb89eebad",
+   "B4-30": "26ca477d69",
+   "B4-48": "8a955b9849",
+   "B3-04": "31447caa31",
+   "B10-32": "7713bff255"
+  }
+ }
+}

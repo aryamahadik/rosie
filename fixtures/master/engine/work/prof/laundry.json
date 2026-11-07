@@ -1,0 +1,3502 @@
+{
+ "id": "laundry",
+ "name": "Laundry, dry cleaning and wash-and-fold pickup",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "tailor",
+ "plugin": {
+  "pf.license": {
+   "need": "none for laundry, wash and fold or dry cleaning in most places; the business registration, where the state asks for one; a dry cleaner that uses cleaning solvents holds the environmental registration or permit the state's rules require (solvent use and waste)",
+   "ask": [
+    "The business registration number, where the state gave one",
+    "For dry cleaning with solvents: the environmental registration or permit number, where the state's rules require one",
+    "Proof of business auto insurance, for pickup and delivery"
+   ],
+   "who": "the business; no license for a person",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "a registration or permit the state requires that the owner says the business lacks keeps that kind of work offline; wash and fold can go live on its registration alone",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance and cover for customers' garments while the shop has them, as the business says; shown only once proof is sent",
+   "otherwise": "identity checked, and 'license: what the business says'; customers see no license claim"
+  },
+  "pf.services": {
+   "pattern": "drop-off: clothes left at the counter, or picked up at the door, then counted, tagged and cleaned, and READY to pick up or delivered back; pickups can repeat on one chosen day",
+   "examples": "the example shop's own prices, not a standard",
+   "list": [
+    {
+     "name": "Wash and fold",
+     "price": "$1.75 a pound, 10-pound minimum ($17.50); the example order of 20 pounds is $35",
+     "kind": "one price from the list, per pound, weighed in front of the customer at the counter, or at the plant for a pickup",
+     "length": "ready next business day by 5pm when dropped by noon; same day for +$10 when dropped by 9am (the rush is in the price shown before the yes)",
+     "place": "at the counter, or by pickup and delivery",
+     "before": "nothing taken at the counter; a card saved for a pickup",
+     "after": "paid at the counter at pick-up; for a pickup, the saved card is charged when the order is delivered"
+    },
+    {
+     "name": "Dry cleaning, per item",
+     "price": "shirt laundered and pressed $3.50, pants or skirt $8, jacket $9, 2-piece suit $17, dress from $14 (the example shop's own prices); a winter coat $25",
+     "kind": "one price from the list, per item",
+     "length": "ready in 2 business days",
+     "place": "at the counter, or by pickup and delivery",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Comforters and blankets",
+     "price": "king comforter $40, queen comforter $30, blanket $20, bedding bundle (comforter, sheets and two pillowcases) $55",
+     "length": "ready in 3 days",
+     "place": "at the counter, or by pickup and delivery"
+    },
+    {
+     "name": "Special-care items (silk, leather, suede, beading, drapes)",
+     "price": "quoted at the counter, item by item, before any cleaning; leather and suede can be priced from photos first",
+     "kind": "quoted at the visit",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Wedding gown cleaning",
+     "price": "$140 for a standard gown; heavy beading, a long train or a preservation box is quoted at the counter first",
+     "length": "4 to 6 weeks",
+     "before": "a $40 deposit books the slot",
+     "after": "the $100 rest at pick-up"
+    },
+    {
+     "name": "Stain check",
+     "price": "free, at the counter",
+     "length": "while you wait",
+     "before": "nothing taken",
+     "after": "nothing"
+    },
+    {
+     "name": "Pickup and delivery",
+     "price": "free over $30; $5.99 under $30, inside the order total shown before the yes",
+     "place": "at the customer's door, in a 2-hour window; bags left out; returned within 48 hours",
+     "before": "a card saved, no fee",
+     "after": "the saved card charged for the ticket total when the order is delivered",
+     "note": "one time, or every week or 2 weeks on one chosen day (a repeat plan; each pickup is booked and paid like a single one)"
+    }
+   ],
+   "stains": "stain treatment is included and not guaranteed; stains are noted at intake",
+   "turnaround": "wash and fold next business day; dry cleaning 2 business days; comforters 3 days; gowns 4 to 6 weeks; a pickup order is back within 48 hours",
+   "included": "a free re-clean or re-press within 7 days, the item returned unworn",
+   "capacity": "pounds a day at the plant (2,000 at the example shop) and stops per pickup window",
+   "nobody_home": "yes for pickup and delivery: bags are left at the door or with a doorman, and the driver takes a photo",
+   "online": "no"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Drop-off at the counter, or pickup at the door",
+    "Wash and fold, dry cleaning, comforters or blankets, or a mix",
+    "About how many pounds or items",
+    "The date it's needed back, like an event (it sets which turnaround fits)",
+    "For a pickup: the town and the kind of place, a house or an apartment with a doorman",
+    "Any item soaked in gasoline, oil or thinner, with blood, or holding needles or sharp things: those stay out of the bag"
+   ],
+   "after_time": [
+    "Detergent: regular, fragrance-free or hypoallergenic; fabric softener or not",
+    "Folded or on hangers; starch on shirts",
+    "Any stain the customer knows about: what and where",
+    "Items that need special care, like silk, wool or leather"
+   ],
+   "secure_page_only": [
+    "The street address, the door or doorman instructions and any building code",
+    "A skin or allergy reason for fragrance-free (the preference itself isn't private)",
+    "The card"
+   ],
+   "who_may_book": "an adult, for themselves or their household; a parent books for a child's clothes"
+  },
+  "pf.safety": {
+   "stop_words": [],
+   "stop_action": "no danger words of its own: the generic screen (danger to life, fire, gas, a medical emergency, crisis words) is always on",
+   "refuse_items": "clothes or rags soaked in gasoline, oil, paint thinner or cooking oil (they can catch fire in a dryer, even on their own); blood, body fluids or waste beyond normal wear; needles or sharp items; the AI asks the customer to keep them out of the bag; the plant sets any found aside, unwashed, and the owner calls",
+   "pests": "bed bugs or lice: only in sealed bags, declared ahead; a $20 handling fee (example); an undeclared infested bag is set aside and the owner calls",
+   "pockets": "pockets are checked; cash and items found come back with the order; a lighter or a needle is set aside",
+   "can_continue": "yes, for the rest of the order, after the item is set aside"
+  },
+  "pf.first_steps": {
+   "required": "none for a drop-off; for a pickup: the door instructions on the secure page",
+   "prep_for_reminder": [
+    "Bag your laundry and empty the pockets",
+    "List any stains on the secure page",
+    "For a pickup: leave the bags at the door by the start of the window"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "at the counter: the check-in code, or a walk-in checked in at once; at the door: the driver scans the bag tag and takes a photo of the bags, and nobody needs to be home",
+   "intake": "each item counted and tagged; wash and fold weighed in front of the customer (at the plant for a pickup); stains, tears, missing buttons and wear noted, with photos of any item at risk; an itemized ticket is texted with the total; a count that differs from the customer's is told the same day",
+   "estimate": "special items are priced before cleaning, and the customer says yes; no yes in 24 hours: the item is left uncleaned and comes back with the order, with nothing charged for it",
+   "added_work": "a repair, extra stain work or special cleaning found later is priced first and needs the customer's yes; no answer in 24 hours: cleaned the normal way, without the extra",
+   "over_weight": "a pickup order weighed more than 10 pounds over what the customer said: the new total is texted first and needs a yes; no answer in 24 hours: only the pounds the customer said are washed, and the rest comes back unwashed",
+   "ready": "READY is texted with the pick-up hours and the total; a pickup order is delivered in its window, with a photo",
+   "pick_up": "anyone with the claim ticket or the code may pick up; a delivery is left at the door or with the doorman",
+   "done_proof": "DONE at pick-up at the counter, or at delivery with the door photo",
+   "claims": "a damaged or missing item is reported within 7 days of pick-up or delivery (the shop's rule); the owner decides with the industry's fair-claims guide (the item's age and condition), never more than the item's value",
+   "unclaimed": "items not picked up: reminders at 30 and 60 days after READY, then a final written notice with the date before anything is donated at 90 days, as the state's unclaimed-property rules allow; the owner decides"
+  },
+  "pf.money": {
+   "before": "drop-off: nothing taken; wedding gown cleaning: a $40 deposit books the slot; pickup and delivery: a card saved to book, with no fee",
+   "deposit": "the $40 gown deposit comes off the price; the rest is paid at pick-up; deposit cap: from the state form",
+   "after": "drop-off: paid at the counter at pick-up; pickup and delivery: the saved card is charged the ticket total when the order is delivered, never before; a business account may be billed after delivery instead",
+   "fees": "no late-cancel or no-show fee; no bags out at a pickup: no fee, and the next pickup stays as planned",
+   "delivery": "free over $30, $5.99 under $30; part of the order total shown before the yes",
+   "rush": "same day +$10 when dropped by 9am, shown in the price before the yes",
+   "tips": "no tip line",
+   "tax": "where the state's rules tax laundry or dry cleaning (the owner's setting)",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies; a repeat pickup plan paid by the visit pays $2 a visit"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "A card number",
+    "A building or door code",
+    "A skin or allergy reason for fragrance-free"
+   ],
+   "staff_texts": "driver texts name the customer, the street, the window and the number of bags; the door instructions open on the secure link",
+   "languages": "English and Spanish",
+   "minors": "texts about a child's clothes go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "counter",
+    "wash and fold",
+    "spotting (stain work)",
+    "pressing",
+    "driving"
+   ],
+   "licenses": "none for a person; drivers hold a valid driver's license, and the business's auto insurance covers them",
+   "supervision": "solvents are handled only by trained staff, under the shop's safety rules",
+   "who_oks": "the owner OKs claims, refunds and special-item prices over $100",
+   "stand_in": "any driver on the route may do a pickup; any counter staff may take a drop-off; nobody is booked by name"
+  },
+  "pf.rules": {
+   "environment": "solvent and waste rules for dry cleaning where the state's rules apply (the business's own)",
+   "unclaimed_items": "switch: how long finished items are held, the written notice, and the waiting time before they're donated or sold: from the state form; the owner decides, and Rosie sends only the notices the owner OKs",
+   "claims": "the shop's posted claims policy; never a value above the item's",
+   "prices": "switch: prices posted where the state's or local rules require it; the same price for like items where those rules require it",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A count that differs from the customer's: told the same day; a missing item is searched for 7 days, then the owner decides",
+    "A stain that stays: noted on the ticket; no charge for a second try",
+    "A damaged item: the owner decides with the claims policy",
+    "No bags out at a pickup: the driver takes a photo of the door; no fee; the next pickup as planned",
+    "Snow or a closed road: a delivery may move to the next day; the customer is told",
+    "A planned closure, like a holiday: repeat pickups skip that day, with notice",
+    "A wrong order: swapped the same day",
+    "A need-by date: only turnarounds that make it are offered",
+    "An item not picked up: reminders at 30 and 60 days; a final notice before the 90-day donation",
+    "An item that can't go in the bag, found at the plant: set aside, unwashed, and the owner calls"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner decides every claim and refund"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork",
+   "plans"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "7am the day of",
+    "B": "6pm the day before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Dolores and Hiro (counter and pressing)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Mateo and Bao (drivers)",
+   "other": "Others (a bank, a doorman)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dolores"
+  },
+  "B": {
+   "staff": "Mateo"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "We couldn't find barbershop license BS20981 for Lee's Barbershop on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, the shop stays offline, saved, until our team checks it within 1 business day.",
+    "We couldn't find registration EX-4012 for Lee's Cleaners on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, the shop stays offline, saved, until our team checks it within 1 business day."
+   ],
+   [
+    "Once a barber is confirmed and you say yes",
+    "Once your team is added and you say yes"
+   ],
+   [
+    "Customers can book it once a barber is confirmed",
+    "Customers can book it once your team is added"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: a solvent permit can cover one plant only."
+   ],
+   [
+    "Barber license number",
+    "Phone for work texts"
+   ],
+   [
+    "Plumbing MP045210",
+    "Registration EX-4011"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "None needed"
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration EX-4012"
+   ],
+   [
+    "MP045210",
+    "EX-4011"
+   ],
+   [
+    "BS20981",
+    "EX-4012"
+   ],
+   [
+    "BS20918",
+    "EX-4021"
+   ],
+   [
+    "JP031552",
+    "EX-3015"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "EC22871",
+    "EX-1058"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken; a $40 deposit for a wedding gown"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved, with no fee"
+   ],
+   [
+    "After the job: Rosie sends the bill",
+    "After the job: the saved card is charged when the order is delivered"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like laundry?"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Mateo: pickups and delivery"
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card taken"
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 7am the day of. After that, or a no-show: no fee, except a gown's $40 deposit, and only if you say yes"
+   ],
+   [
+    "To save cards for the $20 fee, connect Stripe in Lee's Barbershop's own name. Bank and tax details go to Stripe, never to us.",
+    "To take gown deposits and pay-by-text bills, connect Stripe in Lee's Barbershop's own name. Bank and tax details go to Stripe, never to us."
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches wedding gown cleaning from a $40 deposit to nothing taken. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "Nothing taken · paid at the counter after"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Cleaners'"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Laundry could mean wash and fold or dry cleaning."
+   ],
+   [
+    "The chairs",
+    "The counter"
+   ],
+   [
+    "Card saved for the $20 fee",
+    "Nothing taken"
+   ],
+   [
+    "The $25 consult included",
+    "The price check is free"
+   ],
+   [
+    "Only the $25 consult is promised.",
+    "Nothing else is promised."
+   ],
+   [
+    "Yes, make it a fade",
+    "Yes, make it two bags"
+   ],
+   [
+    "Toner · $20",
+    "Leather belt · $20"
+   ],
+   [
+    "quote 110 color correction + 20 toner",
+    "quote 110 suede jacket + 20 leather belt"
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair. {{pay.asks}}. The rest is quoted at the chair, before any work.",
+    "Lee's Cleaners prices special items at the counter, once Dolores sees them. {{pay.asks}}. The price is set at the counter, before any cleaning."
+   ],
+   [
+    "a house call, $75, paid in full when booking",
+    "a pickup, free over $30"
+   ],
+   [
+    "Haircuts already booked keep only their saved card.",
+    "Wedding gown orders already booked keep their $40 deposit."
+   ],
+   [
+    "How would you like it on top?",
+    "Detergent and folding?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a winter coat is $25. Want a time?"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you clean winter coats? My son's is size 8."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Dolores: counter, spotting, pressing"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Mateo and Bao drive the pickup route. Dolores and Hiro work the counter; Dolores also does stain work. Pat is my office manager, for prices over $500. Jules does clothing repairs at the counter, with their own customers."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "Lee's Cleaners: you now have two drop-offs on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go."
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's employer for staff uniforms. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Riley at the chair. That shows Riley really came.",
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Dolores at the counter. That shows Dolores really came."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Dolores will take the order when Alex arrives, or you can move to a later time. No reply by 11:00am means the drop-off stays."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex asks for a rug cleaning, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "At a drop-off, READY and the pick-up come once the work is done. At the chair, the customer is already there, so the shop takes the first branch.",
+    "At a drop-off, READY and the pick-up come once the work is done. Every order is left with the shop, so the shop takes the drop-off branch."
+   ],
+   [
+    "From Riley's phone, or the portal's Today page at the desk. This confirms the visit. No text goes to the customer: they're at the chair.",
+    "From Dolores's phone, or the portal's Today page at the desk. This confirms the drop-off. No text goes to the customer: they're at the counter."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Dolores shows the order, like a shirt after pressing. A re-clean asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "Alex M.'s price: $110 suede jacket and $15 silk scarf, $125 in all. It goes to Sam first."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the counter, at a drop-off, or at the start of a video call."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A special item's example: 'Silk and suede are priced at the counter first. Was it cleaned before?'"
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Means 'Matched': the request fits a listed service, in any words. 'Wash my clothes' or 'fluff and fold' fits wash and fold."
+   ],
+   [
+    "Here they OK the $110 color correction and skip the $15 gloss. The $25 consult is part of the $110.",
+    "Here they OK the $110 suede jacket and skip the $15 silk scarf. The price check was free."
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer spilled paint thinner on the clothes before the drop-off, and asks if the shop can still take them."
+   ],
+   [
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Done. Today: the suede jacket, $110. The $15 silk scarf price is good until Sat Oct 31."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Laundry pickup in Springfield. Wash and fold and dry cleaning, within 25 miles."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee's Cleaners about your Sat 11:00am drop-off: please empty the pockets."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood cleaner on Mill St. Wash and fold, dry cleaning and gown care."
+   ],
+   [
+    "Alex M. asks for a toner instead of the gloss. What's the new price?",
+    "Alex M. asks for a leather belt instead of the silk scarf. What's the new price?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: fragrance-free, folded, no starch."
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the suede jacket only, $110. No silk scarf today."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Special-item prices come to you first. Board prices never need one"
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like to drop off my laundry on Saturday."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "I spilled paint thinner on the clothes. Can I still bring them in?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please empty the pockets on Saturday."
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 suede jacket + 15 silk scarf Alex M."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Dolores do a leather belt instead of the silk scarf?"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Suede jacket $110 · silk scarf $15"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this order."
+   ],
+   [
+    "Gloss to finish · $15",
+    "Silk scarf · $15"
+   ],
+   [
+    "A water heater job",
+    "A pickup at the customer's door"
+   ],
+   [
+    "A chair, ready",
+    "The counter, ready"
+   ],
+   [
+    "Color and cut",
+    "Leather and suede"
+   ],
+   [
+    "Style consult",
+    "Stain check"
+   ],
+   [
+    "Panel upgrade",
+    "Special-care items"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every counter service, and pickups"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Mateo: pickups and delivery"
+   ],
+   [
+    "Casey: plumbing",
+    "Bao: pickups and delivery"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Dolores: the counter and stain work"
+   ],
+   [
+    "Avery: barber",
+    "Hiro: the counter and pressing"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A laundry takes none, at the counter or at the door."
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Color correction can work this way, with only the $25 consult promised.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A wash and fold drop-off works this way."
+   ],
+   [
+    "a skin fade",
+    "a king comforter"
+   ],
+   [
+    "1 color quote",
+    "1 special-item price"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken to book"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Priced at the counter, before any cleaning"
+   ],
+   [
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Dolores's price for your special items is with the owner. You can wait for it, or take the items back today."
+   ],
+   [
+    "Consult only",
+    "Items back"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Items go back; the price stays open"
+   ],
+   [
+    "Copy: you said yes to a color correction, $125, at 11:20am on Riley's phone.",
+    "Copy: you said yes to Dolores's $125 price for your suede jacket and scarf, at 11:20am on the shop's phone."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero dejar mi ropa para lavar el sábado."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley, so Riley's next times show. Stain work stays with Riley."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Laundry could mean wash and fold or dry cleaning."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A laundry books a drop-off time at the counter."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Cleaners doesn't do rug cleaning."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the shop show photos of the finished clothes?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop while I drop off the laundry?"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Dolores will take the order when Alex arrives, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A laundry takes drop-offs: bags and hangers left at the counter, checked in at once."
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Set aside an oil-soaked rag from Alex M.'s bag. Note and photo on the page."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Dolores set aside an item from Alex M.'s bag."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The press scorched my shirt collar."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a shirt collar was scorched in pressing."
+   ],
+   [
+    "Riley finishes the work",
+    "Dolores finishes the order"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A laundry order is rated, so the shop takes the first branch."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "A shirt came back with a stain still on it."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says a shirt from Saturday's drop-off came back with a stain still on it."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 leather and suede price."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds alterations to Lee's Cleaners."
+   ],
+   [
+    "NEW massage",
+    "NEW alterations"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Alterations for Lee's Cleaners: is it the same company?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the counter"
+   ],
+   [
+    "priced at the chair",
+    "priced at the counter"
+   ],
+   [
+    "quote at the chair",
+    "quote at the counter"
+   ],
+   [
+    "added at the chair",
+    "added at the counter"
+   ],
+   [
+    "code at the chair",
+    "code at the counter"
+   ],
+   [
+    "paid at the chair",
+    "paid at the counter"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "pays at the chair",
+    "pays at the counter"
+   ],
+   [
+    "rest at the chair",
+    "rest at the counter"
+   ],
+   [
+    "tip at the chair",
+    "tip at the counter"
+   ],
+   [
+    "is at the chair",
+    "is at the counter"
+   ],
+   [
+    "already in the chair",
+    "already at the counter"
+   ],
+   [
+    "as at the chair",
+    "as at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a workstation"
+   ],
+   [
+    "Signature cut and shave",
+    "Bedding bundle"
+   ],
+   [
+    "Groom's package",
+    "Wedding gown cleaning"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Winter coat"
+   ],
+   [
+    "kids cuts",
+    "winter coats"
+   ],
+   [
+    "a kids cut",
+    "a winter coat"
+   ],
+   [
+    "Kids cut",
+    "Winter coat"
+   ],
+   [
+    "kids cut",
+    "winter coat"
+   ],
+   [
+    "Skin fade",
+    "King comforter"
+   ],
+   [
+    "skin fade",
+    "king comforter"
+   ],
+   [
+    "Beard trim",
+    "Blanket"
+   ],
+   [
+    "a beard trim",
+    "a blanket"
+   ],
+   [
+    "beard trim",
+    "blanket"
+   ],
+   [
+    "Color correction",
+    "Special-care items"
+   ],
+   [
+    "A color correction",
+    "A special-care item"
+   ],
+   [
+    "a color correction",
+    "a special-care item"
+   ],
+   [
+    "color correction",
+    "special-care item"
+   ],
+   [
+    "Haircut plans",
+    "Pickup plans"
+   ],
+   [
+    "Haircut plan",
+    "Pickup plan"
+   ],
+   [
+    "Haircuts",
+    "Wash and folds"
+   ],
+   [
+    "haircuts",
+    "wash and folds"
+   ],
+   [
+    "A haircut",
+    "A wash and fold"
+   ],
+   [
+    "a haircut",
+    "a wash and fold"
+   ],
+   [
+    "Haircut",
+    "Wash and fold"
+   ],
+   [
+    "haircut",
+    "wash and fold"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Cleaners LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Laundry and Lee Dry Cleaning"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dry Cleaning"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Laundry"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pickup Laundry's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pickup Laundry"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Cleaners"
+   ],
+   [
+    "plumbing and electrical",
+    "laundry and dry cleaning"
+   ],
+   [
+    "Plumbing and electrical",
+    "Laundry and dry cleaning"
+   ],
+   [
+    "electrical license",
+    "environmental registration"
+   ],
+   [
+    "Electrical",
+    "Dry cleaning"
+   ],
+   [
+    "electrical",
+    "dry cleaning"
+   ],
+   [
+    "plumber",
+    "driver"
+   ],
+   [
+    "Plumbing",
+    "Laundry"
+   ],
+   [
+    "plumbing",
+    "laundry"
+   ],
+   [
+    "Barbershop",
+    "Cleaning shop"
+   ],
+   [
+    "barbershops",
+    "cleaning shops"
+   ],
+   [
+    "a barbershop",
+    "a cleaning shop"
+   ],
+   [
+    "A barbershop",
+    "A cleaning shop"
+   ],
+   [
+    "barbershop",
+    "cleaning shop"
+   ],
+   [
+    "a barber",
+    "a counter clerk"
+   ],
+   [
+    "A barber",
+    "A counter clerk"
+   ],
+   [
+    "barbers",
+    "counter clerks"
+   ],
+   [
+    "Barbers",
+    "Counter clerks"
+   ],
+   [
+    "barber",
+    "counter clerk"
+   ],
+   [
+    "Barber",
+    "Counter clerk"
+   ],
+   [
+    "House calls",
+    "Pickups"
+   ],
+   [
+    "house calls",
+    "pickups"
+   ],
+   [
+    "a house call",
+    "a pickup"
+   ],
+   [
+    "House call",
+    "Pickup"
+   ],
+   [
+    "house call",
+    "pickup"
+   ],
+   [
+    "Riley Chen",
+    "Dolores Reyes"
+   ],
+   [
+    "Avery Diaz",
+    "Hiro Tanaka"
+   ],
+   [
+    "Jordan Price",
+    "Mateo Ruiz"
+   ],
+   [
+    "Casey Moore",
+    "Bao Tran"
+   ],
+   [
+    "Riley",
+    "Dolores"
+   ],
+   [
+    "Avery",
+    "Hiro"
+   ],
+   [
+    "Jordan",
+    "Mateo"
+   ],
+   [
+    "Casey",
+    "Bao"
+   ],
+   [
+    "88 Elm St",
+    "31 Mill St"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "700 River Rd"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Only the consult",
+    "Only the price check"
+   ],
+   [
+    "only the consult",
+    "only the price check"
+   ],
+   [
+    "the consult only",
+    "the price check only"
+   ],
+   [
+    "the consult",
+    "the price check"
+   ]
+  ],
+  "B": [
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, plumbing stays offline, saved, until our team checks it within 1 business day.",
+    "We couldn't find registration EX-4011 for Sam Lee on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, laundry stays offline, saved, until our team checks it within 1 business day."
+   ],
+   [
+    "Once a barber is confirmed and you say yes",
+    "Once your team is added and you say yes"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: a solvent permit can cover one plant only."
+   ],
+   [
+    "Plumbing MP045210",
+    "Registration EX-4011"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "None needed"
+   ],
+   [
+    "Plumbing, checked",
+    "None needed"
+   ],
+   [
+    "Barber, checked",
+    "None needed"
+   ],
+   [
+    "Everyone's licenses are confirmed on the official lookup. Each person is who their license names: you confirm it. Let them take bookings now?",
+    "Everyone is added. Let them take bookings now?"
+   ],
+   [
+    "The licenses check out; asks Sam",
+    "Everyone is added; asks Sam"
+   ],
+   [
+    "Nobody is offered to customers until their license is confirmed and Sam says yes. Rosie asks about everyone at once.",
+    "Nobody is offered to customers until Sam says yes. Rosie asks about everyone at once."
+   ],
+   [
+    "Each person is who their license names: Sam confirms it with this yes.",
+    "Sam confirms each person with this yes."
+   ],
+   [
+    "Reese can be booked once the license checks out on the state's lookup, and Sam says yes.",
+    "Reese can be booked once Sam says yes."
+   ],
+   [
+    "Welcome! Please add your license number.",
+    "Welcome! Please fill in your secure page."
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration EX-4011"
+   ],
+   [
+    "MP045210",
+    "EX-4011"
+   ],
+   [
+    "MP045201",
+    "EX-4101"
+   ],
+   [
+    "BS20981",
+    "EX-4012"
+   ],
+   [
+    "JP031552",
+    "EX-3015"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "EC22871",
+    "EX-1058"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken; a $40 deposit for a wedding gown"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "When they book: a card saved, with no fee"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved, with no fee"
+   ],
+   [
+    "After the job: Rosie sends the bill",
+    "After the job: the saved card is charged when the order is delivered"
+   ],
+   [
+    "Does it work like plumbing?",
+    "Does it work like laundry?"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Mateo: pickups and delivery"
+   ],
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 6pm the day before. After that, or no bags out: no fee"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Mon–Sat 7am–6pm · 2-hour windows · 1 day's notice · up to 30 days ahead"
+   ],
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every pickup is booked in a window"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line · no bank transfer"
+   ],
+   [
+    "To save cards and send customers their bills, connect Stripe in Lee Home Services' own name. Bank and tax details go to Stripe, never to us.",
+    "To save cards and charge them when orders are delivered, connect Stripe in Lee Home Services' own name. Bank and tax details go to Stripe, never to us."
+   ],
+   [
+    "A card is saved for the $89 service-call fee. Nothing is taken. It's charged only for a fee Sam confirms, like a no-show, and never more than $89.",
+    "A card is saved, with no fee. Nothing is taken when it books. The card is charged the ticket total once the order is delivered."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the wash and fold pickup from a card saved to nothing taken, billed after delivery. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "A card saved for the $89 fee · paid after the job",
+    "A card saved, no fee · charged when delivered"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa pickup Thu 12-2 Casey"
+   ],
+   [
+    "Lee Home Services can clear the drain: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}.",
+    "Lee Pickup Laundry can pick up your laundry: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Say Morgan has a repeat plan: a wash and fold pickup every week. They can skip one visit, pause the plan or end it. Jordan is told."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's pickup?"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for a pickup every week. Lee Pickup Laundry offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you pick up my laundry every week, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Pickup Laundry has a weekly pickup plan, $35 a visit. Each visit is booked and paid like a single one. Want it every week?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every week"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a big batch of linens cleaned over two days."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Weekly wash and fold pickup plan"
+   ],
+   [
+    "Every 12 months",
+    "Every week"
+   ],
+   [
+    "Each visit: $150",
+    "Each visit: $35"
+   ],
+   [
+    "Card saved for the $89 fee",
+    "Card saved, no fee"
+   ],
+   [
+    "$640 quote",
+    "$110 price"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $35"
+   ],
+   [
+    "$20 payment",
+    "$35 payment"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan is stuck behind a road closure."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A special-care item is priced at the plant, after a look. Nothing is charged until Alex says yes."
+   ],
+   [
+    "A repair is rated, so Lee Home Services takes the yes branch.",
+    "A laundry order is rated, so Lee Home Services takes the yes branch."
+   ],
+   [
+    "Jordan found more work. Add it today?",
+    "The plant found more work. Add it today?"
+   ],
+   [
+    "Thanks. Jordan will do the extra work now, for $160. It's added to what you pay for this visit.",
+    "Thanks. The plant will do the extra work now, for $12. It's added to what you pay for this order."
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · your order"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Laundry could mean wash and fold or dry cleaning."
+   ],
+   [
+    "Licenses: checked",
+    "Registrations: checked"
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For laundry, a fire or a gas smell stops the booking."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Please put the bags out on the morning of your pickup."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Dolores: counter, spotting, pressing"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Pickup Laundry. Sam named you their emergency contact. May we call or text you if they miss a safety check? We'd share only where they're working, only after a missed check."
+   ],
+   [
+    "No live waiting line. Work like towing or a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time.",
+    "No live waiting line. Work like a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Mateo and Bao drive the pickup route. Dolores and Hiro work the counter; Dolores also does stain work. Pat is my office manager, for prices over $500. Jules does clothing repairs at the counter, with their own customers."
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like cleaning clothes taken from a neighbor's porch. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note."
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that gasoline spilled on the laundry bag. Rosie runs the plug-in's danger check again, then asks the driver. Bao can come sooner, so that's offered."
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Pickup Laundry asks: is the pickup at a home, an office or somewhere else? And about how many pounds, and is it wash and fold, dry cleaning or both?"
+   ],
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, arriving 3–5pm, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Pickup Laundry. It's a wash and fold pickup, tomorrow, arriving 8–10am, with Mateo. Accept it?"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say the plant scorches a shirt collar and texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A shirt comes back with the stain still on it. It's inside the 7-day free re-clean, so Sam OKs a free return pickup at $0, with its own code."
+   ],
+   [
+    "Reminder: your visit is tomorrow, arriving 8–10am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Reminder: your pickup is tomorrow, arriving 8–10am, with Mateo. {{pay.cancel}}. Please bag your laundry, empty the pockets and leave the bags at the door."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Means 'Matched': the request fits a listed service, in any words. 'Can you pick up my laundry?' fits a wash and fold pickup."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds alterations to Lee Pickup Laundry. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $35 wash and fold pickup needs none."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Laundry pickup in Springfield. Wash and fold and dry cleaning, within 25 miles."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 order of drapes is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a comforter? Say so.'"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood cleaner on Mill St. Wash and fold, dry cleaning and gown care."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Alterations for Lee Pickup Laundry: is it the same company?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about picking up my laundry. A text back is fine."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a stain on my best shirt this morning."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my laundry."
+   ],
+   [
+    "Water heater replacement",
+    "Leather and suede"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW alterations"
+   ],
+   [
+    "Water pressure check",
+    "Stain check"
+   ],
+   [
+    "Yes, it won't drain",
+    "About 20 pounds, mostly towels"
+   ],
+   [
+    "A water heater job",
+    "A pickup at the customer's door"
+   ],
+   [
+    "A chair, ready",
+    "The counter, ready"
+   ],
+   [
+    "Sam adds a plumber",
+    "Sam adds a driver"
+   ],
+   [
+    "Checked by Rosie on the state's lookup, Oct 19",
+    "Registrations: as given, not checked"
+   ],
+   [
+    "Panel upgrade",
+    "Special-care items"
+   ],
+   [
+    "$89, credited to the repair",
+    "Free over $30, else $5.99"
+   ],
+   [
+    "Every plumbing job, and electrical",
+    "Every pickup and delivery"
+   ],
+   [
+    "Every plumbing job",
+    "Every pickup"
+   ],
+   [
+    "Labor",
+    "Shirts"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Mateo: pickups and delivery"
+   ],
+   [
+    "Casey: plumbing",
+    "Bao: pickups and delivery"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Dolores: the counter and stain work"
+   ],
+   [
+    "Avery: barber",
+    "Hiro: the counter and pressing"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A laundry takes none, at the counter or at the door."
+   ],
+   [
+    "Alex M. asked for money back for the Thu Oct 22 visit.",
+    "Alex M. asked for money back for the Sat Oct 24 delivery."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Pickup Laundry does laundry and dry cleaning, not carpet cleaning. Nothing was saved. You can look for a carpet cleaner near you."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a gas smell or a fire, gets the safety steps first."
+   ],
+   [
+    "like a move-out day",
+    "like a hotel linen day"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Take it to a hazardous waste drop-off first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE road closed, there by 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is stuck behind a road closure and will arrive about 9:30am. The pickup should be done by 10am."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scorched a shirt collar"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scorched shirt collar"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "The plant scorched a shirt collar on Alex M.'s order. The before photo shows no mark."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I need my laundry picked up. Can a driver come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito que recojan mi ropa para lavar."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need my laundry picked up."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a driver pick up two bags of laundry this Thursday? What does it cost?"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My dryer smoked after I ran oily rags in it. Is it safe to use again?"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A pickup happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Pickup Laundry doesn't do, like carpet cleaning."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: how many pounds, wash and fold or dry cleaning, and the date it's needed back."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: none of its own. Items soaked in gasoline or oil stay out of the bag."
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 20 pounds of wash and fold."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks to add a king comforter. Both go in one booking, with one pickup window."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Mateo also take a king comforter?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The comforter is priced on the list. Both fit in the same pickup window."
+   ],
+   [
+    "Is the sink still full of water?",
+    "About how many pounds is it?"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Mateo's times show: Mateo is the one who looks at leather and suede."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I leave the bags out the night before?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Gasoline spilled on my laundry bag."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Keep the soaked clothes outside, away from heat and sparks, and leave them out of the bag. Bao can come sooner, at the same price."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Mateo also take my wool coat?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Large wash and fold pickup · $40"
+   ],
+   [
+    "Yard drain",
+    "Dry cleaning"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE 2 bags at the door, tags 4471 and 4472"
+   ],
+   [
+    "Under the sink, before",
+    "Bags at the door, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Bag tags, before"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "The plant finds a red wine stain on a tablecloth."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 12 stain treatment, red wine"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: stain treatment on a tablecloth, $12. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Stain treatment, tablecloth"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $12 stain treatment price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the stain treatment for $12."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plant finds a rag soaked in oil in the bag. The plug-in says it is set aside unwashed, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD oil-soaked rag in the bag, set aside"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Oil-soaked rag in the bag"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The plant found a rag soaked in oil in your bag and set it aside, unwashed."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a rag soaked in oil"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: washing the rag"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE towels folded in thirds; bags at the side gate."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 35 wash and fold"
+   ],
+   [
+    "the kitchen drain",
+    "the wash and fold"
+   ],
+   [
+    "the leak repair",
+    "the special-care items"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A shirt came back with the stain still on it."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s order, delivered Sat Oct 24, came back with a stain still on a shirt. It's inside the 7-day free re-clean."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It's inside the free re-clean, so this pickup is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free re-clean lasts."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left the order in the rain."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan pick up my curtains next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a curtain pickup."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the drapes price before booking."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise wash and fold to 40"
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the wash and fold to $40 for visits from Mon Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Wash and folds already booked keep $35, even after Nov 2."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a wash and fold at $30, an old price."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A wash and fold with Lee Pickup Laundry is $35, not $30."
+   ],
+   [
+    "Drain clearing · $179",
+    "Wash and fold · $35"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Wash and fold pickup"
+   ],
+   [
+    "Kitchen drain",
+    "Wash and fold"
+   ],
+   [
+    "Drain clearings",
+    "Wash and fold pickups"
+   ],
+   [
+    "drain clearings",
+    "wash and fold pickups"
+   ],
+   [
+    "Drain clearing",
+    "Wash and fold pickup"
+   ],
+   [
+    "drain clearing",
+    "wash and fold pickup"
+   ],
+   [
+    "Water heater flush",
+    "King comforter"
+   ],
+   [
+    "A leak repair",
+    "A special-care item"
+   ],
+   [
+    "a leak repair",
+    "a special-care item"
+   ],
+   [
+    "Leak repair",
+    "Special-care items"
+   ],
+   [
+    "leak repair",
+    "special-care item"
+   ],
+   [
+    "$89 service call",
+    "pickup fee"
+   ],
+   [
+    "the service call",
+    "the pickup"
+   ],
+   [
+    "service call",
+    "pickup"
+   ],
+   [
+    "Service call",
+    "Pickup and delivery"
+   ],
+   [
+    "Sewer camera inspection",
+    "Large wash and fold pickup"
+   ],
+   [
+    "paid at the chair",
+    "paid at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a workstation"
+   ],
+   [
+    "A haircut",
+    "A wash and fold"
+   ],
+   [
+    "a haircut",
+    "a wash and fold"
+   ],
+   [
+    "Haircut",
+    "Wash and fold"
+   ],
+   [
+    "haircut",
+    "wash and fold"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Pickup Laundry LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Laundry and Lee Dry Cleaning"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dry Cleaning"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Laundry"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pickup Laundry's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pickup Laundry"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Cleaners"
+   ],
+   [
+    "leehomeservices.com",
+    "leepickuplaundry.com"
+   ],
+   [
+    "plumbing and electrical",
+    "laundry and dry cleaning"
+   ],
+   [
+    "Plumbing and electrical",
+    "Laundry and dry cleaning"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "electrical license",
+    "environmental registration"
+   ],
+   [
+    "Electrical license",
+    "Environmental registration"
+   ],
+   [
+    "Electrical",
+    "Dry cleaning"
+   ],
+   [
+    "electrical",
+    "dry cleaning"
+   ],
+   [
+    "a plumber",
+    "a driver"
+   ],
+   [
+    "plumber",
+    "driver"
+   ],
+   [
+    "Plumbing",
+    "Laundry"
+   ],
+   [
+    "plumbing",
+    "laundry"
+   ],
+   [
+    "Barbershop",
+    "Cleaning shop"
+   ],
+   [
+    "barbershops",
+    "cleaning shops"
+   ],
+   [
+    "a barbershop",
+    "a cleaning shop"
+   ],
+   [
+    "barbershop",
+    "cleaning shop"
+   ],
+   [
+    "a barber",
+    "a counter clerk"
+   ],
+   [
+    "barbers",
+    "counter clerks"
+   ],
+   [
+    "Barbers",
+    "Counter clerks"
+   ],
+   [
+    "barber",
+    "counter clerk"
+   ],
+   [
+    "Barber",
+    "Counter clerk"
+   ],
+   [
+    "House calls",
+    "Pickups"
+   ],
+   [
+    "house calls",
+    "pickups"
+   ],
+   [
+    "a house call",
+    "a pickup"
+   ],
+   [
+    "House call",
+    "Pickup"
+   ],
+   [
+    "house call",
+    "pickup"
+   ],
+   [
+    "Riley Chen",
+    "Dolores Reyes"
+   ],
+   [
+    "Avery Diaz",
+    "Hiro Tanaka"
+   ],
+   [
+    "Jordan Price",
+    "Mateo Ruiz"
+   ],
+   [
+    "Casey Moore",
+    "Bao Tran"
+   ],
+   [
+    "Riley",
+    "Dolores"
+   ],
+   [
+    "Avery",
+    "Hiro"
+   ],
+   [
+    "Jordan",
+    "Mateo"
+   ],
+   [
+    "Casey",
+    "Bao"
+   ],
+   [
+    "88 Elm St",
+    "31 Mill St"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "700 River Rd"
+   ],
+   [
+    "1-year labor warranty",
+    "7-day free re-clean"
+   ],
+   [
+    "$179",
+    "$35"
+   ],
+   [
+    "$150",
+    "$35"
+   ],
+   [
+    "$199",
+    "$40"
+   ],
+   [
+    "$160",
+    "$12"
+   ],
+   [
+    "$120 an hour",
+    "$3.50 a shirt"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex drops off 20 pounds of wash and fold and 3 shirts at Lee's Cleaners, Sat Oct 24 at 11:00am. Dolores weighs and tags the order and texts READY for Mon Oct 26. Alex pays at the counter at pick-up. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Pickup Laundry to pick up 20 pounds of wash and fold at 9 Willow Ct, and Mateo takes the bags from the door Thu Oct 22 between 8 and 10am. Nobody needs to be home. The plant weighs the order, it comes back Sat Oct 24, and the saved card is charged when it is delivered. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "visit|none|counter",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: 20 pounds of wash and fold, $35. Nothing is taken: a YES books the drop-off. Dolores weighs and tags it, texts READY, and Alex pays at the counter at pick-up.",
+    "visit|none|counter": "A silk dress and a suede jacket, priced at the counter before any cleaning. Nothing is taken. Alex says yes to the price, and pays at the counter at pick-up.",
+    "list|deposit|counter": "A wedding gown cleaning, $140. A $40 deposit books the slot, and the $100 rest is paid at the counter at pick-up."
+   },
+   "amounts": {
+    "*": {
+     "name": "Wash and fold"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Wash and fold",
+     "fee": "$0"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Wedding gown cleaning"
+    },
+    "visit|*|*": {
+     "name": "Special-care items",
+     "fee": "$0"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a pickup of 20 pounds of wash and fold, $35. A card is saved, with no fee. Mateo picks up the bags at the door, and the card is charged the ticket total when the order is delivered.",
+    "list|none|bill": "A salon's towels, picked up and delivered on account. Nothing is taken when it books, and Rosie texts the bill after the delivery."
+   },
+   "amounts": {
+    "*": {
+     "fee": "free",
+     "name": "Wash and fold pickup"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Wash and fold pickup"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak"
+ ],
+ "splitsKept": {
+  "A": [],
+  "B": []
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "A laundry pays the $2.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The laundry plug-in adds no agreement, so there is nothing to leave unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "A laundry books clothes to clean, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "A laundry runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "No person at a laundry needs a license.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "A laundry is never sent now: a pickup is booked in a window.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "why": "The laundry's refused items are handled at the bag and the plant, not by a safety call first.",
+    "label": "Safety steps, then go on"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "A laundry has no form to sign first.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Laundry needs no license: the company gives its registration. Dry cleaning solvents are asked with the dry cleaning prices.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "why": "No person at a laundry needs a license.",
+    "label": "A license problem"
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "why": "No person at a laundry holds a license for the work.",
+    "label": "The license holder leaves"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "Nobody is booked by name at a laundry: the counter takes the order.",
+    "label": "Asks for one person by name"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "A drop-off at the counter is booked one time; the weekly schedule is the pickup service.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A laundry order is never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "A drop-off at the counter is booked one time.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "A drop-off at the counter is booked one time.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-02",
+    "why": "A drop-off at the counter is booked one time.",
+    "label": "A plan or count is due"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "why": "Nothing is required at the counter: every item is left with the shop.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A child is never left at the counter.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Every order is left with the shop, so the shop takes the drop-off branch.",
+    "label": "No: the customer stays"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Laundry orders are rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "why": "Work booked at the counter has no right to cancel to send.",
+    "label": "Yes: a contract signed today"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "A new order is booked when there are clothes to clean, not at checkout.",
+    "label": "Next visit booked at checkout"
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "A walk-in drop-off is checked in at once at the counter, with a ticket for what is left.",
+     "Wash and fold is weighed in front of the customer. Anything priced at the counter waits for the customer's yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "The confirmation says what to bring: the bags or hangers, with the pockets emptied.",
+     "It asks for any known stain and any item that needs special care. Those go on the ticket."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.3",
+       "8.21"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "title": "Dolores counts, weighs and tags the order",
+      "does": "Dolores counts every item, weighs the wash and fold in front of Alex, and tags each bag. A ticket lists what was left, with notes on stains and wear.",
+      "more": [
+       "Wash and fold is priced by the pound. The weighed pounds set the total at the price shown.",
+       "Stains, tears, missing buttons and wear are noted, with photos of any item at risk.",
+       "Pockets are checked. Cash and items found come back with the order.",
+       "A count that differs from Alex's is told the same day.",
+       "A rag soaked in oil or gasoline, anything with blood, or a needle stays out of the order (A8-35)."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "COUNTED 20 lb wash and fold, 3 shirts"
+       ],
+       [
+        "san",
+        "cust",
+        "Your ticket for Sat Oct 24: 20 pounds of wash and fold and 3 shirts, tagged. READY is Mon Oct 26 by 5pm. Pick-up is at the counter with your code.",
+        {
+         "card": {
+          "title": "Ticket · Lee's Cleaners",
+          "lines": [
+           "Wash and fold · 20 lb",
+           "Shirts · 3, pressed",
+           "READY Mon Oct 26 by 5pm",
+           "{{pay.after}}"
+          ]
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Dolores finds something the plug-in says stays out: a rag soaked in oil, blood, or a needle. It is set aside unwashed. The rest of the order goes ahead.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Set aside an oil-soaked rag from Alex M.'s bag. Note and photo on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Dolores set aside one item from your bag today. Please read the note, and take the item back with you.",
+      {
+       "card": {
+        "title": "A note from Lee's Cleaners",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Dolores set aside an item from Alex M.'s bag. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "Anyone with the claim ticket or the code may pick up, as the shop's rule says.",
+     "A damaged or missing item is reported within 7 days. Sam decides, with the shop's claims policy."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-23",
+    "does": "An order isn't picked up. After READY, the customer gets a reminder at 30 days and another at 60 days. A final written notice with the date goes out before anything is donated at 90 days.",
+    "more": [
+     "The owner sets the days and what happens after, as the state's unclaimed-property rules allow.",
+     "Rosie never donates, sells or charges on its own. Only the notices the owner OKs go out.",
+     "Notices go inside text hours. No nudges after the final notice."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your order has been ready since Mon Oct 26. Please pick it up at Lee's Cleaners, Tue to Sat, 9am to 6pm.",
+      {
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "Pick-up: Tue to Sat, 9am to 6pm",
+         "Ready since Mon Oct 26",
+         "Bring the code you used to drop it off"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Reply STOP to opt out. Msg & data rates may apply. Reply HELP for help."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-70",
+    "does": "On the drop-off day, Alex says they're running late. The shop takes the order when Alex arrives, or moves it to a later time.",
+    "more": [
+     "There is no fee for a late drop-off. Dolores is told.",
+     "Not there by closing: the drop-off counts as missed, and the no-show steps follow.",
+     "Means 1: that's fine. Means 2: a later time.",
+     "Clock: by the drop-off time. Silence: the drop-off stays, and Dolores takes the order when Alex comes.",
+     "Safe default: nothing moves."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Running 15 minutes late, sorry!"
+     ],
+     [
+      "san",
+      "cust",
+      "No problem. Dolores will take your order when you arrive, or you can move to a later time. No reply by 11:00am means the drop-off stays.",
+      {
+       "buttons": [
+        "That's fine",
+        "A later time"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff:Alex M.}} (11:00am) is about 15 minutes late."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say the customer spilled paint thinner on the clothes before the drop-off, and asks if the shop can still take them.",
+    "more": [
+     "The plug-in's refused items are checked first: clothes soaked in thinner, gasoline or oil stay out of the order.",
+     "Dolores can take the rest of the order, or the customer can move the visit with no fee.",
+     "A question only a pro should answer gets the shop's line, and the visit stays booked.",
+     "Means 1: bring the rest, at the booked time. Means 2: better to move it, with no fee. Means 3: Dolores calls them.",
+     "Safe default: the visit stays without the soaked items; Sam is told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "I spilled paint thinner on the clothes. Can I still bring them in?"
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff:Alex M.}} (Sat 11:00am) sent an update before the visit. Can the visit go ahead without the soaked items?",
+      {
+       "card": {
+        "title": "{{alex.staff:Alex M.}}'s update",
+        "lines": [
+         "On the secure page"
+        ]
+       },
+       "buttons": [
+        "Yes, bring the rest",
+        "Better to move it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Please keep the soaked clothes outside, away from heat, and out of the bag. Dolores can take the rest at your Sat 11:00am drop-off."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Cleaners. Sam Lee added you to the team. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Your phone and languages"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/s/qs"
+       },
+       "as": "Quinn S.",
+       "stop": "first"
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "A laundry pays the $2.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The laundry plug-in adds no agreement, so there is nothing to leave unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "A laundry books clothes to clean, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "A laundry runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "No person at a laundry needs a license.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "A laundry is never sent now: a pickup is booked in a window.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "why": "The laundry's refused items are handled at the bag and the plant, not by a safety call first.",
+    "label": "Safety steps, then go on"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "A pickup is at the customer's door; the counter is the other flow.",
+    "label": "Both places: the customer picks"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "A laundry has no form to sign first.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Pickups are booked in a 2-hour window.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A laundry order is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A laundry sells no seats.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Laundry needs no license: the company gives its registration. Dry cleaning solvents are asked with the dry cleaning prices.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "why": "No person at a laundry needs a license.",
+    "label": "A license problem"
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "why": "No person at a laundry holds a license for the work.",
+    "label": "The license holder leaves"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "A laundry is never sent now.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Nobody is booked by name: any driver on the route does the pickup.",
+    "label": "Asks for one person by name"
+   },
+   {
+    "op": "off",
+    "at": "B8-23",
+    "why": "Extra work found at the plant is priced by text. With no answer in 24 hours it is cleaned the normal way, without the extra.",
+    "label": "No phone at hand"
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "why": "Nothing is required at the door: the bags are out, or they are not (the pickup step handles that).",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "A laundry order needs no contract.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "A laundry is never sent now.",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "A laundry is never sent now, so every pickup is a set window with a reminder.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Each pickup is booked and paid like a single one: there is no separate plan charge.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "A laundry is never sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never in the driver's care.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "A new pickup is booked when there are clothes to clean.",
+    "label": "Next visit booked at checkout"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Laundry orders are rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "more",
+    "at": "B6-13",
+    "more": [
+     "Nobody needs to be home for a pickup. The bags go at the door, or with the doorman, by the start of the window."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-105",
+    "does": "A pickup can be done with nobody home. The plug-in marks it so. The door or doorman instructions go on the secure page, never in a text.",
+    "more": [
+     "Allowed: a door note or a building code goes on the secure page, never in a text.",
+     "With nobody home, no check-in code is used. The photo of the bags at the door confirms the pickup.",
+     "The clean order comes back the same way, left at the door or with the doorman, with a photo.",
+     "Safe default: someone must be there, and the page offers other times."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Booked with nobody home. Leave your bags at the door by the start of your window. The door instructions are on your secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-13",
+    "does": "The customer is booked. Nobody needs to be home, so there is no check-in code. The bags go at the door, and a photo confirms the pickup.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're booked! Leave your bags at the door by the start of your window. No code is needed.",
+      {
+       "card": {
+        "title": "Lee Pickup Laundry · {{svc.intext:Wash and fold pickup}}",
+        "lines": [
+         "{{day:Thu Oct 22}} · {{arrive:8–10am}} · Mateo",
+         "{{pay.price}}",
+         "{{pay.took}}",
+         "{{pay.cancel}}",
+         "Bags at the door, as in your booking"
+        ]
+       },
+       "buttons": [
+        "Change the time",
+        "Call off the visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "does": "Mateo texts OMW before driving. The customer gets Mateo's name and photo and the arrival time. Nobody needs to be home, so there is no code.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Mateo from Lee Pickup Laundry is on the way for your bags, about 15 minutes. Please have them at the door. Nobody needs to be home. If someone else comes, don't hand them over.",
+      {
+       "photos": [
+        "Mateo, from Lee Pickup Laundry"
+       ],
+       "photoLink": "rosfield.com/m/r4",
+       "buttons": [
+        [
+         "2",
+         "It isn't Mateo"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-17",
+    "t": "Thu Oct 22, 8:20am",
+    "title": "Nobody home: the pickup, with a photo",
+    "does": "Mateo takes the bags from the door and photographs them there, with the bag tags. No check-in code is used, and nobody has to be home.",
+    "more": [
+     "The photo of the bags at the door is the before record.",
+     "The pickup is not DONE. The job is done when the clean order is delivered.",
+     "A gate or door code is never in a text. It shows only in the job, on that day.",
+     "The pickup photo rides on the first message after the pickup. Alex can reply within 24 hours if something's wrong."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "PICKED UP 2 bags",
+      {
+       "photos": [
+        "Bags at the door",
+        "Bag tags"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Mateo picked up 2 bags from your door. The plant weighs them today, and you get the ticket. Delivery is Sat Oct 24, 10am to 12pm."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-52",
+    "does": "No bags are out, or the doorman won't take them. Mateo photographs the door and texts it. Alex has 15 minutes to put the bags out or reply.",
+    "more": [
+     "A code Alex sends by text goes at once to this job's secure page for Mateo, today only. It's deleted from the thread.",
+     "Alex is told once to use the page next time.",
+     "Clock: bags out, or a reply, by 15 minutes after Mateo's text. Silence: no pickup today.",
+     "No bags out: the next pickup stays as planned, and nothing is charged.",
+     "Never: repeat a code in a text, or keep it in the thread.",
+     "Safe default: Mateo waits the 15 minutes, then leaves."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NO BAGS at the door, Alex M.",
+      {
+       "photos": [
+        "Door, no bags"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Mateo is at your door, but no bags are out. Please put them out or reply within 15 minutes. If none come, Mateo has to leave. Then Lee Pickup Laundry {{pay.noshow}}. Your next pickup stays as planned."
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-22",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.16",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 22, 1:30pm",
+      "title": "The plant weighs and counts the order",
+      "does": "At the plant, the bags are opened, counted and weighed. The ticket is texted with each line and the total, before anything is charged.",
+      "more": [
+       "Wash and fold is weighed. The weighed pounds set the total at the price per pound.",
+       "The total is charged only when the order is delivered, never before.",
+       "A count that differs from Alex's is told the same day.",
+       "Weighed 10 pounds or more over what Alex said: the new total is texted first and needs a yes.",
+       "No answer in 24 hours: only the pounds Alex said are washed.",
+       "A special item is priced first. No yes in 24 hours: it comes back uncleaned, with nothing charged for it.",
+       "Anything that can't go in the bag, like a rag soaked in oil, is set aside unwashed. Sam calls."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "WEIGHED 20 lb wash and fold, 2 bags"
+       ],
+       [
+        "san",
+        "cust",
+        "Your order is at the plant. We weighed 20 pounds of wash and fold. The total is {{pay.after}}.",
+        {
+         "card": {
+          "title": "Ticket · Lee Pickup Laundry",
+          "lines": [
+           "Wash and fold · 20 lb",
+           "Total · {{price}}",
+           "Delivery Sat Oct 24 · 10am–12pm"
+          ]
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "B8-x02",
+      "line": [
+       "8.2",
+       "8.14"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 10:05am",
+      "title": "Mateo brings the order back",
+      "does": "Mateo texts OMW for the delivery. The order is left at the door or with the doorman, with a photo. Nobody needs to be home.",
+      "more": [
+       "Delivery is within 48 hours of the pickup, in the 2-hour window Alex picked.",
+       "The door photo is the after record. Alex can report a problem within 7 days.",
+       "It's the same booking: no new code and no new $2.",
+       "Snow or a closed road: the delivery may move to the next day, and Alex is told first."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "OMW"
+       ],
+       [
+        "san",
+        "cust",
+        "Mateo is bringing your order, about 15 minutes. Nobody needs to be home. Mateo will leave it at your door and send a photo."
+       ],
+       [
+        "staff",
+        "san",
+        "DELIVERED 2 bags at the door",
+        {
+         "photos": [
+          "Order at the door"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, the order is checked against the ticket: the same items counted again, and after photos taken at the door.",
+    "more": [
+     "The plug-in names what's checked: the count and the tags.",
+     "Alex can report a missing or wrong item within 7 days."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Sat Oct 24, 10:50am"
+   },
+   {
+    "op": "words",
+    "at": "B8-47",
+    "t": "the next morning after B8-x02, 8am"
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pickup Laundry. Sam Lee added you to the team. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Your phone and languages"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/s/rk"
+       },
+       "as": "Reese K.",
+       "stop": "first"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Thu Oct 22. Text OMW when you leave. At each stop, take the bags and send a photo of them at the door.",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Job"
+        ],
+        "rows": [
+         [
+          "{{window:8–10am}}",
+          "{{alex.staff}}",
+          "{{svc.intext:Wash and fold|Visit}}"
+         ],
+         [
+          "{{window:10am–12pm}}",
+          "{{name.staff:Kim L.}}",
+          "{{svc.intext:Dry cleaning|Visit}}"
+         ],
+         [
+          "{{window:12–2pm}}",
+          "{{name.staff:Drew}}",
+          "{{svc.intext:King comforter|Visit}}"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers, photos and gate codes",
+        "lines": [
+         "{{alex.staff:Alex M.}}: {{pay.staff}}",
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open the day",
+        "link": "rosfield.com/d/j22"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-14",
+    "does": "Mateo gets the job, the time and the money line, Nobody needs to be home, so there is no code."
+   }
+  ]
+ },
+ "notes": "BUILT Oct 27 2026 (P3 new profession D3, REDESIGN 2 master, frozen). Start: the refitted tailor (from: tailor), merged with the held-back test-drive plug-in (work/testdrive/laundry.md, work/gaps/laundry.json; the old sample is kept in the scratch folder). Style Drop-off, pattern dropoff.\nWhy tailor: laundry runs like a drop-off. Clothes are counted and tagged, left, cleaned, and READY; pick-up with the ticket or code. Flow B is a pickup and return with nobody home, which the tailor's B8-x01 / B8-x02 own steps already shape.\nFacts: dropoff, extrawork, plans (the weekly pickup is a repeat plan; each pickup is booked and paid like a single one, so no separate plan charge: B7-91 'A plan charge is due' and every plan branch in flow A are off). Not listed: packs (the $149 monthly subscription of the sample plug-in is left out: an owner option, off by default), tips, stages, forms, video, sentnow. No switches ($2 applies; nothing sensitive). Settings: arrive A set start, B 2-hour window; cutoff A 7am the day of, B 6pm the day before (the route is planned the evening before).\nMoney A (3 paths): list|none|counter (main: 20 pounds of wash and fold, $35 = $1.75 a pound, weighed at the counter, nothing taken, paid at pick-up), visit|none|counter (silk, suede, beaded items priced at the counter: suede jacket $110 + silk scarf $15 in the example, the customer says yes first), list|deposit|counter (wedding gown cleaning $140: a $40 deposit books the slot, the $100 rest at pick-up; the late-cancel fee is the $40 deposit).\nMoney B (2 paths): list|card|card (main: pickup and delivery; a card is saved with NO fee; the card is charged the ticket total when the order is DELIVERED, never when it is picked up or weighed), list|none|bill (a business account, like a salon's towels: nothing taken, Rosie texts the bill after delivery). No late-cancel or no-show fee anywhere except the gown deposit; no bags out at a pickup: no fee.\nDecision (the sample plug-in said the card is charged 'when the order is weighed'): the master has one charge moment (DONE). DONE is moved to the delivery (B8-41 time words op), the ticket with the total is texted when the plant weighs (own step B8-x01), and the card is charged at DONE after the clothes are back. Nothing is charged before the clothes return. A weighed order 10 pounds or more over what the customer said: the new total is texted first and needs a yes.\nExample prices: the wash and fold rate is $1.75 a pound (the sample said $1.95) so the 20-pound example order is the master's $35 and every master number stays right. The gown is $140 with the master's own $40 / $100 deposit split. The $5.99 delivery fee under $30 and the free pickup over $30 are inside the order total shown before the yes. Weekly plan visits cost the same $35 (no plan discount).\nLicenses: none for laundry or for any person. The first kind of work gives its business registration only (S1-60 '1 A license' and S2-28 '1 Yes, each one' off, S11-42 license branches off). Dry cleaning with solvents may need an environmental registration; it is asked with the dry cleaning prices (S1-38 'electrical license' becomes 'environmental registration'). Fake license numbers use EX-1042 style (EX-4011, EX-4012, EX-1058). No state, law or number from one state.\nStop words / danger: no danger words of its own (the generic screen is on). Refused items (soaked in gasoline, oil or thinner; blood; needles) are asked about at booking, set aside unwashed at the counter (A8-35) or the plant (B8-30), never a reason to cancel the order. 'Safety steps, then go on' is off in both flows. Bed bugs only sealed and declared ahead.\nWho must not be booked: nobody is booked by name (A4-15 / B4-16 'by name' branches off); adults book, a parent books a child's clothes; no child is left at the counter (A8-67 off).\nOwn steps: A8-x01 (counted, weighed and tagged at the counter, ticket texted), B8-x01 (the plant weighs and counts, ticket with the total, rules for over-weight, special items and refused items), B8-x02 (the order comes back, with a photo). Words ops: A8-35, A10-23 (reminders at 30 and 60 days, a final written notice before the 90-day donation, the owner decides), A7-13 and A7-70 (a late or spilled drop-off), B4-105, B6-13, B6-14, B8-01, B8-02, B8-17 (nobody home: no code, a photo at the door), B8-39, B8-41 and B8-47 (times moved to the delivery), B8-52 (no bags out: no fee, next pickup stays), S11-48.\nDates run forward: pickup Thu Oct 22 8:20am (B8-17), plant Thu 1:30pm (B8-x01), delivery Sat Oct 24 10:05am (B8-x02, a 2-hour window of 10am to 12pm), DONE 10:50am (B8-41). The tailor's own-step dates were not copied.\nNot built (left to the master or the owner): a monthly subscription with an allowance, gown preservation boxes, rug cleaning, alterations (a possible next kind of work), tips, bank transfer.\nKnown master limits (see the log): hard-coded 'haircut' words in A4-14, A4-42, A5-05, A6-14 on the visit and deposit paths; the S1-13 owner replies and read-backs; S12-09 / S12-10 price the second service at the first one's price; S12-19 and S11-99 license steps are not gated by the plug-in.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "We couldn't find barbershop license BS20981 for Lee's Barbershop on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, the shop stays offline, saved, until our team checks it within 1 business day.",
+    "Once a barber is confirmed and you say yes",
+    "Customers can book it once a barber is confirmed",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Barber license number",
+    "Plumbing MP045210",
+    "Plumbing JP031552 · electrical JE30417",
+    "Registration 2020-1187",
+    "MP045210",
+    "BS20981",
+    "BS20918",
+    "JP031552",
+    "JE30417",
+    "EC22871",
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: a card saved for the $89 service-call fee",
+    "After the job: Rosie sends the bill",
+    "Does it work like haircuts?",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "No card, so no $20 fee",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "To save cards for the $20 fee, connect Stripe in Lee's Barbershop's own name. Bank and tax details go to Stripe, never to us.",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "A card saved for the $20 fee · paid after the visit",
+    "Lee's Barbershop's",
+    "A haircut could mean a salon or a barbershop.",
+    "The chairs",
+    "Card saved for the $20 fee",
+    "The $25 consult included",
+    "Only the $25 consult is promised.",
+    "Yes, make it a fade",
+    "Toner · $20",
+    "quote 110 color correction + 20 toner",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair. {{pay.asks}}. The rest is quoted at the chair, before any work.",
+    "a house call, $75, paid in full when booking",
+    "Haircuts already booked keep only their saved card.",
+    "How would you like it on top?",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Do you do kids cuts? My son is 8.",
+    "Riley: barber, color, house calls",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Riley at the chair. That shows Riley really came.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "At a drop-off, READY and the pick-up come once the work is done. At the chair, the customer is already there, so the shop takes the first branch.",
+    "From Riley's phone, or the portal's Today page at the desk. This confirms the visit. No text goes to the customer: they're at the chair.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Here they OK the $110 color correction and skip the $15 gloss. The $25 consult is part of the $110.",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex M. asks for a toner instead of the gloss. What's the new price?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Color quotes come to you first. Board prices never need one",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Could Riley use a toner instead of the gloss?",
+    "Color correction $110 · gloss $15",
+    "My employer pays for this cut.",
+    "Gloss to finish · $15",
+    "A water heater job",
+    "A chair, ready",
+    "Color and cut",
+    "Style consult",
+    "Panel upgrade",
+    "Every shop service, color and house calls",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Color correction can work this way, with only the $25 consult promised.",
+    "a skin fade",
+    "1 color quote",
+    "A card saved for the $20 fee",
+    "Promises the $25 consult; priced at the chair",
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Consult only",
+    "Only the consult; the price stays open",
+    "Copy: you said yes to a color correction, $125, at 11:20am on Riley's phone.",
+    "Quiero un corte el sábado.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop doesn't do perms.",
+    "May the shop show photos of your hair?",
+    "Can my son wait in the shop during my cut?",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Riley stopped Alex M.'s cut.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Riley finishes the work",
+    "A cut is rated, so the shop takes the first branch.",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Priced at the chair",
+    "priced at the chair",
+    "quote at the chair",
+    "added at the chair",
+    "code at the chair",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "rest at the chair",
+    "tip at the chair",
+    "is at the chair",
+    "already in the chair",
+    "as at the chair",
+    "rents a chair",
+    "Signature cut and shave",
+    "Groom's package",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "a beard trim",
+    "beard trim",
+    "Color correction",
+    "A color correction",
+    "a color correction",
+    "color correction",
+    "Haircut plans",
+    "Haircut plan",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "Lee's Barbershop LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee Electric",
+    "Lee Plumbing",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "a barbershop",
+    "A barbershop",
+    "barbershop",
+    "a barber",
+    "A barber",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "House calls",
+    "house calls",
+    "a house call",
+    "House call",
+    "house call",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "Only the consult",
+    "only the consult",
+    "the consult only",
+    "the consult"
+   ],
+   "B": [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, plumbing stays offline, saved, until our team checks it within 1 business day.",
+    "Once a barber is confirmed and you say yes",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Plumbing MP045210",
+    "Plumbing JP031552 · electrical JE30417",
+    "Registration 2019-0451",
+    "MP045210",
+    "MP045201",
+    "BS20981",
+    "JP031552",
+    "JE30417",
+    "EC22871",
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "When they book: a card saved for the $89 service-call fee",
+    "After the job: Rosie sends the bill",
+    "Does it work like plumbing?",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "To save cards and send customers their bills, connect Stripe in Lee Home Services' own name. Bank and tax details go to Stripe, never to us.",
+    "A card is saved for the $89 service-call fee. Nothing is taken. It's charged only for a fee Sam confirms, like a no-show, and never more than $89.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit. It's for new bookings only, and each change is read back first.",
+    "A card saved for the $89 fee · paid after the job",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Lee Home Services can clear the drain: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Can I skip next week's drain cleaning?",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes, every year",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Yearly water heater flush plan",
+    "Every 12 months",
+    "Each visit: $150",
+    "Card saved for the $89 fee",
+    "$640 quote",
+    "Refund · $20",
+    "$20 payment",
+    "Jordan needs a part from the supply house.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A repair is rated, so Lee Home Services takes the yes branch.",
+    "Jordan found more work. Add it today?",
+    "Thanks. Jordan will do the extra work now, for $160. It's added to what you pay for this visit.",
+    "Safety note · your home",
+    "A haircut could mean a salon or a barbershop.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan says no. Please wait until the job is done.",
+    "Riley: barber, color, house calls",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "No live waiting line. Work like towing or a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "One request waits for Lee Home Services. It's a leak under the sink, today, arriving 3–5pm, with Jordan. The service call is $89. Accept it?",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Reminder: your visit is tomorrow, arriving 8–10am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "I found water damage under the sink this morning.",
+    "Me, and yes. It's my kitchen.",
+    "Water heater replacement",
+    "NEW heating and cooling",
+    "Water pressure check",
+    "Yes, it won't drain",
+    "A water heater job",
+    "A chair, ready",
+    "Sam adds a plumber",
+    "Panel upgrade",
+    "$89, credited to the repair",
+    "Every plumbing job, and electrical",
+    "Every plumbing job",
+    "Labor",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex M. asked for money back for the Thu Oct 22 visit.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a move-out day",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Is the sink still full of water?",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Can I run the dishwasher before you come?",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Yard drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "DONE 179 drain",
+    "the kitchen drain",
+    "the leak repair",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "raise drain clearing to 199",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Drain clearing · $179",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "A leak repair",
+    "a leak repair",
+    "Leak repair",
+    "leak repair",
+    "$89 service call",
+    "the service call",
+    "service call",
+    "Service call",
+    "Sewer camera inspection",
+    "paid at the chair",
+    "rents a chair",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "Lee Home Services LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee Electric",
+    "Lee Plumbing",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "leehomeservices.com",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing license",
+    "Plumbing license",
+    "electrical license",
+    "Electrical license",
+    "Electrical",
+    "electrical",
+    "a plumber",
+    "plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "a barbershop",
+    "barbershop",
+    "a barber",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "House calls",
+    "house calls",
+    "House call",
+    "house call",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "Oak St",
+    "1200 Main St",
+    "1-year labor warranty",
+    "$179",
+    "$150",
+    "$199",
+    "$160",
+    "$120 an hour"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A3-22": "0057d8fc9f",
+   "A4-43": "c17d56f766",
+   "S1-60": "235c90a3c3",
+   "S11-42": "fde535c99e",
+   "A4-15": "db5792db95",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-02": "987e1a14cd",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A3-20": "b8251d2535",
+   "A6-14": "b17b52115e",
+   "A8-23": "e3a35f7f9e",
+   "A8-35": "a67e890a5b",
+   "A8-54": "bc2f9467fd",
+   "A10-23": "105d7f426a",
+   "A7-70": "da4cede3e2",
+   "A7-13": "e41528a397",
+   "S11-48": "03f824b27b"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B3-17": "3eb7d7f259",
+   "B4-01": "15f683e6cb",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "S1-60": "235c90a3c3",
+   "S11-42": "8f63c529f7",
+   "B4-16": "37cd99137d",
+   "B8-23": "dd780a2ec8",
+   "B8-45": "09e62897a6",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255",
+   "B6-13": "ed1f412f7d",
+   "B4-105": "0fc3040d7d",
+   "B8-02": "024afae342",
+   "B8-17": "dcff722a6d",
+   "B8-52": "6f008512da",
+   "B8-22": "50d78f1af0",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-47": "8b91635433",
+   "S11-48": "6fd1c7b7b9",
+   "B8-01": "df9177b059",
+   "B6-14": "dfd03ee673"
+  }
+ }
+}

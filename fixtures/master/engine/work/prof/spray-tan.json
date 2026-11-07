@@ -1,0 +1,5365 @@
+{
+ "id": "spray-tan",
+ "name": "Tanning and spray tan",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "esthetician",
+ "plugin": {
+  "pf.license": {
+   "need": "none checked by Rosie: spray tanning has no state license in most places; a technician's certificate or training is the business's own word, optional, and never checked (D96)",
+   "who": "the business, for any registration it chooses to show; each tech's certificate is their own word",
+   "ask": "optional: a registration number or a certificate the business wants shown; nothing is asked of each tech",
+   "check": "none: Rosie never checks a license, certificate or insurance for this work (not on any lookup, not by the team)",
+   "certificates": "a tanning certificate or training is shown as the tech's own word, never as a license",
+   "blocks": "nothing: no license or certificate blocks a booking here",
+   "renewals": "none checked; a date on a certificate is only a reminder the business sets itself",
+   "insurance": "liability insurance is optional: the business's own word; shown only if the business chooses",
+   "background": "any background check is the business's own policy, not checked by Rosie",
+   "claims": "no skin-cure or medical claims: a spray tan is a cosmetic service, never a treatment for skin"
+  },
+  "pf.services": {
+   "shape": "one spray tan per visit, with a tech the client picks or any free one; packs of tans; a home or venue visit for a party",
+   "examples": "the example businesses' own prices (Lee Tan Studio and Lee Mobile Tan), not a standard",
+   "list": [
+    {
+     "name": "Express spray tan",
+     "price": "$45",
+     "kind": "one price",
+     "length": "20 min, plus 10 min to clean the booth",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk",
+     "note": "disposable underwear; eyes and lips protected"
+    },
+    {
+     "name": "5-tan pack (express)",
+     "price": "$200 (the example's price)",
+     "kind": "a pack",
+     "length": "5 tans, valid 6 months",
+     "where": "at the studio",
+     "before": "paid in full when booked, on the secure page or at the desk",
+     "after": "each tan uses one"
+    },
+    {
+     "name": "Mobile spray tan at home",
+     "price": "$95",
+     "kind": "one price",
+     "length": "30 min, plus the set-up",
+     "where": "at the client's home or hotel",
+     "before": "a card saved for the $50 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Express mobile tan, paid in full",
+     "price": "$75",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the client's home",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Bridal party for 5, at a venue",
+     "price": "$450",
+     "kind": "one price",
+     "length": "one morning, 5 people",
+     "where": "at the venue",
+     "before": "a $100 deposit when booked",
+     "after": "the rest billed after the tans"
+    },
+    {
+     "name": "Extra area (add-on)",
+     "price": "$15",
+     "kind": "one price",
+     "length": "added to a tan, same time",
+     "where": "at the studio or at home",
+     "before": "with the tan",
+     "after": "at the front desk, or on the bill"
+    },
+    {
+     "name": "Gift card",
+     "price": "any amount",
+     "kind": "a gift card",
+     "length": "",
+     "where": "both",
+     "before": "typed on the secure page",
+     "after": "comes off what's paid"
+    }
+   ],
+   "travel": "a home visit is included in the price inside the 25-mile area (the example's setting); a travel fee for farther towns where Sam sets one",
+   "capacity": "one tech per tan; a bridal party is one booking with several people, each with their own form",
+   "skills": "express, full-body and bridal spray tans in light, medium and dark shades; eye and lip protection; no DHA tan for a client whose form names an allergy",
+   "online": "no: a spray tan is done in person",
+   "nobodyHome": "never: the client must be there"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "the tan wanted (express, full-body or bridal) and the shade wanted (light, medium or dark)",
+    "a tech by name, or a woman or a man, only if the client asks",
+    "at home or at a venue: the town, the place, and how many people",
+    "for a bridal party: the date and the time of the wedding"
+   ],
+   "afterTime": [
+    "areas to skip (a tattoo, a patch on the face, a fresh scar)",
+    "at home or at a venue: parking, stairs, and a private room with a chair and a changing space"
+   ],
+   "securePage": [
+    "18 or older (no tan is booked for anyone under 18)",
+    "the tan form: skin conditions, allergies (to DHA or other ingredients), any rash or sunburn, pregnancy or nursing, medicines that make skin sensitive, and a recent peel, laser or waxing",
+    "a bridal party: each person's own form"
+   ],
+   "whoMayBook": "an adult, for themselves or another adult; nobody under 18 (the example's setting)"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a rash, blisters, hives, swelling, burning skin, a skin infection, or an open sore or cut in the area",
+     "say": "Please don't book a spray tan now. See a doctor if your skin is sore or burning.",
+     "booking": "no booking until a doctor says it's OK"
+    },
+    {
+     "words": "trouble breathing, chest pain, or fainting",
+     "say": "This could be an emergency. Call 911 now. A tan can wait.",
+     "booking": "no booking"
+    }
+   ],
+   "refuse": {
+    "words": "a request for sexual services, or to be sprayed in a way that is sexual",
+    "say": "This studio offers spray tans only. This request can't be booked.",
+    "what": "the exact words go to the business's safety log; Sam picks: refuse and block that chat or number, or it was innocent and a tan may be booked (every later message is checked again); no reply in 2 of Sam's text hours: nothing is booked"
+   },
+   "goOn": [
+    {
+     "words": "a sunburn or a peeling area",
+     "what": "the tech skips that area; the tan goes on"
+    },
+    {
+     "words": "a cold or the flu",
+     "what": "the visit moves with no fee"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Tan form",
+     "when": "on the secure page before the first tan (due when booking, inside the saved 10 minutes); a returning client confirms by the day before",
+     "goodFor": "12 months, or until the skin changes",
+     "result": "most answers change nothing; a flag (an allergy to DHA, a rash, pregnancy or nursing) goes to the tech to read before the booking is kept"
+    },
+    {
+     "name": "Tech's read of a flag",
+     "when": "before the booking is written, in the tech's text hours; no answer in 1 hour: Sam reads it",
+     "result": "OK as booked; OK with a note (a lighter shade, eyes and lips covered); a doctor's OK first; or no, with the reason kept private"
+    }
+   ],
+   "prep": "shower and shave 6 hours before; no lotion or deodorant on the day; wear a bathing suit or disposable underwear; eyes and lips are protected; at home: a private room with a chair and a towel"
+  },
+  "pf.visit": {
+   "checkIn": "at the studio: the check-in code at the front desk; at home or a venue: the code at the door, from the client who booked",
+   "beforeWork": "the tech goes over the tan form and the shade with the client before the spray; the client changes alone into disposable underwear, and gets eye and lip protection; the tech leaves the room during the spray if the client asks",
+   "changes": "a shade change or an extra area is priced and OK'd before it's done",
+   "stop": "the tech may end a tan at any time for a reaction; Sam decides any charge (only what the client agreed to) and any block; it goes in the safety log",
+   "away": "only techs Sam allows go to homes or venues; the tech's DONE is the check-out: no DONE 15 minutes after the booked end, Rosie texts, then calls the tech, then tells Sam with the address",
+   "done": "the check-in code, or DONE from the tech; the tech's notes (shade, areas, reactions) go in the client's private record"
+  },
+  "pf.money": {
+   "before": "at the studio: a card saved for the $20 late-cancel and no-show fee; a 5-tan pack paid in full when bought; at home or at a venue: a card saved for the $50 fee; a bridal party's $100 deposit when booked, and the rest billed after",
+   "caps": "deposit and fee caps: the business's own; a deposit is never more than the price, and a fee is never more than what was paid now",
+   "cancel": "free to cancel until 24 hours before at the studio, and until 7am the day of a visit at home or a venue (the owner's settings)",
+   "fees": "late cancel or no-show: $20 at the studio; $50 at home; a bridal party keeps its $100 deposit; Sam confirms each fee, never more than what was agreed or paid now",
+   "conduct": "a tan ended for the client's conduct: charged only what the booking page said, and only if Sam says so",
+   "packs": "packs of tans and gift cards: sold at the studio, or on the secure page where Sam turns it on; a visit uses one tan",
+   "tips": "on: at the front desk, or a tip line on the bill Rosie texts; tips go to the tech in full",
+   "tax": "a tax line where the state's rules tax the service or the product",
+   "insurance": "none: the studio bills no health plan or insurance",
+   "fee2": "Rosfield's $2 applies (D97)"
+  },
+  "pf.messages": {
+   "never": "skin answers, allergies, pregnancy, medicines, a doctor's note and the tech's notes never go in a text or through the AI: only the secure page and the client's private record",
+   "tone": "no words that promise a skin result, a cure or a medical effect; a spray tan is a cosmetic service",
+   "languages": "English and Spanish",
+   "minors": "nobody under 18 is booked; Rosie never texts a minor"
+  },
+  "pf.staff": {
+   "licenses": "no state license for spray tanning in most places; a certificate or training is each tech's own word, shown only if they choose; never checked by Rosie (D96)",
+   "skills": "express, full-body and bridal spray tans in light, medium and dark shades; eye and lip protection; no DHA tan for a client whose form names an allergy",
+   "gender": "each tech's gender is set only so a client can ask for a woman or a man; a filter used only when the client asks",
+   "supervision": "a trainee works only with a named tech in the room, where the business sets it (none in the example)",
+   "oks": "Sam OKs same-day tans and new clients at the studio; he can set every home or venue visit to ask him first; a health flag goes to the booked tech, then to Sam after 1 hour",
+   "standIn": "a stand-in must fit the shade and the tan booked, and gets the tan form and notes",
+   "away": "only techs Sam allows are offered for homes and venues"
+  },
+  "pf.rules": {
+   "showLicense": "no license claim on listings, times or confirmations; the business's own registration shows only if it has one",
+   "draping": "the client wears disposable underwear and eye and lip protection; a request for a tan without them is refused",
+   "hours": "no tans in hours the business has not set (the example's own hours)",
+   "away": "home and venue visits only inside the 25-mile area, and only where Sam allows the tech",
+   "minors": "18 or older only, with no exception; a bridal party's guests each book as adults",
+   "reset": "10 minutes between clients to clean the booth (the example studio's setting)",
+   "records": "tan forms and notes kept 7 years"
+  },
+  "pf.edges": {
+   "improper": "a request for sexual services: refused, logged and sent to Sam (pf.safety)",
+   "lateArrival": "the tan starts when the client arrives, at full price; at the studio, no word 15 minutes after the start is a no-show",
+   "runsLate": "the tech runs late: the client keeps the full time if the next booking and the 10-minute clean still fit; if not, a new time with no fee",
+   "standIn": "a stand-in who fits the shade and the tan booked, with the form and notes; or new times with no fee",
+   "healthChange": "a new reaction or change in skin before the tan: the client updates the form; the tech decides; a move has no fee",
+   "conduct": "a tan ended for the client's conduct: Sam decides any charge (only what was agreed) and any block",
+   "awaySafety": "the safety check-out after visits at a home or a venue",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "packs",
+   "firststeps",
+   "forms",
+   "groups",
+   "aftercare",
+   "tips"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Jade and Kayla (spray tan techs)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Marco and Dana (techs who visit)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a bride, a venue manager)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Jade"
+  },
+  "B": {
+   "staff": "Marco"
+  }
+ },
+ "keep": [
+  "spray tan",
+  "visit fee",
+  "Visit fee",
+  "leak",
+  "no-show fee",
+  "No-show fee",
+  "late-cancel"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an express spray tan with Jade at Lee Tan Studio, for Sat Oct 24 at 11:00am, and fills in the tan form on the secure page. A first tan needs a skin check and Jade's OK on the form. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a mobile spray tan at home, 9 Birch Ct, with Marco from Lee Mobile Tan, Thu Oct 22 between 8 and 10am. The service depends on the money choice you pick: a home tan with the bill after, a home tan paid in full, or a bridal party for 5 at a venue."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: an express spray tan at Lee Tan Studio with Jade, $45. A card is saved for the studio's $20 fee, and Alex pays at the front desk.",
+    "list|full|none": "A 5-tan pack, $200, paid in full when booking. Each tan uses one, and a no-show can use one up, if Sam confirms."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "express spray tan"
+    },
+    "list|*|*": {
+     "price": "$45",
+     "name": "express spray tan"
+    },
+    "list|full|*": {
+     "price": "$200",
+     "paid": "$200",
+     "fee": "$40",
+     "name": "express spray tan (5-tan pack)"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra area",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$15",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "express spray tan (5-tan pack)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$40",
+      "paid": "$40",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|full|none",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a mobile spray tan at Alex's home with Marco, $95. A card is saved for the $50 fee, and Rosie texts the bill after the tan.",
+    "list|full|none": "An express mobile tan at home, $75, paid in full when booking.",
+    "list|deposit|bill": "A bridal party for 5 at a venue, $450: a $100 deposit when booked, and the rest billed after the tans."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50",
+     "name": "mobile spray tan at home"
+    },
+    "list|*|*": {
+     "price": "$95",
+     "name": "mobile spray tan at home"
+    },
+    "list|full|*": {
+     "price": "$75",
+     "paid": "$75",
+     "fee": "$35",
+     "name": "express mobile tan, paid in full"
+    },
+    "list|deposit|*": {
+     "price": "$450",
+     "deposit": "$100",
+     "rest": "$350",
+     "fee": "$100",
+     "name": "bridal party for 5, at a venue"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra area",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$15",
+      "fee": "$50"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "express mobile tan, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$75",
+      "paid": "$75",
+      "fee": "$35"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "mobile spray tan at home (pack tan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No state license for this work: the business gives only its own registration (S1-61); nothing is looked up (D96)."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The plug-in names no license to check for this work, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license, certificate or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license is checked for this work (D96): a certificate is the person's own word, optional."
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the person's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the person's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+     "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+     "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your studio, paid at the front desk, your own way",
+         "A card saved when they book, for the fee you OK"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Keep it"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Each tan shows its price and its place before the client picks.",
+      {
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Spray tanning and spray tan work pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Spray tanning adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Spray tanning books a tech (with a spray tan room), never a space alone."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Spray tanning is never urgent, so nothing is sent now: every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Tan spray tans are done in person."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for spray tanning at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books a tech's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books a tech's time, with a room."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A spray tan is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "Studio spray tans need no written contract: the consent is signed with the tan form (A4-72)."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The studio runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays in the room for a teen's spray tan."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio: the customer is on the spray tan bed."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A spray tan is paid when it's done."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each visit is paid at the desk."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for spray tanning."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "No contract is signed at a studio visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "No results come later: the tan check is read before the spray tan."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A spray tan is rated."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "The studio books new clients too: the tan form is the first step, not a list of its own customers."
+   },
+   {
+    "op": "off",
+    "at": "A7-54",
+    "why": "Spray tanning sells packs, not monthly plans: no plan charge or renewal text."
+   },
+   {
+    "op": "off",
+    "at": "A7-91",
+    "why": "No monthly plan renews here (tans are paid per tan or as a pack)."
+   },
+   {
+    "op": "off",
+    "at": "A7-55",
+    "why": "No monthly plan price changes here (tans are paid per tan or as a pack)."
+   },
+   {
+    "op": "more",
+    "at": "A4-66",
+    "more": [
+     "Each tan keeps 10 minutes after it free, to clean the booth."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No state license for this work: the business gives only its own registration (S1-61); nothing is looked up (D96)."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The plug-in names no license to check for this work, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license, certificate or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license is checked for this work (D96): a certificate is the person's own word, optional."
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the person's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the person's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+     "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+     "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your studio, paid at the front desk, your own way",
+         "A card saved when they book, for the fee you OK"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Keep it"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Each tan shows its price and its place before the client picks.",
+      {
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:none+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each tan's card is read from its own price, fee and way of payment, as the plug-in gives them.",
+       "A pack is paid when it's bought, at the desk or on the secure page. Each visit uses one tan.",
+       "A home or venue tan is paid the way its card says: a card saved for the fee, and the bill after.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home or a venue? Tell me which.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid at the front desk, your own way",
+           "A card saved when they book, for the fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each tan shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Spray tanning and spray tan work pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Spray tanning adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Spray tanning books a tech (with a spray tan room), never a space alone."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Spray tanning is never urgent, so nothing is sent now: every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Tan spray tans are done in person."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for spray tanning at home."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Spray tanning is never sent now, so there's no 'Send someone now' button."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A home spray tan is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile spray tanning sells no seats: each booking has its own tech."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Spray tanning is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Spray tanning is never sent now, so every visit gets its reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Spray tanning is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "The customer is the one treated, so a visit with nobody home never happens."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "The customer is the one treated, so there's no visit with nobody home and a gate code."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A teen is never left in the tech's care: a parent on the booking stays (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A home visit is paid when it's done."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each home visit has its own bill."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for spray tanning at home."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Own or rent never matters for a spray tan, so no landlord pays."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "No report comes later from a home spray tan."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A spray tan is rated."
+   },
+   {
+    "op": "off",
+    "at": "B7-32",
+    "why": "Spray tanning sells packs, not repeat plans: no drain-style repeat plan here."
+   },
+   {
+    "op": "off",
+    "at": "B7-51",
+    "why": "No monthly plans here (tans are paid per tan or as a pack)."
+   },
+   {
+    "op": "off",
+    "at": "B7-52",
+    "why": "No plan charges here (tans are paid per tan or as a pack)."
+   },
+   {
+    "op": "off",
+    "at": "B7-86",
+    "why": "No plan renews here (tans are paid per tan or as a pack)."
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that the skin is burning now. Rosie runs the plug-in's danger check again, then asks the tech. Marco can come sooner, so that's offered.",
+    "more": [
+     "The plug-in's danger words are checked first. Then the tech is asked: come in, come in sooner, or move it with no fee.",
+     "A reaction that could get worse, like burning or blisters, gets the safety steps first. If anyone is at risk, the text says to call 911.",
+     "An earlier time shows its price first. No reply: the tan stays as booked. A pick: Marco and Dana are told.",
+     "Safe default: the tan stays as booked."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "My skin is burning right now."
+     ],
+     [
+      "san",
+      "cust",
+      "Stop and rinse with cool water. If you have trouble breathing or chest pain, call 911 now. Marco can offer an earlier time, at the same price.",
+      {
+       "buttons": [
+        "Keep my time",
+        "See the earlier one"
+       ]
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "Built from esthetician (Chair; the sibling's refitted overlay), Oct 27 2026. Spray tanning has no state license in most places: license steps off, the registration line says nothing is looked up (D96, golf-instructor pattern).\nVideo is off (in person only); no children (18 or older only, no exception); no plans (packs only).\nMoney: A studio card (main) and the 5-tan pack paid in full. B home tan with a card saved and the bill after (main), an express home tan paid in full, and a bridal party for 5 with a $100 deposit and the rest billed. $2 applies to every profession (D97); no2 never on.\nFacts: packs, firststeps, forms, groups (a bridal party), aftercare, tips. Sensitive off (cosmetic; health answers stay on the secure page).",
+ "rename": {
+  "A": [
+   [
+    "at $140 an hour",
+    "at $95 a session"
+   ],
+   [
+    "cut hair",
+    "do spray tans"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do microneedling"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Spray tans and tanning at homes in Springfield, within 25 miles."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Spray tans, spray tans and tanning."
+   ],
+   [
+    "A water heater job",
+    "A spray tan room"
+   ],
+   [
+    "asks for a perm",
+    "asks for microneedling"
+   ],
+   [
+    "many barbers, salons and groomers",
+    "many techs, spas and groomers"
+   ],
+   [
+    "books a skin fade for",
+    "books a half-leg tan for"
+   ],
+   [
+    "skin fades",
+    "half-leg tanes"
+   ],
+   [
+    "skin fade",
+    "half-leg tan"
+   ],
+   [
+    "Skin fade",
+    "Half-leg tan"
+   ],
+   [
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A spray tan could mean an spray tanning studio or a med spa. Why: each kind asks its own questions, and nothing is guessed."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter. It goes on the secure page, to sign or decline.",
+    "Say a visit leads to more work, like Jade's spray tan series after a consult, or a lawyer's engagement letter. It goes on the secure page, to sign or decline."
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex arrives at the studio. If the plug-in asks for something to bring, the desk checks it first. Alex's visit needs nothing brought."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Work that's never sent now sets nobody on call."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for a spray tan every 4 weeks. The studio offers a plan, so Rosie books the first visit and saves the next ones on the same day and time."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some spray tans take several visits, like a series of 3 Bridal spray tans, 2 weeks apart. Where the plug-in says so, all the times are picked now."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A bride books express spray tans for herself and four friends on one morning. Rosie finds times back to back across Jade and Kayla."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A spray tan is rated, so the studio takes the first branch."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $45 price. Sam taps Call, and the call goes out from the studio's number."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Jade can do a shorter tan in the time left, at the same price, or move to a later time."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan. Read it, then sign or decline on the secure page.",
+    "Lee Tan Studio sent you a proposal: Jade's spray tan series. Read it, then sign or decline on the secure page."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds spray tanning to Lee Tan Studio. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Alex says yes or no to the quote at the chair. Nothing more is done without that yes.",
+    "Alex says yes or no to the quote after the tan check. Nothing more is done without that yes."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Jade, so Jade's next times show."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in's example: sunburn or broken tan on the area gets 'no spray tan or tan on that tan until it heals'."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Jade stopped Alex M.'s spray tan. The note and photo are on the secure page."
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free tan touch-up within 7 days."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like a patch-test result, or a spray tan and its minutes."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: likes firm pressure, unscented products, enzyme mask"
+   ],
+   [
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Signed, thanks! Pick a time for your first spray tan in the series:"
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped Alex M.'s spray tan. I put a note and a photo on the page."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a spray tan on Saturday."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the clay mask stained a silk blouse today."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The studio's plug-in adds two: a reaction happening now, like a swelling face, and a burn from a product."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Spray tanning for Lee Tan Studio: is it the same company?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The rash on my cheek got worse. Can I still come in?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a teen brow tan (under 18) is $20, with a parent there. Want a time?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Spray tanning is never sent now, at home or at the studio."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's face tan missed a few hairs."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero un spray tan el sábado."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the studio show photos of your tan? Yes / No"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Then the booking goes on, for a gentle spray tan or a later date."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $20 consult; priced at the visit"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my daughter wait in the studio during my spray tan?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, and house calls"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The clay mask stained my silk blouse."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Jade: tech, and house calls"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do teen brow tanes? My daughter is 14."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "First spray tan"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a bridal shower together"
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "The studio's plug-in has none."
+   ],
+   [
+    "Say no to the price at the chair",
+    "Say no to the price after the tan check"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "A few hairs were missed on my face tan."
+   ],
+   [
+    "Anything added at the chair",
+    "Anything added during the visit"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the visit?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a spray tan every 4 weeks"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "plumbing and electrical",
+    "spray tanning and spray tanning"
+   ],
+   [
+    "Plumbing and electrical",
+    "Spray tanning and spray tanning"
+   ],
+   [
+    "Signature cut and shave",
+    "First spray tan"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Spray tan series"
+   ],
+   [
+    "Gloss to finish · $15",
+    "LED mask to finish · $15"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Tan Studio LLC"
+   ],
+   [
+    "Priced at the chair",
+    "Priced after the tan check"
+   ],
+   [
+    "priced at the chair",
+    "priced after the tan check"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tan's"
+   ],
+   [
+    "a color correction",
+    "a corrective spray tan"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tan"
+   ],
+   [
+    "at the chair now",
+    "in the spray tan room now"
+   ],
+   [
+    "set at the chair",
+    "set after the tan check"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Tan Studio"
+   ],
+   [
+    "Color correction",
+    "Full-body spray tan"
+   ],
+   [
+    "color correction",
+    "corrective spray tan"
+   ],
+   [
+    "Groom's package",
+    "Bridal spray tan"
+   ],
+   [
+    "a color and cut",
+    "a back spray tan"
+   ],
+   [
+    "the barbershop",
+    "the studio"
+   ],
+   [
+    "Drain clearing",
+    "Home spray tan"
+   ],
+   [
+    "Panel upgrade",
+    "Custom lash set"
+   ],
+   [
+    "1 color quote",
+    "1 price"
+   ],
+   [
+    "signature cut",
+    "intro spray tan"
+   ],
+   [
+    "Color and cut",
+    "Back spray tan"
+   ],
+   [
+    "color and cut",
+    "back spray tan"
+   ],
+   [
+    "the visit fee",
+    "the consult fee"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Tan"
+   ],
+   [
+    "Lee Electric",
+    "Lee Glow Tan & Brow"
+   ],
+   [
+    "Jordan Price",
+    "Marco Cruz"
+   ],
+   [
+    "1200 Main St",
+    "410 Oak Ave"
+   ],
+   [
+    "A barbershop",
+    "An spray tanning studio"
+   ],
+   [
+    "a beard trim",
+    "a face tan"
+   ],
+   [
+    "NEW massage",
+    "NEW spray tanning"
+   ],
+   [
+    "Casey Moore",
+    "Dana Park"
+   ],
+   [
+    "barbershops",
+    "spray tanning studios"
+   ],
+   [
+    "Electrical",
+    "Spray tanning"
+   ],
+   [
+    "electrical",
+    "spray tanning"
+   ],
+   [
+    "Riley Chen",
+    "Jade Morales"
+   ],
+   [
+    "Avery Diaz",
+    "Kayla Haddad"
+   ],
+   [
+    "Barbershop",
+    "Tan studio"
+   ],
+   [
+    "barbershop",
+    "spray tanning studio"
+   ],
+   [
+    "a kids cut",
+    "a teen brow tan"
+   ],
+   [
+    "Beard trim",
+    "Face tan"
+   ],
+   [
+    "beard trim",
+    "face tan"
+   ],
+   [
+    "the chair",
+    "the spray tan room"
+   ],
+   [
+    "88 Elm St",
+    "75 Maple Ave"
+   ],
+   [
+    "Barbering",
+    "Spray tanning"
+   ],
+   [
+    "a haircut",
+    "an express spray tan"
+   ],
+   [
+    "A haircut",
+    "An express spray tan"
+   ],
+   [
+    "visit fee",
+    "consult fee"
+   ],
+   [
+    "MP045210",
+    "ES045210"
+   ],
+   [
+    "JP031552",
+    "ES031552"
+   ],
+   [
+    "Plumbing",
+    "Spray tanning"
+   ],
+   [
+    "plumbing",
+    "spray tanning"
+   ],
+   [
+    "a barber",
+    "a tech"
+   ],
+   [
+    "A barber",
+    "A tech"
+   ],
+   [
+    "Kids cut",
+    "Teen brow tan"
+   ],
+   [
+    "kids cut",
+    "teen brow tan"
+   ],
+   [
+    "Haircuts",
+    "Express spray tans"
+   ],
+   [
+    "haircuts",
+    "express spray tans"
+   ],
+   [
+    "JE30417",
+    "LA30417"
+   ],
+   [
+    "EC22871",
+    "LC22871"
+   ],
+   [
+    "BS20981",
+    "ST20981"
+   ],
+   [
+    "plumber",
+    "tech"
+   ],
+   [
+    "barbers",
+    "techs"
+   ],
+   [
+    "Haircut",
+    "Express spray tan"
+   ],
+   [
+    "haircut",
+    "express spray tan"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Elm St",
+    "Maple Ave"
+   ],
+   [
+    "Oak St",
+    "Birch Ct"
+   ],
+   [
+    "Barber",
+    "Tech"
+   ],
+   [
+    "barber",
+    "tech"
+   ],
+   [
+    "gloss",
+    "LED mask"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Riley",
+    "Jade"
+   ],
+   [
+    "Avery",
+    "Kayla"
+   ],
+   [
+    "Casey",
+    "Dana"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "$140 an hour",
+    "$95 a session"
+   ],
+   [
+    "$20 fee",
+    "$20 fee"
+   ],
+   [
+    "$89",
+    "$20"
+   ],
+   [
+    "$35",
+    "$45"
+   ],
+   [
+    "$55",
+    "$45"
+   ],
+   [
+    "$140",
+    "$45"
+   ],
+   [
+    "$90",
+    "$45"
+   ],
+   [
+    "$110",
+    "$45"
+   ],
+   [
+    "$125",
+    "$45"
+   ],
+   [
+    "$25",
+    "$20"
+   ],
+   [
+    "$40",
+    "$40"
+   ],
+   [
+    "Yard drain",
+    "Walk-in tan"
+   ],
+   [
+    "old water stain on the cabinet floor",
+    "old stain on the tile floor"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the area behind the wall"
+   ],
+   [
+    "Under the sink, before",
+    "The booth, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Tile floor, before"
+   ],
+   [
+    "Marco finds mold behind the sink wall.",
+    "Marco finds a rash spreading on the back."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD rash spreading, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Rash on the back"
+   ],
+   [
+    "Marco finds corroded shutoff valves.",
+    "Marco finds a booth light that needs a new bulb."
+   ],
+   [
+    "cracks the cabinet floor",
+    "drops a bottle and stains the floor"
+   ],
+   [
+    "cracked the cabinet floor",
+    "stained the floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Stained floor"
+   ],
+   [
+    "inside the 1-year labor warranty",
+    "inside the 1-week touch-up promise"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A tan streaks again 2 weeks later."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a tan at two events every 3 months"
+   ],
+   [
+    "In their own chat, the customer says not to message this number and gives another phone or an email.",
+    "In their own chat, the customer gives another phone or an email and says to stop texts here."
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter tan."
+   ],
+   [
+    "behind the sink wall",
+    "on the back"
+   ],
+   [
+    "Marco found mold behind the wall under your sink and stopped that part of the work.",
+    "Marco found a rash on the back and stopped that part of the work."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a dermatologist first"
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · your visit"
+   ]
+  ],
+  "B": [
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood tan studio on Birch St. Express and bridal tans."
+   ],
+   [
+    "Barber license: on file, checked Oct 19",
+    "Tech's own word: a certificate, if they have one"
+   ],
+   [
+    "at $140 an hour",
+    "at $95 a session"
+   ],
+   [
+    "cut hair",
+    "do spray tans"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do a face tan during the visit?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Face tan · $20"
+   ],
+   [
+    "added a camera inspection to",
+    "added a face tan to"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Spray tans and tanning at homes in Springfield, within 25 miles."
+   ],
+   [
+    "many barbers, salons and groomers",
+    "many techs, spas and groomers"
+   ],
+   [
+    "A water heater job",
+    "A spray tan room set up at a home"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a spray tan at my home this week."
+   ],
+   [
+    "clear a yard drain this Thursday",
+    "come to Kim's home for a spray tan this Thursday"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A spray tan could mean a spa or a dermatologist's office."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My tan feels so dry' fits a home spray tan."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a chemical spray tan at a home."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And which spray tan, and any tan worry to note on the page?"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a face tan? Say so.'"
+   ],
+   [
+    "can clear the drain",
+    "can come for your spray tan"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, in the living room"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $95 home spray tan needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a quiet room with space for the spray tan bed."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My tan is red and sore this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a home spray tan, today"
+   ],
+   [
+    "like a roof leak",
+    "like a tattoo removal"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a spray tan series Jordan noted"
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam."
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can come for your spray tan at a set time"
+   ],
+   [
+    "found more work. Add it today?",
+    "can add more to your visit. Add it today?"
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "Nothing is priced at the visit: a home spray tan has a set price."
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with a note for the tech."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for a spray tan at home every 4 weeks. Lee Mobile Tan offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Work that's never sent now sets nobody on call."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say Alex books spray tans for 5 guests at one home, as the bridal party. It's one booking with one code, given by whoever opens the door."
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Mobile Tan has a spray tan plan at home, $95 a visit. Each visit is booked and paid like a single one. Want it every 4 weeks?"
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Mobile Tan books up to 60 days ahead. We'll text you times for the back spray tan at home you asked Marco about in late Nov."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "If your face or throat swells, call 911. Otherwise, Dana can come sooner, at the same price."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says a bridal party is priced from the host's answers, so Rosie's first text asks for them. No time is saved while it's priced."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Mobile Tan does spray tanning and spray tanning, not lasers or injections. Nothing was saved. You can look for a med spa near you."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Spray tanning at home always has its price before the visit, from the list or from the host's answers."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a face tan. Both services go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds spray tanning to Lee Mobile Tan. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Tan Studio can do your express spray tan at the studio for $35, or at your home for $95. Where would you like it?"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If your face, lips or throat are swelling, or it's hard to breathe, call 911 now."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said their face is swelling after a spray tan. They got the safety message, and nothing was booked."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s face tan from Thu Oct 22 missed a few hairs. It's inside the 7-day touch-up promise."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the spray tan should help with, the tan type, and who it's for. Health questions go only on the secure page."
+   ],
+   [
+    "Lee Home Services couldn't price your water heater this time. Nothing was booked or charged.",
+    "Lee Mobile Tan couldn't price your bridal party this time. Nothing was booked or charged."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told no spray tan or tan goes on the sunburn, and to call 911 if her face swells. She can book a gentle spray tan or a later date."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A face tan at home is $25, from Sam's list. Both fit in the same arrival window."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No se hace spray taning ni cera en piel quemada hasta que sane. Si se le hincha la cara, llame al 911."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Marco's phone, you said yes to a back spray tan with extractions for $95."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Marco went to get a product from the car and will be back about 9:30am. Your spray tan should be done by 10:15am."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the answers path, only Marco's times show: Marco runs the spa parties."
+   ],
+   [
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "Lee Mobile Tan: $450 for part 2 of your bridal tan package. Pay by card, or by bank transfer."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Can a tech come to my home for a spray tan on Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "No spray tan or tan goes on sunburned tan until it heals. If your face swells, call 911."
+   ],
+   [
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Marco left used towels on the bathroom floor.\""
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swelling face or trouble breathing, gets the safety steps first."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. The studio's spray tan room is in the other flow."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Mobile Tan sent you a proposal for a spray tan series, from Marco's notes."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in's example: sunburn or broken tan on the area gets 'no spray tan or tan on that tan until it heals'."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. The touch-up is free."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'd like a spray tan, but I got a sunburn."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: a back spray tan with extractions, $95. Sent to Alex."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "I use a prescription acne cream. Is a spray tan safe for me?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Spray tanning for Lee Mobile Tan: is it the same company?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a reaction happening now, like a swelling face, or a burn from a product."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE likes unscented products. Bring the softer pillow next time."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Marco's next times for a back spray tan at home."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $95 back spray tan price is good for 7 days."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each guest's notes go to the tech, one line each."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Spray tanning is never sent now, at home or at the studio."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Marco says no need: your tan is cleansed first, so come as you are."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: back spray tan at home, 3 months"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no parent home for the teen's spray tan"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 back spray tan with extractions"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero un spray tan, pero me quemé con el sol."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marco come back for a back spray tan next week?"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every 4 weeks, too?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the promise lasts."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "A breakout on my chin flared up overnight, and it's sore."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I have an event tomorrow. Can someone come tonight?"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿se le hincha la cara, o le cuesta respirar?"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Marco also do a face tan?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should my face be clean when you arrive?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face swelling, or is it hard to breathe?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's spray tans?"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Jade: tech, and house calls"
+   ],
+   [
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Tue Oct 27 · arriving 8–10am · Marco"
+   ],
+   [
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "Wed Oct 28 · arriving 8–10am · Marco"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A few hairs were missed on my face tan."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Back spray tan with extractions · $95"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Marco left used towels on the bathroom floor."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A spray tan series"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting a product from the car, back 9:30"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there room for the spray tan bed?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa spray tan Thu 12-2 Dana"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT sprained my wrist, need to stop"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Spray tan plan at home"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It's just red."
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Morgan's spray tan · Tue Oct 20 · $95"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Her sister's spray tan · Wed Oct 21 · $95"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Back spray tan with extractions"
+   ],
+   [
+    "From the photos and answers",
+    "From the answers"
+   ],
+   [
+    "Written estimate and terms",
+    "Party agreement and terms"
+   ],
+   [
+    "a water heater replacement",
+    "a bridal party"
+   ],
+   [
+    "Photos and answers added",
+    "5 guests · answers added"
+   ],
+   [
+    "Water heater replacement",
+    "Spa party"
+   ],
+   [
+    "water heater replacement",
+    "bridal party"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW spray tanning"
+   ],
+   [
+    "A gas smell at the home",
+    "A swelling face after a spray tan"
+   ],
+   [
+    "plumbing and electrical",
+    "spray tanning and spray tanning"
+   ],
+   [
+    "Plumbing and electrical",
+    "Spray tanning and spray tanning"
+   ],
+   [
+    "Sewer camera inspection",
+    "Wedding-morning spray tan"
+   ],
+   [
+    "sewer camera inspection",
+    "wedding-morning spray tan"
+   ],
+   [
+    "Lee Home Services' own",
+    "Lee Mobile Tan's own"
+   ],
+   [
+    "stage 2 of your repipe",
+    "part 2 of your bridal tan package"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Dullness, mostly. It's a bit dry."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home spray tan"
+   ],
+   [
+    "credited to the repair",
+    "counts toward the service"
+   ],
+   [
+    "water heater contract",
+    "bridal party agreement"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Tan LLC"
+   ],
+   [
+    "like a move-out day",
+    "like a wedding day"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo está roja."
+   ],
+   [
+    "Priced at the chair",
+    "Priced after the tan check"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobiletan.com"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tan's"
+   ],
+   [
+    "the shutoff valves",
+    "the back spray tan"
+   ],
+   [
+    "Water heater flush",
+    "Back spray tan at home"
+   ],
+   [
+    "water heater flush",
+    "back spray tan at home"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tan"
+   ],
+   [
+    "the kitchen drain",
+    "the home spray tan"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Tan Studio"
+   ],
+   [
+    "Service call fee",
+    "travel fee"
+   ],
+   [
+    "service call fee",
+    "travel fee"
+   ],
+   [
+    "the photos path",
+    "the answers path"
+   ],
+   [
+    "Every 12 months",
+    "Every 4 weeks"
+   ],
+   [
+    "Drain clearings",
+    "Home spray tans"
+   ],
+   [
+    "drain clearings",
+    "home spray tans"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 home spray tan"
+   ],
+   [
+    "plumbing visit",
+    "home spray tan"
+   ],
+   [
+    "the barbershop",
+    "the studio"
+   ],
+   [
+    "Drain clearing",
+    "Home spray tan"
+   ],
+   [
+    "drain clearing",
+    "home spray tan"
+   ],
+   [
+    "Panel upgrade",
+    "Custom lash set"
+   ],
+   [
+    "water heaters",
+    "spa parties"
+   ],
+   [
+    "Kitchen drain",
+    "Home spray tan"
+   ],
+   [
+    "kitchen drain",
+    "home spray tan"
+   ],
+   [
+    "a leak repair",
+    "a hydrating spray tan at home"
+   ],
+   [
+    "the visit fee",
+    "the travel fee"
+   ],
+   [
+    "water heater",
+    "bridal party"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Tan"
+   ],
+   [
+    "Lee Electric",
+    "Lee Glow Tan & Brow"
+   ],
+   [
+    "Jordan Price",
+    "Marco Cruz"
+   ],
+   [
+    "1200 Main St",
+    "410 Oak Ave"
+   ],
+   [
+    "a barbershop",
+    "an spray tanning studio"
+   ],
+   [
+    "Service call",
+    "travel fee"
+   ],
+   [
+    "service call",
+    "travel fee"
+   ],
+   [
+    "Casey Moore",
+    "Dana Park"
+   ],
+   [
+    "barbershops",
+    "spray tanning studios"
+   ],
+   [
+    "Leak repair",
+    "Hydrating spray tan at home"
+   ],
+   [
+    "leak repair",
+    "hydrating spray tan at home"
+   ],
+   [
+    "Yard drain",
+    "Home spray tan"
+   ],
+   [
+    "Add photos",
+    "Add your answers"
+   ],
+   [
+    "Electrical",
+    "Spray tanning"
+   ],
+   [
+    "electrical",
+    "spray tanning"
+   ],
+   [
+    "Riley Chen",
+    "Jade Morales"
+   ],
+   [
+    "Avery Diaz",
+    "Kayla Haddad"
+   ],
+   [
+    "barbershop",
+    "spray tanning studio"
+   ],
+   [
+    "a plumber",
+    "a tech"
+   ],
+   [
+    "88 Elm St",
+    "75 Maple Ave"
+   ],
+   [
+    "42 Oak St",
+    "26 Birch Ct"
+   ],
+   [
+    "a haircut",
+    "an express spray tan"
+   ],
+   [
+    "A haircut",
+    "An express spray tan"
+   ],
+   [
+    "visit fee",
+    "travel fee"
+   ],
+   [
+    "MP045210",
+    "ES045210"
+   ],
+   [
+    "JP031552",
+    "ES031552"
+   ],
+   [
+    "Plumbing",
+    "Spray tanning"
+   ],
+   [
+    "plumbing",
+    "spray tanning"
+   ],
+   [
+    "a barber",
+    "a tech"
+   ],
+   [
+    "JE30417",
+    "LA30417"
+   ],
+   [
+    "EC22871",
+    "LC22871"
+   ],
+   [
+    "BS20981",
+    "ST20981"
+   ],
+   [
+    "plumber",
+    "tech"
+   ],
+   [
+    "barbers",
+    "techs"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Elm St",
+    "Maple Ave"
+   ],
+   [
+    "Barber",
+    "Tech"
+   ],
+   [
+    "barber",
+    "tech"
+   ],
+   [
+    "Riley",
+    "Jade"
+   ],
+   [
+    "Avery",
+    "Kayla"
+   ],
+   [
+    "Casey",
+    "Dana"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "$140 an hour",
+    "$95 a session"
+   ],
+   [
+    "$160",
+    "$15"
+   ],
+   [
+    "$25",
+    "$15"
+   ],
+   [
+    "$2,400",
+    "$450"
+   ],
+   [
+    "$640",
+    "$450"
+   ],
+   [
+    "$620",
+    "$450"
+   ],
+   [
+    "$540",
+    "$450"
+   ],
+   [
+    "$700",
+    "$450"
+   ],
+   [
+    "$800",
+    "$450"
+   ],
+   [
+    "$600",
+    "$450"
+   ],
+   [
+    "$358",
+    "$190"
+   ],
+   [
+    "$179",
+    "$95"
+   ],
+   [
+    "$199",
+    "$95"
+   ],
+   [
+    "$150",
+    "$95"
+   ],
+   [
+    "$169",
+    "$95"
+   ],
+   [
+    "$165",
+    "$95"
+   ],
+   [
+    "$245",
+    "$95"
+   ],
+   [
+    "$120",
+    "$95"
+   ],
+   [
+    "$100",
+    "$95"
+   ],
+   [
+    "$90",
+    "$95"
+   ],
+   [
+    "$89",
+    "$50"
+   ],
+   [
+    "$35",
+    "$50"
+   ],
+   [
+    "$75",
+    "$95"
+   ],
+   [
+    "$80",
+    "$50"
+   ],
+   [
+    "$60",
+    "$20"
+   ],
+   [
+    "Yard drain",
+    "Walk-in tan"
+   ],
+   [
+    "old water stain on the cabinet floor",
+    "old stain on the tile floor"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the area behind the wall"
+   ],
+   [
+    "Under the sink, before",
+    "The booth, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Tile floor, before"
+   ],
+   [
+    "Marco finds mold behind the sink wall.",
+    "Marco finds a rash spreading on the back."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD rash spreading, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Rash on the back"
+   ],
+   [
+    "Marco finds corroded shutoff valves.",
+    "Marco finds a booth light that needs a new bulb."
+   ],
+   [
+    "cracks the cabinet floor",
+    "drops a bottle and stains the floor"
+   ],
+   [
+    "cracked the cabinet floor",
+    "stained the floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Stained floor"
+   ],
+   [
+    "inside the 1-year labor warranty",
+    "inside the 1-week touch-up promise"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A tan streaks again 2 weeks later."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a tan at two events every 3 months"
+   ],
+   [
+    "In their own chat, the customer says not to message this number and gives another phone or an email.",
+    "In their own chat, the customer gives another phone or an email and says to stop texts here."
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter tan."
+   ],
+   [
+    "behind the sink wall",
+    "on the back"
+   ],
+   [
+    "Marco found mold behind the wall under your sink and stopped that part of the work.",
+    "Marco found a rash on the back and stopped that part of the work."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a dermatologist first"
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · your visit"
+   ]
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "at $140 an hour",
+    "cut hair",
+    "doesn't do perms",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Classic cuts, fades and hot towel shaves.",
+    "A water heater job",
+    "asks for a perm",
+    "many barbers, salons and groomers",
+    "books a skin fade for",
+    "skin fades",
+    "skin fade",
+    "Skin fade",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter. It goes on the secure page, to sign or decline.",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan. Read it, then sign or decline on the secure page.",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Alex says yes or no to the quote at the chair. Nothing more is done without that yes.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "May the shop show photos of your hair? Yes / No",
+    "A barbershop has none, so nothing is sent here.",
+    "Promises the $25 consult; priced at the chair",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "The cape clip ripped my shirt collar.",
+    "Riley: barber, color and house calls",
+    "Do you do kids cuts? My son is 8.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "A barbershop's plug-in has none.",
+    "Say no to the price at the chair",
+    "The cut is uneven on one side.",
+    "Anything added at the chair",
+    "What happens at the chair?",
+    "Books a cut every 4 weeks",
+    "Priced from your photos",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "Proposal · Color plan",
+    "Gloss to finish · $15",
+    "Lee's Barbershop LLC",
+    "Priced at the chair",
+    "priced at the chair",
+    "Lee Home Services'",
+    "a color correction",
+    "Lee Home Services",
+    "at the chair now",
+    "set at the chair",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Groom's package",
+    "a color and cut",
+    "the barbershop",
+    "Drain clearing",
+    "Panel upgrade",
+    "1 color quote",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "the visit fee",
+    "At the chair",
+    "at the chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "A barbershop",
+    "a beard trim",
+    "NEW massage",
+    "Casey Moore",
+    "barbershops",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "Barbershop",
+    "barbershop",
+    "a kids cut",
+    "Beard trim",
+    "beard trim",
+    "the chair",
+    "88 Elm St",
+    "Barbering",
+    "a haircut",
+    "A haircut",
+    "visit fee",
+    "MP045210",
+    "JP031552",
+    "Plumbing",
+    "plumbing",
+    "a barber",
+    "A barber",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "JE30417",
+    "EC22871",
+    "BS20981",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "gloss",
+    "shops",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shop",
+    "Shop",
+    "$140 an hour",
+    "$20 fee",
+    "$89",
+    "$35",
+    "$55",
+    "$140",
+    "$90",
+    "$110",
+    "$125",
+    "$25",
+    "$40",
+    "In their own chat, the customer says not to message this number and gives another phone or an email.",
+    "No reply by 11:00am means the shorter cut."
+   ],
+   "B": [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "at $140 an hour",
+    "cut hair",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "added a camera inspection to",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "many barbers, salons and groomers",
+    "A water heater job",
+    "Hi, it's about a leaking pipe under my sink.",
+    "clear a yard drain this Thursday",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "'Adding a faucet check? Say so.'",
+    "can clear the drain",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "like a roof leak",
+    "like replacing the old pipes Jordan noted",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "can start the sewer camera inspection at a set time",
+    "found more work. Add it today?",
+    "A job priced at the visit never takes more than the visit fee.",
+    "Then the booking goes on, marked urgent.",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Lee Home Services couldn't price your water heater this time. Nothing was booked or charged.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Jordan says no. Please wait until the job is done.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "CANT START no proof Alex may have this work done",
+    "Told to leave, then call 911 and the gas company",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Can you flush my water heater every year, too?",
+    "The plug-in says how long the warranty lasts.",
+    "The sink is overflowing onto the floor now.",
+    "It's overflowing. Can someone come tonight?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "First: is anyone hurt? Do you smell gas?",
+    "Can I skip next week's drain cleaning?",
+    "Riley: barber, color and house calls",
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "The kitchen drain is clogged again.",
+    "Replace both shutoff valves · $160",
+    "Jordan left a mess under the sink.",
+    "Proposal · Replace the old pipes",
+    "UPDATE getting a part, back 9:30",
+    "Is the sink still full of water?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "HURT cut my hand, need to stop",
+    "Yearly water heater flush plan",
+    "No. It doesn't smell like gas.",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "Replace both shutoff valves",
+    "From the photos and answers",
+    "Written estimate and terms",
+    "a water heater replacement",
+    "Photos and answers added",
+    "Water heater replacement",
+    "water heater replacement",
+    "Priced from your photos",
+    "NEW heating and cooling",
+    "A gas smell at the home",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Lee Home Services' own",
+    "stage 2 of your repipe",
+    "Just the kitchen sink.",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "water heater contract",
+    "Lee Home Services LLC",
+    "like a move-out day",
+    "No. No huele a gas.",
+    "leehomeservices.com",
+    "Lee Home Services'",
+    "the shutoff valves",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services",
+    "the kitchen drain",
+    "Lee's Barbershop",
+    "Service call fee",
+    "service call fee",
+    "the photos path",
+    "Every 12 months",
+    "Drain clearings",
+    "drain clearings",
+    "DONE 179 drain",
+    "plumbing visit",
+    "the barbershop",
+    "Drain clearing",
+    "drain clearing",
+    "Panel upgrade",
+    "water heaters",
+    "Kitchen drain",
+    "kitchen drain",
+    "a leak repair",
+    "the visit fee",
+    "water heater",
+    "at the chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "a barbershop",
+    "Service call",
+    "service call",
+    "Casey Moore",
+    "barbershops",
+    "Leak repair",
+    "leak repair",
+    "Yard drain",
+    "Add photos",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "barbershop",
+    "a plumber",
+    "88 Elm St",
+    "42 Oak St",
+    "a haircut",
+    "A haircut",
+    "visit fee",
+    "MP045210",
+    "JP031552",
+    "Plumbing",
+    "plumbing",
+    "a barber",
+    "JE30417",
+    "EC22871",
+    "BS20981",
+    "plumber",
+    "barbers",
+    "Jordan",
+    "Elm St",
+    "Barber",
+    "barber",
+    "Riley",
+    "Avery",
+    "Casey",
+    "Labor",
+    "shop",
+    "Shop",
+    "$140 an hour",
+    "$160",
+    "$2,400",
+    "$640",
+    "$620",
+    "$540",
+    "$700",
+    "$800",
+    "$600",
+    "$358",
+    "$179",
+    "$199",
+    "$150",
+    "$169",
+    "$165",
+    "$245",
+    "$120",
+    "$100",
+    "$90",
+    "$89",
+    "$35",
+    "$75",
+    "$80",
+    "$60",
+    "Yard drain",
+    "old water stain on the cabinet floor",
+    "Not done: the pipe behind the wall",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "cracks the cabinet floor",
+    "cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "inside the 1-year labor warranty",
+    "The drain clogs again 2 weeks later.",
+    "a drain cleaning at two rentals every 3 months",
+    "In their own chat, the customer says not to message this number and gives another phone or an email.",
+    "behind the sink wall",
+    "Call a mold cleanup company first",
+    "Safety note · your home"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-61": "7421d186d5",
+   "S2-28": "549fd7ae22",
+   "S2-29": "974ca3a481",
+   "S1-32": "60f59eda70",
+   "S1-33": "eeaadba298",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-99": "efed1e4f4d",
+   "S11-57": "a3996ae84e",
+   "S12-19": "07db0515b2",
+   "S13-41": "18b280aaa2",
+   "S13-43": "a1049201f6",
+   "S13-11": "4345036419",
+   "S1-13": "eca22651fd",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A5-19": "5d5db6f3c1",
+   "A8-03": "7accda6f86",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A4-43": "c17d56f766",
+   "A7-54": "1c3b16257d",
+   "A7-91": "a3b4e45617",
+   "A7-55": "6f2143030d"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-61": "e30e71f65d",
+   "S2-28": "549fd7ae22",
+   "S2-29": "974ca3a481",
+   "S1-32": "60f59eda70",
+   "S1-33": "2b5d1fa4ab",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S11-99": "a97de4ca58",
+   "S11-57": "2f34f23d8a",
+   "S12-19": "176d3d2beb",
+   "S13-41": "fb75fbb382",
+   "S13-43": "55206e4cb1",
+   "S13-11": "6561316ed7",
+   "S1-13": "6964bfbe60",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B4-83": "a7473a80ea",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255",
+   "B7-32": "0ca33c9fa6",
+   "B7-51": "7910e2fa9f",
+   "B7-52": "62f5c3d1b4",
+   "B7-86": "c347b72e3a",
+   "B7-17": "ac1fd212f3"
+  }
+ }
+}

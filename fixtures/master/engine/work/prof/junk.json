@@ -1,0 +1,6159 @@
+{
+ "id": "junk",
+ "name": "Junk removal",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "plumber",
+ "cast": {
+  "A": {
+   "staff": "Tasha and Luis (yard hands at the gate)"
+  },
+  "B": {
+   "staff": "Rafael and Nate (crew leads, each with a helper)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Tasha"
+  },
+  "B": {
+   "staff": "Rafael"
+  }
+ },
+ "keep": [
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings an old mattress in a pickup to Clean Slate Recycling, Sam's drop-off yard, and Tasha takes it at the gate on Sat Oct 24 at 11:00am. The load depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Clean Slate Hauling to clear a basement and garage at 17 Birch Ln, and Rafael's crew of two comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: a load priced by how much of the truck it fills, one big item, or a hot tub priced from photos."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "visit|none|counter",
+    "photos|none|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 mattress drop-off at the yard. Nothing is taken: a YES books it. Alex pays at the gate.",
+    "visit|none|counter": "A mixed load, priced at the gate by how much of the bed it fills. Only the $25 minimum is promised, and nothing is owed if Alex says no.",
+    "photos|none|counter": "Remodel debris, priced from Alex's photos at $90. Booked once Sam OKs it; paid at the gate.",
+    "list|full|none": "A $55 fridge drop-off, paid in full when booking, so the refrigerant station is set for it."
+   },
+   "labels": {
+    "price": {
+     "visit": "Priced at the gate",
+     "photos": "Priced from photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Mattress drop-off"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Mattress drop-off"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Fridge drop-off"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Remodel debris drop-off"
+    },
+    "visit|*|*": {
+     "name": "Mixed load drop-off"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   }
+  },
+  "B": {
+   "main": "visit|card|bill",
+   "combos": [
+    "visit|card|bill",
+    "visit|none|bill",
+    "list|card|card",
+    "photos|card|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "visit|card|bill": "The main story: a basement and garage, priced on site by how much of the truck it fills: $439. A card is saved for the $89 trip fee, kept only for a late cancel or nobody there. Rosie texts the bill.",
+    "visit|none|bill": "The same cleanout, but nothing is taken up front, the old example owner's way. No fee can be charged for a late cancel.",
+    "list|card|card": "A $179 single item pickup: an old sofa from the den. A card is saved and charged $179 when Rafael texts DONE.",
+    "photos|card|bill": "A hot tub cut apart and hauled, priced from photos at $640. Sam OKs it. A card is saved for the $89 trip fee; the rest is on the bill.",
+    "list|full|none": "A $150 curbside pickup: bags and an old chair left by the curb, paid in full when booking. Nobody needs to be home."
+   },
+   "labels": {
+    "price": {
+     "visit": "Priced on site",
+     "photos": "Priced from photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Single item pickup"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Single item pickup"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Curbside pickup"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Hot tub removal"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Junk haul-away"
+    }
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "B5-34",
+   "B8-69"
+  ]
+ },
+ "notes": "From: plumber. Junk removal runs like the plumber's home visits: a crew comes in a 2-hour arrival window, the trip fee is held, and the price is set at the visit before any work. The cleaner's pilot fits less: junk has no repeat plans. The crew of two uses the master's own crew steps (B4-49 more, B7-53 words).\nFlow B is the usual side: Clean Slate Hauling (the old flowchart's business), crew leads Rafael (with his helper Jamal) and Nate, Alex at 17 Birch Ln, Springfield. Main path: a basement and garage priced on site by truck space, $439 (half a truck $389 plus the fridge $50), the $89 trip fee held, Rosie texts the bill.\nFlow A is the less usual side: Sam's second company is Clean Slate Recycling, a drop-off yard. Alex brings a mattress in a pickup ($35, nothing taken, paid at the gate), and Tasha or Luis works the gate. The old flowchart has no yard, so its values follow the plug-in's safe defaults.\nThe master's second kind of work (electrical) is dumpster rental, Clean Slate Dumpsters: a hauler permit for the company, and the driver's commercial license kept on file by Sam. The master's 'new kind of work' examples are scrap metal (the yard) and moving help (the hauler).\nMoney B, five paths: visit|hold|bill (main, the plug-in's starting answer); visit|none|bill (the old example owner took nothing up front; with nothing taken no fee can be charged, so the old $49 pay link is gone); list|card|card (one big item, a sofa from the den, card charged at DONE); photos|hold|bill (a hot tub cut apart and hauled, $640 from photos, Sam OKs over $500, a written estimate signed as Sam set); list|full|none (a $150 curbside pickup paid in full when booking).\nMoney A, four paths: list|none|counter (main); visit|none|counter (a mixed load priced at the gate, a $25 minimum, nothing owed on a no); photos|none|counter (remodel debris from photos, $90); list|full|none (a $55 fridge drop-off paid in full, so the refrigerant station is set; a $20 fee may be kept on a late cancel if Sam confirms). The yard takes no card or hold otherwise.\nNumbers: the master's own numbers stay ($179, $150, $640, $89). The visit quote changed from the master's $245 ($165 + $80) to the old flowchart's $439 ($389 + $50), so no truck-space line costs less than the $179 single item; the hidden deposit variants follow ($350 left). The master's $95 drain trap and $160 valves (extra work) are the old flowchart's $50 mattress set.\nOwner's rule, not 'industry practice': the firm price is agreed before loading, and a no costs nothing. Written as Clean Slate's rule, and Rosie's starting answer for junk (pf.visit). B8-21 and B9-28 bill nothing; the $2 still counts on the monthly bill, as for any confirmed visit. The gap 'A no at the visit owes nothing' asks the master to draw it; the $2 part was decided on Oct 22.\nOwn steps: B4-x01 to B4-x03 (the won't-take list before any times), B6-x01 and B6-x02 (a range from photos, then Sam's OK first on the visit path), B7-x01 (a branch of B7-05: nobody will be home), B10-x01 (where everything went, with the charity's receipt). Each is also named as a gap where general.\nPlug-in splits kept whole (splitsKept): S1-60 and S1-63 (hauler licenses and yard permits are state by state), B4-57 (a written estimate when Sam asks, like the $640 hot tub), B8-69 and B8-70 (items left outside or a garage code: nobody needs to be home; inside a home: someone must be). Every other split keeps junk's own branch.\nTurned off: everything sent now (junk is never sent now; a same-day job asks Sam first), plans, packages, warranties and insurance, landlord questions (whoever books is the customer), first steps (photos come on the secure page), deliveries, items to a shop, permit inspections, aftercare, rented items, reports later. In A: classes, tables, spaces, stays, drop-off slots for a later pick-up, child branches, crews, plan and insurance branches, contracts and proposals at the gate.\nKept on in B: paid in stages, for an estate cleanout that becomes its own job (B8-62, B8-63, B9-21: $800 to start, $800 after day 2, $800 at the finish). Deposits only there, as the owner sets (pf.money).\nTimes (B main): request Mon 6:40pm, range 6:47pm, Sam's OK 7:04pm, booked 7:05pm; Thu check-in 8:20am, firm price 8:30am, DONE 9:50am (about 90 minutes to load half a truck), bill 9:52am, receipt 9:55am, where it went 3:30pm after the last stop, rating 4:00pm. A single sofa is done at 8:45am, a curbside pile at 8:35am, a hot tub (about 3 hours) at 11:20am. A's mattress drop-off keeps the master's Sat 11:00am.\nNo state is named: hauler licenses, yard permits, USDOT numbers, commercial licenses, e-waste, refrigerant, household hazardous waste and cancel days are switches from each state's form. The old flowchart's New Jersey rules (A-901, its e-waste law) and 'strictest state' wordings are outdated as named rules.\nOutdated: Jobber, Workiz, Housecall Pro, Jobber Payments, Rosie Calendar and Book as separate tools, and the QuickBooks export. Only the phone calendar and Stripe connect.\nMaster examples turned junk: Kim's yard drain is a swing set taken from the backyard (nobody needs to be home); Morgan's water heater is a hot tub; Rosa's Spanish call is a basement with crumbly old wrap (possible asbestos: safety steps, then the booking goes on); Harper's repipe is a 3-day estate cleanout; S12's declared emergency raises dump fees.\nS11-56 in both flows switches a service only between ways the plug-in uses (B: the curbside pickup from paid in full to a card charged at DONE; A: the fridge drop-off from paid in full to nothing taken). S11-09 holds the $89 trip fee on Morgan's hot tub, never a deposit.\nkeep: none. The pilot's words (Brightwater, Marcus, Kenny, faucet...) and the master's plumbing and barbershop words are all renamed.\nNot sure: the yard's weather limit (lightning or ice) is the example owner's; flow A's yard is drawn from defaults, not from an old flowchart.\nreview (Oct 22): Rosfield's $2 follows the master's rule (one $2 per confirmed booking: a code, DONE or the next-morning yes): a no at the visit after check-in counts once (B8-21, B9-28), and a free return trip on the same booking adds none (B10-08). Screens: S2-21 shows no license for the crew and the yard hands (the company's hauler license only); S11-57's yard takes nothing and a fridge is paid ahead; B4-32 and B4-34 ask who agrees the price and truck access. The customer's side at the door is a locked garage, not proof of ownership (whoever books is the customer). Curbside pickups say there's no code (B6-13, B8-02, B8-04). With nothing taken, no trip fee is promised (B4-14, B4-15, B7-01). The hot tub's day list leaves room for its 3 hours (B8-01). A7-59 says why the yard needs no consent to swap a yard hand. Off in A: stages, pay over time and contracts at the gate. 'a remodel debris' reads 'remodel debris'.\nTouch-up 2 (Oct 23): B9-29's deposit paths (hidden today) bill the $300 left: the $389 half truck less the $89 deposit. The master's $76 is gone from the texts.\nRefit (Tue Oct 27, REDESIGN 2 master): pf.facts photos, extrawork; no switches (cancelright stays off as before: a haul-away is priced and done in one visit); arrive A set start, B window. Paths unchanged. Amounts carry names and dollars: the $89 trip fee is the B paths' late-cancel / no-show fee (pf.money: only for a late cancel or nobody there, never after a no to the firm price), so B4-14's 'owed even after a no' lines are renamed to say a no owes nothing; the A fridge drop-off keeps $20. Holds are gone: every 'held' / 'released at check-in' line reworded or removed. Sign-up words ops on S1-12, S1-13, S1-14, S1-21 deleted (money words per path; 170 'two variants fit' errors); the merged B8-23 and B9-06 ops that came from other old steps deleted; the receipt words on B10-01 deleted (the record words it). 577 rename pairs that match nothing on the new master deleted. Booking cards say 'Haul-away', right on every B path. Earlier notes naming holds, A7-59, A7-60, B7-53 or the $2 from a payment are history.",
+ "plugin": {
+  "pf.license": {
+   "need": "Hauling household junk needs a hauler or waste transporter license, permit or registration where the state, county or city asks for one. Many places ask for none: the state's form says which.",
+   "who holds it": "The company. Trucks may need their own registration or decals where the form asks. The crew needs no license of its own, unless the form says so.",
+   "what to ask": [
+    "The company's hauler license or permit number, where the form asks",
+    "Truck registrations or decals, where the form asks",
+    "A USDOT number, where the truck's weight and trips across state lines need one, or where the state asks for one",
+    "A commercial driver's license for drivers of trucks heavy enough to need one: kept on file by the owner"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "Reminders before each expiry, on the dates the owner picks. A lapsed license or permit pauses new bookings.",
+   "insurance or bond": "Liability insurance and commercial auto insurance on the trucks: shown only once the owner sends proof. A bond only where the state's form asks.",
+   "background checks": "Only where the state's form asks.",
+   "at the yard": "A drop-off yard or transfer site may need its own facility permit and recycling registrations, where the state's rules require them. The form for that place says which.",
+   "trust claims": "A license shows on the listing only as the business gave it, never as checked by Rosie. Never 'licensed everywhere'."
+  },
+  "pf.services": {
+   "pattern": "Set service: a crew of two and a truck come in an arrival window, and the load is priced by how much of the truck it fills.",
+   "at the customer's place (the example: Clean Slate Hauling's own list)": [
+    {
+     "service": "Trip fee",
+     "price kind": "one price",
+     "price": "$89",
+     "note": "A card is saved for it at booking. Charged only for a late cancel or nobody there, and only if the owner confirms. Not booked alone."
+    },
+    {
+     "service": "Junk removal by truck space",
+     "price kind": "a range from the customer's photos, then a firm price set at the visit, before loading",
+     "price": "1/8 truck (the minimum) $179 · 1/4 $259 · 3/8 $329 · 1/2 $389 · 5/8 $449 · 3/4 $509 · 7/8 $569 · full truck, about 15 cubic yards, $629",
+     "length": "about 1 to 3 hours, set by the size",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill",
+     "note": "Only the $89 trip fee is promised before. No charge if the customer says no to the firm price: nothing is loaded."
+    },
+    {
+     "service": "Add-ons",
+     "price kind": "one price each, on top of truck space",
+     "price": "fridge, freezer or AC unit +$50 (refrigerant recovered) · mattress or box spring +$25 each · TV or monitor +$25 · each flight of stairs past the first +$25",
+     "note": "Added to the firm price before loading. Items over 300 lb, like a piano or a safe, are priced on site."
+    },
+    {
+     "service": "Single item pickup (one big item, like a sofa, a recliner or a treadmill)",
+     "price kind": "one price",
+     "price": "$179",
+     "length": "about 30 min",
+     "place": "at the customer's place, inside or by the curb",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE",
+     "note": "Nobody needs to be home when the item is left outside. DONE comes with a photo."
+    },
+    {
+     "service": "Curbside pickup (up to 1/8 truck, left by the curb)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "about 15 min",
+     "place": "at the customer's place; nobody needs to be home",
+     "before": "the full price, when booking",
+     "after": "nothing more",
+     "note": "A late cancel or nobody there: the $89 fee may be kept and the rest refunded, only if the owner confirms."
+    },
+    {
+     "service": "Appliance pickup (a fridge, freezer, washer or AC unit)",
+     "price kind": "one price",
+     "price": "$199",
+     "length": "about 30 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill",
+     "note": "The refrigerant is recovered before scrapping, and the record is kept with the job."
+    },
+    {
+     "service": "Loading help (labor only)",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum; $140 with Rafael's crew",
+     "place": "at the customer's place",
+     "note": "Goes on a job, or loads the customer's own truck or dumpster."
+    },
+    {
+     "service": "Hot tub removal (cut apart and hauled)",
+     "price kind": "quoted from the customer's photos",
+     "price": "the quote (the example: $640)",
+     "length": "about 3 hours",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill",
+     "note": "The owner OKs each quote over $500. A written estimate is signed first, as the owner set."
+    },
+    {
+     "service": "Estate or whole-home cleanout",
+     "price kind": "a free estimate visit, then a quote",
+     "price": "the quote",
+     "length": "1 to 3 days",
+     "place": "at the customer's place",
+     "note": "Becomes its own job with a signed estimate and work days."
+    }
+   ],
+   "at the business (the example: Clean Slate Recycling's drop-off yard)": [
+    {
+     "service": "Mattress drop-off",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "15 min",
+     "place": "both: at the yard, or picked up at home by a yard hand with the yard's truck ($75, paid in full when booking)",
+     "before": "nothing taken",
+     "after": "paid at the gate"
+    },
+    {
+     "service": "Car load (trunk and back seat)",
+     "price kind": "one price",
+     "price": "$40",
+     "before": "nothing taken",
+     "after": "paid at the gate"
+    },
+    {
+     "service": "Box spring drop-off",
+     "price kind": "one price",
+     "price": "$20",
+     "before": "nothing taken",
+     "after": "paid at the gate"
+    },
+    {
+     "service": "Tires, up to 4, off the rim",
+     "price kind": "one price",
+     "price": "$25",
+     "before": "nothing taken",
+     "after": "paid at the gate"
+    },
+    {
+     "service": "Fridge drop-off (a fridge, freezer or AC unit)",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "30 min",
+     "before": "the full price, when booking",
+     "after": "nothing more",
+     "note": "The refrigerant is recovered before scrapping, and the record is kept. A late cancel or no-show may keep a $20 fee, if the owner confirms."
+    },
+    {
+     "service": "Pickup-truck load (a full bed)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "30 min",
+     "before": "nothing taken",
+     "after": "paid at the gate"
+    },
+    {
+     "service": "TV or monitor (electronics recycling)",
+     "price kind": "one price",
+     "price": "$15",
+     "before": "nothing taken",
+     "after": "paid at the gate"
+    },
+    {
+     "service": "Remodel debris (drywall, old tile, wood)",
+     "price kind": "quoted from the customer's photos",
+     "price": "the quote (the example: $90)",
+     "before": "nothing taken",
+     "after": "paid at the gate",
+     "note": "The owner OKs each quote."
+    },
+    {
+     "service": "Mixed load",
+     "price kind": "priced at the yard, by how much of the bed it fills",
+     "price": "only the $25 minimum is promised",
+     "before": "nothing taken",
+     "after": "paid at the gate",
+     "note": "Nothing is owed if the customer says no to the price and takes the load home."
+    }
+   ],
+   "capacity": "Each truck has a crew of two: a crew lead and a helper. One truck, about 4 jobs a day. The yard takes one car or truck at a time at each bay.",
+   "the truck's day": "2-hour arrival windows, as the owner sets them (the example: 8 to 10, 10 to 12, 12 to 2, 2 to 4), Monday to Saturday. A dump run after any job of half a truck or more, and whenever the truck is full.",
+   "skills each needs": "Two-person carries (a fridge on stairs, a treadmill, a sofa) need two people. Refrigerant recovery needs the certified person or the recycler that does it.",
+   "nobody home": "Fine when the items are reachable: left outside, or in a garage or shed with a code. The firm price goes by text before loading. DONE comes with a photo.",
+   "won't take": "Paint, solvents, pesticides, pool chemicals, propane tanks, asbestos and car batteries. Checked at booking and again on site. Each one gets where it can go instead: the town's household hazardous waste drop-off, a propane dealer or a tank exchange.",
+   "weather": "Outdoor teardowns, like a swing set or a hot tub, stop for heavy rain, lightning or ice. A move for weather is free.",
+   "online": "No. A video call can help size a load, where the owner offers it.",
+   "extras": "Service area (the example: 25 miles). Dump and recycling fees are in the price. No tax line unless the owner sets a rate."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or crew)": [
+    "What's going: a list, and photos (on the secure page)",
+    "Where each item is: garage, basement, which floor, and how many flights of stairs",
+    "Anything over 300 lb, like a piano, a safe or a hot tub",
+    "A fridge or freezer, and is it empty",
+    "Any paint, chemicals, propane tanks, asbestos or car batteries (the won't-take list)",
+    "At the yard: what's in the load, and the vehicle (a car, a pickup or a trailer)"
+   ],
+   "after a time is picked": [
+    "Truck access: a driveway, the street, or a long carry",
+    "Who will be there to agree the firm price: the customer, another adult, or agree by text",
+    "Will someone be home? If not, are the items reachable?",
+    "Pets, and where they'll be",
+    "A donation receipt wanted for items that can be donated"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "Photos of the items, inside the home",
+    "Garage, gate or door codes",
+    "The card"
+   ],
+   "who may book": "An adult, 18 or older. An adult (18 or older) is there to agree the firm price before loading, or the customer agrees it by text. A landlord, property manager or estate's executor may book for a home they manage."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A gas smell, or a propane tank that's leaking or hissing",
+     "says": "Get out now. Don't use switches or phones inside. Call 911 and the gas company from outside.",
+     "booking": "No booking until it's safe."
+    },
+    {
+     "words": "Someone hurt, a fire, or a medical emergency",
+     "says": "Call 911 now.",
+     "booking": "No booking until it's safe; the customer can come back."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "Possible asbestos: crumbly pipe wrap, old floor tiles, or old duct wrap",
+     "says": "Don't touch, sweep or bag it. The crew won't take it. A licensed asbestos contractor can, where the state's rules require one.",
+     "booking": "The rest of the job books on. The crew leaves that area alone."
+    },
+    {
+     "words": "Paint, chemicals, pesticides or a propane tank in the load",
+     "says": "Set them apart and mark them 'keep'. The crew leaves them. Here's where they can go instead.",
+     "booking": "The rest of the job books on."
+    },
+    {
+     "words": "Mold, droppings or a hoarding situation",
+     "says": "Keep away from it until the owner has looked at the photos.",
+     "booking": "The owner OKs it first, and may ask for a visit before a price."
+    }
+   ],
+   "at the yard": "A leaking tank, a chemical smell, or smoke in a load stops the unload. Everyone steps back, and the yard calls 911 if needed.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "Photos of the items",
+     "for": "Every job priced at the visit",
+     "timing": "On the secure page when booking; Rosie drafts a range from the owner's size guide, and the owner checks it"
+    },
+    {
+     "step": "The owner's OK",
+     "for": "Every photo estimate, same-day jobs, and anything over 300 lb",
+     "timing": "Before the booking is confirmed"
+    },
+    {
+     "step": "A free estimate visit",
+     "for": "Estate or whole-home cleanouts",
+     "timing": "Before the quote"
+    },
+    {
+     "step": "A street permit",
+     "for": "A truck or dumpster parked on a city street, where the city asks",
+     "timing": "Pulled by the business before the day (a to-do for the owner)"
+    }
+   ],
+   "prep for the reminder": [
+    "Clear a path to the items",
+    "Set won't-take items apart and mark them 'keep'",
+    "Empty the fridge or freezer",
+    "Move cars so the truck can reach the driveway",
+    "At the yard: tie down or cover the load"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code at the door. The on-my-way text names the crew lead, with a photo.",
+   "check-in at the yard": "The code at the gate, typed by the yard hand or the gate office.",
+   "before work": "The crew lead photographs the items, the stairs and the path to the truck, and notes what's already damaged.",
+   "the firm price": "Owner's rule (Rosie's starting answer for junk removal): the firm price is agreed before anything is loaded. No charge if the customer says no to it.",
+   "items added at the home": "Priced before loading, with a right to cancel where the rules require it.",
+   "won't-take items found on site": "Left out, with a written note of why and where they can go instead.",
+   "nobody home": "The firm price and photos go by text; 20 minutes to reply. No reply: nothing is loaded, the crew leaves, and any trip fee is the owner's call.",
+   "proof it's done": "The crew lead texts DONE with the bill's lines, and photos of the swept space. Nobody home: DONE with a photo.",
+   "where it went": "Donated, recycled or the transfer station, texted after the last stop. A charity's own receipt is passed on."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's place: a card saved for the $89 trip fee, and Rosie texts the bill after the job",
+    "An owner may take nothing up front (the old example owner's own choice). Then no fee can be charged",
+    "A single item pickup: an owner may save a card and charge it at DONE",
+    "A curbside pickup: an owner may take the full price when booking, since nobody needs to be home",
+    "At the yard: nothing taken; paid at the gate. A fridge, freezer or AC unit is paid in full when booking, so the refrigerant station is set for it"
+   ],
+   "limits": [
+    "Work priced at the visit: nothing is taken before; a card is saved for the trip fee",
+    "No charge if the customer says no to the firm price on site",
+    "Late cancel or nobody there: the $89 trip fee, only if the owner confirms. No answer, no fee",
+    "At the yard: a fridge drop-off paid in full may keep a $20 fee for a late cancel or a no-show, only if the owner confirms; the rest is refunded",
+    "Deposits: only on an estate cleanout that becomes its own job, as the owner sets (the example: $800 to start, of $2,400). Deposit cap: from the state form",
+    "An estate cleanout over several days is billed by stage, as each day is done",
+    "Emergency prices: where the state's rules limit prices in a declared emergency, those limits apply"
+   ],
+   "tips": "Off by default. The owner may turn on a tip line for the crew.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "fees passed on": "None: dump and recycling fees are in the price.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Door or gate codes, card details, and photos from inside the home: these stay on the secure page.",
+   "donation receipts": "The charity's own receipt is passed on as it is. Neither the business nor Rosie puts a value on donated items.",
+   "languages": "English and Spanish.",
+   "danger words": "Gas and leaking-tank words always get the safety message first."
+  },
+  "pf.staff": {
+   "roles": "Crew lead and helper. The crew lead checks in, sets the firm price under the owner's limit, and texts DONE.",
+   "skills": [
+    "Two-person carries",
+    "Appliances with refrigerant",
+    "Hot tub teardown",
+    "Estate cleanouts",
+    "The yard gate"
+   ],
+   "licenses": "No person license by default. A commercial driver's license for a truck heavy enough to need one: kept on file by the owner.",
+   "who OKs what": "The owner OKs every photo estimate, fees, quotes over the limit (the example: $500), same-day jobs and items over 300 lb. The crew lead may set the firm price on site up to the owner's limit.",
+   "stand-ins": "Another crew lead at the same window and price. A crew one person short: the owner or another person joins, or new times are offered with no fee. A two-person carry never goes out short-handed."
+  },
+  "pf.rules": {
+   "won't-take items": "Household hazardous waste: where it can go is each state's or town's own rule, from the state form.",
+   "refrigerant": "Fridges, freezers and AC units go to a recycler that recovers the refrigerant, or it's recovered first and a signed statement goes with the item. The record is kept with the job.",
+   "electronics": "TVs, computers and monitors go to electronics recycling where the state's rules require it, from the state form.",
+   "items added at the home": "A written right to cancel for work sold at the home: where the rules require it, with the state's own days.",
+   "written estimate": "A written estimate before work above an amount: from the state form, or the owner's own amount (the example: $500).",
+   "license on papers": "The license or permit number on bills and receipts: from the state form.",
+   "street permits": "A permit for a truck or dumpster on the street: where the city asks.",
+   "declared emergency": "Price limits in a declared emergency: where the state's rules require it.",
+   "records": "7 years, as for every kind of work, with the disposal and donation records."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for junk removal:",
+   "junk removal": [
+    "Won't-take items found at booking or on site: set apart and left, with where they can go",
+    "Only won't-take items: not a job for the crew; the customer is pointed elsewhere",
+    "Possible asbestos: don't touch it; the rest books on",
+    "Nobody home: the firm price by text; no reply means nothing is loaded",
+    "The customer says no to the firm price: no charge, nothing loaded",
+    "A crew member out: the owner joins, or new times with no fee",
+    "Items added on site: priced before loading",
+    "A charity refuses an item: it goes with the rest; the price doesn't change",
+    "Boxes left behind: a free return trip",
+    "At the yard: a load with won't-take items, or a leaking tank"
+   ]
+  },
+  "pf.facts": [
+   "photos",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most junk yards set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Mattresses, fridges and mixed loads."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks to drop off paint cans, which isn't on the yard's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Clean Slate Recycling doesn't take paint."
+   ],
+   [
+    "skin fades",
+    "drop-offs"
+   ],
+   [
+    "for Lee's Barbershop. Sam named you",
+    "for Clean Slate. Sam named you"
+   ],
+   [
+    "MP045210",
+    "HL045210"
+   ],
+   [
+    "BS20981",
+    "YF20981"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Tasha: yard gate, pricing and pickups at home"
+   ],
+   [
+    "Avery: barber",
+    "Luis: yard gate"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Rafael: junk removal and dumpsters"
+   ],
+   [
+    "Casey: plumbing",
+    "Nate: junk removal"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Junk removal takes no jobs sent now, and neither does the yard."
+   ],
+   [
+    "Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Lee's Barbershop can book you from now on, at the gate and for pickups at home."
+   ],
+   [
+    "Lee's Barbershop can book you from now on, at the shop.",
+    "Lee's Barbershop can book you from now on, at the gate."
+   ],
+   [
+    "Avery at the shop",
+    "Avery at the yard"
+   ],
+   [
+    "Casey for plumbing",
+    "Casey for junk removal"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds scrap metal to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Scrap metal for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW scrap metal"
+   ],
+   [
+    "Sam adds a barber",
+    "Sam adds a yard hand"
+   ],
+   [
+    "A barber can work at both, on one calendar.",
+    "A yard hand can work at both, on one calendar."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Crew lead · roll-off driver"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every yard service, pricing and pickups at home"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A junk hauler's example: crumbly old insulation gets 'don't touch, sweep or bag it'."
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery",
+    "It's a box spring drop-off today at 2:00pm with Avery"
+   ],
+   [
+    "accept the beard trim today at 2:00pm with Avery",
+    "accept the box spring drop-off today at 2:00pm with Avery"
+   ],
+   [
+    "A no-show is marked 15 minutes after the start",
+    "A no-show is marked 15 minutes after the start, with no fee"
+   ],
+   [
+    "Haircut at the shop",
+    "Mattress at the yard"
+   ],
+   [
+    "Haircut at their home",
+    "Mattress picked up at home"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero dejar un colchón el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like to drop off a mattress on Saturday."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video call to size a load"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Load pricing always stays with Riley."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son ride along and wait in the truck?"
+   ],
+   [
+    "Consult only",
+    "Take it home"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Nothing owed; the price stays open"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Gate on Quarry Rd · follow the signs to the bays"
+   ],
+   [
+    "A cut is rated",
+    "A drop-off is rated"
+   ],
+   [
+    "priced a color and cut for Alex M.",
+    "priced the remodel debris for Alex M."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The junk removal plug-in adds its own: a leaking propane tank, a chemical smell, or smoke in a load."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, crumbly old insulation in a load gets 'leave it in the truck; the yard can't take it'."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Getting rid of a mattress could mean a pickup at home or a drop-off yard."
+   ],
+   [
+    "A haircut needs nothing.",
+    "A mattress needs nothing but a tied-down load."
+   ],
+   [
+    "Can Lee's Barbershop do a haircut on Saturday morning?",
+    "Can Lee's Barbershop take a mattress on Saturday morning?"
+   ],
+   [
+    "Walk-in for a haircut",
+    "Drive-in with a mattress"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a mattress and a box spring"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A mattress and a set of tires work the same way. Both are asked before the times."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can I bring a box spring too on Saturday?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: pickup truck; the tailgate sticks; use the left bay"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you take tires on the rim?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Off the rim, yes: up to 4 tires are $25. Want a time?"
+   ],
+   [
+    "photos of your hair",
+    "photos of the load"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Riley sees the load"
+   ],
+   [
+    "You can wait for it, or have the consult only today.",
+    "You can wait for it, or take the load home today."
+   ],
+   [
+    "Riley quotes the rest at the chair, before any work.",
+    "Riley prices it at the gate, before anything comes off."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The forklift scraped my tailgate."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the forklift scraped a tailgate today."
+   ],
+   [
+    "like a skin-test result",
+    "like a vehicle that needs the left bay"
+   ],
+   [
+    "Drain clearing",
+    "Single item pickup"
+   ],
+   [
+    "water heaters",
+    "hot tubs"
+   ],
+   [
+    "water heater",
+    "hot tub"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Fridge, freezer or AC unit"
+   ],
+   [
+    "Signature cut and shave",
+    "Fridge drop-off"
+   ],
+   [
+    "signature cut",
+    "fridge drop-off"
+   ],
+   [
+    "the Groom's package",
+    "the pickup-truck load"
+   ],
+   [
+    "Groom's package",
+    "Pickup-truck load"
+   ],
+   [
+    "Kids cut",
+    "Tires"
+   ],
+   [
+    "kids cut",
+    "tire drop-off"
+   ],
+   [
+    "a skin fade",
+    "a car load"
+   ],
+   [
+    "A skin fade",
+    "A car load"
+   ],
+   [
+    "Skin fade",
+    "Car load"
+   ],
+   [
+    "a beard trim",
+    "a box spring"
+   ],
+   [
+    "Beard trim",
+    "Box spring"
+   ],
+   [
+    "beard trim",
+    "box spring"
+   ],
+   [
+    "a color and cut",
+    "remodel debris"
+   ],
+   [
+    "Color and cut · priced from photos",
+    "Remodel debris · priced from photos"
+   ],
+   [
+    "Color and cut",
+    "Remodel debris"
+   ],
+   [
+    "color and cut",
+    "remodel debris"
+   ],
+   [
+    "Color correction · priced at the chair",
+    "Mixed load · priced at the gate"
+   ],
+   [
+    "Color correction",
+    "Mixed load"
+   ],
+   [
+    "color correction",
+    "mixed load"
+   ],
+   [
+    "$25 consult",
+    "$25 minimum"
+   ],
+   [
+    "Gloss to finish",
+    "TV or monitor"
+   ],
+   [
+    "gloss",
+    "TV"
+   ],
+   [
+    "color quote",
+    "load price"
+   ],
+   [
+    "Haircuts",
+    "Mattress drop-offs"
+   ],
+   [
+    "haircuts",
+    "mattress drop-offs"
+   ],
+   [
+    "Haircut",
+    "Mattress drop-off"
+   ],
+   [
+    "haircut",
+    "mattress drop-off"
+   ],
+   [
+    "house calls",
+    "pickups at home"
+   ],
+   [
+    "House calls",
+    "Pickups at home"
+   ],
+   [
+    "house call",
+    "pickup at home"
+   ],
+   [
+    "at the chair",
+    "at the gate"
+   ],
+   [
+    "in the chair",
+    "at the gate"
+   ],
+   [
+    "the chair",
+    "the gate"
+   ],
+   [
+    "chairs",
+    "bays"
+   ],
+   [
+    "chair",
+    "gate"
+   ],
+   [
+    "Lee Home Services'",
+    "Clean Slate Hauling's"
+   ],
+   [
+    "Lee Home Services",
+    "Clean Slate Hauling"
+   ],
+   [
+    "Lee Plumbing",
+    "Clean Slate Hauling"
+   ],
+   [
+    "Lee Electric",
+    "Clean Slate Dumpsters"
+   ],
+   [
+    "Lee's Barbershop",
+    "Clean Slate Recycling"
+   ],
+   [
+    "plumbing's",
+    "junk removal's"
+   ],
+   [
+    "Plumbing",
+    "Junk removal"
+   ],
+   [
+    "plumbing",
+    "junk removal"
+   ],
+   [
+    "electrical's",
+    "dumpster rental's"
+   ],
+   [
+    "Electrical",
+    "Dumpster rental"
+   ],
+   [
+    "electrical",
+    "dumpster rental"
+   ],
+   [
+    "the barbershop's",
+    "the yard's"
+   ],
+   [
+    "the barbershop",
+    "the drop-off yard"
+   ],
+   [
+    "A barbershop's",
+    "A drop-off yard's"
+   ],
+   [
+    "A barbershop",
+    "A drop-off yard"
+   ],
+   [
+    "Barbershop",
+    "Drop-off yard"
+   ],
+   [
+    "barbershop",
+    "drop-off yard"
+   ],
+   [
+    "barbers'",
+    "yard hands'"
+   ],
+   [
+    "barbers",
+    "yard hands"
+   ],
+   [
+    "barber",
+    "yard hand"
+   ],
+   [
+    "Barber",
+    "Yard hand"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "Jordan Price",
+    "Rafael Cruz"
+   ],
+   [
+    "Casey Moore",
+    "Nate Brooks"
+   ],
+   [
+    "Riley Chen",
+    "Tasha Reed"
+   ],
+   [
+    "Avery Diaz",
+    "Luis Ortega"
+   ],
+   [
+    "Jordan",
+    "Rafael"
+   ],
+   [
+    "Casey",
+    "Nate"
+   ],
+   [
+    "Riley",
+    "Tasha"
+   ],
+   [
+    "Avery",
+    "Luis"
+   ],
+   [
+    "1200 Main St",
+    "40 Depot Rd"
+   ],
+   [
+    "88 Elm St",
+    "9 Quarry Rd"
+   ],
+   [
+    "Elm St",
+    "Quarry Rd"
+   ],
+   [
+    "the shop's",
+    "the yard's"
+   ],
+   [
+    "The shop's",
+    "The yard's"
+   ],
+   [
+    "at the shop",
+    "at the yard"
+   ],
+   [
+    "the shop",
+    "the yard"
+   ],
+   [
+    "The shop",
+    "The yard"
+   ]
+  ],
+  "B": [
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Rafael also take an old TV?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "TV or monitor · $25"
+   ],
+   [
+    "added a camera inspection to",
+    "added an old TV to"
+   ],
+   [
+    "the kitchen drain",
+    "your haul-away"
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Clean Slate Hauling · Haul-away"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · Haul-away"
+   ],
+   [
+    "Book this drain clearing?",
+    "Book this haul-away?"
+   ],
+   [
+    "can clear the drain",
+    "can haul it away"
+   ],
+   [
+    "Only the {{fee}} service call is promised now.",
+    "Only the visit is promised now."
+   ],
+   [
+    "The {{fee}} counts toward the work's price.",
+    "The {{fee}} trip fee is only for a late cancel or nobody there."
+   ],
+   [
+    "Alex is told before the yes: the {{fee}} service call is owed, even after a no to the price.",
+    "Alex is told before the yes: a no to the price on site owes nothing."
+   ],
+   [
+    "for Lee Home Services. Sam named you",
+    "for Clean Slate. Sam named you"
+   ],
+   [
+    " 1-year labor warranty: if there's a problem with the work, reply here.",
+    " If anything was left behind, reply here."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about clearing out my garage."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Just an old sofa' fits a single item pickup."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is anything heavy upstairs?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a dresser"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a path to the garage."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a new scrape on my garage door this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a garage cleanout, tomorrow,"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Rafael sized it up. Here's the firm price to haul it all today."
+   ],
+   [
+    "Leak repair · $245",
+    "Junk haul-away · $439"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Half a truck · $389"
+   ],
+   [
+    "Supply line · $80",
+    "Fridge, refrigerant recovered · $50"
+   ],
+   [
+    "The $89 service call is included",
+    "No charge if you say no"
+   ],
+   [
+    "like a $620 repair",
+    "like a $620 load"
+   ],
+   [
+    "leak repair is $620",
+    "haul-away is $620"
+   ],
+   [
+    "Leak repair · $620",
+    "Junk haul-away · $620"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "A full truck · $570"
+   ],
+   [
+    "your new pipes are in",
+    "the garage is cleared"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like clearing the attic Jordan noted"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 single item pickup needs none."
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Say Kim L.'s curbside pickup needs nobody home."
+   ],
+   [
+    "drain clearings",
+    "pickups"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like hauling a neighbor's things without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a mattress? Say so.'"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's crew scrapes a door frame and texts a photo."
+   ],
+   [
+    "no proof Alex may have this work done",
+    "garage locked, no code"
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads junk removal's now, and dumpster rental's and the yard's when Sam gets to them."
+   ],
+   [
+    "plumbing license MP045210",
+    "hauler license HL045210"
+   ],
+   [
+    "Plumbing license",
+    "Hauler license"
+   ],
+   [
+    "MP045210",
+    "HL045210"
+   ],
+   [
+    "BS20981",
+    "YF20981"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Tasha: yard gate, pricing and pickups at home"
+   ],
+   [
+    "Avery: barber",
+    "Luis: yard gate"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Rafael: junk removal and dumpsters"
+   ],
+   [
+    "Casey: plumbing",
+    "Nate: junk removal"
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every junk removal job, and dumpster jobs"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Junk removal takes no jobs sent now, and neither does the yard."
+   ],
+   [
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "Dumpster rental and Lee's Barbershop now show to AI assistants too."
+   ],
+   [
+    "Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Lee's Barbershop can book you from now on, at the gate and for pickups at home."
+   ],
+   [
+    "Lee's Barbershop can book you from now on, at the shop.",
+    "Lee's Barbershop can book you from now on, at the gate."
+   ],
+   [
+    "Avery at the shop",
+    "Avery at the yard"
+   ],
+   [
+    "Casey for plumbing",
+    "Casey for junk removal"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds moving help to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Moving help for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW moving help"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Crew lead · roll-off driver"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, only for a late cancel or nobody there"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A junk hauler's example: crumbly old insulation gets 'don't touch, sweep or bag it'."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For junk removal, a gas smell or a leaking propane tank stops the booking."
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "the water heater quote",
+    "the hot tub quote"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can take a mattress at the yard for $35, or pick it up at your home for $75."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the yard's hands does pickups at home with the yard's truck."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scraped the basement door frame"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scraped door frame"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan's crew scraped a door frame at Alex M.'s. The before photo shows no mark."
+   ],
+   [
+    "shutoff valve",
+    "half truck"
+   ],
+   [
+    "Jordan texts the quote",
+    "Jordan texts the firm price"
+   ],
+   [
+    "The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "The main story: Alex asks an AI for a junk hauler on Mon Oct 19, 6:40pm."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services can't take paint, chemicals or a propane tank. Nothing was saved. The town's household hazardous waste drop-off can."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be only things Lee Home Services won't take, like paint cans and a propane tank."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what's going, where it is, how many stairs, and anything on the won't-take list."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, a leaking propane tank, or possible asbestos."
+   ],
+   [
+    "replaces water heaters",
+    "takes hot tubs apart"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a crew take an old swing set from the backyard this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa sofa Thu 12-2 Casey"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also wants an old fridge taken. Both go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also take an old fridge from the garage?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The fridge goes on the same truck, priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Book a free fix",
+    "Book a free return"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for the attic boxes."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan take the attic boxes next week?"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Home Services sent you a proposal to clear the attic, from Jordan's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Attic cleanout"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew scuffed the basement stairs."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I empty the fridge before you come?"
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 estate cleanout."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 estate cleanout, 3 days"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 after day 2, $800 at the finish"
+   ],
+   [
+    "stage 2 of your repipe",
+    "day 2 of the estate cleanout"
+   ],
+   [
+    "for your repipe",
+    "for the estate cleanout"
+   ],
+   [
+    "Repipe",
+    "Estate cleanout"
+   ],
+   [
+    "repipe",
+    "estate cleanout"
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Jordan to come back next fall for the attic."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: attic cleanout, 12 months"
+   ],
+   [
+    "for the water heater flush you asked Jordan about",
+    "for the attic cleanout you asked Jordan about"
+   ],
+   [
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Today's estimate visit owes nothing: a junk estimate is free."
+   ],
+   [
+    "the $160 valve work",
+    "the $50 mattress set"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $50 mattress set price is good for 7 days."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Mattress set"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 439 half truck 389 fridge 50"
+   ],
+   [
+    "$245",
+    "$439"
+   ],
+   [
+    "$165",
+    "$389"
+   ],
+   [
+    "$80",
+    "$50"
+   ],
+   [
+    "$156",
+    "$350"
+   ],
+   [
+    "D nothing before. E 25% deposit after the quote. C paid in full when they book",
+    "D nothing before. C paid in full when they book"
+   ],
+   [
+    "E 25% deposit after the quote. C paid in full when they book",
+    "C paid in full when they book"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Single item pickup"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Single item pickups already booked keep $179"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise single item to 199"
+   ],
+   [
+    "Drain clearing",
+    "Single item pickup"
+   ],
+   [
+    "drain clearing",
+    "single item pickup"
+   ],
+   [
+    "Water heater flush",
+    "Curbside pickup"
+   ],
+   [
+    "water heater flush",
+    "curbside pickup"
+   ],
+   [
+    "Water heater replacement",
+    "Hot tub removal"
+   ],
+   [
+    "water heater replacement",
+    "hot tub removal"
+   ],
+   [
+    "Leak repair",
+    "Junk haul-away"
+   ],
+   [
+    "leak repair",
+    "junk haul-away"
+   ],
+   [
+    "Sewer camera inspection",
+    "Appliance pickup"
+   ],
+   [
+    "sewer camera inspection",
+    "appliance pickup"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "Yard drain",
+    "Swing set"
+   ],
+   [
+    "Kitchen drain",
+    "Sofa pickup"
+   ],
+   [
+    "kitchen drain",
+    "sofa pickup"
+   ],
+   [
+    "Water heater",
+    "Hot tub"
+   ],
+   [
+    "water heaters",
+    "hot tubs"
+   ],
+   [
+    "water heater",
+    "hot tub"
+   ],
+   [
+    "haircut",
+    "mattress drop-off"
+   ],
+   [
+    "house calls",
+    "pickups at home"
+   ],
+   [
+    "at the chair",
+    "at the gate"
+   ],
+   [
+    "chairs",
+    "bays"
+   ],
+   [
+    "chair",
+    "gate"
+   ],
+   [
+    "leehomeservices.com",
+    "cleanslatehauling.com"
+   ],
+   [
+    "Lee Home Services'",
+    "Clean Slate Hauling's"
+   ],
+   [
+    "Lee Home Services",
+    "Clean Slate Hauling"
+   ],
+   [
+    "Lee Plumbing",
+    "Clean Slate Hauling"
+   ],
+   [
+    "Lee Electric",
+    "Clean Slate Dumpsters"
+   ],
+   [
+    "Lee's Barbershop",
+    "Clean Slate Recycling"
+   ],
+   [
+    "Plumbing",
+    "Junk removal"
+   ],
+   [
+    "plumbing",
+    "junk removal"
+   ],
+   [
+    "Electrical",
+    "Dumpster rental"
+   ],
+   [
+    "electrical",
+    "dumpster rental"
+   ],
+   [
+    "the barbershop",
+    "the drop-off yard"
+   ],
+   [
+    "a barbershop",
+    "a drop-off yard"
+   ],
+   [
+    "barbershop",
+    "drop-off yard"
+   ],
+   [
+    "barbers",
+    "yard hands"
+   ],
+   [
+    "barber",
+    "yard hand"
+   ],
+   [
+    "Barber",
+    "Yard hand"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "Jordan Price",
+    "Rafael Cruz"
+   ],
+   [
+    "Casey Moore",
+    "Nate Brooks"
+   ],
+   [
+    "Riley Chen",
+    "Tasha Reed"
+   ],
+   [
+    "Avery Diaz",
+    "Luis Ortega"
+   ],
+   [
+    "Jordan",
+    "Rafael"
+   ],
+   [
+    "Casey",
+    "Nate"
+   ],
+   [
+    "Riley",
+    "Tasha"
+   ],
+   [
+    "Avery",
+    "Luis"
+   ],
+   [
+    "1200 Main St",
+    "40 Depot Rd"
+   ],
+   [
+    "88 Elm St",
+    "9 Quarry Rd"
+   ],
+   [
+    "Elm St",
+    "Quarry Rd"
+   ],
+   [
+    "42 Oak St",
+    "17 Birch Ln"
+   ],
+   [
+    "the shop's",
+    "the yard's"
+   ],
+   [
+    "The shop's",
+    "The yard's"
+   ],
+   [
+    "at the shop",
+    "at the yard"
+   ],
+   [
+    "the shop",
+    "the yard"
+   ],
+   [
+    "The shop",
+    "The yard"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Dumpster rental next. Send a photo of your dumpster prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Dumpster rental prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Dumpster price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trip fee",
+          "$89, only for a late cancel or nobody there"
+         ],
+         [
+          "10-yard dumpster, up to 7 days",
+          "$349"
+         ],
+         [
+          "20-yard dumpster, up to 7 days",
+          "$449"
+         ],
+         [
+          "Extra day",
+          "$15 a day"
+         ],
+         [
+          "A dumpster on a city street",
+          "Free estimate, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like junk removal. Send only what's different.",
+      {
+       "card": {
+        "title": "Dumpster rental, set like junk removal",
+        "lines": [
+         "At the customer's place",
+         "a card saved for the $89 trip fee at booking",
+         "Paid after the job, the way you picked for junk removal",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Dumpster rental goes live on the company's own permit. It waits for the driver on the team to join, and for Sam's yes.",
+    "more": [
+     "Sam doesn't drive the roll-off truck, so dumpster rental waits for the driver on the team.",
+     "Where the city or the state asks for a hauler permit, the form for that place asks for it here.",
+     "A driver's commercial license, where the truck needs one, is kept on file by Sam."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the city asks roll-off dumpster companies for a hauler permit. What's its number?"
+     ],
+     [
+      "owner",
+      "san",
+      "DR22871"
+     ],
+     [
+      "san",
+      "owner",
+      "Dumpster rental is set up, under the company's permit. AI assistants can book it once your driver joins and you say yes. You'll add your people at the end. Next, Clean Slate Recycling: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Rafael replies YES, then checks what Sam set. One reply covers every kind of work Rafael does.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Rafael"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Clean Slate Hauling! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Rafael Cruz · Clean Slate Hauling",
+        "lines": [
+         "Every junk removal job, and dumpster jobs",
+         "Commercial driver's license: on file with Sam",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Rafael"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Rafael"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Sam says one price differs by person: loading help with Rafael's crew.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Are your junk removal prices the same, whoever goes?",
+      {
+       "buttons": [
+        "Yes, the same",
+        "Some charge differently"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 Rafael's crew is 140 an hour for loading help"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Loading help is $140 an hour with Rafael's crew, and $120 with anyone else.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Loading help",
+          "Rafael's crew",
+          "$140 an hour"
+         ],
+         [
+          "Loading help",
+          "Anyone else",
+          "$120 an hour"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. No person license is needed, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Rafael: junk removal and dumpsters",
+         "Nate: junk removal",
+         "Tasha: yard gate, pricing and pickups at home",
+         "Luis: yard gate"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can I drop off an old mattress at Clean Slate Recycling on Saturday?"
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "more": [
+       "Paid in full, the example is the $55 fridge drop-off."
+      ],
+      "say": [
+       [
+        "cust",
+        "agent",
+        "Can I drop off an old fridge at Clean Slate Recycling on Saturday?"
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "more": [
+       "Paid in full, the example is the $55 fridge drop-off."
+      ],
+      "say": [
+       [
+        "cust",
+        "agent",
+        "Can I drop off an old fridge at Clean Slate Recycling on Saturday?"
+       ]
+      ]
+     },
+     "price:photos": {
+      "more": [
+       "Priced from photos, the example is remodel debris. Tasha prices it from Alex's photos."
+      ],
+      "say": [
+       [
+        "cust",
+        "agent",
+        "I have a trailer of old drywall and tile. Can Clean Slate Recycling take it on Saturday?"
+       ]
+      ]
+     },
+     "price:visit": {
+      "more": [
+       "Priced at the gate, the example is a mixed load. Only the $25 minimum is promised."
+      ],
+      "say": [
+       [
+        "cust",
+        "agent",
+        "I have a pickup full of mixed junk. Can Clean Slate Recycling take it on Saturday?"
+       ]
+      ]
+     },
+     "price:visit+before:deposit": {
+      "more": [
+       "Priced at the gate, the example is a mixed load. Only the $25 minimum is promised."
+      ],
+      "say": [
+       [
+        "cust",
+        "agent",
+        "I have a pickup full of mixed junk. Can Clean Slate Recycling take it on Saturday?"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "Omar drives in on Saturday with no booking. He texts the number on the sign at the gate, or the yard adds him on the portal's Today page.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Drive-in with a mattress"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Clean Slate Recycling. You're 3rd in line at the gate, about 20 minutes. We'll text you when you're next.",
+      {
+       "card": {
+        "title": "Wait line · Clean Slate Recycling",
+        "lines": [
+         "3rd in line · about 20 minutes",
+         "Mattress drop-off · $35, paid at the gate"
+        ]
+       },
+       "buttons": [
+        "Leave the line"
+       ],
+       "stop": true
+      }
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "say": [
+       [
+        "cust",
+        "san",
+        "Drive-in with a mattress"
+       ],
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Clean Slate Recycling. You're 3rd in line at the gate, about 20 minutes. We'll text you when you're next.",
+        {
+         "card": {
+          "title": "Wait line · Clean Slate Recycling",
+          "lines": [
+           "3rd in line · about 20 minutes",
+           "Mattress drop-off · $35 · Rosie texts the bill after"
+          ]
+         },
+         "buttons": [
+          "Leave the line"
+         ],
+         "stop": true
+        }
+       ]
+      ]
+     },
+     "after:card": {
+      "say": [
+       [
+        "cust",
+        "san",
+        "Drive-in with a mattress"
+       ],
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Clean Slate Recycling. You're 3rd in line at the gate, about 20 minutes. We'll text you when you're next.",
+        {
+         "card": {
+          "title": "Wait line · Clean Slate Recycling",
+          "lines": [
+           "3rd in line · about 20 minutes",
+           "Mattress drop-off · $35 · no saved card, so we text the bill"
+          ]
+         },
+         "buttons": [
+          "Leave the line"
+         ],
+         "stop": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Just the mattress, or a box spring too?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Just the mattress."
+     ]
+    ],
+    "vary": {
+     "price:list+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Just the mattress, or a box spring too?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Just the mattress."
+       ]
+      ]
+     },
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Is the fridge empty and unplugged?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Yes, since Thursday."
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Is the fridge empty and unplugged?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Yes, since Thursday."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "About how much drywall and tile? A bigger load takes longer."
+       ],
+       [
+        "cust",
+        "agent",
+        "A small trailer, about half full."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Is any of it wet, or mixed with trash?"
+       ],
+       [
+        "cust",
+        "agent",
+        "A few boxes are wet."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "Some services need equipment as well as a person. A fridge drop-off needs the yard's one refrigerant station, so two can't overlap."
+   },
+   {
+    "op": "more",
+    "at": "A8-23",
+    "more": [
+     "Tasha also checks the load for won't-take items, like paint or a propane tank. Those stay in the vehicle."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Tasha finds two cans of paint in the load. The yard can't take them, so they stay in Alex's truck, with a written note.",
+    "more": [
+     "The note says what was found, what was left and why, and where it can go.",
+     "It never names a company.",
+     "Nothing is charged for what's left in the truck."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Paint cans in Alex M.'s load. Left in the truck. Note and photo on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Tasha left you a note about today's visit.",
+      {
+       "card": {
+        "title": "A note from Clean Slate Recycling",
+        "lines": [
+         "Found: two cans of paint",
+         "Left in your truck: the yard can't take paint",
+         "It can go to the town's household hazardous waste drop-off"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Tasha left 2 paint cans in Alex M.'s truck. The note and photo are on the secure page."
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "more": [
+       "The note says what was found, what was left and why, and where it can go.",
+       "It never names a company.",
+       "Nothing is charged for what's left in the truck."
+      ]
+     },
+     "price:list+before:deposit+after:card": {
+      "more": [
+       "The note says what was found, what was left and why, and where it can go.",
+       "It never names a company.",
+       "Nothing is charged for what's left in the truck."
+      ]
+     },
+     "price:photos+before:deposit": {
+      "more": [
+       "The note says what was found, what was left and why, and where it can go.",
+       "It never names a company.",
+       "Nothing is charged for what's left in the truck."
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "more": [
+       "The note says what was found, what was left and why, and where it can go.",
+       "It never names a company.",
+       "Nothing is charged for what's left in the truck."
+      ]
+     },
+     "price:visit+before:deposit": {
+      "more": [
+       "The note says what was found, what was left and why, and where it can go.",
+       "It never names a company.",
+       "Nothing is charged for what's left in the truck."
+      ]
+     },
+     "price:list+before:full": {
+      "more": [
+       "The note says what was found, what was left and why, and where it can go.",
+       "It never names a company.",
+       "Nothing is charged for what's left in the truck."
+      ]
+     },
+     "price:photos+before:full": {
+      "more": [
+       "The note says what was found, what was left and why, and where it can go.",
+       "It never names a company.",
+       "Nothing is charged for what's left in the truck."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-30",
+    "does": "Alex says not today and takes the load home. Nothing is owed, and Tasha's price stays good for 7 days.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Nothing is owed today. Tasha's $125 price is good for 7 days if you bring the load back.",
+      {
+       "card": {
+        "title": "Mixed load · $125",
+        "lines": [
+         "Good until Sat Oct 31"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/q/a8"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "before:deposit": {
+      "does": "Alex says not today and takes the load home. Nothing is owed, and Tasha's price stays good for 7 days."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "Before Alex pays, Tasha shows the empty truck bed. Anything still in it comes off before paying.",
+    "more": [
+     "The plug-in says when a walk-through is needed. At the yard, it's a look at the empty bed.",
+     "A last piece left in the bed comes off at no extra cost.",
+     "Anything new needs Alex's yes and its price first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches the fridge drop-off from paid in full to nothing taken, paid at the gate, for new bookings only. Each change is read back first.",
+    "more": [
+     "Fridge drop-offs already booked stay paid in full.",
+     "With nothing taken, there's no card, so no fee can be charged for a late cancel.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "Any deposit stays within the state's limits, from the plug-in."
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "does": "Sam switches the fridge drop-off from paid in full to nothing taken, paid at the gate, for new bookings only. Each change is read back first."
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Junk removal, dumpsters and the yard pay Rosfield's $2, so the bill branch applies.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "No agreement to sign, so none can be left unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Junk removal books crews and yard hands, never a table, court or room.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Junk removal runs no classes, so no timetable is set.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Crews and yard hands need no license of their own. A commercial driver's license, where a truck needs one, is kept on file by the owner.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Junk removal is never sent now: same-day jobs get the soonest window, once Sam OKs them.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The yard books a yard hand's time at the gate. No class seats.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The yard books a yard hand's time at the gate, not a space.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Nothing at the yard is booked as a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "The yard's plug-in names no form to sign.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "why": "A drop-off has no minimum headcount.",
+    "label": "Too few booked to run"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "why": "The yard asks nothing to be brought. A won't-take item in the load is set aside at the gate instead.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "A load is unloaded while Alex waits. Nothing is left for a later pick-up.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "A drop-off is rated, like every visit.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "The yard sells no repeat plans.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "The yard books no groups.",
+    "label": "A group or party"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No plan or insurance pays for a drop-off.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The yard sells no packages or memberships.",
+    "label": "A package or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The yard sells no packages or memberships.",
+    "label": "Buys a pack or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The yard sells no repeat plans.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "why": "A load waiting at home doesn't get worse.",
+    "label": "The problem gets worse"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "The yard sells no plans.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The yard sells no plans.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The yard sells no plans.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "No plan or insurance pays for a drop-off.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "The yard runs no classes.",
+    "label": "A class: names on a roster"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "A load is unloaded while Alex waits, and checked in with the code.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "why": "Nothing is signed at the gate: the yard sells no memberships or contracts.",
+    "label": "Yes: a contract signed today"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "A drop-off leads to no proposal. A bigger job is a cleanout with the crew, booked in the other flow.",
+    "label": "The business sends a proposal"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "why": "There's nothing to fix after a drop-off. A wrong charge is a refund.",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "A drop-off has no results to send later.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "why": "Nothing is left at the yard for a pick-up.",
+    "label": "An item isn't picked up"
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Clean Slate Hauling",
+       "At the customer's place",
+       "Company's hauler license HL045210",
+       "Yes"
+      ],
+      [
+       "Rafael Cruz",
+       "Clean Slate Hauling",
+       "At the customer's place",
+       "None needed · CDL on file with Sam",
+       "Once Sam says yes"
+      ],
+      [
+       "Nate Brooks",
+       "Clean Slate Hauling",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Clean Slate Hauling",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Tasha Reed",
+       "Clean Slate Recycling",
+       "At the yard, and pickups at home",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Luis Ortega",
+       "Clean Slate Recycling",
+       "At the yard",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A license or permit shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. At the yard, only a fridge paid ahead can keep a $20 fee.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Clean Slate Recycling",
+      "9 Quarry Rd, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Mattress drop-off $35 ($40 from Nov 2) · Car load $40 · Box spring $20"
+     ],
+     [
+      "To book",
+      "Nothing taken · paid at the gate · a fridge is paid ahead"
+     ],
+     [
+      "Permits",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Clean Slate Hauling",
+      "Junk removal · within 25 miles of 40 Depot Rd, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A drop-off at the gate is paid at once."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "Drop-offs at the gate need no written contract (the yard's plug-in names none)."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the yard."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "Mixed loads and debris are priced for each customer: from photos first, or at the gate, with a $25 minimum.",
+     "The bigger loads show how long they take, so the bay is saved for all of it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the yard's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Mattress",
+          "$35 · 15 min"
+         ],
+         [
+          "Car load (trunk and back seat)",
+          "$40"
+         ],
+         [
+          "Box spring",
+          "$20"
+         ],
+         [
+          "Tires, up to 4",
+          "$25"
+         ],
+         [
+          "Fridge, freezer or AC unit",
+          "$55 · 30 min"
+         ],
+         [
+          "Pickup-truck load (a full bed)",
+          "$140 · 30 min"
+         ],
+         [
+          "TV or monitor",
+          "$15"
+         ],
+         [
+          "Remodel debris",
+          "Priced from photos"
+         ],
+         [
+          "Mixed load",
+          "Priced at the gate · $25 minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your yard, paid at the gate, your own way",
+         "Nothing taken when they book",
+         "A fridge: paid when they book, for the refrigerant station"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "A at their home too, 75, paid when they book"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. For a mattress, the customer picks the place and sees both prices first.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Mattress at the yard",
+          "$35",
+          "Nothing taken",
+          "At the gate"
+         ],
+         [
+          "Mattress picked up at home",
+          "$75",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "Car load, box spring, tires",
+          "$40, $20, $25",
+          "Nothing taken",
+          "At the gate"
+         ],
+         [
+          "Fridge drop-off",
+          "$55",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "Pickup-truck load",
+          "$140",
+          "Nothing taken",
+          "At the gate"
+         ],
+         [
+          "Remodel debris",
+          "From photos",
+          "Nothing taken",
+          "At the gate"
+         ],
+         [
+          "Mixed load",
+          "At the gate",
+          "Nothing taken",
+          "At the gate"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Dumpster rental next. Send a photo of your dumpster prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Dumpster rental prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Dumpster price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trip fee",
+          "$89, only for a late cancel or nobody there"
+         ],
+         [
+          "10-yard dumpster, up to 7 days",
+          "$349"
+         ],
+         [
+          "20-yard dumpster, up to 7 days",
+          "$449"
+         ],
+         [
+          "Extra day",
+          "$15 a day"
+         ],
+         [
+          "A dumpster on a city street",
+          "Free estimate, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like junk removal. Send only what's different.",
+      {
+       "card": {
+        "title": "Dumpster rental, set like junk removal",
+        "lines": [
+         "At the customer's place",
+         "a card saved for the $89 trip fee at booking",
+         "Paid after the job, the way you picked for junk removal",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Dumpster rental goes live on the company's own permit. It waits for the driver on the team to join, and for Sam's yes.",
+    "more": [
+     "Sam doesn't drive the roll-off truck, so dumpster rental waits for the driver on the team.",
+     "Where the city or the state asks for a hauler permit, the form for that place asks for it here.",
+     "A driver's commercial license, where the truck needs one, is kept on file by Sam."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the city asks roll-off dumpster companies for a hauler permit. What's its number?"
+     ],
+     [
+      "owner",
+      "san",
+      "DR22871"
+     ],
+     [
+      "san",
+      "owner",
+      "Dumpster rental is set up, under the company's permit. AI assistants can book it once your driver joins and you say yes. You'll add your people at the end. Next, Clean Slate Recycling: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Rafael replies YES, then checks what Sam set. One reply covers every kind of work Rafael does.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Rafael"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Clean Slate Hauling! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Rafael Cruz · Clean Slate Hauling",
+        "lines": [
+         "Every junk removal job, and dumpster jobs",
+         "Commercial driver's license: on file with Sam",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Rafael"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Rafael"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Sam says one price differs by person: loading help with Rafael's crew.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Are your junk removal prices the same, whoever goes?",
+      {
+       "buttons": [
+        "Yes, the same",
+        "Some charge differently"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 Rafael's crew is 140 an hour for loading help"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Loading help is $140 an hour with Rafael's crew, and $120 with anyone else.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Loading help",
+          "Rafael's crew",
+          "$140 an hour"
+         ],
+         [
+          "Loading help",
+          "Anyone else",
+          "$120 an hour"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. No person license is needed, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Rafael: junk removal and dumpsters",
+         "Nate: junk removal",
+         "Tasha: yard gate, pricing and pickups at home",
+         "Luis: yard gate"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I have an old sofa to get rid of. Can someone pick it up Thursday morning? I'm in Springfield."
+     ]
+    ],
+    "vary": {
+     "before:deposit": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Paid in full, the example is the $150 curbside pickup on Sam's list.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "I'll leave some bags and an old chair by the curb. Can someone pick them up Thursday morning? I'm in Springfield."
+       ]
+      ]
+     },
+     "before:full": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Paid in full, the example is the $150 curbside pickup on Sam's list.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "I'll leave some bags and an old chair by the curb. Can someone pick them up Thursday morning? I'm in Springfield."
+       ]
+      ]
+     },
+     "price:photos+before:none": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Priced from photos, the example is a hot tub removal. Sam never lists it.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "My old hot tub has to go. Can someone take it apart and haul it away this week? I'm in Springfield."
+       ]
+      ]
+     },
+     "price:photos+before:card": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Priced from photos, the example is a hot tub removal. Sam never lists it.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "My old hot tub has to go. Can someone take it apart and haul it away this week? I'm in Springfield."
+       ]
+      ]
+     },
+     "price:photos+before:full": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Priced from photos, the example is a hot tub removal. Sam never lists it.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "My old hot tub has to go. Can someone take it apart and haul it away this week? I'm in Springfield."
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Priced on site, the example is a basement and garage cleanout.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "We're clearing out the basement and garage: an old sofa, a treadmill, a fridge and about 20 boxes. Can someone haul it all away Thursday morning? I'm in Springfield."
+       ]
+      ]
+     },
+     "price:visit+before:card": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Priced on site, the example is a basement and garage cleanout.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "We're clearing out the basement and garage: an old sofa, a treadmill, a fridge and about 20 boxes. Can someone haul it all away Thursday morning? I'm in Springfield."
+       ]
+      ]
+     },
+     "price:photos+before:deposit": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Priced from photos, the example is a hot tub removal. Sam never lists it.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "My old hot tub has to go. Can someone take it apart and haul it away this week? I'm in Springfield."
+       ]
+      ]
+     },
+     "price:visit+before:deposit": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the job, the area and the day, with no name or address yet. Priced on site, the example is a basement and garage cleanout.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "We're clearing out the basement and garage: an old sofa, a treadmill, a fridge and about 20 boxes. Can someone haul it all away Thursday morning? I'm in Springfield."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero vaciar el sótano.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I want to clear out the basement.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Clean Slate Hauling. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Clean Slate Hauling. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A junk hauler's example: crumbly old insulation gets 'don't touch, sweep or bag it'.",
+     "Rosa is told to leave the crumbly wrap alone. The crew won't take it, and the rest of the job books on."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay alguien herido? ¿Huele a gas?",
+      {
+       "lang": "es",
+       "en": "First: is anyone hurt? Do you smell gas?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Pero hay un forro viejo en el sótano que se desmorona.",
+      {
+       "lang": "es",
+       "en": "No. But there's old wrap in the basement that crumbles.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "No lo toque ni lo barra. El equipo no se lo lleva, pero sí lo demás.",
+      {
+       "lang": "es",
+       "en": "Don't touch or sweep it. The crew won't take it, but it takes the rest.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa, in Spanish. She wants her basement cleared, and has crumbly old wrap down there.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "Possible asbestos · safety steps given",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Clean Slate Hauling. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Clean Slate Hauling · Basement cleanout",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can I put an old propane tank out with the rest?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't answer safety questions about propane tanks. If you smell gas, leave and call 911. To talk to someone, call Clean Slate Hauling at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Clean Slate Hauling asks: what's the item, where is it, and are there stairs?"
+     ],
+     [
+      "cust",
+      "agent",
+      "An old sofa, in the den. No stairs."
+     ]
+    ],
+    "vary": {
+     "before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: what will you leave by the curb?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Six bags and an old armchair."
+       ]
+      ]
+     },
+     "before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: what will you leave by the curb?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Six bags and an old armchair."
+       ]
+      ]
+     },
+     "price:photos+before:none": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: is the hot tub empty, and is its power off?"
+       ],
+       [
+        "cust",
+        "agent",
+        "It's drained, and the breaker is off."
+       ]
+      ]
+     },
+     "price:photos+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: is the hot tub empty, and is its power off?"
+       ],
+       [
+        "cust",
+        "agent",
+        "It's drained, and the breaker is off."
+       ]
+      ]
+     },
+     "price:photos+before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: is the hot tub empty, and is its power off?"
+       ],
+       [
+        "cust",
+        "agent",
+        "It's drained, and the breaker is off."
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: what's going, where is it, and how many flights of stairs? Anything over 300 lb?"
+       ],
+       [
+        "cust",
+        "agent",
+        "A sofa, a treadmill, a fridge and about 20 boxes. Basement and garage, one flight down. Nothing that heavy."
+       ]
+      ]
+     },
+     "price:visit+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: what's going, where is it, and how many flights of stairs? Anything over 300 lb?"
+       ],
+       [
+        "cust",
+        "agent",
+        "A sofa, a treadmill, a fridge and about 20 boxes. Basement and garage, one flight down. Nothing that heavy."
+       ]
+      ]
+     },
+     "price:photos+before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: is the hot tub empty, and is its power off?"
+       ],
+       [
+        "cust",
+        "agent",
+        "It's drained, and the breaker is off."
+       ]
+      ]
+     },
+     "price:visit+before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling asks: what's going, where is it, and how many flights of stairs? Anything over 300 lb?"
+       ],
+       [
+        "cust",
+        "agent",
+        "A sofa, a treadmill, a fridge and about 20 boxes. Basement and garage, one flight down. Nothing that heavy."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B4-05",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.26",
+       "4.7"
+      ],
+      "who": "agent",
+      "to": "cust",
+      "via": "chat",
+      "title": "Checks the won't-take list",
+      "q": "Anything the crew won't take?",
+      "does": "The plug-in's won't-take list is asked before any times. The crew won't haul paint, chemicals, propane tanks, asbestos or car batteries.",
+      "more": [
+       "Each answer gets the danger check too. A leaking tank or a gas smell stops the booking.",
+       "Won't-take items are checked again on site, and left there.",
+       "Where they can go is each town's own rule, from the plug-in."
+      ],
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling won't take paint, chemicals, propane tanks, asbestos or car batteries. Is any of that in the load?"
+       ],
+       [
+        "cust",
+        "agent",
+        "None of that."
+       ]
+      ],
+      "vary": {
+       "price:visit": {
+        "say": [
+         [
+          "agent",
+          "cust",
+          "Clean Slate Hauling won't take paint, chemicals, propane tanks, asbestos or car batteries. Is any of that in the load?"
+         ],
+         [
+          "cust",
+          "agent",
+          "Two cans of paint and a small propane tank."
+         ]
+        ]
+       }
+      },
+      "needs": [
+       "pf.services",
+       "pf.safety"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "None",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Some: set them apart",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.26",
+           "6.4"
+          ],
+          "who": "agent",
+          "to": "cust",
+          "via": "chat",
+          "title": "Says to set them apart; the rest books",
+          "does": "The rest of the job books on. Alex sets the paint and the tank apart, marked 'keep', and hears where they can go instead.",
+          "more": [
+           "Paint and a propane tank are danger words in the plug-in. Its safety step is this one: set them apart, and the booking goes on.",
+           "The crew is told what stays, and leaves it.",
+           "Where they can go comes from the plug-in: the town's household hazardous waste drop-off, or a propane dealer."
+          ],
+          "say": [
+           [
+            "agent",
+            "cust",
+            "No problem. Please set those apart and mark them 'keep'. The crew will leave them.",
+            {
+             "list": {
+              "head": [
+               "Item",
+               "Where it can go"
+              ],
+              "rows": [
+               [
+                "Paint",
+                "The town's household hazardous waste drop-off"
+               ],
+               [
+                "Propane tank",
+                "A propane dealer or a tank exchange"
+               ]
+              ]
+             }
+            }
+           ]
+          ],
+          "needs": [
+           "pf.services"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Only won't-take items",
+        "end": "end",
+        "endText": "Not a job for the crew. Nothing saved; Alex hears where the items can go.",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "4.26",
+           "4.15"
+          ],
+          "who": "agent",
+          "to": "cust",
+          "via": "chat",
+          "title": "Says it isn't a job for the crew",
+          "does": "Everything left is on the won't-take list, so there's nothing for the crew to haul. Nothing is saved, and Alex hears where it can go.",
+          "say": [
+           [
+            "agent",
+            "cust",
+            "Clean Slate Hauling can't take any of those, so there's nothing to book. The town's household hazardous waste drop-off can take paint and chemicals."
+           ]
+          ],
+          "needs": [
+           "pf.services"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Is there a clear path from the den to the front door?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Yes, the hall is clear."
+     ]
+    ],
+    "vary": {
+     "before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Where by the curb will the pile be?"
+       ],
+       [
+        "cust",
+        "agent",
+        "At the end of the driveway."
+       ]
+      ]
+     },
+     "before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Where by the curb will the pile be?"
+       ],
+       [
+        "cust",
+        "agent",
+        "At the end of the driveway."
+       ]
+      ]
+     },
+     "price:photos+before:none": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Is there a gate wide enough for the hot tub's pieces?"
+       ],
+       [
+        "cust",
+        "san",
+        "Yes, a side gate."
+       ]
+      ]
+     },
+     "price:photos+before:card": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Is there a gate wide enough for the hot tub's pieces?"
+       ],
+       [
+        "cust",
+        "san",
+        "Yes, a side gate."
+       ]
+      ]
+     },
+     "price:photos+before:deposit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Is there a gate wide enough for the hot tub's pieces?"
+       ],
+       [
+        "cust",
+        "san",
+        "Yes, a side gate."
+       ]
+      ]
+     },
+     "price:photos+before:full": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Is there a gate wide enough for the hot tub's pieces?"
+       ],
+       [
+        "cust",
+        "san",
+        "Yes, a side gate."
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Would you like a donation receipt for anything that can be given away?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Yes, for the sofa."
+       ]
+      ]
+     },
+     "price:visit+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Would you like a donation receipt for anything that can be given away?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Yes, for the sofa."
+       ]
+      ]
+     },
+     "price:visit+before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Would you like a donation receipt for anything that can be given away?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Yes, for the sofa."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "We move out Friday. Can someone come tonight?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Clean Slate Hauling can't send someone tonight. Its soonest times are next, starting Thu Oct 22."
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "Say Alex needs the hot tub gone fast. A hot tub priced from photos is never sent now, since Sam OKs the price first. So the soonest window shows first.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "How soon can someone take it away?"
+       ],
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling will show its soonest times first, once the price is OK'd."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "For a job priced on site, Alex adds photos of what's going, room by room. Rosie drafts a range from them.",
+     "Truck access is asked too: a driveway, the street, or a long carry."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "A two-person carry, like a fridge on stairs, never goes out with one person."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "B6-03",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.1",
+       "6.1"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Is it priced on site?",
+      "q": "Priced on site: a range from photos first?",
+      "does": "A job priced on site gets a range from Alex's photos before Sam's OK. A price from the list or an OK'd photo quote needs none.",
+      "branches": [
+       {
+        "label": "Priced on site: a range first",
+        "when": {
+         "price": [
+          "visit"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.1",
+           "6.1"
+          ],
+          "who": "san",
+          "via": "auto",
+          "t": "Mon Oct 19, 6:47pm",
+          "title": "Drafts a range from Alex's photos",
+          "does": "Rosie drafts a range from Alex's photos and Sam's size guide, never a firm price. Sam checks it next, as he set for every photo estimate.",
+          "more": [
+           "Here: about half a truck, plus a fridge. That's $439 to $499.",
+           "The firm price is set on site, before anything is loaded.",
+           "Rosie never makes up a price. The range comes from Sam's own list and size guide.",
+           "Photos stay on the secure page. They never go through the AI or a text."
+          ],
+          "needs": [
+           "pf.services",
+           "answers"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Price already set",
+        "when": {
+         "price": [
+          "list",
+          "photos"
+         ]
+        },
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "more": [
+     "Here it books right away: it isn't for today, and the price is from the list or already OK'd.",
+     "A same-day job asks Sam first, as he set at sign-up."
+    ],
+    "vary": {
+     "price:visit": {
+      "more": [
+       "Here it asks Sam first: Sam checks every estimate drafted from photos.",
+       "A same-day job asks Sam first too, as he set at sign-up."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B6-05",
+    "vary": {
+     "price:visit+before:card": {
+      "t": "Mon Oct 19, 7:04pm"
+     },
+     "price:visit+before:none": {
+      "does": "Sam accepts. Nothing was taken, so nothing changes.",
+      "t": "Mon Oct 19, 7:04pm"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B6-10",
+    "vary": {
+     "price:visit": {
+      "t": "Mon Oct 19, 7:05pm",
+      "more": [
+       "Alex is found or added in the customer list.",
+       "The booking and the words Alex agreed to are kept 7 years.",
+       "Here it books once Sam accepts the estimate, at 7:04pm."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "does": "Rafael's truck is full, so he makes a dump run. Rosie tells Alex in the business's name, inside text hours, with the new finish time.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE dump run, back 9:30"
+     ],
+     [
+      "san",
+      "cust",
+      "Rafael's truck is full, so he's making a quick dump run. He'll be back about 9:30am, and the job should be done by 10am."
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "Alex won't be home",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.14",
+        "8.14"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Wed Oct 21, 3:00pm",
+       "title": "Sends Sam's rule for nobody home",
+       "does": "Alex texts that nobody will be home Thursday. Sam's rule: fine if the crew can reach everything. The firm price comes by text before anything is loaded.",
+       "more": [
+        "A garage or door code goes only on the secure page, never in a text.",
+        "Alex gets the firm price and photos by text, with 20 minutes to answer.",
+        "No answer: nothing is loaded, and any trip fee is Sam's call.",
+        "With nobody home, there's no check-in code. DONE with a photo confirms the visit."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "I won't be home Thursday. Can you still do it?"
+        ],
+        [
+         "san",
+         "cust",
+         "Yes, if the crew can reach everything. Add the garage code on your secure page. Rafael texts you the firm price before loading.",
+         {
+          "card": {
+           "title": "Nobody home · Thu Oct 22",
+           "lines": [
+            "Garage code: on the secure page only",
+            "Firm price by text, 20 minutes to answer",
+            "No answer: nothing is loaded"
+           ],
+           "button": "Add the code",
+           "link": "rosfield.com/c/r4n"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.visit",
+        "booked"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "does": "Back to Alex's door, 8:20am. Rafael checks what the plug-in asked Alex to have ready: a clear path, and won't-take items set apart. All set, so the work starts.",
+    "more": [
+     "Examples: a clear path, won't-take items set apart, a gate code that works, a car moved out of the driveway.",
+     "Missing, but the plug-in lets the visit go on: Rafael notes it, and the work starts.",
+     "If the plug-in says it stops the visit, it goes as 'Can't go ahead'."
+    ],
+    "vary": {
+     "before:none": {
+      "does": "Back to Alex's door, 8:20am. Rafael checks what the plug-in asked Alex to have ready: a clear path, and won't-take items set apart. All set, so the work starts."
+     },
+     "before:card": {
+      "does": "Back to Alex's door, 8:20am. Rafael checks what the plug-in asked Alex to have ready: a clear path, and won't-take items set apart. All set, so the work starts."
+     },
+     "before:full": {
+      "does": "Back to Alex's door, 8:20am. Rafael checks what the plug-in asked Alex to have ready: a clear path, and won't-take items set apart. All set, so the work starts."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "more": [
+     "The plug-in names the checks, like stairs, door frames and the path to the truck.",
+     "Alex can see them on the secure page.",
+     "A damage claim later is checked against them.",
+     "When nobody is home, these photos are the record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE scuff on the den doorway",
+      {
+       "photos": [
+        "Sofa, before",
+        "Den doorway, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s job."
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "BEFORE soft deck boards around the tub",
+        {
+         "photos": [
+          "Hot tub, before",
+          "Deck, before"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s job."
+       ]
+      ]
+     },
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "BEFORE the pile at the curb, by the mailbox",
+        {
+         "photos": [
+          "The pile, before",
+          "Curb and lawn, before"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s job."
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "BEFORE the pile at the curb, by the mailbox",
+        {
+         "photos": [
+          "The pile, before",
+          "Curb and lawn, before"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s job."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "BEFORE scuffs on the basement stairs. Paint and propane set apart",
+        {
+         "photos": [
+          "Basement, before",
+          "Garage, before"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s job."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "does": "Rafael sizes up the load and texts the firm price with its lines, before anything is loaded. It's under Sam's $500, so it goes to Alex at once.",
+    "more": [
+     "Owner's rule: the firm price is agreed before loading. No charge if Alex says no.",
+     "It's priced by truck space from Sam's list, plus add-ons like the fridge.",
+     "Over $500, Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+     "The $89 trip fee isn't added: it's only for a late cancel or nobody there.",
+     "No phone at hand: Alex can answer on Rafael's phone, the same as for extra items.",
+     "Two outcomes aren't taps: Alex may be out, or a big estimate can become its own job."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 439 half truck 389 fridge 50"
+     ]
+    ],
+    "vary": {
+     "after:card": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 439 half truck 389 fridge 50"
+       ]
+      ]
+     },
+     "after:own": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 439 half truck 389 fridge 50"
+       ]
+      ]
+     },
+     "price:visit+before:deposit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 439 half truck 389 fridge 50"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 439 half truck 389 fridge 50"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 439 half truck 389 fridge 50"
+       ]
+      ]
+     }
+    },
+    "t": "Thu Oct 22, 8:30am"
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "does": "Nothing is loaded. Alex owes nothing, and the firm price stays good for 7 days.",
+    "more": [
+     "Clean Slate's rule: no charge when Alex says no to the firm price.",
+     "Rafael texts DONE with nothing loaded. No bill goes out."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Nothing is loaded, and there's no charge for today. The price is good for 7 days.",
+      {
+       "card": {
+        "title": "Junk haul-away · $439",
+        "lines": [
+         "Good until Thu Oct 29"
+        ],
+        "button": "Book the haul-away",
+        "link": "rosfield.com/q/r4"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit+before:deposit": {
+      "does": "Nothing is loaded. The $89 deposit is refunded, and the firm price stays good for 7 days.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "No problem. Nothing is loaded, and your $89 deposit is refunded. The price is good for 7 days.",
+        {
+         "card": {
+          "title": "Junk haul-away · $439",
+          "lines": [
+           "Good until Thu Oct 29"
+          ],
+          "button": "Book the haul-away",
+          "link": "rosfield.com/q/r4"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-48",
+    "more": [
+     "Here, Alex keeps the old fridge for now. Half a truck is $389.",
+     "Rafael's DONE has only the OK'd lines.",
+     "The fridge is its own price now, good until Thu Oct 29."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Pick what goes today.",
+      {
+       "card": {
+        "title": "Junk haul-away · pick the lines",
+        "lines": [
+         "Half a truck · $389",
+         "Fridge, refrigerant recovered · $50"
+        ],
+        "button": "Pick lines",
+        "link": "rosfield.com/q/r4p"
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. OK'd the half truck only, $389. Leave the fridge."
+     ],
+     [
+      "san",
+      "cust",
+      "OK: Rafael loads everything but the fridge today, $389. The $50 fridge price stays good until Thu Oct 29."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "more": [
+     "Nothing is done without Alex's yes.",
+     "Don't do it: nothing is loaded, and nothing is owed, the same as Not today.",
+     "Sam calls, and Alex says yes: Rafael does the work, and the yes is saved with the time.",
+     "No answer from Sam in 30 minutes: the work isn't done, and Alex is told."
+    ],
+    "t": "Thu Oct 22, 9:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "does": "Alex adds a mattress and box spring from the bedroom. They weren't in the price, so Rosie reads the price back, then asks Alex first.",
+    "more": [
+     "It's checked against the plug-in's job rules first.",
+     "Under Sam's $500, it goes to Alex at once.",
+     "Two mattress pieces are $25 each on Sam's list.",
+     "Nothing extra is loaded without Alex's yes.",
+     "Alex isn't there: one reminder after 15 minutes. Still none at 30 minutes: Sam picks to call, or not take it."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "EXTRA 50 mattress and box spring"
+     ],
+     [
+      "san",
+      "staff",
+      "Extra for Alex M.: a mattress and box spring, $50. Sent to Alex."
+     ],
+     [
+      "san",
+      "cust",
+      "Rafael priced what you added.",
+      {
+       "card": {
+        "title": "Mattress set · $50",
+        "lines": [
+         "Loaded today, if you say yes",
+         "Added to the bill after the job"
+        ]
+       },
+       "buttons": [
+        "Yes, do it",
+        "No, just the booked work"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-24",
+    "more": [
+     "Alex can cancel it in the cancel period the state's rules set. Here, that's until 11:59pm Mon Oct 26, for a full $50 refund.",
+     "Rafael also tells Alex out loud."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Here's your right to cancel the extra work.",
+      {
+       "card": {
+        "title": "Right to cancel · $50",
+        "lines": [
+         "Cancel in the period the rules set: here, until 11:59pm Mon Oct 26",
+         "Full refund · sent by text and email"
+        ],
+        "button": "Cancel the extra work",
+        "link": "rosfield.com/x/r4"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "more": [
+       "Alex can cancel it in the cancel period the state's rules set. Here, that's until 11:59pm Mon Oct 26, for a full $50 refund.",
+       "Rafael also tells Alex out loud."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Here's your right to cancel the extra work.",
+        {
+         "card": {
+          "title": "Right to cancel · $50",
+          "lines": [
+           "Cancel in the period the rules set: here, until 11:59pm Mon Oct 26",
+           "Full refund · sent by text and email"
+          ],
+          "button": "Cancel the extra work",
+          "link": "rosfield.com/x/r4"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. The $50 mattress set price is good for 7 days.",
+      {
+       "card": {
+        "title": "Mattress set · $50",
+        "lines": [
+         "Good until Thu Oct 29"
+        ],
+        "button": "Book it",
+        "link": "rosfield.com/q/r4v"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "No problem. The $50 mattress set price is good for 7 days.",
+        {
+         "card": {
+          "title": "Mattress set · $50",
+          "lines": [
+           "Good until Thu Oct 29"
+          ],
+          "button": "Book it",
+          "link": "rosfield.com/q/r4v"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-26",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Alex M.'s page is open on your phone. Hand it to Alex to choose.",
+      {
+       "card": {
+        "title": "Mattress set · $50",
+        "lines": [
+         "For Alex to tap: yes, no, or cancel"
+        ],
+        "button": "Open Alex's page",
+        "link": "rosfield.com/q/r4v"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Copy: at 8:52am on Rafael's phone, you said yes to taking the mattress set for $50."
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "staff",
+        "Alex M.'s page is open on your phone. Hand it to Alex to choose.",
+        {
+         "card": {
+          "title": "Mattress set · $50",
+          "lines": [
+           "For Alex to tap: yes, no, or cancel"
+          ],
+          "button": "Open Alex's page",
+          "link": "rosfield.com/q/r4v"
+         }
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Copy: at 8:52am on Rafael's phone, you said yes to taking the mattress set for $50."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Rafael finds a box of weed killer in the garage. The crew can't take it, so it stays, and Alex gets a written note with where it can go.",
+    "more": [
+     "The note says what was found, what was left and why, and where it can go.",
+     "It never names a company.",
+     "Only what's loaded is charged.",
+     "Sam is told, and the note and photos stay with the job."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD weed killer in a box, left out",
+      {
+       "photos": [
+        "Box of weed killer"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Rafael found weed killer in a box in the garage. The crew can't take it, so it stays.",
+      {
+       "card": {
+        "title": "Safety note · 17 Birch Ln",
+        "lines": [
+         "Found: weed killer in a box",
+         "Left: chemicals the crew can't haul",
+         "It can go to the town's household hazardous waste drop-off"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Rafael checks the den with Alex: the sofa is out, and the doorway has no new marks.",
+    "more": [
+     "The plug-in names what's checked: the space is empty, and nothing was bumped on the way out.",
+     "After photos are taken from the same angles as the before photos."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "Before DONE, Rafael and Alex check the deck: the hot tub is gone, and the spot is swept.",
+      "more": [
+       "The plug-in names what's checked: every piece is gone, and the deck and gate weren't damaged.",
+       "After photos are taken from the same angles as the before photos."
+      ]
+     },
+     "price:list+before:deposit": {
+      "does": "Before DONE, Rafael photographs the empty curb. Nobody needs to be home for this check.",
+      "more": [
+       "The plug-in names what's checked: everything at the curb is gone, and the lawn is clear.",
+       "After photos are taken from the same angles as the before photos."
+      ]
+     },
+     "price:list+before:full": {
+      "does": "Before DONE, Rafael photographs the empty curb. Nobody needs to be home for this check.",
+      "more": [
+       "The plug-in names what's checked: everything at the curb is gone, and the lawn is clear.",
+       "After photos are taken from the same angles as the before photos."
+      ]
+     },
+     "price:visit": {
+      "does": "Before DONE, Rafael walks the basement and garage with Alex. Anything missed goes on the truck before Rafael texts DONE.",
+      "more": [
+       "The plug-in names what's checked: the rooms are empty and swept, and the paint and propane tank are still set apart.",
+       "After photos are taken from the same angles as the before photos."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "does": "The sofa is on the truck. Rafael texts DONE with the total, so Rosie can text the bill.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 179 sofa"
+     ]
+    ],
+    "vary": {
+     "price:visit+after:bill": {
+      "does": "Everything is loaded, and the space is swept. Rafael texts DONE with the total and its lines, so Rosie can text the bill.",
+      "t": "Thu Oct 22, 9:50am",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 439 half truck 389 fridge 50"
+       ]
+      ]
+     },
+     "price:photos+after:bill": {
+      "t": "Thu Oct 22, 11:20am"
+     },
+     "after:card": {
+      "t": "Thu Oct 22, 8:45am"
+     },
+     "after:none": {
+      "t": "Thu Oct 22, 8:35am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE narrow hall to the den. Take sofa legs off first next time."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private record."
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE curbside pile at the mailbox. Easy truck access."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE curbside pile at the mailbox. Easy truck access."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE deck boards soft where the tub sat. Alex may want the deck gone next."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE attic is full too. Steep basement stairs: two-person carries only."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "vary": {
+     "price:visit": {
+      "t": "Thu Oct 22, 9:52am"
+     },
+     "price:visit+before:none": {
+      "t": "Thu Oct 22, 9:52am"
+     },
+     "price:photos": {
+      "t": "Thu Oct 22, 11:22am"
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B10-01",
+    "steps": [
+     {
+      "id": "B10-x01",
+      "line": [
+       "10.11",
+       "13.8"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 3:30pm",
+      "title": "Texts where everything went",
+      "does": "After the last stop, Alex hears where it all went: donated, recycled or the transfer station. A charity's own receipt comes with it.",
+      "more": [
+       "Neither Clean Slate nor Rosie puts a value on donated items. The charity's receipt is passed on as it is.",
+       "An item the charity turns down goes with the rest. The price doesn't change.",
+       "A fridge's refrigerant record is kept with the job.",
+       "It's its own text, never with the rating."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Here's where your items went today.",
+        {
+         "list": {
+          "head": [
+           "Item",
+           "Where it went"
+          ],
+          "rows": [
+           [
+            "Sofa",
+            "Donated to the Springfield thrift store"
+           ]
+          ]
+         },
+         "card": {
+          "title": "Donation receipt",
+          "lines": [
+           "From the thrift store, as it gave it"
+          ],
+          "button": "See the receipt",
+          "link": "rosfield.com/d/r4"
+         }
+        }
+       ]
+      ],
+      "vary": {
+       "price:visit": {
+        "say": [
+         [
+          "san",
+          "cust",
+          "Here's where your items went today.",
+          {
+           "list": {
+            "head": [
+             "Item",
+             "Where it went"
+            ],
+            "rows": [
+             [
+              "Sofa",
+              "Donated to the Springfield thrift store"
+             ],
+             [
+              "Treadmill",
+              "Scrap metal recycler"
+             ],
+             [
+              "Fridge",
+              "Appliance recycler, refrigerant recovered"
+             ],
+             [
+              "Boxes",
+              "Paper recycling and the transfer station"
+             ]
+            ]
+           },
+           "card": {
+            "title": "Donation receipt",
+            "lines": [
+             "From the thrift store, as it gave it"
+            ],
+            "button": "See the receipt",
+            "link": "rosfield.com/d/r4"
+           }
+          }
+         ]
+        ]
+       },
+       "price:photos": {
+        "say": [
+         [
+          "san",
+          "cust",
+          "Here's where your items went today.",
+          {
+           "list": {
+            "head": [
+             "Item",
+             "Where it went"
+            ],
+            "rows": [
+             [
+              "Hot tub frame",
+              "Scrap metal recycler"
+             ],
+             [
+              "Shell and cover",
+              "Transfer station"
+             ]
+            ]
+           }
+          }
+         ]
+        ]
+       },
+       "before:full": {
+        "say": [
+         [
+          "san",
+          "cust",
+          "Here's where your items went today.",
+          {
+           "list": {
+            "head": [
+             "Item",
+             "Where it went"
+            ],
+            "rows": [
+             [
+              "Armchair",
+              "Turned down by the charity, so the transfer station"
+             ],
+             [
+              "Bags",
+              "Transfer station"
+             ]
+            ]
+           }
+          }
+         ]
+        ]
+       }
+      },
+      "needs": [
+       "pf.messages",
+       "pf.rules"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 4:00pm"
+   },
+   {
+    "op": "words",
+    "at": "B9-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 50 mattress set"
+     ],
+     [
+      "san",
+      "cust",
+      "Clean Slate Hauling: $50 for today's extra items.",
+      {
+       "pay": {
+        "amount": "$50",
+        "what": "the mattress set",
+        "link": "rosfield.com/p/r4x"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-06",
+    "does": "Alex cancels the $50 mattress set on the page. Sam is told, and the $50 goes back to Alex's card.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Cancel the extra work"
+     ],
+     [
+      "san",
+      "cust",
+      "Done: the $50 for the mattress set is refunded.",
+      {
+       "card": {
+        "title": "Refund · $50",
+        "lines": [
+         "Mattress set",
+         "Cancelled Mon Oct 26"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. cancelled the $50 mattress set. It's refunded."
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "does": "Alex cancels on the page. Clean Slate Hauling was paid its own way, so Sam refunds the $50 the same way.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "Cancel the extra work"
+       ],
+       [
+        "san",
+        "cust",
+        "Your cancel is recorded. Clean Slate Hauling will refund the $50 its own way."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. cancelled the $50 mattress set. Please refund it your own way."
+       ]
+      ]
+     },
+     "price:visit": {
+      "does": "Alex cancels the $50 mattress set on the page. Sam is told, and the $50 goes back to Alex's card.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "Cancel the extra work"
+       ],
+       [
+        "san",
+        "cust",
+        "Done: the $50 for the mattress set is refunded.",
+        {
+         "card": {
+          "title": "Refund · $50",
+          "lines": [
+           "Mattress set",
+           "Cancelled Mon Oct 26"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. cancelled the $50 mattress set. It's refunded."
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "does": "Alex cancels on the page. Clean Slate Hauling was paid its own way, so Sam refunds the $50 the same way.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "Cancel the extra work"
+       ],
+       [
+        "san",
+        "cust",
+        "Your cancel is recorded. Clean Slate Hauling will refund the $50 its own way."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. cancelled the $50 mattress set. Please refund it your own way."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "does": "Alex finds the sofa's cushions left in the den. Sam's rule: anything left behind is a free return trip.",
+    "more": [
+     "A free return trip is booked at $0, with its own check-in code.",
+     "Sam sets how long after the job it's offered: here, 7 days."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "You left the sofa cushions in the den."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says the sofa's cushions were left in the den after Thu Oct 22's pickup.",
+      {
+       "buttons": [
+        "Book a free return",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry about that. The crew comes back for it, free.",
+      {
+       "times": [
+        "Mon Oct 26 · arriving 8–10am · Rafael",
+        "Tue Oct 27 · arriving 8–10am · Rafael"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "Alex finds a piece of the hot tub's frame by the gate. Sam's rule: anything left behind is a free return trip.",
+      "more": [
+       "A free return trip is booked at $0, with its own check-in code.",
+       "Sam sets how long after the job it's offered: here, 7 days."
+      ],
+      "say": [
+       [
+        "cust",
+        "san",
+        "A piece of the hot tub frame is still by the gate."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. says a piece of the hot tub frame was left by the gate after Thu Oct 22.",
+        {
+         "buttons": [
+          "Book a free return",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. The crew comes back for it, free.",
+        {
+         "times": [
+          "Mon Oct 26 · arriving 8–10am · Rafael",
+          "Tue Oct 27 · arriving 8–10am · Rafael"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit": {
+      "does": "Alex finds one bag still at the curb. Sam's rule: anything left behind is a free return trip.",
+      "more": [
+       "A free return trip is booked at $0, with its own check-in code.",
+       "Sam sets how long after the job it's offered: here, 7 days."
+      ],
+      "say": [
+       [
+        "cust",
+        "san",
+        "One bag is still at the curb."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. says one bag was left at the curb after Thu Oct 22's pickup.",
+        {
+         "buttons": [
+          "Book a free return",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. The crew comes back for it, free.",
+        {
+         "times": [
+          "Mon Oct 26 · arriving 8–10am · Rafael",
+          "Tue Oct 27 · arriving 8–10am · Rafael"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "does": "Alex finds one bag still at the curb. Sam's rule: anything left behind is a free return trip.",
+      "more": [
+       "A free return trip is booked at $0, with its own check-in code.",
+       "Sam sets how long after the job it's offered: here, 7 days."
+      ],
+      "say": [
+       [
+        "cust",
+        "san",
+        "One bag is still at the curb."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. says one bag was left at the curb after Thu Oct 22's pickup.",
+        {
+         "buttons": [
+          "Book a free return",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. The crew comes back for it, free.",
+        {
+         "times": [
+          "Mon Oct 26 · arriving 8–10am · Rafael",
+          "Tue Oct 27 · arriving 8–10am · Rafael"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit": {
+      "does": "Alex finds 3 boxes left in a corner of the garage. Sam's rule: anything left behind is a free return trip.",
+      "more": [
+       "A free return trip is booked at $0, with its own check-in code.",
+       "Sam sets how long after the job it's offered: here, 7 days."
+      ],
+      "say": [
+       [
+        "cust",
+        "san",
+        "You left 3 boxes in the garage corner."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. says 3 boxes were left in the garage after Thu Oct 22's haul-away.",
+        {
+         "buttons": [
+          "Book a free return",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. The crew comes back for it, free.",
+        {
+         "times": [
+          "Mon Oct 26 · arriving 8–10am · Rafael",
+          "Tue Oct 27 · arriving 8–10am · Rafael"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-13",
+    "does": "With times to pick, all with Rafael, since only Rafael's crew takes hot tubs apart here. A card is saved for the $89 trip fee when Morgan books.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Clean Slate Hauling can take your hot tub away for $640.",
+      {
+       "card": {
+        "title": "Hot tub removal · $640",
+        "lines": [
+         "A card saved for the $89 trip fee when you book",
+         "Paid after the job"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/q/mp"
+       },
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches the curbside pickup from paid in full to a card saved and charged at DONE, for new bookings only. Each change is read back first.",
+    "more": [
+     "Curbside pickups already booked stay paid in full.",
+     "A saved card is charged only the agreed price, when the crew texts DONE.",
+     "Any deposit stays within the state's limits, from the plug-in.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "does": "Sam switches the curbside pickup from paid in full to a card saved and charged at DONE, for new bookings only. Each change is read back first."
+     },
+     "price:photos+before:deposit": {
+      "does": "Sam switches the curbside pickup from paid in full to a card saved and charged at DONE, for new bookings only. Each change is read back first."
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Junk removal, dumpsters and the yard pay Rosfield's $2, so the bill branch applies.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "No agreement to sign, so none can be left unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Junk removal books crews and yard hands, never a table, court or room.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Junk removal runs no classes, so no timetable is set.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Crews and yard hands need no license of their own. A commercial driver's license, where a truck needs one, is kept on file by the owner.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Junk removal is never sent now: same-day jobs get the soonest window, once Sam OKs them.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Junk removal is never sent now.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Junk removal books a crew in an arrival window.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A haul-away isn't booked as a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A haul-away is a crew's arrival window, never a seat.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Junk removal is never sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "why": "A haul-away has no group size.",
+    "label": "Too few booked to run"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Junk removal is never sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "The crew never takes care of a child: it waits for an adult on the booking.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "The plug-in names no form to sign.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "Clean Slate sells no repeat plans.",
+    "label": "Repeat visits: a plan"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "A haul-away is one job at one address.",
+    "label": "A group at one address"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No plan or warranty pays for a haul-away.",
+    "label": "A plan or warranty pays"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "why": "Clean Slate sells no plans.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "Junk removal is never sent now.",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "why": "Junk waiting to go doesn't get worse. A danger word in any text still gets the safety steps.",
+    "label": "The problem gets worse"
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "why": "Clean Slate sells no plans.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Clean Slate sells no plans.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Clean Slate sells no plans.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "Clean Slate sells no plans.",
+    "label": "One bill for many visits"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "No plan or insurance pays for a haul-away.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "No landlord is asked to pay for a haul-away.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "Where the items went is texted the same day, after the last stop.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Clean Slate Hauling",
+       "At the customer's place",
+       "Company's hauler license HL045210",
+       "Yes"
+      ],
+      [
+       "Rafael Cruz",
+       "Clean Slate Hauling",
+       "At the customer's place",
+       "None needed · CDL on file with Sam",
+       "Once Sam says yes"
+      ],
+      [
+       "Nate Brooks",
+       "Clean Slate Hauling",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Clean Slate Hauling",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Tasha Reed",
+       "Clean Slate Recycling",
+       "At the yard, and pickups at home",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Luis Ortega",
+       "Clean Slate Recycling",
+       "At the yard",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A license or permit shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. At the yard, only a fridge paid ahead can keep a $20 fee.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Clean Slate Recycling",
+      "9 Quarry Rd, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Mattress drop-off $35 ($40 from Nov 2) · Car load $40 · Box spring $20"
+     ],
+     [
+      "To book",
+      "Nothing taken · paid at the gate · a fridge is paid ahead"
+     ],
+     [
+      "Permits",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Clean Slate Hauling",
+      "Junk removal · within 25 miles of 40 Depot Rd, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "form": [
+     [
+      "I'm 18 or older",
+      "Yes"
+     ],
+     [
+      "An adult agrees the price, there or by text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Truck access",
+      "The driveway"
+     ],
+     [
+      "Pets",
+      "A dog, kept inside"
+     ],
+     [
+      "Gate or door code",
+      "None"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-21",
+    "more": [
+     "The check-in confirmed the visit, so Rosie's one $2 for this booking still counts, on the monthly bill."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-08",
+    "more": [
+     "It's part of the same booking, so it adds no $2: one $2 per booking, however many visits."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-58",
+    "more": [
+     "Junk removal is never sent now, so every visit gets the day list and an on-my-way text. The steps below show Alex's Thursday visit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-01",
+    "more": [
+     "Hauling work happens only at the customer's place, so nothing is asked.",
+     "A service offered in both places shows each place's price first. The customer picks.",
+     "A video or phone session counts as the other flow: the customer joins the business online."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "vary": {
+     "before:full": {
+      "does": "Back to Alex: it's Thursday morning, and Rafael heads over. For a curbside pile, nobody needs to be home, so there's no code to give.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "OMW"
+       ],
+       [
+        "san",
+        "cust",
+        "Rafael from Clean Slate Hauling is on the way to your curbside pile, about 15 minutes. Nobody needs to be home. You'll get a photo when it's done.",
+        {
+         "photos": [
+          "Rafael, from Clean Slate Hauling"
+         ],
+         "photoLink": "rosfield.com/m/r4"
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "vary": {
+     "before:full": {
+      "does": "If someone meets the crew, Rafael enters their code. For a curbside pile with nobody home, Rafael's DONE with a photo confirms the pickup instead. Rosfield's $2 already came out of the payment."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "vary": {
+     "price:visit+before:none": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling can clear it out. It's priced at the visit, by how much of the truck it fills. No charge if you say no to the price. Nothing is taken when you book, so there's no trip fee. Arrival times:",
+        {
+         "times": [
+          "Thu Oct 22 · arriving 8–10am · Rafael",
+          "Thu Oct 22 · arriving 12–2pm · Nate",
+          "Fri Oct 23 · arriving 8–10am · Rafael"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling can clear it out, priced at the visit by truck space. No charge if you say no to the price. A card is saved for the $89 trip fee, only for a late cancel or nobody home. Arrival times:",
+        {
+         "times": [
+          "Thu Oct 22 · arriving 8–10am · Rafael",
+          "Thu Oct 22 · arriving 12–2pm · Nate",
+          "Fri Oct 23 · arriving 8–10am · Rafael"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:card+after:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Clean Slate Hauling can clear it out, priced at the visit by truck space. No charge if you say no. The $89 trip fee is only for a late cancel or nobody home. The price you OK is charged to your saved card at the end. Arrival times:",
+        {
+         "times": [
+          "Thu Oct 22 · arriving 8–10am · Rafael",
+          "Thu Oct 22 · arriving 12–2pm · Nate",
+          "Fri Oct 23 · arriving 8–10am · Rafael"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after every haul-away."
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "skin fades",
+    "for Lee's Barbershop. Sam named you",
+    "MP045210",
+    "BS20981",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Lee's Barbershop can book you from now on, at the shop.",
+    "Avery at the shop",
+    "Casey for plumbing",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Sam adds a barber",
+    "A barber can work at both, on one calendar.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Every shop service, color and house calls",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "It's a beard trim today at 2:00pm with Avery",
+    "accept the beard trim today at 2:00pm with Avery",
+    "A no-show is marked 15 minutes after the start",
+    "Haircut at the shop",
+    "Haircut at their home",
+    "Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "like a 15-minute style consult",
+    "Color always stays with Riley.",
+    "Can my son wait in the shop during my cut?",
+    "Consult only",
+    "Only the consult; the price stays open",
+    "Step-free door on Elm St · parking in the back",
+    "A cut is rated",
+    "priced a color and cut for Alex M.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop has none, so nothing is sent here.",
+    "A haircut could mean a salon or a barbershop.",
+    "A haircut needs nothing.",
+    "Can Lee's Barbershop do a haircut on Saturday morning?",
+    "Walk-in for a haircut",
+    "Books a haircut and a beard trim",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Can I add a beard trim on Saturday?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "photos of your hair",
+    "once Riley sees the hair",
+    "You can wait for it, or have the consult only today.",
+    "Riley quotes the rest at the chair, before any work.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "like a skin-test result",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "the Groom's package",
+    "Groom's package",
+    "Kids cut",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "a color and cut",
+    "Color and cut · priced from photos",
+    "Color and cut",
+    "color and cut",
+    "Color correction · priced at the chair",
+    "Color correction",
+    "color correction",
+    "$25 consult",
+    "Gloss to finish",
+    "gloss",
+    "color quote",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "chairs",
+    "chair",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "plumbing's",
+    "Plumbing",
+    "plumbing",
+    "electrical's",
+    "Electrical",
+    "electrical",
+    "the barbershop's",
+    "the barbershop",
+    "A barbershop's",
+    "A barbershop",
+    "Barbershop",
+    "barbershop",
+    "barbers'",
+    "barbers",
+    "barber",
+    "Barber",
+    "plumber",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "the shop's",
+    "The shop's",
+    "at the shop",
+    "the shop",
+    "The shop"
+   ],
+   "B": [
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "added a camera inspection to",
+    "the kitchen drain",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Book this drain clearing?",
+    "can clear the drain",
+    "Only the {{fee}} service call is promised now.",
+    "The {{fee}} counts toward the work's price.",
+    "Alex is told before the yes: the {{fee}} service call is owed, even after a no to the price.",
+    "for Lee Home Services. Sam named you",
+    " 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Leak repair · $245",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "The $89 service call is included",
+    "like a $620 repair",
+    "leak repair is $620",
+    "Leak repair · $620",
+    "Shutoff valve and wall pipe · $540",
+    "your new pipes are in",
+    "like replacing the old pipes Jordan noted",
+    "The $179 drain needs none.",
+    "Say Kim L.'s yard drain needs nobody home.",
+    "drain clearings",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "no proof Alex may have this work done",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "plumbing license MP045210",
+    "Plumbing license",
+    "MP045210",
+    "BS20981",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Every plumbing job, and electrical jobs",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Lee's Barbershop can book you from now on, at the shop.",
+    "Avery at the shop",
+    "Casey for plumbing",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Plumbing JP031552 · electrical JE30417",
+    "$89, credited to the repair",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "service call fee",
+    "Service call fee",
+    "the water heater quote",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "One of the shop's barbers does house calls.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "shutoff valve",
+    "Jordan texts the quote",
+    "The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "replaces water heaters",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Book a free fix",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Jordan left a mess under the sink.",
+    "Can I run the dishwasher before you come?",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "stage 2 of your repipe",
+    "for your repipe",
+    "Repipe",
+    "repipe",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "for the water heater flush you asked Jordan about",
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "the $160 valve work",
+    "The $160 valve quote is good for 7 days.",
+    "Replace both shutoff valves",
+    "QUOTE 245 valve 165 supply line 80",
+    "$245",
+    "$165",
+    "$80",
+    "$156",
+    "D nothing before. E 25% deposit after the quote. C paid in full when they book",
+    "E 25% deposit after the quote. C paid in full when they book",
+    "Kitchen drain clearing",
+    "Drain clearings already booked keep $179",
+    "raise drain clearing to 199",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call",
+    "Service call",
+    "Yard drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater",
+    "water heaters",
+    "water heater",
+    "haircut",
+    "house calls",
+    "at the chair",
+    "chairs",
+    "chair",
+    "leehomeservices.com",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "the barbershop",
+    "a barbershop",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "plumber",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "the shop's",
+    "The shop's",
+    "at the shop",
+    "the shop",
+    "The shop"
+   ]
+  },
+  "A": {
+   "S1-38": "b50b0bd4e8",
+   "S2-06": "6b01a08c94",
+   "S2-15": "4a64408afc",
+   "S2-22": "6fe11c094c",
+   "A3-02": "223044a79d",
+   "A3-20": "b8251d2535",
+   "A4-50": "6f43775326",
+   "A4-14": "95c7ffcfab",
+   "A8-23": "e3a35f7f9e",
+   "A8-35": "a67e890a5b",
+   "A8-30": "c0f4d7c935",
+   "A8-44": "4410a4860c",
+   "S11-56": "bd841a4732",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A7-93": "46cca94e45",
+   "A8-02": "15f418fec4",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-96": "d540b91653",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A9-15": "bd2a17c3c5",
+   "A8-03": "7accda6f86",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "S2-21": "bf6617b6d3",
+   "S11-57": "a3996ae84e",
+   "A5-19": "5d5db6f3c1",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S1-38": "6301c86637",
+   "S2-06": "b78d25d6e2",
+   "S2-15": "4a64408afc",
+   "S2-22": "6fe11c094c",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-22": "19f64ba1ba",
+   "B3-25": "4413e58bcb",
+   "B3-21": "ad48326ac5",
+   "B4-05": "fb3a9061c8",
+   "B4-34": "74ff52d83d",
+   "B4-15": "f13240b9c6",
+   "B6-03": "dcc1eb310c",
+   "B6-05": "32fad5e5ab",
+   "B6-10": "e8d4060d1b",
+   "B8-32": "1cfd4f7afa",
+   "B7-05": "e28a131872",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-48": "3b55a46f7c",
+   "B8-49": "4fcfdeb80b",
+   "B8-23": "dd780a2ec8",
+   "B8-24": "bd5fb0ef0b",
+   "B8-25": "3f7d0c2f58",
+   "B8-26": "056ea7b435",
+   "B8-30": "a1ef4983e4",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B9-06": "f091432f2d",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B9-04": "6017d4c54a",
+   "B10-06": "67a6e79276",
+   "B10-08": "01bac94fd8",
+   "B4-13": "ecedd7f044",
+   "S11-56": "8b6c6c101f",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B4-38": "9539521dc7",
+   "B4-43": "fc9855955a",
+   "B5-01": "841c417586",
+   "B7-93": "4d6f89e473",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "S2-21": "bf6617b6d3",
+   "S11-57": "2f34f23d8a",
+   "B4-32": "fcfe092e37",
+   "B4-01": "15f683e6cb",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

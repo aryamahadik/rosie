@@ -1,0 +1,2628 @@
+{
+ "id": "translator",
+ "name": "Translator and interpreter",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "notary",
+ "plugin": {
+  "pf.license": {
+   "business": "No trade license for translation or interpreting. Business registration where the state's form asks for it; identity checked; 'license: what the business says'.",
+   "person": "No person license. Certificates the owner adds, kept as given with their date and renew-by (S2-29, not checked), limit what each person is offered: court interpreting only by a court-certified or court-registered interpreter where the court's rules require it; medical interpreting only by a certified medical interpreter where the clinic or the state's rules require it; a notarized translation only by a notary with a current commission.",
+   "claims": "'Certified translation' means the translator's signed statement that it's accurate, never a license claim."
+  },
+  "pf.services": [
+   {
+    "name": "On-site interpreting",
+    "price": "list",
+    "example": "$75 an hour, 2-hour minimum ($150) (the example agency's own price)",
+    "length": "2 hours or more, billed by the half hour after the minimum",
+    "where": "B: the customer's appointment (a clinic, a lawyer's office, a school meeting, a business meeting, a wedding)",
+    "money": "B: a card saved for the late-cancel fee; billed after for the time used"
+   },
+   {
+    "name": "Video interpreting",
+    "price": "list",
+    "example": "$90 an hour, 1-hour minimum",
+    "length": "1 hour or more",
+    "where": "A: by video",
+    "money": "A: a card saved; the saved card is charged at DONE for the time used"
+   },
+   {
+    "name": "Certified document translation",
+    "price": "photos",
+    "example": "$45 a page for a birth certificate or a diploma, priced from photos of the pages",
+    "length": "brought to the office once for the original to be seen; the certified translation is ready in 3 business days",
+    "where": "A: at the office",
+    "money": "A: the full price when booking, once the photo price is OK'd"
+   }
+  ],
+  "pf.questions": {
+   "before_times": "The language pair; the kind of appointment in general words only (medical, legal or court, school, business, personal), since it sets who may go (a certificate) and how long; the date, start time and expected length; for documents, how many pages and the date they're needed by (a need-by date).",
+   "after_time": "Name and mobile of the person booking; for on-site work, the address and who the interpreter meets there (a front desk, a clinician, the person served).",
+   "secure_page_only": "The person served's name and any details of the case, the health visit or the legal matter; the documents themselves (photos of pages); a preference for a woman or a man interpreter, where the plug-in allows it (A4-16).",
+   "who_may_book": "An adult for themselves; an organization (a clinic, a law office, a school, a court, a company) for the person it serves; a parent for a child's documents. A teen can't book alone."
+  },
+  "pf.safety": {
+   "stop_words": "A medical emergency or danger described in the request (an interpreter is no emergency service).",
+   "what_rosie_says": "'If anyone is in danger, call 911 now. 911 can connect an interpreter.' No booking during an emergency.",
+   "booking_goes_on": "Only after 'we're safe'."
+  },
+  "pf.first_steps": {
+   "required": "Documents: photos of every page before the price (the photo quote). Court and medical work: the interpreter's certificate on file before they're offered.",
+   "prep": "On-site: the interpreter arrives 15 minutes early and checks in at the front desk. Documents: bring the original."
+  },
+  "pf.visit": {
+   "B": "The interpreter checks in with the code given by the person they meet (the booker, the clinic's front desk or the person served); the session runs; time past the booked length is an extra the customer OKs first; DONE with the time used.",
+   "A": "Video: most sessions join the customer's own meeting (a clinic's telehealth room, a company's video call, a remote hearing), so the customer gives that meeting link for the interpreter; otherwise the interpreter's own link. The code is read out at the start. Documents: the original is seen at the office, the code given there; the certified translation is ready later, on the secure page, with a printed copy to pick up where asked.",
+   "done_proof": "DONE from the interpreter (B, video); the code at the office (documents)."
+  },
+  "pf.money": {
+   "ways": "On-site: a card saved, billed after for the time used. Video: a card saved, charged at DONE. Documents: the full price when booking.",
+   "fees": "On-site: the 2-hour minimum ($150) inside 48 hours or nobody there. Video: the 1-hour minimum inside 24 hours. Documents: none once work started (a cancel in time gets everything back).",
+   "accounts": "Clinics and law offices that book often get one bill a month (the owner's setting).",
+   "tips": "No tip line.",
+   "rosfield": "$2 per booking (not a health practice or a law firm)."
+  },
+  "pf.messages": {
+   "never_in_text": "What the appointment is about (a diagnosis, a court case, an immigration matter), the person served's name for an organization's booking, and anything in the documents. Texts say only 'your interpreting visit' or 'your translation'.",
+   "languages": "The business's language pairs (example: Spanish, Vietnamese and Arabic with English). Texts go in the customer's language where Rosie can use it; a person follows up otherwise."
+  },
+  "pf.staff": {
+   "skills": "Each person's language pairs and certificates (court, medical); only people whose pairs and certificates fit are offered.",
+   "named": "A booking that names an interpreter, or asks for a woman or a man interpreter, is never moved to someone else on silence.",
+   "alone": "Interpreters work alone on site: an emergency contact is required for the check-out timer."
+  },
+  "pf.rules": {
+   "confidentiality": "Every assignment is confidential (the interpreter's code of ethics); nothing about it is shared beyond the people on the booking.",
+   "certified": "A certified translation carries the translator's signed statement of accuracy; a notarized one only a commissioned notary signs.",
+   "court": "Court interpreting only where the court's own rules let a private booking supply the interpreter; otherwise the court assigns its own."
+  },
+  "pf.edges": {
+   "an organization books for a patient or client": "the organization is the customer; the person served gives their own private answers (B4-107)",
+   "the session runs over": "more time is an extra the customer OKs first (B8-23)",
+   "the person served needs a woman or a man interpreter": "A4-16, where the plug-in allows it",
+   "documents needed by a date": "a need-by date (A4-83)",
+   "a translation late": "staff text LATE with a new date (A10-29)"
+  },
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.facts": [
+   "video",
+   "results",
+   "monthlybill",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "48 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Ana and Luis (interpreters)",
+   "other": "Others (a clinic, a court, a parent)"
+  },
+  "B": {
+   "staff": "Diego and Mei (interpreters)",
+   "other": "Others (a clinic, a law office, a school)"
+  }
+ },
+ "keep": [],
+ "rename": {
+  "A": [
+   [
+    "This is Rosie, an automated assistant for Lee's Language Office. Sam named you their emergency contact.",
+    "Rosie here, for Lee's Language Office. Sam named you their emergency contact."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they work, after a missed check."
+   ],
+   [
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Pat: office manager, OKs Lee Interpreting prices over $500"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Diego: on-site and video, $75 an hour"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A translation could mean a certified copy or a plain one."
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour",
+    "Diego does video too, at $75 an hour"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, certified work and on-site visits"
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Saturday's translation has one wrong name"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Translation CC-10552 · interpreting SC-10417"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's booth is in the other flow."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Ana also does certified translations and on-site visits"
+   ],
+   [
+    "Jordan's license expires in 30 days.",
+    "Diego's certificate expires in 30 days."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ana: translator, certified work and on-site visits"
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "The client pays the rest."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a missing page, today,"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Certified translation"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The translation has one wrong name."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Translations and Lee Video Interpreting"
+   ],
+   [
+    "plumbing and electrical work",
+    "translation and interpreting work"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "translation and interpreting jobs"
+   ],
+   [
+    "Jordan and Casey do plumbing",
+    "Diego and Mei do interpreting"
+   ],
+   [
+    "Avery · license not found",
+    "Avery · certificate not on file"
+   ],
+   [
+    "Casey · license not found",
+    "Casey · certificate not on file"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Ana and Eli interpret"
+   ],
+   [
+    "Plumbing and electrical",
+    "Translation and interpreting"
+   ],
+   [
+    "plumbing and electrical",
+    "translation and interpreting"
+   ],
+   [
+    "Avery · license expired",
+    "Avery · certificate on file"
+   ],
+   [
+    "Casey · license expired",
+    "Casey · certificate on file"
+   ],
+   [
+    "signature cut and shave",
+    "certified translation"
+   ],
+   [
+    "Signature cut and shave",
+    "Certified translation"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Rush fee"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW video interpreting"
+   ],
+   [
+    "A plan or warranty pays",
+    "A payer pays"
+   ],
+   [
+    "[photo: A chair, ready]",
+    "[photo: A booth, ready]"
+   ],
+   [
+    "[photo: The shop front]",
+    "[photo: The shop front]"
+   ],
+   [
+    "Jordan does electrical",
+    "Diego does video"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Video session"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Interpreting LLC"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Language Office LLC"
+   ],
+   [
+    "the Groom's package",
+    "the on-site package"
+   ],
+   [
+    "The Groom's package",
+    "The on-site package"
+   ],
+   [
+    "photos of your hair",
+    "photos of your document"
+   ],
+   [
+    "heating and cooling",
+    "video interpreting"
+   ],
+   [
+    "Heating and cooling",
+    "Video interpreting"
+   ],
+   [
+    "Insurance pays part",
+    "A payer pays part"
+   ],
+   [
+    "the shop's own line",
+    "the company's own line"
+   ],
+   [
+    "[photo: The chairs]",
+    "[photo: The booths]"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Language Office's"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Interpreting'"
+   ],
+   [
+    "electrical license",
+    "court certificate"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Interpreting"
+   ],
+   [
+    "Plumbing MP045210",
+    "Translation CC-10552"
+   ],
+   [
+    "a dripping faucet",
+    "a wrong name"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Language Office"
+   ],
+   [
+    "plumbing license",
+    "translator certificate"
+   ],
+   [
+    "Plumbing license",
+    "Translator certificate"
+   ],
+   [
+    "color correction",
+    "video interpreting"
+   ],
+   [
+    "Color correction",
+    "Video interpreting"
+   ],
+   [
+    "garbage disposal",
+    "printer"
+   ],
+   [
+    "service call fee",
+    "rush fee"
+   ],
+   [
+    "Service call fee",
+    "Rush fee"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "hot towel shaves",
+    "stamps"
+   ],
+   [
+    "Every bike shop",
+    "Every language office"
+   ],
+   [
+    "Groom's package",
+    "on-site package"
+   ],
+   [
+    "Gloss to finish",
+    "Stamp to finish"
+   ],
+   [
+    "dripping faucet",
+    "wrong name"
+   ],
+   [
+    "Repipe · $2,400",
+    "Certified translation · $90"
+   ],
+   [
+    "Drain clearing",
+    "Video session"
+   ],
+   [
+    "drain clearing",
+    "video session"
+   ],
+   [
+    "Under the sink",
+    "At the front desk"
+   ],
+   [
+    "under the sink",
+    "at the front desk"
+   ],
+   [
+    "shutoff valves",
+    "signed pages"
+   ],
+   [
+    "a chair, ready",
+    "a booth, ready"
+   ],
+   [
+    "Signature cut",
+    "Certified translation"
+   ],
+   [
+    "signature cut",
+    "certified translation"
+   ],
+   [
+    "groom's party",
+    "client group"
+   ],
+   [
+    "color and cut",
+    "certified translation"
+   ],
+   [
+    "Color and cut",
+    "Certified translation"
+   ],
+   [
+    "sees the hair",
+    "sees the document"
+   ],
+   [
+    "Kitchen drain",
+    "Video session"
+   ],
+   [
+    "kitchen drain",
+    "video session"
+   ],
+   [
+    "bathroom sink",
+    "front desk"
+   ],
+   [
+    "shutoff valve",
+    "signed page"
+   ],
+   [
+    "Shutoff valve",
+    "Signed page"
+   ],
+   [
+    "water heaters",
+    "interpreters"
+   ],
+   [
+    "Water heaters",
+    "Interpreters"
+   ],
+   [
+    "cabinet floor",
+    "office floor"
+   ],
+   [
+    "Cabinet floor",
+    "Office floor"
+   ],
+   [
+    "rents a chair",
+    "rents a booth"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Translations"
+   ],
+   [
+    "Lee Electric",
+    "Lee Video Interpreting"
+   ],
+   [
+    "Jordan Price",
+    "Diego Price"
+   ],
+   [
+    "1200 Main St",
+    "600 Pine St"
+   ],
+   [
+    "a beard trim",
+    "a document note"
+   ],
+   [
+    "A beard trim",
+    "A document note"
+   ],
+   [
+    "a barbershop",
+    "a language office"
+   ],
+   [
+    "A barbershop",
+    "A language office"
+   ],
+   [
+    "barber chair",
+    "interpreting booth"
+   ],
+   [
+    "water heater",
+    "interpreter"
+   ],
+   [
+    "Water heater",
+    "Interpreter"
+   ],
+   [
+    "service call",
+    "on-site visit"
+   ],
+   [
+    "Service call",
+    "On-site visit"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "chair renter",
+    "booth renter"
+   ],
+   [
+    "Casey Moore",
+    "Mei Moore"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "barbershops",
+    "language offices"
+   ],
+   [
+    "Barbershops",
+    "Language offices"
+   ],
+   [
+    "electrician",
+    "video interpreter"
+   ],
+   [
+    "leak repair",
+    "document fix"
+   ],
+   [
+    "Leak repair",
+    "Document fix"
+   ],
+   [
+    "supply line",
+    "pen"
+   ],
+   [
+    "Supply line",
+    "Pen"
+   ],
+   [
+    "overflowing",
+    "running late"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Riley Chen",
+    "Ana Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Eli Diaz"
+   ],
+   [
+    "beard trim",
+    "document note"
+   ],
+   [
+    "Beard trim",
+    "Document note"
+   ],
+   [
+    "patch test",
+    "pre-session check"
+   ],
+   [
+    "Patch test",
+    "Pre-session check"
+   ],
+   [
+    "house call",
+    "on-site visit"
+   ],
+   [
+    "House call",
+    "On-site visit"
+   ],
+   [
+    "barbershop",
+    "language office"
+   ],
+   [
+    "Barbershop",
+    "Language office"
+   ],
+   [
+    "Yard drain",
+    "Video session"
+   ],
+   [
+    "yard drain",
+    "video session"
+   ],
+   [
+    "electrical",
+    "video"
+   ],
+   [
+    "Electrical",
+    "Video"
+   ],
+   [
+    "dishwasher",
+    "printer"
+   ],
+   [
+    "water line",
+    "sound line"
+   ],
+   [
+    "Water line",
+    "Sound line"
+   ],
+   [
+    "travel fee",
+    "rush fee"
+   ],
+   [
+    "Travel fee",
+    "Rush fee"
+   ],
+   [
+    "The chairs",
+    "The booths"
+   ],
+   [
+    "88 Elm St",
+    "27 Hill Rd"
+   ],
+   [
+    "42 Oak St",
+    "320 Bell St"
+   ],
+   [
+    "skin fade",
+    "video session"
+   ],
+   [
+    "Skin fade",
+    "Video session"
+   ],
+   [
+    "kids cuts",
+    "rush fees"
+   ],
+   [
+    "Electric.",
+    "Video."
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "hot towel",
+    "certified"
+   ],
+   [
+    "haircuts",
+    "translations"
+   ],
+   [
+    "Haircuts",
+    "Translations"
+   ],
+   [
+    "Kids cut",
+    "Rush fee"
+   ],
+   [
+    "kids cut",
+    "rush fee"
+   ],
+   [
+    "cut hair",
+    "interpret"
+   ],
+   [
+    "Cut hair",
+    "Interpret"
+   ],
+   [
+    "a barber",
+    "an interpreter"
+   ],
+   [
+    "A barber",
+    "An interpreter"
+   ],
+   [
+    "plumbers",
+    "interpreters"
+   ],
+   [
+    "plumbing",
+    "translation"
+   ],
+   [
+    "Plumbing",
+    "Translation"
+   ],
+   [
+    "the sink",
+    "the front desk"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "haircut",
+    "translation"
+   ],
+   [
+    "Haircut",
+    "Translation"
+   ],
+   [
+    "barbers",
+    "interpreters"
+   ],
+   [
+    "Barbers",
+    "Interpreters"
+   ],
+   [
+    "massage",
+    "sign language check"
+   ],
+   [
+    "Massage",
+    "Sign language check"
+   ],
+   [
+    "plumber",
+    "interpreter"
+   ],
+   [
+    "Plumber",
+    "Interpreter"
+   ],
+   [
+    "shutoff",
+    "stamp"
+   ],
+   [
+    "Shutoff",
+    "Stamp"
+   ],
+   [
+    "clogged",
+    "jammed"
+   ],
+   [
+    "cabinet",
+    "desk"
+   ],
+   [
+    "Cabinet",
+    "Desk"
+   ],
+   [
+    "steamer",
+    "scanner"
+   ],
+   [
+    "line-up",
+    "page order"
+   ],
+   [
+    "Elm St",
+    "Hill Rd"
+   ],
+   [
+    "Oak St",
+    "Bell St"
+   ],
+   [
+    "Barber",
+    "Interpreter"
+   ],
+   [
+    "barber",
+    "interpreter"
+   ],
+   [
+    "faucet",
+    "stamp"
+   ],
+   [
+    "Faucet",
+    "Stamp"
+   ],
+   [
+    "toilet",
+    "printer"
+   ],
+   [
+    "heater",
+    "printer"
+   ],
+   [
+    "Heater",
+    "Printer"
+   ],
+   [
+    "valves",
+    "stamps"
+   ],
+   [
+    "brassy",
+    "blurry"
+   ],
+   [
+    "facial",
+    "notary seal"
+   ],
+   [
+    "repipe",
+    "certified translation"
+   ],
+   [
+    "Repipe",
+    "Certified translation"
+   ],
+   [
+    "$2,400",
+    "$150"
+   ],
+   [
+    "Jordan",
+    "Diego"
+   ],
+   [
+    "chairs",
+    "booths"
+   ],
+   [
+    "color",
+    "certified"
+   ],
+   [
+    "Color",
+    "Certified"
+   ],
+   [
+    "perms",
+    "court filings"
+   ],
+   [
+    "gloss",
+    "stamp"
+   ],
+   [
+    "drain",
+    "session"
+   ],
+   [
+    "Drain",
+    "Session"
+   ],
+   [
+    "pipes",
+    "pages"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "drips",
+    "stalls"
+   ],
+   [
+    "valve",
+    "stamp"
+   ],
+   [
+    "flush",
+    "check"
+   ],
+   [
+    "Flush",
+    "Check"
+   ],
+   [
+    "sewer",
+    "court"
+   ],
+   [
+    "Sewer",
+    "Court"
+   ],
+   [
+    "shave",
+    "stamp"
+   ],
+   [
+    "Shave",
+    "Stamp"
+   ],
+   [
+    "Riley",
+    "Ana"
+   ],
+   [
+    "Avery",
+    "Eli"
+   ],
+   [
+    "Casey",
+    "Mei"
+   ],
+   [
+    "beard",
+    "stamp"
+   ],
+   [
+    "Beard",
+    "Stamp"
+   ],
+   [
+    "perm",
+    "court filing"
+   ],
+   [
+    "sink",
+    "desk"
+   ],
+   [
+    "Sink",
+    "Desk"
+   ],
+   [
+    "pipe",
+    "page"
+   ],
+   [
+    "Pipe",
+    "Page"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "leak",
+    "error"
+   ],
+   [
+    "Leak",
+    "Error"
+   ],
+   [
+    "cape",
+    "folder"
+   ],
+   [
+    "Cape",
+    "Folder"
+   ],
+   [
+    "$800",
+    "$150"
+   ],
+   [
+    "dye",
+    "ink"
+   ]
+  ],
+  "B": [
+   [
+    "This is Rosie, an automated assistant for Lee's Language Office. Sam named you their emergency contact.",
+    "Rosie here, for Lee's Language Office. Sam named you their emergency contact."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they work, after a missed check."
+   ],
+   [
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Pat: office manager, OKs Lee Interpreting prices over $500"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Diego: on-site and video, $75 an hour"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A translation could mean a certified copy or a plain one."
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour",
+    "Diego does video too, at $75 an hour"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, certified work and on-site visits"
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Saturday's translation has one wrong name"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Translation CC-10552 · interpreting SC-10417"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's booth is in the other flow."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Ana also does certified translations and on-site visits"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ana: translator, certified work and on-site visits"
+   ],
+   [
+    "Riley's license expires in 30 days.",
+    "Ana's certificate expires in 30 days."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "The client pays the rest."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a missing page, today,"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Certified translation"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The translation has one wrong name."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Translations and Lee Video Interpreting"
+   ],
+   [
+    "plumbing and electrical work",
+    "translation and interpreting work"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "translation and interpreting jobs"
+   ],
+   [
+    "Jordan and Casey do plumbing",
+    "Diego and Mei do interpreting"
+   ],
+   [
+    "Avery · license not found",
+    "Avery · certificate not on file"
+   ],
+   [
+    "Casey · license not found",
+    "Casey · certificate not on file"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Ana and Eli interpret"
+   ],
+   [
+    "Plumbing and electrical",
+    "Translation and interpreting"
+   ],
+   [
+    "plumbing and electrical",
+    "translation and interpreting"
+   ],
+   [
+    "Avery · license expired",
+    "Avery · certificate on file"
+   ],
+   [
+    "Casey · license expired",
+    "Casey · certificate on file"
+   ],
+   [
+    "signature cut and shave",
+    "certified translation"
+   ],
+   [
+    "Signature cut and shave",
+    "Certified translation"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Rush fee"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW video interpreting"
+   ],
+   [
+    "A plan or warranty pays",
+    "A payer pays"
+   ],
+   [
+    "[photo: A chair, ready]",
+    "[photo: A booth, ready]"
+   ],
+   [
+    "[photo: The shop front]",
+    "[photo: The shop front]"
+   ],
+   [
+    "Jordan does electrical",
+    "Diego does video"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Video session"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Interpreting LLC"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Language Office LLC"
+   ],
+   [
+    "the Groom's package",
+    "the on-site package"
+   ],
+   [
+    "The Groom's package",
+    "The on-site package"
+   ],
+   [
+    "photos of your hair",
+    "photos of your document"
+   ],
+   [
+    "heating and cooling",
+    "video interpreting"
+   ],
+   [
+    "Heating and cooling",
+    "Video interpreting"
+   ],
+   [
+    "Insurance pays part",
+    "A payer pays part"
+   ],
+   [
+    "the shop's own line",
+    "the company's own line"
+   ],
+   [
+    "[photo: The chairs]",
+    "[photo: The booths]"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Language Office's"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Interpreting'"
+   ],
+   [
+    "electrical license",
+    "court certificate"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Interpreting"
+   ],
+   [
+    "Plumbing MP045210",
+    "Translation CC-10552"
+   ],
+   [
+    "a dripping faucet",
+    "a wrong name"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Language Office"
+   ],
+   [
+    "plumbing license",
+    "translator certificate"
+   ],
+   [
+    "Plumbing license",
+    "Translator certificate"
+   ],
+   [
+    "color correction",
+    "video interpreting"
+   ],
+   [
+    "Color correction",
+    "Video interpreting"
+   ],
+   [
+    "garbage disposal",
+    "printer"
+   ],
+   [
+    "service call fee",
+    "rush fee"
+   ],
+   [
+    "Service call fee",
+    "Rush fee"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "hot towel shaves",
+    "stamps"
+   ],
+   [
+    "Every bike shop",
+    "Every language office"
+   ],
+   [
+    "Groom's package",
+    "on-site package"
+   ],
+   [
+    "Gloss to finish",
+    "Stamp to finish"
+   ],
+   [
+    "dripping faucet",
+    "wrong name"
+   ],
+   [
+    "Repipe · $2,400",
+    "Certified translation · $90"
+   ],
+   [
+    "Drain clearing",
+    "Video session"
+   ],
+   [
+    "drain clearing",
+    "video session"
+   ],
+   [
+    "Under the sink",
+    "At the front desk"
+   ],
+   [
+    "under the sink",
+    "at the front desk"
+   ],
+   [
+    "shutoff valves",
+    "signed pages"
+   ],
+   [
+    "a chair, ready",
+    "a booth, ready"
+   ],
+   [
+    "Signature cut",
+    "Certified translation"
+   ],
+   [
+    "signature cut",
+    "certified translation"
+   ],
+   [
+    "groom's party",
+    "client group"
+   ],
+   [
+    "color and cut",
+    "certified translation"
+   ],
+   [
+    "Color and cut",
+    "Certified translation"
+   ],
+   [
+    "sees the hair",
+    "sees the document"
+   ],
+   [
+    "Kitchen drain",
+    "Video session"
+   ],
+   [
+    "kitchen drain",
+    "video session"
+   ],
+   [
+    "bathroom sink",
+    "front desk"
+   ],
+   [
+    "shutoff valve",
+    "signed page"
+   ],
+   [
+    "Shutoff valve",
+    "Signed page"
+   ],
+   [
+    "water heaters",
+    "interpreters"
+   ],
+   [
+    "Water heaters",
+    "Interpreters"
+   ],
+   [
+    "cabinet floor",
+    "office floor"
+   ],
+   [
+    "Cabinet floor",
+    "Office floor"
+   ],
+   [
+    "rents a chair",
+    "rents a booth"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Translations"
+   ],
+   [
+    "Lee Electric",
+    "Lee Video Interpreting"
+   ],
+   [
+    "Jordan Price",
+    "Diego Price"
+   ],
+   [
+    "1200 Main St",
+    "600 Pine St"
+   ],
+   [
+    "a beard trim",
+    "a document note"
+   ],
+   [
+    "A beard trim",
+    "A document note"
+   ],
+   [
+    "a barbershop",
+    "a language office"
+   ],
+   [
+    "A barbershop",
+    "A language office"
+   ],
+   [
+    "barber chair",
+    "interpreting booth"
+   ],
+   [
+    "water heater",
+    "interpreter"
+   ],
+   [
+    "Water heater",
+    "Interpreter"
+   ],
+   [
+    "service call",
+    "on-site visit"
+   ],
+   [
+    "Service call",
+    "On-site visit"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "chair renter",
+    "booth renter"
+   ],
+   [
+    "Casey Moore",
+    "Mei Moore"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "barbershops",
+    "language offices"
+   ],
+   [
+    "Barbershops",
+    "Language offices"
+   ],
+   [
+    "electrician",
+    "video interpreter"
+   ],
+   [
+    "leak repair",
+    "document fix"
+   ],
+   [
+    "Leak repair",
+    "Document fix"
+   ],
+   [
+    "supply line",
+    "pen"
+   ],
+   [
+    "Supply line",
+    "Pen"
+   ],
+   [
+    "overflowing",
+    "running late"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Riley Chen",
+    "Ana Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Eli Diaz"
+   ],
+   [
+    "beard trim",
+    "document note"
+   ],
+   [
+    "Beard trim",
+    "Document note"
+   ],
+   [
+    "patch test",
+    "pre-session check"
+   ],
+   [
+    "Patch test",
+    "Pre-session check"
+   ],
+   [
+    "house call",
+    "on-site visit"
+   ],
+   [
+    "House call",
+    "On-site visit"
+   ],
+   [
+    "barbershop",
+    "language office"
+   ],
+   [
+    "Barbershop",
+    "Language office"
+   ],
+   [
+    "Yard drain",
+    "Video session"
+   ],
+   [
+    "yard drain",
+    "video session"
+   ],
+   [
+    "electrical",
+    "video"
+   ],
+   [
+    "Electrical",
+    "Video"
+   ],
+   [
+    "dishwasher",
+    "printer"
+   ],
+   [
+    "water line",
+    "sound line"
+   ],
+   [
+    "Water line",
+    "Sound line"
+   ],
+   [
+    "travel fee",
+    "rush fee"
+   ],
+   [
+    "Travel fee",
+    "Rush fee"
+   ],
+   [
+    "The chairs",
+    "The booths"
+   ],
+   [
+    "88 Elm St",
+    "27 Hill Rd"
+   ],
+   [
+    "42 Oak St",
+    "320 Bell St"
+   ],
+   [
+    "skin fade",
+    "video session"
+   ],
+   [
+    "Skin fade",
+    "Video session"
+   ],
+   [
+    "kids cuts",
+    "rush fees"
+   ],
+   [
+    "Electric.",
+    "Video."
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "hot towel",
+    "certified"
+   ],
+   [
+    "haircuts",
+    "translations"
+   ],
+   [
+    "Haircuts",
+    "Translations"
+   ],
+   [
+    "Kids cut",
+    "Rush fee"
+   ],
+   [
+    "kids cut",
+    "rush fee"
+   ],
+   [
+    "cut hair",
+    "interpret"
+   ],
+   [
+    "Cut hair",
+    "Interpret"
+   ],
+   [
+    "a barber",
+    "an interpreter"
+   ],
+   [
+    "A barber",
+    "An interpreter"
+   ],
+   [
+    "plumbers",
+    "interpreters"
+   ],
+   [
+    "plumbing",
+    "translation"
+   ],
+   [
+    "Plumbing",
+    "Translation"
+   ],
+   [
+    "the sink",
+    "the front desk"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "haircut",
+    "translation"
+   ],
+   [
+    "Haircut",
+    "Translation"
+   ],
+   [
+    "barbers",
+    "interpreters"
+   ],
+   [
+    "Barbers",
+    "Interpreters"
+   ],
+   [
+    "massage",
+    "sign language check"
+   ],
+   [
+    "Massage",
+    "Sign language check"
+   ],
+   [
+    "plumber",
+    "interpreter"
+   ],
+   [
+    "Plumber",
+    "Interpreter"
+   ],
+   [
+    "shutoff",
+    "stamp"
+   ],
+   [
+    "Shutoff",
+    "Stamp"
+   ],
+   [
+    "clogged",
+    "jammed"
+   ],
+   [
+    "cabinet",
+    "desk"
+   ],
+   [
+    "Cabinet",
+    "Desk"
+   ],
+   [
+    "steamer",
+    "scanner"
+   ],
+   [
+    "line-up",
+    "page order"
+   ],
+   [
+    "Elm St",
+    "Hill Rd"
+   ],
+   [
+    "Oak St",
+    "Bell St"
+   ],
+   [
+    "Barber",
+    "Interpreter"
+   ],
+   [
+    "barber",
+    "interpreter"
+   ],
+   [
+    "faucet",
+    "stamp"
+   ],
+   [
+    "Faucet",
+    "Stamp"
+   ],
+   [
+    "toilet",
+    "printer"
+   ],
+   [
+    "heater",
+    "printer"
+   ],
+   [
+    "Heater",
+    "Printer"
+   ],
+   [
+    "valves",
+    "stamps"
+   ],
+   [
+    "brassy",
+    "blurry"
+   ],
+   [
+    "facial",
+    "notary seal"
+   ],
+   [
+    "repipe",
+    "certified translation"
+   ],
+   [
+    "Repipe",
+    "Certified translation"
+   ],
+   [
+    "$2,400",
+    "$150"
+   ],
+   [
+    "Jordan",
+    "Diego"
+   ],
+   [
+    "chairs",
+    "booths"
+   ],
+   [
+    "color",
+    "certified"
+   ],
+   [
+    "Color",
+    "Certified"
+   ],
+   [
+    "perms",
+    "court filings"
+   ],
+   [
+    "gloss",
+    "stamp"
+   ],
+   [
+    "drain",
+    "session"
+   ],
+   [
+    "Drain",
+    "Session"
+   ],
+   [
+    "pipes",
+    "pages"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "drips",
+    "stalls"
+   ],
+   [
+    "valve",
+    "stamp"
+   ],
+   [
+    "flush",
+    "check"
+   ],
+   [
+    "Flush",
+    "Check"
+   ],
+   [
+    "sewer",
+    "court"
+   ],
+   [
+    "Sewer",
+    "Court"
+   ],
+   [
+    "shave",
+    "stamp"
+   ],
+   [
+    "Shave",
+    "Stamp"
+   ],
+   [
+    "Riley",
+    "Ana"
+   ],
+   [
+    "Avery",
+    "Eli"
+   ],
+   [
+    "Casey",
+    "Mei"
+   ],
+   [
+    "beard",
+    "stamp"
+   ],
+   [
+    "Beard",
+    "Stamp"
+   ],
+   [
+    "perm",
+    "court filing"
+   ],
+   [
+    "sink",
+    "desk"
+   ],
+   [
+    "Sink",
+    "Desk"
+   ],
+   [
+    "pipe",
+    "page"
+   ],
+   [
+    "Pipe",
+    "Page"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "leak",
+    "error"
+   ],
+   [
+    "Leak",
+    "Error"
+   ],
+   [
+    "cape",
+    "folder"
+   ],
+   [
+    "Cape",
+    "Folder"
+   ],
+   [
+    "$800",
+    "$150"
+   ],
+   [
+    "dye",
+    "ink"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Alex sends photos of a 2-page birth certificate, OKs the $90 photo price and pays it, brings the original to the office with the code, and gets the certified translation three business days later on the secure page.",
+  "B": "A clinic books a Spanish interpreter for its patient's 2-hour visit; the card is saved for the late-cancel fee, the interpreter checks in at the front desk with the code, and the clinic gets the bill for the time used."
+ },
+ "money": {
+  "A": {
+   "main": "photos|full|none",
+   "combos": [
+    "photos|full|none",
+    "list|card|card"
+   ],
+   "examples": {
+    "photos|full|none": "A 2-page birth certificate, priced at $90 from photos, paid in full when booking.",
+    "list|card|card": "A 1-hour video interpreting session at $90; the card is saved and charged at DONE for the time used."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$90",
+     "name": "Video interpreting"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Certified translation"
+    },
+    "photos|full|*": {
+     "price": "$90",
+     "paid": "$90",
+     "name": "Certified translation"
+    },
+    "list|*|*": {
+     "price": "$90",
+     "fee": "$90",
+     "name": "Video interpreting"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|card|card",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|card|bill": "A 2-hour on-site session at $150; the card is saved for the $150 late-cancel fee; the bill comes after for the time used.",
+    "list|card|card": "The same session, the saved card charged at DONE.",
+    "list|none|bill": "A clinic on account: nothing taken when booking; its bill after."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$150",
+     "name": "On-site interpreting"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "fee": "$150",
+     "name": "On-site interpreting"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ],
+    "timing": [
+     "settime"
+    ]
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No trade license for translation or interpreting; registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A person's time is booked, not rooms or things."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Not a health practice or a law firm: the $2 applies."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license; court and medical certificates are checked as certificates (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No interpreter is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A session or a document drop-off is a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "The original is seen and handed back; nothing is left with the business."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left with an interpreter or translator."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Sensitive work: no rating (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "translation fees are set per signature from the state's form, so the office offers no gift cards, packages, plans or codes."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "why": "A translation needs no written contract: the fees and the notice are ticks on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "translation work sells no repeat plans: each translation is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for translation work."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The office books a translation's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The office books a translation's time."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "translation work sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "translation work sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "translation work sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "A translation is paid once, at the desk or by the bill: no stages, goods, plans or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "why": "A translation sells no contract at the office, so there's no cancel period."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No trade license; registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A person's time only."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license; certificates by S2-29."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "An appointment has a set start."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "An interpreter never takes charge of a child."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Sensitive work: no rating (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "B4-63",
+    "why": "No plan or warranty pays for translation work, so nothing is checked here."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "A translation needs no written contract: the fees are ticked on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "why": "translation fees are set per signature from the state's form, so the office offers no gift cards, packages or codes."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "translation work sells no repeat plans: each translation is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "translation work is never sent now (B4-81), so the button never shows."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "No form is signed before a translation: the fees and the no-legal-advice notice are ticks on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A translation needs no contract: the fees are ticked on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "translation work sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "translation work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "translation work sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "translation work sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "translation work sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Every signer must be there, so a translation is never done with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Own or rent is never asked for a translation, so no landlord pays."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "New build (H3, Tue Oct 27 2026) on the frozen master: from notary (refitted), base plug-in = the verified test-drive work/testdrive/translator.md (facts, services, prices, rules and the decided fixes kept).\nFlow A, the office: certified document translation priced from photos ($90 a 2-page document), paid in full when booking, ready in 3 business days on the secure page; video interpreting $90 an hour, card saved and charged at DONE for the time used.\nFlow B, on site: interpreting at the customer's appointment, $75 an hour with a 2-hour minimum ($150), card saved for the $150 late-cancel fee inside 48 hours and billed after for the time used; a clinic on account gets one bill a month.\nSwitch sensitive ON (health, legal and immigration work; every assignment confidential). Facts: video, results, monthlybill, extrawork. Settings: set start; B cutoff 48 hours before. $2 applies (D97). Certificates the owner adds are kept as given, not checked (D96).\nPlans, packs, memberships, insurance and staged bills are off. Renames: names, addresses, the office and interpreting companies, the notary example words moved to translation words.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "We'd share only where they're working, only after a missed check.",
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "A haircut could mean a salon or a barbershop.",
+    "Jordan does electrical too, at $140 an hour",
+    "Every shop service, color and house calls",
+    "says Saturday's cut is uneven on one side",
+    "Plumbing JP031552 · electrical JE30417",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Signature cut and hot towel shave",
+    "The cut is uneven on one side.",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical jobs",
+    "Jordan and Casey do plumbing",
+    "Avery · license not found",
+    "Gives the shop's own line",
+    "Riley and Avery cut hair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Avery · license expired",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "Jordan does electrical",
+    "Lee's Barbershop LLC",
+    "the Groom's package",
+    "The Groom's package",
+    "photos of your hair",
+    "Insurance pays part",
+    "the shop's own line",
+    "Lee's Barbershop's",
+    "Lee Home Services'",
+    "electrical license",
+    "Lee Home Services",
+    "Plumbing MP045210",
+    "Lee's Barbershop",
+    "color correction",
+    "Color correction",
+    "the shop's board",
+    "hot towel shaves",
+    "Groom's package",
+    "Gloss to finish",
+    "Drain clearing",
+    "Signature cut",
+    "signature cut",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "sees the hair",
+    "water heaters",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "a beard trim",
+    "A beard trim",
+    "a barbershop",
+    "A barbershop",
+    "water heater",
+    "At the chair",
+    "at the chair",
+    "chair renter",
+    "Casey Moore",
+    "house calls",
+    "House calls",
+    "barbershops",
+    "price board",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "Beard trim",
+    "patch test",
+    "house call",
+    "House call",
+    "barbershop",
+    "Barbershop",
+    "electrical",
+    "Electrical",
+    "travel fee",
+    "The chairs",
+    "88 Elm St",
+    "skin fade",
+    "Skin fade",
+    "kids cuts",
+    "Electric.",
+    "the chair",
+    "hot towel",
+    "haircuts",
+    "Haircuts",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "a barber",
+    "A barber",
+    "plumbing",
+    "Plumbing",
+    "Main St",
+    "haircut",
+    "Haircut",
+    "barbers",
+    "Barbers",
+    "massage",
+    "Massage",
+    "plumber",
+    "Plumber",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "heater",
+    "Jordan",
+    "chairs",
+    "color",
+    "Color",
+    "perms",
+    "gloss",
+    "Drain",
+    "valve",
+    "shave",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "Beard",
+    "perm",
+    "pipe",
+    "leak",
+    "Leak",
+    "cape"
+   ],
+   "B": [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "We'd share only where they're working, only after a missed check.",
+    "Pat: office manager, OKs Lee Home Services prices over $500",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "A haircut could mean a salon or a barbershop.",
+    "Jordan does electrical too, at $140 an hour",
+    "Plumbing JP031552 · electrical JE30417",
+    "The shop's chair is in the other flow.",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Your home warranty covers the rest.",
+    "It's a leak under the sink, today,",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical work",
+    "plumbing and electrical jobs",
+    "Jordan and Casey do plumbing",
+    "Casey · license not found",
+    "Gives the shop's own line",
+    "Riley and Avery cut hair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Casey · license expired",
+    "NEW heating and cooling",
+    "A plan or warranty pays",
+    "Jordan does electrical",
+    "Kitchen drain clearing",
+    "Lee Home Services LLC",
+    "heating and cooling",
+    "Heating and cooling",
+    "Insurance pays part",
+    "the shop's own line",
+    "Lee Home Services'",
+    "electrical license",
+    "Lee Home Services",
+    "Plumbing MP045210",
+    "a dripping faucet",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "service call fee",
+    "Service call fee",
+    "hot towel shaves",
+    "dripping faucet",
+    "Repipe · $2,400",
+    "Drain clearing",
+    "drain clearing",
+    "Under the sink",
+    "under the sink",
+    "shutoff valves",
+    "Kitchen drain",
+    "kitchen drain",
+    "bathroom sink",
+    "shutoff valve",
+    "Shutoff valve",
+    "water heaters",
+    "cabinet floor",
+    "Cabinet floor",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "a barbershop",
+    "water heater",
+    "Water heater",
+    "service call",
+    "Service call",
+    "at the chair",
+    "chair renter",
+    "Casey Moore",
+    "house calls",
+    "House calls",
+    "barbershops",
+    "leak repair",
+    "Leak repair",
+    "supply line",
+    "Supply line",
+    "overflowing",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "house call",
+    "House call",
+    "barbershop",
+    "Barbershop",
+    "yard drain",
+    "electrical",
+    "Electrical",
+    "dishwasher",
+    "water line",
+    "travel fee",
+    "The chairs",
+    "88 Elm St",
+    "42 Oak St",
+    "Electric.",
+    "the chair",
+    "hot towel",
+    "cut hair",
+    "a barber",
+    "plumbing",
+    "Plumbing",
+    "the sink",
+    "Main St",
+    "haircut",
+    "Haircut",
+    "barbers",
+    "Barbers",
+    "plumber",
+    "Plumber",
+    "shutoff",
+    "Shutoff",
+    "clogged",
+    "cabinet",
+    "Cabinet",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "faucet",
+    "heater",
+    "valves",
+    "repipe",
+    "Repipe",
+    "$2,400",
+    "Jordan",
+    "chairs",
+    "color",
+    "drain",
+    "Drain",
+    "pipes",
+    "clogs",
+    "valve",
+    "flush",
+    "sewer",
+    "Sewer",
+    "shave",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "perm",
+    "sink",
+    "pipe",
+    "clog",
+    "leak",
+    "Leak",
+    "$800"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A4-28": "c8e677520c",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A9-15": "bd2a17c3c5",
+   "A10-05": "63c3536c7a"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "B4-63": "49ce39c037",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B4-38": "9539521dc7",
+   "B6-03": "dcc1eb310c",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-69": "5d0e4c0045",
+   "B9-06": "f091432f2d"
+  }
+ }
+}

@@ -1,0 +1,2896 @@
+{
+ "id": "roofer",
+ "name": "Roofer",
+ "style": "Project",
+ "pattern": "project",
+ "from": "contractor",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a roofing license or registration for the company, where the state's form requires one (some states license roofing on its own, some under a contractor or home improvement license, some not at all)",
+   "ask": [
+    "The company's roofing license or registration number, and its class",
+    "Any job-size limit the license has",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business; plus a qualifying person where the state's form names one. Solar installers hold their own licenses where the state asks.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No roofing goes live until the company's license checks out, where one is required",
+    "A job over the license's size limit is never offered or quoted: the owner is told why"
+   ],
+   "declared_emergency": "In a declared emergency, the owner says which licenses in that area have lapsed, and a roofer new to the state is held until the owner says yes, where the state's rules say so",
+   "renewals": "License, insurance and bond dates kept; reminded 30 days out; a lapse pauses new bookings",
+   "lead_safe": "Work that disturbs painted trim or fascia on older homes only by a firm and a person certified for lead-safe work, where the rules require it",
+   "showroom": "The showroom: a registration, and a seller's license for each consultant who sells roof work, only where the state's form asks",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Inspection, then project: a roof is booked only after a written estimate and a signed contract",
+   "B": [
+    {
+     "name": "Roof inspection",
+     "price": "$89, counted toward the roof work if Alex signs (the example business's own price; a free inspection is a common starting option)",
+     "length": "45 to 60 minutes",
+     "where": "at the customer's place",
+     "before": "nothing taken (or a card saved for the $89 fee)",
+     "after": "billed only if no contract follows",
+     "report": "photos by slope, an attic look, squares measured; a written report and estimate the same day, good for 30 days"
+    },
+    {
+     "name": "New roof (storm damage or an old roof)",
+     "price": "quoted after the inspection; the example: $575 a square for architectural shingles, plus $650 for the permit and dumpster and $350 for the ridge vent and vent boots",
+     "length": "1 day per roof up to 30 squares, per crew",
+     "where": "at the customer's place; nobody needs to be home on install day",
+     "before": "nothing at booking; a deposit only after the contract is signed",
+     "after": "the balance after the city's final inspection"
+    },
+    {
+     "name": "Rotted decking",
+     "price": "$95 a sheet, photos first; up to 10 sheets OK'd in the contract",
+     "where": "added to a new roof, never booked alone"
+    },
+    {
+     "name": "Roof repair (flashing, boots, shingles)",
+     "price": "quoted at the visit (example: $245)",
+     "where": "at the customer's place",
+     "before": "nothing, or a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Shingle repair (up to 10 shingles)",
+     "price": "$179, from the list",
+     "length": "1 to 2 hours",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Moss treatment",
+     "price": "$150, from the list",
+     "length": "half a day",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "paid in full when booked, or a $40 deposit",
+     "after": "nothing more, or the rest on the bill"
+    },
+    {
+     "name": "Skylight replacement",
+     "price": "priced from photos (example: $640); over $500, Sam OKs it",
+     "length": "1 day",
+     "where": "at the customer's place",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Roof certification (for a sale or an insurer)",
+     "price": "$199, with a written report",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Roof check on a plan",
+     "price": "the list price each visit; for rentals and other buildings",
+     "where": "at the customer's place; nobody needs to be home"
+    },
+    {
+     "name": "Emergency tarp",
+     "price": "a set price on the list (the example: $395), sent now with Sam's OK; a written price before anyone goes up",
+     "where": "at the customer's place",
+     "after": "on the bill"
+    },
+    {
+     "name": "Tile or metal roofs",
+     "price": "an inspection first, then a written estimate"
+    },
+    {
+     "name": "Labor",
+     "price": "$120 an hour, 1-hour minimum",
+     "where": "added to a job, never booked alone"
+    },
+    {
+     "name": "Solar (the second kind of work)",
+     "price": "panel cleaning $149, critter guard $189, an install after a free estimate visit",
+     "where": "at the customer's place",
+     "note": "waits for its installer's own license, where the state asks"
+    }
+   ],
+   "A": [
+    {
+     "name": "Shingle consult",
+     "price": "$35, 30 minutes",
+     "where": "at the showroom; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the showroom desk"
+    },
+    {
+     "name": "Skylight pick",
+     "price": "$40",
+     "where": "at the showroom",
+     "before": "a card saved",
+     "after": "at the showroom desk"
+    },
+    {
+     "name": "Sample kit",
+     "price": "$20, an add-on to take home",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Trim match",
+     "price": "$25",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Roof preview session (a picture of the house with its new roof)",
+     "price": "$55, 60 minutes; counts toward the roof if Alex signs with Lee Roofing",
+     "where": "at the showroom",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Full exterior plan (roof, skylights, trim, preview)",
+     "price": "$140, 2½ hours",
+     "where": "at the showroom",
+     "before": "a card saved for the $40 fee (over 2 hours), or a $40 deposit",
+     "after": "at the showroom desk"
+    },
+    {
+     "name": "Metal roof plan",
+     "price": "priced from the customer's photos and measurements (example: $90); Sam OKs each one",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Tile roof match",
+     "price": "priced at the showroom after a $25 consult, once the consultant sees the old tile",
+     "where": "at the showroom"
+    }
+   ],
+   "capacity": "One estimator or consultant per booking; 1 roof per crew per day, up to 30 squares; the showroom's layout table is saved with long sessions",
+   "skills": "Inspections and estimates: estimators. Installs: crew leads with their crews. Solar: licensed installers. Showroom: consultants.",
+   "nobody_home": "Roof work outside: nobody needs to be home; a start photo and day-end photos. An adult is needed only for the attic check at the inspection.",
+   "online": "No video consult: shingle picks use the samples at the showroom"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What's wrong: storm damage, a leak, or an old roof?",
+    "Roof type: shingle, tile, metal or flat",
+    "About how old is the roof?",
+    "How many stories is the house?",
+    "Is anything dripping inside now?"
+   ],
+   "after_time": [
+    "Have you filed an insurance claim? Yes or no only, never the claim's details",
+    "The year the home was built (painted trim on older homes may need lead-safe work, where the rules require it)",
+    "OK to go on the roof and take photos?",
+    "Will an adult be home for a 5-minute attic check?",
+    "Gate, pets and parking",
+    "Do you own the home or rent? (the owner signs any contract)"
+   ],
+   "secure_page_only": [
+    "Gate or lockbox codes",
+    "Photos of the damage (optional)",
+    "Budget (optional)"
+   ],
+   "who_may_book": "An adult who owns the home, or someone with the owner's written OK. Everyone on the home's title signs a roof contract.",
+   "showroom": [
+    "Which part of the house: the roof, skylights or trim",
+    "Photos of the house, and an old tile or shingle if there is one (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a tree through the roof or a wall, power lines down on or near the house",
+     "says": "Leave the house and stay far from the lines. Then call 911 and the power company.",
+     "booking": "no booking until the house is safe"
+    },
+    {
+     "words": "a ceiling sagging, bulging or falling",
+     "says": "Get everyone out of that room, and call 911 if anyone is at risk.",
+     "booking": "no booking until it's safe"
+    },
+    {
+     "words": "a gas smell, sparking or smoking wires",
+     "says": "Leave the house now. Then call 911 and the gas or power company.",
+     "booking": "no booking"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "water dripping inside, a wet or stained ceiling",
+     "says": "Keep everyone out from under it, and catch the drips in a bucket. Turn that room off at the breaker only if it's safe to reach. Don't go on the roof.",
+     "booking": "goes on, marked urgent; the emergency tarp is offered first, with Sam's OK"
+    }
+   ],
+   "business_line": "Questions about whether a roof is safe to walk on, or about the structure, go to the business's own line",
+   "never": "Customers are told never to climb on a damaged or wet roof"
+  },
+  "pf.first_steps": {
+   "before_quote": "The inspection at the home: the roof and the attic, photos by slope, squares measured",
+   "after_contract": [
+    "The cancel window ends before any work or orders, where the state's rules give one",
+    "The permit, pulled by the license holder in the business's name, and any notice the state's rules require before work starts",
+    "Shingles and a dumpster delivered the day before the install",
+    "A dry forecast the day before the tear-off"
+   ],
+   "prep": [
+    "Stay off the roof",
+    "An adult home for the 5-minute attic check at the inspection",
+    "Before the install: move cars from the driveway, take pictures off the walls, and keep pets inside"
+   ],
+   "showroom_prep": [
+    "Bring photos of the house",
+    "Bring an old tile or shingle, if there is one"
+   ],
+   "sample_pickup": "A 15-minute sample pickup before a full exterior plan, at least 2 days before, so the shingles are seen on the house in daylight"
+  },
+  "pf.visit": {
+   "check_in": "Inspection: the check-in code at the door, with an adult home for the attic. Install day: nobody needs to be home; the crew texts a start photo. Showroom: the code at the desk.",
+   "at_the_visit": "The roof is walked only when it's dry. Photos by slope, an attic look, squares measured. The written report and estimate come the same day, good for 30 days. Nothing is signed or paid at the inspection.",
+   "wet_roof": "Never walk a wet roof: inspect by drone and from the attic, or move the time",
+   "changes": "Rotted decking at the contract's price per sheet, up to the count OK'd in the contract, with photos and a change order for the record. Past it, a signed change order before that work.",
+   "install_day": "Plants and the AC unit covered; the roof sealed the same day; a magnet sweep of the yard, driveway and street for nails, with photos; day-end photos to the customer",
+   "outside_checks": "The city's final inspection, where the permit requires it",
+   "done": "The final inspection where needed, then the walk-around and nail sweep, then DONE",
+   "showroom_done": "DONE after the consult, with the picks saved for the inspection and estimate",
+   "before_photos": "Each slope of the roof, the attic and any ceiling stains"
+  },
+  "pf.money": {
+   "inspection": "The example's $89 inspection counts toward the roof work, and is billed only if no contract follows. A free inspection is a safe start.",
+   "no_money_before_contract": "On a new roof, nothing is taken before the contract is signed by everyone",
+   "deposit": "Only after signing; the deposit cap comes from the state's form",
+   "kept_apart": "Money paid before the work is kept apart or bonded where the state's rules require it (a switch from the state's form)",
+   "balance": "After the city's final inspection; never ahead of the work",
+   "insurance": "The customer's own insurance claim pays the customer, never through Rosie or the business. The deductible is always the customer's: never paid, waived or rebated.",
+   "insurance_check": "If the balance waits for the insurer's check, Sam picks: wait, or call",
+   "storm_prices": "In a declared emergency, prices stay at the list from before it, for as long as the state's rules say",
+   "rosfield_fee": "Rosfield's $2 can be switched off by state and by who pays, where a state's rule on pay for referrals reaches it (a switch from the state's form, for counsel to confirm)",
+   "change_orders": "Added to the balance",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the crew lead texts 'paid check'.",
+   "tips": "No tip line",
+   "tax": "Tax on materials and labor follows the state's form",
+   "showroom": "The roof preview session's $55 counts toward the roof if Alex signs with Lee Roofing; the $20 missed-consult fee only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Insurance claim details",
+    "Gate or lockbox codes",
+    "Contract, change order and permit papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home never lets the crew in, and never goes in the attic with them",
+   "no_claim_ads": "No text ever urges anyone to file an insurance claim"
+  },
+  "pf.staff": {
+   "roles": "Estimators and crew leads (Diego, Owen): inspections, estimates, and installs with their crews. Showroom consultants (Hana, Ruby).",
+   "licenses": "The company holds the roofing license; solar installers hold their own, checked before they're named on a job",
+   "drone": "Drone inspections only by a pilot who holds the federal remote pilot certificate",
+   "lead_safe": "A certified renovator on any job that disturbs painted trim on an older home, where lead-safe rules apply",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another estimator may take an inspection; an install keeps its crew lead unless Sam moves it",
+   "on_call": "Emergency tarps: Diego weeknights, Owen weekends, each the other's backup"
+  },
+  "pf.rules": {
+   "contract": "A written contract for a new roof where the state's rules require one, signed by everyone on title and by the business before any money",
+   "contract_parts": "The parts the state's form lists (license number, price, dates, deposit, cancel notice, any lien or recovery-fund notice, who owes the deductible)",
+   "cancel_window": "A cancel window after signing, where the state's rules give one; a longer one for contracts signed in a declared emergency, where the rules say so. Work and orders wait for it.",
+   "claim_denied": "A contract signed before the insurer decides: any right to cancel after a written denial, where the state's rules give one",
+   "insurance_claims": "The business never files, adjusts or explains the customer's claim, unless the state's rules allow it; no gifts or rebates tied to an inspection or a claim",
+   "permits": "Pulled by the license holder in the business's name, never the homeowner's",
+   "notice_before_work": "Any notice the state's rules require before work starts, filed by the owner of the business",
+   "change_orders": "Written and signed by both before added work, past what the contract already OK'd",
+   "final": "The city's final inspection before the balance is asked for",
+   "lien_release": "A lien release with the final payment, where the state's rules provide one",
+   "show": "The license number on the listing, the times read out, the confirmation, the estimate, the contract and the receipt, where the state's rules require it",
+   "storm_prices": "Prices from before a declared emergency, for as long as the state's rules say",
+   "warranty": "10 years on a new roof's workmanship and 1 year on repairs (the example's); the shingle maker's warranty registered in the owner's name",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "weather": "No tear-off at a 40% chance of rain or more (the example business's own limit); a weather move never costs the customer",
+   "wet_roof": "Rain at inspection time: a drone and attic look, or a new time",
+   "leak_gets_worse": "Safety steps first, then the emergency tarp offered with Sam's OK and a written price",
+   "hidden_damage": "Rotted decking: at the contract's price per sheet, inside the count OK'd; past it, a signed change order first",
+   "insurance_wait": "The estimate waits on the customer's insurer until its good-until date, with one reminder",
+   "insurance_check": "The balance may wait for the insurer's check: Sam picks wait or call",
+   "deductible_offer": "A customer or a door-knocker offers a deductible deal: answered with the plug-in's rule, never paid, waived or rebated",
+   "declared_emergency": "The owner says which licenses lapsed, newcomers held until the owner says yes, storm-period contracts marked, prices from before it",
+   "permit_late": "The install moves with no fee; the customer is told",
+   "inspection_fails": "The crew fixes it and it's checked again; the balance waits",
+   "nobody_home": "Install days: start and day-end photos",
+   "over_license_limit": "Not offered, and the owner is told why",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "photos",
+   "multiday",
+   "sentnow",
+   "extrawork",
+   "stages",
+   "banktransfer"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Hana and Ruby (showroom consultants)",
+   "other": "Others (a bank, a landlord)"
+  },
+  "B": {
+   "staff": "Diego and Owen (estimators and crew leads)",
+   "other": "Others (a bank, an insurer, a landlord)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Hana"
+  },
+  "B": {
+   "staff": "Diego"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Riley and Avery cut hair",
+    "Riley and Avery run the showroom"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Shingle consults, skylight picks and sample kits at the showroom. Consults at home only where the state's rules allow them."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A roofing showroom on Elm St. Shingle, metal and tile samples, and roof plans to take home."
+   ],
+   [
+    "barbershops",
+    "exterior showrooms"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for driveway paving, which isn't on the showroom's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Exterior Showroom doesn't do driveway paving."
+   ],
+   [
+    "skin fades",
+    "skylight picks"
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "The roof preview session, $55, is paid in full when booked."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds siding to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Siding for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW siding"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a tarp after a storm, or a lockout"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a tarp after a storm"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A roofer's example: water through a ceiling gets 'catch the drips, and stay off the roof'."
+   ],
+   [
+    "Electric.",
+    "About 20 squares."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small repairs have a set price. A roof is quoted after an inspection. A tree through the roof stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A roofing license behind the company, where the state asks."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero escoger tejas el sábado."
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A skylight pick at Lee Exterior Showroom is $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for a skylight pick at $35"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a sample board fell and scratched a bag today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A sample board fell and scratched my bag."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Hana sees the old tile"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you match trim too? Ours is from 1998."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A shingle consult could mean a roofer's showroom or a supply store."
+   ],
+   [
+    "MP045210",
+    "RC045210"
+   ],
+   [
+    "EC22871",
+    "SC22871"
+   ],
+   [
+    "BS20981",
+    "SR20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work, like salons and groomers, is licensed to its own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Books the groom's party together",
+    "Books three neighbors together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Three neighbors on one street book consults on one morning, to pick a look that fits. Rosie finds times side by side with Hana and Ruby."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A shingle consult and a trim match work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your roof"
+   ],
+   [
+    "patch test",
+    "sample pickup"
+   ],
+   [
+    "skin-test result",
+    "sample Alex picked"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the showroom during my consult?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The leak in my bedroom got worse. Can I still come in?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: charcoal shingle, white trim, two skylights over the kitchen"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the porch roof."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the porch roof"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Quarry Rd"
+   ],
+   [
+    "takes no cut of them",
+    "takes no share of them"
+   ],
+   [
+    "Barber license",
+    "Seller's license"
+   ],
+   [
+    "JP031552",
+    "RF031552"
+   ],
+   [
+    "JE30417",
+    "SE30417"
+   ],
+   [
+    "Gloss to finish",
+    "Sealer to finish"
+   ],
+   [
+    "$15 gloss",
+    "$15 sealer"
+   ],
+   [
+    "gloss",
+    "sealer"
+   ],
+   [
+    "an estimate visit",
+    "a measure visit"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Roofing's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Roofing"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Exterior Showroom LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Exterior Showroom"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Roofing"
+   ],
+   [
+    "1200 Main St",
+    "460 Depot St"
+   ],
+   [
+    "88 Elm St",
+    "310 Quarry Rd"
+   ],
+   [
+    "Riley",
+    "Hana"
+   ],
+   [
+    "Avery",
+    "Ruby"
+   ],
+   [
+    "Jordan",
+    "Diego"
+   ],
+   [
+    "Casey",
+    "Owen"
+   ],
+   [
+    "plumbing and electrical",
+    "roofing and solar"
+   ],
+   [
+    "electrical",
+    "solar"
+   ],
+   [
+    "Electrical",
+    "Solar"
+   ],
+   [
+    "Panel upgrade",
+    "Solar install"
+   ],
+   [
+    "Plumber",
+    "Roofer"
+   ],
+   [
+    "plumber",
+    "roofer"
+   ],
+   [
+    "plumbing",
+    "roofing"
+   ],
+   [
+    "Plumbing",
+    "Roofing"
+   ],
+   [
+    "barbershop",
+    "showroom"
+   ],
+   [
+    "Barbershop",
+    "Showroom"
+   ],
+   [
+    "barbers",
+    "consultants"
+   ],
+   [
+    "barber",
+    "consultant"
+   ],
+   [
+    "Barber",
+    "Consultant"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Roof preview session"
+   ],
+   [
+    "Signature cut and shave",
+    "Roof preview session"
+   ],
+   [
+    "Groom's package",
+    "Full exterior plan"
+   ],
+   [
+    "Color and cut",
+    "Metal roof plan"
+   ],
+   [
+    "color and cut",
+    "metal roof plan"
+   ],
+   [
+    "Color correction",
+    "Tile roof match"
+   ],
+   [
+    "color correction",
+    "tile roof match"
+   ],
+   [
+    "color quote",
+    "custom quote"
+   ],
+   [
+    "color plan",
+    "custom plan"
+   ],
+   [
+    "Color plan",
+    "Custom plan"
+   ],
+   [
+    "color",
+    "custom plan"
+   ],
+   [
+    "Color",
+    "Custom plan"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Trim match"
+   ],
+   [
+    "Kids cut",
+    "Trim match"
+   ],
+   [
+    "kids cut",
+    "trim match"
+   ],
+   [
+    "Skin fade",
+    "Skylight pick"
+   ],
+   [
+    "skin fade",
+    "skylight pick"
+   ],
+   [
+    "Beard trim",
+    "Sample kit"
+   ],
+   [
+    "beard trim",
+    "sample kit"
+   ],
+   [
+    "Haircuts",
+    "Shingle consults"
+   ],
+   [
+    "haircuts",
+    "shingle consults"
+   ],
+   [
+    "Haircut",
+    "Shingle consult"
+   ],
+   [
+    "haircut",
+    "shingle consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "the chair",
+    "the showroom"
+   ],
+   [
+    "Drain clearing",
+    "Shingle repair"
+   ],
+   [
+    "water heaters",
+    "skylights"
+   ],
+   [
+    "water heater",
+    "skylight"
+   ],
+   [
+    "Drain",
+    "Shingle repair"
+   ],
+   [
+    "shops",
+    "showrooms"
+   ],
+   [
+    "shop",
+    "showroom"
+   ],
+   [
+    "Shop",
+    "Showroom"
+   ],
+   [
+    "does custom plan",
+    "does custom plans"
+   ]
+  ],
+  "B": [
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Roofing can fix the missing shingles:"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Roofing asks: is the job at a home, an office or somewhere else? And how many shingles are missing, and is anything dripping inside?"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Riley and Avery run the showroom"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Diego's ladder cracked a patio tile at Alex M.'s."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Shingle consults, skylight picks and sample kits at the showroom. Consults at home only where the state's rules allow them."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A roofing showroom on Elm St. Shingle, metal and tile samples, and roof plans to take home."
+   ],
+   [
+    "barbershops",
+    "exterior showrooms"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a leak in my bedroom ceiling. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Shingles blew off' fits a shingle repair."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please move cars out of the driveway, and keep pets inside."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a new ceiling stain this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a roof leak, today"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Flashing and decking · $540"
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Jordan's inspection at Harper J.'s is for a $2,400 porch roof."
+   ],
+   [
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Today's inspection owes only what was promised for it, like the $89 inspection."
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Roofing's quote for your porch roof."
+   ],
+   [
+    "Repipe · $2,400",
+    "Porch roof · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the framing is done, $800 at the finish"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages, as Sam set it up.",
+    "Say Harper J.'s $2,400 porch roof is billed in three stages, as Sam set it up."
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: the porch roof's framing is done."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like roofing a neighbor's house without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a ridge vent? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. About six, over the garage."
+   ],
+   [
+    "The customer is offered an estimate visit, booked like any visit.",
+    "The customer is offered a roof inspection, booked like any visit."
+   ],
+   [
+    "Lee Home Services · Estimate visit",
+    "Lee Roofing · Roof inspection"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's ladder cracks a patio tile, and Jordan texts a photo."
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · porch roof"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a tarp after a storm, or a lockout"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 flashing 165 shingles 80"
+   ],
+   [
+    "Sam adds heating and cooling to",
+    "Sam adds siding to"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW siding"
+   ],
+   [
+    "Heating and cooling for",
+    "Siding for"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Diego's notes"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I climb up and put a tarp on it before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Diego says no. Please stay off the roof until Diego is there."
+   ],
+   [
+    "like an overflowing drain",
+    "like a storm tarp"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Emergency tarp, roof leaking"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Leave the house, and stay far from any fallen power lines. Then call 911 and the power company."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said a tree came through their roof. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "A tree through the roof"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to leave, then call 911 and the power company"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the new attic vents Diego noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for new attic vents, from Diego's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · New attic vents"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a tarp after a storm"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Rain is coming through my ceiling. Can someone tarp it tonight?"
+   ],
+   [
+    "LATE camera report",
+    "LATE certification report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Roof work happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Roofing doesn't do, like a cracked driveway."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Roofing does roofing and solar work, not driveways. Nothing was saved. You can look for a paving company near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the roof's type and age, how many stories, and if anything drips inside now."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a tree through the roof, power lines down, or a ceiling sagging."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE stain on the bedroom ceiling, damp decking in the attic"
+   ],
+   [
+    "Under the sink, before",
+    "Attic, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Bedroom ceiling, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A roof is quoted after the inspection: only the $89 inspection was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Diego finds mold in the attic. The plug-in says a roofer stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold in the attic"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold in the attic"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Diego found mold in your attic and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the attic check"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left nails in the driveway.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left nails in the driveway."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Diego look at my garage roof next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Diego's next times for a roof inspection."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the roof inspection for today"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Entra agua por el techo de la recámara."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Water is coming through the bedroom ceiling."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A roofer's example: water through a ceiling gets 'catch the drips, and stay off the roof'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to catch the drips and keep out from under the wet ceiling. If it sags, she leaves the room and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Ponga una cubeta bajo la gotera y no se quede debajo del techo mojado. Si se hunde, salga del cuarto y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Put a bucket under the drip, and don't stay under the wet ceiling. If it sags, leave the room and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe for me to climb up and look at the damage?"
+   ],
+   [
+    "a dripping faucet",
+    "a leaking skylight"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The skylight is a roof repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a roofer fix a few shingles this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Shingle repair"
+   ],
+   [
+    "yard drain",
+    "shingle repair"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa shingle repair Thu 12-2 Owen"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a roof check at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's roof check?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "A few shingles blew off my roof. Can a roofer come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Can you see bare wood where they blew off?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that water now drips into the garage."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Water is dripping into the garage now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Move things away from the drip, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you treat the moss every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Roofing has a yearly moss plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a moss treatment every year."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 shingle repair"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE more loose tabs on the north side. Roof is 18 years old: check it after storms."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Two shingles lift again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Two of the new shingles are lifting."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s shingle repair, done Thu Oct 22, has two shingles lifting."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your repair is under warranty"
+   ],
+   [
+    "Electric.",
+    "About 20 squares."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Diego finds two cracked vent boots."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace both vent boots, cracked"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both vent boots"
+   ],
+   [
+    "both shutoff valves",
+    "both vent boots"
+   ],
+   [
+    "the shutoff valves",
+    "the vent boots"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 vent boot quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 vent boot work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Diego also write a roof certification for my insurer?"
+   ],
+   [
+    "Sewer camera report",
+    "Roof certification report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the certification report link"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 porch roof"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your porch roof"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 porch roof, 3 stages"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small repairs have a set price. A roof is quoted after an inspection. A tree through the roof stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A roofing license behind the company, where the state asks."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE ladder cracked a patio tile"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked patio tile"
+   ],
+   [
+    "leehomeservices.com",
+    "leeroofing.com"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A shingle consult could mean a roofer's showroom or a supply store."
+   ],
+   [
+    "MP045210",
+    "RC045210"
+   ],
+   [
+    "EC22871",
+    "SC22871"
+   ],
+   [
+    "BS20981",
+    "SR20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work, like salons and groomers, is licensed to its own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The showroom is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Exterior Showroom can do your shingle consult at the showroom for $35, or at your home for $75."
+   ],
+   [
+    "takes no cut of them",
+    "takes no share of them"
+   ],
+   [
+    "JP031552",
+    "RF031552"
+   ],
+   [
+    "JE30417",
+    "SE30417"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Diego gashes a hand and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT gashed my hand, need to stop"
+   ],
+   [
+    "an estimate visit",
+    "a measure visit"
+   ],
+   [
+    "Shutoff valve",
+    "Flashing"
+   ],
+   [
+    "shutoff valve",
+    "flashing"
+   ],
+   [
+    "Supply line",
+    "Shingle work"
+   ],
+   [
+    "supply line",
+    "shingle work"
+   ],
+   [
+    "sewer camera report",
+    "roof certification report"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Roofing's"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Roofing LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Roofing"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Exterior Showroom"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Roofing"
+   ],
+   [
+    "1200 Main St",
+    "460 Depot St"
+   ],
+   [
+    "88 Elm St",
+    "310 Quarry Rd"
+   ],
+   [
+    "42 Oak St",
+    "58 Cedar Ln"
+   ],
+   [
+    "Riley",
+    "Hana"
+   ],
+   [
+    "Avery",
+    "Ruby"
+   ],
+   [
+    "Jordan",
+    "Diego"
+   ],
+   [
+    "Casey",
+    "Owen"
+   ],
+   [
+    "plumbing and electrical",
+    "roofing and solar"
+   ],
+   [
+    "electrical",
+    "solar"
+   ],
+   [
+    "Electrical",
+    "Solar"
+   ],
+   [
+    "Panel upgrade",
+    "Solar install"
+   ],
+   [
+    "Plumber",
+    "Roofer"
+   ],
+   [
+    "plumber",
+    "roofer"
+   ],
+   [
+    "plumbing",
+    "roofing"
+   ],
+   [
+    "Plumbing",
+    "Roofing"
+   ],
+   [
+    "barbershop",
+    "showroom"
+   ],
+   [
+    "Barbershop",
+    "Showroom"
+   ],
+   [
+    "barbers",
+    "consultants"
+   ],
+   [
+    "barber",
+    "consultant"
+   ],
+   [
+    "Barber",
+    "Consultant"
+   ],
+   [
+    "color",
+    "custom plan"
+   ],
+   [
+    "Haircut",
+    "Shingle consult"
+   ],
+   [
+    "haircut",
+    "shingle consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "the chair",
+    "the showroom"
+   ],
+   [
+    "credited to the repair",
+    "credited to the roof work"
+   ],
+   [
+    "service call",
+    "inspection"
+   ],
+   [
+    "Service call",
+    "Inspection"
+   ],
+   [
+    "Water heater replacement",
+    "Skylight replacement"
+   ],
+   [
+    "water heater replacement",
+    "skylight replacement"
+   ],
+   [
+    "Leak repair",
+    "Roof repair"
+   ],
+   [
+    "leak repair",
+    "roof repair"
+   ],
+   [
+    "Sewer camera inspection",
+    "Roof certification"
+   ],
+   [
+    "sewer camera inspection",
+    "roof certification"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Shingle repair"
+   ],
+   [
+    "Drain clearings",
+    "Shingle repairs"
+   ],
+   [
+    "Drain clearing",
+    "Shingle repair"
+   ],
+   [
+    "drain clearing",
+    "shingle repair"
+   ],
+   [
+    "the kitchen drain",
+    "the shingle repair"
+   ],
+   [
+    "Kitchen drain",
+    "Shingle repair"
+   ],
+   [
+    "Water heater flush",
+    "Moss treatment"
+   ],
+   [
+    "water heater flush",
+    "moss treatment"
+   ],
+   [
+    "water heaters",
+    "skylights"
+   ],
+   [
+    "Water heater",
+    "Skylight"
+   ],
+   [
+    "water heater",
+    "skylight"
+   ],
+   [
+    "drain",
+    "shingle repair"
+   ],
+   [
+    "Drain",
+    "Shingle repair"
+   ],
+   [
+    "shop",
+    "showroom"
+   ],
+   [
+    "Shop",
+    "Showroom"
+   ],
+   [
+    "does custom plan",
+    "does custom plans"
+   ]
+  ]
+ },
+ "keep": [
+  "roofing",
+  "roofer",
+  "leak",
+  "drips"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Exterior Showroom, Sam's roofing showroom, to pick shingles with Hana on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. After a storm, Alex books Lee Roofing to look at his roof at 58 Cedar Ln. Diego inspects it Thu Oct 22 between 8 and 10am and sends a written estimate. Once Alex's insurer and Alex say yes, the crew puts on a new roof. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Shingle consult, $35 at the showroom; a card saved for the $20 missed-consult fee; paid at the showroom desk.",
+    "list|none|counter": "Shingle consult, $35; nothing taken; a YES books it; paid at the showroom desk.",
+    "list|full|none": "Roof preview session, $55, paid in full when booking; it counts toward the roof if Alex signs.",
+    "list|deposit|counter": "Full exterior plan, $140; a $40 deposit now; the $100 rest at the showroom desk.",
+    "photos|card|counter": "Metal roof plan, priced from Alex's photos and measurements at $90 (Sam OKs it); a card saved for the $20 fee; paid at the desk.",
+    "visit|card|counter": "Tile roof match, priced at the showroom once Hana sees the old tile: only the $25 consult is promised; a card saved; paid at the desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Shingle consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Shingle consult"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Full exterior plan"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Roof preview session"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Metal roof plan"
+    },
+    "visit|*|*": {
+     "name": "Tile roof match"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "list|card|bill",
+    "photos|deposit|bill",
+    "list|none|bill",
+    "list|full|none",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "Storm-damaged roof: a repair priced at the visit (the $89 inspection fee is owed even after a no), nothing taken; Rosie texts the bill after. A bigger job, like Harper J.'s $2,400 porch roof, becomes its own job: a signed quote and stage payments.",
+    "visit|none|own": "The same repair priced at the visit, but Sam bills it the business's own way; Rosie sends nothing about money.",
+    "visit|card|bill": "The same repair priced at the visit, with a card saved for the $89 inspection fee when Alex books.",
+    "list|card|bill": "A $179 shingle repair from the list; a card saved for the $89 fee; Rosie texts the bill after the job.",
+    "photos|deposit|bill": "A skylight priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill.",
+    "list|none|bill": "A $179 shingle repair for a returning customer: nothing taken; Rosie texts the bill after.",
+    "list|full|none": "A $150 moss treatment, paid in full when booking.",
+    "list|deposit|bill": "The $150 moss treatment with a $40 deposit; the $110 rest on the bill after the job."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Roof inspection"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Shingle repair"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Moss treatment"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Moss treatment"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Skylight"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Skylight"
+    },
+    "visit|*|*": {
+     "name": "Roof repair"
+    },
+    "list|deposit|bill": {
+     "fee": "$40"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A shingle consult is for the home's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the roof inspection at home",
+      "does": "Hana saves Alex's picks for the estimate. If Alex wants the roof priced, Hana books Diego's inspection at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Roofing, Sam's other company. It runs in the other flow.",
+       "The picks and photos go with it, so Diego's estimate uses them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: roof inspection at home. Picks saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Hana saved your picks. Want Lee Roofing to inspect your roof for an estimate?",
+        {
+         "buttons": [
+          "Book the inspection",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Roofing is licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Roofing and the showroom both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The roofer's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Estimators, crews and consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: inspections, roof jobs and showroom consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Solar installers hold their own licenses where the state's form asks, and so do showroom sellers; roofers work under the company's."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Some roof work is sent now, like an emergency tarp after a storm (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Shingle picks use the samples and boards at the showroom; the plug-in offers no video or phone consult."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The showroom books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The showroom books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The showroom books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A showroom consult has no form to sign first; a roof's contract comes after the estimate, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the showroom."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "A showroom sells no repeat plan: a consult is booked once, when a roof needs picking."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plan at the showroom (A4-28's plan branch is off), so no plan terms are shown."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plan at the showroom, so no plan visit to skip."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plan at the showroom, so no plan charge."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plan at the showroom, so no plan price to change."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a showroom consult; a roof paid from the owner's own claim is flow B's (B8-x01), and its money goes to the owner, never through Rosie."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a showroom consult; a roof paid from the owner's own claim is flow B's (B8-x01), and its money goes to the owner, never through Rosie."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A showroom consult: no child is left with the staff."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "The plug-in asks about an insurance claim as yes or no only. Its details never go in a chat or a text.",
+     "If Alex asks about the claim, the AI says the claim is Alex's to handle. Lee Roofing gives Alex the report and photos."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-16",
+    "more": [
+     "A roofer's what-if: a door-knocker offers to cover Alex's deductible. Rosie answers with the plug-in's rule.",
+     "That rule: the deductible is always the owner's to pay.",
+     "Rosie never judges another company. It only says what Lee Roofing does."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-17",
+    "more": [
+     "A roofer's plug-in can offer the emergency tarp first. Sam OKs it, and Alex gets the written price before anyone goes up."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "Nothing is done or signed at a roof inspection (the plug-in's rule): Alex signs a written contract first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A roof estimate is signed whole, as one contract. A small repair is its own written quote from Diego."
+   },
+   {
+    "op": "before",
+    "at": "B8-62",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "type": "split",
+      "line": [
+       "8.7",
+       "4.25"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 6:10pm",
+      "title": "Asks how Alex will pay for the roof",
+      "q": "How does Alex pay for the roof?",
+      "does": "Many storm roofs are paid from the owner's insurance claim. So Rosie asks only how Alex will pay. The claim is always Alex's to file and handle.",
+      "more": [
+       "Lee Roofing never files, handles or explains a claim, unless the state's rules allow it.",
+       "The insurer's money goes to Alex. Alex pays Lee Roofing, the same as paying out of pocket.",
+       "Claim details never go in a text."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "How will you pay for the new roof? If it's through insurance, you file and handle the claim. Your report and photos are on your page to send.",
+        {
+         "buttons": [
+          "My insurer first",
+          "I'll pay myself"
+         ]
+        }
+       ],
+       [
+        "cust",
+        "san",
+        "1"
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "pf.money",
+       "pf.messages"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Alex's insurer decides first",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x02",
+          "type": "split",
+          "line": [
+           "8.7",
+           "11.22"
+          ],
+          "who": "cust",
+          "to": "san",
+          "via": "msg",
+          "t": "Thu Oct 29, 11:00am",
+          "title": "Waits for Alex's insurer",
+          "q": "What does Alex's insurer decide?",
+          "does": "Alex files the claim and sends the insurer the report. The estimate stays good until Sat Nov 21. A week later, Alex texts that the insurer said yes.",
+          "more": [
+           "The adjuster's visit is between Alex and the insurer. Diego can meet the adjuster there if Alex asks.",
+           "No word by Sat Nov 14: one reminder, a week before the estimate's date.",
+           "Rosie never asks about the claim's details."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "My insurer approved the roof."
+           ],
+           [
+            "san",
+            "cust",
+            "Good news. Your estimate from Lee Roofing is good until Sat Nov 21. Sign when you're ready.",
+            {
+             "card": {
+              "title": "New roof · $14,800",
+              "lines": [
+               "Good until Sat Nov 21"
+              ],
+              "button": "Read and sign",
+              "link": "rosfield.com/k/r4"
+             }
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "Approves it",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "Denies it",
+            "end": "end",
+            "endText": "Alex can still pay out of pocket until Sat Nov 21. Only the $89 inspection is owed.",
+            "steps": [
+             {
+              "id": "B8-x03",
+              "line": [
+               "8.7",
+               "10.3"
+              ],
+              "who": "san",
+              "to": "cust",
+              "via": "msg",
+              "t": "Thu Oct 29, 11:05am",
+              "title": "Keeps the estimate open after a no",
+              "does": "The insurer says no. Alex can still pay for the roof out of pocket until the estimate's date. Only the $89 inspection is owed until then.",
+              "more": [
+               "Some owners sign before the insurer decides. Where the state's rules give a right to cancel after a written denial, Rosie keeps its date.",
+               "Sam is told. Nothing else is sent."
+              ],
+              "say": [
+               [
+                "san",
+                "cust",
+                "Sorry to hear that. Your estimate stays good until Sat Nov 21 if you'd like to go ahead yourself.",
+                {
+                 "card": {
+                  "title": "New roof · $14,800",
+                  "lines": [
+                   "Good until Sat Nov 21"
+                  ],
+                  "button": "Read the estimate",
+                  "link": "rosfield.com/q/r4"
+                 }
+                }
+               ],
+               [
+                "san",
+                "owner",
+                "Alex M.'s insurer said no to the roof. Alex's $14,800 estimate stays open until Sat Nov 21."
+               ]
+              ],
+              "needs": [
+               "pf.rules"
+              ],
+              "tells": [
+               "cust",
+               "owner"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "2 Pays out of pocket",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Asks to skip the deductible",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "line": [
+           "13.4",
+           "8.7"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Thu Oct 22, 6:20pm",
+          "title": "Says no: the deductible is Alex's",
+          "does": "Alex asks if Lee Roofing can cover the deductible. Rosie says no, kindly. The plug-in's rule: a deductible is never paid, waived or rebated.",
+          "more": [
+           "The rule comes from the plug-in and the state's form, never from one state alone.",
+           "The estimate is the same either way. Alex can still sign it."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "Can you cover my deductible?"
+           ],
+           [
+            "san",
+            "cust",
+            "Sorry, Lee Roofing can't pay, waive or rebate a deductible. It's always the owner's to pay. Your estimate stays the same."
+           ]
+          ],
+          "needs": [
+           "pf.rules"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-63",
+    "steps": [
+     {
+      "id": "B8-x07",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Wed Nov 4, 8:00am",
+      "title": "Sam pulls the reroof permit",
+      "q": "Is the permit in by the install day?",
+      "does": "The cancel window (B8-78) ends with no cancel. Sam files the reroof permit in Lee Roofing's name, and any notice the state's rules require before work starts.",
+      "more": [
+       "The license holder always pulls the permit, never Alex.",
+       "Sam gets a to-do with its due date, and replies when it's in.",
+       "Shingles and the dumpster are ordered now, after the window."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s new roof: file the reroof permit, and any notice due before work starts. Both are due before Mon Nov 9.",
+        {
+         "buttons": [
+          "It's in",
+          "Not in yet"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner"
+      ],
+      "branches": [
+       {
+        "label": "1 Issued in time",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Still in review",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x08",
+          "line": [
+           "7.16",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Fri Nov 6, 10:00am",
+          "title": "Moves the install day, with no fee",
+          "does": "The permit is still in review on Fri Nov 6. The business caused the move, so it's free. Alex picks a new install day.",
+          "more": [
+           "Only days after the permit's new expected date are offered.",
+           "The shingle delivery moves with it."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your permit is still in review, so Lee Roofing needs to move your install day. There's no fee.",
+            {
+             "times": [
+              "Mon Nov 16 · 7am · Diego's crew",
+              "Tue Nov 17 · 7am · Diego's crew"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "line": [
+       "8.18",
+       "8.3"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 9, 7:05am",
+      "title": "The crew starts the tear-off",
+      "does": "Diego's crew arrives at 7am. Nobody needs to be home, so Diego texts a start photo instead of a code, and Alex gets it.",
+      "more": [
+       "If Alex is home, the check-in code works as usual.",
+       "The crew covers plants and the AC unit before the old shingles come off."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "IN tear-off starts",
+        {
+         "photos": [
+          "Front of the house, 7am"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Diego's crew started your new roof at 7:05am. You'll get photos at the end of the day."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "B8-x12",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 9, 11:30am",
+      "title": "Finds rotted decking under the shingles",
+      "q": "Is any decking rotted, and how much?",
+      "does": "With the old roof off, Diego finds 6 rotted sheets of decking. That's inside the 10 Alex OK'd in the contract, so the crew goes on. Alex gets the photos and change order 1.",
+      "more": [
+       "Each sheet is $95, the price in the contract: $570 in all.",
+       "Change order 1 is for the record. It goes on the balance.",
+       "Inside the count, nobody waits on a reply with the roof open.",
+       "All the decking sound: nothing is added, and no change order goes out."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "DECKING 6 sheets rotted, replacing. Inside the 10 OK'd",
+        {
+         "photos": [
+          "Rotted decking, north slope"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Diego's crew found 6 rotted sheets of decking. They're inside the 10 you OK'd, so the crew is replacing them now.",
+        {
+         "card": {
+          "title": "Change order 1 · $570",
+          "lines": [
+           "6 sheets of decking at $95",
+           "Inside the 10 you OK'd",
+           "Added to your balance"
+          ],
+          "button": "See the photos",
+          "link": "rosfield.com/k/r4c1"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Inside the 10 OK'd",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "All sound: nothing added",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "More than 10: Alex's yes first",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x13",
+          "line": [
+           "8.8",
+           "8.9"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Asks Alex before the 11th sheet",
+          "does": "A what-if: Diego finds 12 rotted sheets, 2 past the 10 Alex OK'd. Those 2 need Alex's signed change order first. The crew covers that spot while Alex decides.",
+          "more": [
+           "It's under Sam's $500, so it goes to Alex at once.",
+           "No answer in 1 hour: Sam is asked to call Alex. The open spot stays covered.",
+           "The other 10 sheets go on as OK'd."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Diego found 2 more rotted sheets, past the 10 you OK'd. They need your OK before the crew replaces them.",
+            {
+             "card": {
+              "title": "Change order 2 · $190",
+              "lines": [
+               "2 more sheets at $95",
+               "Past the 10 you OK'd"
+              ],
+              "button": "Read and sign",
+              "link": "rosfield.com/k/r4c2"
+             },
+             "buttons": [
+              "Sign it",
+              "Call me first"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "price_oks"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x14",
+      "line": [
+       "8.12",
+       "8.18"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 9, 4:30pm",
+      "title": "Shingles the roof; sweeps for nails",
+      "does": "By 4:30pm the new roof is on and sealed. The crew sweeps the yard, the driveway and the street for nails with a magnet. Alex gets the day's photos.",
+      "more": [
+       "Updates go out inside text hours, in Lee Roofing's name.",
+       "Alex's reply goes to Diego, like a question before the visit."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "UPDATE new roof on, ridge vent in. Nail sweep done",
+        {
+         "photos": [
+          "Front slope, done",
+          "Driveway after the nail sweep"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your new roof is on. Here are today's photos. The crew swept the yard, driveway and street for nails."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Diego and Alex look over the shingle repair together. Anything wrong is fixed before Diego texts DONE."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Roofing is licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Roofing and the showroom both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The roofer's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Estimators, crews and consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: inspections, roof jobs and showroom consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Solar installers hold their own licenses where the state's form asks, and so do showroom sellers; roofers work under the company's."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Some roof work is sent now, like an emergency tarp after a storm (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An inspection has no form to sign first; a roof's contract is signed with the estimate (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Inspections and repairs are booked in 2-hour arrival windows; an install day starts at 7am, set with the contract."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Roofing books visits and install days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Roofing books an estimator's or a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking meets the crew (the plug-in's messages)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each roof job is rated."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "B4-81",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "B8-65"
+  ]
+ },
+ "notes": "Pilot: contractor (from: contractor). A roofer runs like a remodeler: an inspection at the home first, then a written estimate, a contract signed by everyone on title, a deposit, a cancel window, a permit, the work, an outside inspection, then the last bill. Only the timing differs: one install day instead of weeks, and no stage bills between the deposit and the balance.\nFlow B (main path visit|none|bill): a storm-damaged roof at 58 Cedar Ln. The booking is the $89 roof inspection, priced at the visit. Diego's report and written estimate ($14,800: 24 squares at $575, $650 permit and dumpster, $350 ridge vent and vent boots) are B8-20's words. The '1 Signs the contract' branch (the master's 'An estimate becomes its own job', renamed) holds the insurance question (B8-x01 to B8-x04), the contract (B8-62), the $1,000 deposit (B8-63), the cancel window (B8-x05, B8-x06) and the permit (B8-x07, B8-x08).\nThe install runs on B8-22's 'The job runs several days': B8-37 carries the install plan, then the own steps for the forecast before the tear-off (B8-x09, B8-x10), the start photo (B8-x11), the rotted decking (B8-x12, B8-x13) and the day-end photos and nail sweep (B8-x14). The city's final inspection is B8-65/B8-50/B8-51 (words). The balance, $14,370 ($14,800 less the $1,000 deposit, plus the $570 decking change order), is the last bill (B9-05 to B9-26 words). Receipt $15,370 with the lien release and both warranties (B10-01).\nThe example inspection costs $89 (the master's number, so its holds and fees stay true), counted toward the roof work if Alex signs. The old flowchart's inspection was free; the plug-in says a free inspection is the safe start.\nInsurance: the customer's own claim is Alex's to file and handle; Rosie asks only how he will pay (B8-x01). The estimate waits for the insurer until its good-until date (B8-x02); a denial keeps it open (B8-x03); a deductible deal is refused (B8-x04). The insurer's money goes to Alex, never through Rosie. Raised as a general gap.\nRotted decking is OK'd in the contract up to 10 sheets at $95 each, so the crew never stops with the roof open (change order 1 is for the record); an 11th sheet needs a signed change order (B8-x13). Raised as a general gap (extra work pre-approved up to a limit).\nB8-20's '1 Yes, fix it' and '3 OK some lines' are off: nothing is done or signed at a roof inspection, and a roof estimate is signed whole. A small repair is its own written quote (B8-27, B8-28). '2 Not today' keeps the master's path (only the $89 is owed, the report is Alex's). 'No answer: Alex is out' is renamed 'No reply in 7 days' (the old flowchart's 7 days), with one reminder, then Sam (B8-49 words).\nB10-29's 'A permit: the city inspects' is off: the final inspection runs during the job (B8-50), and the balance waits for it.\nWeather: the old business's limit (no tear-off at a 40% chance of rain or more) is the example's own, in pf.edges; a weather move never costs the customer. A wet roof is never walked: an inspection uses a drone and the attic, or a new time (B7-35 more; drone pilots hold the federal remote pilot certificate, pf.staff).\nEvery state rule is a switch from the state's form: the license and its job-size limit, the written contract and its parts, the deposit cap, money kept apart, the cancel window (longer for contracts signed in a declared emergency where the rules say so), cancel after an insurer's written denial, permits and notices before work, lien releases, no deductible deals or claim handling, prices in a declared emergency. The old flowchart's Florida, California, Missouri, Pennsylvania, New York and Texas rules and numbers are dropped (180 days, 10 days, 10% or $1,000, $2,500, 5 business days, pre-1978).\nLead-safe work is written as 'painted trim on older homes, where the rules require it'; the year the home was built is asked after a time is saved, with no cutoff year from one law.\nThe old flowchart's AccuLynx, JobNimbus, ServiceTitan, Roofr and Leap parts are OUTDATED: Rosie is the software now.\nSecond kind of work: solar (trade name Lee Solar), which waits for its installer's own license where the state asks (the master's electrical). Second company: Lee Exterior Showroom (the master's Lee's Barbershop), where customers come in to pick shingles, skylights and trim.\nFlow A (main path list|card|counter): a $35 shingle consult with Hana at the showroom, a card saved for the $20 missed-consult fee, paid at the showroom desk. A8-x01 offers Diego's inspection at home, which runs in flow B. Showroom services keep the barbershop's prices: shingle consult $35, skylight pick $40, sample kit $20, trim match $25, roof preview session $55 (credited to the roof), full exterior plan $140, metal roof plan from photos ($90), tile roof match after a $25 consult. A patch test becomes a 15-minute sample pickup.\nOff in A: the child branches (A4-24, A8-32), and the repeat-plan branches (A4-28, A5-01, A7-02): a showroom sells no plan of consults. Flow B keeps its plans (a yearly moss treatment, Morgan's roof check at two rentals).\nPlug-in splits: every one is decided. Off where the roofer never uses a branch (spaces, classes, seats, stays, a set start, no person named, a damage hold, a delivery to sign for, items leaving the home, a date that can't move, the child in the pro's care, no $2, no license). splitsKept for the ones it uses branch by branch: A7-61 (a stand-in for a consult, none for a tile match), A8-02 (an old tile to bring for a match), B4-81, B7-55, B8-58 (the emergency tarp is sent now, an inspection never), B4-57 (a skylight over the plug-in's amount takes a contract, a shingle repair none), B8-69, B8-70 (roof work needs nobody home, the inspection's attic check needs an adult), B8-65 (a new roof has the city's final inspection, a repair none).\nB8-72 '1 An item goes to the workshop' and B10-07 'The chimney cap isn't taken back' are off: nothing of the customer's leaves the home on roof work. Their rename (a copper chimney cap to the workshop) stays only so the master's words read right where they're shown off.\nMoney combinations used: B visit|none|bill, visit|none|own, visit|hold|bill, list|hold|bill (a $179 shingle repair with the $89 held), photos|deposit|bill (a $640 skylight from photos, a contract, a $160 deposit). A list|card|counter, list|none|counter, list|full|none, list|deposit|counter. Left out: the saved card charged at DONE on a roof (big bills are paid by link, bank transfer or check) and paid-in-full roofs.\nRosfield's $2 for the roof booking comes out of the deposit, once (B8-63, B9-07). The old flowchart's 'no fee on Florida roof jobs' is a gap (the $2 switched by who pays), not a rule here.\nNames: Jordan and Casey are Diego and Owen (estimators and crew leads); Riley and Avery are Hana and Ruby (showroom consultants); Theo B. is Nico B. Addresses: 58 Cedar Ln (Alex), 310 Quarry Rd (the showroom), 460 Depot St (Lee Roofing). License numbers renamed (RC, SC, SR, SP, RF, SE). Kim's outdoor job is a shingle repair; Rosa's call is a roof leak into a bedroom.\nThe master's plumbing jobs keep their prices as the example's own: shingle repair $179 (drain clearing), moss treatment $150 (water heater flush), skylight replacement $640 from photos (water heater replacement), roof repair at the visit $245 with flashing $165 and shingle work $80 (leak repair), roof certification $199 (sewer camera), cracked vent boots $160 and a vent cap $95 as extras.\nkeep: roofing, roofer and leak. They are the profession's own words (the contractor pilot used roofing as its second kind of work; a roof leak is the roofer's core job).\nPipe boots are written 'vent boots' so no plumbing word ('pipe') is left in the flows.\nThe joined reading was done with prof-read.js (work/prof/roofer-read-A.md and -read-B.md) and a scratch path reader: sections 3-10 of both main paths, the other combinations' changed steps, and sections 1-2 and 11-13 skimmed.\nReview (Oct 22): added the money paths the plug-in itself names: A list|hold|counter (full exterior plan, $40 held), photos|card|counter (metal roof plan), visit|card|counter (tile roof match); B list|none|bill (the emergency tarp and a returning customer's shingle repair), list|full|none and list|deposit|bill (moss treatment). Fixed leftover words: S1-60/S2-28 'barbering' (now as the plug-in says: roofing licenses the company, solar and showroom sales each person, so Owen isn't checked), A4-50 'About an inch.', A4-22/A6-15 'Short on the sides.' and 'brassy', A7-38 'steamer', B8-27/B8-28 'main water line' on the photos path. The inspection booking reads 'Roof inspection', not 'Roof repair', on the booking cards (B3-04, B4-29, B5-03, B6-04, B6-13, B6-14, B7-01). Off in A: the plan and insurance branches (A4-28, A4-54, A7-02, A9-15). A8-34 on the tile-match path no longer says a \"custom plan-correction session\".\ntouch-up 4 (Oct 23): B8-39's base line (the $179 shingle repair paths) still had the plumber's 'runs the water with Alex and checks for drips'; the B8-39 words op now says Diego and Alex look over the shingle repair together. Keep 'drips': water that drips through a ceiling, catching the drips, and a skylight that drips at one corner are real roofing words.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Riley and Avery cut hair",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "barbershops",
+    "house calls",
+    "house call",
+    "House calls",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "skin fades",
+    "The signature cut, $55, is paid in full when booked.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "like a burst pipe or a lockout",
+    "takes jobs sent now, like a burst pipe",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Electric.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "A repair shop, a tailor or a groomer does.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "takes no cut of them",
+    "Barber license",
+    "JP031552",
+    "JE30417",
+    "Gloss to finish",
+    "$15 gloss",
+    "gloss",
+    "an estimate visit",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color plan",
+    "Color plan",
+    "color",
+    "Color",
+    "Kids cut (12 and under)",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "the chair",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Drain",
+    "shops",
+    "shop",
+    "Shop"
+   ],
+   "B": [
+    "Lee Home Services can clear the drain:",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Riley and Avery cut hair",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "barbershops",
+    "house calls",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "Shutoff valve and wall pipe · $540",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Say Harper J.'s $2,400 repipe is billed in three stages, as Sam set it up.",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "The customer is offered an estimate visit, booked like any visit.",
+    "Lee Home Services · Estimate visit",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Right to cancel · repipe",
+    "like a burst pipe or a lockout",
+    "QUOTE 245 valve 165 supply line 80",
+    "Sam adds heating and cooling to",
+    "NEW heating and cooling",
+    "Heating and cooling for",
+    "Video and Jordan's notes",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "like an overflowing drain",
+    "Overflowing kitchen drain",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Electric.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "QUOTE 2400 repipe, 3 stages",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "leehomeservices.com",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "takes no cut of them",
+    "JP031552",
+    "JE30417",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "an estimate visit",
+    "Shutoff valve",
+    "shutoff valve",
+    "Supply line",
+    "supply line",
+    "sewer camera report",
+    "Lee Home Services'",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "color",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "the kitchen drain",
+    "Kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "drain",
+    "Drain",
+    "shop",
+    "Shop"
+   ]
+  },
+  "A": {
+   "A4-24": "0a292df05b",
+   "A8-44": "4410a4860c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B4-34": "74ff52d83d",
+   "B7-16": "3177c3701b",
+   "B7-17": "ac1fd212f3",
+   "B8-93": "c1406fd6bc",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "B8-37": "3ce85cf051",
+   "B8-39": "aa75251207",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

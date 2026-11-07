@@ -1,0 +1,5754 @@
+{
+ "id": "dog-walker",
+ "name": "Dog walking",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "cleaner",
+ "cast": {
+  "A": {
+   "staff": "Sage and Mika (hike leaders)",
+   "cust": "Alex M. (customer, with Biscuit) · other customers"
+  },
+  "B": {
+   "staff": "Devon and Luca (dog walkers)",
+   "cust": "Alex M. (customer, with Biscuit) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Sage"
+  },
+  "B": {
+   "staff": "Devon"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books Biscuit, a beagle mix, a 1-hour group walk with Lee Pack Hikes: a free group check Fri Oct 23, then drop-off Sat Oct 24 at 11:00am at the base, 120 Ridge Rd, and pick-up at 12:00pm. The money depends on the choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Dog Walking for Biscuit, a beagle mix, at 31 Maple Ave: a free meet-and-greet Tue Oct 20 at 5:30pm, then 30-minute walks with Devon on weekdays, 11am to 1pm, from Thu Oct 22, while Alex is at work. The money depends on the choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $35 group walk. A card is saved when booking and charged when Sage texts DONE at pick-up.",
+    "list|full|none": "A $55 two-hour trail hike, paid in full when booking. Nothing more is owed at pick-up."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Group walk, 1 hour"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Group walk, 1 hour"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$20",
+     "name": "Trail hike, 2 hours"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $28 walk, then walks every weekday. A card is saved and charged $28 when Devon texts DONE after each walk.",
+    "list|none|bill": "A $28 walk. Nothing is taken. Rosie texts the bill after the walk.",
+    "list|full|none": "A one-time 60-minute walk, $42, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$28",
+     "name": "Solo walk, 30 min"
+    },
+    "list|*|*": {
+     "price": "$28",
+     "name": "Solo walk, 30 min"
+    },
+    "list|full|*": {
+     "price": "$42",
+     "paid": "$42",
+     "fee": "$28",
+     "name": "One-time walk, 60 min"
+    }
+   }
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "Usually none: most states license neither dog walking nor pet sitting. Some cities ask for a permit to walk dogs for pay, or to walk several dogs at once in a park. Carrying dogs in a van can need a pet transport license where the state's rules require one. The state's or city's form says which.",
+   "ask": "The business registration or local business license number, where the form asks for one. A city dog-walking permit, or a pet transport license for van pick-ups, where the form asks for it.",
+   "who_holds": "The business. A city permit to walk dogs in its parks can be per walker, where the city's form says so.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "insurance_bond": "Pet-care liability insurance or a bond is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "not_this_work": "Dog training, grooming, boarding at the business and vet care are other kinds of work, with their own plug-ins."
+  },
+  "pf.services": {
+   "pattern": "Set service: walks at the customer's home while they're out, usually on a weekly plan, after a free meet-and-greet. Group walks and hikes can also start from the business's own meeting spot.",
+   "list": [
+    {
+     "name": "Meet-and-greet",
+     "price_kind": "free",
+     "length": "20 minutes",
+     "where": "at the customer's home, with the customer there",
+     "money": "nothing taken",
+     "note": "Required before a new dog's first walk. The walker meets the dog, checks the harness fits, and tries the lockbox or key."
+    },
+    {
+     "name": "Solo walk, 30 min",
+     "price_kind": "one price",
+     "example": "$28 a walk (the example business's own price)",
+     "length": "30 minutes, inside a 2-hour window (like 10am–12pm, 11am–1pm or 1–3pm)",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "card saved at booking; charged after each walk, at DONE"
+    },
+    {
+     "name": "One-time walk, 60 min",
+     "price_kind": "one price",
+     "example": "$42, for a customer with no plan",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "paid in full when booked"
+    },
+    {
+     "name": "Short visit, 20 min",
+     "price_kind": "one price",
+     "example": "$22: a potty break and play, for a puppy or an extra midday check",
+     "where": "at the customer's place",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Extra dog, same home",
+     "price_kind": "one price, added to a walk",
+     "example": "$8 a walk"
+    },
+    {
+     "name": "Holiday walks",
+     "price_kind": "added to a walk on the business's holidays",
+     "example": "$10 a walk (the example: Thanksgiving, Dec 24–25, Jan 1), shown before the yes"
+    },
+    {
+     "name": "Late skip or no way in",
+     "price_kind": "a fee, never more than the walk's own price",
+     "example": "the $28 walk, only if the owner confirms it",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Pet sitting (the second kind of work)",
+     "price_kind": "one price each",
+     "example": "drop-in visit, 30 min $30; cat visit, 20 min $22; overnight stay at the customer's home $95 (the example business's own prices)",
+     "where": "at the customer's place; nobody needs to be home for a drop-in",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Group walks and hikes (Lee Pack Hikes, the second company)",
+     "price_kind": "one price each, a spot in a hike",
+     "example": "group walk, 1 hour $35 from the base, or $75 with a van pick-up at home; group walk, 90 min $40; trail hike, 2 hours $55; puppy walk, 30 min $25; paw rinse after a muddy walk $20; group check for a new dog, free; a private hike for one family's dogs, priced for the group, each price OK'd by the owner",
+     "where": "dropped off and picked up at the business's base by the trailhead; the group walk can also start with a van pick-up at home",
+     "money": "a group walk saves a card and is charged at pick-up; a trail hike, or a group walk with a van pick-up, is paid in full when booked"
+    }
+   ],
+   "capacity": "Solo walks: one home at a time. Group walks and hikes: up to 4 dogs per walker, or fewer where the city's rules say so.",
+   "nobody_home": "Yes, for walks, puppy visits and drop-ins: entry by lockbox, door code or a key the business holds. DONE with the walk report and a photo confirms it. The meet-and-greet needs the customer home.",
+   "online": "No.",
+   "not_offered": "Training, grooming and vet care. A dog that has bitten a person is walked only if the owner OKs it after reading the answers.",
+   "drop_off_slots": "At the meeting spot, hikes are booked as drop-off slots that name no walker, up to 4 dogs a walker. The dog is dropped off at the start and picked up at the end with the check-in code."
+  },
+  "pf.questions": {
+   "before_times": [
+    "The dog's name, breed, age and weight, and how many dogs",
+    "Has the dog ever bitten or snapped at a person or a dog? (a yes sends the request to the owner first)",
+    "Good with people? With other dogs? (group walks and hikes need both)",
+    "The days, the time window and the walk length: 30 or 60 minutes",
+    "A one-time walk, or a weekly plan",
+    "For pet sitting: which pets, and how many visits a day"
+   ],
+   "after_a_time": [
+    "Does the dog pull, or slip the collar or harness?",
+    "Where the harness, leash and treats are kept",
+    "Water or food to give, and anything the dog must not eat",
+    "Fears to know about, like thunder, bikes or big dogs",
+    "Parking"
+   ],
+   "secure_page_only": [
+    "The lockbox, door, garage or alarm code, or where the business's key goes",
+    "The vaccine record (rabies, and DHPP for group walks and hikes)",
+    "The vet's name and phone, an emergency contact, and the vet-care OK with a spending limit",
+    "Health conditions and medicines"
+   ],
+   "who_may_book": "An adult who owns the dog or is allowed to care for it, and who can let the walker into the home."
+  },
+  "pf.safety": {
+   "words": [
+    "a dog that is hurt, very sick, struggling to breathe or ate something toxic, right now",
+    "a person bitten and hurt",
+    "a dog that bit someone today",
+    "a dog lost right now",
+    "signs of a catching illness, like kennel cough, for a group walk or hike"
+   ],
+   "what_happens": [
+    "A dog hurt, very sick or poisoned now: Rosie can't judge how sick a pet is. It says to call the vet, or the nearest 24-hour emergency vet, now. No booking until the dog is safe.",
+    "A person bitten and hurt: call 911 first.",
+    "A dog that has bitten a person or a dog: the request goes to the owner first, who decides.",
+    "A lost dog right now: Rosie gives the business's number to call, and tells the owner at once.",
+    "Signs of a catching illness: no group walk or hike until a vet clears the dog. A solo walk can still be booked."
+   ],
+   "booking_goes_on": "No, for an emergency now. Yes, after the owner's OK, for a dog that has bitten. Solo walks only, for a dog not cleared for groups."
+  },
+  "pf.first_steps": {
+   "meet_and_greet": "A new dog's first walk comes after a free 20-minute meet-and-greet at home, at least 1 day before (the example). The walker meets the dog with the customer, checks the harness fits, and tries the lockbox or key. It stays good while the dog keeps walking with the business.",
+   "forms": "On the secure page, before the first walk: the vaccine record, an emergency contact, and a vet-care OK with a spending limit the customer sets (the example: up to $500). The business's service agreement, with its skip and weather terms, is signed there too.",
+   "group_check": "Group walks and hikes: a new dog joins only after a free 20-minute group check at the meeting spot, at least 1 day before (the example), and with rabies and DHPP on file.",
+   "plan": "A weekly plan starts after the meet-and-greet. It gets its own yes. If the meet-and-greet finds the dog isn't a fit, the plan ends before any walk, with nothing charged.",
+   "prep_for_reminder": [
+    "Leave the harness and leash where you said",
+    "Fill the water bowl",
+    "Put the lockbox code on the secure page, never in a text",
+    "Tell us about any change in your dog's health"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Walks and drop-ins: nobody home, no code. The walker opens the lockbox and texts DONE with the walk report and a photo. When the customer is home, the code at the door works as usual. The meet-and-greet is with the customer home. At the meeting spot: the code is given at drop-off, and again at pick-up.",
+   "entry_codes": "Shown only to the walker on the job, only during the walk window. Each opening is logged. Deleted 72 hours after the plan ends.",
+   "lockout": "The lockbox or door code fails: the walker texts it, the customer gets a link to fix it on the secure page, and the walker waits 10 minutes (the example), then leaves. A fee, never more than the walk's price, only if the owner confirms.",
+   "walk_report": "Times in and out, pee and poop, water filled, the door locked, any notes, and a photo.",
+   "pick_up": "At the meeting spot, a dog goes home only with the customer's code, or with someone the customer named who shows an ID.",
+   "changes_at_visit": "A longer walk or an extra dog only when the customer asks, priced from the list first.",
+   "proof_done": "DONE with the walk report and a photo.",
+   "weather": "Ice, lightning, heat over the owner's limit or deep cold: a 10-minute potty break and play inside, same price, or a free skip. The customer picks; the business's call never costs more."
+  },
+  "pf.money": {
+   "start": "Walks: a card saved at booking, and each walk charged to it at DONE. Sam can bill the week's walks on Friday instead. A one-time walk is paid in full when booked. The meet-and-greet and the group check are free. At the meeting spot: a trail hike is paid in full when booked; a group walk saves a card and is charged at pick-up.",
+   "deposits": "None. Nothing is held for a walk.",
+   "fees": "A late skip (the example: after 8pm the night before) or no way in: up to the walk's own price, $28, only if the owner confirms. A late cancel or no-show at the meeting spot: $20 (the example). No answer, no fee. A change the business makes never costs the customer.",
+   "plans": "Each plan walk is charged at its own DONE. Or Sam bills the week's walks on Friday, after the last walk, told the day before. Rosfield's $2 counts once a month for a plan.",
+   "vet_care": "Emergency vet care is paid by the customer, up to the limit they signed. It never goes through Rosie.",
+   "tips": "Optional, all to the walker. A tip line only if the owner turns it on.",
+   "tax": "A sales tax line only where the state taxes pet services, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking, once a month for a plan."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Lockbox, door, garage and alarm codes",
+    "Where a key is kept",
+    "The dog's health conditions, medicines and vet records"
+   ],
+   "photos": "Walk photos go only to the customer and the business. They're shown to others only with the customer's yes.",
+   "urgent": "A lost dog, a bite or an injury: the owner and the customer are told at once, at any hour. Rosie then steps back, and never admits fault or offers money.",
+   "languages": "English and Spanish.",
+   "minors": "Nobody under 18 books. A teen at home isn't the booking's adult."
+  },
+  "pf.staff": {
+   "skills": [
+    "Solo walks and puppy visits",
+    "Group walks and hikes: up to 4 dogs",
+    "Dogs that pull or are nervous with other dogs",
+    "Pet sitting and overnight stays",
+    "Driving the van for pick-ups"
+   ],
+   "licenses": "None per person unless the state's or city's form says so, like a city permit to walk dogs in its parks.",
+   "new_person_ok": "A walker the customer hasn't met goes into the home only after the customer's OK by reply, or after the owner calls them. No answer: the owner calls first, or the walk is skipped with no charge.",
+   "ratio": "Up to 4 dogs per walker on group walks and hikes, or fewer where the city's rules say so.",
+   "who_oks": "The owner OKs a dog with a bite history, every fee and every refund. The office manager may OK prices over the limit; the owner's answer wins."
+  },
+  "pf.rules": {
+   "plans": [
+    "The plan's terms show before any card is asked: the days and window, the price a walk, when it's charged, skip and weather terms, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking, and the terms are texted back.",
+    "One reply ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask.",
+    "Once a year, the terms and how to end the plan are texted again (the business's own rule), plus any reminder the state's rules require."
+   ],
+   "agreement": "A signed service agreement and vet-care OK before the first walk (the business's own rule).",
+   "local_rules": "Leash laws, waste pick-up and limits on dogs per walker in parks, as the city's form sets them.",
+   "records": "7 years, with walk reports and anything that happened on a walk."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "A lost dog, a bite or an injury on a walk: the owner and the customer are told at once. The business handles it; Rosie never admits fault or offers money.",
+    "Lockout: a lockbox or door code that fails. The walker waits 10 minutes, then leaves; the owner decides any fee.",
+    "A walker is out: someone the customer hasn't met goes in only after the customer's OK. No reply: the owner calls first, or a free skip.",
+    "Weather day: ice, lightning, heat or deep cold turns a walk into a short potty break and play inside, same price, or a free skip.",
+    "Skip, pause or end a plan. A skip after the cut-off may be charged, only if the owner confirms.",
+    "The meet-and-greet finds the dog isn't a fit, or fits solo walks only.",
+    "Several open walks in a plan's week: which one is asked first.",
+    "A dog not picked up at the meeting spot on time.",
+    "A vaccine record runs out: group walks and hikes stop until a new one is on file."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "animals",
+   "plans",
+   "firststeps",
+   "groups",
+   "forms",
+   "dropoff"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": {
+     "window": 2
+    }
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Someone in the shop is threatening people.",
+    "Someone at the base is threatening people."
+   ],
+   [
+    "someone in the shop was threatening people",
+    "someone at the base was threatening people"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about the walk wasn't right, reply here."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Private hike quotes come to you first. Board prices never need one"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A hike's example: 'A new dog needs a quick group check first. Had one at Lee's in the last 3 months?'"
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some jobs take several visits, like a two-day trail trip."
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Puppy walk, 30 min"
+   ],
+   [
+    "barbershops",
+    "dog hiking companies"
+   ],
+   [
+    "Kids cut",
+    "Puppy walk, 30 min"
+   ],
+   [
+    "Color correction",
+    "Private hike"
+   ],
+   [
+    "color correction",
+    "private hike"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Group dog walks and trail hikes from our base by the trailhead on Ridge Rd."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for dog grooming, which isn't on the base's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Pack Hikes doesn't do grooming."
+   ],
+   [
+    "NEW massage",
+    "NEW dog training"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Dog training for Lee Pack Hikes: is it the same company?"
+   ],
+   [
+    "Ben T. books a skin fade",
+    "Ben T. books a 90-minute group walk"
+   ],
+   [
+    "skin fades",
+    "group walks"
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "The rinse is done at pick-up, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no hike leader. A time shows only if its group has a spot."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A family books a group walk for its three dogs on one morning."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds three spots in one group, so the dogs walk together."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like a dog that's hurt or sick right now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A walk is rated, so the base takes the first branch."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's walk came back after half an hour, not one."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a walk gets the soonest window."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May Lee Pack Hikes show photos of your dog? Yes / No"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. the Sat Oct 24 3:00pm drop-off?"
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says Biscuit's harness came back with a broken buckle"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's for my friend's dog, as a gift. Can I pay for it?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can Biscuit bring her own ball on the walk?"
+   ],
+   [
+    "Lee's Barbershop will fix it for free.",
+    "Lee Pack Hikes will make it up with a free walk."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Biscuit's harness came back with a broken buckle."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds dog training to Lee Pack Hikes."
+   ],
+   [
+    "Adds a second shop, with its own team",
+    "Adds a second base, with its own team"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a group walk from the base or with a pick-up at home"
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. group walk Sat 11am"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a dog walker or a hiking company"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning group walk"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a group walk every Saturday."
+   ],
+   [
+    "The state's license lookup is down",
+    "The city's permit records are down"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Trail hike, 2 hours"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's dogs together"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up, if Sam says so"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Saturday's walk came back after half an hour."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was Biscuit's walk?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Pack Hikes · drop-off"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens on the walk?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a group walk every Saturday"
+   ],
+   [
+    "like a skin-test result",
+    "like a group check result"
+   ],
+   [
+    "plumbing and electrical",
+    "dog walking and pet sitting"
+   ],
+   [
+    "Signature cut and shave",
+    "Trail hike"
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "the $90 color quote",
+    "the $90 private hike quote"
+   ],
+   [
+    "Alex asks for a fix",
+    "Alex asks for a make-up"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Pack Hikes'"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Dog Walking's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Dog Walking"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pack Hikes"
+   ],
+   [
+    "a lapsed license",
+    "a lapsed permit"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Groom's package",
+    "Full-day trail trip"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "2:00pm · Avery",
+    "2:00pm drop-off"
+   ],
+   [
+    "1 color quote",
+    "1 private hike quote"
+   ],
+   [
+    "every 4 weeks",
+    "every Saturday"
+   ],
+   [
+    "color and cut",
+    "private hike"
+   ],
+   [
+    "Color and cut",
+    "Private hike"
+   ],
+   [
+    "signature cut",
+    "trail hike"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Walks"
+   ],
+   [
+    "Lee Electric",
+    "Lee Pet Sitting"
+   ],
+   [
+    "1200 Main St",
+    "210 Park Ave"
+   ],
+   [
+    "at the chair",
+    "at the base"
+   ],
+   [
+    "At the chair",
+    "At the base"
+   ],
+   [
+    "house calls",
+    "van pick-ups"
+   ],
+   [
+    "House calls",
+    "Van pick-ups"
+   ],
+   [
+    "patch test",
+    "group check"
+   ],
+   [
+    "Electrical",
+    "Pet sitting"
+   ],
+   [
+    "electrical",
+    "pet sitting"
+   ],
+   [
+    "Barbershop",
+    "Pack hikes"
+   ],
+   [
+    "barbershop",
+    "hiking company"
+   ],
+   [
+    "Beard trim",
+    "Paw rinse"
+   ],
+   [
+    "beard trim",
+    "paw rinse"
+   ],
+   [
+    "house call",
+    "van pick-up"
+   ],
+   [
+    "The shop's",
+    "Lee Pack Hikes'"
+   ],
+   [
+    "the shop's",
+    "Lee Pack Hikes'"
+   ],
+   [
+    "Shop front",
+    "The base's sign"
+   ],
+   [
+    "kids cuts",
+    "puppy walks"
+   ],
+   [
+    "Skin fade",
+    "Group walk, 90 min"
+   ],
+   [
+    "skin fade",
+    "90-minute group walk"
+   ],
+   [
+    "88 Elm St",
+    "120 Ridge Rd"
+   ],
+   [
+    "on Elm St",
+    "on Ridge Rd"
+   ],
+   [
+    "kids cut",
+    "puppy walk"
+   ],
+   [
+    "Plumbing",
+    "Dog walking"
+   ],
+   [
+    "plumbing",
+    "dog walking"
+   ],
+   [
+    "Haircuts",
+    "Group walks"
+   ],
+   [
+    "haircuts",
+    "group walks"
+   ],
+   [
+    "The shop",
+    "The base"
+   ],
+   [
+    "the shop",
+    "the base"
+   ],
+   [
+    "25 miles",
+    "5 miles"
+   ],
+   [
+    "the cut",
+    "the walk"
+   ],
+   [
+    "Plumber",
+    "Dog walker"
+   ],
+   [
+    "plumber",
+    "dog walker"
+   ],
+   [
+    "barbers",
+    "hike leaders"
+   ],
+   [
+    "Haircut",
+    "Group walk"
+   ],
+   [
+    "haircut",
+    "group walk"
+   ],
+   [
+    "Jordan",
+    "Devon"
+   ],
+   [
+    "Barber",
+    "Hike leader"
+   ],
+   [
+    "barber",
+    "hike leader"
+   ],
+   [
+    "a cut",
+    "a walk"
+   ],
+   [
+    "Casey",
+    "Luca"
+   ],
+   [
+    "Riley",
+    "Sage"
+   ],
+   [
+    "Avery",
+    "Mika"
+   ],
+   [
+    "$89",
+    "$28"
+   ]
+  ],
+  "B": [
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Where is the leash kept?'"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $28 walk needs none."
+   ],
+   [
+    "Someone in the shop is threatening people.",
+    "Someone at the base is threatening people."
+   ],
+   [
+    "someone in the shop was threatening people",
+    "someone at the base was threatening people"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about the walk wasn't right, reply here."
+   ],
+   [
+    "Leak repair",
+    "Pet sitting visit"
+   ],
+   [
+    "Water heater replacement",
+    "Overnight stay"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra dog, same home · $8"
+   ],
+   [
+    "Sewer camera inspection",
+    "Extra dog, same home"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Dog walks and pet sitting in Springfield: 30-minute solo walks on weekdays, after a free meet-and-greet."
+   ],
+   [
+    "A water heater job",
+    "A walk in the park"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for a walk every weekday. Lee Dog Walking offers that as a plan, so the AI shows its terms. Each walk is booked and paid like a single one."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a weekend of pet sitting."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Devon walk Biscuit every weekday, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Dog Walking has a weekday walk plan, $28 a walk. Each walk is booked and paid like a single one. Want it every weekday?"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Devon's times show: Devon does the overnight stays."
+   ],
+   [
+    "Water heater fix",
+    "Pet sitting check"
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the pet sitting quote before booking."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks Devon to feed the cat. Both go in one booking, with one walk window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also feed the cat while there?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A cat visit is $22 from the list. Both fit in the same walk window."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a walk for a dog, today,"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "The walk is $28. Accept it?"
+   ],
+   [
+    "accept the leak repair for today,",
+    "accept the walk for today,"
+   ],
+   [
+    "Accepted: the leak repair today,",
+    "Accepted: the walk today,"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also walk my second dog?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about weekday walks for my dog. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Someone to take my dog out at lunch' fits a solo walk."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please leave the key in the lockbox and the leash by the door."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a chewed leash by the door this morning."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a walker take my dog out this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa walk Thu 12-2 Casey"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Dog Walking can walk your dog:"
+   ],
+   [
+    "Yard drain",
+    "Group walk"
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A walk was cut short 2 weeks later. Sam OKs a free make-up walk at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Thursday's walk was cut short."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "'s walk on Thu Oct 22 was cut short."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. Your make-up walk is free."
+   ],
+   [
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Ivy C. books a walk for Mon Nov 9 in the morning."
+   ],
+   [
+    "drain clearings",
+    "walks"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like walking a neighbor's dog without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a second dog? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Dog Walking asks: is the walk from a home, an office or somewhere else? And how big is your dog, and does it pull on the leash?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. A beagle mix, and she pulls a little."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $28 extra walk is good for 7 days."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "An extra walk · $28"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to an extra walk for $28."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds dog training to Lee Dog Walking."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW dog training"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Dog training for Lee Dog Walking: is it the same company?"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Dog Walking doesn't do, like training a dog."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A solo walk happens only at the customer's home, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a walk plan: one dog, every Mon, Wed and Fri."
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "Walks are priced from the list. Nothing is quoted from photos or at a walk."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A 30-minute walk with Lee Dog Walking is $28, not $25."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a 30-minute walk at $25, an old price."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Devon's next times for a 60-minute walk."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a walk gets the soonest window."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Devon also do a 60-minute walk with Biscuit next week?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip Monday's walk? I'm off work."
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a group walk from the base or with a pick-up at home"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The back gate was left open after the walk."
+   ],
+   [
+    "The state's license lookup is down",
+    "The city's permit records are down"
+   ],
+   [
+    "How was your visit with Jordan?",
+    "How was Biscuit's walk with Devon?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "2 Someone else meets the pro",
+    "2 Someone else gets the texts"
+   ],
+   [
+    "Jordan came late and rushed.",
+    "The walk was cut short."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise walks to 30"
+   ],
+   [
+    "Jordan was late and rushed.",
+    "The walk was only 20 minutes."
+   ],
+   [
+    "1 Yes, Alex will be there",
+    "1 Alex gets the texts"
+   ],
+   [
+    "plumbing license MP045210",
+    "business registration 2019-0451"
+   ],
+   [
+    "No answer in 15 minutes",
+    "No fix in 10 minutes"
+   ],
+   [
+    "plumbing and electrical",
+    "dog walking and pet sitting"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Solo walk, 30 min"
+   ],
+   [
+    "leehomeservices.com",
+    "leedogwalking.com"
+   ],
+   [
+    "Water heater flush",
+    "One-time walk, 60 min"
+   ],
+   [
+    "water heater flush",
+    "one-time 60-minute walk"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Dog Walking's"
+   ],
+   [
+    "the kitchen drain",
+    "the walk"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Dog Walking"
+   ],
+   [
+    "service call fee",
+    "late-skip fee"
+   ],
+   [
+    "Service call fee",
+    "Late-skip fee"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pack Hikes"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "a lapsed license",
+    "a lapsed permit"
+   ],
+   [
+    "Drain clearings",
+    "Walks"
+   ],
+   [
+    "Drain clearing",
+    "Solo walk"
+   ],
+   [
+    "drain clearing",
+    "walk"
+   ],
+   [
+    "Kitchen drain",
+    "Solo walk"
+   ],
+   [
+    "service call",
+    "late-skip fee"
+   ],
+   [
+    "Service call",
+    "Late-skip fee"
+   ],
+   [
+    "today's work",
+    "today's walk"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Walks"
+   ],
+   [
+    "Lee Electric",
+    "Lee Pet Sitting"
+   ],
+   [
+    "1200 Main St",
+    "210 Park Ave"
+   ],
+   [
+    "at the chair",
+    "at the base"
+   ],
+   [
+    "house calls",
+    "van pick-ups"
+   ],
+   [
+    "House calls",
+    "Van pick-ups"
+   ],
+   [
+    "Electrical",
+    "Pet sitting"
+   ],
+   [
+    "electrical",
+    "pet sitting"
+   ],
+   [
+    "Barbershop",
+    "Pack hikes"
+   ],
+   [
+    "barbershop",
+    "hiking company"
+   ],
+   [
+    "beard trim",
+    "paw rinse"
+   ],
+   [
+    "The shop's",
+    "Lee Pack Hikes'"
+   ],
+   [
+    "the shop's",
+    "Lee Pack Hikes'"
+   ],
+   [
+    "Shop front",
+    "The base's sign"
+   ],
+   [
+    "42 Oak St",
+    "31 Maple Ave"
+   ],
+   [
+    "88 Elm St",
+    "120 Ridge Rd"
+   ],
+   [
+    "Plumbing",
+    "Dog walking"
+   ],
+   [
+    "plumbing",
+    "dog walking"
+   ],
+   [
+    "The shop",
+    "The base"
+   ],
+   [
+    "the shop",
+    "the base"
+   ],
+   [
+    "25 miles",
+    "5 miles"
+   ],
+   [
+    "40 miles",
+    "15 miles"
+   ],
+   [
+    "7am Thu",
+    "8pm Wed"
+   ],
+   [
+    "Fri 8am",
+    "Fri 11am"
+   ],
+   [
+    "Plumber",
+    "Dog walker"
+   ],
+   [
+    "plumber",
+    "dog walker"
+   ],
+   [
+    "barbers",
+    "hike leaders"
+   ],
+   [
+    "Haircut",
+    "Group walk"
+   ],
+   [
+    "haircut",
+    "group walk"
+   ],
+   [
+    "25-mile",
+    "5-mile"
+   ],
+   [
+    "8–10am",
+    "11am–1pm"
+   ],
+   [
+    "Jordan",
+    "Devon"
+   ],
+   [
+    "Barber",
+    "Hike leader"
+   ],
+   [
+    "barber",
+    "hike leader"
+   ],
+   [
+    "Casey",
+    "Luca"
+   ],
+   [
+    "Riley",
+    "Sage"
+   ],
+   [
+    "Avery",
+    "Mika"
+   ],
+   [
+    "$179",
+    "$28"
+   ],
+   [
+    "$150",
+    "$42"
+   ],
+   [
+    "$89",
+    "$28"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Dog walking, pet sitting and pack hikes need no state license where Sam works (the plug-in), so the company gives its registration (S1-61). Where a city or state asks for a permit, its form asks there."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The dog walking plug-in adds no agreement for the business to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Walkers and hike leaders are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: walks, visits and hike drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Walkers and hike leaders need no license of their own unless the state's or city's form says so (the plug-in)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A walk is never sent now: a walk needed soon gets the soonest open window (the plug-in)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of Lee Pack Hikes' price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Group walk, 1 hour",
+          "$35"
+         ],
+         [
+          "Trail hike, 2 hours",
+          "$55"
+         ],
+         [
+          "Group walk, 90 min",
+          "$40"
+         ],
+         [
+          "Puppy walk, 30 min",
+          "$25"
+         ],
+         [
+          "Paw rinse",
+          "$20"
+         ],
+         [
+          "Group check, new dogs",
+          "Free · 20 min"
+         ],
+         [
+          "Full-day trail trip",
+          "$140 · 6 hours"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "does": "The same as dog walking: Sam sends a photo and checks what Rosie read. Nothing is typed from scratch."
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a license or a permit to walk dogs, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Dog Walking is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Business card"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Dog Walking is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Dog walking needs no state license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Dog walking price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most dog walkers start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Dog Walking, to start",
+        "lines": [
+         "Every walk",
+         "Where: at the customer's home; nobody needs to be home",
+         "When they book: a card saved",
+         "After each walk: the saved card is charged at DONE"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules dog walkers often set. Your call: keep them, or change any. They become its own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Dog Walking: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Dog Walking will look to customers and AI assistants. I drafted it from your website and Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Dog walks and pet sitting in Springfield: 30-minute solo walks on weekdays, after a free meet-and-greet."
+        ]
+       },
+       "photos": [
+        "Devon with a dog",
+        "The team",
+        "A walk in the park"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Dog Walking the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Dog Walking · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s01"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ],
+     [
+      "san",
+      "owner",
+      "Pet sitting next: same company, so only what's new. It needs no state license where you work, so I've set it like dog walking. Send only what's different.",
+      {
+       "card": {
+        "title": "Pet sitting, set like dog walking",
+        "lines": [
+         "At the customer's home; nobody needs to be home for a drop-in",
+         "A card saved when they book, charged after each visit",
+         "Drop-in visit, 30 min $30 · Overnight stay $95 a night"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "Where the state's rules don't allow it, Rosie won't set the van pick-up. The group walk stays at the base, at $35.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Your state's rules need a pet transport license for van pick-ups, and none is on file. So the group walk starts at the base only.",
+      {
+       "card": {
+        "title": "Group walk · from the base only",
+        "lines": [
+         "$35, card saved, charged at pick-up",
+         "Van pick-ups stay off"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city licenses group dog walking or pet transport, its form asks for it here instead.",
+     "Where the city requires a park permit for group walks, it's asked for when each hike leader joins.",
+     "Each hike leader can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "Lee Pack Hikes needs no license in Sam's state, so its registration is checked instead.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way pet sitting was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Dog walking",
+          "Now"
+         ],
+         [
+          "Pet sitting",
+          "Once your pet sitter joins and you say yes"
+         ],
+         [
+          "Lee Pack Hikes",
+          "Once a hike leader joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Dog Walking",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Devon Price",
+       "Lee Dog Walking",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Luca Moore",
+       "Lee Dog Walking",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Dog Walking",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Sage Chen",
+       "Lee Pack Hikes",
+       "At the base, and van pick-ups",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Mika Diaz",
+       "Lee Pack Hikes",
+       "At the base",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, pet sitting and Lee Pack Hikes now show to AI assistants too. Each person hears they can be booked for their own work: Luca for dog walking, Mika at the base."
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who walks dogs and sits pets, and who leads the hikes? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam walks dogs too, so Sam is on the dog walking team.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Devon Price and Luca Moore walk dogs. Devon does pet sitting too. Sage Chen and Mika Diaz lead the hikes. Sage also drives the van for pick-ups"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Devon Price: dog walking and pet sitting",
+         "Luca Moore: dog walking",
+         "Sage Chen: hikes and van pick-ups",
+         "Mika Diaz: hikes, at the base"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Luca Moore"
+     ],
+     [
+      "Company",
+      "Lee Dog Walking"
+     ],
+     [
+      "Kinds of work",
+      "Dog walking"
+     ],
+     [
+      "Jobs",
+      "Solo walks, short visits, one-time walks"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 10am–5pm"
+     ],
+     [
+      "Luca agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Quinn S. to Lee Pack Hikes. Quinn gets one invite, and replies YES. Where the city requires a permit to walk several dogs in its parks, Quinn sends the permit number too.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pack Hikes. Sam Lee added you to the team. Reply YES to join. If your city requires a park permit for group walks, add its number. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES DW-4471",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Dog Walking. Sam Lee added you to the team for dog walking and pet sitting. Reply YES to join and get your walks here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Devon"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Devon replies YES, then checks what Sam set. One reply covers every kind of work Devon does.",
+    "more": [
+     "No license number is asked: walking dogs and pet sitting need none in Sam's state.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Luca, Sage and Mika join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 7am",
+      {
+       "card": {
+        "title": "Devon Price · my profile",
+        "lines": [
+         "Dog walking and pet sitting",
+         "Mon–Fri, 10am–5pm",
+         "Lee Dog Walking's 5 miles"
+        ]
+       },
+       "as": "Devon"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 7:00am.",
+      {
+       "as": "Devon"
+      }
+     ]
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed in Sam's state"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "A 30-minute walk is $32 with Sam, and $28 with anyone else. An overnight stay is $105 with Devon.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Solo walk, 30 min",
+          "You",
+          "$32"
+         ],
+         [
+          "Solo walk, 30 min",
+          "Anyone else",
+          "$28"
+         ],
+         [
+          "Overnight stay",
+          "Devon",
+          "$105"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license in Sam's state, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Devon: dog walking and pet sitting",
+         "Luca: dog walking",
+         "Sage: hikes and van pick-ups",
+         "Mika: hikes"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Where the city requires a park permit for group walks, Rosie checks no permit; the owner says when one lapses. Here, Sam says Quinn's is suspended, so Quinn comes off the hike schedule at once.",
+    "more": [
+     "Every 30 days by default, and again before each expiry.",
+     "Expired, suspended or revoked all take a hike leader off the schedule.",
+     "Drop-off slots name no hike leader, so fewer slots show until Sam adds someone.",
+     "Dogs already booked stay booked. Sam picks who leads them, and no customer is told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The city's records show Quinn's park permit as suspended today.",
+      {
+       "card": {
+        "title": "Quinn · off the hike schedule",
+        "lines": [
+         "Fewer drop-off slots show from today",
+         "Dogs already booked stay booked: pick who leads them"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "The city's records show your park permit as suspended, so you're off the hike schedule for now. Tell Sam if that's wrong.",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Where the city requires a park permit for group walks, Rosie checks it on the city's own records. While they're down, nobody new leads a hike until checked. Those already checked stay on.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The city's permit records are down, so Quinn S.'s park permit isn't checked yet. Quinn isn't on the hike schedule until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "more": [
+     "It's one booking, with one code.",
+     "The rinse needs no slot of its own: it's done as the group comes back.",
+     "Two dogs from one home work the same way: each takes a spot in the group. Both are asked before the times."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-32",
+    "does": "Say Owen H. has a group walk plan, every Saturday at 10:00am. Owen can skip one walk, pause the plan or end it. The hike leaders are told.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I skip this one? I'll be away.",
+      {
+       "as": "Owen"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your group walk is part of a plan, every Saturday. What would you like?",
+      {
+       "as": "Owen",
+       "card": {
+        "title": "Group walk every Saturday · 10:00am",
+        "lines": [
+         "This one: Sat Oct 31 · 10:00am",
+         "Next: Sat Nov 7 · 10:00am"
+        ]
+       },
+       "buttons": [
+        "Skip this one",
+        "Pause the plan",
+        "End the plan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A dog is booked by its adult owner, never for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A hike happens on the trail, never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee Pack Hikes books a spot in a hike as a drop-off slot (A4-67): the dog is left and picked up."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee Pack Hikes books a spot in a hike as a drop-off slot (A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A hike is a few hours, booked as a drop-off slot (A4-67), never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Hike slots name no hike leader. A wish for one goes in the notes."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A hike runs with any number of dogs."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The dog is left with the hike leader: READY and the pick-up follow the hike."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A hike is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A hike has no result that comes later: READY is the result (A8-50)."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "A dog not picked up is a same-day matter: Sam calls Alex, then the emergency contact (A8-54). There's never a storage fee."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "Hikes are booked from the list; nothing is proposed after one."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a hike."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A hike is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a hike."
+   },
+   {
+    "op": "words",
+    "at": "A3-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero una caminata para mi perro el sábado.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like a walk for my dog on Saturday.",
+       "as": "Lucía"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Pack Hikes. Esta llamada se graba. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Pack Hikes. This call is recorded. How can I help?",
+       "as": "Lucía"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "A walk-in dog is checked in at the base now, if a group has a spot. The dog needs a group check and a vaccine record on file."
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the search goes on.",
+    "more": [
+     "A dog walking example: a dog with a cough gets 'no group walk until a vet clears it'.",
+     "Then only dates after the vet's OK are offered."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If your dog is hurt or very sick, call your vet or the nearest emergency vet now. If a person is in danger, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the hike leaders themselves. They can go over it at drop-off. For anything sooner, call Lee Pack Hikes at (555) 010-0177. If your dog seems sick, call your vet."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Pack Hikes asks: how many dogs, and has your dog ever bitten or snapped at a person or a dog?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Just Biscuit, a 3-year-old beagle mix. She's never bitten."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a time. Hike times name no hike leader, so Alex can't ask for one by name. A wish for one goes in the notes."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Anything the hike leader should know about Biscuit?"
+     ],
+     [
+      "cust",
+      "agent",
+      "She pulls hard, and she's nervous around big dogs."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "does": "Sam says yes, with a change, like a shorter walk. Rosie reads it back, then asks Alex. Here, Sam offers the 1-hour group walk instead.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Group walk instead, same time"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. a 1-hour group walk, Sat Oct 24 at 11:00am?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another change"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Fri Oct 23, 5:50pm",
+      "title": "Sage runs Biscuit's group check",
+      "does": "Fri 5:30pm: Biscuit's group check at the base. Sage walks her with two calm dogs for 20 minutes. She's fine in a group, so her Saturday booking stands.",
+      "more": [
+       "Alex gives the group check's own code at the base, like any visit.",
+       "Sage checks her harness, her recall, and how she is with other dogs.",
+       "A dog that isn't a fit for groups goes as 'A first step's result comes in', before the hike.",
+       "Alex not there for it: 'A first step isn't done in time'. It's free, so there's never a fee."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "GROUP CHECK Biscuit: fine with the group. Nervous with big dogs, keep her near me."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Biscuit's record. Her Saturday booking stands."
+       ],
+       [
+        "san",
+        "cust",
+        "Thanks for coming in, Alex! Biscuit passed her group check. See you Saturday at 11:00am."
+       ]
+      ],
+      "needs": [
+       "booked",
+       "pf.first_steps"
+      ],
+      "tells": [
+       "staff",
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Biscuit bring her own ball on the hike?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can Biscuit bring her own ball on the hike?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Sage says no: balls start fights in a group. Treats are fine."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M.'s Biscuit, Sat 11:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "Biscuit is checked in with Sage. Thanks, Alex! Pick-up is at the base, with the same code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "At Lee Pack Hikes, the code is given when the dog is left at the base. It confirms the visit, like any check-in.",
+    "more": [
+     "A dog that comes by van pick-up is checked in at the customer's door instead, in the other flow.",
+     "Next come the before notes and the hike. READY and the pick-up come after it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Before the walk: a small old scar on Biscuit's left ear. Paws fine.",
+      {
+       "photos": [
+        "Biscuit's ear, before the walk"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "Biscuit cuts a paw pad on the trail. Sage cleans and wraps it, and heads back. Sam and Alex are told at once.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Biscuit cut a paw pad on the trail. Cleaned and wrapped. Heading back."
+     ],
+     [
+      "san",
+      "owner",
+      "Sage says Biscuit (Alex M.) cut a paw pad on the hike. It's cleaned and wrapped, and they're heading back. Call Alex."
+     ],
+     [
+      "san",
+      "cust",
+      "From Lee Pack Hikes: Biscuit cut a paw pad on the trail. Sage cleaned and wrapped it, and they're heading back. Sam is calling you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Sage leads the walk: the hour with the group, and anything Alex said yes to.",
+    "more": [
+     "Sage texts an update with a photo, mid-walk.",
+     "At a drop-off, READY and the pick-up come next."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-53",
+    "does": "At a drop-off, READY and the pick-up come once the work is done. At Lee Pack Hikes, Alex leaves Biscuit for the walk, so the base takes the drop-off branch."
+   },
+   {
+    "op": "words",
+    "at": "A8-11",
+    "t": "Sat Oct 24, 11:30am",
+    "more": [
+     "The plug-in sets the status words: an update, LATE and READY.",
+     "A moved pick-up time is always sent, with the new time.",
+     "A reply from the customer goes to staff, like any question.",
+     "Nothing extra, like a paw rinse, is done until the customer says yes."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE all good on the meadow loop",
+      {
+       "photos": [
+        "Biscuit with the group"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "An update from Biscuit's walk: all good on the meadow loop.",
+      {
+       "photos": [
+        "Biscuit with the group"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "t": "Sat Oct 24, 12:05pm",
+    "does": "Alex gives the drop-off code at pick-up, or the person Alex named shows an ID. Biscuit goes home only with them.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Hand Biscuit over."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "At pick-up, Sage tells Alex how the walk went: Biscuit's paws, water, and how Biscuit did with the group.",
+    "more": [
+     "A sore paw or a scrape is shown to Alex at pick-up.",
+     "Anything new needs Alex's yes and its price first, like a paw rinse.",
+     "Work with no hand-back, like a class, skips this."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Biscuit: great with small dogs, nervous with big ones. Keep her near the leader on climbs."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for visiting Lee Pack Hikes! How was Biscuit's walk?",
+      {
+       "card": {
+        "title": "Rate the walk",
+        "lines": [
+         "Sat Oct 24",
+         "1 to 5 stars, one tap on the page"
+        ],
+        "button": "Rate it",
+        "link": "rosfield.com/r/a2"
+       },
+       "stars": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-42",
+    "say": [
+     [
+      "san",
+      "cust",
+      "After the hike, from Lee Pack Hikes.",
+      {
+       "card": {
+        "title": "After the hike",
+        "lines": [
+         "Fresh water and a rest",
+         "Check her paws for burrs or cuts"
+        ],
+        "button": "Read it",
+        "link": "rosfield.com/a/a14"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Pack Hikes",
+          "6 dogs on 2 hikes · Sage 3, Mika 3"
+         ],
+         [
+          "Lee Dog Walking",
+          "9 walks"
+         ],
+         [
+          "Waiting on you",
+          "Dee W.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-11",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your private hike quote is with Lee Pack Hikes' owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in's form goes on the secure page: the vaccine record, an emergency contact and a vet-care OK. A group needs rabies and DHPP. It's due before the first hike."
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say Biscuit starts coughing before the hike. The plug-in's danger words are checked first. A cough can be catching, so she can't join a group until a vet clears her.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Biscuit started coughing today. Can she still come Saturday?"
+     ],
+     [
+      "san",
+      "cust",
+      "A cough can be catching, so Biscuit can't join a group until a vet clears her. Move her hike with no fee:",
+      {
+       "times": [
+        "Sat Oct 31 · 11:00am",
+        "Sun Nov 1 · 10:00am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Sage finds Biscuit limping on a sore paw. The plug-in says to stop: Sage brings her back to the base, and nothing is charged for the part not done.",
+    "more": [
+     "The note says what was found, what wasn't done, and why.",
+     "It names the kind of pro to see, like a vet, never a named one.",
+     "Health details stay on the secure page, never in a text."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Stopped Biscuit's walk: sore front paw. Back at the base. Note and photo on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Sage left you a note about Biscuit's walk today.",
+      {
+       "card": {
+        "title": "A note from Lee Pack Hikes",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Sage stopped Biscuit's walk early: a sore paw. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every dog signs the vaccine record, emergency contact and vet-care form first."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the base."
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "t": "Sat Oct 24, 11:55am",
+    "does": "The group is back at the base. Sage texts READY with a photo, and Alex hears Biscuit is ready for pick-up.",
+    "more": [
+     "Only Alex, or someone Alex named, can pick Biscuit up.",
+     "Alex can reply within 24 hours if something's wrong, and Sam is told."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "READY Alex M.",
+      {
+       "photos": [
+        "Biscuit, back at the base"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Biscuit is back at the base and ready for pick-up.",
+      {
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "Lee Pack Hikes · 120 Ridge Rd",
+         "Pick-up by 12:15pm",
+         "Bring the code you used to drop Biscuit off",
+         "Something wrong? Reply within 24 hours"
+        ],
+        "button": "See the photos",
+        "link": "rosfield.com/r/a7"
+       },
+       "photos": [
+        "Biscuit, back at the base"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-40",
+    "more": [
+     "Here: lightning on the ridge, a loose dog that attacks, or smoke. All dogs come back to the base first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-12",
+    "more": [
+     "New dogs join a group only after a free group check at the base.",
+     "The hikes show how long they take, so each hike leader's group is saved for all of it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-43",
+    "more": [
+     "If a customer asks for a pick-up, Rosie offers a drop-off at the base instead."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-48",
+    "more": [
+     "Where a permit is required, Quinn leads hikes only once Rosie's team checks it with the city, and Sam says yes.",
+     "A permit that doesn't match keeps Quinn off the schedule, and Sam is told."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-05",
+    "more": [
+     "Luca gets the same invite. Sage and Mika get theirs from Lee Pack Hikes.",
+     "Pat gets one too, to OK prices for Lee Dog Walking.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "At the base, prices are the same whichever hike leader goes.",
+     "A person can have their own price list, their own hourly rate, or a different price for one service."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S12-19",
+    "more": [
+     "A renewal receipt counts while the records catch up.",
+     "Not back in 1 business day: a person on Rosie's team checks with the city another way, and Sam is told."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "The price, and the owner's OK, come before the hike.",
+     "READY is texted when the group is back, with the pick-up time.",
+     "The plug-in says how many dogs a hike leader takes: up to 4."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-15",
+    "more": [
+     "The dog joins whoever leads that group, up to 4 dogs."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-38",
+    "more": [
+     "A record is kept on the secure page, never in a text with health details.",
+     "Lost means a dog in Lee Pack Hikes' care: Sam and Alex are told at once, the same way.",
+     "The vet-care OK Alex signed lets Sage get care, up to its limit, if Alex can't be reached."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: Biscuit stays with Sage.",
+     "Not picked up 15 minutes after the end: Sam calls Alex, then the emergency contact. Biscuit stays safe with Sage.",
+     "A dog that came by van goes home by van, in the other flow."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-13",
+    "more": [
+     "A sign of danger gets the safety message first, like 'call your vet now'.",
+     "Health details stay on the secure page, never in a text to staff.",
+     "The plug-in asks for the move, so there's no fee."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Dog walking, pet sitting and pack hikes need no state license where Sam works (the plug-in), so the company gives its registration (S1-61). Where a city or state asks for a permit, its form asks there."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The dog walking plug-in adds no agreement for the business to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Walkers and hike leaders are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: walks, visits and hike drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Walkers and hike leaders need no license of their own unless the state's or city's form says so (the plug-in)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A walk is never sent now: a walk needed soon gets the soonest open window (the plug-in)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your dog walking services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Dog walking prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Dog walking price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Meet-and-greet",
+          "Free · 20 min · required first"
+         ],
+         [
+          "Solo walk, 30 min",
+          "$28"
+         ],
+         [
+          "One-time walk, 60 min",
+          "$42"
+         ],
+         [
+          "Short visit, 20 min",
+          "$22"
+         ],
+         [
+          "Extra dog, same home",
+          "$8 a walk"
+         ],
+         [
+          "Holiday walks",
+          "$10 more a walk"
+         ],
+         [
+          "Late skip or no way in",
+          "Up to the walk's price, if you OK it"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a license or a permit to walk dogs, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Pet sitting next: same company, so only what's new. It needs no state license where you work. Send your pet sitting prices."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Pet sitting price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like dog walking. Send only what's different.",
+      {
+       "card": {
+        "title": "Pet sitting, set like dog walking",
+        "lines": [
+         "At the customer's home; nobody needs to be home for a drop-in",
+         "A card saved when they book, charged after each visit",
+         "Drop-in visit, 30 min $30 · Overnight stay $95 a night"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee Pack Hikes is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The base's sign"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the base is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Group dog walks need no state license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most group walk businesses start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Pack Hikes, to start",
+        "lines": [
+         "Every group walk and hike",
+         "Dropped off and picked up at your base",
+         "When they book: a card saved, for a $20 fee you OK",
+         "At pick-up: the saved card is charged at DONE"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules group walk businesses often set. Your call: keep them, or change any. They become the base's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Pack Hikes, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Pack Hikes will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Group dog walks and trail hikes from our base by the trailhead on Ridge Rd."
+        ]
+       },
+       "photos": [
+        "The base",
+        "The van",
+        "A pack on the trail"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Pack Hikes the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Pack Hikes · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "Where the state's rules don't allow it, Rosie won't set the van pick-up. The group walk stays at the base, at $35.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Your state's rules need a pet transport license for van pick-ups, and none is on file. So the group walk starts at the base only.",
+      {
+       "card": {
+        "title": "Group walk · from the base only",
+        "lines": [
+         "$35, card saved, charged at pick-up",
+         "Van pick-ups stay off"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-38",
+    "more": [
+     "Where a state or city licenses group dog walking or pet transport, its form asks for it here instead.",
+     "Where the city requires a park permit for group walks, it's asked for when each hike leader joins.",
+     "Each hike leader can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "Lee Pack Hikes needs no license in Sam's state, so its registration is checked instead.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way pet sitting was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Dog walking",
+          "Now"
+         ],
+         [
+          "Pet sitting",
+          "Once your pet sitter joins and you say yes"
+         ],
+         [
+          "Lee Pack Hikes",
+          "Once a hike leader joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Dog Walking",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Devon Price",
+       "Lee Dog Walking",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Luca Moore",
+       "Lee Dog Walking",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Dog Walking",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Sage Chen",
+       "Lee Pack Hikes",
+       "At the base, and van pick-ups",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Mika Diaz",
+       "Lee Pack Hikes",
+       "At the base",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, pet sitting and Lee Pack Hikes now show to AI assistants too. Each person hears they can be booked for their own work: Luca for dog walking, Mika at the base."
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who walks dogs and sits pets, and who leads the hikes? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam walks dogs too, so Sam is on the dog walking team.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Devon Price and Luca Moore walk dogs. Devon does pet sitting too. Sage Chen and Mika Diaz lead the hikes. Sage also drives the van for pick-ups"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Devon Price: dog walking and pet sitting",
+         "Luca Moore: dog walking",
+         "Sage Chen: hikes and van pick-ups",
+         "Mika Diaz: hikes, at the base"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Luca Moore"
+     ],
+     [
+      "Company",
+      "Lee Dog Walking"
+     ],
+     [
+      "Kinds of work",
+      "Dog walking"
+     ],
+     [
+      "Jobs",
+      "Solo walks, short visits, one-time walks"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 10am–5pm"
+     ],
+     [
+      "Luca agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Dog Walking. Reese gets one invite, and replies YES. Where the plug-in says a license or permit is needed. It's optional and not checked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Dog Walking. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Dog Walking. Sam Lee added you to the team for dog walking and pet sitting. Reply YES to join and get your walks here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Devon"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Devon replies YES, then checks what Sam set. One reply covers every kind of work Devon does.",
+    "more": [
+     "No license number is asked: walking dogs and pet sitting need none in Sam's state.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Luca, Sage and Mika join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 7am",
+      {
+       "card": {
+        "title": "Devon Price · my profile",
+        "lines": [
+         "Dog walking and pet sitting",
+         "Mon–Fri, 10am–5pm",
+         "Lee Dog Walking's 5 miles"
+        ]
+       },
+       "as": "Devon"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 7:00am.",
+      {
+       "as": "Devon"
+      }
+     ]
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed in Sam's state"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "A 30-minute walk is $32 with Sam, and $28 with anyone else. An overnight stay is $105 with Devon.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Solo walk, 30 min",
+          "You",
+          "$32"
+         ],
+         [
+          "Solo walk, 30 min",
+          "Anyone else",
+          "$28"
+         ],
+         [
+          "Overnight stay",
+          "Devon",
+          "$105"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license in Sam's state, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Devon: dog walking and pet sitting",
+         "Luca: dog walking",
+         "Sage: hikes and van pick-ups",
+         "Mika: hikes"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Where the city requires a park permit for group walks, Rosie checks no permit; the owner says when one lapses. Here, Sam says Mika's is suspended, so Mika comes off the hike schedule at once.",
+    "more": [
+     "Every 30 days by default, and again before each expiry.",
+     "Expired, suspended or revoked all take a hike leader off the schedule.",
+     "Drop-off slots name no hike leader, so fewer slots show until Sam adds someone.",
+     "Dogs already booked stay booked. Sam picks who leads them, and no customer is told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Dog Walking's pet-care insurance certificate ends in 30 days. Send the new one to keep 'insured' on the listing.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "A new certificate in the business's name",
+         "Not sent by then: 'insured' comes off the listing"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-60",
+    "more": [
+     "Sam fills in that state's form to take those addresses.",
+     "Not now, or no answer in 7 days: only home-state addresses are offered."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-77",
+    "does": "Sam fills in the second state's form on the portal: any permit for work there, and that state's job rules. Dog walking needs no license there, so nothing waits on a lookup.",
+    "more": [
+     "Addresses there are offered once the form is done.",
+     "Until then, an address there gets the same answer as one outside the area. Nothing is booked.",
+     "Jobs there follow that state's rules: the address decides."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The second state's form is done. Dog walking there needs no license.",
+      {
+       "card": {
+        "title": "Second state · now offered",
+        "lines": [
+         "Addresses there, inside your 5 miles",
+         "All your walkers, from today"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Where the city requires a park permit for group walks, Rosie checks it on the city's own records. While they're down, nobody new leads a hike until checked. Those already checked stay on.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The city's permit records are down, so Quinn S.'s park permit for Lee Pack Hikes isn't checked yet. Quinn isn't on the hike schedule until it is."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "does": "One number booked several walks under different names, and each time there was no way in. New requests from it now wait for Sam's OK.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 walks at Lee Dog Walking this week under different names. Each time, there was no way in. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "The walk report comes at DONE, with the photo (B8-41)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Walks are booked from the list; nothing is proposed after one."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Walks are booked in 2-hour windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Walks are visits, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A solo walk books a walker's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Solo walks have no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A walker never looks after a child."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Only a child answers",
+    "why": "Nobody needs to be home for a walk: a child at home doesn't change it."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody home",
+    "why": "Nobody needs to be home for a walk, so nobody home is never a no-show. A lockbox that fails is the last branch."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "Walks are priced from the list; nothing is quoted at a walk."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "One home's dogs are one booking."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or insurance pays for a walk."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "A walk is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "The service agreement is the plug-in's form on the secure page (B4-86), signed with the booking."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "A walk is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "A walk is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "A walk is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A walk is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a walk."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Walks never ask who owns the home (B4-78)."
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I go back to the office Thursday. Can someone walk my dog Biscuit around midday on weekdays? I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Necesito paseos para mi perro.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I need walks for my dog.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Dog Walking. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Dog Walking. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, and a bite sends it to Sam first. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A dog walking example: a dog that bit someone gets 'is anyone hurt?' first.",
+     "Rosa says her dog nipped another dog at the park yesterday. Nobody was hurt, so the call goes on, and Sam reads her answers before it books."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay alguien herido, una persona o un perro?",
+      {
+       "lang": "es",
+       "en": "First: is anyone hurt, a person or a dog?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Mi perro mordió a otro perro ayer, pero nadie se lastimó.",
+      {
+       "lang": "es",
+       "en": "No. My dog nipped another dog yesterday, but nobody got hurt.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Gracias. Si una persona mordida está herida, llame al 911. Sam revisa su pedido antes de reservar.",
+      {
+       "lang": "es",
+       "en": "Thanks. If a person who was bitten is hurt, call 911. Sam checks your request before it's booked.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Dog Walking. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Dog Walking · Solo walks",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa, in Spanish. She wants weekday walks. Her dog nipped another dog yesterday; nobody was hurt.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "A bite yesterday · nobody hurt · safety steps given",
+         "Booking link sent · comes to you first"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Dog Walking. We got your voicemail about walks for your two dogs. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Dog Walking · Solo walk, 30 min",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about walks for two dogs. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants weekday walks from next week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Booked, with no texts to Tessa. Please tell her the details yourself.",
+      {
+       "card": {
+        "title": "Tessa · Solo walk, 30 min",
+        "lines": [
+         "Thu Oct 22 · 12–2pm · Luca",
+         "Add the address on the Today page"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/b8"
+       },
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For dog walking, a dog that's hurt, very sick or poisoned right now stops the booking.",
+    "more": [
+     "The message is the plug-in's: Rosie can't judge how sick a pet is, so it says to call the vet now.",
+     "A person who was bitten and is hurt gets 911 first.",
+     "On a call, the caller hears it, and Sam gets the call summary."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency for your dog. Rosie can't judge how sick a pet is. Call your vet, or the nearest 24-hour emergency vet, now. If a person was bitten and is hurt, call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their dog just ate rat poison. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A dog that ate rat poison",
+         "Told to call the vet or an emergency vet now"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Biscuit has been limping a little since this morning. Should she still go for walks?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't judge a pet's health. If she can't put weight on the leg, call your vet. To ask about her walks, call Lee Dog Walking at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Dog Walking walks dogs and looks after pets, but doesn't train them. Nothing was saved. You can look for a dog trainer near you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: the dog's breed, age and weight, any bite history, and how the walker gets in.",
+     "Its danger words: a dog that's hurt, very sick or poisoned right now, or a person bitten.",
+     "Its first steps: a free meet-and-greet at home before a new dog's first walk, and a vet-care form.",
+     "Who can stand in for whom, and how a walk is checked in: the lockbox, with nobody home.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Dog Walking asks: what's your dog's breed, age and weight? And has your dog ever bitten or snapped at a person or a dog?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Biscuit, a beagle mix, 3 years old, 28 lb. She's never bitten anyone."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-43",
+    "more": [
+     "Alex's plan, a 30-minute walk every weekday, is the plan branch. Its walks keep the same window and walker.",
+     "The meet-and-greet is the first step with a lead time: at least a day before the first walk."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-97",
+    "does": "The plug-in sets a first step with a lead time: a free meet-and-greet at home, a day or more ahead. The AI says so, and the walk times start after it.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Dog Walking meets every new dog at home first, for free. It takes 20 minutes, at least a day before the first walk. So the first walk times start Thursday."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Does Biscuit pull, or slip her collar or harness? And where's her leash?"
+     ],
+     [
+      "cust",
+      "agent",
+      "She pulls hard, and she backed out of her collar once. Her harness and leash are on the hook by the back door."
+     ]
+    ],
+    "does": "Alex adds how Devon gets in and what Devon should know. The lockbox code shows to Devon only during the walk window.",
+    "form": [
+     [
+      "Parking",
+      "On the street"
+     ],
+     [
+      "Pets",
+      "Biscuit, beagle mix, 28 lb; a cat who stays inside"
+     ],
+     [
+      "Lockbox code",
+      "Typed here only"
+     ],
+     [
+      "Harness and leash",
+      "On the hook by the back door"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-26",
+    "does": "Nobody needs to be home for a walk: Alex will be at work. So the AI asks who gets the walk texts and reports. The meet-and-greet is with Alex.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Nobody needs to be home for walks. Should the walk texts and reports go to you?",
+      {
+       "buttons": [
+        "Yes, to me",
+        "Someone else"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Dog walking: a new dog's first walk comes after a free meet-and-greet at home, the branch Alex takes. A form on the secure page comes too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "more": [
+     "Examples: a written estimate for work over a set amount, or the right to cancel a sale made at home.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date. Sam is reminded before it's late.",
+     "Walks need no notice at booking here. The skip and weather terms are on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "does": "Who may book comes from the plug-in. The person booking confirms they're 18 or older and may care for the dog. An adult is home for the meet-and-greet.",
+    "form": [
+     [
+      "I'm 18 or older",
+      "Yes"
+     ],
+     [
+      "Biscuit is my dog, or I may care for her",
+      "Yes"
+     ],
+     [
+      "An adult (18+) will be home for the meet-and-greet, Tue 5:30pm",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "If Alex had named a plan or insurance that pays, Sam would check it here. No plan or insurance pays for a walk, so this step is skipped."
+   },
+   {
+    "op": "words",
+    "at": "B4-64",
+    "does": "Say Alex wants Wednesday's midday window, and it's full. Alex joins its waitlist, in order. Nothing is taken, and texts come only after Alex's own yes.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Wednesday's midday window is full. Lee Dog Walking can put you on its waitlist, in order. Nothing is taken.",
+      {
+       "buttons": [
+        "Join the waitlist",
+        "See other days"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Dog Walking. Join the waitlist for Wed Oct 21, 11am–1pm? We text you only if it opens.",
+      {
+       "buttons": [
+        "Yes, add me",
+        "No thanks"
+       ],
+       "stop": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Fri 11am"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. a first walk Fri Oct 23, 11am to 1pm, with Devon?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes. Alex has them in writing, and can end the plan with one reply.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "Yes: every weekday",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to the walk plan on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: the days and window, the price a walk, and when it's charged. The skip and weather terms, and that it runs until Alex ends it.",
+           "Ending it takes one reply. Walks already done stay paid.",
+           "Once a year, the terms and how to end the plan come again, by the business's own rule. Any reminder the state's rules require comes too."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your walk plan with Lee Dog Walking is set.",
+            {
+             "card": {
+              "title": "Walks Mon to Fri · $28 a walk",
+              "lines": [
+               "From Thu Oct 22 · 11am–1pm · Devon",
+               "Your saved card is charged after each walk",
+               "Skip free until 8pm the night before",
+               "Runs until you end it"
+              ]
+             },
+             "buttons": [
+              [
+               "3",
+               "End the plan"
+              ]
+             ]
+            }
+           ]
+          ],
+          "vary": {
+           "after:bill": {
+            "say": [
+             [
+              "san",
+              "cust",
+              "Your walk plan with Lee Dog Walking is set.",
+              {
+               "card": {
+                "title": "Walks Mon to Fri · $28 a walk",
+                "lines": [
+                 "From Thu Oct 22 · 11am–1pm · Devon",
+                 "We text you the bill after each walk",
+                 "Skip free until 8pm the night before",
+                 "Runs until you end it"
+                ]
+               },
+               "buttons": [
+                [
+                 "3",
+                 "End the plan"
+                ]
+               ]
+              }
+             ]
+            ]
+           },
+           "before:full": {
+            "say": [
+             [
+              "san",
+              "cust",
+              "Your walk plan with Lee Dog Walking is set.",
+              {
+               "card": {
+                "title": "Walks Mon to Fri · $28 a walk",
+                "lines": [
+                 "From Fri Oct 23 · 11am–1pm · Devon",
+                 "Your saved card is charged after each walk",
+                 "Skip free until 8pm the night before",
+                 "Runs until you end it"
+                ]
+               },
+               "buttons": [
+                [
+                 "3",
+                 "End the plan"
+                ]
+               ]
+              }
+             ]
+            ]
+           }
+          },
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "before",
+    "at": "B7-55",
+    "steps": [
+     {
+      "id": "B7-x01",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Tue Oct 20, 5:55pm",
+      "title": "Devon meets Biscuit at home",
+      "does": "Tue 5:30pm: the meet-and-greet. Devon meets Biscuit with Alex, checks the harness, and tries the lockbox. Biscuit is fine for solo walks, so the walks stand.",
+      "more": [
+       "Alex is home, so Devon knocks and Alex lets Devon in. It takes about 20 minutes.",
+       "Devon walks the block with them, and watches how Biscuit is with other dogs.",
+       "The harness is fitted snug, so Biscuit can't back out of it. The lockbox code is typed only on the secure page.",
+       "A dog that isn't a fit, or needs a change, goes as 'A first step changes the job', before the visit.",
+       "Nobody home for it: 'First steps not done in time'. It's free, so there's never a fee."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "MET Biscuit. Good for solo walks, not groups. Harness fits snug. Lockbox works."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Biscuit's record. The walks stand."
+       ],
+       [
+        "san",
+        "cust",
+        "Thanks for meeting Devon today! Biscuit's walks are set. The first one is Thu Oct 22, 11am to 1pm."
+       ]
+      ],
+      "needs": [
+       "booked",
+       "pf.first_steps"
+      ],
+      "tells": [
+       "staff",
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-15",
+    "say": [
+     [
+      "cust",
+      "san",
+      "STOP"
+     ],
+     [
+      "san",
+      "cust",
+      "You won't get more texts from Rosie for Lee Dog Walking. Your walks stay booked."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. opted out of texts. The walks stay. Text DONE as usual; the report goes to Alex's secure page."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. opted out of texts. The walks stand, from Thu 11am–1pm. For any change, call Alex."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Devon give Biscuit a treat after her walk?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can Devon give Biscuit a treat after her walk?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Devon says yes, and will give her one when the walk is done."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that Biscuit has an upset stomach. Rosie runs the plug-in's danger check again, then offers an earlier potty visit if one is free.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Biscuit has had an upset stomach since this morning."
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry to hear it. If she's very sick or won't drink, call your vet now. Luca can come sooner for a walk, at the same price.",
+      {
+       "times": [
+        "Wed Oct 21 · 2–4pm · Luca"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep Thursday"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-22",
+    "does": "No reply by 8pm Wed. The plug-in's default: Sam calls Alex before Luca goes in. If Sam can't reach Alex by 10am, Thursday's walk is skipped, with no charge.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered about Luca walking Biscuit tomorrow, 11am–1pm. Please call Alex before Luca goes in.",
+      {
+       "buttons": [
+        "Alex said OK",
+        "Skip it, no charge"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sam from Lee Dog Walking will call you about tomorrow's walk. Luca goes in only after your OK. If we can't reach you, the walk is skipped with no charge."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "A what-if: nobody was home for Tuesday's meet-and-greet, so the plug-in's first step isn't done by the day before. Sam decides.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Biscuit's meet-and-greet didn't happen: nobody was home Tue 5:30pm. Her first walk is Thu 11am–1pm.",
+      {
+       "buttons": [
+        "Move the walk",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "We missed you at Biscuit's meet-and-greet, so her first walk needs to move. There's no fee. Pick a new meet-and-greet; the walks start the next weekday:",
+      {
+       "times": [
+        "Fri Oct 23 · 5:30pm · Devon",
+        "Mon Oct 26 · 5:30pm · Devon"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "Alex runs late",
+    "why": "Nobody needs to be home for a walk, so a customer running late changes nothing."
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 11:25am",
+    "does": "Back to Alex: it's Thursday, and Devon heads over for Biscuit's first walk. Nobody needs to be home, so there's no code and no door check.",
+    "more": [
+     "The text names the walker, with a photo link, so Alex knows who has the key.",
+     "The photo link is where a plain text finds the photo.",
+     "If Alex texted STOP, nobody calls: nobody needs to be home.",
+     "When Alex is home for a walk, the code at the door works as usual."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Devon from Lee Dog Walking is on the way to walk Biscuit, about 15 minutes. Nobody needs to be home. You'll get a report and a photo after the walk.",
+      {
+       "photos": [
+        "Devon, from Lee Dog Walking"
+       ],
+       "photoLink": "rosfield.com/m/r4"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 11:40am"
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before the walk, Devon notes how Biscuit and the home look: the water bowl, anything chewed or already broken. The notes stay with the walk.",
+    "more": [
+     "The plug-in names the checks: the water bowl, anything chewed, and the doors and gates.",
+     "Alex can see them on the secure page.",
+     "A damage claim later is checked against them.",
+     "When nobody is home, these notes and photos are the record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE water bowl empty, refilled. Couch cushion already chewed.",
+      {
+       "photos": [
+        "Couch cushion, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s walk."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-19",
+    "does": "Walks have their price before the visit, from Sam's list. Nothing is priced at a walk."
+   },
+   {
+    "op": "words",
+    "at": "B8-22",
+    "does": "Back to Biscuit's walk on Thursday. Each branch is one thing that can happen on a walk. Most rejoin before DONE."
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "The dog gets loose",
+     "end": "end",
+     "endText": "Sam and Devon search, with Alex on the phone. Rosie logged the times and the place.",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.20"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 11:55am",
+       "title": "Lost dog: Sam and Alex told at once",
+       "does": "Biscuit pulls free near the park. Devon texts LOST DOG with the place. Rosie tells Sam and Alex at once, at any hour, then steps back.",
+       "more": [
+        "Sam and Devon run the search, with Alex on the phone.",
+        "Rosie never admits fault or offers money. Sam decides the rest.",
+        "The times and the place stay on the walk record."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "LOST DOG Biscuit pulled free at Grove St and Maple Ave, chasing her"
+        ],
+        [
+         "san",
+         "owner",
+         "URGENT: Biscuit (Alex M.) got loose at Grove St and Maple Ave at 11:55am. Devon is searching. Call Alex now."
+        ],
+        [
+         "san",
+         "cust",
+         "Urgent from Lee Dog Walking: Biscuit got loose near Grove St and Maple Ave at 11:55am. Devon is searching now, and Sam is calling you."
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Devon finds the back gate latch broken, so Biscuit stays out of the yard. The plug-in says to stop that part, so Alex gets a written note and the photo.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD back gate latch broken, no yard time",
+      {
+       "photos": [
+        "Back gate latch"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Devon found the back gate latch broken, so Biscuit had no yard time after her walk.",
+      {
+       "card": {
+        "title": "Safety note · 31 Maple Ave",
+        "lines": [
+         "Found: the back gate latch is broken",
+         "Not done: yard time after the walk",
+         "Call a fence or gate repair company"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "does": "A what-if: the park path is closed, so Devon walks Biscuit around the long block instead. Any change in price goes to Alex first.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CHANGE park path closed, walked the long block instead, same 30 min"
+     ],
+     [
+      "san",
+      "cust",
+      "The park path was closed, so Devon walked Biscuit around the long block instead. Your price doesn't change."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "does": "Devon sends a photo from the walk. Rosie tells Alex in the business's name, inside text hours.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE Biscuit met a puppy friend, all good",
+      {
+       "photos": [
+        "Biscuit and a puppy"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "An update from Biscuit's walk: she met a puppy friend, and all is well.",
+      {
+       "photos": [
+        "Biscuit and a puppy"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-35",
+    "does": "A what-if: Devon knocks over a vase in the hall and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DAMAGE knocked over a vase in the hall, broken",
+      {
+       "photos": [
+        "Broken vase"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Devon broke a vase at Alex M.'s. The before photo shows it whole.",
+      {
+       "photos": [
+        "Before",
+        "After"
+       ],
+       "buttons": [
+        "Pay for it",
+        "Take money off",
+        "I'll call Alex"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Alex isn't home, so the walk report is the check: the times, pee and poop, water and a photo. Devon checks the door and the lockbox before DONE.",
+    "more": [
+     "The plug-in names what's checked: water filled, the harness back on its hook, the door locked and the key in the lockbox.",
+     "When Alex is home, Devon tells Alex how the walk went instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 12:14pm",
+    "does": "The walk is done: 11:42am to 12:12pm. Devon texts DONE with the walk report. Alex gets the report and a photo.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 28 walk. Pee + poop, water filled, door locked",
+      {
+       "photos": [
+        "Biscuit, after her walk"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Done: Alex M., Thu 11am–1pm. The report is sent to Alex."
+     ],
+     [
+      "san",
+      "cust",
+      "Biscuit's walk is done: 30 minutes with Devon, 11:42am to 12:12pm. Pee and poop, fresh water, back door locked.",
+      {
+       "photos": [
+        "Biscuit, after her walk"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Biscuit pulls toward squirrels on Grove St. Treats are in the jar by the door."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private record."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-03",
+    "label": "Yes: one pay link",
+    "why": "No extra work is sold at a walk (B8-22). A change before the walk is paid when it's made (B7-31)."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam keeps cards only: walks are small bills (S1-57)."
+   },
+   {
+    "op": "words",
+    "at": "B9-19",
+    "does": "Before the bill goes out: each branch is one more thing a bill can carry. Most show only for the money choices that use them."
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 6:00pm",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for choosing Lee Dog Walking! How was Biscuit's walk with Devon?",
+      {
+       "card": {
+        "title": "Rate the walk",
+        "lines": [
+         "Thu Oct 22 · Devon"
+        ],
+        "button": "Rate it",
+        "link": "rosfield.com/r/r4"
+       },
+       "stars": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "A walk sells no extra work at the home, so there's nothing here to cancel. The booked walks can't be cancelled this way."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at a walk (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at a walk (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Next visit booked at checkout",
+    "why": "A plan books the next walks. Nobody is home at a walk's DONE to book one."
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Pack Hikes",
+          "6 dogs on 2 hikes"
+         ],
+         [
+          "Lee Dog Walking",
+          "9 walks · Devon 6, Luca 3"
+         ],
+         [
+          "Waiting on you",
+          "Nora S.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-05",
+    "does": "Nora is booked, and Luca is told. Nora's text goes out at 9:00am, when her text hours start. The payment held until now is taken.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Dog Walking. You're booked! Nobody needs to be home: Luca uses your lockbox, and you'll get a report after the walk.",
+      {
+       "card": {
+        "title": "Lee Dog Walking · Solo walk, 30 min",
+        "lines": [
+         "Today · 1 to 3pm · Luca"
+        ]
+       },
+       "stop": true,
+       "as": "Nora S."
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "New walk for you: Nora S., today, 1 to 3pm. Read her dog's notes first.",
+      {
+       "as": "Luca"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-12",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your pet sitting quote is with the owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-14",
+    "does": "Or a skip with no charge. Nothing is held for a walk, so nothing is on Lin's card for it. If texts are off, Sam calls.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Dog Walking had to block Thu Oct 29, 12 to 5pm. So your 12 to 2pm walk can't go ahead then. Pick a new time:",
+      {
+       "times": [
+        "Mon Nov 2 · 11am to 1pm",
+        "Tue Nov 3 · 10am to 12pm"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Skip it, no charge"
+        ]
+       ],
+       "as": "Lin W."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "does": "Luca's day is blocked, and each customer picks. A skip is free. With no reply in 24 hours, Sam calls before Devon goes in. If Sam can't reach them, the walk is skipped, free.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Luca is out on Fri Oct 30, so Devon can take your 10am to 12pm walk instead.",
+      {
+       "buttons": [
+        "Devon instead",
+        "New times",
+        "Skip it, no charge"
+       ],
+       "as": "Nora S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "The plug-in needs a form before the first walk: the vaccine record, an emergency contact and a vet-care OK. The vet-care OK covers care up to the limit Alex sets."
+   },
+   {
+    "op": "words",
+    "at": "B8-17",
+    "t": "Thu Oct 22, 11:40am",
+    "does": "Nobody needs to be home for a walk. Devon opens the lockbox with the code shown only during the walk window. DONE, with the walk report and a photo, confirms the walk at the end.",
+    "more": [
+     "Each opening of the lockbox is logged. The key goes back in it after the walk.",
+     "Alex gets the report and photo, and has 24 hours to say if something's wrong. Sam is told of any reply.",
+     "There's no code to enter, so DONE confirms the walk for Rosfield's $2.",
+     "Only for work the plug-in marks 'nobody needs to be home', like walks and drop-in visits."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "IN Alex M."
+     ],
+     [
+      "san",
+      "staff",
+      "Got it: in at 11:40am. Text DONE with Biscuit's report and a photo after the walk."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-34",
+    "does": "An off-leash dog bites Biscuit on the walk. Devon texts HURT and takes her to the vet. Rosie tells Sam and Alex at once.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT off-leash dog bit Biscuit on the walk. Taking her to Southside Pet Clinic now"
+     ],
+     [
+      "san",
+      "owner",
+      "URGENT: Biscuit (Alex M.) was hurt on her walk. Devon is taking her to Southside Pet Clinic. Call Alex now."
+     ],
+     [
+      "san",
+      "cust",
+      "Urgent from Lee Dog Walking: Biscuit was hurt on her walk. Devon is taking her to Southside Pet Clinic now, as you allowed. Sam is calling you."
+     ],
+     [
+      "san",
+      "staff",
+      "Sam and Alex are told. If a person is hurt, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each walk is rated."
+   },
+   {
+    "op": "more",
+    "at": "S1-12",
+    "more": [
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "Every walk is on the list. Nothing is priced from photos or at a walk."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-43",
+    "more": [
+     "If a customer asks for a pick-up, Rosie offers a drop-off at the base instead."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-48",
+    "more": [
+     "Reese can be booked once Sam says yes.",
+     "Where the city requires a permit to walk dogs in its parks, it's checked before Reese is offered for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-05",
+    "more": [
+     "Luca gets the same invite. Sage and Mika get theirs from Lee Pack Hikes.",
+     "Pat gets one too, to OK prices for Lee Dog Walking.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "At the base, prices are the same whichever hike leader goes.",
+     "A person can have their own price list, their own hourly rate, or a different price for one service."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S12-19",
+    "more": [
+     "A renewal receipt counts while the records catch up.",
+     "Not back in 1 business day: a person on Rosie's team checks with the city another way, and Sam is told."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-97",
+    "more": [
+     "The meet-and-greet itself is booked once the walk time is saved.",
+     "Alex asks on Monday evening, so the first walk can be Thursday, after a meet-and-greet on Tuesday or Wednesday."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "Building rules, like a doorman's sign-in, go to Sam to check.",
+     "The plug-in adds its own questions: the vet, the vaccine record and an emergency contact.",
+     "The code is typed only on this page, never in a text. Each opening is logged.",
+     "It's deleted 72 hours after the plan ends."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-26",
+    "more": [
+     "There's no check-in code at the door for a walk with nobody home. Devon uses the lockbox, and DONE with a photo confirms each walk.",
+     "If someone is home for a walk, the code at the door works as usual."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B5-34",
+    "more": [
+     "Walks are under that amount, so they need none.",
+     "The service agreement is the plug-in's form on the secure page, signed with the booking.",
+     "Sam can also ask for a contract on any service, at sign-up or in the portal."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-06",
+    "more": [
+     "Take it: Nora is booked, as when Sam accepts.",
+     "No thanks, or no reply in 2 hours: nothing is booked, and the payment held is released.",
+     "A shorter walk shows its own price before Nora says yes.",
+     "Where the plug-in keeps service names private, the text gives only the business, the date, the time and the place."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-15",
+    "more": [
+     "The word CANCEL also means 'stop texting me', never 'cancel my visit'.",
+     "To cancel a walk, Alex taps Cancel the visit, or calls.",
+     "Walk reports can't go by text now. Alex sees them on the secure page.",
+     "Devon still texts DONE when each walk is done."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-17",
+    "more": [
+     "Real danger, like a dog that won't drink or is struggling to breathe, gets the safety steps first: call the vet now.",
+     "An earlier time shows its price first. No reply: the walk stays as booked.",
+     "If Alex picks the earlier time, Devon and Luca are told."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-22",
+    "more": [
+     "Luca never goes into the home without Alex's OK.",
+     "A skip the business causes is always free.",
+     "Alex is told either way, and can still pick another time."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "The meet-and-greet is free, so a missed one costs nothing.",
+     "Only walk times after a new meet-and-greet are offered.",
+     "No answer from Sam by 6pm: Sam is reminded, and Alex is told the walk may move.",
+     "No answer by 8pm: the walk moves with no fee, Alex picks a new time, and Devon is told not to go."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-46",
+    "more": [
+     "Only a walker the plug-in allows for that dog stands in, at the same price or lower.",
+     "A walker the customer hasn't met never goes in without their OK.",
+     "A STOP keeps the walk as it is, and Sam calls."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-34",
+    "more": [
+     "Rosie tells them at any hour, then steps back. It never admits fault or offers money.",
+     "If Devon is hurt instead, Sam is told the same way. Luca finishes, or Alex gets a new time with no fee.",
+     "What happened stays on the walk record.",
+     "The vet-care OK Alex signed is on the secure page; its limit never goes in a text."
+    ]
+   }
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "Visit fee",
+  "color"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "From the cleaner pilot: dog walking runs the same way as home cleaning. The walker comes to an empty home on a weekly plan, gets in with a lockbox or a door code, and a stand-in needs the customer's OK. The cleaner's lockbox, plan and stand-in ops were the starting point; every pilot word was replaced.\nFlow B is the usual side: Lee Dog Walking. Alex books Biscuit, a beagle mix, at 31 Maple Ave: a free meet-and-greet at home Tue Oct 20 at 5:30pm (a required first step), then 30-minute walks with Devon on weekdays, 11am to 1pm, from Thu Oct 22, with nobody home. Devon texts DONE with a walk report and a photo. Second kind of work: pet sitting (drop-ins and overnights), with no license.\nFlow A is the less usual side, from the old flowchart's group walks and van pick-up: Lee Pack Hikes, Sam's second company. Alex drops Biscuit at the base, 120 Ridge Rd, for a 1-hour group walk Sat Oct 24 at 11:00am, after a free group check Fri Oct 23 at 5:30pm. Pick-up is at 12:00pm with the check-in code. Drop-off slots name no hike leader, up to 4 dogs a leader.\nNames: Jordan and Casey become dog walkers Devon and Luca; Riley and Avery become hike leaders Sage and Mika. Jamie becomes Ellis. Neutral names, so every he, she or they still fits.\nPrices: $28 solo walk (the old flowchart's own price), $42 one-time 60-minute walk, $8 extra dog, $10 holiday add-on, $22 short visit, $30 drop-in, $95 overnight. Lee Pack Hikes: $35 group walk, $75 with a van pick-up, $40 90-minute group walk, $25 puppy walk, $55 trail hike, $20 paw rinse, $140 full-day trip, group check free. Lee Dog Walking's fee for a late skip or no way in is the walk's own $28; Lee Pack Hikes' no-show or late-cancel fee is $20. Each is charged only after Sam's yes.\nMoney paths, and why each is real. B list|card|card (main): a card saved at booking, charged $28 at each DONE, the way plan walks are usually paid. B list|none|bill: a walk with nothing taken, billed by text after, for customers who pay by link, cash or check. B list|full|none: the one-time 60-minute walk, paid in full when booked, since there's no plan. A list|card|card (main): the group walk, card charged at pick-up. A list|full|none: the trail hike (and van pick-up group walk, full-day trip), paid in full when booked. No holds or deposits anywhere, so the sign-up words (S1-13 to S1-16, S1-41 to S1-47) and S11-56 were rewritten to say so.\nThe old flowchart billed the week on Fridays. The main story charges at each DONE instead (the master's card path); a weekly plan charge is the B7-52 what-if: told Thursday, charged Friday after the week's last walk, the old flowchart's way (B9-22 on the bill path). Both are real ways dog walkers are paid.\nTimes run forward on each listed path. B main: ask Mon Oct 19 6:40pm, booked 6:48pm, meet-and-greet Tue 5:55pm, reminder Wed 10am, forecast check Wed 5pm, day list Thu 7am, OMW 11:25am, in 11:40am, DONE 12:14pm, receipt 12:15pm, rating 6pm. One-time 60-minute walk: DONE 12:44pm. A main: ask Wed Oct 21 7:15pm, booked 7:22pm, reminder Fri 10am, group check Fri 5:50pm, day list Sat 8am, drop-off 11:00am, update 11:30am, ready 11:55am, pick-up and charge 12:05pm, rating 4pm. Trail hike: ready 12:55pm, pick-up 1:05pm.\nLicenses: most states license neither dog walking nor pet sitting, so the sign-up gives the business registration only (S1-60 'A license' off). Where a city requires a permit to walk several dogs at once in its parks, its form asks for it (S1-64). The team steps for Lee Pack Hikes (S11-48, S11-50, S11-51, S12-19, S11-57) show that switch on, each as 'where the city requires one', with no city named; Lee Dog Walking's walkers need none, and its renewal what-if is the insurance certificate.\nOwn steps: B7-x01 the meet-and-greet at home; B6-x01 and B6-x02 the plan's terms texted back; B8-x01 a lost dog (a new branch of B8-22); A7-x01 the group check at the base.\nOff: child bookings, crews, deliveries, parts, permits, landlords, insurance or plan checks, contracts, results, rentals and proposals: dog walking has none of them. A4-28, A4-54, A7-02, A9-15 plan and insurance branches are off; the group walk plan is kept (A5-21, A7-32, A7-55) since Lee Pack Hikes sells a weekly Saturday plan.\nPlug-in splits: A8-02 keeps both branches (a missing vaccine record stops a drop-off; everything on file goes ahead). Every other split keeps one branch: no contract (B4-57), nobody needs to be home (B8-69, B8-70), one person not a crew (A7-62), booked by name for walks in B, not by name at the base in A (S11-87, S11-90).\nLeftover-word warnings are at zero, so 'keep' is empty.\nReview Oct 23: A7-02's crew, fixed-date, too-few and notice branches are off (a hike has none). Walkers' hours are 10am to 5pm in 2-hour windows, so afternoon what-ifs fit. Morgan's plan is one dog, so the weekly $84 adds up. A private hike, priced for one group, is in the plug-in (S11-08).\nOct 27 refit: kept 'leak' (S12-29 / S13-xx: a privacy leak) and 'visit fee' (S1-03 / A8-41 / B8-37: the master's generic term).\nOct 27 refit: \"color\" kept: S13-40 lists race, color, religion or sex.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Someone in the shop is threatening people.",
+    "someone in the shop was threatening people",
+    "Color quotes come to you first. Board prices never need one",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Kids cut (12 and under)",
+    "barbershops",
+    "Kids cut",
+    "Color correction",
+    "color correction",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Ben T. books a skin fade",
+    "skin fades",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "May the shop show photos of your hair? Yes / No",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "says the cape clip ripped a shirt collar today",
+    "It's a gift for my brother. Can I pay for it?",
+    "Can my son wait in the shop during my cut?",
+    "Lee's Barbershop will fix it for free.",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Adds a second shop, with its own team",
+    "like a haircut at the shop or at home",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "could mean a salon or a barbershop",
+    "Wants Saturday morning, with Riley",
+    "Alex asks for a cut every 4 weeks.",
+    "The state's license lookup is down",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "Books a free fix, if Sam says so",
+    "The cut is uneven on one side.",
+    "How was your visit with Riley?",
+    "like a burst pipe or a lockout",
+    "Lee's Barbershop · with Riley",
+    "What happens at the chair?",
+    "Books a cut every 4 weeks",
+    "like a skin-test result",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "Today · 3:00pm · Avery",
+    "the $90 color quote",
+    "Alex asks for a fix",
+    "Lee's Barbershop's",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "a lapsed license",
+    "11:00am · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Groom's package",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "2:00pm · Avery",
+    "1 color quote",
+    "every 4 weeks",
+    "color and cut",
+    "Color and cut",
+    "signature cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "house calls",
+    "House calls",
+    "patch test",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "The shop's",
+    "the shop's",
+    "Shop front",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "88 Elm St",
+    "on Elm St",
+    "kids cut",
+    "Plumbing",
+    "plumbing",
+    "Haircuts",
+    "haircuts",
+    "The shop",
+    "the shop",
+    "25 miles",
+    "the cut",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "a cut",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$89"
+   ],
+   "B": [
+    "like 'Is the sink still full of water?'",
+    "The $179 drain needs none.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Leak repair",
+    "Water heater replacement",
+    "Sewer camera inspection · $199",
+    "Sewer camera inspection",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Water heater fix",
+    "would like to talk about the water heater quote before booking.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "It's a leak under the sink, today,",
+    "The service call is $89. Accept it?",
+    "accept the leak repair for today,",
+    "Accepted: the leak repair today,",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Lee Home Services can clear the drain:",
+    "Yard drain",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "drain clearings",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Replace both shutoff valves · $160",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A job quoted at the visit promises only the service call now.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Can I skip next week's drain cleaning?",
+    "like a haircut at the shop or at home",
+    "Jordan left a mess under the sink.",
+    "The state's license lookup is down",
+    "How was your visit with Jordan?",
+    "like a burst pipe or a lockout",
+    "2 Someone else meets the pro",
+    "Jordan came late and rushed.",
+    "raise drain clearing to 199",
+    "Jordan was late and rushed.",
+    "1 Yes, Alex will be there",
+    "plumbing license MP045210",
+    "No answer in 15 minutes",
+    "plumbing and electrical",
+    "Kitchen drain clearing",
+    "leehomeservices.com",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services'",
+    "the kitchen drain",
+    "Lee Home Services",
+    "service call fee",
+    "Service call fee",
+    "Lee's Barbershop",
+    "Plumbing license",
+    "a lapsed license",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "service call",
+    "Service call",
+    "today's work",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "house calls",
+    "House calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "beard trim",
+    "The shop's",
+    "the shop's",
+    "Shop front",
+    "42 Oak St",
+    "88 Elm St",
+    "Plumbing",
+    "plumbing",
+    "The shop",
+    "the shop",
+    "25 miles",
+    "40 miles",
+    "Fri 8am",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "25-mile",
+    "8–10am",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$179",
+    "$150",
+    "$89"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "41b86c1e72",
+   "S1-61": "7421d186d5",
+   "S1-38": "b50b0bd4e8",
+   "S1-43": "e16d5048f3",
+   "S1-50": "3167049ceb",
+   "S2-21": "bf6617b6d3",
+   "S2-24": "0acce38d9e",
+   "S1-70": "3961b1f903",
+   "S2-02": "b2094081ee",
+   "S11-48": "03f824b27b",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-15": "4a64408afc",
+   "S2-22": "6fe11c094c",
+   "S11-50": "c4536a448c",
+   "S12-19": "07db0515b2",
+   "A4-34": "9f322d96aa",
+   "A7-32": "0f63100be0",
+   "A4-24": "0a292df05b",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A7-93": "46cca94e45",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A3-07": "6b005cf195",
+   "A3-20": "b8251d2535",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A3-26": "9e3630dc0b",
+   "A4-50": "6f43775326",
+   "A4-65": "fa7ec0389d",
+   "A6-04": "fe10e3d360",
+   "A7-01": "afb51b5e1b",
+   "A7-12": "05f64179a4",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-23": "e3a35f7f9e",
+   "A8-38": "5e48b74f3a",
+   "A8-43": "7b0f73c701",
+   "A8-11": "d5522790d9",
+   "A8-54": "bc2f9467fd",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A10-02": "c9223be948",
+   "A10-42": "4f28189298",
+   "S11-02": "d0b2cf9f6c",
+   "A4-11": "2983f72b69",
+   "A4-43": "c17d56f766",
+   "A7-13": "e41528a397",
+   "A8-35": "a67e890a5b",
+   "A8-67": "e9fd748fc5",
+   "A8-50": "0f26abfc87",
+   "A8-40": "8ce1ecdbe5"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "0bea92643b",
+   "S1-61": "e30e71f65d",
+   "S1-38": "6301c86637",
+   "S1-43": "dd3ae2a1a9",
+   "S1-50": "daa9091585",
+   "S2-21": "bf6617b6d3",
+   "S2-24": "593cd0d5cf",
+   "S1-70": "34e952eac5",
+   "S2-02": "b2094081ee",
+   "S11-48": "6fd1c7b7b9",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-15": "4a64408afc",
+   "S2-22": "6fe11c094c",
+   "S11-50": "b9d718f51a",
+   "S11-60": "3781bd4314",
+   "S11-77": "b61a23f148",
+   "S12-19": "176d3d2beb",
+   "S12-24": "7514a15e65",
+   "B10-38": "867fe1ab7c",
+   "B4-83": "a7473a80ea",
+   "B7-90": "a5b8b2fe42",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B8-93": "c1406fd6bc",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-25": "4413e58bcb",
+   "B3-22": "19f64ba1ba",
+   "B3-04": "31447caa31",
+   "B3-24": "a31b436ff1",
+   "B3-19": "2f53161fb2",
+   "B3-21": "ad48326ac5",
+   "B4-03": "1126d68737",
+   "B4-04": "df3ea4b2f5",
+   "B4-05": "fb3a9061c8",
+   "B4-97": "04796bf8db",
+   "B4-34": "74ff52d83d",
+   "B4-26": "912686f788",
+   "B4-38": "9539521dc7",
+   "B4-28": "506d267aaf",
+   "B4-32": "fcfe092e37",
+   "B4-63": "49ce39c037",
+   "B4-64": "d91cd645a7",
+   "B6-06": "1d676278da",
+   "B6-13": "ed1f412f7d",
+   "B7-15": "a00f0c64fb",
+   "B7-16": "3177c3701b",
+   "B7-17": "ac1fd212f3",
+   "B7-22": "c8a4abe80b",
+   "B7-61": "342b55fd9b",
+   "B7-89": "889628e2d6",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-18": "530038d2b8",
+   "B8-19": "11e79a26d8",
+   "B8-22": "50d78f1af0",
+   "B8-30": "a1ef4983e4",
+   "B8-23": "dd780a2ec8",
+   "B8-32": "1cfd4f7afa",
+   "B8-35": "93207824c7",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B9-03": "df9548d13f",
+   "B10-02": "eaf53a5e74",
+   "B10-05": "a326ea3c0b",
+   "S11-02": "b5be5f9aa7",
+   "B6-05": "32fad5e5ab",
+   "B4-12": "e6d956ac70",
+   "S11-14": "5a5607d715",
+   "S11-46": "ed17f66a63",
+   "B8-17": "dcff722a6d",
+   "B8-34": "643812e26f",
+   "B10-32": "7713bff255"
+  }
+ }
+}

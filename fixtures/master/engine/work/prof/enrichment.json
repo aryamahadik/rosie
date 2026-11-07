@@ -1,0 +1,2605 @@
+{
+ "id": "enrichment",
+ "name": "Kids' enrichment and after-school programs",
+ "style": "Class",
+ "pattern": "class",
+ "from": "camp",
+ "cast": {
+  "A": {
+   "staff": "Ruth and Iris (lead and assistant) and the front desk",
+   "cust": "Alex M. (a parent, for Noa, 9, and Rafi, 7) · other families"
+  },
+  "B": {
+   "staff": "Remy and Clara (teachers who go to a home or a school)",
+   "cust": "Alex M. (the host parent, for Lia, 8) · other families",
+   "other": "Others (a school, a daycare, another parent or guardian)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Ruth"
+  },
+  "B": {
+   "staff": "Remy"
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "none from the state for enrichment or tutoring in most places; where the state licenses a child-care or after-school program, the business shows its own license only once it is on file; teachers hold the certificates the business says they hold (the business's own word)",
+   "who": "the business, for its registration and any child-care or after-school license; each teacher, for their own certificate or background check where the rules ask",
+   "ask": "the business registration; any child-care license number; each teacher's certificate and its end date",
+   "check": "Rosie checks no license, certificate or background check: each one is the business's own word, shown as that, never as a state license or as checked",
+   "scope": "a teacher is offered only for the programs and ages the owner says they may teach",
+   "blocks": "goes live on identity and the business's registration; a teacher is offered once the owner says yes",
+   "renewals": "certificates reminded 30 and 7 days before; a lapsed one the owner reports takes that teacher off new classes",
+   "insurance": "liability insurance: the business's own word, shown once it is sent",
+   "background": "background checks for every teacher and volunteer who works with children: the business's own word, where the rules ask"
+  },
+  "pf.services": {
+   "shape": "class: a seat in a term or a drop-in session for one child, with a set number of places by age; a home or school session books a teacher for a group of children at the customer's place (flow B)",
+   "examples": "the example program's own prices (Lee Learning Lab and Lee Kids Club), not a standard",
+   "list": [
+    {
+     "name": "After-school term (10 weeks, two afternoons a week)",
+     "price": "$240",
+     "kind": "one price per child for the term",
+     "length": "10 weeks",
+     "where": "at the program center (flow A)",
+     "before": "a $60 deposit when enrolling, the rest charged to the saved card at the end of the term",
+     "after": "nothing more",
+     "capacity": "12 children per teacher"
+    },
+    {
+     "name": "Drop-in homework club (one afternoon)",
+     "price": "$20",
+     "kind": "one price per visit",
+     "length": "2 hours",
+     "where": "at the program center (flow A)",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "16 places"
+    },
+    {
+     "name": "Holiday program day",
+     "price": "$65",
+     "kind": "one price per child per day",
+     "length": "a full day, 8:00am to 5:00pm",
+     "where": "at the program center (flow A)",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "a child picked up after 5:00pm is charged the late fee, paid at the desk"
+    },
+    {
+     "name": "Free visit to see the program",
+     "price": "free",
+     "kind": "free",
+     "length": "45 minutes",
+     "where": "at the program center (flow A)",
+     "before": "nothing taken; a yes by text",
+     "after": "nothing owed"
+    },
+    {
+     "name": "Home science club (up to 6 children)",
+     "price": "$150",
+     "kind": "one price per group",
+     "length": "90 minutes",
+     "where": "at the customer's home (flow B)",
+     "before": "a card saved for the $40 fee",
+     "after": "the saved card charged when the teacher texts DONE"
+    },
+    {
+     "name": "In-school enrichment program (per child, a term)",
+     "price": "$25 a child, one term",
+     "kind": "one price per child",
+     "length": "one class a week for 10 weeks",
+     "where": "at the school (flow B)",
+     "before": "nothing taken",
+     "after": "one bill to the school after the term"
+    }
+   ],
+   "intro": "a free look at the program for a child: a parent comes in with the child for 45 minutes, nothing is taken",
+   "capacity": "places per term or class by age, set by the room and the teachers' limit (12 children per teacher)",
+   "minimum": "a term runs with 6 children; too few before it starts: Sam runs it or cancels, and each family gets a full refund",
+   "waitlist": "a full term keeps a waitlist; a freed place goes by text to one family at a time",
+   "skills": "homework help, science, art, reading, coding, sports, music; the age groups each teacher may work with",
+   "online": "no",
+   "nobodyHome": "never: a child is never left without a listed adult to pick them up"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which program, and the start date",
+    "the child's age and grade",
+    "how many children, for a home or school program",
+    "a term or a drop-in visit"
+   ],
+   "afterTime": [
+    "anything the teacher should know: a learning need, a language, a fear or a food allergy",
+    "the child's usual pick-up plan"
+   ],
+   "securePage": [
+    "the child's name, age and a waiver, read and signed by the parent or guardian",
+    "health notes: allergies, asthma, a seizure note, medicine they carry",
+    "an emergency contact and who may pick the child up (a list of adults)",
+    "a photo permission choice"
+   ],
+   "whoMayBook": "a parent or guardian for each child; a school's office books an in-school program; a child is never booked by someone who isn't on the child's record",
+   "told": "the program, the hours, the pick-up rule (only listed adults), and what to bring"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a child not breathing, unresponsive, or hurt badly right now",
+     "say": "Call 911 now. Keep the child still, and start first aid if trained.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a learning need, asthma, a food allergy, or a recent injury",
+     "what": "the booking goes on; the answer stays on the secure page, and the teacher reads it before the program; Rosie gives no health advice"
+    },
+    {
+     "words": "a child who finds school hard after a loss or a move",
+     "what": "the booking goes on, kindly; a teacher may call the parent; crisis words get the crisis line"
+    }
+   ],
+   "inClass": "a child becomes unwell or is hurt: the teacher gives first aid, calls 911 if it's serious, calls the parent at once, and the owner is told; nothing about it goes in a text",
+   "always": "the generic screen, always on"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Waiver on the secure page",
+     "when": "while booking",
+     "who": "the parent or guardian",
+     "result": "not signed in 10 minutes: nothing is booked"
+    },
+    {
+     "name": "Pick-up list on the secure page",
+     "when": "before the first day",
+     "who": "the parent or guardian",
+     "result": "no adult on the list: the child isn't released at pick-up"
+    },
+    {
+     "name": "Health questions on the secure page",
+     "when": "before the first day",
+     "who": "the parent or guardian",
+     "result": "the booking goes on; any yes is read by the teacher before the first day"
+    }
+   ],
+   "prep": "a snack, a water bottle, and clothes the child can get messy in; a photo ID for the adult who picks up"
+  },
+  "pf.visit": {
+   "checkIn": "the teacher ticks each child on the roster at the door when the parent drops them off",
+   "lateEntry": "a child may join up to 30 minutes after the start; after that the place may go to someone waiting",
+   "changes": "an extra day or an extra hour is priced first and the parent says yes; nothing is added to a term",
+   "leaveEarly": "a child who leaves early pays the full price: the place was theirs",
+   "done": "the teacher texts DONE once the last child is picked up"
+  },
+  "pf.money": {
+   "before": "a term: a $60 deposit when enrolling, the rest charged to the saved card at the end of the term; a holiday day and a drop-in visit paid in full when booking; a home science club: a card saved for the $40 fee, charged when the teacher texts DONE; an in-school program: nothing before, one bill after the term",
+   "after": "everything is settled before, at the desk, or on the saved card at the end; nothing is billed later except a school's bill",
+   "cancel": "a term: free to cancel before it starts; after it starts, the deposit may be kept only with the owner's yes; a drop-in or a holiday day: free up to 24 hours before",
+   "fees": "late pick-up after 5:00pm: a late fee, paid at the desk; a late cancel or no-show: the $40 fee at a home, only with the owner's yes; the owner confirms each fee",
+   "caps": "deposits and prepayments within the state's limits where they apply",
+   "tips": "no tips line",
+   "tax": "any sales tax the state requires, in the price before the yes",
+   "fee2": "Rosfield's $2 per confirmed booking applies: one $2 per booking, however many children"
+  },
+  "pf.messages": {
+   "never": "a child's name and age, health notes, a learning need or a pick-up detail in texts to anyone but the parent: only on the secure page",
+   "staffTexts": "the teacher's day list shows the program and the number of children; names open on the secure page",
+   "languages": "English and Spanish",
+   "minors": "texts go to the parent or guardian who booked"
+  },
+  "pf.staff": {
+   "licenses": "each teacher's certificate or background check, the business's own word, never checked by Rosie",
+   "skills": "homework help, science, art, reading, coding, sports, music; the age groups each teacher may work with",
+   "ratio": "up to 12 children per teacher; younger children at 8 per teacher",
+   "standIn": "another teacher the owner has cleared for the age group; a home or school program that named a teacher is asked first, and nobody moves on silence",
+   "oks": "the owner OKs late pick-ups, extra days, home and school programs and refunds"
+  },
+  "pf.rules": {
+   "showFacts": "the program, the hours, the pick-up rule, the cancel terms and the deposit before the yes",
+   "cancelRight": "no cancel period for a day or a visit already given; a term follows its signed terms",
+   "pickup": "a child is released only to an adult on the pick-up list; anyone else waits while the parent is called, and a teacher never drives a child",
+   "waiver": "what a waiver may say, where the state limits it; the state form sets the words",
+   "records": "waivers, health notes and pick-up lists kept with the booking for 7 years, or longer where the state asks",
+   "reviews": "a rating once after the term"
+  },
+  "pf.edges": {
+   "tooFew": "too few before a term starts: Sam runs it or cancels; each family gets a full refund",
+   "full": "a full term: the waitlist, in order; a freed place goes by text for 30 minutes",
+   "late": "a child who arrives late joins up to 30 minutes after the start; after that the place may go to someone waiting",
+   "teacherOut": "another cleared teacher covers the same program at the same time",
+   "noPickup": "no listed adult comes by closing time: the teacher stays with the child, calls the parent, then the emergency contact; the owner is told",
+   "unwell": "a child looks unwell or is hurt: the teacher gives first aid, calls 911 if it's serious, calls the parent, and the owner is told; nothing in a text",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "classes",
+   "groups",
+   "children",
+   "waitlist",
+   "forms",
+   "incare"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a after-school term at $300, an old price. Rosie answers with the real price, $65. That's the price Ben sees before saying yes."
+   ],
+   [
+    "After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "After that, or a no-show: what the program's signed refund schedule says, only if you say yes"
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "Holiday Week 2 can take a $250 deposit when booked. The other $150 is charged to the saved card at the end."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, Holiday Week 2 takes a $250 deposit; the $150 rest is paid after the week."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A after-school term at Lee Learning Lab is $65, not $300. Here are the open weeks at $65."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a kids' term for a son, so the times fit it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A gas company's example: a gas smell gets 'leave the house now'."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "You told us the after-school term is for Rafi, and that you're Rafi's parent."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At a program tour, a parent stays with the child, so nothing more happens."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only at the business's own place."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Ruth and Iris are head teachers; Ruth also leads home science clubs."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A week for Noa and a after-school term for Rafi work the same way."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A program's example: 'Program needs this summer's health forms first."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "After-school term $65 ($340 from Nov 2) · Holiday week $240 · Extended day $65"
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Home science clubs: allowed where you are, for those cleared"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a robotics week, which isn't on the program's list."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Coding lessons for Lee Learning Lab: is it the same company?"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most programs set it."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: Day Program Week 6 (ages 6 to 8) is $65. Want a week?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A program week is rated, so the program takes the first branch."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Backyard program weeks and program events, within 25 miles."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Register my daughter for a program week at Lee Learning Lab, starting Saturday."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's program work takes no jobs sent now, at the program or away."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a program tour for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Program could mean a day program or an overnight program."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every program session and home science clubs"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Overnight and day program on the lake, ages 6 to 14."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Noa's sleeping bag was torn at program."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds coding lessons to Lee Learning Lab."
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the program's list"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ruth: head teacher and home science clubs"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A program books a place in a session, or the director's time for a tour."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Learning Lab doesn't run robotics weeks."
+   ],
+   [
+    "Notes what's there before the work",
+    "Checks things at the start"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Ruth: head teacher, home science clubs"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you run day program for 7-year-olds?"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Holiday week"
+   ],
+   [
+    "Barbershop, plumbing, electrical",
+    "Overnight program, home science clubs, events"
+   ],
+   [
+    "Riley helps; Sam is told at once",
+    "Staff help; the parent is called"
+   ],
+   [
+    "What happens before Sat 11:00am?",
+    "What happens before the day?"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a program week and extended day"
+   ],
+   [
+    "Books the groom's party together",
+    "Books two students together"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Special requests come to you first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "The leaders week always stays with Ruth."
+   ],
+   [
+    "A haircut at Lee's Barbershop:",
+    "{{name}} at Lee Learning Lab:"
+   ],
+   [
+    "Tells Riley it's still waiting",
+    "Tells Iris it's still waiting"
+   ],
+   [
+    "Riley adds notes for next time",
+    "Adds notes for next time"
+   ],
+   [
+    "Shows sessions with seats left",
+    "Shows sessions with places left"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Holiday Week 2 · $250 deposit"
+   ],
+   [
+    "Saves the time for 10 minutes",
+    "Saves the pick for 10 minutes"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the week?"
+   ],
+   [
+    "Counselor-in-training week",
+    "Teacher-in-training week"
+   ],
+   [
+    "counselor-in-training week",
+    "teacher-in-training week"
+   ],
+   [
+    "Riley asks for a day off",
+    "Iris asks for a day off"
+   ],
+   [
+    "Riley finishes the work",
+    "Staff text DONE"
+   ],
+   [
+    "plumbing and electrical",
+    "home science clubs and events"
+   ],
+   [
+    "Signature cut and shave",
+    "Holiday week"
+   ],
+   [
+    "The $75 late-cancel fee",
+    "The late-cancel fee"
+   ],
+   [
+    "Alex pays at the chair",
+    "Nothing is paid at the office"
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration EX-4411"
+   ],
+   [
+    "Tells Riley it's a no",
+    "Tells Iris it's a no"
+   ],
+   [
+    "Counselor-in-training",
+    "Teacher-in-training"
+   ],
+   [
+    "counselor-in-training",
+    "teacher-in-training"
+   ],
+   [
+    "Asks for another day",
+    "Asks for another week"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Learning Lab LLC"
+   ],
+   [
+    "priced at the chair",
+    "priced at check-in"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at check-in"
+   ],
+   [
+    "$75 late-cancel fee",
+    "late-cancel fee"
+   ],
+   [
+    "never more than $75",
+    "never more than the program price"
+   ],
+   [
+    "A water heater job",
+    "A backyard program week"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Backyard Programs'"
+   ],
+   [
+    "Paid at the chair",
+    "At the office: nothing to pay"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Backyard Programs"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Learning Lab"
+   ],
+   [
+    "Color correction",
+    "Teacher-in-training week"
+   ],
+   [
+    "color correction",
+    "teacher-in-training week"
+   ],
+   [
+    "Two-week session",
+    "Two-term session"
+   ],
+   [
+    "two-week session",
+    "two-term session"
+   ],
+   [
+    "Overnight Week 2",
+    "Holiday Week 2"
+   ],
+   [
+    "Skin fade · $40",
+    "Program tour · free"
+   ],
+   [
+    "Groom's package",
+    "Two-term session"
+   ],
+   [
+    "Leadership week",
+    "Leaders week"
+   ],
+   [
+    "leadership week",
+    "leaders week"
+   ],
+   [
+    "Color touch-up",
+    "Make-up day"
+   ],
+   [
+    "color touch-up",
+    "make-up day"
+   ],
+   [
+    "Overnight week",
+    "Holiday week"
+   ],
+   [
+    "overnight week",
+    "holiday week"
+   ],
+   [
+    "Planning visit",
+    "Family visit"
+   ],
+   [
+    "planning visit",
+    "family visit"
+   ],
+   [
+    "Overnight Week",
+    "Holiday Week"
+   ],
+   [
+    "Color and cut",
+    "Leaders week"
+   ],
+   [
+    "color and cut",
+    "leaders week"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Program at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Program Events"
+   ],
+   [
+    "Jordan Price",
+    "Remy Price"
+   ],
+   [
+    "1200 Main St",
+    "60 Elm Park"
+   ],
+   [
+    "A beard trim",
+    "Extended day"
+   ],
+   [
+    "a beard trim",
+    "extended day"
+   ],
+   [
+    "at the chair",
+    "at check-in"
+   ],
+   [
+    "At the chair",
+    "At check-in"
+   ],
+   [
+    "2250 Lake Rd",
+    "22 Garden Ln"
+   ],
+   [
+    "60 Meadow Rd",
+    "60 Elm Park"
+   ],
+   [
+    "water heater",
+    "board rack"
+   ],
+   [
+    "NEW massage",
+    "NEW coding lessons"
+   ],
+   [
+    "Casey Moore",
+    "Clara Moore"
+   ],
+   [
+    "color quote",
+    "special request"
+   ],
+   [
+    "house calls",
+    "home science clubs"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "barbershops",
+    "programs"
+   ],
+   [
+    "the $75 fee",
+    "the late-cancel fee"
+   ],
+   [
+    "27 Aspen Ct",
+    "9 Cedar Ct"
+   ],
+   [
+    "Electrical",
+    "Events"
+   ],
+   [
+    "electrical",
+    "events"
+   ],
+   [
+    "Riley Chen",
+    "Ruth Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Iris Diaz"
+   ],
+   [
+    "Beard trim",
+    "Extended day"
+   ],
+   [
+    "beard trim",
+    "extended day"
+   ],
+   [
+    "house call",
+    "home science club"
+   ],
+   [
+    "barbershop",
+    "program"
+   ],
+   [
+    "skin fades",
+    "holiday weeks"
+   ],
+   [
+    "88 Elm St",
+    "22 Garden Ln"
+   ],
+   [
+    "Skin fade",
+    "Holiday week"
+   ],
+   [
+    "skin fade",
+    "holiday week"
+   ],
+   [
+    "kids cuts",
+    "after-school terms"
+   ],
+   [
+    "counselor",
+    "teacher"
+   ],
+   [
+    "Counselor",
+    "Teacher"
+   ],
+   [
+    "Plumbing",
+    "Home science clubs"
+   ],
+   [
+    "plumbing",
+    "home science clubs"
+   ],
+   [
+    "Haircuts",
+    "After-school terms"
+   ],
+   [
+    "haircuts",
+    "after-school terms"
+   ],
+   [
+    "Kids cut",
+    "After-school term"
+   ],
+   [
+    "kids cut",
+    "after-school term"
+   ],
+   [
+    "BS20981",
+    "EX-1042"
+   ],
+   [
+    "plumber",
+    "teacher"
+   ],
+   [
+    "Haircut",
+    "After-school term"
+   ],
+   [
+    "haircut",
+    "after-school term"
+   ],
+   [
+    "barbers",
+    "teachers"
+   ],
+   [
+    "parties",
+    "events"
+   ],
+   [
+    "Parties",
+    "Events"
+   ],
+   [
+    "shutoff",
+    "lift"
+   ],
+   [
+    "cabinet",
+    "rack"
+   ],
+   [
+    "Jordan",
+    "Remy"
+   ],
+   [
+    "Elm St",
+    "Lake Rd"
+   ],
+   [
+    "Barber",
+    "Teacher"
+   ],
+   [
+    "barber",
+    "teacher"
+   ],
+   [
+    "$1,150",
+    "$240"
+   ],
+   [
+    "$2,150",
+    "$480"
+   ],
+   [
+    "valves",
+    "gear"
+   ],
+   [
+    "heater",
+    "rack"
+   ],
+   [
+    "Riley",
+    "Ruth"
+   ],
+   [
+    "Avery",
+    "Iris"
+   ],
+   [
+    "Casey",
+    "Clara"
+   ],
+   [
+    "shops",
+    "programs"
+   ],
+   [
+    "Party",
+    "Event"
+   ],
+   [
+    "beard",
+    "hair tie"
+   ],
+   [
+    "valve",
+    "gear"
+   ],
+   [
+    "drain",
+    "session"
+   ],
+   [
+    "Shop",
+    "Program"
+   ],
+   [
+    "shop",
+    "program"
+   ],
+   [
+    "$900",
+    "$150"
+   ],
+   [
+    "$675",
+    "$180"
+   ],
+   [
+    "$325",
+    "$65"
+   ],
+   [
+    "$225",
+    "$60"
+   ],
+   [
+    "$300",
+    "$250"
+   ],
+   [
+    "Ella",
+    "Lia"
+   ],
+   [
+    "cape",
+    "smock"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "$75",
+    "$65"
+   ],
+   [
+    "Ava",
+    "Noa"
+   ],
+   [
+    "Max",
+    "Rafi"
+   ]
+  ],
+  "B": [
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: backyard program week $950 from Mon Nov 2. Weeks already booked keep $150. Plans go to $950 from Wed Nov 25, only with a yes."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for a backyard program week at $850, an old price. Rosie answers with the real price, $150. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Reply here, and it goes to Sam. How was the program with Jordan?"
+   ],
+   [
+    "After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "After that, or nobody home: what the signed refund schedule says, only if you say yes"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact.",
+    "This is Rosie, an automated assistant for Lee Kids Club. Sam named you an emergency contact."
+   ],
+   [
+    "A late-cancel or nobody-home fee, up to the $89 service call, is charged only after Sam confirms it.",
+    "A late-cancel or nobody-home fee, up to the $60 deposit, is kept only after Sam confirms it."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: how many children, their ages, and the yard's size."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep the children inside, and to call 911 if anyone is hurt."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A backyard program week with Lee Kids Club is $150, not $850. Here are the open times at $150."
+   ],
+   [
+    "A late cancel or a no-show: only the policy's fee may be kept, up to the $89 service call.",
+    "A late cancel or a no-show: only the signed schedule's share may be kept, up to the $60 deposit."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Remy's phone, you said yes to an extended day for $160."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Bring the children inside, away from windows, until 30 minutes after the last thunder."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Remy's times show: Remy runs the two-week programs."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Remy found a broken fence board by the play area and moved the games away from it."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $1,800 two-week home science club is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the home science club day from paid in full to a $65 deposit."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding an extended day? Say so.'"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like lightning or someone hurt, gets the safety steps first."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $150."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "We couldn't find registration EX-4410 for Lee Backyard Programs on the state's lookup."
+   ],
+   [
+    "Lee Home Services took the service call fee you agreed to when you booked.",
+    "Lee Kids Club kept the deposit, under the refund schedule you signed."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Backyard program week $150 ($950 from Nov 2) · Home science club day $250"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A gas company's example: a gas smell gets 'leave the house now'."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a kids' term for a son, so the times fit it."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many children, and their ages?"
+   ],
+   [
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $950 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Program events for Lee Kids Club: is it the same company?"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only at the business's own place."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about the home science club for Lia. A text back is fine."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE Lia's group loved the relay. Bring more cones next time."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Ruth and Iris are head teachers; Ruth also leads home science clubs."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the backyard program week to $950 for visits from Mon Nov 2."
+   ],
+   [
+    "Reading it back: drain clearing goes to $199 for new bookings.",
+    "Reading it back: the backyard program week goes to $950 for new bookings."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Weeks already booked keep $150, even after Nov 2."
+   ],
+   [
+    "Lin agreed to the business's service call fee when booking.",
+    "Lin agreed to the program's refund schedule when booking."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Program days already booked keep what they paid."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say a game cracks a patio pot, and Remy texts a photo."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most programs start."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a program in a park the city closed."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Backyard program weeks and program events, within 25 miles."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Remy's next times for a program morning."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds program events to Lee Kids Club."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's program work takes no jobs sent now, at the program or away."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found paint on the patio this morning."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Remy also run a science birthday party?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can two teachers run a home science club day this Thursday?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 extended day, 2 more hours"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Remy run another program morning next week?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Program could mean a day program or an overnight program."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Keep the children inside, away from the nest."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Program at my house for the kids' fits a backyard program week."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a storm is coming in."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "There's thunder close by now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scuff on the patio door"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Overnight and day program on the lake, ages 6 to 14."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules programs often set."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can the kids bring their own snacks?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD broken fence board, play moved"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "There's a wasp nest by the backyard play area."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a shaded spot and water ready."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 extended-day quote is good for 7 days."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Our backyard flooded in the storm."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Remy finds a broken fence board by the play area."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "The parents ask Remy for an extended day."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ruth: head teacher and home science clubs"
+   ],
+   [
+    "Charge or keep the service call fee?",
+    "Keep the deposit?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Six children, ages 7 to 9."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Extended day, 2 more hours · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: games by the fence"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Remy left paint on the patio."
+   ],
+   [
+    "Notes what's there before the work",
+    "Checks things at the start"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Ruth: head teacher, home science clubs"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Holiday week"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a shaded spot for the children?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a broken fence board"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a patio pot"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa program day Thu 12pm Casey"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Program-style birthday party · $250"
+   ],
+   [
+    "Tells Casey it's still waiting",
+    "Tells Remy it's still waiting"
+   ],
+   [
+    "Jordan feels unsafe and leaves",
+    "Remy feels unsafe: children inside"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Saves the time for 10 minutes",
+    "Saves the pick for 10 minutes"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "We'd like a home science club for Lia and five friends."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise backyard program week to 950"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $150 backyard program week needs none."
+   ],
+   [
+    "Counselor-in-training week",
+    "Teacher-in-training week"
+   ],
+   [
+    "counselor-in-training week",
+    "teacher-in-training week"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Broken fence board"
+   ],
+   [
+    "The service call is $89.",
+    "The deposit is $60."
+   ],
+   [
+    "Casey asks for a day off",
+    "Remy asks for a day off"
+   ],
+   [
+    "Water heater replacement",
+    "Two-week home science club"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW program events"
+   ],
+   [
+    "plumbing and electrical",
+    "home science clubs and events"
+   ],
+   [
+    "Sewer camera inspection",
+    "Program-style birthday party"
+   ],
+   [
+    "sewer camera inspection",
+    "science birthday party"
+   ],
+   [
+    "The $75 late-cancel fee",
+    "The late-cancel fee"
+   ],
+   [
+    "Under the sink, before",
+    "Patio door, before"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration EX-4410"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Backyard program week"
+   ],
+   [
+    "Cabinet floor, before",
+    "Play area, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked patio pot"
+   ],
+   [
+    "Drain clearing · $179",
+    "Home science club day · $250"
+   ],
+   [
+    "Tells Casey it's a no",
+    "Tells Remy it's a no"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Backyard Programs LLC"
+   ],
+   [
+    "Counselor-in-training",
+    "Teacher-in-training"
+   ],
+   [
+    "counselor-in-training",
+    "teacher-in-training"
+   ],
+   [
+    "Asks for another day",
+    "Asks for another week"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, under the big tree"
+   ],
+   [
+    "leehomeservices.com",
+    "leebackyardcamps.com"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at check-in"
+   ],
+   [
+    "$75 late-cancel fee",
+    "late-cancel fee"
+   ],
+   [
+    "never more than $75",
+    "never more than the program price"
+   ],
+   [
+    "A water heater job",
+    "A backyard program week"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Backyard Programs'"
+   ],
+   [
+    "Water heater flush",
+    "Home science club day"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Backyard Programs"
+   ],
+   [
+    "Service call fee",
+    "Deposit kept"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Learning Lab"
+   ],
+   [
+    "Two-week session",
+    "Two-term session"
+   ],
+   [
+    "two-week session",
+    "two-term session"
+   ],
+   [
+    "Overnight Week 2",
+    "Holiday Week 2"
+   ],
+   [
+    "Drain clearings",
+    "Backyard program weeks"
+   ],
+   [
+    "drain clearings",
+    "backyard program weeks"
+   ],
+   [
+    "Leadership week",
+    "Leaders week"
+   ],
+   [
+    "leadership week",
+    "leaders week"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 900 program week"
+   ],
+   [
+    "Drain clearing",
+    "Backyard program week"
+   ],
+   [
+    "drain clearing",
+    "backyard program week"
+   ],
+   [
+    "Overnight week",
+    "Holiday week"
+   ],
+   [
+    "overnight week",
+    "holiday week"
+   ],
+   [
+    "Planning visit",
+    "Family visit"
+   ],
+   [
+    "planning visit",
+    "family visit"
+   ],
+   [
+    "Overnight Week",
+    "Holiday Week"
+   ],
+   [
+    "after the job",
+    "after the session"
+   ],
+   [
+    "Kitchen drain",
+    "Backyard program week"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Program at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Program Events"
+   ],
+   [
+    "Jordan Price",
+    "Remy Price"
+   ],
+   [
+    "1200 Main St",
+    "60 Elm Park"
+   ],
+   [
+    "at the chair",
+    "at check-in"
+   ],
+   [
+    "Service call",
+    "Family visit"
+   ],
+   [
+    "service call",
+    "family visit"
+   ],
+   [
+    "2250 Lake Rd",
+    "22 Garden Ln"
+   ],
+   [
+    "60 Meadow Rd",
+    "60 Elm Park"
+   ],
+   [
+    "water heater",
+    "board rack"
+   ],
+   [
+    "Casey Moore",
+    "Clara Moore"
+   ],
+   [
+    "house calls",
+    "home science clubs"
+   ],
+   [
+    "the $75 fee",
+    "the late-cancel fee"
+   ],
+   [
+    "27 Aspen Ct",
+    "9 Cedar Ct"
+   ],
+   [
+    "Electrical",
+    "Events"
+   ],
+   [
+    "electrical",
+    "events"
+   ],
+   [
+    "Riley Chen",
+    "Ruth Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Iris Diaz"
+   ],
+   [
+    "Beard trim",
+    "Extended day"
+   ],
+   [
+    "beard trim",
+    "extended day"
+   ],
+   [
+    "house call",
+    "home science club"
+   ],
+   [
+    "barbershop",
+    "program"
+   ],
+   [
+    "Yard drain",
+    "Home science club day"
+   ],
+   [
+    "88 Elm St",
+    "22 Garden Ln"
+   ],
+   [
+    "42 Oak St",
+    "9 Cedar Ct"
+   ],
+   [
+    "counselor",
+    "teacher"
+   ],
+   [
+    "Counselor",
+    "Teacher"
+   ],
+   [
+    "Plumbing",
+    "Home science clubs"
+   ],
+   [
+    "plumbing",
+    "home science clubs"
+   ],
+   [
+    "BS20981",
+    "EX-1042"
+   ],
+   [
+    "plumber",
+    "teacher"
+   ],
+   [
+    "Haircut",
+    "After-school term"
+   ],
+   [
+    "haircut",
+    "after-school term"
+   ],
+   [
+    "barbers",
+    "teachers"
+   ],
+   [
+    "parties",
+    "events"
+   ],
+   [
+    "Parties",
+    "Events"
+   ],
+   [
+    "shutoff",
+    "lift"
+   ],
+   [
+    "cabinet",
+    "rack"
+   ],
+   [
+    "Jordan",
+    "Remy"
+   ],
+   [
+    "Elm St",
+    "Lake Rd"
+   ],
+   [
+    "Barber",
+    "Teacher"
+   ],
+   [
+    "barber",
+    "teacher"
+   ],
+   [
+    "$1,150",
+    "$240"
+   ],
+   [
+    "$2,150",
+    "$480"
+   ],
+   [
+    "valves",
+    "gear"
+   ],
+   [
+    "heater",
+    "rack"
+   ],
+   [
+    "Riley",
+    "Ruth"
+   ],
+   [
+    "Avery",
+    "Iris"
+   ],
+   [
+    "Casey",
+    "Clara"
+   ],
+   [
+    "shops",
+    "programs"
+   ],
+   [
+    "Party",
+    "Event"
+   ],
+   [
+    "beard",
+    "hair tie"
+   ],
+   [
+    "valve",
+    "gear"
+   ],
+   [
+    "drain",
+    "session"
+   ],
+   [
+    "Rosa",
+    "Marta"
+   ],
+   [
+    "Shop",
+    "Program"
+   ],
+   [
+    "shop",
+    "program"
+   ],
+   [
+    "$900",
+    "$150"
+   ],
+   [
+    "$675",
+    "$180"
+   ],
+   [
+    "$325",
+    "$65"
+   ],
+   [
+    "$225",
+    "$60"
+   ],
+   [
+    "$300",
+    "$250"
+   ],
+   [
+    "Ella",
+    "Lia"
+   ],
+   [
+    "cape",
+    "smock"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "$75",
+    "$65"
+   ],
+   [
+    "Ava",
+    "Noa"
+   ],
+   [
+    "Max",
+    "Rafi"
+   ]
+  ]
+ },
+ "keep": [
+  "camp",
+  "Camp",
+  "school",
+  "School",
+  "children",
+  "teacher",
+  "leak",
+  "color",
+  "photo ID",
+  "Ruth",
+  "Remy"
+ ],
+ "story": {
+  "A": "Alex enrolls Noa, 9, in the after-school term at Lee Learning Lab: $240 for 10 weeks, with a $60 deposit now and the rest charged to the saved card at the end. Ruth ticks the roster at the door, and a pick-up list names who may collect Noa. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a home science club for Lia, 8, at home with up to 5 friends. Remy comes Thu Oct 22 at 4:00pm. A card is saved for the $40 fee, and the $150 is charged when Remy texts DONE. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|full|none",
+    "list|none|none"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: Alex enrolls Noa, 9, in the after-school term at the program center: $240 for 10 weeks, a $60 deposit when enrolling, and the $180 rest charged to the saved card at the end of the term.",
+    "list|full|none": "A holiday program day for Rafi, 7: $65, paid in full when booking.",
+    "list|none|none": "A free 45-minute visit to see the program, with nothing taken and nothing owed after."
+   },
+   "amounts": {
+    "*": {
+     "price": "$240",
+     "deposit": "$60",
+     "rest": "$180",
+     "fee": "$60",
+     "name": "After-school term"
+    },
+    "list|full|*": {
+     "price": "$65",
+     "paid": "$65",
+     "fee": "$65",
+     "name": "Holiday program day"
+    },
+    "list|none|none": {
+     "price": "free",
+     "deposit": "$0",
+     "rest": "$0",
+     "fee": "$0",
+     "name": "Free visit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: a home science club for Lia, 8, and up to 5 friends: $150, a card saved for the $40 fee, and the $150 charged to the saved card when the teacher texts DONE.",
+    "list|none|bill": "An in-school program: $25 a child for a 10-week term, nothing taken to book, and one bill to the school after the term."
+   },
+   "amounts": {
+    "*": {
+     "price": "$150",
+     "fee": "$40",
+     "name": "Home science club"
+    },
+    "list|none|bill": {
+     "price": "$250",
+     "fee": "$0",
+     "name": "In-school enrichment program (10 children)"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Backyard camps, parties and the camp all pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A camp books places in a session and counselors' time. Cabin beds are part of each session's cap, not spaces booked on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The camp runs sessions on a set table (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No camp work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Camp is in person, so a session or a tour is never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "A camp week isn't a repeat plan: next summer is a new registration."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A camp bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The camp books places in a session and the director's time for tours, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "An overnight week is a place in a set session with fixed dates (the session branch), not a stay picked by its own start and end."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "A camp place names no counselor, and a camp tour is always with Sam, the director."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "Another adult",
+    "why": "Every camper is a child, so a parent or guardian registers (the child branch). A grandparent can pay on the page ('Someone else pays')."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "An adult the booker acts for",
+    "why": "Every camper is a child, registered by a parent or guardian."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "A camp sells no packages or memberships: each session is its own registration."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A camp sells no packs or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A camp week isn't a repeat plan: next summer is a new registration."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "The camp's agreement is signed with the forms on the secure page (the form step), so no second contract is signed here."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "Check-in is a two-hour window run by the camp's staff, so one counselor running late changes nothing for a family."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "A camp week isn't a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "A camp week isn't a repeat plan. The rest is charged once, when the session is done."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "A camp week isn't a repeat plan, and the price is fixed when registering."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "Missing health forms are handled before camp ('A form isn't done by its due date'). At the table, a parent fills anything missing on the secure page before the code is taken."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off for work at a camp."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "A camper who is sick or hurt is 'Someone is hurt or feels sick'. Going home early is 'Alex has to leave early'."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the camp for work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A camp bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A camp week and a tour are rated: no camp work is named only."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Nothing is sold at pick-up or on a tour. A cancel right for camp sold ahead, where the state's rules give one, came in writing at registration."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "Next summer is the family's own new registration, never booked at pick-up."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A camp sends no proposals: each session is registered on its own."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "A camp week can't be redone. A family who feels it fell short asks for money back, or complains, and Sam decides."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing from camp comes back later. Jess's end-of-week note comes with the receipt."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Lost and found is the camp's own, and never carries a storage fee."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "A camp takes new families."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Backyard camps and parties need no state license here, so the company gives only its registration (S1-61). Where the state's form names one, this branch comes back."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Backyard camps, parties and the camp all pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A camp books places in a session and counselors' time. Cabin beds are part of each session's cap, not spaces booked on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The camp runs sessions on a set table (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No camp work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "A backyard camp week isn't a repeat plan: another week is its own booking."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Several services at once",
+    "why": "A backyard camp week is one service."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for camp."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A backyard camp starts at a set time (B4-84), never in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A backyard camp is mornings, not a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "The host books the whole group, not seats."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Backyard camps take no jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Asks for one person by name",
+    "why": "Counselors come as the pair Sam sets for each week. A family can ask Sam about a counselor by text."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "An adult the booker acts for",
+    "why": "A backyard camp is for children, booked by the host parent."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "The camp's agreement is part of each child's forms (the form step), so no other contract is signed."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "A backyard camp week isn't a plan: each week is its own booking."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Backyard camps take no jobs sent now, so nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Backyard camps take no jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "The pro runs late",
+    "why": "The counselors arrive 30 minutes before camp starts, so a short delay changes nothing for families. A longer one is 'Tyler can't come'."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "A backyard camp week isn't a plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "A backyard camp week isn't a plan, and its price is set when booking."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A backyard camp week isn't a plan. The rest is charged once, when the week is done."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Backyard camps take no jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "An adult from the host family stays home every camp morning."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A backyard camp week is paid as a deposit and one rest, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Nothing extra is sold at the home during camp, and a camp week already given has no cancel period."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A camp week can't be redone. A family who feels it fell short asks for money back, or complains, and Sam decides."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Next visit booked at checkout",
+    "why": "Next summer is a new booking, never made at pick-up."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Backyard camps send no proposals: each week is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing comes back later. Tyler's notes stay on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A camp asks families for a rating after the week."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-66",
+   "A8-67",
+   "S2-28",
+   "A4-43",
+   "S1-60"
+  ],
+  "B": [
+   "B8-67",
+   "S2-28"
+  ]
+ },
+ "notes": "Built Oct 27 2026 (new profession, batch L2) from sibling camp (refit R14, class pattern). No base plug-in or test-drive exists.\nD96: no state license; Rosie checks no teacher certificate, background check, child-care license or insurance (pf.license).\nD97: one $2 per booking; no no2 switch. Children: the children fact and the incare fact (children who can't be left alone: a pick-up list, no release to anyone not listed). Not sensitive.\nMoney: A list|deposit|card (after-school term $240: $60 deposit, the $180 rest charged to the saved card at the end of the term), A list|full|none (holiday day $65 paid in full), A list|none|none (free visit, nothing taken), B list|card|card (home science club $150: card saved for the $40 fee, charged at DONE), B list|none|bill (in-school program $250 for 10 children, one bill after the term). Never a card hold, never a charge on a set day.\nNames: Lee Learning Lab (flow A) and Lee Kids Club (flow B), both of Sam Lee; teachers Ruth and Iris (A), Remy and Clara (B); the example children Noa, Rafi and Lia.\nNot used: plans, packs, memberships, intro offers, online, drop-off, insurance, holds, results, sent-now work, on-call, stays.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "We'd share only where they're working, only after a missed check.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "House calls: allowed where you are, for those cleared",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Each service starts the way most barbershops set it.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "A haircut could mean a salon or a barbershop.",
+    "Every shop service, color and house calls",
+    "Classic cuts, fades and hot towel shaves.",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Takes the price from the shop's board",
+    "Riley: barber, color and house calls",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop doesn't do perms.",
+    "Notes what's there before the work",
+    "Riley: barber, color, house calls",
+    "Do you do kids cuts? My son is 8.",
+    "Signature cut and hot towel shave",
+    "Barbershop, plumbing, electrical",
+    "Riley helps; Sam is told at once",
+    "What happens before Sat 11:00am?",
+    "Books a haircut and a beard trim",
+    "Books the groom's party together",
+    "Color quotes come to you first.",
+    "Color always stays with Riley.",
+    "A haircut at Lee's Barbershop:",
+    "Tells Riley it's still waiting",
+    "Riley adds notes for next time",
+    "Shows sessions with seats left",
+    "like a burst pipe or a lockout",
+    "Groom's package · $40 deposit",
+    "Saves the time for 10 minutes",
+    "What happens at the chair?",
+    "Riley asks for a day off",
+    "Riley finishes the work",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "Alex pays at the chair",
+    "Registration 2020-1187",
+    "Tells Riley it's a no",
+    "Asks for another day",
+    "Lee's Barbershop LLC",
+    "priced at the chair",
+    "Priced at the chair",
+    "A water heater job",
+    "Lee Home Services'",
+    "Paid at the chair",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Skin fade · $40",
+    "Groom's package",
+    "Color touch-up",
+    "color touch-up",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "A beard trim",
+    "a beard trim",
+    "at the chair",
+    "At the chair",
+    "water heater",
+    "NEW massage",
+    "Casey Moore",
+    "color quote",
+    "house calls",
+    "price board",
+    "barbershops",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "barbershop",
+    "skin fades",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Plumbing",
+    "plumbing",
+    "Haircuts",
+    "haircuts",
+    "Kids cut",
+    "kids cut",
+    "BS20981",
+    "plumber",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "Jordan",
+    "Elm St",
+    "Barber",
+    "barber",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "beard",
+    "valve",
+    "Shop",
+    "shop",
+    "cape",
+    "$75",
+    "Ava"
+   ],
+   "B": [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact.",
+    "A late-cancel or nobody-home fee, up to the $89 service call, is charged only after Sam confirms it.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A late cancel or a no-show: only the policy's fee may be kept, up to the $89 service call.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "Lee Home Services took the service call fee you agreed to when you booked.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "We'd share only where they're working, only after a missed check.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Reading it back: drain clearing goes to $199 for new bookings.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Lin agreed to the business's service call fee when booking.",
+    "Drain clearings already booked keep only their saved card.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Its money card is set the way most barbershops start.",
+    "Like tapping a neighbor's water line without asking.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can Jordan look at my bathroom sink next week?",
+    "A haircut could mean a salon or a barbershop.",
+    "Shut the cold-water valve, above the heater.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Classic cuts, fades and hot towel shaves.",
+    "Here are the rules barbershops often set.",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Water is coming out of the water heater.",
+    "Please clear the cabinet under the sink.",
+    "The $160 valve quote is good for 7 days.",
+    "My gas water heater got wet in a flood.",
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds corroded shutoff valves.",
+    "Riley: barber, color and house calls",
+    "Charge or keep the service call fee?",
+    "At my home. Just the kitchen sink.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Notes what's there before the work",
+    "Riley: barber, color, house calls",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Sewer camera inspection · $199",
+    "Tells Casey it's still waiting",
+    "Jordan feels unsafe and leaves",
+    "like a burst pipe or a lockout",
+    "Saves the time for 10 minutes",
+    "My kitchen drain is clogged.",
+    "raise drain clearing to 199",
+    "The $179 drain needs none.",
+    "Mold behind the sink wall",
+    "The service call is $89.",
+    "Casey asks for a day off",
+    "Water heater replacement",
+    "NEW heating and cooling",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Under the sink, before",
+    "Registration 2019-0451",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "Drain clearing · $179",
+    "Tells Casey it's a no",
+    "Lee Home Services LLC",
+    "Asks for another day",
+    "Yes, it won't drain",
+    "leehomeservices.com",
+    "A water heater job",
+    "Lee Home Services'",
+    "Water heater flush",
+    "Lee Home Services",
+    "Service call fee",
+    "Plumbing license",
+    "Lee's Barbershop",
+    "Drain clearings",
+    "drain clearings",
+    "DONE 179 drain",
+    "Drain clearing",
+    "drain clearing",
+    "after the job",
+    "Kitchen drain",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "at the chair",
+    "Service call",
+    "service call",
+    "water heater",
+    "Casey Moore",
+    "house calls",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "house call",
+    "barbershop",
+    "Yard drain",
+    "88 Elm St",
+    "42 Oak St",
+    "Plumbing",
+    "plumbing",
+    "BS20981",
+    "plumber",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "shutoff",
+    "cabinet",
+    "Jordan",
+    "Elm St",
+    "Barber",
+    "barber",
+    "valves",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "beard",
+    "valve",
+    "drain",
+    "Rosa",
+    "Shop",
+    "shop",
+    "sink",
+    "$75",
+    "Ava"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-24": "0a292df05b",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-02": "15f418fec4",
+   "A8-03": "7accda6f86",
+   "A8-86": "c989a99e52",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A4-43": "c17d56f766"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B4-32": "fcfe092e37",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-69": "5d0e4c0045",
+   "B9-19": "b97bfbf0d2",
+   "B10-05": "a326ea3c0b",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255"
+  }
+ }
+}

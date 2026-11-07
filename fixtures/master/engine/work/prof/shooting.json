@@ -1,0 +1,2902 @@
+{
+ "id": "shooting",
+ "name": "Shooting instructor and range",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "driving-school",
+ "plugin": {
+  "pf.license": {
+   "need": "none checked by Rosie: a range needs no state license in most places; the business registration and the range's local permits are the owner's own word; where the state's rules require a training certificate for a class, the owner says so (a switch from the state form)",
+   "who": "the range for its registration and permits; each instructor for their own training certificate",
+   "ask": "optional: the registration number and any permit number the range wants shown; nothing is checked",
+   "check": "none: Rosie never checks a license, certificate, permit, insurance or background check (D96); the range keeps its own records",
+   "blocks": "nothing: no license or certificate blocks a booking here; the owner decides who may teach or staff a lane",
+   "renewals": "a reminder the owner sets for its own dates, if it wants one",
+   "insurance": "liability insurance is the range's own matter; optional for the booking",
+   "background": "any background or ownership check is the business's own step, outside Rosie; Rosie never checks it"
+  },
+  "pf.services": {
+   "shape": "a lane (indoor) or a bench (outdoor) booked by the hour like a space, with a range safety officer on duty; lessons book an instructor's time plus a lane; classes are seats on a timetable; flow B: an instructor's time at the customer's home or private land, and classroom seats at a host's place",
+   "examples": "the example range's own prices (Lee Shooting Range and Lee Shooting Lessons), not a standard",
+   "list": [
+    {
+     "name": "First-time shooter package",
+     "price": "$89 (example)",
+     "kind": "one price",
+     "length": "a safety briefing and a 1-hour lane lesson with an instructor",
+     "where": "at the range",
+     "before": "paid in full when booking",
+     "after": "nothing more; range ammunition is bought at the counter, the range's own sale outside Rosie",
+     "needs": "a range safety officer on duty for the lane, and a rental handgun if the shooter has none",
+     "note": "one adult per package; a shooter under 18 comes with a parent who signs and stays on site for the whole visit"
+    },
+    {
+     "name": "Indoor lane hour (supervised range time)",
+     "price": "$25 (example)",
+     "kind": "one price",
+     "length": "1 hour on a lane with a range safety officer on duty",
+     "where": "at the range",
+     "before": "a card saved for the $15 no-show fee",
+     "after": "paid at the counter",
+     "note": "a second shooter on the same lane adds $12 (example); lanes are supervised range time, not an empty room"
+    },
+    {
+     "name": "Private lesson (1 hour)",
+     "price": "$95 (example)",
+     "kind": "one price",
+     "length": "1 hour with an instructor on a lane",
+     "where": "at the range",
+     "before": "a card saved for the $25 late-cancel fee",
+     "after": "the saved card is charged at DONE",
+     "needs": "an instructor and a lane with a range safety officer on duty"
+    },
+    {
+     "name": "Carry-permit class (a seat in a session)",
+     "price": "$199 (example)",
+     "kind": "one price, a seat",
+     "length": "4 Saturdays, the hours the state's rules set",
+     "where": "in the range's classroom",
+     "before": "a $50 deposit now",
+     "after": "the $149 rest paid at the counter at the first class",
+     "capacity": "10 seats; runs with at least 4 by 7 days before",
+     "note": "only where the state's rules require training for a permit (a switch from the state form); a certificate after the last class"
+    },
+    {
+     "name": "Firearm rental (an add-on)",
+     "price": "$15 a firearm (example)",
+     "kind": "one price",
+     "length": "for the visit",
+     "where": "at the range",
+     "before": "added to the booking",
+     "after": "paid at the counter",
+     "note": "photo ID and the owner's age and eligibility rules at the counter; rental firearms never leave the range"
+    },
+    {
+     "name": "In-home safety and safe-storage lesson (flow B)",
+     "price": "$120 (example)",
+     "kind": "one price",
+     "length": "about 90 minutes",
+     "where": "at the customer's home",
+     "before": "a card saved for the $40 fee",
+     "after": "the saved card is charged at DONE",
+     "note": "no live fire and no ammunition in the room; the instructor checks each firearm is unloaded and safely stored"
+    },
+    {
+     "name": "Private coaching on the customer's land (flow B, 4 visits)",
+     "price": "$600 (example)",
+     "kind": "a series of visits",
+     "length": "4 visits over 2 to 4 weeks",
+     "where": "at the customer's land, with the owner's written OK",
+     "before": "a $150 deposit on the series",
+     "after": "the $450 rest on the bill after the last visit",
+     "note": "a cleared instructor only; the land's owner must OK it in writing (Sam asks)"
+    },
+    {
+     "name": "Classroom safety course seat at a host's place (flow B)",
+     "price": "$45 a seat (example)",
+     "kind": "one price, a seat",
+     "length": "3 hours, classroom only, no live fire",
+     "where": "at a host's place",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "20 seats; runs with at least 6"
+    }
+   ],
+   "capacity": "one instructor per lesson; a lane shows a time only when the instructor and a range safety officer are both free; a range safety officer is on duty for every open lane",
+   "goods": "ammunition, targets and gear are the business's own sale at the counter, outside Rosie; Rosie books services only",
+   "online": "classroom theory may be by video where the state allows it; lanes and lessons never",
+   "outOfScope": "renting a lane or a range by the hour with no instruction or staff is renting a space for a time, which Rosie doesn't book (Jay, Oct 24); lanes are booked only as supervised range time"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new to shooting, or experienced (new shooters get the package or a lesson, and the safety briefing)",
+    "how many shooters, and the age of each (sets the lane and who may come)",
+    "a rental firearm, or their own",
+    "for a class: which class",
+    "for flow B: a home or private land, and the town"
+   ],
+   "afterTime": [
+    "anything the instructor should know (left-handed, a past injury that affects grip)"
+   ],
+   "securePage": [
+    "the waiver and the range rules, signed by each shooter (a parent signs for anyone under 18)",
+    "the date of birth of each shooter (age limits)",
+    "for a rental: a yes that the renter isn't barred by the federal or state rules from having a firearm (a switch)",
+    "for flow B at home: that every firearm will be unloaded with ammunition stored in another room, and where children are during the lesson",
+    "for flow B on private land: that the customer owns or may use the land, that shooting is allowed there, and the backstop",
+    "an emergency contact"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or legal guardian books for anyone under 18 and shoots on the same lane; nobody under 8 on the firing line (the range's rule)"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone shot or hurt now, a firearm accident, a threat to hurt someone",
+     "say": "Call 911 now. Get to a safe place.",
+     "booking": "no booking"
+    },
+    {
+     "words": "words about ending one's life or hurting oneself",
+     "say": "the 988 line and 911, at once",
+     "booking": "no booking in that chat; staff are told privately, with no words passed on"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "pregnant, or bringing a young child to an indoor range",
+     "what": "the booking goes on; the range's own note about lead and noise is shown; Rosie gives no medical advice"
+    },
+    {
+     "words": "a hearing or heart condition, a recent surgery on the hands, arms or shoulders",
+     "what": "the booking goes on; it's noted privately for the instructor"
+    }
+   ],
+   "sobriety": "nobody who seems drunk or high shoots that day",
+   "rental": "a rental firearm is never given to someone alone and visibly upset; staff decide privately, and nothing is said in a text",
+   "range": "eye and ear protection for everyone on the range; the range safety officer's commands come first; a cease-fire stops every lane",
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Waiver and range rules",
+     "when": "signed on the secure page while booking",
+     "who": "every shooter; a parent or guardian signs for anyone under 18",
+     "goodFor": "1 year",
+     "result": "signed: it books; not signed: no shooting until it's signed at the counter"
+    },
+    {
+     "name": "Safety briefing",
+     "when": "at the counter at the start of a shooter's first visit, 15 minutes",
+     "who": "every first-time shooter",
+     "goodFor": "1 year",
+     "result": "done: the shooter goes to the lane; not able to follow the range rules: no shooting today"
+    },
+    {
+     "name": "Photo ID",
+     "when": "at the counter, every visit with a rental",
+     "who": "every renter",
+     "result": "shows the right age: the rental goes ahead; none: no rental today"
+    },
+    {
+     "name": "Barred-person yes for a rental",
+     "when": "on the secure page while booking",
+     "who": "every renter, where the federal and state rules apply (a switch)",
+     "result": "a yes: it books; a no: no rental, told kindly, the reason never texted"
+    },
+    {
+     "name": "Home or land checklist (flow B)",
+     "when": "on the secure page while booking",
+     "who": "the customer",
+     "result": "all yes: it books; a no: the instructor calls before anything is booked"
+    }
+   ],
+   "prep": "bring a photo ID; wear closed-toe shoes and a crew-neck top (hot brass); no alcohol before; arrive 15 minutes early for the briefing; bring your own firearm unloaded and cased"
+  },
+  "pf.visit": {
+   "checkIn": "at the counter: the check-in code, the photo ID for a rental, the waiver on file, and the safety briefing for a first visit; the class roster for classes; at the customer's home or land (flow B): the code at the door",
+   "beforeWork": "the range safety officer assigns the lane and checks eye and ear protection; at a home, the instructor checks every firearm used is unloaded and the ammunition is in another room before the lesson",
+   "changes": "more lane time only if the next booking allows, priced first; a cease-fire or lightning stops shooting; a lesson stopped for safety is done another way or moved",
+   "done": "the check-in code, or the instructor's DONE; the rental firearms are checked back in before the shooter leaves",
+   "children": "a shooter under 18 is always on the same lane as their parent or guardian; never left"
+  },
+  "pf.money": {
+   "before": "a first-time package and a class seat are paid in full, or a class takes a deposit with the rest at the first class; lanes and lessons save a card for the fee; a series' deposit is taken when booked",
+   "after": "lanes are paid at the counter, or the saved card is charged at DONE for private lessons and the in-home lesson; the rest of a series on the bill after the last visit",
+   "caps": "deposit cap: from the state form; prepaid training money kept apart where the state's rules require it",
+   "cancel": "free to cancel until 24 hours before (the owner's setting); a weather or range-closed cancel by the range is always free",
+   "fees": "late cancel or no-show: $25 (example), $15 for a lane, $40 at home, only with the owner's OK, and never more than what was paid now; never for weather, a range closure, or a shooter who says before the visit that they aren't fit to shoot. A shooter turned away for their own reason (impaired, refuses a safety rule, or gave an answer that wasn't true) is treated like a no-show: any fee is the owner's call.",
+   "membership": "charged monthly to the saved card after the membership's own yes; cancel with 30 days' notice (the example's terms) or as the state's rules require",
+   "refunds": "a lesson or lane the range cancels is never charged; unused classes refunded under the course terms",
+   "tax": "where the state's rules tax the range's sales or services",
+   "tips": "none",
+   "fee2": "Rosfield's $2 applies: one $2 per confirmed booking; a series counts once",
+   "goods": "ammunition, targets, eye and ear protection and range gear are the range's own sale at the counter, outside Rosie"
+  },
+  "pf.messages": {
+   "never": "whether someone owns firearms, which ones, serial numbers, permit numbers, the barred-person answer, health notes and any crisis words never go in a text: only the secure page",
+   "staffTexts": "texts to staff name the customer, the lane or class and the time only",
+   "neutral": "texts name the business, the date, the time and the lane or class, nothing about firearms",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian"
+  },
+  "pf.staff": {
+   "licenses": "each instructor's training certificate and ratings are the range's own word, shown to the owner; not checked by Rosie (D96)",
+   "skills": "range safety officer, handgun instructor, rifle instructor, carry-permit instructor, youth instructor, in-home safety lessons",
+   "supervision": "a range safety officer on duty for every open lane; at most 6 lanes per range safety officer (the range's rule)",
+   "oks": "the owner OKs fees, refunds and private-land lessons; the range safety officer may stop anyone from shooting",
+   "standIn": "a lesson's instructor may be replaced only by one with the same skill, offered first, never assumed; a class's instructor by one with the same certification",
+   "away": "only instructors cleared by the owner teach at homes or on private land",
+   "certificates": "each instructor's certificate end date, if the range enters one: a reminder for the owner only"
+  },
+  "pf.rules": {
+   "age": "minimum ages for using and renting firearms on the range follow the federal and state rules and the range's own stricter rule (switches)",
+   "barred": "rentals only to people the federal and state rules allow to have a firearm (a switch)",
+   "carry": "a carry-permit class only where the state's rules call for one, taught as the state's form says",
+   "lead": "lead and air rules for indoor ranges (switches from the state and local forms)",
+   "childAccess": "child-access and safe-storage rules where the state has them, taught in the home lesson (a switch)",
+   "records": "waivers, briefing records and rental logs kept as the state asks, and at least 7 years",
+   "security": "a shooter's eligibility (age and any legal bar) is the range's own check at the counter, on the shooter's own yes on the secure page; Rosie never checks a document (D96)",
+   "scope": "instructors don't give legal advice on carrying or storage; the state's rules set what's taught, where the state's rules require it"
+  },
+  "pf.edges": {
+   "impaired": "a shooter who seems impaired: no shooting that day",
+   "noId": "no photo ID for a rental: no rental today; the lane can still be used with their own firearm",
+   "alone": "a first-time renter alone: a lesson instead, or come back with another adult",
+   "lightning": "lightning within 10 miles: the outdoor range closes until 30 minutes after the last strike; bookings move indoors or to a new time with no fee",
+   "ceaseFire": "a cease-fire stops every lane; time lost is added or refunded",
+   "hurt": "someone hurt: cease-fire, first aid, 911; the owner told at once",
+   "minor": "a minor: always on the same lane as the parent or guardian",
+   "late": "a late shooter: the lane time ends when booked",
+   "full": "all lanes busy: the next open lane, or the waitlist",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "forms",
+   "children",
+   "classes",
+   "spaces"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Dale and Nora (range safety officers and instructors)",
+   "cust": "Alex M. (new shooter) · other shooters",
+   "other": "Others (a parent, a bank)"
+  },
+  "B": {
+   "staff": "Gabe and Nadia (instructors who travel to homes and land)",
+   "cust": "Alex M. (customer, shooter at home) · other customers",
+   "other": "Others (a host, a club, a bank)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dale"
+  },
+  "B": {
+   "staff": "Gabe"
+  }
+ },
+ "keep": [
+  "instructor",
+  "Instructor",
+  "instructors",
+  "grace",
+  "leak",
+  "valve",
+  "color",
+  "range",
+  "lane"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex, a new shooter, books the first-time package at Lee Shooting Range with Dale, Sat Oct 24 at 11:00am: a safety briefing and a 1-hour lane lesson, paid in full when booking. The counter asks for photo ID, and the waiver is signed on the secure page. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Shooting Lessons for an in-home safety and safe-storage lesson with Gabe, Thu Oct 22 at 8:00am, at Alex's home. No live fire and no ammunition in the room, and the saved card is charged at DONE. Pick a money choice at the top to follow its path."
+ },
+ "splitsKept": {
+  "A": [
+   "S1-80",
+   "A4-43",
+   "A4-66",
+   "A7-59",
+   "A7-15",
+   "A7-63",
+   "A7-68",
+   "A8-02",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-80",
+   "B4-78",
+   "B5-34",
+   "B7-62",
+   "S11-87",
+   "S11-90"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "{{svc.intext:haircut|visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:color and cut|visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Color and cut|Your visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Your visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:beard trim|service}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Visits}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:haircut plan|plan}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Skin fade|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Beard trim|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Signature cut and shave|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:color correction|visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Color correction|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:a color correction|the price}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:cut|visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:color plan visit|visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Skin fade}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:skin fades|visits}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "First-time packages, private lessons and safety class for new and nervous shooters."
+   ],
+   [
+    "books a skin fade for",
+    "books a first-time package for"
+   ],
+   [
+    "gives the job's address alone to their contact",
+    "gives the address alone to their contact"
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a lesson at the range or at the customer's own airport."
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent visits sent now, like a tow or a lockout."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company sends anyone now."
+   ],
+   [
+    "Sets nobody on call: no jobs sent now",
+    "Sets nobody on call: nothing sent now"
+   ],
+   [
+    "Jobs sent now are never offered.",
+    "Nothing is ever sent now."
+   ],
+   [
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Your work is never sent now, so nobody needs to be on call."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Dale: range instructor, private lessons and checkrides"
+   ],
+   [
+    "Avery: barber",
+    "Nora: range instructor"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every service: ranges, safety class and lane time"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the range and at a customer's own airport"
+   ],
+   [
+    "the visit fee",
+    "the trip fee"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the range, and at a customer's own airport"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states tie a shooting range's license to its place, and an instructor to their own certificate."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A shooting range's example: a gas smell gets 'get clear of the range, and call 911'."
+   ],
+   [
+    "raises the haircut to $40",
+    "raises the 1-hour ground lesson to $95"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Ben's AI asks for a first-time package at $79, an old price."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A first-time package at Lee Shooting Range is $89, not $79."
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "raise haircut to 40",
+    "raise the ground lesson to 95"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the lesson"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the lesson?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lesson could mean a first-time package or a safety class."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a lesson every Saturday"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's first-time packages together"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the school share photos of your range?"
+   ],
+   [
+    "Color always stays with Riley.",
+    "The private lesson always stays with Dale."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Dale can do a shorter lesson in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your lesson is part of a plan with Dale, every Saturday."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A lesson is rated, so the school takes the first branch."
+   ],
+   [
+    "kids cuts",
+    "junior lessons"
+   ],
+   [
+    "kids cut",
+    "junior lesson"
+   ],
+   [
+    "Kids cut",
+    "Junior lesson"
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "It's a ground lesson today at 2:00pm with Nora, for a new student. It's $25."
+   ],
+   [
+    "accept the beard trim today at 2:00pm with Avery",
+    "accept the ground lesson today at 2:00pm with Nora"
+   ],
+   [
+    "priced from photos",
+    "priced from her answers"
+   ],
+   [
+    "Color and cut",
+    "Lesson plan"
+   ],
+   [
+    "color and cut",
+    "lesson plan"
+   ],
+   [
+    "color quote",
+    "custom plan quote"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds a lane to Lee Shooting Lessons."
+   ],
+   [
+    "NEW massage",
+    "NEW lane time"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Lane time for Lee Shooting Lessons: is it the same company?"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una clase de vuelo el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a range lesson on Saturday."
+   ],
+   [
+    "JP031552",
+    "EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "EC22871",
+    "EX-1045"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Shooting Range LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Shooting Range"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Shooting Lessons'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Shooting Lessons"
+   ],
+   [
+    "Riley Chen",
+    "Dale Hale"
+   ],
+   [
+    "Riley",
+    "Dale"
+   ],
+   [
+    "Avery Diaz",
+    "Nora Cruz"
+   ],
+   [
+    "Avery",
+    "Nora"
+   ],
+   [
+    "Jordan Price",
+    "Gabe Patel"
+   ],
+   [
+    "Jordan",
+    "Gabe"
+   ],
+   [
+    "Casey Moore",
+    "Nadia Lopez"
+   ],
+   [
+    "Casey",
+    "Nadia"
+   ],
+   [
+    "1200 Main St",
+    "4 Range Rd"
+   ],
+   [
+    "88 Elm St",
+    "40 Range Rd"
+   ],
+   [
+    "Elm St",
+    "Range Rd"
+   ],
+   [
+    "Oak St",
+    "Pine Ct"
+   ],
+   [
+    "a barber",
+    "a range instructor"
+   ],
+   [
+    "A barber",
+    "A range instructor"
+   ],
+   [
+    "plumbing and electrical",
+    "range training and safety class"
+   ],
+   [
+    "Electrical",
+    "Safety class"
+   ],
+   [
+    "electrical",
+    "safety class"
+   ],
+   [
+    "Plumbing",
+    "Range training"
+   ],
+   [
+    "plumbing",
+    "range training"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "Barbering",
+    "Flying"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "barbershop",
+    "shooting range"
+   ],
+   [
+    "Barbershop",
+    "Shooting range"
+   ],
+   [
+    "shops",
+    "schools"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "1 At the shop",
+    "1 At the range"
+   ],
+   [
+    "Only at the shop",
+    "Only at the range"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up lesson, if Sam says so"
+   ],
+   [
+    "Alex asks for a fix",
+    "Alex asks for a make-up lesson"
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Private lesson"
+   ],
+   [
+    "Signature cut and shave",
+    "Private lesson"
+   ],
+   [
+    "signature cut",
+    "private lesson"
+   ],
+   [
+    "The Groom's package",
+    "The safety course"
+   ],
+   [
+    "the Groom's package",
+    "the safety course"
+   ],
+   [
+    "Groom's package",
+    "safety course"
+   ],
+   [
+    "Haircuts",
+    "Lessons"
+   ],
+   [
+    "haircuts",
+    "lessons"
+   ],
+   [
+    "A haircut",
+    "A 1-hour private lesson"
+   ],
+   [
+    "a haircut",
+    "a private lesson"
+   ],
+   [
+    "Haircut",
+    "1-hour private lesson"
+   ],
+   [
+    "haircut",
+    "private lesson"
+   ],
+   [
+    "a beard trim",
+    "a first-time package"
+   ],
+   [
+    "Beard trim",
+    "First-time package"
+   ],
+   [
+    "beard trim",
+    "first-time package"
+   ],
+   [
+    "$55",
+    "$89"
+   ],
+   [
+    "$35",
+    "$25"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "in the cockpit"
+   ],
+   [
+    "the chair",
+    "the cockpit"
+   ],
+   [
+    "Jobs",
+    "Lessons"
+   ],
+   [
+    "jobs",
+    "lessons"
+   ],
+   [
+    "Job",
+    "Lesson"
+   ],
+   [
+    "job",
+    "lesson"
+   ],
+   [
+    "cuts",
+    "lessons"
+   ],
+   [
+    "cut",
+    "lesson"
+   ],
+   [
+    "every 4 weeks",
+    "every Saturday"
+   ],
+   [
+    "skin fades",
+    "first-time packages"
+   ],
+   [
+    "skin fade",
+    "first-time package"
+   ],
+   [
+    "Skin fade",
+    "First-time package"
+   ],
+   [
+    "Skin fade",
+    "First-time package"
+   ],
+   [
+    "skin fade",
+    "first-time package"
+   ],
+   [
+    "color correction",
+    "training program"
+   ],
+   [
+    "a perm",
+    "a helicopter rating"
+   ],
+   [
+    "perms",
+    "helicopter ratings"
+   ],
+   [
+    "perm",
+    "helicopter rating"
+   ],
+   [
+    "The cape clip",
+    "The seat belt clip"
+   ],
+   [
+    "the cape clip",
+    "the seat belt clip"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: crosswind landings next time; radio calls first."
+   ],
+   [
+    "barbershops",
+    "shooting ranges"
+   ],
+   [
+    "once Dale sees the hair",
+    "once Dale sees the student's needs"
+   ],
+   [
+    "Color correction",
+    "Training program"
+   ],
+   [
+    "At the cockpit",
+    "At the desk"
+   ],
+   [
+    "Range training for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "First-time packages and private lessons at the range, and safety class."
+   ],
+   [
+    "water heater",
+    "series estimate"
+   ],
+   [
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "a phone talk about the program is free: nothing before, nothing after."
+   ],
+   [
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "a visit with nobody at the desk is paid by the bill Rosie sends."
+   ],
+   [
+    "Saturday mornings are paid by the saved card at DONE.",
+    "a visit with nobody at the desk is charged to the saved card at DONE."
+   ],
+   [
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "a range tour is free: nothing before, nothing after."
+   ],
+   [
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "a visit with nobody at the desk is paid by the bill Rosie sends."
+   ],
+   [
+    "Saturday mornings are paid by the saved card at DONE.",
+    "a visit with nobody at the desk is charged to the saved card at DONE."
+   ],
+   [
+    "Sale gas del ala.",
+    "Sale gas de la pared."
+   ]
+  ],
+  "B": [
+   [
+    "{{svc.intext:Drain clearing}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Water heater replacement}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain clearing}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:drain clearing|visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain clearing|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:plumbing visit|visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:camera inspection|service}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:home-repair class|session}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:plan|plan}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Yard drain|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Water heater flush|Visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Leak repair|Quote}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Leak repair|Your quote}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:leak repair|work}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:kitchen drain|visit}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:Sewer camera inspection}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "{{svc.intext:drain clearings|visits}}",
+    "{{svc.intext:Range booking}}"
+   ],
+   [
+    "the shutoff valves",
+    "the extra time"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Gabe also add a lane hour?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Lane hour · $25"
+   ],
+   [
+    "added a camera inspection to",
+    "added a lane hour to"
+   ],
+   [
+    "Pay $160 for the shutoff valves",
+    "Pay $30 for the extra time"
+   ],
+   [
+    "$160 for today's extra work",
+    "$30 for today's extra time"
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can start the lesson at a set time"
+   ],
+   [
+    "like the sewer camera inspection",
+    "like a ground lesson"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Range lessons at the customer's airport in Springfield, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A safety lesson"
+   ],
+   [
+    "up to the $89 service call",
+    "up to the $25 late-cancel fee"
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a safety lesson, today"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "The lesson is $120. Accept it?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a safety lesson for my plane."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lesson could mean a safety lesson or a safety class."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I need my safety lesson' fits a safety lesson."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like flying someone else's plane without their OK."
+   ],
+   [
+    "two drain clearings",
+    "two ground lessons"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack on my wing this morning."
+   ],
+   [
+    "the kitchen drain",
+    "the ground lesson"
+   ],
+   [
+    "gives the job's address alone to their contact",
+    "gives the address alone to their contact"
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a lesson at the range or at the customer's airport."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent visits sent now, like a tow or a lockout."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company sends anyone now."
+   ],
+   [
+    "Sets nobody on call: no jobs sent now",
+    "Sets nobody on call: nothing sent now"
+   ],
+   [
+    "Jobs sent now are never offered.",
+    "Nothing is ever sent now."
+   ],
+   [
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Your work is never sent now, so nobody needs to be on call."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Gabe: safety lessons, transition training and ground lessons"
+   ],
+   [
+    "Avery: barber",
+    "Nadia: safety class and safety lessons"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the range and at the customer's airport"
+   ],
+   [
+    "the visit fee",
+    "the trip fee"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the range, and at the customer's airport"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states tie a shooting range's license to its place, and an instructor to their own certificate."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A shooting range's example: a gas smell gets 'get clear of the range, and call 911'."
+   ],
+   [
+    "The door stayed shut.",
+    "The range door stayed shut."
+   ],
+   [
+    "for that window",
+    "for that time"
+   ],
+   [
+    "the safety check comes before the door opens",
+    "the prerange check comes before the student climbs in"
+   ],
+   [
+    "before letting anyone in",
+    "before the student climbs in"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Gabe and Alex do the prerange check"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The offer is good for the next lesson."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds safety class to Lee Shooting Lessons."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW safety class"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Safety class for Lee Shooting Lessons: is it the same company?"
+   ],
+   [
+    "You go to customers",
+    "You go to the customer's airport"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Safety lessons already booked keep $120"
+   ],
+   [
+    "Drain clearing plans",
+    "Safety lesson plans"
+   ],
+   [
+    "at the door",
+    "at the range"
+   ],
+   [
+    "JP031552",
+    "EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "EC22871",
+    "EX-1045"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Range Classes"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Shooting Lessons LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Shooting Lessons'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Shooting Lessons"
+   ],
+   [
+    "leehomeservices.com",
+    "leerangelessons.com"
+   ],
+   [
+    "Riley Chen",
+    "Dale Hale"
+   ],
+   [
+    "Riley",
+    "Dale"
+   ],
+   [
+    "Avery Diaz",
+    "Nora Cruz"
+   ],
+   [
+    "Avery",
+    "Nora"
+   ],
+   [
+    "Jordan Price",
+    "Gabe Patel"
+   ],
+   [
+    "Jordan",
+    "Gabe"
+   ],
+   [
+    "Casey Moore",
+    "Nadia Lopez"
+   ],
+   [
+    "Casey",
+    "Nadia"
+   ],
+   [
+    "1200 Main St",
+    "4 Range Rd"
+   ],
+   [
+    "88 Elm St",
+    "40 Range Rd"
+   ],
+   [
+    "Elm St",
+    "Range Rd"
+   ],
+   [
+    "42 Oak St",
+    "17 Cedar Ln"
+   ],
+   [
+    "a plumber",
+    "an instructor"
+   ],
+   [
+    "a barber",
+    "an instructor"
+   ],
+   [
+    "plumbing and electrical",
+    "range training and safety class"
+   ],
+   [
+    "Electrical",
+    "Safety class"
+   ],
+   [
+    "electrical",
+    "safety class"
+   ],
+   [
+    "Plumbing",
+    "Range training"
+   ],
+   [
+    "plumbing",
+    "range training"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "barbershop",
+    "shooting range"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "2 At the shop",
+    "2 At the range"
+   ],
+   [
+    "Booked at the shop: the other flow goes on from here.",
+    "Booked at the range: the other flow goes on from here."
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Safety lesson"
+   ],
+   [
+    "Drain clearing",
+    "Safety lesson"
+   ],
+   [
+    "drain clearing",
+    "safety lesson"
+   ],
+   [
+    "Water heater flush",
+    "Safety course"
+   ],
+   [
+    "water heater flush",
+    "safety course"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 8:00am"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "7am Thu",
+    "7:30am Thu"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 12:00pm"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:00am"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 8:10am"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 10:00am"
+   ],
+   [
+    "$150",
+    "$120"
+   ],
+   [
+    "$110",
+    "$25"
+   ],
+   [
+    "$40",
+    "$25"
+   ],
+   [
+    "Jobs",
+    "Lessons"
+   ],
+   [
+    "jobs",
+    "lessons"
+   ],
+   [
+    "Job",
+    "Lesson"
+   ],
+   [
+    "job",
+    "lesson"
+   ],
+   [
+    "barbershops",
+    "shooting ranges"
+   ],
+   [
+    "for a haircut instead",
+    "for a first-time package instead"
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s Thu Oct 22 lesson ended 20 minutes early."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Alex missed part of a lesson when Gabe left early. Sam OKs a free make-up visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The lesson ended early again."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Nadia",
+    "BOOK Tessa lesson Thu 12-2 Nadia"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a ground lesson? Say so."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the range."
+   ],
+   [
+    "Send Alex M. $600 for the water heater replacement, not $600?",
+    "Send Alex M. $550 for the series estimate, not $600?"
+   ],
+   [
+    "Price needed: Alex M., water heater replacement.",
+    "Price needed: Alex M., series estimate."
+   ],
+   [
+    "Gabe priced a water heater replacement for Alex M.",
+    "Gabe priced a series estimate for Alex M."
+   ],
+   [
+    "Your water heater price is with Lee Shooting Lessons.",
+    "Your estimate is with Lee Shooting Lessons."
+   ],
+   [
+    "your water heater replacement at {{price:$90}}",
+    "your series estimate at {{price:$600}}"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your estimate this time"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount",
+    "The $600 series estimate is over the plug-in's amount"
+   ],
+   [
+    "Can Gabe also look at a dripping faucet?",
+    "Can Gabe also look at a stuck throttle?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a stuck throttle."
+   ],
+   [
+    "with one arrival window and one code",
+    "with one start time and one code"
+   ],
+   [
+    "like new pipes put in one day and finished another.",
+    "like a coaching series finished over two weeks."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is the range still locked?'"
+   ],
+   [
+    "like an overflowing drain at night",
+    "like a tow at night"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The plane won't start. Can someone come tonight?"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $120 safety lesson needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the range door open."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I warm up the engine before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the gas is leaking now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The gas is leaking onto the range floor now."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's safety lesson?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a safety lesson in two range lane every 3 months"
+   ],
+   [
+    "yard drain needs nobody home",
+    "range needs nobody home"
+   ],
+   [
+    "old water stain on the cabinet floor",
+    "old oil stain on the range floor"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 ground lesson 165 gas line 80"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 extra range time, 30 minutes"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $30.",
+    "Extra for Alex M.: 30 more minutes, $30."
+   ],
+   [
+    "Gabe finds corroded shutoff valves.",
+    "Gabe finds a worn spark plug."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160",
+    "you said yes to 30 more minutes for $30"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD crack in the wing strut, stopped"
+   ],
+   [
+    "Gabe finds mold behind the sink wall.",
+    "Gabe finds a crack in the wing strut."
+   ],
+   [
+    "Gabe found mold behind the wall under your sink",
+    "Gabe found a crack in the wing strut"
+   ],
+   [
+    "cabinet floor",
+    "range floor"
+   ],
+   [
+    "shutoff valve only",
+    "gas valve only"
+   ],
+   [
+    "Leave the supply line.",
+    "Leave the gas line."
+   ],
+   [
+    "fixes the shutoff valve today",
+    "fixes the gas valve today"
+   ],
+   [
+    "The $80 supply line",
+    "The $80 gas line"
+   ],
+   [
+    "for your repipe",
+    "for your coaching series"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 coaching series, 3 stages"
+   ],
+   [
+    "Sewer camera inspection",
+    "Lane hour"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Leak repair",
+    "Transition estimate"
+   ],
+   [
+    "Water heater replacement",
+    "Transition estimate"
+   ],
+   [
+    "sewer camera report",
+    "training record"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE takeoff roll longer than usual. Next time: add crosswind practice."
+   ],
+   [
+    "repipe",
+    "coaching series"
+   ],
+   [
+    "A neighborhood shooting range on Range Rd.",
+    "A shooting range at Range Rd."
+   ],
+   [
+    "the valve is off",
+    "the gas is off"
+   ],
+   [
+    "under the sink",
+    "under the wing"
+   ],
+   [
+    "bathroom sink",
+    "bathroom"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $30 extra time is good for 7 days."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it won't start"
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Safety lesson|Visit}}"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 255 safety lesson"
+   ],
+   [
+    "leak repair is $620",
+    "series estimate is $620"
+   ],
+   [
+    "Gabe found the leak.",
+    "Gabe found the fault."
+   ],
+   [
+    "Gabe finds the leak",
+    "Gabe finds the fault"
+   ],
+   [
+    "leak repair",
+    "series estimate"
+   ],
+   [
+    "roof leak",
+    "roof repair"
+   ],
+   [
+    "A fix-a-leak class.",
+    "A throttle check class."
+   ],
+   [
+    "to shut the cold-water valve",
+    "to get clear of the range"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My plane needs its yearly review."
+   ],
+   [
+    "which drain is clogged",
+    "which part needs a check"
+   ],
+   [
+    "the leak",
+    "the fault"
+   ],
+   [
+    "replaces water heaters",
+    "replaces engines"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the range still locked?"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both gas valves"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My range got wet in a flood. Is my plane safe to fly?"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the gas is off.",
+    "Its questions: where the fault is, if anything is still wrong, and if the gas is off."
+   ],
+   [
+    "The faucet is a series estimate",
+    "The throttle is a series estimate"
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your lesson ran short, so this make-up visit is free."
+   ],
+   [
+    "for a bathroom drain.",
+    "for a make-up lesson."
+   ],
+   [
+    "the water heater quote",
+    "the series estimate"
+   ],
+   [
+    "Drain clearings already booked",
+    "Safety lessons already booked"
+   ],
+   [
+    "a yard drain this Thursday",
+    "a safety lesson this Thursday"
+   ],
+   [
+    "Replace both gas valves · $30",
+    "30 more minutes · $30"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "Gas is leaking out of the wing."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Get clear of the range, away from the gas."
+   ],
+   [
+    "Cabinet floor, before",
+    "Hangar floor, before"
+   ],
+   [
+    "Under the sink, before",
+    "Under the wing, before"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Crack in the wing strut"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the gas line behind the wing"
+   ],
+   [
+    "Kitchen drain",
+    "Safety lesson"
+   ],
+   [
+    "Yard drain",
+    "Hangar check"
+   ],
+   [
+    "Water heater fix",
+    "Engine fix"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "First-time packages, private lessons and safety class."
+   ],
+   [
+    "A neighborhood shooting range on Range Rd.",
+    "A shooting range at Range Rd."
+   ],
+   [
+    "Turn off the water valve under the wing, and keep away from any outlet the water reaches.",
+    "Shut off the gas valve, and keep away from any gas the range spills."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a crack in the wing strut"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Crack in the wing strut"
+   ],
+   [
+    "Sale agua del calentador.",
+    "Sale gas del ala."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Aléjese de la aeronave. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Sale gas del ala.",
+    "Sale gas de la pared."
+   ],
+   [
+    "shutoff valves",
+    "safety checks"
+   ],
+   [
+    "shutoff valve",
+    "safety check"
+   ],
+   [
+    "shutoff",
+    "safety"
+   ],
+   [
+    "water heater",
+    "series"
+   ],
+   [
+    "heater",
+    "range"
+   ]
+  ]
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|counter",
+    "list|card|card",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a $89 first-time shooter package, paid in full when booking. Range ammunition is bought at the counter.",
+    "list|card|counter": "An indoor lane hour, $25. A card is saved for the $15 no-show fee, and Alex pays at the counter.",
+    "list|card|card": "A 1-hour private lesson, $95. A card is saved for the $25 fee, and the saved card is charged at DONE.",
+    "list|deposit|counter": "The $199 carry-permit class: a $50 deposit now, and the $149 rest paid at the counter at the first class."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$25",
+     "name": "shooting session"
+    },
+    "list|*|*": {
+     "price": "$25",
+     "name": "indoor lane hour"
+    },
+    "list|full|none": {
+     "price": "$89",
+     "paid": "$89",
+     "name": "first-time shooter package"
+    },
+    "list|card|counter": {
+     "price": "$25",
+     "fee": "$15",
+     "name": "indoor lane hour"
+    },
+    "list|card|card": {
+     "price": "$95",
+     "name": "1-hour private lesson"
+    },
+    "list|deposit|counter": {
+     "price": "$199",
+     "deposit": "$50",
+     "rest": "$149",
+     "fee": "$25",
+     "name": "carry-permit class"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $120 in-home safety and safe-storage lesson at Alex's home. The saved card is charged at DONE.",
+    "list|full|none": "A $45 seat at a classroom safety course at a host's place, paid in full.",
+    "list|deposit|bill": "Private coaching on the customer's land: a $150 deposit on the $600 series, and the $450 rest on the bill after the last visit."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "shooting lesson"
+    },
+    "list|card|card": {
+     "price": "$120",
+     "name": "in-home safety lesson"
+    },
+    "list|full|none": {
+     "price": "$45",
+     "paid": "$45",
+     "fee": "$20",
+     "name": "safety class seat"
+    },
+    "list|deposit|bill": {
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "fee": "$40",
+     "name": "private coaching series (4 visits)"
+    },
+    "list|*|*": {
+     "price": "$120"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word the company gives only its registration (S1-61)"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "this work adds no agreement with Rosie beyond the standard terms"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "this work runs classes (a timetable, seats)"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "nothing is ever sent now, and nobody is on call"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S1-71",
+    "label": "2 Yes: sign it now",
+    "why": "not health care: no health privacy agreement is signed for this work"
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The license can stop the work and cut what may be offered, so it comes before prices and money. The range needs no state license checked here, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Decides which check runs on what each person added on their secure page. For this work none runs: no person license is checked.",
+    "more": [
+     "The plug-in says which, and which official lookup checks it: none for this work (D96).",
+     "D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word",
+     "Safe default: no person license is checked here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the the range's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the the range's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "nothing is left with the range"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "nothing is dropped off at the range"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "a minor is always with a parent or guardian on site"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "every lesson is rated"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "this work never bills a plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "no insurance plan is billed"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "a package or class is never paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "nothing is left at the range"
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "The waiver and the range's rules are signed by each shooter on the secure page, before the first lane.",
+     "A parent signs for anyone under 18, and stays on site for the whole visit.",
+     "Health and eligibility answers stay on the secure page, never in a text or through the AI."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-14",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're booked! Give this code at the counter when you arrive.",
+      {
+       "card": {
+        "title": "Lee Shooting Range · {{svc.intext:Range booking}}",
+        "lines": [
+         "Sat Oct 24 · 11:00am · Dale",
+         "{{pay.price}}",
+         "{{pay.took}}",
+         "{{pay.cancel}}",
+         "Range entrance on Range Rd · parking in the back"
+        ]
+       },
+       "code": "5160",
+       "buttons": [
+        "Change the time",
+        "Call off the visit"
+       ]
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word the company gives only its registration (S1-61)"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "this work adds no agreement with Rosie beyond the standard terms"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "this work runs classes (a timetable, seats)"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "nothing is ever sent now, and nobody is on call"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S1-71",
+    "label": "2 Yes: sign it now",
+    "why": "not health care: no health privacy agreement is signed for this work"
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word"
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The license can stop the work and cut what may be offered, so it comes before prices and money. The range needs no state license checked here, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Decides which check runs on what each person added on their secure page. For this work none runs: no person license is checked.",
+    "more": [
+     "The plug-in says which, and which official lookup checks it: none for this work (D96).",
+     "D96: no license is checked by Rosie for this work; the range's own registration and permits are the business's word",
+     "Safe default: no person license is checked here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the the range's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the the range's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "a shooting lesson starts at a set time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "nobody is on call for shooting lessons (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "an adult is always there for a home lesson with a minor"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "the customer must be there"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "this work never bills a plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "no insurance plan is billed"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "a series is paid by a deposit and the bill, not in stages"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "every lesson is rated"
+   },
+   {
+    "op": "words",
+    "at": "B6-13",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're booked! Give this code at the door when you arrive.",
+      {
+       "card": {
+        "title": "Lee Shooting Lessons · {{svc.intext:Range booking}}",
+        "lines": [
+         "Thu Oct 22 · starts at 8:00am · Gabe",
+         "{{pay.price}}",
+         "{{pay.took}}",
+         "{{pay.cancel}}",
+         "The address and way in, from your booking"
+        ]
+       },
+       "code": "5160",
+       "buttons": [
+        "Change the time",
+        "Call off the visit"
+       ]
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "books a skin fade for",
+    "gives the job's address alone to their contact",
+    "Sam named you their emergency contact.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "no cut of",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sets nobody on call: no jobs sent now",
+    "Jobs sent now are never offered.",
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Every shop service, color and house calls",
+    "at the shop and for house calls",
+    "the visit fee",
+    "At the shop, and house calls",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "raises the haircut to $40",
+    "Next: Sat Nov 28 · 10:00am",
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Priced from your photos",
+    "raise haircut to 40",
+    "Priced at the chair",
+    "What happens at the chair?",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a cut every 4 weeks",
+    "Books the groom's party together",
+    "May the shop show photos of your hair?",
+    "Color always stays with Riley.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A cut is rated, so the shop takes the first branch.",
+    "kids cuts",
+    "kids cut",
+    "Kids cut",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "accept the beard trim today at 2:00pm with Avery",
+    "priced from photos",
+    "Color and cut",
+    "color and cut",
+    "color quote",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "a barber",
+    "A barber",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Barbering",
+    "barbers",
+    "Barber",
+    "barber",
+    "barbershop",
+    "Barbershop",
+    "shops",
+    "Shop",
+    "1 At the shop",
+    "Only at the shop",
+    "Books a free fix, if Sam says so",
+    "Alex asks for a fix",
+    "shop",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "The Groom's package",
+    "the Groom's package",
+    "Groom's package",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "$55",
+    "$35",
+    "paid at the chair",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "Jobs",
+    "jobs",
+    "Job",
+    "job",
+    "cuts",
+    "cut",
+    "every 4 weeks",
+    "skin fades",
+    "skin fade",
+    "Skin fade",
+    "Skin fade",
+    "skin fade",
+    "color correction",
+    "a perm",
+    "perms",
+    "perm",
+    "The cape clip",
+    "the cape clip",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "barbershops",
+    "Color correction",
+    "water heater",
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "Saturday mornings are paid by the saved card at DONE.",
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "Saturday mornings are paid by the saved card at DONE."
+   ],
+   "B": [
+    "the shutoff valves",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "added a camera inspection to",
+    "$160 for today's extra work",
+    "can start the sewer camera inspection at a set time",
+    "like the sewer camera inspection",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "up to the $89 service call",
+    "It's a leak under the sink, today",
+    "The service call is $89. Accept it?",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "two drain clearings",
+    "I found water damage under the sink this morning.",
+    "the kitchen drain",
+    "gives the job's address alone to their contact",
+    "Sam named you their emergency contact.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sets nobody on call: no jobs sent now",
+    "Jobs sent now are never offered.",
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "at the shop and for house calls",
+    "the visit fee",
+    "At the shop, and house calls",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The door stayed shut.",
+    "for that window",
+    "the safety check comes before the door opens",
+    "before letting anyone in",
+    "Jordan and Alex check the work",
+    "The $160 valve quote is good for 7 days.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "You go to customers",
+    "Service call fee",
+    "service call fee",
+    "Drain clearings already booked keep $179",
+    "Drain clearing plans",
+    "at the door",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "a plumber",
+    "a barber",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "barbershop",
+    "Shop",
+    "2 At the shop",
+    "Booked at the shop: the other flow goes on from here.",
+    "shop",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "arriving 8–10am",
+    "8–10am",
+    "arriving 12–2pm",
+    "12–2pm",
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 9:10am",
+    "$150",
+    "$110",
+    "$40",
+    "Jobs",
+    "jobs",
+    "Job",
+    "job",
+    "barbershops",
+    "for a haircut instead",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "Adding a faucet check? Say so.",
+    "Just the kitchen sink.",
+    "Price needed: Alex M., water heater replacement.",
+    "your water heater replacement at {{price:$90}}",
+    "couldn't price your water heater this time",
+    "The $640 water heater is over the plug-in's amount",
+    "Say Alex also asks about a dripping faucet.",
+    "with one arrival window and one code",
+    "like new pipes put in one day and finished another.",
+    "like 'Is the sink still full of water?'",
+    "like an overflowing drain at night",
+    "It's overflowing. Can someone come tonight?",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Can I skip next week's drain cleaning?",
+    "a drain cleaning at two rentals every 3 months",
+    "yard drain needs nobody home",
+    "old water stain on the cabinet floor",
+    "QUOTE 245 valve 165 supply line 80",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "you said yes to replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "cabinet floor",
+    "shutoff valve only",
+    "Leave the supply line.",
+    "fixes the shutoff valve today",
+    "The $80 supply line",
+    "for your repipe",
+    "QUOTE 2400 repipe, 3 stages",
+    "Sewer camera inspection",
+    "Service call",
+    "service call",
+    "Leak repair",
+    "Water heater replacement",
+    "sewer camera report",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "repipe",
+    "the valve is off",
+    "under the sink",
+    "bathroom sink",
+    "The $160 valve quote is good for 7 days.",
+    "Yes, it won't drain",
+    "DONE 179 drain",
+    "leak repair is $620",
+    "leak repair",
+    "roof leak",
+    "A fix-a-leak class.",
+    "to shut the cold-water valve",
+    "My kitchen drain is clogged.",
+    "which drain is clogged",
+    "the leak",
+    "replaces water heaters",
+    "Is the sink still full of water?",
+    "Replace both shutoff valves",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Your drain is under warranty, so this visit is free.",
+    "for a bathroom drain.",
+    "the water heater quote",
+    "Drain clearings already booked",
+    "a yard drain this Thursday",
+    "Water is coming out of the water heater.",
+    "Shut the cold-water valve, above the heater.",
+    "Cabinet floor, before",
+    "Under the sink, before",
+    "Mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Kitchen drain",
+    "Yard drain",
+    "Water heater fix",
+    "Classic cuts, fades and hot towel shaves.",
+    "Found: mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Sale agua del calentador.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "shutoff valves",
+    "shutoff valve",
+    "shutoff",
+    "water heater",
+    "heater"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S2-28": "549fd7ae22",
+   "S1-71": "d5b18e87e4",
+   "S1-32": "60f59eda70",
+   "S1-33": "eeaadba298",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-99": "efed1e4f4d",
+   "S11-57": "a3996ae84e",
+   "S12-19": "07db0515b2",
+   "S13-41": "18b280aaa2",
+   "S13-43": "a1049201f6",
+   "S13-11": "4345036419",
+   "S1-61": "7421d186d5",
+   "S2-29": "974ca3a481",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-03": "7accda6f86",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A4-43": "c17d56f766",
+   "A6-14": "b17b52115e"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S2-28": "549fd7ae22",
+   "S1-71": "d5b18e87e4",
+   "S1-32": "60f59eda70",
+   "S1-33": "2b5d1fa4ab",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S11-99": "a97de4ca58",
+   "S11-57": "2f34f23d8a",
+   "S12-19": "176d3d2beb",
+   "S13-41": "fb75fbb382",
+   "S13-43": "55206e4cb1",
+   "S13-11": "6561316ed7",
+   "S1-61": "e30e71f65d",
+   "S2-29": "974ca3a481",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255",
+   "B6-13": "ed1f412f7d"
+  }
+ },
+ "notes": "Built Oct 27 by Haiku builder C4 from driving-school (refitted, 0/0) and the Oct 24 shooting sample plug-in (verified gaps kept in work/gaps/shooting.json).\nLanes are supervised range time with a range safety officer on duty, not an empty room (Jay removed renting a space for a time on Oct 24). Flagged for Jay and the verifier: if lane-only booking is out, the lane path (card|counter) goes and the rest stays.\nPaths A: full|none first-time shooter package ($89, paid in full; fee $25); card|counter indoor lane hour ($25, fee $15, paid at the counter); card|card 1-hour private lesson ($95, fee $25, DONE); deposit|counter carry-permit class ($199: $50 deposit, $149 rest at the counter at the first class).\nPaths B: card|card in-home safety and safe-storage lesson ($120, fee $40, DONE; no live fire, no ammunition in the room); full|none classroom seat at a host's place ($45, fee $20); deposit|bill private coaching on the customer's land ($600 over 4 visits: $150 deposit, $450 rest on the bill after the last visit; owner's written OK).\nMinors: a shooter under 18 always has a parent or guardian on site, who signs (A8-67 'a child may be left' off; B8-67 child-in-care off). Under 10 is not booked (the example's setting; the owner sets it).\nAges and eligibility for a handgun or rifle rental: the federal and state rules and the range's own rule, shown as generic words with no number from any state; the shooter's own yes on the secure page; the counter decides. Rosie never checks a document (D96).\nD96: no range registration, permit, instructor certificate or background check is checked by Rosie; S1-60 off, S2-28 off, D96 steps off, words on S1-60/S1-61/S2-28/S2-29.\nD97: the $2 applies (S1-62 off). S2-30 sent now off. S1-71 health agreement off (not health care). Sensitive OFF (no health words in the work; the verifier may decide).\nImpaired or refused-rule shooter: treated like a no-show, the owner's call (test-drive gap, A8-51 shop's side; not fixed in the master).\nSplits kept: S1-80 (lanes are spaces), A4-43 (the waiver and range rules per shooter), A4-66, A7-59, A7-15, A7-63, A7-68, A8-02, S11-87, S11-90; B: S1-80, B4-78, B5-34, B7-62, S11-87, S11-90.\nNot sure (verifier): the land-coaching series (B) puts live firearms on a private land: the steps are thin and need the verifier's eye; the carry-permit class names 'a switch from the state form' but no switch is live, so it runs as an example class."
+}

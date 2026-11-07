@@ -1,0 +1,3210 @@
+{
+ "id": "golf-instructor",
+ "name": "Golf instructor",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "trainer",
+ "plugin": {
+  "pf.license": {
+   "need": "none checked by Rosie: golf lessons need no state license here; a license or insurance is optional and the business's own word (D96)",
+   "who": "the business, for any registration, certificate or insurance it chooses to show",
+   "ask": "optional: a registration or certificate number the business wants shown; nothing is asked of each pro",
+   "check": "none: Rosie never checks a license or insurance for this work (not on any lookup, not by the team)",
+   "certificates": "a golf coaching certificate and a first-aid card are what the business says; shown as the business's word, never as a license",
+   "blocks": "nothing: no license or certificate blocks a booking here",
+   "renewals": "none checked; a card's end date is only a reminder the business sets itself",
+   "insurance": "liability insurance is optional: the business's own word; a course or a school may ask to see it, and the business shows it there",
+   "background": "any background check is the business's own policy, not checked by Rosie",
+   "parks": "a lesson on a public course may need that course's permit or fee; the business says which courses it holds one for; the course's own green fee is paid to the course"
+  },
+  "pf.services": {
+   "shape": "one person's time: a lesson with a named pro, booked by the pro's free hours, at the academy, at the client's home net, or on a course the business lists; a partner lesson adds a second person",
+   "examples": "the example business's own prices (Lee Golf Academy and Lee Golf Lessons), not a standard",
+   "list": [
+    {
+     "name": "Free swing check (new students)",
+     "price": "$0",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the academy, or at the client's home net",
+     "before": "nothing taken",
+     "after": "nothing",
+     "note": "booked first, at least the day before the first lesson"
+    },
+    {
+     "name": "30-minute lesson",
+     "price": "$35",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the academy",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk; the saved card charged at DONE on Saturday mornings, when the desk is closed"
+    },
+    {
+     "name": "60-minute lesson",
+     "price": "$90",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the academy",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk"
+    },
+    {
+     "name": "5-lesson pack (60 minutes each)",
+     "price": "$275 ($55 a lesson)",
+     "kind": "one price",
+     "length": "60 min a lesson",
+     "where": "at the academy",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "each booking uses one lesson; good for 90 days (the example's setting)"
+    },
+    {
+     "name": "Short-game lesson (chipping and putting)",
+     "price": "$40",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the academy",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Short-game add-on (15 min, after a lesson)",
+     "price": "$20",
+     "kind": "one price",
+     "length": "15 min, after a lesson",
+     "where": "at the academy",
+     "before": "added to the booking",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Junior lesson (ages 8 to 17)",
+     "price": "$25",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the academy",
+     "before": "a card saved",
+     "after": "at the front desk",
+     "note": "a parent or guardian books, signs the waiver and stays at the academy"
+    },
+    {
+     "name": "Video swing review (a video and a reply call)",
+     "price": "$35",
+     "kind": "one price",
+     "length": "a video sent, then a 20-minute call",
+     "where": "online, counts as at the academy",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Weekly lesson plan",
+     "price": "the lesson's own price",
+     "kind": "a repeat plan",
+     "length": "one lesson a week, same day, time and pro",
+     "where": "at the academy or at home",
+     "before": "a card saved",
+     "after": "each lesson paid like a single one",
+     "note": "its terms get their own yes; skip, pause or end by text"
+    },
+    {
+     "name": "30-minute lesson at your home net (a range pro)",
+     "price": "$75",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the client's home",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "60-minute lesson at your home net",
+     "price": "$179",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the client's home",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE",
+     "note": "the pro brings the clubs and balls; $249 when Sam goes himself"
+    },
+    {
+     "name": "3-lesson pack at home (60 minutes each)",
+     "price": "$450 ($150 a lesson)",
+     "kind": "one price",
+     "length": "60 min a lesson",
+     "where": "at the client's home",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "each booking uses one lesson"
+    },
+    {
+     "name": "Partner lesson at home (2 people)",
+     "price": "$160",
+     "kind": "one price, for both",
+     "length": "60 min",
+     "where": "at the client's home",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE",
+     "note": "each person signs their own waiver"
+    },
+    {
+     "name": "Short-game add-on at home",
+     "price": "$30",
+     "kind": "one price",
+     "length": "15 min, after a lesson",
+     "where": "at the client's home",
+     "before": "added to the booking",
+     "after": "with the lesson"
+    },
+    {
+     "name": "Lesson on the course (a second kind of work)",
+     "price": "$179",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "a course the business lists, at a tee time the student books",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE",
+     "note": "the course's own green fee is paid to the course, not through Rosie; bad weather: a new time, or a free cancel"
+    },
+    {
+     "name": "Late cancel or no-show away from the academy",
+     "price": "$89",
+     "kind": "a fee",
+     "length": "-",
+     "where": "home and course lessons",
+     "before": "on the saved card",
+     "after": "only if Sam confirms it"
+    },
+    {
+     "name": "Extra time",
+     "price": "$120 an hour, by the half hour ($60); $140 an hour with Tomas",
+     "kind": "per hour",
+     "length": "added on the day",
+     "where": "at the client's place",
+     "before": "added to the booking",
+     "after": "on the saved card"
+    }
+   ],
+   "packs": "a pack is paid in full on the secure page when booked; each booking uses one lesson, counted down on the student's page, on each confirmation and on each receipt; a cancel in time puts the lesson back; a late cancel or a no-show can use it up, only if the owner confirms",
+   "plans": "a weekly lesson plan: one lesson a week at the same time with the same pro; each lesson is charged after it, under terms the student says yes to; skip, pause or end by text",
+   "memberships": "monthly memberships are sold at the academy, never in a booking text; a repeat charge needs its own yes to its terms",
+   "intro": "every new student starts with a free swing check (the example's setting; the owner can turn it off)",
+   "capacity": "one student per lesson; a partner lesson takes two people, each with their own waiver",
+   "skills": "full swing, short game, putting, juniors (ages 8 to 17), and course play; juniors only with pros the owner clears for them",
+   "places": "the academy; the client's home net within the travel area (25 miles); a course the business lists, with the course's own green fee paid to the course",
+   "online": "yes: a video swing review counts as at the academy; the pro's reply call is the visit",
+   "nobodyHome": "never: the student must be there"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new or returning (a new student gets the free swing check first, and the waiver)",
+    "what to work on: full swing, short game, putting, or a round on a course",
+    "where: the academy, at home, or on a course",
+    "a single lesson, a pack or a weekly plan",
+    "for a junior: the age",
+    "one person or two (a partner lesson)"
+   ],
+   "afterTime": [
+    "clubs: whether the student has their own, or wants to borrow some",
+    "a net or a space to swing at home (home lessons)",
+    "the course and the tee time (course lessons)",
+    "a pro they'd like, or either"
+   ],
+   "securePage": [
+    "18 or older (8 to 17 with a parent or guardian who books and signs)",
+    "the health questions: the standard check before exercise (heart, dizziness, back or joint injuries, medicines, a doctor's limits), and any injury now",
+    "the waiver, read and signed",
+    "an emergency contact",
+    "the home address, or the course and tee time"
+   ],
+   "whoMayBook": "an adult; a parent or guardian for anyone 8 to 17, who signs the waiver; under 8 is not booked (the example's minimum, set by the owner)"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone unwell right now: chest pain, trouble breathing, fainting, or sudden weakness",
+     "say": "Call 911 now. Rosie can help you book later.",
+     "booking": "no booking"
+    },
+    {
+     "words": "someone hit in the head by a ball or a club, and now confused, bleeding badly or not waking up",
+     "say": "Call 911 now. Rosie can help you book later.",
+     "booking": "no booking"
+    },
+    {
+     "words": "lightning or a storm right now at the course or the range",
+     "say": "Get indoors now. Call 911 if anyone is hurt. Rosie can help you book later.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a heart condition, chest pain during exercise, dizziness, a back or joint injury, pregnancy, or a recent surgery",
+     "what": "the booking goes on; the answer stays on the secure page, and the pro reads it before the lesson and may ask for a doctor's OK; Rosie gives no health advice"
+    },
+    {
+     "words": "injury rehab or physical therapy",
+     "what": "not a pro's work: Rosie says golf pros don't treat injuries, and the AI can look for a licensed physical therapist"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Free swing check",
+     "when": "booked first, at least the day before the first lesson",
+     "who": "every new student (the example's setting)",
+     "result": "OK to play and practice; a change (another length or a plan); or a doctor's OK first, when the lesson moves or is cancelled with a full refund"
+    },
+    {
+     "name": "Health questions",
+     "when": "on the secure page while booking; asked again every 12 months, or when something changes",
+     "result": "all no: it books; a yes: the pro reads it privately before the lesson, and may ask for a doctor's OK"
+    },
+    {
+     "name": "Waiver",
+     "when": "signed on the secure page while booking, before the first lesson",
+     "who": "every new student; a parent or guardian signs for anyone under 18",
+     "goodFor": "12 months (the example's setting)",
+     "result": "signed: the booking goes on; not signed in 10 minutes: nothing is booked"
+    },
+    {
+     "name": "Doctor's OK",
+     "when": "only when the pro asks, after a health answer or the swing check",
+     "result": "a note from the student's doctor that golf is OK, added on the secure page; the booking waits for it"
+    }
+   ],
+   "prep": "for the reminder: comfortable clothes and golf shoes, a water bottle and sunscreen; at home, a clear space about 10 by 20 feet to swing; on a course, the tee time"
+  },
+  "pf.visit": {
+   "checkIn": "at the academy: the check-in code at the front desk; at a home: the code at the door; on a course: the code at the first tee; a video review: read out at the start",
+   "lateEntry": "lessons end on time: a late student gets the time left, at the same price (the example's rule, shown before booking)",
+   "changes": "an add-on (a short-game add-on) is priced and OK'd first; more lessons or a pack only if the student asks",
+   "done": "the check-in code, or DONE from the pro; a lesson from a pack counts down by one",
+   "notes": "lesson notes (swing changes, drills, a note on an injury) go on the student's record, private to the pros"
+  },
+  "pf.money": {
+   "before": "single lessons: a card saved for the fee; packs: paid in full when booked; a home lesson from the 3-lesson pack: paid in full",
+   "after": "at the academy: paid at the front desk, or the saved card charged at DONE when the desk is closed; at home or on a course: the saved card charged at DONE",
+   "packs": "a lesson from a pack takes nothing more at booking; a late cancel or a no-show can use up that lesson instead of a fee (the owner confirms; no answer in 24 hours: the lesson stays on the pack)",
+   "caps": "limits on money taken ahead for lessons, packs or plans, or a bond: from the state form",
+   "cancel": "free to cancel until 24 hours before (the owner's setting); a longer right to cancel from the state form wins",
+   "fees": "late cancel or no-show: $20 at the academy, $89 at home or on a course; never more than the lesson price; the owner confirms each one",
+   "refunds": "a full refund, or the lesson back on the pack, whenever the business cancels or moves a lesson",
+   "tips": "at the academy, the academy's own way; a tip line only on a bill Rosie texts, if the owner turns it on (a saved card charged at DONE has none); Rosie never asks for one",
+   "tax": "a tax line for goods sold, where the state's rules require it",
+   "fee2": "Rosfield's $2 applies to each confirmed lesson; a lesson from a pack counts once it's checked in"
+  },
+  "pf.messages": {
+   "never": "health answers, injuries, a doctor's note and incident notes never go in a text or through the AI: only the secure page and the student's record",
+   "languages": "English and Spanish",
+   "minors": "a junior's booking texts go to the parent or guardian"
+  },
+  "pf.staff": {
+   "licenses": "no person license is checked for golf lessons; a pro's coaching certificate and first-aid card are the business's own word",
+   "certificates": "each pro's coaching certificate and first-aid card, as the business says; reminded 30 days before they run out",
+   "skills": "full swing, short game, putting, juniors, and course play; juniors only with pros the owner clears for them",
+   "supervision": "a pro in training works only with a lead pro there",
+   "oks": "Sam OKs same-day lessons, every fee and every used-up pack lesson; he can also set each first visit to a new student's home or course to ask him first (off in this example); the pro reads health answers and may ask for a doctor's OK",
+   "standIn": "another pro with the same skill can cover, if the student says yes; or new times, or a free cancel",
+   "away": "only pros set for homes and courses are offered there"
+  },
+  "pf.rules": {
+   "cancelRight": "a longer right to cancel a pack, a plan or a membership where the state's rules give one (a switch from the state form)",
+   "contracts": "a written contract for a pack, a plan or a membership over an amount, where the state's rules require it",
+   "prepay": "limits on money taken ahead, or a bond, where the state's rules require them",
+   "renewals": "plans or memberships that renew: what must be shown and how to cancel, where the state's rules require it",
+   "waiver": "what a waiver may say, where the state's rules limit it; the state form sets the words (a risk notice where a release isn't allowed)",
+   "scope": "pros don't diagnose, treat injuries or prescribe for a condition; those stay with licensed professionals, where the state's rules require it",
+   "parks": "a course's or a city's permit for paid lessons on its land, where it requires one",
+   "records": "waivers, health answers, doctor's notes and incident notes kept with the student's record: 7 years, or longer where the state asks"
+  },
+  "pf.edges": {
+   "healthYes": "a yes to a health question: the pro reads it privately before the lesson; OK, no, or a doctor's OK first; no answer in the plug-in's time: declined politely",
+   "doctorOK": "a doctor's OK asked: the note goes on the secure page, and the booking waits; not in by the deadline: declined, or moved, with no fee",
+   "pack": "a pack counts down one lesson per booking; the page shows what's left; a cancel in time puts it back; a no-show or a late cancel can use it up, if Sam confirms",
+   "packEnds": "the last lesson of a pack: the receipt says it's the last one; Rosie never offers a new pack in a text",
+   "weather": "a course or range in bad weather (rain, wind, lightning): a new time, or a free cancel, with no fee; a move indoors to the academy is listed as a gap",
+   "late": "a student runs late: the lesson ends on time, at the same price",
+   "standIn": "a pro out: another pro with the skill, if the student says yes; or new times, or a free cancel",
+   "hurt": "someone is hurt or unwell during a lesson: the pro stops, follows the business's steps, and calls 911 if it's serious; Sam is told; notes on the secure page",
+   "rehab": "a request for injury rehab: pointed to a licensed physical therapist",
+   "other": "all other edge cases the generic way",
+   "urgent": "no lesson is sent now and nobody is on call: a same-day lesson gets the soonest time, with the owner's OK"
+  },
+  "pf.facts": [
+   "packs",
+   "firststeps",
+   "forms",
+   "video"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Kenji and Dana (pros at the academy)",
+   "cust": "Alex M. (student) · other students"
+  },
+  "B": {
+   "staff": "Tomas and Lia (pros who travel)",
+   "cust": "Alex M. (student) · other students",
+   "other": "Others (a club, a parent, a course office)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Kenji"
+  },
+  "B": {
+   "staff": "Tomas"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Thanks. The state licenses the shop and each barber. What's the shop's license number?",
+    "Thanks. Golf lessons need no license checked here. Send the business's registration number, if it has one."
+   ],
+   [
+    "It's on file under Jordan Price, a license holder.",
+    "It's the company's own word, not checked."
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's employer for a wellness lesson. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Kenji can do a shorter lesson in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter lesson."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Kenji goes over the program for next time. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Alex bought a package of cuts at the shop. This booking uses one of them. The page shows the credits left after this visit.",
+    "Alex bought a 5-lesson pack at the academy. This booking uses one of them. The page shows the lessons left after this visit."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "The 60-minute lesson, $55, is paid in full when booked. Nothing more is owed after."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Means 'Matched': the request fits a listed service, in any words. 'A quick lesson' or 'a short lesson' fits a golf lesson."
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the client's sore knee gets worse before the lesson, and they ask if they can still come in."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee Golf Academy about your Sat 11:00am visit: please bring water and golf shoes."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the academy, the client is already at the front desk, so there's no door check."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Kenji stopped Alex M.'s lesson. The note is on the secure page."
+   ],
+   [
+    "With some lines OK'd, only those are paid. Not today: only the consult.",
+    "With some lines OK'd, only those are paid. Not today: only the swing check."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring water and golf shoes on Saturday."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this lesson."
+   ],
+   [
+    "A chair, ready",
+    "A range bay, ready"
+   ],
+   [
+    "Style consult",
+    "Free swing check"
+   ],
+   [
+    "Color and cut · $90",
+    "60-minute lesson · $90"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: our junior lesson (ages 13 to 17) is $25. A parent books it and signs. Want a time?"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee's Barbershop. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Golf Academy. Sam named you their emergency contact. May we call or text you if they miss a safety check? We'd share only where they're working, only after a missed check."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Tomas and Lia do golf lessons at home; Tomas does course coaching too, at $140 an hour. Kenji and Dana train at the academy; Kenji also does home lessons. Pat is my office manager, for prices over $500. Jules rents academy time, with their own clients."
+   ],
+   [
+    "The visit is for a child, and a parent or guardian books. Alex picked a kids cut for a son before the times, so the times fit it. The parent books, pays and gets the texts. The child's details go on the secure page.",
+    "The visit is for a child, and a parent or guardian books. Alex picked a junior lesson for a son before the times, so the times fit it. The parent books, pays and gets the texts. The child's details go on the secure page."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "Lee Golf Academy: you now have two 30-minute lessons on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex asks for physical therapy for a knee injury, which isn't on the academy's list. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter.",
+    "Now money. When clients book, do you take anything? Each service starts the way most golf academies set it. Send only what's different, by letter."
+   ],
+   [
+    "Some services start with a first step on the same visit, like a patch test with a wait, or a screening. It comes before the price and the work.",
+    "Some services start with a first step on the same visit, like a short movement screen. It comes before the price and the work."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at the start of a video call."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A lessons example: 'New clients start with a free swing check. Had one here in the last 12 months?'"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Golf lessons at home in Springfield, within 25 miles."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms. Nothing was saved. Other businesses nearby may.",
+    "Lee Golf Academy doesn't give physical therapy. Nothing was saved. A physical therapist may."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood golf academy on Fairway Dr. Swing, short-game lesson and small-group lessons."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Kenji, so Kenji's next times show. A custom program always stays with its pro."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Custom program quotes come to you first. List prices never need one"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Kenji: pro, academy and home lessons"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Kenji: pro, academy and home lessons"
+   ],
+   [
+    "Barbershop, plumbing, electrical",
+    "Golf academy, golf lessons, course coaching"
+   ],
+   [
+    "Barber license number",
+    "CPR certificate number"
+   ],
+   [
+    "A water heater job",
+    "A lesson at a client's home"
+   ],
+   [
+    "Groom's package",
+    "Swing check and program"
+   ],
+   [
+    "Color and cut",
+    "Short-game lesson"
+   ],
+   [
+    "Kids cut",
+    "Junior lesson"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up, if Sam says so"
+   ],
+   [
+    "Alex asks for a fix",
+    "Alex asks for a make-up"
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex arrives at the academy. If the plug-in asks for something to bring, the desk checks it first. A lesson needs nothing: the academy lends the equipment."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the 5-lesson pack. Sam taps Call, and the call goes out from the shop's number."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan. Read it, then sign or decline on the secure page.",
+    "Lee Golf Academy sent you a proposal: Riley's 12-week plan. Read it, then sign or decline on the secure page."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like a 12-week plan after the free swing check, or a lawyer's engagement letter."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley can do a shorter lesson in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute style consult.",
+    "A what-if: the plug-in lets this work be done by video or phone, like a 30-minute video check-in on a home lesson."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds nutrition coaching to Lee's Barbershop. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "Riley suggests moving your lesson until your back feels better, with no fee. Pick a new time:"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The pro's example: pain right now gets 'if it's severe, call 911', and the booking can go on."
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free make-up lesson."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the weights used and what to build on."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "Five coworkers book back-to-back lessons on one morning, before a charity run."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: goblet squats 20 lb, 3 sets of 10. Next: add rows"
+   ],
+   [
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Signed, thanks! Pick a time for the plan's first lesson:"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds times side by side across Riley and Avery."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a golf lesson on Saturday."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a kettlebell cracked a phone in a bag today."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Nutrition coaching for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "I hurt my back moving a couch. Can I still come in?"
+   ],
+   [
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Lee Golf Academy will give you a free make-up lesson. Pick a time:"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A lesson is rated, so the academy takes the first branch."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's lesson ended 15 minutes early."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una sesión de entrenamiento el sábado."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A golf academy adds none of its own, so nothing more is sent here."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A pro could mean golf lessons or dog lessons."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the lobby during my lesson?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Academy lessons, prenatal and home lessons"
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "5-lesson pack · $275"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the academy show photos from your lessons?"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A kettlebell rolled into my bag and cracked my phone."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A golf academy books a pro's time."
+   ],
+   [
+    "A barbershop's services need none.",
+    "Here, the state's form asks for none for a lesson or a pack."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for the same Saturday lesson every week."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you train juniors? My son is 15."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a lesson and a short-game extra"
+   ],
+   [
+    "Books the groom's party together",
+    "Books five coworkers together"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Riley ended my lesson 15 minutes early."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Weekly plan · every Saturday"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like golf lessons?"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the lesson?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books the same lesson every week"
+   ],
+   [
+    "Riley finishes the work",
+    "Riley finishes the lesson"
+   ],
+   [
+    "Haircuts work like this",
+    "Golf lessons work like this"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · 12-week plan"
+   ],
+   [
+    "3 visits with Riley",
+    "2 lessons a week with Riley"
+   ],
+   [
+    "NEW massage",
+    "NEW nutrition coaching"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a weekly golf lesson plan with Riley."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's lessons work takes no jobs sent now, at the academy or away."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Golf Lessons'"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Golf Academy LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Golf Academy"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Golf Lessons"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Golf at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Course Coaching"
+   ],
+   [
+    "plumbing and electrical",
+    "golf lessons and course coaching"
+   ],
+   [
+    "Electrical",
+    "Course coaching"
+   ],
+   [
+    "electrical",
+    "course coaching"
+   ],
+   [
+    "Plumbing",
+    "Golf lessons"
+   ],
+   [
+    "plumbing",
+    "golf lessons"
+   ],
+   [
+    "plumber",
+    "pro"
+   ],
+   [
+    "Riley Chen",
+    "Kenji Chen"
+   ],
+   [
+    "Riley",
+    "Kenji"
+   ],
+   [
+    "Avery",
+    "Dana"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey Moore",
+    "Lia Moore"
+   ],
+   [
+    "Casey",
+    "Lia"
+   ],
+   [
+    "88 Elm St",
+    "60 Fairway Dr"
+   ],
+   [
+    "Elm St",
+    "Fairway Dr"
+   ],
+   [
+    "1200 Main St",
+    "300 Hilltop Rd"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "60-minute lesson"
+   ],
+   [
+    "Signature cut and shave",
+    "60-minute lesson"
+   ],
+   [
+    "Skin fade",
+    "Short-game lesson"
+   ],
+   [
+    "skin fade",
+    "Short-game lesson"
+   ],
+   [
+    "A beard trim",
+    "A Short-game extra"
+   ],
+   [
+    "a beard trim",
+    "a short-game extra"
+   ],
+   [
+    "Beard trim",
+    "Short-game extra"
+   ],
+   [
+    "beard trim",
+    "short-game extra"
+   ],
+   [
+    "kids cuts",
+    "junior lessons"
+   ],
+   [
+    "kids cut",
+    "junior lesson"
+   ],
+   [
+    "a color correction",
+    "a custom program lesson"
+   ],
+   [
+    "Color correction",
+    "Short-game lesson"
+   ],
+   [
+    "color quote",
+    "lesson quote"
+   ],
+   [
+    "Haircuts",
+    "30-minute lessons"
+   ],
+   [
+    "Haircut",
+    "golf lesson"
+   ],
+   [
+    "haircut",
+    "golf lesson"
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "House calls",
+    "Home lessons"
+   ],
+   [
+    "house call",
+    "home lesson"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "priced at the chair",
+    "priced at the lesson"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the lesson"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "barbershop",
+    "golf academy"
+   ],
+   [
+    "barbers",
+    "pros"
+   ],
+   [
+    "barber",
+    "pro"
+   ],
+   [
+    "shops",
+    "academys"
+   ],
+   [
+    "Shop",
+    "Academy"
+   ],
+   [
+    "shop",
+    "academy"
+   ],
+   [
+    "BS20981",
+    "EX-2098"
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The lookup shows Tomas's course coaching license as expired."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s lesson."
+   ],
+   [
+    "I put a note and a photo on the page.",
+    "I put a note on the page."
+   ],
+   [
+    "The note and photo are on the secure page.",
+    "The note is on the secure page."
+   ],
+   [
+    "License renewal",
+    "Certificate renewal"
+   ],
+   [
+    "Riley",
+    "Kenji"
+   ],
+   [
+    "Avery",
+    "Dana"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Lia"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Golf Lessons"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Golf Academy"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Short-game lesson: a free check, then a lesson"
+   ],
+   [
+    "Riley",
+    "Kenji"
+   ],
+   [
+    "Avery",
+    "Dana"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Lia"
+   ],
+   [
+    "Oak St",
+    "Fairway Dr"
+   ],
+   [
+    "chair renter",
+    "bay renter"
+   ],
+   [
+    "video session",
+    "video lesson"
+   ],
+   [
+    "Lee Golf Academy's",
+    "Lee Golf Academy's"
+   ],
+   [
+    "Barber license",
+    "Certification"
+   ],
+   [
+    "barber license",
+    "certification"
+   ],
+   [
+    "Barber",
+    "Golf pro"
+   ],
+   [
+    "barber",
+    "golf pro"
+   ]
+  ],
+  "B": [
+   [
+    "Thanks. The state licenses plumbing for the company and each plumber. What's the license number Lee Home Services works under?",
+    "Thanks. Golf lessons need no license checked here. Send the company's registration number, if it has one."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. A company lesson is in the other flow."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my home."
+   ],
+   [
+    "A chair, ready",
+    "A range bay, ready"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · 3-lesson pack · $450"
+   ],
+   [
+    "Service call fee",
+    "No-show fee"
+   ],
+   [
+    "Water heater replacement · $640",
+    "3-lesson pack at home · $450"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Golf Lessons. Sam named you their emergency contact. May we call or text you if they miss a safety check? We'd share only where they're working, only after a missed check."
+   ],
+   [
+    "Thanks for visiting Lee Home Services. Your receipt is on your secure page, with what was paid and how. Think this is wrong? Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Thanks for lessons with Lee Golf Lessons. Your receipt is on your secure page, with what was paid and how. Think this is wrong? Reply here, and it goes to Sam. How was your lesson with Tomas?"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Tomas and Lia do golf lessons at home; Tomas does course coaching too, at $140 an hour. Kenji and Dana train at the company; Kenji also does home lessons. Pat is my office manager, for prices over $500. Jules rents company time, with their own clients."
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like asking a pro to supply banned drugs. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "The request turns out to be for work Lee Golf Lessons doesn't do, like physical therapy for an injury. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Lee Home Services: you have two drain clearings on Mon Nov 9. They're at 10:00am and 12:00pm. Keep both, or was that the same visit? No reply by 6:00pm Sun Nov 8: we keep 10:00am.",
+    "Lee Golf Lessons: you have two lessons on Mon Nov 9. They're at 10:00am and 12:00pm. Keep both, or was that the same visit? No reply by 6:00pm Sun Nov 8: we keep 10:00am."
+   ],
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: 60-minute lesson $199 for visits from Mon Nov 2. Lessons already booked keep $179. Lesson plans go to $199 from Wed Nov 25, only for clients who say yes."
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts about feeling dizzy after the last lesson. Rosie runs the plug-in's danger check again, then asks the pro. Lia can come sooner, so that's offered."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Say Morgan has a repeat plan: a lesson every Tuesday. They can skip one visit, pause the plan or end it. Tomas is told."
+   ],
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Golf Lessons. It's a lesson at home, today, starts at 3:00pm, with Tomas. The fee is $89. Accept it?"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Golf Lessons asks: is the lesson at a home, an office or a course? And what are your goals? Any injuries go on the secure page later."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Tomas's kettlebell scuffs the floor and Tomas texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Alex missed part of a lesson when Tomas left early. Sam OKs a free make-up visit at $0, with its own code."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "If you feel faint or have chest pain, call 911 now. Lia can come sooner, at the same price."
+   ],
+   [
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a pro come to Kim's home this Thursday? What does it cost?"
+   ],
+   [
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Tomas. {{pay.cancel}}. Please have water and a clear space ready."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules golf companies often set. Your call: keep them, or change any. They become the company's own rules."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Means 'Matched': the request fits a listed service, in any words. 'Help me get stronger' fits a 60-minute lesson."
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "The plug-in's questions that don't change the time or price go here, like 'Any equipment at home, and a clear space?'"
+   ],
+   [
+    "Reading it back: accept the leak repair for today, starts at 3:00pm, with Jordan. Say yes to go ahead.",
+    "Reading it back: accept the lesson for today, starts at 3:00pm, with Tomas. Say yes to go ahead."
+   ],
+   [
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Alex asks Tomas for 30 more minutes. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most golf companies start. Is it right? Send only what's different."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s Thu Oct 22 lesson ended 20 minutes early."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Tomas's phone, you said yes to 30 more minutes for $60."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 lesson needs none."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Golf lessons at home in Springfield, within 25 miles."
+   ],
+   [
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Lee Golf Lessons can start your lesson at a set time. {{pay.asks}}:"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 12-week program is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Tomas was late and rushed.\""
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a short-game extra? Say so.'"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Tomas's kettlebell scuffed the floor at Alex M.'s. The before photo shows no scratch."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood golf company on Elm St. Swing, short-game lesson and small-group lessons."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. Your make-up visit is free."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about lessons at home, two mornings a week. A text back is fine."
+   ],
+   [
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Accepted: the lesson today, starts at 3:00pm, with Tomas."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Lessons already booked keep only their saved card."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Tomas's next times for a lesson."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My knee hurt after the lesson."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Tomas add a short-game extra at the end?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Tomas come an extra day next week?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "I felt dizzy after the last lesson."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Kenji: pro, company and home lessons"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Tomas left 20 minutes early last time."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Tomas was late and rushed."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Kenji: pro, company and home lessons"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa lesson Thu 12-2 Lia"
+   ],
+   [
+    "Water heater replacement",
+    "12-week program"
+   ],
+   [
+    "Yes, it won't drain",
+    "Dumbbells and a mat; the living room is clear"
+   ],
+   [
+    "A water heater job",
+    "A lesson at a client's home"
+   ],
+   [
+    "the kitchen drain",
+    "the 60-minute lesson"
+   ],
+   [
+    "Service call",
+    "Free swing check"
+   ],
+   [
+    "Leak repair",
+    "Short-game lesson"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for the same lesson every Thursday. Lee Home Services offers that as a weekly plan, so the AI shows its terms. Each visit is booked and paid like a single one."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say a couple books one partner lesson at their home. It's one booking with one code, given by whoever lets the pro in."
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Home Services has a weekly plan, $179 a lesson, charged after each. Each visit is booked and paid like a single one. Want it every week?"
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the ski lessons you asked Jordan about in late Aug 2027."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds the floor by the patio door wet and slippery. The plug-in says a pro stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the 60-minute lesson at home to $199 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Pros at Lee Home Services don't treat injuries, so nothing was saved. A licensed physical therapist can help."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee's Barbershop for a golf lesson instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Every lesson has its price before the visit, from Sam's list. Nothing is priced at the door."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a course coaching after the lesson. Both go in one booking, with one start time and one code."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds nutrition coaching to Lee Home Services. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop has a golf lesson at the company for $35, or at your home for $75. Where would you like it?"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a client's AI said someone has chest pain right now. They got the 911 message, and nothing was booked."
+   ],
+   [
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Your pack contract is waiting for your signature. Your Thu time is saved until 7:45pm today."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: new or returning, what to work on, and the space and equipment at home."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A 60-minute course coaching is $149. Both fit in the same visit."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Sus respuestas de salud van en la página segura, solo para el entrenador. Si alguien se desmaya, llame al 911."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is getting the kettlebells from the car and will start about 8:10am. You still get the full 60 minutes, to about 9:10am."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I'd like a golf pro at home. I haven't worked out in two years. Can someone come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found the floor by your patio door wet and slippery, and stopped the jumping moves there."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A lesson at home happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the 3-lesson pack before booking."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The pro's example: pain right now gets 'if it's severe, call 911', and the booking can go on."
+   ],
+   [
+    "Thanks for choosing Lee Home Services! How was your visit with Jordan?",
+    "Thanks for choosing Lee Golf Lessons! How was your lesson with Jordan?"
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Every lesson Lee Golf Lessons gives starts at a set time."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: 15 minutes of short-game work, $30. Sent to Alex."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Nutrition coaching for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE goblet squats 25 lb, 3 sets of 10. Next time: add hinges and rows."
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "A job priced at the visit never takes more than its fee for the visit."
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "Every golf lesson has its price from the list, so nothing is quoted at the visit."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Lessons already booked keep $179, even after Nov 2."
+   ],
+   [
+    "May Lee Home Services show photos of the work? Yes / No",
+    "May Lee Golf Lessons show photos from your lessons? Yes / No"
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the pro, one line each. Each signs their own waiver."
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911"
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: ski lessons, next fall"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 30 short-game extra, 15 min"
+   ],
+   [
+    "May Lee Home Services show photos of this job?",
+    "May Lee Golf Lessons show photos from your lessons?"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Jordan come every Thursday at 8, too?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the living room floor"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also do a course coaching after the lesson?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wet floor by the patio door, jumps stopped"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next Tuesday's lesson?"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the jumping moves on that floor"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Short-game extra · $30"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Dry the floor before the next lesson"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Any equipment at home? And is there a clear space about 6 by 8 feet?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wet, slippery floor by the patio door"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting kettlebells from the car, start 8:10"
+   ],
+   [
+    "Answers, photos and gate codes",
+    "Answers, notes and gate codes"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Weekly plan · every Thursday"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Lesson · Tue Oct 20 · $179"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Lesson · Tue Oct 27 · $179"
+   ],
+   [
+    "Written estimate and terms",
+    "Pack contract and terms"
+   ],
+   [
+    "Books one job for a group",
+    "Books one lesson for two"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wet floor by the patio door"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW nutrition coaching"
+   ],
+   [
+    "A gas smell at the home",
+    "Chest pain, right now"
+   ],
+   [
+    "Jordan found more work.",
+    "Jordan can add 15 minutes of short-game work."
+   ],
+   [
+    "Just the kitchen sink.",
+    "New. Getting stronger, and better posture."
+   ],
+   [
+    "Under the sink, before",
+    "The space, before"
+   ],
+   [
+    "Kitchen drain clearing",
+    "60-minute lesson at home"
+   ],
+   [
+    "Cabinet floor, before",
+    "Living room floor, before"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every week"
+   ],
+   [
+    "Kitchen drain",
+    "60-minute lesson"
+   ],
+   [
+    "Yard drain",
+    "Course lesson"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I eat right before the lesson?"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Can someone come tonight for a lesson?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Golf lessons books a set start time."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a home lesson plan Jordan suggested"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a home lesson plan, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Home lesson plan"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's lessons work takes no jobs sent now, at the company or away."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE home plan Mon Oct 26"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Course coaching EX-3041"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Golf Lessons'"
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Each lesson has a set start time. The pro comes 10 minutes early to set up."
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Golf Academy"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Golf Lessons LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Golf Lessons"
+   ],
+   [
+    "leehomeservices.com",
+    "leepersonaltraining.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Golf at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Course Coaching"
+   ],
+   [
+    "plumbing and electrical",
+    "golf lessons and course coaching"
+   ],
+   [
+    "Electrical",
+    "Course coaching"
+   ],
+   [
+    "electrical",
+    "course coaching"
+   ],
+   [
+    "Plumbing",
+    "Golf lessons"
+   ],
+   [
+    "plumbing",
+    "golf lessons"
+   ],
+   [
+    "plumber",
+    "pro"
+   ],
+   [
+    "Riley",
+    "Kenji"
+   ],
+   [
+    "Avery",
+    "Dana"
+   ],
+   [
+    "Jordan Price",
+    "Tomas Price"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey Moore",
+    "Lia Moore"
+   ],
+   [
+    "Casey",
+    "Lia"
+   ],
+   [
+    "88 Elm St",
+    "60 Fairway Dr"
+   ],
+   [
+    "1200 Main St",
+    "300 Hilltop Rd"
+   ],
+   [
+    "42 Oak St",
+    "17 Cedar Ln"
+   ],
+   [
+    "Haircut",
+    "golf lesson"
+   ],
+   [
+    "haircut",
+    "golf lesson"
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "House calls",
+    "Home lessons"
+   ],
+   [
+    "house call",
+    "home lesson"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "barbershop",
+    "golf company"
+   ],
+   [
+    "barbers",
+    "pros"
+   ],
+   [
+    "barber",
+    "pro"
+   ],
+   [
+    "Shop",
+    "Company"
+   ],
+   [
+    "shop",
+    "company"
+   ],
+   [
+    "Drain clearing",
+    "60-minute lesson"
+   ],
+   [
+    "drain clearing",
+    "60-minute lesson"
+   ],
+   [
+    "Water heater flush",
+    "3-lesson pack at home"
+   ],
+   [
+    "water heater flush",
+    "3-lesson pack at home"
+   ],
+   [
+    "replaces water heaters",
+    "trains group bootcamps"
+   ],
+   [
+    "Sewer camera inspection",
+    "Lesson at home"
+   ],
+   [
+    "Sewer camera report",
+    "Home lesson plan"
+   ],
+   [
+    "sewer camera report",
+    "home lesson plan"
+   ],
+   [
+    "service call fee",
+    "no-show fee"
+   ],
+   [
+    "service call",
+    "fee"
+   ],
+   [
+    "after the job",
+    "after the lesson"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "BS20981",
+    "EX-2098"
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The lookup shows Tomas's course coaching license as expired."
+   ],
+   [
+    "Arrival windows",
+    "Time held per visit"
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Estoy embarazada y quiero una clase privada."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "I'm pregnant, and I'd like a lesson."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told her health answers go on the secure page, and to call 911 if anyone faints."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien se siente mal ahora mismo?"
+   ],
+   [
+    "Do you smell gas?",
+    "Does anyone feel unwell right now?"
+   ],
+   [
+    "No huele a gas.",
+    "Nadie."
+   ],
+   [
+    "It doesn't smell like gas.",
+    "Nobody."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Your health answers go on the secure page, only for the pro."
+   ],
+   [
+    "If you smell gas, get out and call 911.",
+    "If anyone faints, call 911."
+   ],
+   [
+    "If you smell gas, leave the house now.",
+    "If someone has chest pain or fainted, call 911 now."
+   ],
+   [
+    "Then call 911 and the gas company.",
+    "Stay with them until help comes."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "I'm 30 weeks pregnant."
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is it safe for me to do lessons?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone unwell right now, like chest pain or fainting."
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which wellness benefit should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Wellness, my employer's plan."
+   ],
+   [
+    "Drive time from the jobs before and after is checked again.",
+    "Drive time from the lessons before and after is checked again."
+   ],
+   [
+    "Please wait until the job is done.",
+    "Please wait until the lesson is done."
+   ],
+   [
+    "Saved with Alex M.'s job.",
+    "Saved with Alex M.'s lesson."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Second person joins"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 quote is good for 7 days."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT twisted my ankle, need to stop"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 lesson"
+   ],
+   [
+    "the shutoff valves",
+    "the second person"
+   ],
+   [
+    "Each rejoins: the job stays on Alex's record.",
+    "Each rejoins: the lesson stays on Alex's record."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratch on the floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratch on the floor"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the home plan link"
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Nora can ask to be next for that time."
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or benefit pays"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "Riley",
+    "Kenji"
+   ],
+   [
+    "Avery",
+    "Dana"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Lia"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Golf Lessons"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Golf Academy"
+   ],
+   [
+    "Lee Golf Lessons's",
+    "Lee Golf Lessons'"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Short-game lesson: a free check, then a lesson"
+   ],
+   [
+    "Riley",
+    "Kenji"
+   ],
+   [
+    "Avery",
+    "Dana"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Lia"
+   ],
+   [
+    "Lee Golf Lessons's",
+    "Lee Golf Lessons'"
+   ],
+   [
+    "Elm St",
+    "Hilltop Rd"
+   ],
+   [
+    "chair renter",
+    "bay renter"
+   ],
+   [
+    "video session",
+    "video lesson"
+   ],
+   [
+    "Barber license",
+    "Certification"
+   ],
+   [
+    "barber license",
+    "certification"
+   ],
+   [
+    "Barber",
+    "Golf pro"
+   ],
+   [
+    "barber",
+    "golf pro"
+   ]
+  ]
+ },
+ "keep": [
+  "visit fee",
+  "Visit fee",
+  "teacher",
+  "Teacher",
+  "fee",
+  "leak",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex, new to Lee Golf Academy, buys a 5-lesson pack and books the first 60-minute lesson with Kenji, Sat Oct 24 at 11:00am. A free swing check comes first, and Alex answers the health questions and signs the waiver on the secure page. Each lesson counts the pack down. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Golf Lessons at home, 17 Cedar Ln: a free swing check first, then Tomas comes Thu Oct 22 at 8:00am for a 60-minute lesson, charged to the saved card after. The health questions and the waiver are on the secure page. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|counter",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|full|none": "The main story: Alex buys a 5-lesson pack, $275 ($55 a lesson), and the first 60-minute lesson with Kenji uses one. A no-show can use one up, if Sam confirms.",
+    "list|card|card": "A video swing review, $35. A card is saved, and charged when Kenji texts DONE after the reply call.",
+    "list|card|counter": "A single 30-minute lesson, $35. A card is saved for the academy's $20 fee, and Alex pays at the front desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "golf lesson"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "golf lesson"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "golf lesson (5-lesson pack)"
+    },
+    "list|card|card": {
+     "price": "$35",
+     "name": "video swing review"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 60-minute lesson at Alex's home with Tomas. A card is saved and charged $179 when Tomas texts DONE.",
+    "list|full|none": "A 3-lesson pack at home, $450 ($150 a lesson), paid in full when booking. Each lesson uses one, and a no-show can use one up, if Sam confirms."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "60-minute lesson at home"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "60-minute lesson at home"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Lesson at home (3-lesson pack)"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Golf lessons needs no state license here, so the company gives only its registration (S1-61). Pros' own licenses come with their invite (S2-11).",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Golf lessons and course coaching pay the $2.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "Golf lessons adds no agreement, so there's nothing to leave unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Lessons books a pro's time, never a room on its own.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Lessons are one-to-one with a named pro, booked by the pro's free hours; a partner lesson adds one more person (A4-71, B4-72).",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "No golf lesson is sent now, and nobody is on call.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Every lesson is a pro's time (A4-14); the academy runs no classes with seats.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The academy books pros, not spaces.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A lesson is never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "why": "Nothing is brought: the academy lends the equipment, and the waiver is signed while booking.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A parent or guardian stays at the academy for a junior lesson (the example's rule).",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left at the academy.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Every lesson is rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "Clients pay for lessons themselves: no insurance plan is billed.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "No insurance plan is billed for lessons.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "A lesson isn't paid in stages: a pack is paid in full when booked.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "why": "Nothing is left at the academy.",
+    "label": "An item isn't picked up"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The academy runs no classes: each lesson is checked in with its own code."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off or mailed in at the academy."
+   },
+   {
+    "op": "off",
+    "at": "S1-71",
+    "label": "2 Yes: sign it now",
+    "why": "Not health care: no health privacy agreement is signed for this work."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license is checked for this work (D96): the coach's certificate is the business's word."
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The license can stop the work and cut what may be offered, so it comes before prices and money. Golf lessons need no state license checked here, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Decides which check runs on what each person added on their secure page. For golf lessons none runs: no person license is checked.",
+    "more": [
+     "The plug-in says which, and which official lookup checks it: none for this work (D96).",
+     "A certificate the business names is its own word, not checked.",
+     "Safe default: no person license is checked here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the coach's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the coach's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here it's the health questions and the waiver. Alex is new, so both are done now, before the money step.",
+     "The health questions are the standard check before a lesson: the heart, dizziness, back or joint injuries, medicines.",
+     "The answers stay on the secure page and in Alex's record, never in a text or through the AI.",
+     "A yes goes to the pro to read before it books. A parent signs for anyone under 18.",
+     "Where the state's rules limit what a waiver can say, the state's form sets the words."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-70",
+    "more": [
+     "Lessons end on time: the academy's rule, shown before booking."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Golf lessons needs no state license here, so the company gives only its registration (S1-61). Pros' own licenses come with their invite (S2-11).",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Golf lessons and course coaching pay the $2.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "Golf lessons adds no agreement, so there's nothing to leave unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Lessons books a pro's time, never a room on its own.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Lessons are one-to-one with a named pro, booked by the pro's free hours; a partner lesson adds one more person (A4-71, B4-72).",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "No golf lesson is sent now, and nobody is on call.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A lesson starts at a set time (B4-84), never in an arrival window.",
+    "label": "1 Time held per visit"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A lesson is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Lessons are one-to-one, with no seats.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "No golf lesson is sent now (S2-30).",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "No golf lesson is sent now (S2-30).",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A junior is never left in the pro's care at home: an adult on the booking is there (B8-09).",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "The client is always there: a lesson can't happen with nobody home.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "The client is always there: a lesson can't happen with nobody home.",
+    "label": "The way in fails"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "No golf lesson is sent now (S2-30), so this is never offered.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "Nobody is on call for lessons (S2-30).",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "Clients pay for lessons themselves: no plan or warranty pays.",
+    "label": "A plan or benefit pays"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "No insurance plan is billed for lessons.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "A lesson isn't paid in stages: a pack is paid in full when booked.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A golf lesson is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "S1-71",
+    "label": "2 Yes: sign it now",
+    "why": "Not health care: no health privacy agreement is signed for this work."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license is checked for this work (D96): the coach's certificate is the business's word."
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The license can stop the work and cut what may be offered, so it comes before prices and money. Golf lessons need no state license checked here, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Decides which check runs on what each person added on their secure page. For golf lessons none runs: no person license is checked.",
+    "more": [
+     "The plug-in says which, and which official lookup checks it: none for this work (D96).",
+     "A certificate the business names is its own word, not checked.",
+     "Safe default: no person license is checked here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the coach's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the coach's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Rosie checks this before the secure page, so the page knows what to ask.",
+     "The swing check's time and the form both go on the one secure link.",
+     "A returning student whose waiver and health answers are still good skips them (the second branch).",
+     "Here it's the health questions and the waiver. Alex is new, so both are done now, before the money step.",
+     "The health questions are the standard check before a lesson: the heart, dizziness, back or joint injuries, medicines.",
+     "The answers stay on the secure page and in Alex's record, never in a text or through the AI.",
+     "A yes goes to the pro to read before it books. A parent signs for anyone under 18.",
+     "Where the state's rules limit what a waiver can say, the state's form sets the words."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "Alex is new: Tomas gives the free swing check first, Tue 7:00am. The health answers and the waiver are on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Tomas also asks how Alex feels today. Anything new goes on the secure page, never in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "The last lesson's receipt says it's the last one. Rosie never offers a new pack in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-30",
+    "more": [
+     "For a course lesson, Alex picks a course Sam lists, and a tee time.",
+     "The course's own green fee is paid to the course, not through Rosie."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-03",
+    "more": [
+     "On a course, Alex gives the code at the first tee."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-77",
+    "more": [
+     "A course lesson meets at a course Sam lists, at the tee the student picks.",
+     "The course's own permit is there where the course asks for one. The meeting spot goes on the secure page."
+    ]
+   }
+  ]
+ },
+ "notes": "C1 build (Oct 27, 2026, builder P-C1): from trainer (refitted Oct 27 by R03). Same master steps; the trade's own services, safety words, first steps, money and names.\nMoney paths: A list|full|none (main: a 5-lesson pack, a credit per lesson), list|card|counter (a single 30-minute lesson, $20 fee card saved, paid at the desk), list|card|card (a video swing review, charged at DONE). B list|card|card (main: a 60-minute lesson at home, $179, card charged at DONE), list|full|none (3-lesson pack at home, $450). Amounts are the trainer's example numbers kept, so every sum holds.\nVideo: the fact `video` is on, so the video visit (A4-01 / B4-01) counts as flow A; the reply call is the visit.\nLicenses: none checked, per D96. The license branch (S1-60 '1 A license') and the per-person check (S2-28 '1 Yes, each one') are off; S1-60, S1-61, S2-28 and S2-29 stay (the master's chain needs their gives) with words that say nothing is looked up.\nGroups: no classes on a timetable; a partner lesson takes two people in one booking (the trainer's shape). Group clinics are not in this work (a gap, not built).\nAges: 8 to 17 with a parent or guardian who books and signs; under 8 is not booked (the example's minimum, the owner's setting).\nCourse lessons: the course's own green fee is paid to the course, not through Rosie; bad weather gets a new time or a free cancel (indoor move is a gap, as for the trainer).\nSensitive: off. Golf lessons are mostly adult; juniors' texts go to the parent who booked (pf.messages).\nNames: Sam Lee's main company is Lee Golf Lessons LLC (golf lessons at home and on a course; 250 Ridge Rd); his second is Lee Golf Academy LLC (75 Mill St). Academy pros Kenji and Dana (the master's Riley and Avery); lesson pros who travel Tomas and Lia (Jordan and Casey). Alex's home is 9 Linden Ave.\nOff: classes and seats, spaces, drop-offs, stays, crews, dates that can't move, minimums, jobs sent now, nobody home, deliveries, items taken away, outside checks, permit inspections, damage holds, plan or insurance billing, a landlord or employer paying, walk-ins, the day-before hold, custom quotes.\nOutdated: the old outside software; nothing about one single state; the state's rules come only as switches from the state form.",
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A4-43"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Alex bought a package of cuts at the shop. This booking uses one of them. The page shows the credits left after this visit.",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "With some lines OK'd, only those are paid. Not today: only the consult.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "My employer pays for this cut.",
+    "A chair, ready",
+    "Style consult",
+    "Color and cut · $90",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "This is Rosie, an automated assistant for Lee's Barbershop. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "The visit is for a child, and a parent or guardian books. Alex picked a kids cut for a son before the times, so the times fit it. The parent books, pays and gets the texts. The child's details go on the secure page.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter.",
+    "Some services start with a first step on the same visit, like a patch test with a wait, or a screening. It comes before the price and the work.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lee's Barbershop doesn't do perms. Nothing was saved. Other businesses nearby may.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Color quotes come to you first. Board prices never need one",
+    "Riley: barber, color and house calls",
+    "Riley: barber, color, house calls",
+    "Barbershop, plumbing, electrical",
+    "Barber license number",
+    "A water heater job",
+    "Groom's package",
+    "Color and cut",
+    "Kids cut",
+    "Books a free fix, if Sam says so",
+    "Alex asks for a fix",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan. Read it, then sign or decline on the secure page.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute style consult.",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Riley suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "A cut is rated, so the shop takes the first branch.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "A barbershop has none, so nothing is sent here.",
+    "A haircut could mean a salon or a barbershop.",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "Signature cut and hot towel shave · $55",
+    "May the shop show photos of your hair?",
+    "The cape clip ripped my shirt collar.",
+    "A barbershop books a person's time.",
+    "A barbershop's services need none.",
+    "Alex asks for a cut every 4 weeks.",
+    "Do you do kids cuts? My son is 8.",
+    "Books a haircut and a beard trim",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Haircut plan · every 4 weeks",
+    "Does it work like haircuts?",
+    "What happens at the chair?",
+    "Books a cut every 4 weeks",
+    "Riley finishes the work",
+    "Haircuts work like this",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "NEW massage",
+    "EC22871",
+    "like a burst pipe or a lockout",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee Home Services'",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Skin fade",
+    "skin fade",
+    "A beard trim",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "kids cuts",
+    "kids cut",
+    "a color correction",
+    "Color correction",
+    "color quote",
+    "Haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "price board",
+    "priced at the chair",
+    "Priced at the chair",
+    "at the chair",
+    "At the chair",
+    "barbershop",
+    "barbers",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "BS20981",
+    "The lookup shows the license as expired.",
+    "Stopped Alex M.'s cut.",
+    "I put a note and a photo on the page.",
+    "The note and photo are on the secure page.",
+    "License renewal",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Panel upgrade: a free estimate, then a quote",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Oak St",
+    "chair renter",
+    "video session",
+    "Barber license",
+    "Barber",
+    "barber"
+   ],
+   "B": [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "Me, and yes. It's my kitchen.",
+    "A chair, ready",
+    "Contract · Water heater replacement · $640",
+    "Service call fee",
+    "Water heater replacement · $640",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "Thanks for visiting Lee Home Services. Your receipt is on your secure page, with what was paid and how. Think this is wrong? Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Lee Home Services: you have two drain clearings on Mon Nov 9. They're at 10:00am and 12:00pm. Keep both, or was that the same visit? No reply by 6:00pm Sun Nov 8: we keep 10:00am.",
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "Reading it back: accept the leak repair for today, starts at 3:00pm, with Jordan. Say yes to go ahead.",
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Drain clearings already booked keep only their saved card.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan look at my bathroom sink next week?",
+    "The sink is overflowing onto the floor now.",
+    "Riley: barber, color and house calls",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "Riley: barber, color, house calls",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Water heater replacement",
+    "Yes, it won't drain",
+    "A water heater job",
+    "the kitchen drain",
+    "Service call",
+    "Leak repair",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Thanks for choosing Lee Home Services! How was your visit with Jordan?",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "A job priced at the visit never takes more than the visit fee.",
+    "A job quoted at the visit promises only the service call now.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "May Lee Home Services show photos of the work? Yes / No",
+    "Each unit's notes go to the plumber, one line each.",
+    "Told to leave, then call 911 and the gas company",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "May Lee Home Services show photos of this job?",
+    "Can you flush my water heater every year, too?",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Can I skip next week's drain cleaning?",
+    "Not done: the pipe behind the wall",
+    "Replace both shutoff valves · $160",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "Answers, photos and gate codes",
+    "Yearly water heater flush plan",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "Written estimate and terms",
+    "Books one job for a group",
+    "Mold behind the sink wall",
+    "NEW heating and cooling",
+    "A gas smell at the home",
+    "Jordan found more work.",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Yes, every year",
+    "Kitchen drain",
+    "Yard drain",
+    "EC22871",
+    "Can I run the dishwasher before you come?",
+    "It's overflowing. Can someone come tonight?",
+    "like a burst pipe or a lockout",
+    "Plumbing books a 2-hour window.",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "Plumbing JP031552 · electrical JE30417",
+    "Lee Home Services'",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Riley",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "at the chair",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Shop",
+    "shop",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "replaces water heaters",
+    "Sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "service call fee",
+    "service call",
+    "after the job",
+    "Labor",
+    "BS20981",
+    "The lookup shows the license as expired.",
+    "Arrival windows",
+    "Arrival times:",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Do you smell gas?",
+    "No huele a gas.",
+    "It doesn't smell like gas.",
+    "Shut the cold-water valve, above the heater.",
+    "If you smell gas, get out and call 911.",
+    "If you smell gas, leave the house now.",
+    "Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood.",
+    "Is it safe to turn back on?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "Drive time from the jobs before and after is checked again.",
+    "Please wait until the job is done.",
+    "Saved with Alex M.'s job.",
+    "Replace both shutoff valves",
+    "The $160 valve quote is good for 7 days.",
+    "HURT cut my hand, need to stop",
+    "The before photo shows no crack.",
+    "DONE 179 drain",
+    "the shutoff valves",
+    "Each rejoins: the job stays on Alex's record.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Texts the camera report link",
+    "Nora can ask to be next for that window.",
+    "A plan or warranty pays",
+    "JE30417",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Panel upgrade: a free estimate, then a quote",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Elm St",
+    "chair renter",
+    "video session",
+    "Barber",
+    "barber"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A8-03": "7accda6f86",
+   "S1-71": "d5b18e87e4",
+   "S2-28": "549fd7ae22",
+   "S1-32": "60f59eda70",
+   "S1-33": "eeaadba298",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-99": "efed1e4f4d",
+   "S11-57": "a3996ae84e",
+   "S12-19": "07db0515b2",
+   "S13-41": "18b280aaa2",
+   "S13-43": "a1049201f6",
+   "S13-11": "4345036419",
+   "S1-61": "7421d186d5",
+   "S2-29": "974ca3a481",
+   "S1-21": "913a9558f4",
+   "A4-43": "c17d56f766",
+   "A7-70": "da4cede3e2"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255",
+   "S1-71": "d5b18e87e4",
+   "S2-28": "549fd7ae22",
+   "S1-32": "60f59eda70",
+   "S1-33": "2b5d1fa4ab",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S11-99": "a97de4ca58",
+   "S11-57": "2f34f23d8a",
+   "S12-19": "176d3d2beb",
+   "S13-41": "fb75fbb382",
+   "S13-43": "55206e4cb1",
+   "S13-11": "6561316ed7",
+   "S1-61": "e30e71f65d",
+   "S2-29": "974ca3a481",
+   "S1-21": "334e0a791c",
+   "B4-38": "9539521dc7",
+   "B6-14": "dfd03ee673",
+   "B8-18": "530038d2b8",
+   "B10-01": "814aa1fde7",
+   "B4-30": "26ca477d69",
+   "B4-77": "67ff953065"
+  }
+ }
+}

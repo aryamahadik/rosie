@@ -1,0 +1,3101 @@
+{
+ "id": "concierge",
+ "name": "Concierge and errand service",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "home-care",
+ "plugin": {
+  "pf.license": {
+   "need": "No state license for errands in most places: a business registration, and any local business license. Carrying people for pay is not offered (it needs a for-hire permit). Buying and delivering alcohol only where the state's rules let a third party do it.",
+   "who_holds": "The business. Each person who drives holds their own driver's license.",
+   "ask": "The business registration, and proof of auto insurance that covers driving for work.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "Errands go live on identity and registration.",
+   "insurance_bond": "General liability, auto coverage for driving for work, and a bond or crime coverage for staff who hold keys (the business's own rule). It is shown as given by the business, not checked by Rosie.",
+   "background_checks": "A criminal background check and a driving-record check for every person who holds keys or drives (the business's own rule).",
+   "renewals": "Insurance and the bond are reminded 30 days before they lapse. A driver whose license lapses is off driving errands.",
+   "desk": "The errand desk, Sam's second company, needs a registration only."
+  },
+  "pf.services": {
+   "pattern": "Set service: errands and home checks for the customer, often with nobody home, by the hour. Purchases are made for the customer at cost. Flow A is the errand desk, where the customer drops off returns, packages to ship and dry cleaning.",
+   "list": [
+    {
+     "name": "Errand run (groceries, pharmacy pick-up, dry cleaning, returns, post office)",
+     "price_kind": "per hour, 1-hour minimum",
+     "example": "$45 an hour (the example business's own price) plus 70 cents a mile; a 2-hour run is $90. Purchases are paid back at cost, with the receipt, up to the limit the customer sets",
+     "where": "out and about, starting and ending at the customer's home",
+     "money": "a card saved; the saved card is charged at DONE for the hours, miles and purchases"
+    },
+    {
+     "name": "Waiting at the home",
+     "price_kind": "per hour, 2-hour minimum",
+     "example": "$40 an hour: the concierge lets in only the company the customer named, and stays until it leaves",
+     "where": "at the customer's home",
+     "money": "a card saved; charged at DONE"
+    },
+    {
+     "name": "Home check while you're away",
+     "price_kind": "one price a visit",
+     "example": "$35 a visit: a walk-through, mail and packages in, lights and thermostat, a photo report of the home. Nobody is home",
+     "where": "at the customer's home",
+     "money": "a card saved; charged at DONE"
+    },
+    {
+     "name": "Standing errands",
+     "price_kind": "each run at its list price",
+     "example": "the same run on set days, like groceries every Tuesday",
+     "money": "a repeat plan with its own yes and a reminder before the first run; each run charged at its own DONE. A prepaid bundle of hours is not offered in this example"
+    },
+    {
+     "name": "Office errands for a business",
+     "price_kind": "per hour",
+     "example": "$45 an hour; nothing taken; one bill a month",
+     "money": "nothing taken at booking; the business gets one bill a month"
+    },
+    {
+     "name": "Desk drop-off (flow A)",
+     "price_kind": "one price",
+     "example": "returns, packages to ship and dry cleaning, up to 3 items for $35 (single return $20; dry cleaning drop-off $25; package to ship $40), plus shipping at cost; handled within 2 business days",
+     "where": "at the errand desk",
+     "money": "a card saved; the saved card is charged when it's done"
+    },
+    {
+     "name": "Holiday gift wrap and send (flow A)",
+     "price_kind": "one price",
+     "example": "up to 5 gifts for $55, shipping included up to 5 lb each; ready in 3 business days",
+     "money": "paid in full when booking"
+    }
+   ],
+   "capacity": "One person per errand. Same-day errands only when someone is free; nothing is sent now.",
+   "nobody_home": "Most errands, deliveries and home checks are done with nobody home, with a photo at DONE. Alcohol, a prescription that needs a signature, and waiting at the home need the customer or their named adult.",
+   "online": "No. Errands are in person.",
+   "not_offered": "Carrying people for pay; handling more cash than the customer's limit; pet care; repairs."
+  },
+  "pf.questions": {
+   "before_times": [
+    "What the errand is: groceries, a pick-up, a return, a drop-off, waiting at the home or a home check",
+    "Where it starts and ends (the town or ZIP), and how many stops",
+    "Any time it must be done by (a store closing, a return deadline, a delivery window)",
+    "How long to book, and for a purchase, the most the customer will OK without a text"
+   ],
+   "after_a_time": [
+    "The list, the store, or the item, and what to do if something is out of stock (skip it, or pick the closest match)",
+    "Who is at home, and where to leave things",
+    "For waiting at the home: the company coming and its window"
+   ],
+   "secure_page_only": [
+    "The street address and how to get in: a key hand-over, a lockbox code or a garage code (alarm codes are given only to the owner by phone, never typed)",
+    "A signed key release: who may hold the key, where it is kept (coded, never with the address), and that it comes back when the errands end",
+    "For a pharmacy pick-up: the paper the pharmacy needs, who may sign for it, and the medicine names",
+    "The spending limit for each errand, and the card for purchases"
+   ],
+   "who_may_book": "An adult for themself. A family member for an older parent, with the parent's OK where they can give it. The person whose home it is OKs any key hand-over. A business books office errands. Nobody under 18 books."
+  },
+  "pf.safety": {
+   "words": [
+    "someone hurt or ill right now",
+    "a fire or smoke",
+    "a gas smell",
+    "a break-in in progress",
+    "someone at home not answering who may need help",
+    "words about suicide or self-harm"
+   ],
+   "what_happens": [
+    "Someone hurt, a fire, a gas smell or a break-in in progress: 'Call 911 now.' No booking until they're safe.",
+    "Suicide or self-harm: 'Call or text 988 now; call 911 if anyone is in danger right now.' No booking in that chat; the owner is told, never the words.",
+    "A concierge who finds a door open, a window broken or a leak at a home check: photos of the home only, the customer told at once. A break-in found: the concierge leaves and calls 911 first.",
+    "Someone at home who doesn't answer and may need help: the concierge calls the customer's contact, then the owner decides about a welfare check. The concierge never calls 911 for the company; the owner does."
+   ],
+   "go_on": [
+    "An older adult at home alone: the booking goes on; the concierge checks in with the family contact named on the page.",
+    "A dog or other animal at home: the booking goes on; the customer says where it will be. Staff don't walk or feed animals unless the errand says so.",
+    "Alcohol or tobacco on a list: bought only where the state's rules let a third party do it, handed only to the customer or a named adult of age, with ID, never left at the door.",
+    "A prescription pick-up: only with the paper the pharmacy needs, handed only to the customer or their named adult, never left at the door if it needs a signature or must stay cold."
+   ],
+   "booking_goes_on": "No, for an emergency or crisis words. Yes, for the go-on cases."
+  },
+  "pf.first_steps": {
+   "key_release": "A key hand-over comes before the first errand that needs entry. The customer hands over a key, or sets a lockbox code on the secure page, and signs a key release. It's good until the errands end or the customer asks for the key back. On file: entry errands can be booked. Not on file: only errands with someone home.",
+   "pharmacy_paper": "Before the first pharmacy pick-up: the paper the pharmacy needs, from the customer.",
+   "spending_limit": "Before the first errand with purchases: the spending limit and the card for purchases, on the secure page.",
+   "prep_for_reminder": [
+    "Leave the list and any return items and receipts by the door",
+    "Put the dry cleaning out, and tell us where pets will be",
+    "Send your list by the night before"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Errands with someone home: the check-in code at the door. Nobody home: a photo at DONE, of where things were left. At the desk: the code at the desk.",
+   "at_the_visit": "Items taken from the home (dry cleaning, returns) are signed out, with a photo of the items and never of a person. Purchases come with receipt photos.",
+   "changes": "An item out of stock: the customer's rule (skip it, or the closest match). A purchase over the limit or a second errand: the customer's yes first, priced first.",
+   "keys": "Keys are logged at hand-over, kept coded without the address, and returned when the errands end or the customer asks.",
+   "done": "DONE with the hours, the miles and the receipts. The customer gets photos and has 24 hours to say if something is wrong.",
+   "proof": "The code or the photo, the hours, the miles and the receipts."
+  },
+  "pf.money": {
+   "start": "A card saved at booking, never charged up front. The saved card is charged at DONE for the hours, the miles and purchases at cost, with the receipts. A gift wrap and send is paid in full when booking. A business gets one bill a month.",
+   "deposits": "None by default. Where the state's rules cap fees or deposits, the cap.",
+   "purchases": "At cost, with the receipt photo, never marked up (the example business's rule). Up to the customer's limit; over it, only with a yes first.",
+   "fees": "A late cancel (under 24 hours before) or a no-show at a home where someone must be there: the 1-hour minimum, $45 in the example, only if the owner confirms it. Never when the store or the company caused the miss. A desk drop-off missed or cancelled late may keep up to $20, only if the owner confirms it.",
+   "plans": "Standing errands are charged run by run, at each DONE. Rosfield's $2 counts once for each booking. A price change is told 30 days ahead, and needs the customer's yes.",
+   "business_accounts": "A business takes nothing at booking. Rosie texts it one bill a month; its account holder OKs the bill.",
+   "tips": "No tip line. The owner may turn one on.",
+   "tax": "Where the state taxes these services, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking, paid by the business."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Medicine names and health details",
+    "Door, lockbox, garage and alarm codes, and where the key is kept",
+    "Card details",
+    "What is bought for a pharmacy pick-up"
+   ],
+   "texts_carry": "The business, the concierge's first name, the day, the start time and a secure link. Owner and staff texts use the customer's initials (A.M.) and say 'an errand', never what it is. The spending limit goes only to the staff on the errand.",
+   "languages": "English and Spanish.",
+   "minors": "Never booked by a minor. Errands for a teen are booked by a parent."
+  },
+  "pf.staff": {
+   "skills": [
+    "Errands in a car, with an insured vehicle and a checked driver's license",
+    "Waiting at a home for a repair or delivery",
+    "Home checks with a photo report",
+    "Handling keys (key release and coded storage)"
+   ],
+   "licenses": "No person license. Drivers keep a valid driver's license and a clean driving record (the business's rule). Staff who hold keys pass the business's background check.",
+   "stand_in": "A customer who asked for their regular concierge in the home is asked before anyone else comes in. Errands with nobody home and no named person go to whoever is free. If there is no answer, the errand is off and nothing is charged.",
+   "keys": "Only staff named on the key release may hold that key.",
+   "who_oks": "The owner OKs a purchase over $300 on one errand, any key hand-over and every fee. The office manager may OK prices too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "key_release": "A signed key release before anyone holds a key.",
+   "purchases": "Receipts are kept with the booking. A return is credited to the customer's own card by the store.",
+   "no_rides": "No carrying people for pay; a ride is pointed to a licensed service.",
+   "alcohol": "Only where the state's rules allow; ID at hand-over.",
+   "records": "7 years, or longer where the state's rules ask: the booking, the hours, the receipts and the key log."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "An item is out of stock: the customer's rule (skip it, or the closest match); anything else is a text first.",
+    "A purchase would go over the limit: a yes by text before buying; no answer means one reminder after 15 minutes, then Sam reaches the customer, or the item is skipped.",
+    "The store is closed: the errand moves with no fee.",
+    "The repair company is late: the concierge waits up to the booked hours, then asks; extra time needs the customer's yes.",
+    "The key doesn't work or the code fails: the concierge reaches the customer; no answer means the errand is off with no fee.",
+    "A problem found at a home check: photos of the home, the customer told at once, and a repair company let in only with the customer's yes.",
+    "Damage to the customer's car or home: it goes to the owner, with the photos.",
+    "A regular concierge is out: nobody new comes into the home without the customer's yes.",
+    "A returned item: the store credits the customer's own card; the business doesn't."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "forms",
+   "extrawork",
+   "monthlybill",
+   "dropoff"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Ravi and Mei (desk staff)",
+   "cust": "Alex M. (customer, drops off returns and a package) · other customers",
+   "other": "Others (a sister who pays; a bank)"
+  },
+  "B": {
+   "staff": "Bea and Tariq (concierges)",
+   "cust": "Alex M. (customer, books errands for a mother) · other customers",
+   "other": "Others (Ana, Alex's mother; a business that pays; a bank)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Ravi"
+  },
+  "B": {
+   "staff": "Bea"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Haircut at home · $75",
+    "Holiday gift wrap and send, 8 gifts · $75"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "The errand desk takes drop-offs: returns, packages and dry cleaning. A barbershop takes none."
+   ],
+   [
+    "Texts READY with the pick-up details",
+    "Texts READY with the receipt or pick-up details"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your desk, the saved card is charged when it's done"
+   ],
+   [
+    "Free on your board: nothing taken, nothing after",
+    "Free errand quote: nothing taken, nothing after"
+   ],
+   [
+    "Haircut at the shop",
+    "Desk drop-off"
+   ],
+   [
+    "Haircut at their home",
+    "Holiday gift wrap and send, 8 gifts"
+   ],
+   [
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "E paid when they book. E for 8 gifts too, 75, paid when they book"
+   ],
+   [
+    "A nothing before, and at their home too, 75, paid when they book. E paid when they book",
+    "A nothing before, and one bill after. E paid when they book"
+   ],
+   [
+    "Other days: paid at the chair",
+    "Other days: the saved card at DONE"
+   ],
+   [
+    "Set. For a haircut, the customer picks the place and sees both prices first.",
+    "Set. For a desk drop-off, the customer sees the price first."
+   ],
+   [
+    "Barbering workshop",
+    "Gift wrap session"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Is anything fragile? (optional)"
+   ],
+   [
+    "How would you like it on top?",
+    "Is anything fragile?"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Step-free door on Market Way · parking in the back"
+   ],
+   [
+    "A step-free door on Elm St, and parking in the back.",
+    "A step-free door on Market Way, and parking in the back."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free door:"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, but make it Sunday' goes back to the times."
+   ],
+   [
+    "'s cut. I put a note and a photo on the page.",
+    "'s drop-off. I put a note on the page."
+   ],
+   [
+    "The note and photo are on the secure page.",
+    "The note is on the secure page."
+   ],
+   [
+    "Please use the side door on Oak St.",
+    "Please use the side door on Market Way."
+   ],
+   [
+    "Every plumbing service, to start",
+    "Every errand, to start"
+   ],
+   [
+    "Each service starts the way most plumbing businesses set it.",
+    "Each service starts the way most errand companies set it."
+   ],
+   [
+    "Every plumbing service",
+    "Every errand"
+   ],
+   [
+    "cuts a hand",
+    "hurts a wrist"
+   ],
+   [
+    "cut my hand",
+    "wrenched my wrist"
+   ],
+   [
+    "Lee Home Services's",
+    "Lee Concierge Co's"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Driver's license checked · keys held"
+   ],
+   [
+    "Plumbing MP045210",
+    "Errand service, registered"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Bea: errands and home checks, waits at homes"
+   ],
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Errands need no company license; the business gives its registration only."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "MP045201",
+    "EX-1024"
+   ],
+   [
+    "EC22871",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-5081"
+   ],
+   [
+    "BS20918",
+    "EX-5018"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Mon–Sat 7:00am–7:00pm · set start times · 2 hours' notice · up to 60 days ahead"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither the errand service nor the desk takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every errand is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line · businesses get one bill a month"
+   ],
+   [
+    "Saturdays: a tip line on the bill",
+    "One bill a month, no tip line"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Home checks: a photo report of the home, no repairs"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An errand desk on Market Way. Drop off returns, packages to ship and dry cleaning."
+   ],
+   [
+    "The shop front",
+    "The desk front"
+   ],
+   [
+    "The chairs",
+    "The drop-off shelves"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Elm Street Dental",
+    "Oak Street Dental"
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's sister. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Ravi can still take your items at the desk today, or you can move to a later slot. No reply by 11:00am means today."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Ravi goes over the receipts with Alex. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Means 'Matched': the request fits a listed service, in any words. 'Can you ship this package for me?' fits a desk drop-off."
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer's plans change before the drop-off, and they ask if they can still come in."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee Errand Desk about your Sat 11:00am drop-off: please bring your return receipts."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring your return receipts on Saturday."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the desk keep photos of your items for the claim? Yes / No"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My sister pays for this drop-off."
+   ],
+   [
+    "A chair, ready",
+    "The desk, ready"
+   ],
+   [
+    "Style consult",
+    "Errand quote"
+   ],
+   [
+    "Color and cut · $90",
+    "Custom errand · $90"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a single return is $20. Want a time?"
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at the start of a video call."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Bea and Tariq run errands and home checks; Bea also waits at homes for repair visits. Ravi and Mei work the errand desk; Ravi runs errands too. Pat is my office manager, for prices over $500. Jules runs a small errand business of their own, with their own customers."
+   ],
+   [
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. Lee Errand Desk serves adults only, so nothing more happens."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Errands are never sent now, so nobody is on call."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex asks for a ride for a person, which isn't on the company's list. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter.",
+    "Now money. When customers book, do you take anything? Each service starts the way most errand companies set it. Send only what's different, by letter."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Errand Desk can book you from now on, at the desk and on errands. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "Some services start with a first step on the same visit, like a patch test with a wait, or a screening. It comes before the price and the work.",
+    "Some services start with a first step on the same visit, like a signed key release or the pharmacy's paper. It comes before the price and the work."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Alex wants it at the home: an errand run, $90, with a card saved. From here it's the other flow, where the business goes to the customer."
+   ],
+   [
+    "The plug-in says a color and cut is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says a custom errand is priced after a call, so Rosie's first text asks for the details. No time is saved while it's priced."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some errands take several visits, like a drop-off and a pick-up a week later. Where the plug-in says so, all the times are picked now."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "The holiday gift wrap and send, $55, is paid in full when booked. Nothing more is owed after."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A first-step example: 'Pharmacy pick-ups need the pharmacy's paper first. Sent it in this year?'"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds package shipping to Lee Errand Desk. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Errands and home checks in Springfield: groceries, returns, waiting at home, within 25 miles."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms. Nothing was saved. Other businesses nearby may.",
+    "Lee Errand Desk doesn't carry people. Nothing was saved. A licensed ride service may."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An errand desk on Market Way. Drop off returns, packages to ship and dry cleaning."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Custom prices come to you first. List prices never need one"
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: call before ringing the bell."
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Errands at homes: allowed where you are, for those cleared"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Package shipping for Lee Errand Desk: is it the same company?"
+   ],
+   [
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "A.M. says the desk door caught a coat sleeve today."
+   ],
+   [
+    "Goes on as a house call, in the other flow.",
+    "Goes on as an errand at a home, in the other flow."
+   ],
+   [
+    "Goes on as a house call in the other flow.",
+    "Goes on as an errand at a home in the other flow."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every desk service, and errands at homes"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ravi: errand desk, runs errands too"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Ravi: errand desk, runs errands too"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the desk, and errands at homes"
+   ],
+   [
+    "Goes on as a house call",
+    "Goes on as an errand at a home"
+   ],
+   [
+    "A water heater job",
+    "An errand run at a customer's home"
+   ],
+   [
+    "Color and cut",
+    "Custom errand"
+   ],
+   [
+    "NEW massage",
+    "NEW package shipping"
+   ],
+   [
+    "Kids cut",
+    "Dry cleaning drop-off"
+   ],
+   [
+    "From the price list or photos, the price is set.",
+    "From the price list, or made for the request, the price is set."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work is licensed to its own office."
+   ],
+   [
+    "3 jobs",
+    "3 errands"
+   ],
+   [
+    "next job:",
+    "next errand:"
+   ],
+   [
+    "An AI that asks for the shop by name hears only that: no reason, and no other shops.",
+    "An AI that asks for the desk by name hears only that: no reason, and no other businesses."
+   ],
+   [
+    "1 color quote",
+    "1 custom price"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 custom price."
+   ],
+   [
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "Rosie is the desk's booking software. Its only outside links are the staff phone calendars and Stripe."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book me a drop-off at Lee Errand Desk on Saturday for two returns and a package."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero dejar dos devoluciones y un paquete el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a drop-off on Saturday."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. drop-off Sat 11am Ravi"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The errand plug-in adds its own danger words, like a break-in happening now."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A concierge example: a gas smell gets 'leave and call 911'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Then the booking goes on."
+   ],
+   [
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Sam set this line at sign-up: the number customers call for what only a concierge should answer."
+   ],
+   [
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "That's a question for the pharmacy. Ravi can go over the paper at your drop-off."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants Saturday morning, with Ravi"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a quote for a custom errand"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A return could mean a store return or a rental return."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a drop-off every week"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for a drop-off every Saturday. The desk offers a plan, so Rosie books the first drop-off and saves the next ones on the same day and time."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a return and a package to ship"
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a dry cleaning drop-off. Rosie finds one time long enough for both, with one desk worker, and adds the prices: $35 and $25."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A return for Alex and a dry cleaning drop-off for a sister work the same way. Both are asked before the times."
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the desk's list"
+   ],
+   [
+    "on the shop's board",
+    "on the desk's price list"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A desk books a worker's time."
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything Ravi should know?"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "The gift wrap is for my sister. Can I pay for it?"
+   ],
+   [
+    "A barbershop has none.",
+    "A desk drop-off has none."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Drop-off plan · every week"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A custom errand always stays with Ravi."
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code at the desk when you arrive."
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at the desk."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my sister wait at the desk with me?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My plans changed. Can I still come Saturday?"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Ravi suggests moving your drop-off to Monday, with no fee."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Ravi can still take your items at the desk today, or you can move to a later slot."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can I add a dry cleaning drop-off on Saturday?"
+   ],
+   [
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "Ravi has time for it. Add a dry cleaning drop-off to your Sat 11:00am visit?"
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a weekly drop-off with Ravi."
+   ],
+   [
+    "the Groom's package",
+    "the party gift wrap"
+   ],
+   [
+    "Groom's package",
+    "Party gift wrap, 20 gifts"
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex arrives at the desk. If the plug-in asks for something to bring, the desk checks it first. A return needs its receipt."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair.",
+    "It's 11:00am, and Alex is at the desk."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens at the desk?"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A dry cleaning drop-off is on the price list: $25."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The desk door caught my coat sleeve."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the receipts and the tracking numbers."
+   ],
+   [
+    "Alex pays at the chair",
+    "Alex pays at the desk"
+   ],
+   [
+    "DONE 35 haircut",
+    "DONE 35 drop-off"
+   ],
+   [
+    "My company is paying for this one.",
+    "My sister is paying for this one."
+   ],
+   [
+    "A long job or a course can be paid in stages the plug-in sets.",
+    "A long job can be paid in stages the plug-in sets."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A drop-off is rated, so the desk takes the first branch."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next drop-off at the desk"
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like Ravi's standing errands plan after a drop-off."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Errand Desk sent you a proposal: Ravi's standing errands plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Standing errands"
+   ],
+   [
+    "3 visits with Riley",
+    "3 drop-offs with Ravi"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The plan's drop-offs are booked like any booking, each with its own money choices and confirmation."
+   ],
+   [
+    "Color correction",
+    "Special handling"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do holiday gift wrap too? I have five gifts."
+   ],
+   [
+    "Priced from your photos",
+    "Priced for your request"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Concierge Co's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Concierge Co"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Errand Desk LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Errand Desk"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Errand Service"
+   ],
+   [
+    "Lee Electric",
+    "Lee Home Checks"
+   ],
+   [
+    "plumbing and electrical",
+    "errand and home check service"
+   ],
+   [
+    "1200 Main St",
+    "14 Quarry Rd"
+   ],
+   [
+    "88 Elm St",
+    "9 Market Way"
+   ],
+   [
+    "on Elm St",
+    "on Market Way"
+   ],
+   [
+    "$89",
+    "$45"
+   ],
+   [
+    "Drain clearing",
+    "Errand run"
+   ],
+   [
+    "Plumbing",
+    "Errand service"
+   ],
+   [
+    "plumbing",
+    "errand service"
+   ],
+   [
+    "Electrical",
+    "Home check service"
+   ],
+   [
+    "electrical",
+    "home check service"
+   ],
+   [
+    "Barbershop",
+    "Errand desk"
+   ],
+   [
+    "barbershop",
+    "errand desk"
+   ],
+   [
+    "Barbering",
+    "Errand desk"
+   ],
+   [
+    "Plumber",
+    "Concierge"
+   ],
+   [
+    "plumber",
+    "concierge"
+   ],
+   [
+    "barbers",
+    "desk staff"
+   ],
+   [
+    "Barber",
+    "Desk staff"
+   ],
+   [
+    "barber",
+    "desk staff"
+   ],
+   [
+    "Haircuts",
+    "Desk drop-offs"
+   ],
+   [
+    "haircuts",
+    "desk drop-offs"
+   ],
+   [
+    "Haircut",
+    "Desk drop-off"
+   ],
+   [
+    "haircut",
+    "desk drop-off"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The shop's",
+    "The desk's"
+   ],
+   [
+    "the shop's",
+    "the desk's"
+   ],
+   [
+    "The shop",
+    "The desk"
+   ],
+   [
+    "the shop",
+    "the desk"
+   ],
+   [
+    "Shop",
+    "Desk"
+   ],
+   [
+    "shop",
+    "desk"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Holiday gift wrap and send"
+   ],
+   [
+    "Signature cut and shave",
+    "Holiday gift wrap and send"
+   ],
+   [
+    "Skin fade",
+    "Package to ship"
+   ],
+   [
+    "skin fade",
+    "package to ship"
+   ],
+   [
+    "Beard trim",
+    "Single return"
+   ],
+   [
+    "beard trim",
+    "single return"
+   ],
+   [
+    "the price board",
+    "the price list"
+   ],
+   [
+    "Jordan",
+    "Bea"
+   ],
+   [
+    "Casey",
+    "Tariq"
+   ],
+   [
+    "Riley",
+    "Ravi"
+   ],
+   [
+    "Avery",
+    "Mei"
+   ],
+   [
+    "service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service-call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "Rental 1",
+    "Desk drop-off"
+   ],
+   [
+    "Rental 2",
+    "Desk drop-off"
+   ],
+   [
+    "Water heater",
+    "Special handling"
+   ],
+   [
+    "kids cut",
+    "dry cleaning"
+   ],
+   [
+    "skin fades",
+    "packages to ship"
+   ]
+  ],
+  "B": [
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first · only when someone is free"
+   ],
+   [
+    "Same-day jobs",
+    "Same-day errands"
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home. Jordan lets himself in the agreed way",
+    "Say Kim L.'s groceries need nobody home. Jordan gets in the agreed way"
+   ],
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: up to the $45 late-cancel fee, only if a card was saved and you say yes"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your desk, the saved card is charged when it's done"
+   ],
+   [
+    "Free on your board: nothing taken, nothing after",
+    "Free errand quote: nothing taken, nothing after"
+   ],
+   [
+    "Every plumbing service, to start",
+    "Every errand, to start"
+   ],
+   [
+    "Every barbershop service",
+    "Every desk service"
+   ],
+   [
+    "businesses start. Is it right",
+    "businesses start. Is it right"
+   ],
+   [
+    "Each service starts the way most plumbing businesses set it.",
+    "Each service starts the way most errand companies set it."
+   ],
+   [
+    "$89, credited to the repair",
+    "$45, only if agreed"
+   ],
+   [
+    "a card saved for the $89 service-call fee you OK",
+    "a card saved for the $45 late-cancel fee you OK"
+   ],
+   [
+    "E 25% deposit after the quote. C paid in full when they book",
+    "E and C as on the card"
+   ],
+   [
+    "Nothing more is done",
+    "NMKEEP is done"
+   ],
+   [
+    "Nothing more goes",
+    "NMKEEP goes"
+   ],
+   [
+    "Nothing more to pay",
+    "NMKEEP to pay"
+   ],
+   [
+    "Nothing more is paid",
+    "NMKEEP is paid"
+   ],
+   [
+    "Nothing more is taken",
+    "NMKEEP is taken"
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For errands, a gas smell, smoke or a break-in happening now stops the booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hurt, a fire or smoke, a gas smell, a break-in happening now."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first. If anyone is at risk, the text says to call 911.",
+    "Real danger, like smoke or a gas smell, gets the safety steps first. If anyone is at risk, the text says to call 911."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Concierge Co runs errands and home checks, not repairs. Nothing was saved. You can look for a repair company near you."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "An errand could mean a delivery service or an errand company."
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Errand service books a set start time."
+   ],
+   [
+    "Yes, every year",
+    "Yes, every week"
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This errand starts with a key release on the secure page. It takes about 3 minutes, and the start time waits for it."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Check the home before anyone goes in"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan finds the store has a long line."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is waiting in line at the store and will be back about 9:30am. The errand should be done by 10am."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE long line at the store, back 9:30"
+   ],
+   [
+    "water is off on Main St after 2pm, so afternoon jobs may run late",
+    "roadwork closes Market Way after 2pm, so afternoon errands may run late"
+   ],
+   [
+    "Prices it from Alex's photos",
+    "Prices it from Alex's errand details"
+   ],
+   [
+    "from the customer's photos and answers",
+    "from the errand details and answers"
+   ],
+   [
+    "Photos and answers added",
+    "Errand details and answers added"
+   ],
+   [
+    "From the photos and answers",
+    "From the errand details and answers"
+   ],
+   [
+    "priced by Jordan, from photos",
+    "priced by Bea, from the errand details"
+   ],
+   [
+    "Priced by Jordan, from your photos",
+    "Priced by Bea, from your errand details"
+   ],
+   [
+    "Every plumbing service, to start",
+    "Every errand, to start"
+   ],
+   [
+    "Each service starts the way most plumbing businesses set it.",
+    "Each service starts the way most errand companies set it."
+   ],
+   [
+    "Every plumbing service",
+    "Every errand"
+   ],
+   [
+    "cuts a hand",
+    "hurts a wrist"
+   ],
+   [
+    "cut my hand",
+    "wrenched my wrist"
+   ],
+   [
+    "Lee Home Services's",
+    "Lee Concierge Co's"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Driver's license checked · keys held"
+   ],
+   [
+    "Plumbing MP045210",
+    "Errand service, registered"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Bea: errands and home checks, waits at homes"
+   ],
+   [
+    "The state licenses the barbershop itself, and each barber.",
+    "Errands need no state license, so the desk gives its registration only."
+   ],
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Errands need no company license; the business gives its registration only."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "MP045201",
+    "EX-1024"
+   ],
+   [
+    "EC22871",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-5081"
+   ],
+   [
+    "BS20918",
+    "EX-5018"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Mon–Sat 7:00am–7:00pm · set start times · 2 hours' notice · up to 60 days ahead"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither the errand service nor the desk takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every errand is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line · businesses get one bill a month"
+   ],
+   [
+    "Saturdays: a tip line on the bill",
+    "One bill a month, no tip line"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Home checks: a photo report of the home, no repairs"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An errand desk on Market Way. Drop off returns, packages to ship and dry cleaning."
+   ],
+   [
+    "The shop front",
+    "The desk front"
+   ],
+   [
+    "The chairs",
+    "The drop-off shelves"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Elm Street Dental",
+    "Oak Street Dental"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "My mom, Ana. Yes, we're both adults."
+   ],
+   [
+    "Water pressure check",
+    "Errand quote"
+   ],
+   [
+    "A chair, ready",
+    "The front desk, ready"
+   ],
+   [
+    "The drop-off and pick-up times come with the dates. The confirmation and the reminder show both days.",
+    "The start and end times come with the dates. The confirmation and the reminder show both days."
+   ],
+   [
+    "Thu Oct 22 to Sat Oct 24 · drop-off 8–10am · Jordan",
+    "Thu Oct 22 to Sat Oct 24 · start 8:00am · Bea"
+   ],
+   [
+    "Fri Oct 23 to Sun Oct 25 · drop-off 8–10am · Casey",
+    "Fri Oct 23 to Sun Oct 25 · start 8:00am · Tariq"
+   ],
+   [
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Bea asks in person and opens Alex's page on Bea's own phone. Alex taps there, never Bea."
+   ],
+   [
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Bea texts OMW before driving. The person at the door gets the concierge's name and photo, the arrival time and the code to give."
+   ],
+   [
+    "Unsure who's at the door? Call the business line: it says only the pro's first name, and whether his code was entered.",
+    "Unsure who's at the door? Call the business line: it says only the concierge's first name, and whether the concierge's code was entered."
+   ],
+   [
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there. The receipt goes to Alex their way.",
+    "Bea opens Alex's pay page on Bea's own phone, and Alex pays there. The receipt goes to Alex their way."
+   ],
+   [
+    "A job sent now: the pro is told at once, before he sets out.",
+    "Errands are never sent now: the concierge is told at once when a job is called off."
+   ],
+   [
+    "Water heater replacement · $640",
+    "Event-day concierge · $640"
+   ],
+   [
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos. Open times come next.",
+    "Lee Concierge Co: Bea priced your event-day errands at {{price:$90}}, after your call. Open times come next."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Bea and Tariq run errands and home checks; Bea also waits at homes for repair visits. Ravi and Mei work the errand desk; Ravi runs errands too. Pat is my office manager, for prices over $500. Jules runs a small errand business of their own, with their own customers."
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like asking to sign the customer's checks. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note."
+   ],
+   [
+    "This is Rosie, the automated booking assistant for Lee Home Services. Add photos of your water heater, and a plumber will price the job. Need access, more time or a language? Tell us.",
+    "This is Rosie, the automated booking assistant for Lee Concierge Co. Add the errand details on the secure page. Lee Concierge Co will call to price the day. Need access, more time or a language? Tell us."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "The request turns out to be for work Lee Concierge Co doesn't do, like driving a person to an appointment. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: errand runs at $48 an hour for jobs from Mon Nov 2. Jobs already booked keep $45 an hour. Standing errands go to $48 an hour from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for the same errand run every Tuesday. Lee Concierge Co offers that as standing errands, so the AI shows its terms. Each run is booked and paid like a single one."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush. Jordan texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder.",
+    "At DONE, Alex asks Bea about errands next month, when Alex travels. Bea texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder."
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that the lock on the back door is now broken. Rosie runs the plug-in's danger check again, then asks the concierge. Tariq can come sooner, so that's offered."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Errands are never sent now, so nobody is on call."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Say Morgan has standing errands: groceries every Tuesday for a mother. They can skip one run, pause the plan or end it. Bea is told."
+   ],
+   [
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted. Alex signs or declines it on the secure page.",
+    "Say Sam sends a proposal for more errands after the first month, like a second weekly run. Alex signs or declines it on the secure page."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Errand Desk can book you from now on, at the desk and on errands. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Concierge Co. It's an errand run, today, starts at 3:00pm, with Bea. The late-cancel fee is $45. Accept it?"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Concierge Co asks: is the errand for a home, an office or somewhere else? And what is on the list, which stores, and how much may be spent?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Concierge Co has standing errands, $90 a run. Each run is booked and paid like a single one. Want it every Tuesday?"
+   ],
+   [
+    "Jordan priced a water heater replacement for A.M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you.",
+    "Bea priced event-day errands for A.M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you."
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Concierge Co books up to 60 days ahead. We'll text you times for the errands you asked Bea about in late Aug 2027."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Bea drops a lamp and breaks it, and texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "If anyone is in danger or the home isn't safe, call 911 now. Tariq can come sooner, at the same price."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says event-day errands are priced after a call. So Rosie's first text asks for the errand details on the secure page. No time is saved while it's priced."
+   ],
+   [
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can someone pick up Kim's groceries and dry cleaning this Thursday? What does it cost?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Bea finds the back door open and a window broken. The plug-in says a concierge stops there, so Alex gets a written note."
+   ],
+   [
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Reminder: your errand run is tomorrow, starts at 8:00am, with Bea. {{pay.cancel}}. Leave your list and any returns by the door."
+   ],
+   [
+    "Sorry, Lee Home Services couldn't price your water heater this time. Nothing was booked or charged. You can ask again.",
+    "Sorry, Lee Concierge Co couldn't price your event-day errands this time. Nothing was booked or charged. You can ask again."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "An errand run's price is set before: $45 an hour. Only work priced at the visit would take the other branch."
+   ],
+   [
+    "Your water heater visit wasn't booked, since the document wasn't signed in time. Nothing was charged for this visit.",
+    "Your errand wasn't booked, since the key release wasn't signed in time. Nothing was charged for this errand."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules errand companies often set. Your call: keep them, or change any. They become the company's own rules."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Means 'Matched': the request fits a listed service, in any words. 'Can someone pick up my groceries?' fits an errand run."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a stop at the post office. Both go in one booking, with one start and one code."
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "The plug-in's questions that don't change the time or price go here, like 'Where should the concierge leave the bags?'"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds package shipping to Lee Concierge Co. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Reading it back: accept the leak repair for today, starts at 3:00pm, with Jordan. Say yes to go ahead.",
+    "Reading it back: accept the errand run for today, starts at 3:00pm, with Bea. Say yes to go ahead."
+   ],
+   [
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Your key release is waiting for your signature. Your Thu time is saved until 7:45pm today."
+   ],
+   [
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Bea finds the store out of the usual brand. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Your water heater price is with Lee Home Services. We'll let you know by 12:00pm Tue either way.",
+    "Your event-day price is with Lee Concierge Co. We'll let you know by 12:00pm Tue either way."
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most errand companies start. Is it right? Send only what's different."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to leave and call 911 if there's a gas smell or smoke."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the errand is, which stores, and how much may be spent."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si huele a gas o hay humo, salga de la casa y llame al 911."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A stop at the post office is $45 an hour like the rest of the run. Both fit in the same start."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Bea's phone, you said yes to one more hour for $45."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, errands need no written estimate. The price shows before the yes: $45 an hour."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some errands take more than one stop, like groceries and a pharmacy in one run."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the event-day path, only Bea's times show: Bea is the one who runs event days."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Errands and home checks in Springfield: groceries, returns, waiting at home, within 25 miles."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I need someone to pick up groceries and dry cleaning for my mom Thursday morning. I'm in Springfield."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If you smell gas or see smoke, get out and call 911."
+   ],
+   [
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Lee Concierge Co can run your mom's errands at a set time. {{pay.asks}}:"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Bea found a door open at the home and stopped there. Please call us."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 event-day price is set by Sam after a call, so Sam OKs it first."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a stop at the post office? Say so.'"
+   ],
+   [
+    "A.M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "A.M. isn't happy with the Thu Oct 22 errand: \"Bea was late.\""
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An errand desk on Market Way. Drop off returns, packages to ship and dry cleaning."
+   ],
+   [
+    "Price needed: A.M., water heater replacement. Price it before anyone says yes.",
+    "Price needed: A.M., event-day errands. Price it before anyone says yes."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "Bea broke a lamp at A.M.'s. The before photo shows it was fine."
+   ],
+   [
+    "A.M. didn't sign the water heater contract in time, so nothing was booked.",
+    "A.M. didn't sign the key release in time, so nothing was booked."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Concierge Co sent you a proposal for a second weekly run, from Bea's notes."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A concierge example: a break-in happening now gets 'leave and call 911'."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Errand run $90 ($96 from Nov 2) · Home check $35"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need someone to run errands for my mom."
+   ],
+   [
+    "M.P. would like to talk about the water heater quote before booking.",
+    "M.P. would like to talk about the event-day price before booking."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Should my mom take her pills with the food you bring?"
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Here it's every errand run: the start is a set time."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Package shipping for Lee Concierge Co: is it the same company?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about weekly errands for my mother. A text back is fine."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE the store closes at 6. The gate sticks."
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: one more hour, $45. Sent to Alex."
+   ],
+   [
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Accepted: the errand run today, starts at 3:00pm, with Bea."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Errand runs already booked keep $45 an hour, even after Nov 2."
+   ],
+   [
+    "Send A.M. $600 for the water heater replacement, not $640?",
+    "Send A.M. $600 for the event day, not $640?"
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Errand runs already booked keep only their saved card."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Bea's next times for another run."
+   ],
+   [
+    "A.M. asks: Can I run the dishwasher before you come?",
+    "A.M. asks: Should the dry cleaning go back to the same store?"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. Bea keeps the start at 8:00am, as booked."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My mom's lamp was broken after the visit."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Bea also pick up a package at the post office?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito ayuda con mandados para mi mamá."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 45 one more hour, a second store"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Bea come every Tuesday, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Bea come an extra day next week?"
+   ],
+   [
+    "NEXT A.M. asks: water heater flush, 12 months",
+    "NEXT A.M. asks: errands next month"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The lock on the back door is broken now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE back door locked, hall clear"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Bea also stop at the post office?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should the dry cleaning go back to the same store?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD back door open, window broken, stopped"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Do you smell gas?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next Tuesday's run?"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ravi: errand desk, runs errands too"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my mom's home. Groceries and dry cleaning, 2 hours."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more hour · $45"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the home check"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Bea seemed rushed today."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Ravi: errand desk, runs errands too"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Where should the concierge leave the bags?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the back door is open"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE broke a lamp"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A second weekly run"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa errands Thu 12pm Tariq"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It doesn't smell like gas."
+   ],
+   [
+    "A.M.: water heater replacement",
+    "A.M.: event-day errands"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Standing errands: every Tuesday"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Three home checks · $105"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the desk, and errands at homes"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Back door open"
+   ],
+   [
+    "Water heater replacement",
+    "Event-day concierge"
+   ],
+   [
+    "Sewer camera inspection",
+    "Three home checks"
+   ],
+   [
+    "Priced from your photos",
+    "Priced after a call"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW package shipping"
+   ],
+   [
+    "Under the sink, before",
+    "Back door, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Hall, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken lamp"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No huele a gas."
+   ],
+   [
+    "A.M. · water heater",
+    "A.M. · errands"
+   ],
+   [
+    "Yes, it won't drain",
+    "No, but a cat. Leave the bags in the kitchen."
+   ],
+   [
+    "A water heater job",
+    "An errand run at a customer's home"
+   ],
+   [
+    "Water heater flush",
+    "Home check"
+   ],
+   [
+    "the shutoff valves",
+    "the extra hour"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 90 errands, 2 hours"
+   ],
+   [
+    "Leak repair",
+    "Purchases"
+   ],
+   [
+    "Quoted from photos first",
+    "Priced after a call first"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work is licensed to its own office."
+   ],
+   [
+    "3 jobs",
+    "3 errands"
+   ],
+   [
+    "next job:",
+    "next errand:"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the errand details"
+   ],
+   [
+    "Something of Alex's is damaged",
+    "Something of Ana's is damaged"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Bea and Alex check the bags and receipts"
+   ],
+   [
+    "The quote stays open 7 days",
+    "The price stays open 7 days"
+   ],
+   [
+    "Drain clearing · $179",
+    "Errand run · $90"
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote.",
+    "Morgan P. asked to talk about the $640 event-day price."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise errands to 48 an hour"
+   ],
+   [
+    "Ask Sam about your jobs.",
+    "Ask Sam about your errands."
+   ],
+   [
+    "one address tried to book more jobs today than the plug-in allows",
+    "one address tried to book more errands today than the plug-in allows"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Concierge Co LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Concierge Co's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Concierge Co"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Errand Desk"
+   ],
+   [
+    "leehomeservices.com",
+    "leeconcierge.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Errand Service"
+   ],
+   [
+    "Lee Electric",
+    "Lee Home Checks"
+   ],
+   [
+    "plumbing and electrical",
+    "errand and home check service"
+   ],
+   [
+    "1200 Main St",
+    "14 Quarry Rd"
+   ],
+   [
+    "42 Oak St",
+    "27 Birch Ln"
+   ],
+   [
+    "88 Elm St",
+    "9 Market Way"
+   ],
+   [
+    "on Elm St",
+    "on Market Way"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "an $89",
+    "a $45"
+   ],
+   [
+    "$89",
+    "$45"
+   ],
+   [
+    "$179",
+    "$90"
+   ],
+   [
+    "arriving 8–10am",
+    "start at 8:00am"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Errand run"
+   ],
+   [
+    "Drain clearing",
+    "Errand run"
+   ],
+   [
+    "drain clearing",
+    "errand run"
+   ],
+   [
+    "Plumbing",
+    "Errand service"
+   ],
+   [
+    "plumbing",
+    "errand service"
+   ],
+   [
+    "Electrical",
+    "Home check service"
+   ],
+   [
+    "electrical",
+    "home check service"
+   ],
+   [
+    "Barbershop",
+    "Errand desk"
+   ],
+   [
+    "barbershop",
+    "errand desk"
+   ],
+   [
+    "Plumber",
+    "Concierge"
+   ],
+   [
+    "plumber",
+    "concierge"
+   ],
+   [
+    "barbers",
+    "desk staff"
+   ],
+   [
+    "Barber",
+    "Desk staff"
+   ],
+   [
+    "barber",
+    "desk staff"
+   ],
+   [
+    "Haircut",
+    "Desk drop-off"
+   ],
+   [
+    "haircut",
+    "desk drop-off"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The shop's",
+    "The company's"
+   ],
+   [
+    "the shop's",
+    "the company's"
+   ],
+   [
+    "The shop",
+    "The company"
+   ],
+   [
+    "the shop",
+    "the company"
+   ],
+   [
+    "Shop",
+    "Company"
+   ],
+   [
+    "shop",
+    "company"
+   ],
+   [
+    "beard trim",
+    "post office stop"
+   ],
+   [
+    "Jordan",
+    "Bea"
+   ],
+   [
+    "Casey",
+    "Tariq"
+   ],
+   [
+    "Riley",
+    "Ravi"
+   ],
+   [
+    "Avery",
+    "Mei"
+   ],
+   [
+    "Add photos",
+    "Add the errand details"
+   ],
+   [
+    "service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service-call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "$358",
+    "$180"
+   ],
+   [
+    "Rental 1",
+    "Errand run"
+   ],
+   [
+    "Rental 2",
+    "Errand run"
+   ],
+   [
+    "25% deposit",
+    "Card saved for the $45 fee"
+   ],
+   [
+    "The rest after",
+    "Card at DONE"
+   ],
+   [
+    "Paid in full",
+    "Card saved for the $45 fee"
+   ],
+   [
+    "Priced from photos",
+    "Priced after a call"
+   ],
+   [
+    "From photos",
+    "After a call"
+   ],
+   [
+    "$120 an hour",
+    "$45 an hour"
+   ],
+   [
+    "$150",
+    "$35"
+   ],
+   [
+    "$199",
+    "$105"
+   ],
+   [
+    "$160",
+    "$45"
+   ],
+   [
+    "Priced at the visit",
+    "At cost, with receipts"
+   ],
+   [
+    "Labor",
+    "Errand hours"
+   ],
+   [
+    "Water heater fix",
+    "Post office stop"
+   ],
+   [
+    "Nothing more",
+    "Card at DONE"
+   ],
+   [
+    "NMKEEP",
+    "Nothing more"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex drops off two store returns and a package to ship at Lee Errand Desk, Sam's second company, on Sat Oct 24 at 11:00am. Ravi takes them in. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Concierge Co to run errands for a mother, Ana, who lives at 27 Birch Ln: groceries and dry cleaning on Thu Oct 22, starting at 8:00am, for 2 hours, with nobody home. Bea runs them. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: two returns and a package dropped at the desk, up to 3 items for $35, plus shipping at cost. A card is saved, and it's charged when the desk is done with them.",
+    "list|full|none": "Holiday gift wrap and send, up to 5 gifts for $55, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Desk drop-off"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Desk drop-off"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Holiday gift wrap and send"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: groceries and dry cleaning for Ana, Thu Oct 22, starting at 8:00am, 2 hours at $45 an hour: $90, plus miles and purchases at cost with receipts. A card is saved, and it's charged when Bea texts DONE. Standing errands use the same card.",
+    "list|none|bill": "Office errands for a business at $45 an hour. Nothing is taken at booking, and Rosie texts the business one bill a month."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$45",
+     "name": "Errand run"
+    },
+    "list|*|*": {
+     "price": "$90",
+     "name": "Errand run"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "color",
+  "Caregiver",
+  "caregiver"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "Each drop-off is charged when it is done, never as a plan charge on a set day.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "does": "Say Sofia G. left two returns, a package and dry cleaning. Staff text READY when each is done. Sofia hears the receipt or tracking number, and the pick-up hours for dry cleaning.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "READY S.G. Receipt and tracking added."
+     ],
+     [
+      "san",
+      "cust",
+      "Your items are done. A return has its store receipt, and a package has its tracking number. Dry cleaning is ready for pick-up.",
+      {
+       "card": {
+        "title": "Done",
+        "lines": [
+         "What was done: on your page, with the receipt and tracking number",
+         "Dry cleaning pick-up: Tue to Sat, 9am to 6pm",
+         "Bring the code you used to drop it off",
+         "Something wrong? Reply within 24 hours"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/r/s7"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Customers book a concierge's time, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "No classes: errands and desk drop-offs.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "No person license; drivers' licenses and checks are asked at S2-29.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Errands aren't a health practice, so both companies pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The errand plug-in names no agreement to sign before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Errands are never sent now: same-day errands show the soonest times first.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Errands need no state license: registration only.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A desk drop-off books a worker's time.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A desk drop-off books a worker's time.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A desk drop-off books a worker's time.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "A desk drop-off needs no form signed first.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Every desk visit leaves an item with the desk.",
+    "label": "No: the customer stays"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "Lee Errand Desk serves adults; nobody is left in its care.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Sensitive work: no rating is asked (the switch sensitive).",
+    "label": "Yes, a rating is asked"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "why": "A drop-off has nothing to fix. A complaint goes to Sam.",
+    "label": "Alex asks for a fix"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Bea and Alex go over the bags, the receipts and anything taken from the home. Anything wrong is fixed first, and the photos settle any claim."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Standing errands are charged run by run at each DONE, never as a plan charge on a set day.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Customers book a concierge's time, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "No classes: errands.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "No person license; drivers' licenses and checks are asked at S2-29.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Errands aren't a health practice, so both companies pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The errand plug-in names no agreement to sign before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Errands are never sent now: same-day errands show the soonest times first.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Errands need no state license: registration only.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Errands are never sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Errands are never sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "Errands start at the customer's place. The desk drop-off is the other company's.",
+    "label": "Both places: the customer picks"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "An errand starts at a set time.",
+    "label": "1 Arrival windows"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Errands have no stays.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Errands book a person's time, never a seat.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A concierge is never left alone with a child.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B8-96",
+    "why": "An errand run is done in one trip.",
+    "label": "It needs another day"
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "why": "A missed task is made up at the next run, with Sam's OK: it's a complaint, never a warranty.",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Sensitive work: no rating is asked (the switch sensitive).",
+    "label": "Yes, a rating is asked"
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A purchase would go over the limit",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.8",
+        "9.2"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:45am",
+       "title": "A purchase would go over the limit",
+       "does": "Bea finds the groceries would cost more than the limit Alex set. Bea texts OVER with the total. Rosie asks Alex before anything is bought, and the extra is paid with the rest at DONE.",
+       "more": [
+        "The limit is on the secure page. Up to it, Bea buys at cost and keeps the receipt.",
+        "Over it, Alex's yes comes first. No answer: a reminder after 15 minutes, then Sam reaches Alex, or the item is skipped.",
+        "A purchase over Sam's amount for one errand goes to Sam first.",
+        "Nothing is marked up. Alex is charged the cost on the receipt, at DONE, never before."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "OVER 112 groceries, limit 100"
+        ],
+        [
+         "san",
+         "cust",
+         "Bea needs $112 for the groceries, and your limit is $100. Buy them at cost, with the receipt?",
+         {
+          "buttons": [
+           "Yes, buy them",
+           "Skip them"
+          ]
+         }
+        ],
+        [
+         "san",
+         "staff",
+         "Alex said yes. Buy the groceries at cost and keep the receipt.",
+         {
+          "as": "Bea"
+         }
+        ]
+       ],
+       "rule": "Rosie's rule: a purchase over the customer's limit waits for the customer's yes. Why: the customer sets what may be spent.",
+       "needs": [
+        "booked"
+       ],
+       "gives": [],
+       "tells": [
+        "cust",
+        "staff"
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "notes": "From home-care (refitted 9:21am Tue Oct 27, not edited), merged with the verified sample base plug-in (the held-back test-drive, work/testdrive/concierge.md and its gaps). Kept from the base: the registration-only license, the services and prices, purchases at cost with receipts, the key release, the pharmacy paper, the spending limit, the safety words and go-on cases, the stand-in rule (a regular concierge is asked first), the edges. Why home-care: a set service at the customer's home, often with nobody home, a key hand-over, the same person each time, and standing runs.\nFlow B is the real work: Lee Concierge Co (kinds of work: errand service; home check service). Alex M. books errands for a mother, Ana, at 27 Birch Ln: groceries and dry cleaning, Thu Oct 22 starting 8:00am, 2 hours at $45 an hour = $90, plus miles and purchases at cost with receipts, nobody home, DONE with a photo. Flow A is the less usual side: Lee Errand Desk, Sam's second company, where the customer drops off returns, packages to ship and dry cleaning (fact dropoff), Sat Oct 24 at 11:00am.\nPrices (the example business's own; sign-up cards keep the master's numbers): B errand run $45 an hour (1-hour minimum) = $90 for 2 hours, wait at the home $40 an hour, home check $35, office errands $45 an hour, fee $45 (the 1-hour minimum). A desk drop-off up to 3 items $35 (single return $20, dry cleaning $25, package to ship $40), holiday gift wrap and send up to 5 gifts $55, fee $20.\nMoney B: list|card|card is the main path (a card saved, charged at DONE for the hours, miles and purchases at cost); list|none|bill is office errands (one bill a month, fact monthlybill). Money A: list|card|card (main: the saved card charged when the desk is done) and list|full|none (gift wrap and send paid in full). The base's monthly 10-hour bundle (charged on the 1st, unused hours carried over) is NOT used: it would be a prepaid pack or a charge on a set day. Standing errands are a repeat plan, each run charged at its own DONE; the 'plan charge is due' branches are off. A bundle of hours stays an owner option (the packs feature), not set up in this example.\nFacts: plans, forms, extrawork, monthlybill, dropoff. Switches: sensitive (initials; a prescription pick-up is a health detail, so no service name in a text and no rating) and welfare in flow B (someone who must be home and does not answer is a safety check first). Settings: set start, cutoff 24 hours before. Never sent now. No classes, no spaces, no rating.\nOwn step B8-x01 (a branch of B8-22): a purchase would go over the customer's limit; the customer's yes first; with no answer, one reminder after 15 minutes, then Sam reaches the customer, or the item is skipped (the master's B8-23 and B8-96 already say what silence does; the step adds the customer's limit and the receipt); nothing marked up. A words op on A8-50 (non-money words): READY says receipt or tracking number for returns and packages, and pick-up hours for dry cleaning only.\nOff: spaces or things; classes; each-person license; both places, windows, stays and seats in flow B; a form first in flow A; 'the customer stays' at the desk; a child in the pro's care; 'needs another day'; ratings (sensitive); 'Alex asks for a fix'. Kept words: leak, color, Caregiver, caregiver. Staff Bea, Tariq, Ravi, Mei; the key release is signed on the secure page.\nNot sure of: (1) dropping the monthly bundle (the verifier may want a packs variant); (2) the $2 for errands (kept from the test-drive); (3) the desk's drop-offs of items that never come back are only partly covered (the READY words op); see the gap.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Haircut at home · $75",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Texts READY with the pick-up details",
+    "At your shop, paid at the chair, your own way",
+    "Free on your board: nothing taken, nothing after",
+    "Haircut at the shop",
+    "Haircut at their home",
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "A nothing before, and at their home too, 75, paid when they book. E paid when they book",
+    "Other days: paid at the chair",
+    "Set. For a haircut, the customer picks the place and sees both prices first.",
+    "Barbering workshop",
+    "How would you like it on top? (optional)",
+    "How would you like it on top?",
+    "Step-free door on Elm St · parking in the back",
+    "A step-free door on Elm St, and parking in the back.",
+    "Access, like a step-free chair:",
+    "'Yes, make it a fade' goes back to the times.",
+    "'s cut. I put a note and a photo on the page.",
+    "The note and photo are on the secure page.",
+    "Please use the side door on Oak St.",
+    "Every plumbing service",
+    "Plumbing JP031552 · electrical JE30417",
+    "Plumbing MP045210",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "BS20918",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Saturdays: a tip line on the bill",
+    "Panel upgrade: a free estimate, then a quote",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The shop front",
+    "The chairs",
+    "Price board",
+    "Elm Street Dental",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "May the shop show photos of your hair? Yes / No",
+    "My employer pays for this cut.",
+    "A chair, ready",
+    "Style consult",
+    "Color and cut · $90",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "Some services start with a first step on the same visit, like a patch test with a wait, or a screening. It comes before the price and the work.",
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "The plug-in says a color and cut is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lee's Barbershop doesn't do perms. Nothing was saved. Other businesses nearby may.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Color quotes come to you first. Board prices never need one",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "House calls: allowed where you are, for those cleared",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "Goes on as a house call, in the other flow.",
+    "Goes on as a house call in the other flow.",
+    "Every shop service, color and house calls",
+    "Riley: barber, color and house calls",
+    "Riley: barber, color, house calls",
+    "At the shop, and house calls",
+    "Goes on as a house call",
+    "A water heater job",
+    "Color and cut",
+    "NEW massage",
+    "Kids cut",
+    "From the price list or photos, the price is set.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "3 jobs",
+    "next job:",
+    "An AI that asks for the shop by name hears only that: no reason, and no other shops.",
+    "1 color quote",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "Wants Saturday morning, with Riley",
+    "like a 15-minute style consult",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Books a haircut and a beard trim",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Takes the price from the shop's board",
+    "on the shop's board",
+    "A barbershop books a person's time.",
+    "Anything Riley should know?",
+    "It's a gift for my brother. Can I pay for it?",
+    "A barbershop has none.",
+    "Haircut plan · every 4 weeks",
+    "Color always stays with Riley.",
+    "Give this code at the chair when you arrive.",
+    "Give this code at the chair.",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Can I add a beard trim on Saturday?",
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "the Groom's package",
+    "Groom's package",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "It's 11:00am, and Alex is at the chair.",
+    "What happens at the chair?",
+    "A beard trim is on the price board: $20.",
+    "The cape clip ripped my shirt collar.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "Alex pays at the chair",
+    "DONE 35 haircut",
+    "My company is paying for this one.",
+    "A long job or a course can be paid in stages the plug-in sets.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Books the next visit at the chair",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Color correction",
+    "Do you do kids cuts? My son is 8.",
+    "Priced from your photos",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "on Elm St",
+    "$89",
+    "Drain clearing",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Barbering",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "At the chair",
+    "at the chair",
+    "the chair",
+    "The shop's",
+    "the shop's",
+    "The shop",
+    "the shop",
+    "Shop",
+    "shop",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "the price board",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "service-call fee",
+    "kids cut"
+   ],
+   "B": [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Same-day jobs",
+    "Say Kim L.'s yard drain needs nobody home. Jordan lets himself in the agreed way",
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "At your shop, paid at the chair, your own way",
+    "Every plumbing service, to start",
+    "Each service starts the way most plumbing businesses set it.",
+    "$89, credited to the repair",
+    "a card saved for the $89 service-call fee you OK",
+    "E 25% deposit after the quote. C paid in full when they book",
+    "Nothing more is done",
+    "Nothing more goes",
+    "Nothing more to pay",
+    "Nothing more is paid",
+    "Nothing more is taken",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first. If anyone is at risk, the text says to call 911.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "A haircut could mean a salon or a barbershop.",
+    "Plumbing books a 2-hour window.",
+    "Yes, every year",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Call a mold cleanup company first",
+    "Jordan needs a part from the supply house.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "UPDATE getting a part, back 9:30",
+    "water is off on Main St after 2pm, so afternoon jobs may run late",
+    "Prices it from Alex's photos",
+    "from the customer's photos and answers",
+    "Photos and answers added",
+    "From the photos and answers",
+    "priced by Jordan, from photos",
+    "Priced by Jordan, from your photos",
+    "Every plumbing service, to start",
+    "Each service starts the way most plumbing businesses set it.",
+    "Every plumbing service",
+    "cuts a hand",
+    "cut my hand",
+    "Lee Home Services's",
+    "Plumbing JP031552 · electrical JE30417",
+    "Plumbing MP045210",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "MP045210",
+    "MP045201",
+    "EC22871",
+    "BS20981",
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "Panel upgrade: a free estimate, then a quote",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The shop front",
+    "The chairs",
+    "Price board",
+    "Elm Street Dental",
+    "Me, and yes. It's my kitchen.",
+    "Water pressure check",
+    "A chair, ready",
+    "The drop-off and pick-up times come with the dates. The confirmation and the reminder show both days.",
+    "Thu Oct 22 to Sat Oct 24 · drop-off 8–10am · Jordan",
+    "Fri Oct 23 to Sun Oct 25 · drop-off 8–10am · Casey",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Unsure who's at the door? Call the business line: it says only the pro's first name, and whether his code was entered.",
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there. The receipt goes to Alex their way.",
+    "A job sent now: the pro is told at once, before he sets out.",
+    "Water heater replacement · $640",
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos. Open times come next.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "This is Rosie, the automated booking assistant for Lee Home Services. Add photos of your water heater, and a plumber will price the job. Need access, more time or a language? Tell us.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush. Jordan texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder.",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted. Alex signs or declines it on the secure page.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Jordan priced a water heater replacement for A.M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you.",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Sorry, Lee Home Services couldn't price your water heater this time. Nothing was booked or charged. You can ask again.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Your water heater visit wasn't booked, since the document wasn't signed in time. Nothing was charged for this visit.",
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Reading it back: accept the leak repair for today, starts at 3:00pm, with Jordan. Say yes to go ahead.",
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Your water heater price is with Lee Home Services. We'll let you know by 12:00pm Tue either way.",
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A.M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Price needed: A.M., water heater replacement. Price it before anyone says yes.",
+    "Jordan cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "A.M. didn't sign the water heater contract in time, so nothing was booked.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "M.P. would like to talk about the water heater quote before booking.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Send A.M. $600 for the water heater replacement, not $640?",
+    "Drain clearings already booked keep only their saved card.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "A.M. asks: Can I run the dishwasher before you come?",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "NEXT A.M. asks: water heater flush, 12 months",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "First: is anyone hurt? Do you smell gas?",
+    "Can I skip next week's drain cleaning?",
+    "Riley: barber, color and house calls",
+    "At my home. Just the kitchen sink.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Riley: barber, color, house calls",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "Proposal · Replace the old pipes",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "No. It doesn't smell like gas.",
+    "A.M.: water heater replacement",
+    "Yearly water heater flush plan",
+    "Sewer camera inspection · $199",
+    "At the shop, and house calls",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "Sewer camera inspection",
+    "Priced from your photos",
+    "NEW heating and cooling",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "No. No huele a gas.",
+    "A.M. · water heater",
+    "Yes, it won't drain",
+    "A water heater job",
+    "Water heater flush",
+    "the shutoff valves",
+    "DONE 179 drain",
+    "Leak repair",
+    "Quoted from photos first",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "3 jobs",
+    "next job:",
+    "Asks Alex for photos",
+    "Something of Alex's is damaged",
+    "Jordan and Alex check the work",
+    "The quote stays open 7 days",
+    "Drain clearing · $179",
+    "Morgan P. asked to talk about the $640 quote.",
+    "raise drain clearing to 199",
+    "Ask Sam about your jobs.",
+    "one address tried to book more jobs today than the plug-in allows",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "42 Oak St",
+    "88 Elm St",
+    "on Elm St",
+    "Service call fee",
+    "service call fee",
+    "Service call",
+    "service call",
+    "an $89",
+    "$89",
+    "$179",
+    "arriving 8–10am",
+    "8–10am",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "Haircut",
+    "haircut",
+    "at the chair",
+    "the chair",
+    "The shop's",
+    "the shop's",
+    "The shop",
+    "the shop",
+    "Shop",
+    "shop",
+    "beard trim",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "Add photos",
+    "service-call fee",
+    "$358",
+    "Rental 1",
+    "Rental 2",
+    "25% deposit",
+    "The rest after",
+    "Paid in full",
+    "Priced from photos",
+    "From photos",
+    "$120 an hour",
+    "$150",
+    "$199",
+    "$160",
+    "Priced at the visit",
+    "Labor",
+    "Water heater fix",
+    "Nothing more"
+   ]
+  },
+  "A": {
+   "A7-94": "6490d5d8e6",
+   "A8-50": "0f26abfc87",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S2-30": "3a9ee593f3",
+   "S1-60": "235c90a3c3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A10-44": "50aad85ac2"
+  },
+  "B": {
+   "B8-39": "aa75251207",
+   "B7-91": "7132851ec1",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S2-30": "3a9ee593f3",
+   "S1-60": "235c90a3c3",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-01": "15f683e6cb",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B8-96": "8d7fd18ef5",
+   "B10-37": "be87433467",
+   "B10-32": "7713bff255",
+   "B8-22": "50d78f1af0"
+  }
+ }
+}

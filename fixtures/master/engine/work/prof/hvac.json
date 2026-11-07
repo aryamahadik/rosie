@@ -1,0 +1,6390 @@
+{
+ "id": "hvac",
+ "name": "HVAC technician",
+ "style": "Home visit",
+ "pattern": "fix",
+ "from": "plumber",
+ "plugin": {
+  "pf.license": {
+   "need": "Heating and cooling work in a home needs a license where the state or city licenses it. Gas or oil burner work can need its own license, where the state issues one apart.",
+   "who holds it": "Both, where the state asks: the company (a heating and cooling contractor license) and each tech (a registration, or an apprentice, journeyperson or master level).",
+   "what to ask": [
+    "The company's license number and class",
+    "Each tech's own number and level, in their invite reply",
+    "A gas or oil license, where the state issues one apart from the HVAC license",
+    "Each tech's refrigerant card (the federal EPA technician card) and its type, for AC and heat pump work"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "The company's listing goes live once it's set up, where one is required. Each tech is offered only once the owner says yes.",
+   "renewals": "Reminders before each expiry, on the dates the owner picks (the example: 5 weeks and 1 week before). A lapsed license pauses new bookings for that person.",
+   "insurance or bond": "Liability insurance, and a bond where the state's form asks for one: from the state form.",
+   "background checks": "Only where the state's form asks.",
+   "at the counter": "Part tests and bench repairs at the counter: the state's form says if they need a license. Safe default: the company's registration on file, shown on the listing.",
+   "local rules": "Where the state has no HVAC license, or licenses only some work, the city's or county's license is checked, by the customer's address."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Ridgeway Heat & Air's own list)": [
+    {
+     "service": "Diagnostic visit (finds why there's no heat or no cooling)",
+     "price kind": "one price",
+     "price": "$89, credited to the repair",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill",
+     "note": "Goes on the repairs below. Alex sees it, and that it's owed even if he says no to the repair, before booking."
+    },
+    {
+     "service": "No-heat or no-cooling repair (furnace, boiler, AC, heat pump)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 diagnostic visit is promised",
+     "length": "60 to 90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 diagnostic visit",
+     "after": "Rosie texts the bill",
+     "note": "Nothing is fixed until the customer OKs the quote."
+    },
+    {
+     "service": "Furnace tune-up",
+     "price kind": "one price",
+     "price": "$179",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 fee, or a card saved when the card is charged at DONE",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    },
+    {
+     "service": "AC or heat pump tune-up",
+     "price kind": "one price",
+     "price": "$179",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 fee, or a card saved when the card is charged at DONE",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE",
+     "note": "Only a tech with the refrigerant card. An outdoor unit may be done with nobody home."
+    },
+    {
+     "service": "Mini-split cleaning",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Comfort Plan (yearly upkeep)",
+     "price kind": "one price",
+     "price": "$189 a year: a fall furnace tune-up and a spring AC tune-up",
+     "length": "two 60-minute visits a year",
+     "place": "at the customer's place",
+     "before": "the full price, after the plan's own yes",
+     "after": "nothing more",
+     "note": "Renews each year, told before each renewal. Each season's visit starts with a text to pick a time."
+    },
+    {
+     "service": "Humidifier or air cleaner put in",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $640)",
+     "length": "half a day",
+     "place": "at the customer's place",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill"
+    },
+    {
+     "service": "System replacement (furnace, boiler, AC or heat pump)",
+     "price kind": "free estimate visit first",
+     "price": "the signed contract's price",
+     "length": "one or two days",
+     "place": "at the customer's place",
+     "before": "a deposit under the signed contract, within the state form's cap",
+     "after": "the rest on the bill",
+     "note": "Sam does the estimates (the example's own choice). The license holder pulls the permit, where the local rules require one."
+    },
+    {
+     "service": "Duct camera inspection",
+     "price kind": "by person",
+     "price": "tech $199, master $249",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 diagnostic visit",
+     "after": "Rosie texts the bill",
+     "note": "The report link comes later"
+    },
+    {
+     "service": "Gas line or venting work",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 diagnostic visit is promised",
+     "length": "set by the owner",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 diagnostic visit",
+     "after": "Rosie texts the bill",
+     "note": "The owner OKs each booking first. Only techs with the gas license, where the state issues one."
+    },
+    {
+     "service": "After-hours no-heat or no-cooling call",
+     "price kind": "one price",
+     "price": "$149, credited to the repair; flat-price jobs $60 more",
+     "length": "sent now: an arrival estimate, not a window",
+     "place": "at the customer's place",
+     "before": "a card saved for the $149 fee",
+     "after": "Rosie texts the bill",
+     "note": "Sent now to the tech on call, then the backup. Free to cancel until he texts OMW."
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum",
+     "place": "at the customer's place",
+     "note": "Goes on quoted jobs; not booked alone"
+    }
+   ],
+   "at the business (the example: Ridgeway Supply's counter list)": [
+    {
+     "service": "Part test (bring the old part: an igniter, a flame sensor, a capacitor or a motor)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "both: at the shop, or at the customer's home as a $75 home visit paid in full",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "A new part found to match is sold at the shop's own price, once Alex says yes."
+    },
+    {
+     "service": "Thermostat setup (bring the thermostat)",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Custom filter (cut to size)",
+     "price kind": "one price",
+     "price": "$20",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Flame sensor cleaning",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Window AC cleaning",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the shop",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Dehumidifier repair",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours, or a drop-off",
+     "place": "at the shop",
+     "before": "a card saved for the $40 fee (over 2 hours), or a $40 deposit",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Control board repair",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $90)",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "The owner OKs each quote. Only Luis does board repairs."
+    },
+    {
+     "service": "Blower motor repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $25 bench test is promised",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Video check of a thermostat or a unit",
+     "price kind": "the owner's own price",
+     "place": "at the business (a video session)",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Only where the owner offers it"
+    }
+   ],
+   "capacity": "One tech per booking. A replacement can need a crew of two. The counter's bench repairs need its one test bench.",
+   "skills each needs": "AC and heat pump work needs the refrigerant card. Gas furnaces and boilers need the gas license, and oil burners the oil license, where the state issues one. Board repairs at the counter need the board skill.",
+   "nobody home": "An outdoor AC or heat pump tune-up, with the customer's OK: nobody needs to be home. DONE comes with a photo. Anything inside: an adult is home.",
+   "online": "A video check only, where the owner offers it. No repair is done by video.",
+   "extras": "Travel inside the service area only (the example: 25 miles). Parts at cost or at list, the owner's pick. An after-hours price the owner sets. No tax line unless the owner sets a rate."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What heats or cools the home: a gas furnace, a boiler, a heat pump, oil, central AC or a mini-split",
+    "What's happening: no heat, no cooling, a noise, water around the unit, or it keeps turning on and off",
+    "Is a carbon monoxide alarm going off, or is there a gas smell? A yes means get out first",
+    "No heat in freezing weather, or no cooling in great heat, with an older person, a baby or someone with a medical need at home: a yes or no only",
+    "For a tune-up or the plan: which system, and when it was last serviced",
+    "At the counter: which part, and the unit's brand and model from its label"
+   ],
+   "after a time is picked": [
+    "Is the thermostat set to heat or cool? Is a light blinking, or a code showing?",
+    "When was the filter last changed? About how old is the system?",
+    "Where the equipment is (a basement, an attic, a closet, outside), access, parking and pets",
+    "Own or rent, and who pays: the customer, or the landlord or manager",
+    "A home warranty or the maker's warranty: the plan's name only; the customer gets the receipt for the claim"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "Gate or lock codes",
+    "Any medical need at home: only whether it makes the job urgent, never the details",
+    "The landlord's or manager's name and mobile",
+    "Photos inside the home",
+    "The card"
+   ],
+   "saved for next time": "Each home's equipment: its type, fuel, brand and model, the year it was put in, the filter size, the last service, and if it's tagged off or waiting on a part. The next booking shows these for a quick yes.",
+   "who may book": "An adult. A renter books, and the landlord or manager OKs it where they pay. A person the owner of the home names may book for them."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A carbon monoxide alarm going off, or a gas smell",
+     "says": "Get everyone outside now, pets too, and leave the door open. Don't flip switches or use a phone inside. From outside, call 911 and the gas company.",
+     "booking": "No booking. A new request must say the house was cleared."
+    },
+    {
+     "words": "Someone feels sick, dizzy, or too cold or hot; smoke or a burning smell from the equipment",
+     "says": "Call 911.",
+     "booking": "No booking until it's safe; the customer can come back."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "No heat in freezing weather, with an older person, a baby or someone with a medical need at home",
+     "says": "Keep everyone in one warm room, in layers. Never heat the home with the oven, a grill or a camp heater: they can make carbon monoxide. If anyone seems unwell or too cold, call 911."
+    },
+    {
+     "words": "No cooling in great heat, with someone at risk at home",
+     "says": "Move to the coolest room, drink water, and use fans. If anyone feels faint or confused, call 911."
+    },
+    {
+     "words": "Water dripping from the furnace or the AC",
+     "says": "Turn the system off at the thermostat, and keep the water away from outlets."
+    }
+   ],
+   "set answers to risky questions": [
+    {
+     "asks": "Can I heat the house with the oven?",
+     "says": "Please don't: an oven used for heat can give off carbon monoxide."
+    },
+    {
+     "asks": "Can I use a space heater?",
+     "says": "A plug-in space heater stays 3 feet from anything that can burn, and is never left on while you sleep."
+    },
+    "Any other question goes to the tech."
+   ],
+   "at the visit": "A cracked heat exchanger or a carbon monoxide reading: the tech turns off the gas to that equipment, tags it 'do not use' and shows the photos. Rosie texts a written safety notice.",
+   "at the counter": "A gas valve or a gas control isn't repaired at the counter. The customer is offered a home visit by a tech with the gas license. Refrigerant is sold only to people with the refrigerant card.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "A free estimate visit",
+     "for": "System replacements, and big repairs like a new heat exchanger",
+     "timing": "Before the quote. Sam does them (the example's own choice)"
+    },
+    {
+     "step": "Photos first",
+     "for": "A humidifier or an air cleaner",
+     "timing": "Before the quote"
+    },
+    {
+     "step": "A signed contract",
+     "for": "Replacements, and jobs over the state form's amount",
+     "timing": "Before any money, with the cancel days the rules give"
+    },
+    {
+     "step": "A permit",
+     "for": "Replacements, and new gas or duct work",
+     "timing": "Pulled by the license holder before the work, where the local rules require one (a to-do for the owner); the inspection follows"
+    },
+    {
+     "step": "The owner's OK",
+     "for": "Urgent no-heat or no-cooling jobs, gas work, and same-day jobs",
+     "timing": "Before the booking is confirmed; a 15-minute wait when it's urgent"
+    },
+    {
+     "step": "A part check (the old part brought in, or a photo of the unit's label)",
+     "for": "A special-order part at the counter",
+     "timing": "At least 2 days before; good for 3 months"
+    }
+   ],
+   "prep for the reminder": [
+    "Clear a path to the furnace, the boiler or the outdoor unit",
+    "Write down any code or blinking light",
+    "Put pets in another room",
+    "At the counter: bring the old part, or a photo of the unit's label; drain a dehumidifier before a drop-off"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code at the door. The on-my-way text names the tech, with a photo. An adult is home for the whole visit.",
+   "check-in at the counter": "The code at the counter (the tech or the desk types it). A drop-off gets its code when the item is left, and READY when it's tested.",
+   "before work": "The tech checks the air for carbon monoxide before working on a furnace or boiler that burns fuel.",
+   "quotes at the visit": "The tech texts the quote with its lines before any work. The diagnostic visit is credited. The customer may OK part of it. The quote stays good 7 days.",
+   "extra work": "Quoted by text up to the owner's limit (the example: $500). Above it, the owner OKs it first. A replacement found gets its own free estimate.",
+   "a hazard": "A cracked heat exchanger or another danger: the gas to it is turned off, it's tagged 'do not use', and the photos are shown. A written safety notice goes out. A second opinion is fine.",
+   "work sold at the home": "A written right to cancel, plans too, where the rules require it. The work starts inside the cancel days only if the customer writes and signs their own emergency statement, where the rules allow it.",
+   "old parts": "The replaced parts are offered to the customer, where the state's rules require it (the safe default: always offered).",
+   "proof it's done": "The tech checks venting and carbon monoxide again on fuel-burning equipment, then texts DONE with the bill's lines. Nobody home needed: DONE with a photo.",
+   "equipment record": "The tech adds the system's details to the home's record: type, fuel, brand, model, year, filter size and status.",
+   "permits": "Where a permit was pulled, the inspector's visit is set up after the work, and the result is kept with the job."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's place: a card saved for the $89 diagnostic visit, and Rosie texts the bill after the job",
+    "An owner may take nothing before, with any fee sent as one pay link (the old example's own choice)",
+    "Tune-ups: the saved card may be charged at DONE",
+    "The Comfort Plan: the year paid in full, after its own yes",
+    "At the counter: nothing taken; a card saved for the $20 fee; paid at the counter. Over 2 hours: a card saved for the $40 fee",
+    "After hours: the $149 call saved, credited to the repair"
+   ],
+   "limits": [
+    "Work quoted at the visit: nothing more than the diagnostic visit is taken before",
+    "At the home, deposits only on quoted jobs: a humidifier (the example: 25%), or a replacement under a signed contract. At the counter, a drop-off repair may take a small deposit (the example: $40 on a dehumidifier). Deposit cap: from the state form",
+    "No money before a signed contract, where the state's rules say so",
+    "Late cancel or nobody home: the $89 fee (after hours, the $149 call once the tech has headed out). The owner confirms each one; no answer, no fee",
+    "Emergency prices: where the state's rules limit prices in a declared emergency, those limits apply"
+   ],
+   "pay over time": "Only on the lender's own page, never through Rosie.",
+   "plans": "The Comfort Plan needs its own yes. Before each yearly renewal, the customer is told the date, the price and how to end it, with the notice the state's rules require. Ending it takes one reply or the link.",
+   "insurance and warranties": "A home warranty plan pays only once the owner checks it. The maker's warranty may cover a part; the labor is billed.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "parts": "Parts at cost or at list, the owner's pick; parts billed after go on the bill.",
+   "Rosfield's $2": "Applies, as for every kind of work. A plan counts once a month."
+  },
+  "pf.messages": {
+   "never in a text": "Any medical need at home (only 'urgent' is passed on), gate or lock codes, card details, and photos from inside the home: these stay on the secure page.",
+   "languages": "English and Spanish.",
+   "danger words": "Carbon monoxide and gas words always get the safety message first, before anything else."
+  },
+  "pf.staff": {
+   "levels": "A registration, or apprentice, journeyperson and master levels: each person's own license per state, where the state licenses HVAC work.",
+   "skills": [
+    "Gas furnaces and boilers",
+    "Oil burners",
+    "AC and heat pumps",
+    "Mini-splits",
+    "Tune-ups",
+    "Ductwork and duct camera",
+    "Humidifiers and air cleaners",
+    "Counter part tests and board repairs"
+   ],
+   "refrigerant card": "Only techs with a refrigerant card of the right type are offered for AC and heat pump jobs. A gas furnace job needs none.",
+   "gas and oil": "Gas furnaces, boilers and gas lines only by techs with the gas license, and oil burners with the oil license, where the state issues one apart.",
+   "supervision": "An apprentice works only with a licensed tech on the job, where the state's rules require it. An apprentice is never sent alone by default.",
+   "who OKs what": "The owner OKs fees, quotes over the limit, urgent jobs, gas work and same-day jobs. Replacement estimates: the owner only (the example). After hours, a job sent now goes to the tech on call, then the backup. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "Another tech with the same skills and cards, at the same window and price."
+  },
+  "pf.rules": {
+   "written contract": "A signed written contract before work above an amount, and for replacements: from the state form.",
+   "money before": "No money before a signed contract, and the deposit cap: from the state form.",
+   "right to cancel": "Cancel days for work sold at the home, plans too: where the rules require it.",
+   "emergency start": "Work starts inside the cancel days only if the customer writes and signs their own emergency statement, where the rules allow it. Rosie never fills it in.",
+   "permits": "Pulled by the license holder for replacements and new gas or duct work, where the local rules require one; the inspection follows.",
+   "one service charge": "One service charge per visit, the trip included, shown before the customer agrees: where the state's rules require it (the safe default: always).",
+   "old parts": "The replaced parts offered to the customer: where the state's rules require it.",
+   "license on papers": "The license number on listings, confirmations, quotes and bills: from the state form.",
+   "plans": "Renewal notices and refund days for plans: from the state form.",
+   "declared emergency": "Price limits in a declared emergency: where the state's rules require it.",
+   "refrigerant": "Refrigerant handled only by people with the refrigerant card: always.",
+   "warranty": "The owner's own (the example: 1 year on labor), shown on the receipt.",
+   "records": "7 years, as for every kind of work."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for heating and cooling:",
+   "heating and cooling": [
+    "No heat in freezing weather or no cooling in great heat, with someone at risk at home: the safety steps, then urgent, soonest first, a shorter wait for the owner",
+    "A carbon monoxide alarm or a gas smell at any point: get out, call 911 and the gas company; the visit waits, with no fee",
+    "The heat comes back before the visit: the customer decides; Rosie doesn't guess if it will last",
+    "A risky question, like heating with the oven: the set safety answer at once, then the tech",
+    "A cracked heat exchanger: turned off and tagged, a written notice, and a free estimate for the fix",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "After hours: sent now to the tech on call, then the backup; nobody takes it means no visit tonight and the hold released",
+    "A replacement needed inside the cancel days: only with the customer's own signed statement",
+    "A cold snap or a heat wave brings many calls: PAUSE, and a declared emergency's price limits",
+    "At the counter: a part that can't be fixed, a gas part, or a drop-off nobody picks up"
+   ]
+  },
+  "pf.facts": [
+   "documents",
+   "dropoff",
+   "extrawork",
+   "photos",
+   "plans",
+   "sentnow"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Your haircut is part of a plan",
+    "Your filter pickup is part of a plan"
+   ],
+   [
+    "Haircut every 4 weeks",
+    "Filter pickup every 4 weeks"
+   ],
+   [
+    "Haircut · Sat Oct 31",
+    "Filter pickup · Sat Oct 31"
+   ],
+   [
+    "Sam raises the haircut to $40",
+    "Sam raises the filter pickup to $40"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit.",
+    "Tune-ups have a set price. No-heat repairs are priced at the visit."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "My furnace won't light. Can Ridgeway Supply test the old igniter on Saturday?"
+   ],
+   [
+    "Book me the Groom's package at Lee's Barbershop on Saturday.",
+    "My dehumidifier stopped working. Can Ridgeway Supply fix it on Saturday?"
+   ],
+   [
+    "Book me a signature cut and hot towel shave at Lee's Barbershop on Saturday.",
+    "Can Ridgeway Supply clean my window AC on Saturday?"
+   ],
+   [
+    "Book me a color and cut at Lee's Barbershop on Saturday.",
+    "Can Ridgeway Supply fix my furnace's control board on Saturday?"
+   ],
+   [
+    "Book me a color correction at Lee's Barbershop on Saturday.",
+    "My blower motor squeals. Can Ridgeway Supply repair it on Saturday?"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's my brother's furnace part. Can I pay for it?"
+   ],
+   [
+    "A haircut plan follows the shop's own setup for haircuts",
+    "A filter plan follows the shop's own setup for filters"
+   ],
+   [
+    "Haircut plans go to",
+    "Filter plans go to"
+   ],
+   [
+    "haircut plans go to",
+    "filter plans go to"
+   ],
+   [
+    "Haircut plan",
+    "Filter plan"
+   ],
+   [
+    "haircut plan",
+    "filter plan"
+   ],
+   [
+    "Keep it as a haircut for $35",
+    "Keep it as a dry clean for $35"
+   ],
+   [
+    "Keep it as a haircut",
+    "Keep it as a dry clean"
+   ],
+   [
+    "Uses a cut from Alex's package",
+    "Uses a filter from Alex's pack"
+   ],
+   [
+    "Alex bought a package of cuts at the shop. This booking uses one of them, so the cut itself is already paid.",
+    "Alex bought a pack of custom filters at the shop. This booking uses one of them, so the filter itself is already paid."
+   ],
+   [
+    "Alex's page shows the cuts left.",
+    "Alex's page shows the filters left."
+   ],
+   [
+    "Alex has had cuts at the shop before",
+    "Alex has had parts tested at the shop before"
+   ],
+   [
+    "Shows Alex the cut; fixes first",
+    "Shows Alex the part; fixes first"
+   ],
+   [
+    "whichever barber cuts",
+    "whichever counter tech works"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Andre hurts a hand and texts HURT."
+   ],
+   [
+    "Color and cut",
+    "Control board repair"
+   ],
+   [
+    "color and cut",
+    "control board repair"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Appliance repair for Ridgeway Supply: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds appliance repair to Ridgeway Supply."
+   ],
+   [
+    "NEW massage",
+    "NEW appliance repair"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 test; priced at the counter"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the bench test; the price stays open"
+   ],
+   [
+    "have the consult only today",
+    "have the bench test only today"
+   ],
+   [
+    "2 Consult only: Riley does the consult",
+    "2 Bench test only: Riley does the bench test"
+   ],
+   [
+    "Consult only",
+    "Bench test only"
+   ],
+   [
+    "does the consult only",
+    "does the bench test only"
+   ],
+   [
+    "pays for the consult",
+    "pays for the bench test"
+   ],
+   [
+    "$25 consult",
+    "$25 bench test"
+   ],
+   [
+    "after a consult",
+    "after a bench test"
+   ],
+   [
+    "Alex asks for a perm, which the shop doesn't do.",
+    "Alex asks for a refrigerator repair, which the shop doesn't do."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't repair refrigerators."
+   ],
+   [
+    "Gloss to finish",
+    "Contact cleaner to finish"
+   ],
+   [
+    "gloss",
+    "contact cleaning"
+   ],
+   [
+    "Alex is already in the chair",
+    "Alex is already at the counter"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench clamp scratched my motor's housing."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the bench clamp scratched a motor housing today."
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A custom filter is on the price list: $20."
+   ],
+   [
+    "beard trim will start",
+    "visit for a custom filter will start"
+   ],
+   [
+    "Alex's to bring, like a form",
+    "Alex's to bring, like a part"
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "Some pieces of the part are missing."
+   ],
+   [
+    "the signed form Alex was to bring is missing",
+    "some pieces of the part Alex was to bring are missing"
+   ],
+   [
+    "the signed form it needs is missing",
+    "some pieces of the part are missing"
+   ],
+   [
+    "since the signed form was missing",
+    "since some pieces of the part were missing"
+   ],
+   [
+    "Once you have the form, you can book again",
+    "Once you have all the pieces, you can book again"
+   ],
+   [
+    "fee for the missing form",
+    "fee for the missing pieces"
+   ],
+   [
+    "A barbershop books kids cuts with a parent.",
+    "An HVAC parts counter books adults only."
+   ],
+   [
+    "Plumbing, electrical and barbering need one",
+    "HVAC, electrical and counter work need one"
+   ],
+   [
+    "Plumbing, electrical and barbering license each person",
+    "HVAC, electrical and counter work license each person"
+   ],
+   [
+    "Barbering pays the $2",
+    "Counter work pays the $2"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a thermostat"
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else, like board repairs"
+   ],
+   [
+    "Alex's color has nobody else",
+    "Alex's board repair has nobody else"
+   ],
+   [
+    "Say Alex's visit were a color, which only Riley does at the shop.",
+    "Say Alex's visit were a board repair, which only Riley does at the shop."
+   ],
+   [
+    "Alex's color has buttons 1 and 2.",
+    "Alex's board repair has buttons 1 and 2."
+   ],
+   [
+    "Color at the shop is like that: only Riley does it.",
+    "Board repairs at the shop are like that: only Riley does them."
+   ],
+   [
+    "Alex stays in the chair",
+    "Alex stays at the counter"
+   ],
+   [
+    "Haircuts and beard trims",
+    "Part tests and custom filters"
+   ],
+   [
+    "Any scalp trouble Riley should know about?",
+    "Do you know the furnace's brand and model?"
+   ],
+   [
+    "can cut your hair at the shop",
+    "can test your part at the counter"
+   ],
+   [
+    "A color correction at Lee's Barbershop is priced at the chair.",
+    "Ridgeway Supply prices a blower motor repair at the counter."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A furnace part could mean a parts counter or a tech at home"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The HVAC plug-in adds its own: a carbon monoxide alarm or a gas smell."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A furnace that is off at home can still have its part tested here. A tech at home is the other flow."
+   ],
+   [
+    "It adds any way to get ready from the plug-in. A barbershop has none.",
+    "It adds the plug-in's way to get ready: bring the old part, or a photo of the unit's label."
+   ],
+   [
+    "A haircut needs nothing.",
+    "A part test needs the old part, with any wires or brackets on it."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A dehumidifier repair can be a drop-off: Alex leaves it, and picks it up when it's ready."
+   ],
+   [
+    "If it's for a child, the kids cut is picked here, so the times fit it.",
+    "A second part is added here too, so the times fit both."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two parts from one furnace work the same way. Both are asked before the times."
+   ],
+   [
+    "A patch test is a small skin test for a reaction to hair dye.",
+    "A part check: Alex brings the old part in first, so the right one can be ordered."
+   ],
+   [
+    "like a doctor's note",
+    "like the maker's warranty claim number"
+   ],
+   [
+    "get the doctor's note before the visit",
+    "get the maker's warranty claim number before the visit"
+   ],
+   [
+    "Before the cut: an old scar on Alex's crown, left side.",
+    "Before the test: a burn mark on the part's wire, left side."
+   ],
+   [
+    "Crown, before the cut",
+    "Wire, before the test"
+   ],
+   [
+    "shows the cut in the mirror",
+    "runs the part on the test bench"
+   ],
+   [
+    "like a skin-test result",
+    "like a part number"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The new igniter glows, but the burners still won't light."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's igniter glows, but the burners won't light"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you clean flame sensors too?"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a flame sensor cleaning is $25"
+   ],
+   [
+    "The plug-in's aftercare notes go out after the visit. A reaction Alex reports is checked for danger first.",
+    "The plug-in's care notes go out after the visit: turn the power off at the furnace before putting the part in. A problem Alex reports is checked for danger first."
+   ],
+   [
+    "How to care for your skin and hair",
+    "How to put in your new part"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop the part off and come back later?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Picks up filters every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks",
+    "Alex rents out homes, and asks for custom filters every 4 weeks"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero probar una pieza del calentador el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a furnace part tested on Saturday."
+   ],
+   [
+    "Offers a shorter cut or a later time",
+    "Offers a later start or a new time"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley can still fit the test if you're here by 11:20, or you can move to a later time."
+   ],
+   [
+    "Shorter is fine",
+    "I'll be there"
+   ],
+   [
+    "Alex's employer pays for a staff cut",
+    "Alex's landlord pays for the part test"
+   ],
+   [
+    "an employer for a staff cut",
+    "a landlord for a rental's furnace part"
+   ],
+   [
+    "A skin problem stops the work",
+    "A gas part stops the work"
+   ],
+   [
+    "like a doctor, never a named one",
+    "like a tech with the gas license, never a named one"
+   ],
+   [
+    "If it's urgent, see a doctor or call 911.",
+    "If you smell gas, get everyone out and call 911 from outside."
+   ],
+   [
+    "your Sat Oct 31 color",
+    "your Sat Oct 31 board repair"
+   ],
+   [
+    "that's the skin and scalp",
+    "that's any burn mark or crack on the part"
+   ],
+   [
+    "looks at Alex's hair",
+    "looks at Alex's part"
+   ],
+   [
+    "sees the hair",
+    "sees the part"
+   ],
+   [
+    "a beard oil",
+    "a spare fuse"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s part test"
+   ],
+   [
+    "Cut only",
+    "Test only"
+   ],
+   [
+    "a barber who rents a chair",
+    "a tech who rents bench space"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Just a trim on top.",
+    "It's the igniter."
+   ],
+   [
+    "Keep the beard short.",
+    "It hums but won't run."
+   ],
+   [
+    "Short on the sides.",
+    "It's a flame sensor."
+   ],
+   [
+    "Like the color in my photos.",
+    "Fix it if you can, so I keep the old board."
+   ],
+   [
+    "It went brassy last time.",
+    "It failed once before."
+   ],
+   [
+    "How long is your beard now? A long beard takes longer.",
+    "Is it a dehumidifier or a window AC? A window AC takes longer."
+   ],
+   [
+    "About an inch.",
+    "A dehumidifier."
+   ],
+   [
+    "Is your beard longer than an inch? A long beard takes longer.",
+    "Does the motor have two speeds? Two take longer."
+   ],
+   [
+    "No, it's short.",
+    "No."
+   ],
+   [
+    "Is your hair past your shoulders? Longer hair takes more time.",
+    "Is the furnace over 20 years old? Older parts take longer."
+   ],
+   [
+    "Was the color done at a salon, or at home?",
+    "Was the board fixed before, by a tech or at home?"
+   ],
+   [
+    "Long hair can take longer.",
+    "An older part can take longer."
+   ],
+   [
+    "had to leave before the facial",
+    "had to leave before the run test"
+   ],
+   [
+    "had to leave before the hot towel shave",
+    "had to leave before the final test"
+   ],
+   [
+    "had to leave before the color",
+    "had to leave before the board was tested"
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "hot surface igniter, cracked; furnace brand on file"
+   ],
+   [
+    "Towel steamer broken until Mon",
+    "Coil wash station broken until Mon"
+   ],
+   [
+    "The towel steamer breaks",
+    "The coil wash station breaks"
+   ],
+   [
+    "needs the steamer",
+    "needs the wash station"
+   ],
+   [
+    "The hot towel part of your",
+    "The coil wash part of your"
+   ],
+   [
+    "color-correction session",
+    "blower motor repair visit"
+   ],
+   [
+    "Every price on the board books without an OK. Color is priced for each customer, so Sam OKs each color quote, like the color correction price Riley sets at the chair.",
+    "Every price on the list books without an OK. Repairs are priced for each customer, so Sam OKs each repair quote, like Riley's blower motor price at the counter."
+   ],
+   [
+    "Color is priced for each customer",
+    "Board repairs are priced for each customer"
+   ],
+   [
+    "Color services need",
+    "Board repairs need"
+   ],
+   [
+    "color services offer",
+    "board repairs offer"
+   ],
+   [
+    "Color always stays with Riley",
+    "Board repairs always stay with Riley"
+   ],
+   [
+    "The color ordered",
+    "The part ordered"
+   ],
+   [
+    "The color I ordered",
+    "The part I ordered"
+   ],
+   [
+    "The color Riley ordered",
+    "The part Riley ordered"
+   ],
+   [
+    "the color for a",
+    "the part for a"
+   ],
+   [
+    "the color costs more",
+    "the part costs more"
+   ],
+   [
+    "color +$20",
+    "part +$20"
+   ],
+   [
+    "color quotes",
+    "repair quotes"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "Color quote",
+    "Repair quote"
+   ],
+   [
+    "does color",
+    "does board repairs"
+   ],
+   [
+    "but color",
+    "but board repairs"
+   ],
+   [
+    "color and house calls",
+    "board repairs and home visits"
+   ],
+   [
+    "color, house calls",
+    "board repairs, home visits"
+   ],
+   [
+    "a different color",
+    "a different fix"
+   ],
+   [
+    "new color plan",
+    "new repair plan"
+   ],
+   [
+    "for a color",
+    "for a board repair"
+   ],
+   [
+    "a color needs",
+    "a board repair needs"
+   ],
+   [
+    "the color Riley can't do",
+    "the board repair Riley can't do"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "on the board",
+    "on the list"
+   ],
+   [
+    "A barbershop has none. The plug-in sets which services run longer.",
+    "A dehumidifier left for repair can take a few days. The plug-in sets which services run longer."
+   ],
+   [
+    "A cut",
+    "A part test"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Furnace tune-up"
+   ],
+   [
+    "kitchen drain clearing",
+    "furnace tune-up"
+   ],
+   [
+    "Lee Plumbing and Lee Electric.",
+    "Ridgeway Electric and Ridgeway Heat & Air."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For HVAC work, a carbon monoxide alarm or a gas smell stops the booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a carbon monoxide alarm or a gas smell."
+   ],
+   [
+    "like a new garbage disposal",
+    "like a new smart thermostat"
+   ],
+   [
+    "A customer wants a garbage disposal put in. Is one in stock?",
+    "A customer wants a smart thermostat put in. Is one in stock?"
+   ],
+   [
+    "like where the main water shut-off is",
+    "like where the furnace's power switch is"
+   ],
+   [
+    "Old heater hauled away Fri, not Thu",
+    "Thermostat wiring done Fri, not Thu"
+   ],
+   [
+    "the old heater hauled away Fri?",
+    "the thermostat wiring done Fri?"
+   ],
+   [
+    "The old heater is hauled away Fri, not Thu",
+    "The thermostat wiring is done Fri, not Thu"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a carbon monoxide alarm or a gas smell, gets the safety steps first."
+   ],
+   [
+    "Jetter in the shop until Mon",
+    "Coil cleaner in the shop until Mon"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE CO reading 0. Old oil stain on the floor by the furnace"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor by the furnace, before"
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Sam's estimate visit at Harper J.'s is for a $2,400 duct replacement."
+   ],
+   [
+    "Repipe · $2,400",
+    "Duct replacement · $2,400"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 duct replacement, 3 stages"
+   ],
+   [
+    "repipe",
+    "duct replacement"
+   ],
+   [
+    "Old heater, leaking at the base",
+    "Old blower motor, failing"
+   ],
+   [
+    "Jordan finds the main water line cracked.",
+    "Andre finds a crushed return duct."
+   ],
+   [
+    "QUOTE 900 main water line cracked, repair",
+    "QUOTE 900 return duct crushed, repair"
+   ],
+   [
+    "found that your main water line is cracked.",
+    "found that your return duct is crushed."
+   ],
+   [
+    "Main water line repair · $900",
+    "Return duct repair · $900"
+   ],
+   [
+    "main water line",
+    "return duct"
+   ],
+   [
+    "CHANGE cleared the main line from the outside cleanout, same price",
+    "CHANGE took the blower out to clean it, same price"
+   ],
+   [
+    "Jordan cracks the cabinet floor and texts a photo.",
+    "Andre cracks a floor tile by the furnace and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a floor tile by the furnace"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked floor tile"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Andre cracked a floor tile at Alex M.'s."
+   ],
+   [
+    "Before DONE, Jordan runs the water with Alex and checks for drips.",
+    "Before DONE, Andre runs the furnace with Alex and checks the carbon monoxide reading."
+   ],
+   [
+    "Here: the heater runs, the hot water is hot, and nothing drips.",
+    "Here: the system runs as it should, and nothing drips."
+   ],
+   [
+    "NOTE new 50-gallon heater in the garage. Old one hauled away.",
+    "NOTE new humidifier on the supply duct. Pad size noted for next time."
+   ],
+   [
+    "Alex M.'s leak repair from Thu Oct 22 is dripping again.",
+    "Alex M.'s furnace, fixed Thu Oct 22, isn't heating again."
+   ],
+   [
+    "The $150 flush takes a $40 deposit too, with the $110 rest later.",
+    "The $150 mini-split cleaning takes a $40 deposit too, with the $110 rest later."
+   ],
+   [
+    "A water heater quote from photos at $640 is over $500, so it comes to Sam.",
+    "A humidifier quote from photos at $640 is over $500, so it comes to Sam."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Tune-ups and no-heat repairs"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like no heat on a freezing night, or a lockout"
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "HVAC takes jobs sent now, like no heat on a freezing night."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My furnace is due for its fall tune-up. Can a tech come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Can a plumber flush my water heater Thursday morning? I'm in Springfield.",
+    "Can a tech clean my mini-split Thursday morning? I'm in Springfield."
+   ],
+   [
+    "There's a leak under my bathroom sink. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My furnace keeps trying to start, but no heat comes out. Can a tech come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "My water heater is old and rusty. Can a plumber replace it this week? I'm in Springfield.",
+    "The air in my house is very dry. Can a tech put in a humidifier this week? I'm in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? La calefacción no funciona, y mi mamá está en casa."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? The heat isn't working, and my mother is home."
+   ],
+   [
+    "Lee Home Services · Water heater leak",
+    "Ridgeway Heat & Air · No heat"
+   ],
+   [
+    "Call summary: Rosa, in Spanish. Water is leaking from the water heater, and the valve is shut.",
+    "Call summary: Rosa, in Spanish. Her furnace gives no heat, and an older person is home."
+   ],
+   [
+    "Leak at the gas water heater · safety steps given",
+    "No heat, older person home · safety steps given"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An HVAC example: no heat with a baby or an older person at home gets 'keep everyone in one warm room'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone in one warm room and never heat with the oven. If she smells gas, she leaves and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantengan a todos en un cuarto cálido, con ropa abrigada. No use el horno para calentar la casa. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep everyone in one warm room, in warm layers. Don't heat the house with the oven. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My furnace got wet in a flood. Is it safe to turn back on?"
+   ],
+   [
+    "We got your voicemail about a dripping faucet.",
+    "We got your voicemail about a noisy furnace."
+   ],
+   [
+    "Voicemail from a new caller about a dripping kitchen faucet.",
+    "Voicemail from a new caller about a noisy furnace."
+   ],
+   [
+    "Wants the faucet looked at this week",
+    "Wants the furnace looked at this week"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a tech tune up an outdoor heat pump this Thursday? What does it cost?"
+   ],
+   [
+    "A drain clearing is $179. I can't book on this call.",
+    "A heat pump tune-up is $179. I can't book on this call."
+   ],
+   [
+    "Lee Home Services · Yard drain clearing",
+    "Ridgeway Heat & Air · Heat pump tune-up"
+   ],
+   [
+    "Alex M. asked you to confirm and pay for a plumbing visit.",
+    "Alex M. asked you to confirm and pay for an HVAC visit."
+   ],
+   [
+    "Alex M. added you to a plumbing visit with Lee Home Services.",
+    "Alex M. added you to an HVAC visit with Ridgeway Heat & Air."
+   ],
+   [
+    "the state asks for a plumbing license for the company, and one for each plumber sent out.",
+    "the state asks for an HVAC license for the company, and one for each tech sent out."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa tune-up Thu 12-2 Hector"
+   ],
+   [
+    "Book Tessa for a clogged drain,",
+    "Book Tessa for a furnace tune-up,"
+   ],
+   [
+    "like a roof leak",
+    "like a roof repair"
+   ],
+   [
+    "like a roofer for a roof leak",
+    "like a roofer for a roof repair"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what heats or cools the home, what's happening, and if a carbon monoxide alarm is going off."
+   ],
+   [
+    "Its first steps: none for a drain. A leak is quoted on site, and a water heater from photos.",
+    "Its first steps: none for a tune-up. A no-heat repair is quoted on site, and a humidifier from photos."
+   ],
+   [
+    "Lee Home Services asks: which drain is clogged, and is water backing up anywhere else?",
+    "Ridgeway Heat & Air asks: is it a gas furnace, and when was the filter last changed?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Gas. The filter was changed in the spring."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric?",
+    "Ridgeway Heat & Air asks: how many indoor units does your mini-split have?"
+   ],
+   [
+    "Electric.",
+    "Just one."
+   ],
+   [
+    "Lee Home Services asks: where is the leak, and is water still coming?",
+    "Ridgeway Heat & Air asks: what heats your home, and is the thermostat set to heat?"
+   ],
+   [
+    "Under the bathroom sink. I shut the valve.",
+    "A gas furnace. The thermostat is on heat, at 70."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric, and is it leaking?",
+    "Ridgeway Heat & Air asks: what kind of furnace do you have, and where is it?"
+   ],
+   [
+    "Gas. It's rusty, but it isn't leaking.",
+    "A gas furnace, in the basement."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos",
+    "The plug-in says a humidifier is priced from photos"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your furnace and the ducts by it, and a tech will price the job."
+   ],
+   [
+    "Alex M. sent photos of a water heater.",
+    "Alex M. sent photos of a furnace and its ducts."
+   ],
+   [
+    "Water heater · Alex M.",
+    "Humidifier · Alex M."
+   ],
+   [
+    "Your water heater price is with",
+    "Your humidifier price is with"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your humidifier this time"
+   ],
+   [
+    "can replace your water heater for $640",
+    "can put in a humidifier for $640"
+   ],
+   [
+    "A clogged drain that's overflowing may be. A water heater replacement never is.",
+    "No heat on a freezing night may be. A humidifier install never is."
+   ],
+   [
+    "Say Alex needs the water heater fast. A replacement priced from photos is never sent now",
+    "Say Alex wants the humidifier fast. A job priced from photos is never sent now"
+   ],
+   [
+    "Casey does drains, leaks and flushes, not water heater replacements.",
+    "Hector does tune-ups and no-heat repairs, not humidifier installs."
+   ],
+   [
+    "Casey does drains, leaks and flushes, so he isn't offered for a replacement.",
+    "Hector does tune-ups and no-heat repairs, so he isn't offered for a humidifier install."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Where is the furnace: a basement, a closet or the attic?"
+   ],
+   [
+    "Yes, it won't drain at all.",
+    "In the basement."
+   ],
+   [
+    "Where is the water heater: a garage, a closet or a basement?",
+    "Which room is the unit in?"
+   ],
+   [
+    "In the garage.",
+    "The basement."
+   ],
+   [
+    "Is the pipe under the sink easy to reach?",
+    "Is a light on the furnace blinking?"
+   ],
+   [
+    "Yes, the cabinet is empty.",
+    "Yes, a small red light blinks."
+   ],
+   [
+    "The $179 drain and the $150 flush need no notice here. The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $179 tune-up and $150 cleaning need no notice here. The $640 humidifier is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "like a renter's new water heater",
+    "like a renter's new furnace"
+   ],
+   [
+    "like a new water heater. Alex forwards a link.",
+    "like a new furnace. Alex forwards a link."
+   ],
+   [
+    "The $179 drain and the $150 flush are under that amount, so they need none.",
+    "The $179 tune-up and the $150 cleaning are under that amount, so they need none."
+   ],
+   [
+    "A leak priced at the visit has no price yet.",
+    "A no-heat repair priced at the visit has no price yet."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it needs one.",
+    "The $640 humidifier is over the plug-in's amount, so it needs one."
+   ],
+   [
+    "Here it's the $640 water heater.",
+    "Here it's the $640 humidifier."
+   ],
+   [
+    "water heater contract",
+    "humidifier contract"
+   ],
+   [
+    "a 25% deposit on the $640 water heater",
+    "a 25% deposit on the $640 humidifier"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you tune up my furnace every fall, too?"
+   ],
+   [
+    "Lee Home Services can clear the drain for $179,",
+    "Ridgeway Heat & Air can tune up your furnace for $179,"
+   ],
+   [
+    "Lee Home Services can flush your water heater for $150,",
+    "Ridgeway Heat & Air can clean your mini-split for $150,"
+   ],
+   [
+    "Lee Home Services can come for the leak.",
+    "Ridgeway can come for your furnace."
+   ],
+   [
+    "and the $89 service call counts toward it",
+    "and the $89 diagnostic counts toward it"
+   ],
+   [
+    "like an overflowing drain",
+    "like no heat on a freezing night"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in on one day and finished on another.",
+    "Some jobs take more than one visit, like new ducts put in on one day and finished on another."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a thermostat that reads wrong."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Andre also look at my thermostat? It reads wrong."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The thermostat is a repair, quoted at the visit."
+   ],
+   [
+    "Alex M. · Overflowing kitchen drain",
+    "Alex M. · No heat, freezing night"
+   ],
+   [
+    "Can you reach the water shut-off valve?",
+    "Can you reach the furnace's power switch?"
+   ],
+   [
+    "Note: the sink is full and won't drain.",
+    "Note: gas furnace in the basement. Filter changed in the spring."
+   ],
+   [
+    "Note: Electric water heater, in the garage.",
+    "Note: one mini-split unit, in the basement."
+   ],
+   [
+    "Note: Gas water heater, in the garage. Contract signed.",
+    "Note: gas furnace in the basement. Contract signed."
+   ],
+   [
+    "Note: Leak under the bathroom sink. The valve is shut.",
+    "Note: gas furnace, on heat at 70, no heat. A red light blinks."
+   ],
+   [
+    "Alex's kitchen drain has a set time.",
+    "Alex's furnace visit has a set time."
+   ],
+   [
+    "like clearing the cabinet under the sink",
+    "like clearing a path to the furnace"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a path to the furnace."
+   ],
+   [
+    "Please clear a path to the water heater.",
+    "Please clear a path to the indoor unit."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the furnace now makes a loud bang when it starts."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The furnace makes a loud bang when it starts now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Turn the furnace off at the thermostat. If you smell gas, get everyone out and call 911 from outside. Hector can come sooner, at the same price."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor. Rosie runs the plug-in's danger check again. Only Jordan replaces water heaters, and he has no earlier time.",
+    "Alex texts that there's a burning smell from the unit. Rosie runs the plug-in's danger check again. Only Andre installs humidifiers, and he has no earlier time."
+   ],
+   [
+    "The water heater is leaking onto the floor now.",
+    "There's a burning smell from the unit now."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches. Nobody who does replacements is free sooner, so Jordan still comes Thursday, 8–10am.",
+    "Turn the system off at the thermostat. If you see smoke, get out and call 911. Nobody who installs humidifiers is free sooner, so Andre still comes Thursday, 8–10am."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor. Rosie runs the plug-in's danger check again, then offers an earlier time if one is free.",
+    "Alex texts that there's a burning smell from the unit. Rosie runs the plug-in's danger check again, then offers an earlier time if one is free."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Turn the system off at the thermostat. If you see smoke, get out and call 911. Hector can come sooner, at the same price."
+   ],
+   [
+    "Alex texts that the leak under the sink is worse.",
+    "Alex texts that the furnace stopped trying, and the house is down to 58 degrees."
+   ],
+   [
+    "The leak under the sink is much worse now.",
+    "The furnace stopped trying. It's 58 in here now."
+   ],
+   [
+    "Turn off the valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Keep everyone in one warm room, in layers. Never heat the house with the oven or a grill. Hector can come sooner, at the same price."
+   ],
+   [
+    "Alex's drain is booked with Jordan by name.",
+    "Alex's visit is booked with Andre by name."
+   ],
+   [
+    "Casey is free then and does drain work.",
+    "Hector is free then and does furnace work."
+   ],
+   [
+    "Casey does drain work, so Casey can stand in.",
+    "Hector does furnace work, so Hector can stand in."
+   ],
+   [
+    "Casey will do your yard drain tomorrow without Jordan.",
+    "Hector will work on your heat pump tomorrow without Andre."
+   ],
+   [
+    "yard drain dig",
+    "outdoor heat pump job"
+   ],
+   [
+    "yard drain visit",
+    "heat pump visit"
+   ],
+   [
+    "The cleared yard drain",
+    "The cleaned outdoor unit"
+   ],
+   [
+    "the water jetter for Kim's yard drain",
+    "the coil cleaner for Kim's outdoor heat pump"
+   ],
+   [
+    "like a yard drain",
+    "like an outdoor heat pump"
+   ],
+   [
+    "Yard drain",
+    "Outdoor heat pump"
+   ],
+   [
+    "yard drain",
+    "outdoor heat pump"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Andre also run a camera through my ducts?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a filter change at two rentals every 3 months"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's filter change?"
+   ],
+   [
+    "Your drain cleaning plan's price is changing.",
+    "Your filter change plan's price is changing."
+   ],
+   [
+    "Indoor work, like Alex's drain, has none.",
+    "Indoor work, like Alex's furnace, has none."
+   ],
+   [
+    "Alex M.: the vent pipe needs replacing too. New price 700.",
+    "Alex M.: a duct section needs replacing too. New price 700."
+   ],
+   [
+    "Old vent pipe",
+    "Old duct section"
+   ],
+   [
+    "new price for Alex M.'s water heater: $700, was $640.",
+    "new price for Alex M.'s humidifier: $700, was $640."
+   ],
+   [
+    "found that the vent pipe needs replacing too.",
+    "found that a duct section needs replacing too."
+   ],
+   [
+    "Was $640: the new vent pipe adds $60",
+    "Was $640: the new duct section adds $60"
+   ],
+   [
+    "found that the new water heater can't go in as planned.",
+    "found that the humidifier can't go in as planned."
+   ],
+   [
+    "like a drain snake and a camera",
+    "like a carbon monoxide meter and gauges"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Furnace tune-up"
+   ],
+   [
+    "Kitchen drain",
+    "Furnace tune-up"
+   ],
+   [
+    "The plug-in names the checks, like the pipes under the sink and the cabinet floor.",
+    "The plug-in names the checks, like a carbon monoxide reading first, then the burners and the flue."
+   ],
+   [
+    "Under the sink, before",
+    "Furnace, before"
+   ],
+   [
+    "BEFORE rust at the base of the water heater",
+    "BEFORE dusty unit, filter clogged"
+   ],
+   [
+    "Water heater, before",
+    "The unit, before"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Andre finds a cracked igniter and texts the price with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 igniter 165 flame sensor 80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Andre found why there's no heat. Here's the price to fix it today."
+   ],
+   [
+    "Shutoff valve · $165",
+    "New igniter · $165"
+   ],
+   [
+    "Supply line · $80",
+    "New flame sensor · $80"
+   ],
+   [
+    "The supply line is its own quote now",
+    "The flame sensor is its own quote now"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 flame sensor stays good until Thu Oct 29."
+   ],
+   [
+    "Here, Alex OKs the shutoff valve and leaves the supply line.",
+    "Here, Alex OKs the igniter and leaves the flame sensor."
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the igniter only, $165. Leave the flame sensor."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Andre puts in the new igniter today, $165. The $80 flame sensor price stays good until Thu Oct 29."
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the ducts are in, $800 at the finish"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Andre finds a worn igniter and a dirty flame sensor."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 new igniter and flame sensor, both worn"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: a new igniter and flame sensor, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "New igniter and flame sensor · $160"
+   ],
+   [
+    "Jordan finds the drain trap under the sink is cracked.",
+    "Andre finds the blower belt is worn."
+   ],
+   [
+    "EXTRA 95 replace the cracked drain trap",
+    "EXTRA 95 replace the worn blower belt"
+   ],
+   [
+    "Extra for Alex M.: replace the cracked drain trap, $95.",
+    "Extra for Alex M.: replace the worn blower belt, $95."
+   ],
+   [
+    "Replace the drain trap · $95",
+    "Replace the blower belt · $95"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 parts quote is good for 7 days."
+   ],
+   [
+    "The $95 drain trap quote is good for 7 days.",
+    "The $95 blower belt quote is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to a new igniter and flame sensor for $160."
+   ],
+   [
+    "you said yes to replacing the drain trap for $95.",
+    "you said yes to a new blower belt for $95."
+   ],
+   [
+    "Jordan sees the water heater leaking at the base. He sends photos, and prices a new one from them at $640, over Sam's $500 limit.",
+    "Andre finds the blower motor failing. He sends photos, and prices a new one from them at $640, over Sam's $500 limit."
+   ],
+   [
+    "QUOTE 640 water heater leaking at the base, replace",
+    "QUOTE 640 blower motor failing, replace"
+   ],
+   [
+    "Jordan quotes a new water heater for Alex M. from his photos: $640.",
+    "Andre quotes a new blower motor for Alex M. from his photos: $640."
+   ],
+   [
+    "Found at Thu's water heater visit",
+    "Found at Thu's furnace visit"
+   ],
+   [
+    "Jordan found that your water heater is leaking. Here's the price for a new one, from his photos, as its own visit.",
+    "Andre found that your furnace's blower motor is failing. Here's the price for a new one, from his photos, as its own visit."
+   ],
+   [
+    "The $160 valves go over your landlord's OK, so they went to your landlord first.",
+    "The $160 parts go over your landlord's OK, so they went to your landlord first."
+   ],
+   [
+    "The $95 drain trap goes over your landlord's OK, so it went to your landlord first.",
+    "The $95 blower belt goes over your landlord's OK, so it went to your landlord first."
+   ],
+   [
+    "A what-if for a drain job: the clog is in the main line, so Jordan clears it from the outside cleanout.",
+    "A what-if for a tune-up: the blower is too dirty to clean in place, so Andre takes it out to clean it."
+   ],
+   [
+    "Jordan cleared the clog from the outside cleanout. It was in the main line. Your price doesn't change.",
+    "Andre took the blower out to clean it. It was too dirty to clean in place. Your price doesn't change."
+   ],
+   [
+    "like a new water heater. The customer signs for it.",
+    "like a new furnace. The customer signs for it."
+   ],
+   [
+    "A what-if: a new water heater is delivered and set up.",
+    "A what-if: a new furnace is delivered and set up."
+   ],
+   [
+    "DELIVERED water heater set up",
+    "DELIVERED furnace set up"
+   ],
+   [
+    "New water heater, set up",
+    "New furnace, set up"
+   ],
+   [
+    "Your new water heater is in. Please check it and sign for it.",
+    "Your new furnace is in. Please check it and sign for it."
+   ],
+   [
+    "Delivery · Water heater",
+    "Delivery · Furnace"
+   ],
+   [
+    "A what-if: the water heater job takes two days.",
+    "A what-if: a furnace replacement takes two days."
+   ],
+   [
+    "like a faucet to rebuild",
+    "like a window AC to repair"
+   ],
+   [
+    "Jordan takes Alex's old faucet to the shop to rebuild it.",
+    "Andre takes Alex's window AC to the shop to repair it."
+   ],
+   [
+    "TAKEN faucet to the shop, back Mon",
+    "TAKEN window AC to the shop, back Mon"
+   ],
+   [
+    "Faucet, as taken",
+    "Window AC, as taken"
+   ],
+   [
+    "Jordan took your faucet to the shop to rebuild it.",
+    "Andre took your window AC to the shop to repair it."
+   ],
+   [
+    "Taken to the shop · Faucet",
+    "Taken to the shop · Window AC"
+   ],
+   [
+    "Here: the drain runs clear, and nothing drips.",
+    "Here: the furnace lights, heats and shuts off as it should."
+   ],
+   [
+    "check the water heater together",
+    "check the system together"
+   ],
+   [
+    "Here: the water runs, and nothing drips under the sink.",
+    "Here: the burners light, the heat comes on, and the carbon monoxide reading is normal."
+   ],
+   [
+    "The drain runs clear. Jordan texts DONE",
+    "The furnace runs clean. Andre texts DONE"
+   ],
+   [
+    "DONE 179 drain, parts 38 trap",
+    "DONE 179 furnace tune-up, parts 38 flame sensor"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 furnace tune-up"
+   ],
+   [
+    "The leak is fixed. Jordan texts DONE",
+    "The heat is back on. Andre texts DONE"
+   ],
+   [
+    "DONE 245 valve 165 supply line 80",
+    "DONE 245 igniter 165 flame sensor 80"
+   ],
+   [
+    "The new water heater is in. Jordan texts DONE",
+    "The new humidifier is in. Andre texts DONE"
+   ],
+   [
+    "DONE 640 water heater, parts 45 expansion tank",
+    "DONE 640 humidifier, parts 45 hookup kit"
+   ],
+   [
+    "DONE 640 water heater",
+    "DONE 640 humidifier"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE furnace 17 yrs old, filter 16x25x1. Flame sensor worn: replace it next time."
+   ],
+   [
+    "NOTE heavy sediment in the tank. Flush again in 12 months.",
+    "NOTE coil and blower wheel cleaned. Next cleaning in 12 months."
+   ],
+   [
+    "NOTE new shutoff valve and supply line under the kitchen sink.",
+    "NOTE new igniter and flame sensor. Furnace 17 yrs old, filter 16x25x1."
+   ],
+   [
+    "Jordan texts DONE with only the shutoff valve.",
+    "Andre texts DONE with only the igniter."
+   ],
+   [
+    "DONE 165 shutoff valve",
+    "DONE 165 igniter"
+   ],
+   [
+    "the shutoff valves",
+    "the igniter and flame sensor"
+   ],
+   [
+    "the shutoff valve",
+    "the igniter"
+   ],
+   [
+    "1-year labor warranty on the valve: if it leaks again, reply here.",
+    "1-year labor warranty on the igniter: if the heat stops again, reply here."
+   ],
+   [
+    "for today's shutoff valve. 1-year labor warranty: if it leaks again, reply here.",
+    "for today's igniter. 1-year labor warranty: if the heat stops again, reply here."
+   ],
+   [
+    "when the new pipes are in",
+    "when the new ducts are in"
+   ],
+   [
+    "your new pipes are in",
+    "your new ducts are in"
+   ],
+   [
+    "Alex M.: $179 drain + $38 parts = $217.",
+    "Alex M.: $179 tune-up + $38 parts = $217."
+   ],
+   [
+    "DONE 150 water heater flush, parts 12 drain valve",
+    "DONE 150 mini-split cleaning, parts 12 filter"
+   ],
+   [
+    "Alex M.: $150 flush + $12 parts = $162.",
+    "Alex M.: $150 cleaning + $12 parts = $162."
+   ],
+   [
+    "Alex M.: $640 water heater + $45 parts = $685.",
+    "Alex M.: $640 humidifier + $45 parts = $685."
+   ],
+   [
+    "DONE 245 leak, parts 18 fittings",
+    "DONE 245 igniter, parts 18 wire connectors"
+   ],
+   [
+    "the kitchen drain at 42 Oak St",
+    "the furnace tune-up at 112 Fern St"
+   ],
+   [
+    "the kitchen drain",
+    "the furnace tune-up"
+   ],
+   [
+    "left for your water heater flush",
+    "left for your mini-split cleaning"
+   ],
+   [
+    "left on your water heater flush",
+    "left on your mini-split cleaning"
+   ],
+   [
+    "left for your water heater",
+    "left for your humidifier"
+   ],
+   [
+    "left for your new water heater",
+    "left for your new humidifier"
+   ],
+   [
+    "the rest of the water heater job",
+    "the rest of the humidifier job"
+   ],
+   [
+    "the rest of the water heater at 42 Oak St",
+    "the rest of the humidifier at 112 Fern St"
+   ],
+   [
+    "Nothing more is owed for the flush.",
+    "Nothing more is owed for the cleaning."
+   ],
+   [
+    "DONE 160 valves",
+    "DONE 160 igniter and flame sensor"
+   ],
+   [
+    "like the $160 valves",
+    "like the $160 parts"
+   ],
+   [
+    "like the $95 drain trap",
+    "like the $95 blower belt"
+   ],
+   [
+    "for the kitchen drain. Sending Alex the bill.",
+    "for the furnace tune-up. Sending Alex the bill."
+   ],
+   [
+    "$640 for the water heater",
+    "$640 for the humidifier"
+   ],
+   [
+    "$640 for your new water heater",
+    "$640 for your new humidifier"
+   ],
+   [
+    "left on your water heater",
+    "left on your humidifier"
+   ],
+   [
+    "the $640 water heater bill",
+    "the $640 humidifier bill"
+   ],
+   [
+    "left on the water heater bill",
+    "left on the humidifier bill"
+   ],
+   [
+    "1-year labor warranty: if it clogs again, reply here.",
+    "1-year labor warranty: if the furnace acts up, reply here."
+   ],
+   [
+    "Kitchen drain cleared · $179",
+    "Furnace tune-up · $179"
+   ],
+   [
+    "if anything leaks, reply here",
+    "if anything acts up, reply here"
+   ],
+   [
+    "1-year labor warranty: if it leaks again, reply here.",
+    "1-year labor warranty: if the heat stops again, reply here."
+   ],
+   [
+    "Alex cancels the $160 valve work on the page.",
+    "Alex cancels the $160 parts work on the page."
+   ],
+   [
+    "Done: the $160 for the shutoff valves is refunded.",
+    "Done: the $160 for the igniter and flame sensor is refunded."
+   ],
+   [
+    "Alex M. cancelled the $160 valve work.",
+    "Alex M. cancelled the $160 parts work."
+   ],
+   [
+    "Alex cancels the $95 drain trap work on the page.",
+    "Alex cancels the $95 blower belt work on the page."
+   ],
+   [
+    "Done: the $95 for the drain trap is refunded.",
+    "Done: the $95 for the blower belt is refunded."
+   ],
+   [
+    "Replace the drain trap",
+    "Replace the blower belt"
+   ],
+   [
+    "Alex M. cancelled the $95 drain trap work.",
+    "Alex M. cancelled the $95 blower belt work."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The furnace won't light again 2 weeks after the tune-up."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My furnace won't light again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s furnace, tuned up Thu Oct 22, won't light again."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your tune-up is under warranty, so this visit is free."
+   ],
+   [
+    "The new water heater drips at a fitting 2 weeks later.",
+    "The new humidifier drips at a fitting 2 weeks later."
+   ],
+   [
+    "My new water heater is dripping at a fitting.",
+    "My new humidifier is dripping at a fitting."
+   ],
+   [
+    "Alex M.'s new water heater, put in Thu Oct 22, is dripping at a fitting.",
+    "Alex M.'s new humidifier, put in Thu Oct 22, is dripping at a fitting."
+   ],
+   [
+    "Your water heater is under warranty, so this visit is free.",
+    "Your humidifier is under warranty, so this visit is free."
+   ],
+   [
+    "The heater's drain valve drips 2 weeks after the flush.",
+    "The mini-split drips water 2 weeks after the cleaning."
+   ],
+   [
+    "My water heater's drain valve is dripping since the flush.",
+    "My mini-split is dripping water since the cleaning."
+   ],
+   [
+    "Alex M.'s water heater, flushed Thu Oct 22, is dripping at the drain valve.",
+    "Alex M.'s mini-split, cleaned Thu Oct 22, is dripping water."
+   ],
+   [
+    "The leak comes back 2 weeks later.",
+    "The heat stops again 2 weeks later."
+   ],
+   [
+    "The leak under my sink is back.",
+    "My furnace stopped heating again."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Andre left a mess by the furnace."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Andre look at my AC next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Andre's next times for an AC check."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like replacing the old furnace Andre noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a new furnace, from Andre's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Replace the old furnace"
+   ],
+   [
+    "Say the water heater job needed one.",
+    "Say a furnace replacement needed one."
+   ],
+   [
+    "The city's final inspection for your new water heater is set.",
+    "The city's final inspection for your new furnace is set."
+   ],
+   [
+    "Sewer camera report",
+    "Duct camera report"
+   ],
+   [
+    "Replace both shutoff valves",
+    "New igniter and flame sensor"
+   ],
+   [
+    "Sends written notice about the faucet",
+    "Sends written notice about the window AC"
+   ],
+   [
+    "Your rebuilt faucet is ready at Lee Home Services. Please pick a time for Jordan to bring it back.",
+    "Your repaired window AC is ready at Ridgeway Heat & Air. Please pick a time for Andre to bring it back."
+   ],
+   [
+    "Written notice · Your faucet",
+    "Written notice · Your window AC"
+   ],
+   [
+    "and the faucet is still at the shop",
+    "and the window AC is still at the shop"
+   ],
+   [
+    "Alex M.'s rebuilt faucet is still at the shop.",
+    "Alex M.'s repaired window AC is still at the shop."
+   ],
+   [
+    "Booking the faucet's return before that day means no fee.",
+    "Booking the window AC's return before that day means no fee."
+   ],
+   [
+    "The fee is added to the bill when the faucet goes back.",
+    "The fee is added to the bill when the window AC goes back."
+   ],
+   [
+    "Your rebuilt faucet is still at Lee Home Services.",
+    "Your repaired window AC is still at Ridgeway Heat & Air."
+   ],
+   [
+    "The faucet isn't taken back",
+    "The window AC isn't taken back"
+   ],
+   [
+    "Jordan left a drying fan after a leak.",
+    "Andre lent a space heater while a part was on order."
+   ],
+   [
+    "Tips for your drain: run hot water for a minute after washing dishes, and skip store-bought drain cleaners. If it slows again, reply here.",
+    "Tips for your furnace: change the filter every 3 months, and keep the space around it clear. If it stops heating, reply here."
+   ],
+   [
+    "Tips for your water heater: keep the space around it clear, and check for drips this week. If you see water or lose hot water, reply here.",
+    "Tips for your system: keep the space around it clear, and change the filter every 3 months. If it stops heating, reply here."
+   ],
+   [
+    "Tips after your leak repair: check under the sink for drips tomorrow, and don't store heavy things on the pipes. If it drips again, reply here.",
+    "Tips after your no-heat repair: change the filter every 3 months, and keep the vents open. If the heat stops again, reply here."
+   ],
+   [
+    "Is water backing up into the sink?",
+    "Is the thermostat set to heat?"
+   ],
+   [
+    "Morgan P.'s water heater",
+    "Morgan P.'s humidifier"
+   ],
+   [
+    "can replace your water heater for $640.",
+    "can put in a humidifier for $640."
+   ],
+   [
+    "Your water heater quote is with the owner.",
+    "Your humidifier quote is with the owner."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The furnace quit, and it's freezing. Can someone come tonight?"
+   ],
+   [
+    "It's a leak under the sink, today 3 to 5pm with Jordan.",
+    "It's a furnace that won't heat, today 3 to 5pm with Andre."
+   ],
+   [
+    "about the water heater quote before booking",
+    "about the humidifier quote before booking"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Tune-ups already booked keep $179"
+   ],
+   [
+    "Drain clearing plans get 30 days' notice first.",
+    "Tune-up plans get 30 days' notice first."
+   ],
+   [
+    "Morgan P.'s two shutoff valves",
+    "Morgan P.'s igniter and flame sensor"
+   ],
+   [
+    "Jordan's supplier invoice shows the valves cost more since then.",
+    "Andre's supplier invoice shows the parts cost more since then."
+   ],
+   [
+    "Supplier invoice: valves +$15 each",
+    "Supplier invoice: parts +$15 each"
+   ],
+   [
+    "replaces water heaters",
+    "installs humidifiers"
+   ],
+   [
+    "replace water heaters",
+    "install humidifiers"
+   ],
+   [
+    "water heater replacements",
+    "humidifier installs"
+   ],
+   [
+    "leehomeservices.com",
+    "ridgewayhvac.com"
+   ],
+   [
+    "Lee Home Services'",
+    "Ridgeway Heat & Air's"
+   ],
+   [
+    "Lee Home Services",
+    "Ridgeway Heat & Air"
+   ],
+   [
+    "Lee Plumbing",
+    "Ridgeway Heat & Air"
+   ],
+   [
+    "Lee Electric",
+    "Ridgeway Electric"
+   ],
+   [
+    "Lee's Barbershop",
+    "Ridgeway Supply"
+   ],
+   [
+    "The barbershop plug-in",
+    "The HVAC plug-in"
+   ],
+   [
+    "Barbershop",
+    "Parts counter"
+   ],
+   [
+    "barbershop",
+    "parts counter"
+   ],
+   [
+    "Plumbing + electrical",
+    "HVAC + electrical"
+   ],
+   [
+    "MP045210",
+    "HM045210"
+   ],
+   [
+    "JP031552",
+    "HJ031552"
+   ],
+   [
+    "BR41862",
+    "HJ041862"
+   ],
+   [
+    "BS20981",
+    "SR20981"
+   ],
+   [
+    "Jordan Price",
+    "Andre Baptiste"
+   ],
+   [
+    "Casey Moore",
+    "Hector Ruiz"
+   ],
+   [
+    "Riley Chen",
+    "Luis Ortega"
+   ],
+   [
+    "Avery Diaz",
+    "Kara Bell"
+   ],
+   [
+    "Jordan",
+    "Andre"
+   ],
+   [
+    "Casey",
+    "Hector"
+   ],
+   [
+    "Riley",
+    "Luis"
+   ],
+   [
+    "Avery",
+    "Kara"
+   ],
+   [
+    "1200 Main St",
+    "300 Ridge Rd"
+   ],
+   [
+    "88 Elm St",
+    "60 Depot St"
+   ],
+   [
+    "Elm St",
+    "Depot St"
+   ],
+   [
+    "42 Oak St",
+    "112 Fern St"
+   ],
+   [
+    "haircut membership",
+    "filter plan"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 dehumidifier repair"
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Dehumidifier repair"
+   ],
+   [
+    "Groom's packages",
+    "Dehumidifier repairs"
+   ],
+   [
+    "the Groom's package ·",
+    "the dehumidifier repair ·"
+   ],
+   [
+    "Groom's package ·",
+    "Dehumidifier repair ·"
+   ],
+   [
+    "the Groom's package,",
+    "the dehumidifier repair,"
+   ],
+   [
+    "your Groom's package,",
+    "your dehumidifier repair,"
+   ],
+   [
+    "Groom's package,",
+    "Dehumidifier repair,"
+   ],
+   [
+    "· Groom's package",
+    "· Dehumidifier repair"
+   ],
+   [
+    "the Groom's package",
+    "the dehumidifier repair"
+   ],
+   [
+    "The Groom's package",
+    "The dehumidifier repair"
+   ],
+   [
+    "your Groom's package",
+    "your dehumidifier repair"
+   ],
+   [
+    "Your Groom's package",
+    "Your dehumidifier repair"
+   ],
+   [
+    "today's Groom's package",
+    "today's dehumidifier repair"
+   ],
+   [
+    "tomorrow's Groom's package",
+    "tomorrow's dehumidifier repair"
+   ],
+   [
+    "11:00am Groom's package",
+    "11:00am dehumidifier repair"
+   ],
+   [
+    "2:00pm Groom's package",
+    "2:00pm dehumidifier repair"
+   ],
+   [
+    "1:00 Groom's package",
+    "1:00 dehumidifier repair"
+   ],
+   [
+    "Oct 31 Groom's package",
+    "Oct 31 dehumidifier repair"
+   ],
+   [
+    "Nov 7 Groom's package",
+    "Nov 7 dehumidifier repair"
+   ],
+   [
+    "2½-hour Groom's package",
+    "2½-hour dehumidifier repair"
+   ],
+   [
+    "B.'s Groom's package",
+    "B.'s dehumidifier repair"
+   ],
+   [
+    "Groom's package",
+    "Dehumidifier repair"
+   ],
+   [
+    "grooms package",
+    "dehumidifier repair"
+   ],
+   [
+    "groom's party",
+    "landlord's window units"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Part test, thermostat setup and custom filter"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Window AC cleaning"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "window AC cleaning"
+   ],
+   [
+    "Signature cut and shave",
+    "Window AC cleaning"
+   ],
+   [
+    "signature cut and shave",
+    "window AC cleaning"
+   ],
+   [
+    "Signature cut",
+    "Window AC cleaning"
+   ],
+   [
+    "signature cut",
+    "window AC cleaning"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Flame sensor cleaning"
+   ],
+   [
+    "kids cuts",
+    "flame sensor cleanings"
+   ],
+   [
+    "Kids cut",
+    "Flame sensor cleaning"
+   ],
+   [
+    "kids cut",
+    "flame sensor cleaning"
+   ],
+   [
+    "a skin fade",
+    "a thermostat setup"
+   ],
+   [
+    "A skin fade",
+    "A thermostat setup"
+   ],
+   [
+    "Skin fade",
+    "Thermostat setup"
+   ],
+   [
+    "skin fade",
+    "thermostat setup"
+   ],
+   [
+    "a beard trim",
+    "a custom filter"
+   ],
+   [
+    "Beard trim",
+    "Custom filter"
+   ],
+   [
+    "beard trim",
+    "custom filter"
+   ],
+   [
+    "Color and cut",
+    "Control board repair"
+   ],
+   [
+    "color and cut",
+    "control board repair"
+   ],
+   [
+    "Color correction",
+    "Blower motor repair"
+   ],
+   [
+    "color correction",
+    "blower motor repair"
+   ],
+   [
+    "color station",
+    "test bench"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the shop show photos of the work?"
+   ],
+   [
+    "photos of your hair",
+    "photos of the board"
+   ],
+   [
+    "patch test",
+    "part check"
+   ],
+   [
+    "Haircuts",
+    "Part tests"
+   ],
+   [
+    "haircuts",
+    "part tests"
+   ],
+   [
+    "Haircut",
+    "Part test"
+   ],
+   [
+    "haircut",
+    "part test"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "cuts hair",
+    "works the counter"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "barbering",
+    "counter work"
+   ],
+   [
+    "barbers",
+    "counter techs"
+   ],
+   [
+    "barber",
+    "counter tech"
+   ],
+   [
+    "Barber",
+    "Counter tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "package cut",
+    "package repair"
+   ],
+   [
+    "the cut",
+    "the test"
+   ],
+   [
+    "a cut",
+    "a part test"
+   ],
+   [
+    "cuts",
+    "tests"
+   ],
+   [
+    "color plan",
+    "repair plan"
+   ],
+   [
+    "Color plan",
+    "Repair plan"
+   ],
+   [
+    "kitchen drain clearing",
+    "furnace tune-up"
+   ],
+   [
+    "Drain clearing",
+    "Furnace tune-up"
+   ],
+   [
+    "drain clearing",
+    "furnace tune-up"
+   ],
+   [
+    "Water heater flush",
+    "Mini-split cleaning"
+   ],
+   [
+    "water heater flush",
+    "mini-split cleaning"
+   ],
+   [
+    "Water heater replacement",
+    "Humidifier install"
+   ],
+   [
+    "water heater replacement",
+    "humidifier install"
+   ],
+   [
+    "Leak repair",
+    "No-heat repair"
+   ],
+   [
+    "leak repair",
+    "no-heat repair"
+   ],
+   [
+    "Sewer camera inspection",
+    "Duct camera inspection"
+   ],
+   [
+    "sewer camera",
+    "duct camera"
+   ],
+   [
+    "plumbers",
+    "techs"
+   ],
+   [
+    "Plumbers",
+    "Techs"
+   ],
+   [
+    "plumber",
+    "tech"
+   ],
+   [
+    "Plumber",
+    "HVAC tech"
+   ],
+   [
+    "plumbing's",
+    "HVAC's"
+   ],
+   [
+    "Plumbing",
+    "HVAC"
+   ],
+   [
+    "plumbing",
+    "HVAC"
+   ],
+   [
+    "service call",
+    "diagnostic visit"
+   ],
+   [
+    "Service call",
+    "Diagnostic visit"
+   ],
+   [
+    "only after a missed check",
+    "after a missed check"
+   ],
+   [
+    "barbershop",
+    "HVAC shop"
+   ],
+   [
+    "Barbershop",
+    "HVAC shop"
+   ],
+   [
+    "barbershops",
+    "HVAC shops"
+   ],
+   [
+    "hot towel shave",
+    "tune-up"
+   ],
+   [
+    "hot towel",
+    "tune-up"
+   ],
+   [
+    "shave",
+    "tune-up"
+   ],
+   [
+    "Shave",
+    "Tune-up"
+   ],
+   [
+    "perm",
+    "tune-up"
+   ],
+   [
+    "skin fade",
+    "duct cleaning"
+   ],
+   [
+    "Skin fade",
+    "Duct cleaning"
+   ],
+   [
+    "water heater",
+    "furnace"
+   ],
+   [
+    "Water heater",
+    "Furnace"
+   ],
+   [
+    "water heaters",
+    "furnaces"
+   ],
+   [
+    "massage",
+    "duct cleaning"
+   ],
+   [
+    "Massage",
+    "Duct cleaning"
+   ],
+   [
+    "shaves",
+    "tune-ups"
+   ],
+   [
+    "skin fades",
+    "duct cleaning"
+   ],
+   [
+    "barbershops",
+    "HVAC shops"
+   ],
+   [
+    "overflowing",
+    "not cooling"
+   ],
+   [
+    "Overflowing",
+    "Not cooling"
+   ],
+   [
+    "the plug-in's job questions and anything",
+    "job questions and anything"
+   ]
+  ],
+  "B": [
+   [
+    "The plug-in's questions that don't change the time or price go here",
+    "Questions that don't change the time or price go here"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds duct cleaning to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Duct cleaning for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW duct cleaning"
+   ],
+   [
+    "Flushes already booked",
+    "Cleanings already booked"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit.",
+    "Tune-ups have a set price. No-heat repairs are priced at the visit."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "My furnace won't light. Can Ridgeway Supply test the old igniter on Saturday?"
+   ],
+   [
+    "Book me the Groom's package at Lee's Barbershop on Saturday.",
+    "My dehumidifier stopped working. Can Ridgeway Supply fix it on Saturday?"
+   ],
+   [
+    "Book me a signature cut and hot towel shave at Lee's Barbershop on Saturday.",
+    "Can Ridgeway Supply clean my window AC on Saturday?"
+   ],
+   [
+    "Book me a color and cut at Lee's Barbershop on Saturday.",
+    "Can Ridgeway Supply fix my furnace's control board on Saturday?"
+   ],
+   [
+    "Book me a color correction at Lee's Barbershop on Saturday.",
+    "My blower motor squeals. Can Ridgeway Supply repair it on Saturday?"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's my brother's furnace part. Can I pay for it?"
+   ],
+   [
+    "A haircut plan follows the shop's own setup for haircuts",
+    "A filter plan follows the shop's own setup for filters"
+   ],
+   [
+    "Haircut plans go to",
+    "Filter plans go to"
+   ],
+   [
+    "haircut plans go to",
+    "filter plans go to"
+   ],
+   [
+    "Haircut plan",
+    "Filter plan"
+   ],
+   [
+    "haircut plan",
+    "filter plan"
+   ],
+   [
+    "Keep it as a haircut for $35",
+    "Keep it as a dry clean for $35"
+   ],
+   [
+    "Keep it as a haircut",
+    "Keep it as a dry clean"
+   ],
+   [
+    "Uses a cut from Alex's package",
+    "Uses a filter from Alex's pack"
+   ],
+   [
+    "Alex bought a package of cuts at the shop. This booking uses one of them, so the cut itself is already paid.",
+    "Alex bought a pack of custom filters at the shop. This booking uses one of them, so the filter itself is already paid."
+   ],
+   [
+    "Alex's page shows the cuts left.",
+    "Alex's page shows the filters left."
+   ],
+   [
+    "Alex has had cuts at the shop before",
+    "Alex has had parts tested at the shop before"
+   ],
+   [
+    "Shows Alex the cut; fixes first",
+    "Shows Alex the part; fixes first"
+   ],
+   [
+    "whichever barber cuts",
+    "whichever counter tech works"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Andre hurts a hand and texts HURT."
+   ],
+   [
+    "Color and cut",
+    "Control board repair"
+   ],
+   [
+    "color and cut",
+    "control board repair"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Appliance repair for Ridgeway Supply: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds appliance repair to Ridgeway Supply."
+   ],
+   [
+    "NEW massage",
+    "NEW appliance repair"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 test; priced at the counter"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the bench test; the price stays open"
+   ],
+   [
+    "have the consult only today",
+    "have the bench test only today"
+   ],
+   [
+    "2 Consult only: Riley does the consult",
+    "2 Bench test only: Riley does the bench test"
+   ],
+   [
+    "Consult only",
+    "Bench test only"
+   ],
+   [
+    "does the consult only",
+    "does the bench test only"
+   ],
+   [
+    "pays for the consult",
+    "pays for the bench test"
+   ],
+   [
+    "$25 consult",
+    "$25 bench test"
+   ],
+   [
+    "after a consult",
+    "after a bench test"
+   ],
+   [
+    "Alex asks for a perm, which the shop doesn't do.",
+    "Alex asks for a refrigerator repair, which the shop doesn't do."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't repair refrigerators."
+   ],
+   [
+    "Gloss to finish",
+    "Contact cleaner to finish"
+   ],
+   [
+    "gloss",
+    "contact cleaning"
+   ],
+   [
+    "Alex is already in the chair",
+    "Alex is already at the counter"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench clamp scratched my motor's housing."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the bench clamp scratched a motor housing today."
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A custom filter is on the price list: $20."
+   ],
+   [
+    "beard trim will start",
+    "visit for a custom filter will start"
+   ],
+   [
+    "Alex's to bring, like a form",
+    "Alex's to bring, like a part"
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "Some pieces of the part are missing."
+   ],
+   [
+    "the signed form Alex was to bring is missing",
+    "some pieces of the part Alex was to bring are missing"
+   ],
+   [
+    "the signed form it needs is missing",
+    "some pieces of the part are missing"
+   ],
+   [
+    "since the signed form was missing",
+    "since some pieces of the part were missing"
+   ],
+   [
+    "Once you have the form, you can book again",
+    "Once you have all the pieces, you can book again"
+   ],
+   [
+    "fee for the missing form",
+    "fee for the missing pieces"
+   ],
+   [
+    "A barbershop books kids cuts with a parent.",
+    "An HVAC parts counter books adults only."
+   ],
+   [
+    "Plumbing, electrical and barbering need one",
+    "HVAC, electrical and counter work need one"
+   ],
+   [
+    "Plumbing, electrical and barbering license each person",
+    "HVAC, electrical and counter work license each person"
+   ],
+   [
+    "Barbering pays the $2",
+    "Counter work pays the $2"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a thermostat"
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else, like board repairs"
+   ],
+   [
+    "Alex's color has nobody else",
+    "Alex's board repair has nobody else"
+   ],
+   [
+    "Say Alex's visit were a color, which only Riley does at the shop.",
+    "Say Alex's visit were a board repair, which only Riley does at the shop."
+   ],
+   [
+    "Alex's color has buttons 1 and 2.",
+    "Alex's board repair has buttons 1 and 2."
+   ],
+   [
+    "Color at the shop is like that: only Riley does it.",
+    "Board repairs at the shop are like that: only Riley does them."
+   ],
+   [
+    "Alex stays in the chair",
+    "Alex stays at the counter"
+   ],
+   [
+    "Haircuts and beard trims",
+    "Part tests and custom filters"
+   ],
+   [
+    "Any scalp trouble Riley should know about?",
+    "Do you know the furnace's brand and model?"
+   ],
+   [
+    "can cut your hair at the shop",
+    "can test your part at the counter"
+   ],
+   [
+    "A color correction at Lee's Barbershop is priced at the chair.",
+    "Ridgeway Supply prices a blower motor repair at the counter."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A furnace part could mean a parts counter or a tech at home"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The HVAC plug-in adds its own: a carbon monoxide alarm or a gas smell."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A furnace that is off at home can still have its part tested here. A tech at home is the other flow."
+   ],
+   [
+    "It adds any way to get ready from the plug-in. A barbershop has none.",
+    "It adds the plug-in's way to get ready: bring the old part, or a photo of the unit's label."
+   ],
+   [
+    "A haircut needs nothing.",
+    "A part test needs the old part, with any wires or brackets on it."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A dehumidifier repair can be a drop-off: Alex leaves it, and picks it up when it's ready."
+   ],
+   [
+    "If it's for a child, the kids cut is picked here, so the times fit it.",
+    "A second part is added here too, so the times fit both."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two parts from one furnace work the same way. Both are asked before the times."
+   ],
+   [
+    "A patch test is a small skin test for a reaction to hair dye.",
+    "A part check: Alex brings the old part in first, so the right one can be ordered."
+   ],
+   [
+    "like a doctor's note",
+    "like the maker's warranty claim number"
+   ],
+   [
+    "get the doctor's note before the visit",
+    "get the maker's warranty claim number before the visit"
+   ],
+   [
+    "Before the cut: an old scar on Alex's crown, left side.",
+    "Before the test: a burn mark on the part's wire, left side."
+   ],
+   [
+    "Crown, before the cut",
+    "Wire, before the test"
+   ],
+   [
+    "shows the cut in the mirror",
+    "runs the part on the test bench"
+   ],
+   [
+    "like a skin-test result",
+    "like a part number"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The new igniter glows, but the burners still won't light."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's igniter glows, but the burners won't light"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you clean flame sensors too?"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a flame sensor cleaning is $25"
+   ],
+   [
+    "The plug-in's aftercare notes go out after the visit. A reaction Alex reports is checked for danger first.",
+    "The plug-in's care notes go out after the visit: turn the power off at the furnace before putting the part in. A problem Alex reports is checked for danger first."
+   ],
+   [
+    "How to care for your skin and hair",
+    "How to put in your new part"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop the part off and come back later?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Picks up filters every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks",
+    "Alex rents out homes, and asks for custom filters every 4 weeks"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero probar una pieza del calentador el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a furnace part tested on Saturday."
+   ],
+   [
+    "Offers a shorter cut or a later time",
+    "Offers a later start or a new time"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley can still fit the test if you're here by 11:20, or you can move to a later time."
+   ],
+   [
+    "Shorter is fine",
+    "I'll be there"
+   ],
+   [
+    "Alex's employer pays for a staff cut",
+    "Alex's landlord pays for the part test"
+   ],
+   [
+    "an employer for a staff cut",
+    "a landlord for a rental's furnace part"
+   ],
+   [
+    "A skin problem stops the work",
+    "A gas part stops the work"
+   ],
+   [
+    "like a doctor, never a named one",
+    "like a tech with the gas license, never a named one"
+   ],
+   [
+    "If it's urgent, see a doctor or call 911.",
+    "If you smell gas, get everyone out and call 911 from outside."
+   ],
+   [
+    "your Sat Oct 31 color",
+    "your Sat Oct 31 board repair"
+   ],
+   [
+    "that's the skin and scalp",
+    "that's any burn mark or crack on the part"
+   ],
+   [
+    "looks at Alex's hair",
+    "looks at Alex's part"
+   ],
+   [
+    "sees the hair",
+    "sees the part"
+   ],
+   [
+    "a beard oil",
+    "a spare fuse"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s part test"
+   ],
+   [
+    "Cut only",
+    "Test only"
+   ],
+   [
+    "a barber who rents a chair",
+    "a tech who rents bench space"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Just a trim on top.",
+    "It's the igniter."
+   ],
+   [
+    "Keep the beard short.",
+    "It hums but won't run."
+   ],
+   [
+    "Short on the sides.",
+    "It's a flame sensor."
+   ],
+   [
+    "Like the color in my photos.",
+    "Fix it if you can, so I keep the old board."
+   ],
+   [
+    "It went brassy last time.",
+    "It failed once before."
+   ],
+   [
+    "How long is your beard now? A long beard takes longer.",
+    "Is it a dehumidifier or a window AC? A window AC takes longer."
+   ],
+   [
+    "About an inch.",
+    "A dehumidifier."
+   ],
+   [
+    "Is your beard longer than an inch? A long beard takes longer.",
+    "Does the motor have two speeds? Two take longer."
+   ],
+   [
+    "No, it's short.",
+    "No."
+   ],
+   [
+    "Is your hair past your shoulders? Longer hair takes more time.",
+    "Is the furnace over 20 years old? Older parts take longer."
+   ],
+   [
+    "Was the color done at a salon, or at home?",
+    "Was the board fixed before, by a tech or at home?"
+   ],
+   [
+    "Long hair can take longer.",
+    "An older part can take longer."
+   ],
+   [
+    "had to leave before the facial",
+    "had to leave before the run test"
+   ],
+   [
+    "had to leave before the hot towel shave",
+    "had to leave before the final test"
+   ],
+   [
+    "had to leave before the color",
+    "had to leave before the board was tested"
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "hot surface igniter, cracked; furnace brand on file"
+   ],
+   [
+    "Towel steamer broken until Mon",
+    "Coil wash station broken until Mon"
+   ],
+   [
+    "The towel steamer breaks",
+    "The coil wash station breaks"
+   ],
+   [
+    "needs the steamer",
+    "needs the wash station"
+   ],
+   [
+    "The hot towel part of your",
+    "The coil wash part of your"
+   ],
+   [
+    "color-correction session",
+    "blower motor repair visit"
+   ],
+   [
+    "Every price on the board books without an OK. Color is priced for each customer, so Sam OKs each color quote, like the color correction price Riley sets at the chair.",
+    "Every price on the list books without an OK. Repairs are priced for each customer, so Sam OKs each repair quote, like Riley's blower motor price at the counter."
+   ],
+   [
+    "Color is priced for each customer",
+    "Board repairs are priced for each customer"
+   ],
+   [
+    "Color services need",
+    "Board repairs need"
+   ],
+   [
+    "color services offer",
+    "board repairs offer"
+   ],
+   [
+    "Color always stays with Riley",
+    "Board repairs always stay with Riley"
+   ],
+   [
+    "The color ordered",
+    "The part ordered"
+   ],
+   [
+    "The color I ordered",
+    "The part I ordered"
+   ],
+   [
+    "The color Riley ordered",
+    "The part Riley ordered"
+   ],
+   [
+    "the color for a",
+    "the part for a"
+   ],
+   [
+    "the color costs more",
+    "the part costs more"
+   ],
+   [
+    "color +$20",
+    "part +$20"
+   ],
+   [
+    "color quotes",
+    "repair quotes"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "Color quote",
+    "Repair quote"
+   ],
+   [
+    "does color",
+    "does board repairs"
+   ],
+   [
+    "but color",
+    "but board repairs"
+   ],
+   [
+    "color and house calls",
+    "board repairs and home visits"
+   ],
+   [
+    "color, house calls",
+    "board repairs, home visits"
+   ],
+   [
+    "a different color",
+    "a different fix"
+   ],
+   [
+    "new color plan",
+    "new repair plan"
+   ],
+   [
+    "for a color",
+    "for a board repair"
+   ],
+   [
+    "a color needs",
+    "a board repair needs"
+   ],
+   [
+    "the color Riley can't do",
+    "the board repair Riley can't do"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "on the board",
+    "on the list"
+   ],
+   [
+    "A barbershop has none. The plug-in sets which services run longer.",
+    "A dehumidifier left for repair can take a few days. The plug-in sets which services run longer."
+   ],
+   [
+    "A cut",
+    "A part test"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Furnace tune-up"
+   ],
+   [
+    "kitchen drain clearing",
+    "furnace tune-up"
+   ],
+   [
+    "Lee Plumbing and Lee Electric.",
+    "Ridgeway Electric and Ridgeway Heat & Air."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For HVAC work, a carbon monoxide alarm or a gas smell stops the booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a carbon monoxide alarm or a gas smell."
+   ],
+   [
+    "like a new garbage disposal",
+    "like a new smart thermostat"
+   ],
+   [
+    "A customer wants a garbage disposal put in. Is one in stock?",
+    "A customer wants a smart thermostat put in. Is one in stock?"
+   ],
+   [
+    "like where the main water shut-off is",
+    "like where the furnace's power switch is"
+   ],
+   [
+    "Old heater hauled away Fri, not Thu",
+    "Thermostat wiring done Fri, not Thu"
+   ],
+   [
+    "the old heater hauled away Fri?",
+    "the thermostat wiring done Fri?"
+   ],
+   [
+    "The old heater is hauled away Fri, not Thu",
+    "The thermostat wiring is done Fri, not Thu"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a carbon monoxide alarm or a gas smell, gets the safety steps first."
+   ],
+   [
+    "Jetter in the shop until Mon",
+    "Coil cleaner in the shop until Mon"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE CO reading 0. Old oil stain on the floor by the furnace"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor by the furnace, before"
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Sam's estimate visit at Harper J.'s is for a $2,400 duct replacement."
+   ],
+   [
+    "Repipe · $2,400",
+    "Duct replacement · $2,400"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 duct replacement, 3 stages"
+   ],
+   [
+    "repipe",
+    "duct replacement"
+   ],
+   [
+    "Old heater, leaking at the base",
+    "Old blower motor, failing"
+   ],
+   [
+    "Jordan finds the main water line cracked.",
+    "Andre finds a crushed return duct."
+   ],
+   [
+    "QUOTE 900 main water line cracked, repair",
+    "QUOTE 900 return duct crushed, repair"
+   ],
+   [
+    "found that your main water line is cracked.",
+    "found that your return duct is crushed."
+   ],
+   [
+    "Main water line repair · $900",
+    "Return duct repair · $900"
+   ],
+   [
+    "main water line",
+    "return duct"
+   ],
+   [
+    "CHANGE cleared the main line from the outside cleanout, same price",
+    "CHANGE took the blower out to clean it, same price"
+   ],
+   [
+    "Jordan cracks the cabinet floor and texts a photo.",
+    "Andre cracks a floor tile by the furnace and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a floor tile by the furnace"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked floor tile"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Andre cracked a floor tile at Alex M.'s."
+   ],
+   [
+    "Before DONE, Jordan runs the water with Alex and checks for drips.",
+    "Before DONE, Andre runs the furnace with Alex and checks the carbon monoxide reading."
+   ],
+   [
+    "Here: the heater runs, the hot water is hot, and nothing drips.",
+    "Here: the system runs as it should, and nothing drips."
+   ],
+   [
+    "NOTE new 50-gallon heater in the garage. Old one hauled away.",
+    "NOTE new humidifier on the supply duct. Pad size noted for next time."
+   ],
+   [
+    "Alex M.'s leak repair from Thu Oct 22 is dripping again.",
+    "Alex M.'s furnace, fixed Thu Oct 22, isn't heating again."
+   ],
+   [
+    "The $150 flush takes a $40 deposit too, with the $110 rest later.",
+    "The $150 mini-split cleaning takes a $40 deposit too, with the $110 rest later."
+   ],
+   [
+    "A water heater quote from photos at $640 is over $500, so it comes to Sam.",
+    "A humidifier quote from photos at $640 is over $500, so it comes to Sam."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Tune-ups and no-heat repairs"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like no heat on a freezing night, or a lockout"
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "HVAC takes jobs sent now, like no heat on a freezing night."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My furnace is due for its fall tune-up. Can a tech come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Can a plumber flush my water heater Thursday morning? I'm in Springfield.",
+    "Can a tech clean my mini-split Thursday morning? I'm in Springfield."
+   ],
+   [
+    "There's a leak under my bathroom sink. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My furnace keeps trying to start, but no heat comes out. Can a tech come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "My water heater is old and rusty. Can a plumber replace it this week? I'm in Springfield.",
+    "The air in my house is very dry. Can a tech put in a humidifier this week? I'm in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? La calefacción no funciona, y mi mamá está en casa."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? The heat isn't working, and my mother is home."
+   ],
+   [
+    "Lee Home Services · Water heater leak",
+    "Ridgeway Heat & Air · No heat"
+   ],
+   [
+    "Call summary: Rosa, in Spanish. Water is leaking from the water heater, and the valve is shut.",
+    "Call summary: Rosa, in Spanish. Her furnace gives no heat, and an older person is home."
+   ],
+   [
+    "Leak at the gas water heater · safety steps given",
+    "No heat, older person home · safety steps given"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An HVAC example: no heat with a baby or an older person at home gets 'keep everyone in one warm room'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone in one warm room and never heat with the oven. If she smells gas, she leaves and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantengan a todos en un cuarto cálido, con ropa abrigada. No use el horno para calentar la casa. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep everyone in one warm room, in warm layers. Don't heat the house with the oven. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My furnace got wet in a flood. Is it safe to turn back on?"
+   ],
+   [
+    "We got your voicemail about a dripping faucet.",
+    "We got your voicemail about a noisy furnace."
+   ],
+   [
+    "Voicemail from a new caller about a dripping kitchen faucet.",
+    "Voicemail from a new caller about a noisy furnace."
+   ],
+   [
+    "Wants the faucet looked at this week",
+    "Wants the furnace looked at this week"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a tech tune up an outdoor heat pump this Thursday? What does it cost?"
+   ],
+   [
+    "A drain clearing is $179. I can't book on this call.",
+    "A heat pump tune-up is $179. I can't book on this call."
+   ],
+   [
+    "Lee Home Services · Yard drain clearing",
+    "Ridgeway Heat & Air · Heat pump tune-up"
+   ],
+   [
+    "Alex M. asked you to confirm and pay for a plumbing visit.",
+    "Alex M. asked you to confirm and pay for an HVAC visit."
+   ],
+   [
+    "Alex M. added you to a plumbing visit with Lee Home Services.",
+    "Alex M. added you to an HVAC visit with Ridgeway Heat & Air."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa tune-up Thu 12-2 Hector"
+   ],
+   [
+    "Book Tessa for a clogged drain,",
+    "Book Tessa for a furnace tune-up,"
+   ],
+   [
+    "like a roof leak",
+    "like a roof repair"
+   ],
+   [
+    "like a roofer for a roof leak",
+    "like a roofer for a roof repair"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what heats or cools the home, what's happening, and if a carbon monoxide alarm is going off."
+   ],
+   [
+    "Its first steps: none for a drain. A leak is quoted on site, and a water heater from photos.",
+    "Its first steps: none for a tune-up. A no-heat repair is quoted on site, and a humidifier from photos."
+   ],
+   [
+    "Lee Home Services asks: which drain is clogged, and is water backing up anywhere else?",
+    "Ridgeway Heat & Air asks: is it a gas furnace, and when was the filter last changed?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Gas. The filter was changed in the spring."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric?",
+    "Ridgeway Heat & Air asks: how many indoor units does your mini-split have?"
+   ],
+   [
+    "Electric.",
+    "Just one."
+   ],
+   [
+    "Lee Home Services asks: where is the leak, and is water still coming?",
+    "Ridgeway Heat & Air asks: what heats your home, and is the thermostat set to heat?"
+   ],
+   [
+    "Under the bathroom sink. I shut the valve.",
+    "A gas furnace. The thermostat is on heat, at 70."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric, and is it leaking?",
+    "Ridgeway Heat & Air asks: what kind of furnace do you have, and where is it?"
+   ],
+   [
+    "Gas. It's rusty, but it isn't leaking.",
+    "A gas furnace, in the basement."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos",
+    "The plug-in says a humidifier is priced from photos"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your furnace and the ducts by it, and a tech will price the job."
+   ],
+   [
+    "Alex M. sent photos of a water heater.",
+    "Alex M. sent photos of a furnace and its ducts."
+   ],
+   [
+    "Water heater · Alex M.",
+    "Humidifier · Alex M."
+   ],
+   [
+    "Your water heater price is with",
+    "Your humidifier price is with"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your humidifier this time"
+   ],
+   [
+    "can replace your water heater for $640.",
+    "can put in a humidifier for $640."
+   ],
+   [
+    "can replace your water heater for $640",
+    "can put in a humidifier for $640"
+   ],
+   [
+    "A clogged drain that's overflowing may be. A water heater replacement never is.",
+    "No heat on a freezing night may be. A humidifier install never is."
+   ],
+   [
+    "Say Alex needs the water heater fast. A replacement priced from photos is never sent now",
+    "Say Alex wants the humidifier fast. A job priced from photos is never sent now"
+   ],
+   [
+    "Casey does drains, leaks and flushes, not water heater replacements.",
+    "Hector does tune-ups and no-heat repairs, not humidifier installs."
+   ],
+   [
+    "Casey does drains, leaks and flushes, so he isn't offered for a replacement.",
+    "Hector does tune-ups and no-heat repairs, so he isn't offered for a humidifier install."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Where is the furnace: a basement, a closet or the attic?"
+   ],
+   [
+    "Yes, it won't drain at all.",
+    "In the basement."
+   ],
+   [
+    "Where is the water heater: a garage, a closet or a basement?",
+    "Which room is the unit in?"
+   ],
+   [
+    "In the garage.",
+    "The basement."
+   ],
+   [
+    "Is the pipe under the sink easy to reach?",
+    "Is a light on the furnace blinking?"
+   ],
+   [
+    "Yes, the cabinet is empty.",
+    "Yes, a small red light blinks."
+   ],
+   [
+    "The $179 drain and the $150 flush need no notice here. The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $179 tune-up and $150 cleaning need no notice here. The $640 humidifier is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "like a renter's new water heater",
+    "like a renter's new furnace"
+   ],
+   [
+    "like a new water heater. Alex forwards a link.",
+    "like a new furnace. Alex forwards a link."
+   ],
+   [
+    "The $179 drain and the $150 flush are under that amount, so they need none.",
+    "The $179 tune-up and the $150 cleaning are under that amount, so they need none."
+   ],
+   [
+    "A leak priced at the visit has no price yet.",
+    "A no-heat repair priced at the visit has no price yet."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it needs one.",
+    "The $640 humidifier is over the plug-in's amount, so it needs one."
+   ],
+   [
+    "Here it's the $640 water heater.",
+    "Here it's the $640 humidifier."
+   ],
+   [
+    "water heater contract",
+    "humidifier contract"
+   ],
+   [
+    "a 25% deposit on the $640 water heater",
+    "a 25% deposit on the $640 humidifier"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you tune up my furnace every fall, too?"
+   ],
+   [
+    "Lee Home Services can clear the drain for $179,",
+    "Ridgeway Heat & Air can tune up your furnace for $179,"
+   ],
+   [
+    "Lee Home Services can flush your water heater for $150,",
+    "Ridgeway Heat & Air can clean your mini-split for $150,"
+   ],
+   [
+    "Lee Home Services can come for the leak.",
+    "Ridgeway can come for your furnace."
+   ],
+   [
+    "and the $89 service call counts toward it",
+    "and the $89 diagnostic counts toward it"
+   ],
+   [
+    "like an overflowing drain",
+    "like no heat on a freezing night"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in on one day and finished on another.",
+    "Some jobs take more than one visit, like new ducts put in on one day and finished on another."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a thermostat that reads wrong."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Andre also look at my thermostat? It reads wrong."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The thermostat is a repair, quoted at the visit."
+   ],
+   [
+    "Alex M. · Overflowing kitchen drain",
+    "Alex M. · No heat, freezing night"
+   ],
+   [
+    "Can you reach the water shut-off valve?",
+    "Can you reach the furnace's power switch?"
+   ],
+   [
+    "Note: the sink is full and won't drain.",
+    "Note: gas furnace in the basement. Filter changed in the spring."
+   ],
+   [
+    "Note: Electric water heater, in the garage.",
+    "Note: one mini-split unit, in the basement."
+   ],
+   [
+    "Note: Gas water heater, in the garage. Contract signed.",
+    "Note: gas furnace in the basement. Contract signed."
+   ],
+   [
+    "Note: Leak under the bathroom sink. The valve is shut.",
+    "Note: gas furnace, on heat at 70, no heat. A red light blinks."
+   ],
+   [
+    "Alex's kitchen drain has a set time.",
+    "Alex's furnace visit has a set time."
+   ],
+   [
+    "like clearing the cabinet under the sink",
+    "like clearing a path to the furnace"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a path to the furnace."
+   ],
+   [
+    "Please clear a path to the water heater.",
+    "Please clear a path to the indoor unit."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the furnace now makes a loud bang when it starts."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The furnace makes a loud bang when it starts now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Turn the furnace off at the thermostat. If you smell gas, get everyone out and call 911 from outside. Hector can come sooner, at the same price."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor. Rosie runs the plug-in's danger check again. Only Jordan replaces water heaters, and he has no earlier time.",
+    "Alex texts that there's a burning smell from the unit. Rosie runs the plug-in's danger check again. Only Andre installs humidifiers, and he has no earlier time."
+   ],
+   [
+    "The water heater is leaking onto the floor now.",
+    "There's a burning smell from the unit now."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches. Nobody who does replacements is free sooner, so Jordan still comes Thursday, 8–10am.",
+    "Turn the system off at the thermostat. If you see smoke, get out and call 911. Nobody who installs humidifiers is free sooner, so Andre still comes Thursday, 8–10am."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor. Rosie runs the plug-in's danger check again, then offers an earlier time if one is free.",
+    "Alex texts that there's a burning smell from the unit. Rosie runs the plug-in's danger check again, then offers an earlier time if one is free."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Turn the system off at the thermostat. If you see smoke, get out and call 911. Hector can come sooner, at the same price."
+   ],
+   [
+    "Alex texts that the leak under the sink is worse.",
+    "Alex texts that the furnace stopped trying, and the house is down to 58 degrees."
+   ],
+   [
+    "The leak under the sink is much worse now.",
+    "The furnace stopped trying. It's 58 in here now."
+   ],
+   [
+    "Turn off the valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Keep everyone in one warm room, in layers. Never heat the house with the oven or a grill. Hector can come sooner, at the same price."
+   ],
+   [
+    "Alex's drain is booked with Jordan by name.",
+    "Alex's visit is booked with Andre by name."
+   ],
+   [
+    "Casey is free then and does drain work.",
+    "Hector is free then and does furnace work."
+   ],
+   [
+    "Casey does drain work, so Casey can stand in.",
+    "Hector does furnace work, so Hector can stand in."
+   ],
+   [
+    "Casey will do your yard drain tomorrow without Jordan.",
+    "Hector will work on your heat pump tomorrow without Andre."
+   ],
+   [
+    "yard drain dig",
+    "outdoor heat pump job"
+   ],
+   [
+    "yard drain visit",
+    "heat pump visit"
+   ],
+   [
+    "The cleared yard drain",
+    "The cleaned outdoor unit"
+   ],
+   [
+    "the water jetter for Kim's yard drain",
+    "the coil cleaner for Kim's outdoor heat pump"
+   ],
+   [
+    "like a yard drain",
+    "like an outdoor heat pump"
+   ],
+   [
+    "Yard drain",
+    "Outdoor heat pump"
+   ],
+   [
+    "yard drain",
+    "outdoor heat pump"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Andre also run a camera through my ducts?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a filter change at two rentals every 3 months"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's filter change?"
+   ],
+   [
+    "Your drain cleaning plan's price is changing.",
+    "Your filter change plan's price is changing."
+   ],
+   [
+    "Indoor work, like Alex's drain, has none.",
+    "Indoor work, like Alex's furnace, has none."
+   ],
+   [
+    "Alex M.: the vent pipe needs replacing too. New price 700.",
+    "Alex M.: a duct section needs replacing too. New price 700."
+   ],
+   [
+    "Old vent pipe",
+    "Old duct section"
+   ],
+   [
+    "new price for Alex M.'s water heater: $700, was $640.",
+    "new price for Alex M.'s humidifier: $700, was $640."
+   ],
+   [
+    "found that the vent pipe needs replacing too.",
+    "found that a duct section needs replacing too."
+   ],
+   [
+    "Was $640: the new vent pipe adds $60",
+    "Was $640: the new duct section adds $60"
+   ],
+   [
+    "found that the new water heater can't go in as planned.",
+    "found that the humidifier can't go in as planned."
+   ],
+   [
+    "like a drain snake and a camera",
+    "like a carbon monoxide meter and gauges"
+   ],
+   [
+    "Kitchen drain cleared · $179",
+    "Furnace tune-up · $179"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Furnace tune-up"
+   ],
+   [
+    "Kitchen drain",
+    "Furnace tune-up"
+   ],
+   [
+    "The plug-in names the checks, like the pipes under the sink and the cabinet floor.",
+    "The plug-in names the checks, like a carbon monoxide reading first, then the burners and the flue."
+   ],
+   [
+    "Under the sink, before",
+    "Furnace, before"
+   ],
+   [
+    "BEFORE rust at the base of the water heater",
+    "BEFORE dusty unit, filter clogged"
+   ],
+   [
+    "Water heater, before",
+    "The unit, before"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Andre finds a cracked igniter and texts the price with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 igniter 165 flame sensor 80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Andre found why there's no heat. Here's the price to fix it today."
+   ],
+   [
+    "Shutoff valve · $165",
+    "New igniter · $165"
+   ],
+   [
+    "Supply line · $80",
+    "New flame sensor · $80"
+   ],
+   [
+    "The supply line is its own quote now",
+    "The flame sensor is its own quote now"
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Andre puts in the new igniter today, $165. The $80 flame sensor price stays good until Thu Oct 29."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 flame sensor stays good until Thu Oct 29."
+   ],
+   [
+    "Here, Alex OKs the shutoff valve and leaves the supply line.",
+    "Here, Alex OKs the igniter and leaves the flame sensor."
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the igniter only, $165. Leave the flame sensor."
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the ducts are in, $800 at the finish"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Andre finds a worn igniter and a dirty flame sensor."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 new igniter and flame sensor, both worn"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: a new igniter and flame sensor, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "New igniter and flame sensor · $160"
+   ],
+   [
+    "Jordan finds the drain trap under the sink is cracked.",
+    "Andre finds the blower belt is worn."
+   ],
+   [
+    "EXTRA 95 replace the cracked drain trap",
+    "EXTRA 95 replace the worn blower belt"
+   ],
+   [
+    "Extra for Alex M.: replace the cracked drain trap, $95.",
+    "Extra for Alex M.: replace the worn blower belt, $95."
+   ],
+   [
+    "Replace the drain trap · $95",
+    "Replace the blower belt · $95"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 parts quote is good for 7 days."
+   ],
+   [
+    "The $95 drain trap quote is good for 7 days.",
+    "The $95 blower belt quote is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to a new igniter and flame sensor for $160."
+   ],
+   [
+    "you said yes to replacing the drain trap for $95.",
+    "you said yes to a new blower belt for $95."
+   ],
+   [
+    "Jordan sees the water heater leaking at the base. He sends photos, and prices a new one from them at $640, over Sam's $500 limit.",
+    "Andre finds the blower motor failing. He sends photos, and prices a new one from them at $640, over Sam's $500 limit."
+   ],
+   [
+    "QUOTE 640 water heater leaking at the base, replace",
+    "QUOTE 640 blower motor failing, replace"
+   ],
+   [
+    "Jordan quotes a new water heater for Alex M. from his photos: $640.",
+    "Andre quotes a new blower motor for Alex M. from his photos: $640."
+   ],
+   [
+    "Found at Thu's water heater visit",
+    "Found at Thu's furnace visit"
+   ],
+   [
+    "Jordan found that your water heater is leaking. Here's the price for a new one, from his photos, as its own visit.",
+    "Andre found that your furnace's blower motor is failing. Here's the price for a new one, from his photos, as its own visit."
+   ],
+   [
+    "The $160 valves go over your landlord's OK, so they went to your landlord first.",
+    "The $160 parts go over your landlord's OK, so they went to your landlord first."
+   ],
+   [
+    "The $95 drain trap goes over your landlord's OK, so it went to your landlord first.",
+    "The $95 blower belt goes over your landlord's OK, so it went to your landlord first."
+   ],
+   [
+    "A what-if for a drain job: the clog is in the main line, so Jordan clears it from the outside cleanout.",
+    "A what-if for a tune-up: the blower is too dirty to clean in place, so Andre takes it out to clean it."
+   ],
+   [
+    "Jordan cleared the clog from the outside cleanout. It was in the main line. Your price doesn't change.",
+    "Andre took the blower out to clean it. It was too dirty to clean in place. Your price doesn't change."
+   ],
+   [
+    "like a new water heater. The customer signs for it.",
+    "like a new furnace. The customer signs for it."
+   ],
+   [
+    "A what-if: a new water heater is delivered and set up.",
+    "A what-if: a new furnace is delivered and set up."
+   ],
+   [
+    "DELIVERED water heater set up",
+    "DELIVERED furnace set up"
+   ],
+   [
+    "New water heater, set up",
+    "New furnace, set up"
+   ],
+   [
+    "Your new water heater is in. Please check it and sign for it.",
+    "Your new furnace is in. Please check it and sign for it."
+   ],
+   [
+    "Delivery · Water heater",
+    "Delivery · Furnace"
+   ],
+   [
+    "A what-if: the water heater job takes two days.",
+    "A what-if: a furnace replacement takes two days."
+   ],
+   [
+    "like a faucet to rebuild",
+    "like a window AC to repair"
+   ],
+   [
+    "Jordan takes Alex's old faucet to the shop to rebuild it.",
+    "Andre takes Alex's window AC to the shop to repair it."
+   ],
+   [
+    "TAKEN faucet to the shop, back Mon",
+    "TAKEN window AC to the shop, back Mon"
+   ],
+   [
+    "Faucet, as taken",
+    "Window AC, as taken"
+   ],
+   [
+    "Jordan took your faucet to the shop to rebuild it.",
+    "Andre took your window AC to the shop to repair it."
+   ],
+   [
+    "Taken to the shop · Faucet",
+    "Taken to the shop · Window AC"
+   ],
+   [
+    "Here: the drain runs clear, and nothing drips.",
+    "Here: the furnace lights, heats and shuts off as it should."
+   ],
+   [
+    "check the water heater together",
+    "check the system together"
+   ],
+   [
+    "Here: the water runs, and nothing drips under the sink.",
+    "Here: the burners light, the heat comes on, and the carbon monoxide reading is normal."
+   ],
+   [
+    "The drain runs clear. Jordan texts DONE",
+    "The furnace runs clean. Andre texts DONE"
+   ],
+   [
+    "DONE 179 drain, parts 38 trap",
+    "DONE 179 furnace tune-up, parts 38 flame sensor"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 furnace tune-up"
+   ],
+   [
+    "The leak is fixed. Jordan texts DONE",
+    "The heat is back on. Andre texts DONE"
+   ],
+   [
+    "DONE 245 valve 165 supply line 80",
+    "DONE 245 igniter 165 flame sensor 80"
+   ],
+   [
+    "The new water heater is in. Jordan texts DONE",
+    "The new humidifier is in. Andre texts DONE"
+   ],
+   [
+    "DONE 640 water heater, parts 45 expansion tank",
+    "DONE 640 humidifier, parts 45 hookup kit"
+   ],
+   [
+    "DONE 640 water heater",
+    "DONE 640 humidifier"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE furnace 17 yrs old, filter 16x25x1. Flame sensor worn: replace it next time."
+   ],
+   [
+    "NOTE heavy sediment in the tank. Flush again in 12 months.",
+    "NOTE coil and blower wheel cleaned. Next cleaning in 12 months."
+   ],
+   [
+    "NOTE new shutoff valve and supply line under the kitchen sink.",
+    "NOTE new igniter and flame sensor. Furnace 17 yrs old, filter 16x25x1."
+   ],
+   [
+    "Jordan texts DONE with only the shutoff valve.",
+    "Andre texts DONE with only the igniter."
+   ],
+   [
+    "DONE 165 shutoff valve",
+    "DONE 165 igniter"
+   ],
+   [
+    "Done: the $160 for the shutoff valves is refunded.",
+    "Done: the $160 for the igniter and flame sensor is refunded."
+   ],
+   [
+    "the shutoff valves",
+    "the igniter and flame sensor"
+   ],
+   [
+    "the shutoff valve",
+    "the igniter"
+   ],
+   [
+    "1-year labor warranty on the valve: if it leaks again, reply here.",
+    "1-year labor warranty on the igniter: if the heat stops again, reply here."
+   ],
+   [
+    "for today's shutoff valve. 1-year labor warranty: if it leaks again, reply here.",
+    "for today's igniter. 1-year labor warranty: if the heat stops again, reply here."
+   ],
+   [
+    "when the new pipes are in",
+    "when the new ducts are in"
+   ],
+   [
+    "your new pipes are in",
+    "your new ducts are in"
+   ],
+   [
+    "Alex M.: $179 drain + $38 parts = $217.",
+    "Alex M.: $179 tune-up + $38 parts = $217."
+   ],
+   [
+    "DONE 150 water heater flush, parts 12 drain valve",
+    "DONE 150 mini-split cleaning, parts 12 filter"
+   ],
+   [
+    "Alex M.: $150 flush + $12 parts = $162.",
+    "Alex M.: $150 cleaning + $12 parts = $162."
+   ],
+   [
+    "Alex M.: $640 water heater + $45 parts = $685.",
+    "Alex M.: $640 humidifier + $45 parts = $685."
+   ],
+   [
+    "DONE 245 leak, parts 18 fittings",
+    "DONE 245 igniter, parts 18 wire connectors"
+   ],
+   [
+    "the kitchen drain at 42 Oak St",
+    "the furnace tune-up at 112 Fern St"
+   ],
+   [
+    "for the kitchen drain. Sending Alex the bill.",
+    "for the furnace tune-up. Sending Alex the bill."
+   ],
+   [
+    "the kitchen drain",
+    "the furnace tune-up"
+   ],
+   [
+    "left for your water heater flush",
+    "left for your mini-split cleaning"
+   ],
+   [
+    "left on your water heater flush",
+    "left on your mini-split cleaning"
+   ],
+   [
+    "left for your water heater",
+    "left for your humidifier"
+   ],
+   [
+    "left for your new water heater",
+    "left for your new humidifier"
+   ],
+   [
+    "the rest of the water heater job",
+    "the rest of the humidifier job"
+   ],
+   [
+    "the rest of the water heater at 42 Oak St",
+    "the rest of the humidifier at 112 Fern St"
+   ],
+   [
+    "Nothing more is owed for the flush.",
+    "Nothing more is owed for the cleaning."
+   ],
+   [
+    "DONE 160 valves",
+    "DONE 160 igniter and flame sensor"
+   ],
+   [
+    "like the $160 valves",
+    "like the $160 parts"
+   ],
+   [
+    "like the $95 drain trap",
+    "like the $95 blower belt"
+   ],
+   [
+    "$640 for the water heater",
+    "$640 for the humidifier"
+   ],
+   [
+    "$640 for your new water heater",
+    "$640 for your new humidifier"
+   ],
+   [
+    "left on your water heater",
+    "left on your humidifier"
+   ],
+   [
+    "the $640 water heater bill",
+    "the $640 humidifier bill"
+   ],
+   [
+    "left on the water heater bill",
+    "left on the humidifier bill"
+   ],
+   [
+    "1-year labor warranty: if it clogs again, reply here.",
+    "1-year labor warranty: if the furnace acts up, reply here."
+   ],
+   [
+    "if anything leaks, reply here",
+    "if anything acts up, reply here"
+   ],
+   [
+    "1-year labor warranty: if it leaks again, reply here.",
+    "1-year labor warranty: if the heat stops again, reply here."
+   ],
+   [
+    "Alex cancels the $160 valve work on the page.",
+    "Alex cancels the $160 parts work on the page."
+   ],
+   [
+    "Alex M. cancelled the $160 valve work.",
+    "Alex M. cancelled the $160 parts work."
+   ],
+   [
+    "Alex cancels the $95 drain trap work on the page.",
+    "Alex cancels the $95 blower belt work on the page."
+   ],
+   [
+    "Done: the $95 for the drain trap is refunded.",
+    "Done: the $95 for the blower belt is refunded."
+   ],
+   [
+    "Replace the drain trap",
+    "Replace the blower belt"
+   ],
+   [
+    "Alex M. cancelled the $95 drain trap work.",
+    "Alex M. cancelled the $95 blower belt work."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The furnace won't light again 2 weeks after the tune-up."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My furnace won't light again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s furnace, tuned up Thu Oct 22, won't light again."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your tune-up is under warranty, so this visit is free."
+   ],
+   [
+    "The new water heater drips at a fitting 2 weeks later.",
+    "The new humidifier drips at a fitting 2 weeks later."
+   ],
+   [
+    "My new water heater is dripping at a fitting.",
+    "My new humidifier is dripping at a fitting."
+   ],
+   [
+    "Alex M.'s new water heater, put in Thu Oct 22, is dripping at a fitting.",
+    "Alex M.'s new humidifier, put in Thu Oct 22, is dripping at a fitting."
+   ],
+   [
+    "Your water heater is under warranty, so this visit is free.",
+    "Your humidifier is under warranty, so this visit is free."
+   ],
+   [
+    "The heater's drain valve drips 2 weeks after the flush.",
+    "The mini-split drips water 2 weeks after the cleaning."
+   ],
+   [
+    "My water heater's drain valve is dripping since the flush.",
+    "My mini-split is dripping water since the cleaning."
+   ],
+   [
+    "Alex M.'s water heater, flushed Thu Oct 22, is dripping at the drain valve.",
+    "Alex M.'s mini-split, cleaned Thu Oct 22, is dripping water."
+   ],
+   [
+    "The leak comes back 2 weeks later.",
+    "The heat stops again 2 weeks later."
+   ],
+   [
+    "The leak under my sink is back.",
+    "My furnace stopped heating again."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Andre left a mess by the furnace."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Andre look at my AC next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Andre's next times for an AC check."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like replacing the old furnace Andre noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a new furnace, from Andre's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Replace the old furnace"
+   ],
+   [
+    "Say the water heater job needed one.",
+    "Say a furnace replacement needed one."
+   ],
+   [
+    "The city's final inspection for your new water heater is set.",
+    "The city's final inspection for your new furnace is set."
+   ],
+   [
+    "Sewer camera report",
+    "Duct camera report"
+   ],
+   [
+    "Replace both shutoff valves",
+    "New igniter and flame sensor"
+   ],
+   [
+    "Sends written notice about the faucet",
+    "Sends written notice about the window AC"
+   ],
+   [
+    "Your rebuilt faucet is ready at Lee Home Services. Please pick a time for Jordan to bring it back.",
+    "Your repaired window AC is ready at Ridgeway Heat & Air. Please pick a time for Andre to bring it back."
+   ],
+   [
+    "Written notice · Your faucet",
+    "Written notice · Your window AC"
+   ],
+   [
+    "and the faucet is still at the shop",
+    "and the window AC is still at the shop"
+   ],
+   [
+    "Alex M.'s rebuilt faucet is still at the shop.",
+    "Alex M.'s repaired window AC is still at the shop."
+   ],
+   [
+    "Booking the faucet's return before that day means no fee.",
+    "Booking the window AC's return before that day means no fee."
+   ],
+   [
+    "The fee is added to the bill when the faucet goes back.",
+    "The fee is added to the bill when the window AC goes back."
+   ],
+   [
+    "Your rebuilt faucet is still at Lee Home Services.",
+    "Your repaired window AC is still at Ridgeway Heat & Air."
+   ],
+   [
+    "The faucet isn't taken back",
+    "The window AC isn't taken back"
+   ],
+   [
+    "Jordan left a drying fan after a leak.",
+    "Andre lent a space heater while a part was on order."
+   ],
+   [
+    "Tips for your drain: run hot water for a minute after washing dishes, and skip store-bought drain cleaners. If it slows again, reply here.",
+    "Tips for your furnace: change the filter every 3 months, and keep the space around it clear. If it stops heating, reply here."
+   ],
+   [
+    "Tips for your water heater: keep the space around it clear, and check for drips this week. If you see water or lose hot water, reply here.",
+    "Tips for your system: keep the space around it clear, and change the filter every 3 months. If it stops heating, reply here."
+   ],
+   [
+    "Tips after your leak repair: check under the sink for drips tomorrow, and don't store heavy things on the pipes. If it drips again, reply here.",
+    "Tips after your no-heat repair: change the filter every 3 months, and keep the vents open. If the heat stops again, reply here."
+   ],
+   [
+    "Is water backing up into the sink?",
+    "Is the thermostat set to heat?"
+   ],
+   [
+    "Morgan P.'s water heater",
+    "Morgan P.'s humidifier"
+   ],
+   [
+    "Your water heater quote is with the owner.",
+    "Your humidifier quote is with the owner."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The furnace quit, and it's freezing. Can someone come tonight?"
+   ],
+   [
+    "It's a leak under the sink, today 3 to 5pm with Jordan.",
+    "It's a furnace that won't heat, today 3 to 5pm with Andre."
+   ],
+   [
+    "about the water heater quote before booking",
+    "about the humidifier quote before booking"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Tune-ups already booked keep $179"
+   ],
+   [
+    "Drain clearing plans get 30 days' notice first.",
+    "Tune-up plans get 30 days' notice first."
+   ],
+   [
+    "Morgan P.'s two shutoff valves",
+    "Morgan P.'s igniter and flame sensor"
+   ],
+   [
+    "Jordan's supplier invoice shows the valves cost more since then.",
+    "Andre's supplier invoice shows the parts cost more since then."
+   ],
+   [
+    "Supplier invoice: valves +$15 each",
+    "Supplier invoice: parts +$15 each"
+   ],
+   [
+    "replaces water heaters",
+    "installs humidifiers"
+   ],
+   [
+    "replace water heaters",
+    "install humidifiers"
+   ],
+   [
+    "water heater replacements",
+    "humidifier installs"
+   ],
+   [
+    "leehomeservices.com",
+    "ridgewayhvac.com"
+   ],
+   [
+    "Lee Home Services'",
+    "Ridgeway Heat & Air's"
+   ],
+   [
+    "Lee Home Services",
+    "Ridgeway Heat & Air"
+   ],
+   [
+    "Lee Plumbing",
+    "Ridgeway Heat & Air"
+   ],
+   [
+    "Lee Electric",
+    "Ridgeway Electric"
+   ],
+   [
+    "Lee's Barbershop",
+    "Ridgeway Supply"
+   ],
+   [
+    "The barbershop plug-in",
+    "The HVAC plug-in"
+   ],
+   [
+    "Barbershop",
+    "Parts counter"
+   ],
+   [
+    "barbershop",
+    "parts counter"
+   ],
+   [
+    "Plumbing + electrical",
+    "HVAC + electrical"
+   ],
+   [
+    "MP045210",
+    "HM045210"
+   ],
+   [
+    "JP031552",
+    "HJ031552"
+   ],
+   [
+    "BR41862",
+    "HJ041862"
+   ],
+   [
+    "BS20981",
+    "SR20981"
+   ],
+   [
+    "Jordan Price",
+    "Andre Baptiste"
+   ],
+   [
+    "Casey Moore",
+    "Hector Ruiz"
+   ],
+   [
+    "Riley Chen",
+    "Luis Ortega"
+   ],
+   [
+    "Avery Diaz",
+    "Kara Bell"
+   ],
+   [
+    "Jordan",
+    "Andre"
+   ],
+   [
+    "Casey",
+    "Hector"
+   ],
+   [
+    "Riley",
+    "Luis"
+   ],
+   [
+    "Avery",
+    "Kara"
+   ],
+   [
+    "1200 Main St",
+    "300 Ridge Rd"
+   ],
+   [
+    "88 Elm St",
+    "60 Depot St"
+   ],
+   [
+    "Elm St",
+    "Depot St"
+   ],
+   [
+    "42 Oak St",
+    "112 Fern St"
+   ],
+   [
+    "haircut membership",
+    "filter plan"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 dehumidifier repair"
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Dehumidifier repair"
+   ],
+   [
+    "Groom's packages",
+    "Dehumidifier repairs"
+   ],
+   [
+    "the Groom's package ·",
+    "the dehumidifier repair ·"
+   ],
+   [
+    "Groom's package ·",
+    "Dehumidifier repair ·"
+   ],
+   [
+    "the Groom's package,",
+    "the dehumidifier repair,"
+   ],
+   [
+    "your Groom's package,",
+    "your dehumidifier repair,"
+   ],
+   [
+    "Groom's package,",
+    "Dehumidifier repair,"
+   ],
+   [
+    "· Groom's package",
+    "· Dehumidifier repair"
+   ],
+   [
+    "the Groom's package",
+    "the dehumidifier repair"
+   ],
+   [
+    "The Groom's package",
+    "The dehumidifier repair"
+   ],
+   [
+    "your Groom's package",
+    "your dehumidifier repair"
+   ],
+   [
+    "Your Groom's package",
+    "Your dehumidifier repair"
+   ],
+   [
+    "today's Groom's package",
+    "today's dehumidifier repair"
+   ],
+   [
+    "tomorrow's Groom's package",
+    "tomorrow's dehumidifier repair"
+   ],
+   [
+    "11:00am Groom's package",
+    "11:00am dehumidifier repair"
+   ],
+   [
+    "2:00pm Groom's package",
+    "2:00pm dehumidifier repair"
+   ],
+   [
+    "1:00 Groom's package",
+    "1:00 dehumidifier repair"
+   ],
+   [
+    "Oct 31 Groom's package",
+    "Oct 31 dehumidifier repair"
+   ],
+   [
+    "Nov 7 Groom's package",
+    "Nov 7 dehumidifier repair"
+   ],
+   [
+    "2½-hour Groom's package",
+    "2½-hour dehumidifier repair"
+   ],
+   [
+    "B.'s Groom's package",
+    "B.'s dehumidifier repair"
+   ],
+   [
+    "Groom's package",
+    "Dehumidifier repair"
+   ],
+   [
+    "grooms package",
+    "dehumidifier repair"
+   ],
+   [
+    "groom's party",
+    "landlord's window units"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Part test, thermostat setup and custom filter"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Window AC cleaning"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "window AC cleaning"
+   ],
+   [
+    "Signature cut and shave",
+    "Window AC cleaning"
+   ],
+   [
+    "signature cut and shave",
+    "window AC cleaning"
+   ],
+   [
+    "Signature cut",
+    "Window AC cleaning"
+   ],
+   [
+    "signature cut",
+    "window AC cleaning"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Flame sensor cleaning"
+   ],
+   [
+    "kids cuts",
+    "flame sensor cleanings"
+   ],
+   [
+    "Kids cut",
+    "Flame sensor cleaning"
+   ],
+   [
+    "kids cut",
+    "flame sensor cleaning"
+   ],
+   [
+    "a skin fade",
+    "a thermostat setup"
+   ],
+   [
+    "A skin fade",
+    "A thermostat setup"
+   ],
+   [
+    "Skin fade",
+    "Thermostat setup"
+   ],
+   [
+    "skin fade",
+    "thermostat setup"
+   ],
+   [
+    "a beard trim",
+    "a custom filter"
+   ],
+   [
+    "Beard trim",
+    "Custom filter"
+   ],
+   [
+    "beard trim",
+    "custom filter"
+   ],
+   [
+    "Color and cut",
+    "Control board repair"
+   ],
+   [
+    "color and cut",
+    "control board repair"
+   ],
+   [
+    "Color correction",
+    "Blower motor repair"
+   ],
+   [
+    "color correction",
+    "blower motor repair"
+   ],
+   [
+    "color station",
+    "test bench"
+   ],
+   [
+    "photos of your hair",
+    "photos of the board"
+   ],
+   [
+    "patch test",
+    "part check"
+   ],
+   [
+    "Haircuts",
+    "Part tests"
+   ],
+   [
+    "haircuts",
+    "part tests"
+   ],
+   [
+    "Haircut",
+    "Part test"
+   ],
+   [
+    "haircut",
+    "part test"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "cuts hair",
+    "works the counter"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "barbering",
+    "counter work"
+   ],
+   [
+    "barbers",
+    "counter techs"
+   ],
+   [
+    "barber",
+    "counter tech"
+   ],
+   [
+    "Barber",
+    "Counter tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "package cut",
+    "package repair"
+   ],
+   [
+    "the cut",
+    "the test"
+   ],
+   [
+    "a cut",
+    "a part test"
+   ],
+   [
+    "cuts",
+    "tests"
+   ],
+   [
+    "color plan",
+    "repair plan"
+   ],
+   [
+    "Color plan",
+    "Repair plan"
+   ],
+   [
+    "kitchen drain clearing",
+    "furnace tune-up"
+   ],
+   [
+    "Drain clearing",
+    "Furnace tune-up"
+   ],
+   [
+    "drain clearing",
+    "furnace tune-up"
+   ],
+   [
+    "Water heater flush",
+    "Mini-split cleaning"
+   ],
+   [
+    "water heater flush",
+    "mini-split cleaning"
+   ],
+   [
+    "Water heater replacement",
+    "Humidifier install"
+   ],
+   [
+    "water heater replacement",
+    "humidifier install"
+   ],
+   [
+    "Leak repair",
+    "No-heat repair"
+   ],
+   [
+    "leak repair",
+    "no-heat repair"
+   ],
+   [
+    "Sewer camera inspection",
+    "Duct camera inspection"
+   ],
+   [
+    "sewer camera",
+    "duct camera"
+   ],
+   [
+    "plumbers",
+    "techs"
+   ],
+   [
+    "Plumbers",
+    "Techs"
+   ],
+   [
+    "plumber",
+    "tech"
+   ],
+   [
+    "Plumber",
+    "HVAC tech"
+   ],
+   [
+    "plumbing's",
+    "HVAC's"
+   ],
+   [
+    "Plumbing",
+    "HVAC"
+   ],
+   [
+    "plumbing",
+    "HVAC"
+   ],
+   [
+    "service call",
+    "diagnostic visit"
+   ],
+   [
+    "Service call",
+    "Diagnostic visit"
+   ],
+   [
+    "only after a missed check",
+    "after a missed check"
+   ],
+   [
+    "barbershop",
+    "HVAC shop"
+   ],
+   [
+    "Barbershop",
+    "HVAC shop"
+   ],
+   [
+    "hot towel",
+    "tune-up"
+   ],
+   [
+    "shave",
+    "tune-up"
+   ],
+   [
+    "water heater",
+    "furnace"
+   ],
+   [
+    "Water heater",
+    "Furnace"
+   ],
+   [
+    "water heaters",
+    "furnaces"
+   ],
+   [
+    "sink",
+    "thermostat"
+   ],
+   [
+    "Sink",
+    "Thermostat"
+   ],
+   [
+    "pipes",
+    "ducts"
+   ],
+   [
+    "pipe",
+    "duct"
+   ],
+   [
+    "Pipe",
+    "Duct"
+   ],
+   [
+    "drain",
+    "condensate line"
+   ],
+   [
+    "Drain",
+    "Condensate line"
+   ],
+   [
+    "water line",
+    "duct"
+   ],
+   [
+    "faucet",
+    "thermostat"
+   ],
+   [
+    "flush",
+    "cleaning"
+   ],
+   [
+    "Flush",
+    "Cleaning"
+   ],
+   [
+    "overflowing",
+    "not cooling"
+   ],
+   [
+    "dishwasher",
+    "furnace"
+   ],
+   [
+    "valves",
+    "parts"
+   ],
+   [
+    "valve",
+    "part"
+   ],
+   [
+    "shutoff",
+    "blower"
+   ],
+   [
+    "Shutoff",
+    "Blower"
+   ],
+   [
+    "massage",
+    "duct cleaning"
+   ],
+   [
+    "Massage",
+    "Duct cleaning"
+   ],
+   [
+    "shaves",
+    "tune-ups"
+   ],
+   [
+    "skin fades",
+    "duct cleaning"
+   ],
+   [
+    "barbershops",
+    "HVAC shops"
+   ],
+   [
+    "overflowing",
+    "not cooling"
+   ],
+   [
+    "Overflowing",
+    "Not cooling"
+   ],
+   [
+    "the plug-in's job questions and anything",
+    "job questions and anything"
+   ]
+  ]
+ },
+ "cast": {
+  "A": {
+   "staff": "Luis and Kara (techs at the parts counter)"
+  },
+  "B": {
+   "staff": "Andre and Nina (HVAC techs)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Luis"
+  },
+  "B": {
+   "staff": "Andre"
+  }
+ },
+ "keep": [
+  "leak",
+  "electrical",
+  "electrician",
+  "heating",
+  "heater",
+  "drips"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings the old igniter from a furnace that won't light to the counter at Ridgeway Supply, Sam's heating and cooling parts shop, and Luis tests it on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex's furnace stops heating, and Alex books Ridgeway Heat & Air at 112 Fern St. Andre comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: a no-heat repair, a tune-up, a mini-split cleaning or a humidifier."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 part test at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+    "list|none|counter": "A $35 part test. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|deposit|counter": "The $140 dehumidifier repair. A $40 deposit now, and $100 at the counter.",
+    "list|full|none": "The $55 window AC cleaning, paid in full when booking.",
+    "photos|card|counter": "A control board repair, priced from Alex's photos at $90. Booked once Sam OKs it.",
+    "visit|card|counter": "A blower motor repair, priced at the counter. Only the $25 bench test is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Repair"
+    },
+    "list|none|*": {
+     "price": "$35",
+     "name": "Part test"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Part test"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Dehumidifier repair"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "free",
+     "name": "Window AC cleaning"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Control board repair"
+    },
+    "visit|*|*": {
+     "name": "Blower motor repair"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Part test",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$35"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "visit|card|bill",
+   "combos": [
+    "visit|card|bill",
+    "visit|none|bill",
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "list|full|none",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "visit|card|bill": "The main story: no heat. A no-heat repair, priced at the visit. Only the $89 diagnostic visit is promised, and a card is saved for the $89 fee. Rosie texts the bill.",
+    "visit|none|bill": "The same no-heat repair. Nothing is taken before. Rosie texts the bill.",
+    "list|card|bill": "A $179 furnace tune-up. A card is saved for the $89 fee. Rosie texts the bill after the job.",
+    "list|none|bill": "A $179 furnace tune-up. Nothing is taken. Rosie texts the bill after the job.",
+    "list|card|card": "A $179 furnace tune-up. A card is saved and charged $179 when Andre texts DONE.",
+    "list|full|none": "A $150 mini-split cleaning, paid in full when booking.",
+    "photos|deposit|bill": "A humidifier put in, priced from photos at $640. Sam OKs it. A $160 deposit now, and the $480 rest on the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Diagnostic visit"
+    },
+    "visit|*|*": {
+     "name": "No-heat repair"
+    },
+    "list|none|*": {
+     "price": "$179",
+     "name": "Furnace tune-up"
+    },
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Furnace tune-up"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "free",
+     "name": "Mini-split cleaning"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "Humidifier install"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "AC tune-up",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$179",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Mini-split cleaning",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "free"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-59",
+   "A7-15",
+   "A8-02",
+   "A8-53",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B4-81",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "B8-65",
+   "B10-29",
+   "B8-72",
+   "B8-71"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "A4-32",
+    "does": "A landlord brings window AC units from five apartments, on one morning, to be cleaned. Rosie finds counter spots side by side across Luis and Kara."
+   },
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "A tech's video check shows a thermostat or a unit on the call. Luis says which part to bring in, or if a tech should come to the home."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "The owner sets the daily number at sign-up. A full day isn't shown.",
+     "Pick-up comes once it's READY, in the pick-up hours.",
+     "At the counter, a dehumidifier or a window AC left for repair is a drop-off: the shop takes a few a day."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "The part can't be fixed",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.19",
+        "8.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Sat Oct 24, 11:15am",
+       "title": "Offers a new part, or a tech at home",
+       "does": "Luis finds the old igniter is cracked, so it can't be fixed. Nothing is charged for a fix. Alex picks a new igniter from the counter, or a tech at home.",
+       "more": [
+        "A new part is sold at the shop's own price, once Alex says yes.",
+        "A tech at home is a new booking with Ridgeway Heat & Air, at the customer's place.",
+        "The $35 test was done, so it's still paid at the counter.",
+        "No answer: nothing more is done, and Alex takes the old part home."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "Alex M.'s igniter is cracked. It can't be fixed."
+        ],
+        [
+         "san",
+         "cust",
+         "Luis found a crack in your old igniter, so it can't be fixed. Here's what you can do:",
+         {
+          "buttons": [
+           "A new igniter here",
+           "A tech at home",
+           "Take it back"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.services"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Heating and cooling work and counter work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "HVAC work books techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "HVAC work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "HVAC work takes urgent jobs sent now, like no heat on a freezing night."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The counter books a tech's time, or a drop-off slot for a dehumidifier or a window unit. No class seats."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The counter books a tech's time, or a drop-off slot. No spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at an HVAC parts counter is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The counter's plug-in names no form to sign. Its first steps are a part check, or a paper the shop gets, like a warranty claim number."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Counter work is rated, like every part test."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "HVAC work is not for children: no child booking (the children fact is not listed)"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "HVAC has no children left here (children fact not listed)"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "No heat in freezing weather, or no cooling in great heat, with someone at risk at home: it's marked urgent.",
+     "Only a yes or no is asked about who's at risk, never the details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "AC and heat pump jobs show only techs with a refrigerant card on file.",
+     "Gas furnaces show only techs with the gas license, where the state issues one."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-04",
+    "more": [
+     "Urgent no heat or no cooling, with someone at risk at home: Sam set his OK to wait 15 minutes, not 30.",
+     "Then Alex can look elsewhere sooner if Sam can't take it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-16",
+    "more": [
+     "Alex also gets the safety steps again: one warm room, and never heat with the oven or a grill."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-52",
+    "more": [
+     "A yearly plan, like the Comfort Plan, is told before it renews too, with how to end it.",
+     "The state's rules can set how early that notice goes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "On a furnace or boiler that burns gas or oil, Andre checks the air for carbon monoxide before any work."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-39",
+    "more": [
+     "On a fuel-burning furnace, venting and carbon monoxide are checked again after the work.",
+     "Andre offers Alex the old parts, where the state's rules require it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-63",
+    "more": [
+     "No heat, and a new furnace can't wait out the cancel days? The work starts sooner only one way.",
+     "The customer writes and signs their own emergency statement, where the rules allow it. Rosie never fills it in."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-07",
+    "more": [
+     "Declining an urgent no-heat job also says: if the home gets too cold for anyone, call 911."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B10-07",
+    "branch": {
+     "label": "Alex asks about a plan",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B10-x01",
+       "line": [
+        "10.10",
+        "4.18"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Thu Oct 22, 9:20am",
+       "title": "Texts the plan's terms, since Alex asked",
+       "does": "At DONE, Alex asks how to avoid this next winter. Andre tells Alex about the Comfort Plan, and Rosie texts its terms only because Alex asked.",
+       "more": [
+        "The terms are on their own page, with their own yes. Nothing is charged without it.",
+        "No yes: nothing is charged, and nobody follows up.",
+        "A yes saves the spring tune-up as a reminder. Each season's visit starts with a text to pick a time.",
+        "Where the state's rules give days to cancel a plan sold at the home, the page says so."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "NEXT Alex M. asks about the Comfort Plan"
+        ],
+        [
+         "san",
+         "cust",
+         "Here's Ridgeway's Comfort Plan, as you asked Andre. Read it, and join only if you want it.",
+         {
+          "card": {
+           "title": "Comfort Plan · $189 a year",
+           "lines": [
+            "A fall heating and a spring cooling tune-up",
+            "Renews each year: we text you before it charges",
+            "End it any time, by text"
+           ],
+           "button": "Read and join",
+           "link": "rosfield.com/m/r44"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.services",
+        "pf.rules"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Heating and cooling work and counter work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "HVAC work books techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "HVAC work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "HVAC work takes urgent jobs sent now, like no heat on a freezing night."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "HVAC work at the home books a tech in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in HVAC work is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "HVAC work at the home books a tech in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "HVAC work is never with a child: the tech waits for an adult on the booking."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "not a named-only trade: the rating is asked (no sensitive switch)"
+   },
+   {
+    "op": "words",
+    "at": "B4-07",
+    "does": "The price, {{price:$179}}, comes straight from Sam's list. List prices never need Sam's OK."
+   }
+  ]
+ },
+ "notes": "Pilot: plumber (pattern fix, style Home visit). An HVAC tech runs like a plumber: a home visit in an arrival window, a diagnostic fee held and credited to the repair, a quote at the visit before any work, urgent jobs sent now after hours to the tech on call, permits for replacements and gas work, and a parts counter as the less usual side. What the plumber lacked I added: the carbon monoxide screen, the cracked heat exchanger, the yearly upkeep plan, and the refrigerant-card and gas-license matching.\nFlow B (the usual side): Ridgeway Heat & Air, the old flowchart's business, is Sam's main company (the master's Lee Home Services; trade names Ridgeway Heat & Air and Ridgeway Electric). Jordan is Andre (the old flowchart's tech), Casey is Hector (he, as the master writes Casey), Alex lives at 112 Fern St (the old flowchart's street), the company is at 300 Ridge Rd. Teresa, the old owner, is Sam; Megan is Alex.\nFlow B's money keeps the master's numbers: the $89 service call is the diagnostic visit, credited to the repair; the $179 kitchen drain is a furnace tune-up; the $150 water heater flush is a mini-split cleaning, paid in full; the leak repair is a no-heat repair priced at the visit ($245: a $165 igniter and an $80 flame sensor, the $89 in it); the $640 water heater from photos is a humidifier install with a 25% deposit; the $199 sewer camera is a duct camera; the $2,400 repipe in stages is a duct replacement; Kim's yard drain is an outdoor heat pump tune-up. These are Ridgeway's example prices, not facts about HVAC prices. The old flow's $129 diagnostic became the master's $89 so every sum stays right.\nMoney B: main visit|hold|bill (no heat: diagnose, quote, fix; the plug-in's starting answer holds the visit fee). Also visit|none|bill (the old Ridgeway kept no card and sent fees by pay link; today a fee comes only from what was agreed, so with nothing taken there is no fee), list|hold|bill and list|card|card (seasonal tune-ups, a card charged at DONE), list|full|none (a mini-split cleaning paid ahead, and the yearly Comfort Plan, $189, paid in full after its own yes), photos|deposit|bill (a humidifier). No visit+deposit path: Ridgeway holds the diagnostic, never takes it as a deposit. Replacements go through the estimate visit that becomes its own job (B8-62, B8-63): a signed contract first, a deposit within the state form's cap, financing only on the lender's page.\nThe maintenance plan: B4-44 and B5-21 (words) make the plan the Comfort Plan, $189 a year for a fall and a spring tune-up, paid once a year, with a notice before each renewal (B7-52 more; the timing is a gap). Asked for after a visit, its terms go out only because the customer asked (B10-x01, a branch of B10-07). Morgan's master plan (two rentals every 3 months) is a filter change plan.\nFlow A (the less usual side): Sam's second company (the master's Lee's Barbershop) is Ridgeway Supply at 60 Depot St, his heating and cooling parts counter, with its own tax number and the same HVAC plug-in, at the business. Riley is Luis, Avery is Kara. The barbershop's price board keeps its amounts as the counter's example list: part test $35 (bring the old part; the main story is the old igniter of a furnace that won't light), thermostat setup $40, custom filter $20 (the add-on at the visit), flame sensor cleaning $25, window AC cleaning $55 (paid in full), dehumidifier repair $140 (2½ hours or a drop-off; the $40 fee held, or a $40 deposit), control board repair from photos ($90; only Luis does board repairs), blower motor repair priced at the counter after a $25 bench test; a part test at the customer's home is a $75 home visit paid in full. The patch test is a part check; the customer's haircut plan is a filter plan.\nMoney A: all seven of the plumber's counter paths fit an HVAC parts counter (a card saved for the $20 fee and paid at the counter is the main one).\nThe second kind of work in sign-up stays electrical (HVAC and electrical are a common pair, and each has its own license), so the master's electrical services and license numbers EC22871 and JE30417 stay; Lee Electric is Ridgeway Electric. The master's plumbing becomes HVAC; plumber becomes tech. License numbers: MP045210 is HM045210 (Sam's HVAC license), JP031552 is HJ031552 (Andre's), BR41862 is HJ041862 (Luis's), BS20981 is SR20981 (the shop's registration).\nkeep: heating is HVAC's own word (the plumber's pilot renamed electrical to heating, so the check lists it); electrical and electrician are Sam's second kind of work.\nOps, flow B: B3-18, B3-19 and B4-04 via renames carry the HVAC danger words (a CO alarm or a gas smell stops the booking; no heat with someone at risk gets the cold-weather steps, then urgent). B4-19 (words): the after-hours no-heat call, $149 held. B4-82, B6-04, B6-07, B6-18 (more): urgent with someone at risk, a 15-minute owner wait (Sam's setting), 911 if too cold. B4-15 (more): refrigerant card and gas license matching. B7-16 (words): the oven question gets the set safety answer at once; the heat coming back is the customer's call. B7-17 (more): a CO alarm before the visit. B8-18, B8-39 (more): CO checked before and after on fuel-burning equipment, old parts offered. B8-27, B8-28 (words): a bigger job found is a failing blower motor. B8-30 (words): the cracked heat exchanger, gas off and tagged, a written note, a free estimate. B8-63, B9-24, B10-24 (more): the emergency statement, financing, permits.\nOps, flow A: A4-29, A4-32, A4-67, A7-13, A7-60 (words) and A4-36 (more) give the counter's own examples; A8-x01 (a branch of A8-32) is a part that can't be fixed: a new part at the counter, or a tech at home (flow B).\nPlug-in splits: as the plumber. The license splits S1-60, S1-63, S2-28 stay whole in both flows (licensed where the state or city licenses HVAC work, state by state). Flow A keeps A7-59, S11-87, S11-90 (a drop-off names no tech), A7-61 (board repairs are Luis's alone), A8-02 (a part test needs the part), A8-53 (the counter or a drop-off). Flow B keeps B4-81, B7-55, B8-58 (no heat after hours is sent now, a humidifier never), B4-57 (a contract over the state form's amount), B8-69, B8-70 (an outdoor unit with nobody home), B8-71 (a new furnace delivered and set up), B8-65 (a replacement's inspection), B10-29 (the inspection after permit work), B8-72 (a window AC to the shop).\nTurned off (as the plumber, with HVAC reasons): no $2 exemption, no agreement to sign, no tables or classes, never-sent-now; in A: walk-in seats and tables, class seats, stays, children (adults only), reaction and form first steps, damage holds, crews, fixed dates, minimums; in B: set start times, stays, seats and no-person times, nobody-asks own or rent, damage holds at booking, fixed dates, groups, a child in the pro's care.\nThe old flowchart's free cancel 'until the tech is on the way' is the owner's setting; the master's default (until 7am on the visit day) is kept in the example. Its 'one service charge, trip included, shown first' is a state switch (plugin pf.rules), on by default.\nThe refrigerant card (the EPA's technician card) is federal, not one state's rule, so the plug-in names it as a skill and a card to check; every state rule (Connecticut's licenses, Florida's and Texas's license numbers, California's and Pennsylvania's money lines, the 10% or $1,000 cap, Connecticut's price freeze) is a switch filled from each state's form.\nOutdated from the old flowchart: Housecall Pro and the other job software (Rosie is the software now), and its state rules applied everywhere. Gaps: a shorter owner wait for urgent work with someone at risk, an emergency start inside the cancel days, replaced parts offered back, a safety note when a fix is declined, and a yearly plan's renewal notice.\nReview (Oct 22): fixed the S1-05 trade name (an answer pair turned 'Ridgeway Electric.' into 'Just one.'), the S1-11 example's drains and leaks, S11-56's 'Flushes', the A4-65 photo question, Owen's filter plan wording (A7-32, A7-54, A7-55); turned off the rented-fan branch (B10-07) and rented items (A10-06), since HVAC rents nothing out; added list|none|bill (a tune-up with nothing taken, the plug-in's own starting answer); tune-ups now say a card is saved when it's charged at DONE; the deposit limit now names the counter's dehumidifier deposit.\nTouch-up Oct 22: the capital \"Plumber\" pair gives \"HVAC tech\", not \"Tech\". In the master it is only S1-11's example label, which now names the kind of work like the other labels (Dentist, Parts counter).\ntouch-up 4 (Oct 23): keep 'heater' and 'drips': the space heater safety tip in B7-16, and a mini-split or humidifier that drips water, are real HVAC words.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Your haircut is part of a plan",
+    "Haircut every 4 weeks",
+    "Haircut · Sat Oct 31",
+    "Sam raises the haircut to $40",
+    "Drains have a set price. Leaks are priced at the visit.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "It's a gift for my brother. Can I pay for it?",
+    "Haircut plans go to",
+    "Haircut plan",
+    "haircut plan",
+    "Color and cut",
+    "color and cut",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Promises the $25 consult; priced at the chair",
+    "Only the consult; the price stays open",
+    "have the consult only today",
+    "2 Consult only: Riley does the consult",
+    "Consult only",
+    "does the consult only",
+    "pays for the consult",
+    "$25 consult",
+    "after a consult",
+    "doesn't do perms.",
+    "Gloss to finish",
+    "gloss",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "A beard trim is on the price board: $20.",
+    "The signed form this service needs is missing.",
+    "like a 15-minute style consult",
+    "A haircut could mean a salon or a barbershop",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop has none, so nothing is sent here.",
+    "A haircut needs nothing.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "like a skin-test result",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Do you do kids cuts? My son is 8.",
+    "a Kids cut (12 and under) is $25",
+    "Can my son wait in the shop during my cut?",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks",
+    "Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Shorter is fine",
+    "sees the hair",
+    "Alex M.'s cut",
+    "rents a chair",
+    "#2 on the sides, scissors on top, low beard line",
+    "Color always stays with Riley",
+    "color quote",
+    "Color quote",
+    "does color",
+    "color and house calls",
+    "color, house calls",
+    "the shop's board",
+    "A cut",
+    "Lee Plumbing and Lee Electric.",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Electric.",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Barbershop",
+    "barbershop",
+    "MP045210",
+    "JP031552",
+    "BS20981",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "Groom's package ·",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "groom's party",
+    "Haircut, fade and beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "skin fade",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "May the shop show photos of your hair?",
+    "photos of your hair",
+    "patch test",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "price board",
+    "Price board",
+    "cut hair",
+    "barbers",
+    "barber",
+    "Barber",
+    "chairs",
+    "chair",
+    "the cut",
+    "a cut",
+    "cuts",
+    "color plan",
+    "Color plan",
+    "Drain clearing",
+    "plumber",
+    "Plumber",
+    "plumbing's",
+    "Plumbing",
+    "plumbing",
+    "only after a missed check",
+    "barbershop",
+    "Barbershop",
+    "barbershops",
+    "hot towel shave",
+    "hot towel",
+    "shave",
+    "perm",
+    "skin fade",
+    "Skin fade",
+    "water heater",
+    "water heaters",
+    "massage",
+    "Massage",
+    "shaves",
+    "skin fades",
+    "barbershops"
+   ],
+   "B": [
+    "The plug-in's questions that don't change the time or price go here",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Drains have a set price. Leaks are priced at the visit.",
+    "Jordan cuts a hand and texts HURT.",
+    "can cut your hair at the shop",
+    "A haircut could mean a salon or a barbershop",
+    "many barbers, salons and groomers are licensed to their shop",
+    "rents a chair",
+    "does color",
+    "color and house calls",
+    "color, house calls",
+    "Kitchen drain clearing",
+    "Lee Plumbing and Lee Electric.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "BEFORE old water stain on the cabinet floor",
+    "Cabinet floor, before",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Repipe · $2,400",
+    "QUOTE 2400 repipe, 3 stages",
+    "repipe",
+    "Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Just the kitchen sink.",
+    "Electric.",
+    "The plug-in says a water heater is priced from photos",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Your water heater price is with",
+    "couldn't price your water heater this time",
+    "Is the sink still full of water?",
+    "water heater contract",
+    "Can you flush my water heater every year, too?",
+    "like an overflowing drain",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Yard drain",
+    "yard drain",
+    "Can Jordan also run a camera down my sewer line?",
+    "a drain cleaning at two rentals every 3 months",
+    "Can I skip next week's drain cleaning?",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Under the sink, before",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "the shutoff valve",
+    "your new pipes are in",
+    "the kitchen drain",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty, so this visit is free.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Sewer camera report",
+    "Replace both shutoff valves",
+    "It's overflowing. Can someone come tonight?",
+    "about the water heater quote before booking",
+    "Drain clearings already booked keep $179",
+    "replaces water heaters",
+    "leehomeservices.com",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Barbershop",
+    "barbershop",
+    "MP045210",
+    "JP031552",
+    "BS20981",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "Haircut, fade and beard trim",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "Price board",
+    "cut hair",
+    "barbers",
+    "barber",
+    "Barber",
+    "chairs",
+    "chair",
+    "the cut",
+    "cuts",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera",
+    "plumber",
+    "Plumber",
+    "plumbing's",
+    "Plumbing",
+    "plumbing",
+    "service call",
+    "Service call",
+    "only after a missed check",
+    "barbershop",
+    "Barbershop",
+    "hot towel",
+    "shave",
+    "water heater",
+    "Water heater",
+    "water heaters",
+    "sink",
+    "pipes",
+    "pipe",
+    "drain",
+    "Drain",
+    "water line",
+    "faucet",
+    "flush",
+    "overflowing",
+    "dishwasher",
+    "valves",
+    "valve",
+    "shutoff",
+    "Shutoff",
+    "shaves",
+    "barbershops",
+    "overflowing",
+    "Overflowing",
+    "the plug-in's job questions and anything"
+   ]
+  },
+  "A": {
+   "A4-32": "d5a284a416",
+   "A4-36": "f261af1660",
+   "A4-14": "95c7ffcfab",
+   "A8-32": "632f2b5b40",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3",
+   "A4-24": "0a292df05b",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B4-15": "f13240b9c6",
+   "B6-04": "6d888abcaa",
+   "B6-16": "d428d8c29e",
+   "B7-52": "62f5c3d1b4",
+   "B8-18": "530038d2b8",
+   "B8-39": "aa75251207",
+   "B8-63": "c0d957be82",
+   "B6-07": "9f926bb426",
+   "B10-07": "3737f1d1c8",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "B4-07": "9d0dbc90ad"
+  }
+ }
+}

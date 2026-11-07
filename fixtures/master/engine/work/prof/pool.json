@@ -1,0 +1,4682 @@
+{
+ "id": "pool",
+ "name": "Pool & spa service",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "cleaner",
+ "plugin": {
+  "pf.license": {
+   "need": "Cleaning, water care, weekly visits, openings and closings: usually none. Equipment repair and draining a pool for a repair: a pool contractor license where the state or county licenses it. Some counties license pool cleaning too. Each state's form says which.",
+   "ask": "The company's pool contractor license number, where repairs are licensed. Otherwise the business registration, where the state asks for one.",
+   "who_holds": "The business, through its license holder. Pool techs work under the company's license and need none of their own, unless the state's form says so.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "certificates": "A public, shared or HOA pool is offered only with a tech whose pool operator certificate is on file, where the state's health rules ask for one. Where the state treats some pool chemicals as pesticides, a chemical applicator certificate may be needed for hire. The state's form says so.",
+   "insurance_bond": "Insured or bonded is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "not_this_work": "Building or remodeling a pool, gas lines and new gas heaters, wiring for pumps and lights, and pool fences are other trades with their own licenses."
+  },
+  "pf.services": {
+   "pattern": "Set service: visits at the customer's pool, often weekly, priced by the pool's size. The shop side takes drop-offs and walk-in water tests.",
+   "list": [
+    {
+     "name": "Pool clean-up",
+     "price_kind": "one price by the pool's size",
+     "example": "up to 20,000 gallons: $179 (the example business's own price)",
+     "length": "about 1½ hours, one tech",
+     "includes": "skim, brush, vacuum, empty the baskets, clean the filter, test and balance the water, check the equipment",
+     "where": "at the customer's place",
+     "money": "card saved at booking; charged at DONE"
+    },
+    {
+     "name": "Weekly service plan",
+     "price_kind": "a price a visit",
+     "example": "$45 a visit, chemicals included",
+     "length": "about 30 minutes",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "card saved; each visit charged at its own DONE, or once a month for that month's visits, told the day before"
+    },
+    {
+     "name": "Green-pool cleanup",
+     "price_kind": "quoted from the customer's photos first; the owner OKs it",
+     "example": "$640 for a dark green 20,000-gallon pool",
+     "length": "about 1¾ hours on site to shock, brush and clean the filter; the pool clears over the next days with the pump running",
+     "where": "at the customer's place",
+     "money": "card saved; charged at DONE",
+     "second_visit": "a second visit at a price set in the signed estimate (the example: $95) if the water isn't clear in 3 days. It's the estimate's price, not a free return"
+    },
+    {
+     "name": "Pump or equipment repair",
+     "price_kind": "quoted at the visit, before any work",
+     "example": "only the $89 trip fee is promised; the example quote: pump seal $165 and pump lid $80",
+     "where": "at the customer's place; only under the company's license where the state licenses repairs",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Opening (spring) and closing (fall)",
+     "price_kind": "one price each",
+     "example": "$275 each",
+     "where": "at the customer's place",
+     "season": "the months the owner sets; a closing only once the water is clear and balanced"
+    },
+    {
+     "name": "Hot tub clean",
+     "price_kind": "one price",
+     "example": "$150: drain, clean and refill",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Leak detection",
+     "price_kind": "one price",
+     "example": "$199, with a written report within 2 days",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Trip fee",
+     "price_kind": "one price",
+     "example": "$89: only for a late cancel or a visit the tech can't get into, if the owner confirms it; owed when a repair quoted at the visit isn't done",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Labor",
+     "price_kind": "by the hour",
+     "example": "$120 an hour, 1-hour minimum",
+     "where": "not booked alone: added to a repair"
+    },
+    {
+     "name": "Pressure washing (the second kind of work)",
+     "price_kind": "from the list",
+     "example": "pool deck $149; deck and patio $189; a whole house wash: a free estimate, then a quote",
+     "where": "at the customer's place; nobody needs to be home",
+     "weather": "a weather limit the owner sets; a move for weather is free"
+    },
+    {
+     "name": "At the shop: water test",
+     "price_kind": "free",
+     "length": "about 5 minutes",
+     "where": "a walk-in at the counter, in a line",
+     "money": "nothing"
+    },
+    {
+     "name": "At the shop: filter clean",
+     "price_kind": "one price",
+     "example": "$35 a cartridge filter; ready in 2 days. Or at the customer's home: $75, on a card saved when booking and charged when done",
+     "where": "dropped off at the shop",
+     "money": "nothing taken; paid at the counter at pick-up"
+    },
+    {
+     "name": "At the shop: other drop-offs",
+     "price_kind": "one price each",
+     "example": "filter grid clean $40, hot tub filter $20, quick rinse while you wait $25, filter deep clean with an acid soak $55, pool robot rebuild $140"
+    },
+    {
+     "name": "At the shop: pump seal",
+     "price_kind": "quoted from photos of the pump and its label",
+     "example": "$90",
+     "money": "paid at the counter at pick-up"
+    },
+    {
+     "name": "At the shop: motor repair",
+     "price_kind": "quoted at the counter after a bench test",
+     "example": "only the $25 bench test is promised; the example quote: motor repair $110 and a new shaft seal $15",
+     "money": "paid at the counter at pick-up"
+    }
+   ],
+   "capacity": "One tech per visit. Visits can book by route days for an area, set by the owner. The shop takes a set number of drop-offs a day.",
+   "nobody_home": "Yes, for plan visits and outdoor work: the tech uses the gate code shown that day. DONE with photos confirms it, the latched gate included.",
+   "online": "No.",
+   "not_offered": "Pool building and remodeling, gas lines and new gas heaters, electrical work, fences."
+  },
+  "pf.questions": {
+   "before_times": [
+    "How big is the pool: gallons, or length and width",
+    "Can you see the bottom? (No: it's priced from photos as a green pool)",
+    "Just once, or every week",
+    "For a repair: what the pump or filter is doing, and is it still running",
+    "Is it a public, shared or HOA pool? (Only a tech with a pool operator certificate)",
+    "For pressure washing: what and about how big",
+    "At the shop: the filter's size and how many cartridges; for a pump seal, photos of the pump and its label"
+   ],
+   "after_a_time": [
+    "Plaster, vinyl or fiberglass",
+    "Filter type, and is there a heater or a hot tub",
+    "Salt or chlorine",
+    "The cover: mesh safety, solid or none",
+    "Dogs, and where they'll be",
+    "How the gate opens",
+    "Will someone be home?"
+   ],
+   "secure_page_only": [
+    "The gate code or lock combo",
+    "Alarm codes",
+    "Whether children live at or visit the home (the tech latches the gate every visit anyway)",
+    "A photo of the pool"
+   ],
+   "who_may_book": "An adult who lives there or owns the home, or a property manager or HOA board member for a shared pool. A renter can book cleaning; equipment repair may need the owner's OK."
+  },
+  "pf.safety": {
+   "words": [
+    "someone in the water, a child missing near a pool, a drowning",
+    "chemical fumes, a chemical spill, or chemicals mixed",
+    "a sparking pump, a shock in the water, bare wires near the pool",
+    "a gas smell near a pool heater"
+   ],
+   "what_happens": [
+    "Someone in the water: 'Call 911 now. If a child is missing, check the pool first. Get them out only if it's safe, and start CPR if you know how.' No booking.",
+    "Chemical fumes: 'Get everyone into fresh air now. Call 911 if anyone has trouble breathing, or Poison Control at 1-800-222-1222. Don't touch or mix the chemicals.' No booking until it's safe.",
+    "A sparking pump or a shock: 'Stay out of the water and away from the pump. Shut off its breaker only if it's safe. Call 911 if anyone is hurt.' Then a repair can be booked, soonest first.",
+    "A gas smell at a heater: 'Leave the area and call 911 from outside.' No booking until it's safe.",
+    "Chemical questions (like old chlorine found in a garage) go to the tech. Rosie never answers them, and asks the customer not to open, add or mix anything.",
+    "After a shock treatment, everyone stays out until the tech says it's safe."
+   ],
+   "booking_goes_on": "Yes, after the safety steps, for a sparking pump with nobody hurt. No, for someone in the water, fumes or a gas smell."
+  },
+  "pf.first_steps": {
+   "green_pool": "A pool whose bottom can't be seen is priced from photos first, and the owner OKs it.",
+   "first_visit": "A first visit includes an equipment check: pump, filter, valves, skimmer and return lines.",
+   "plan": "A weekly plan starts after the first visit. Cancelling the first visit also ends the plan that starts after it, and the customer is told first.",
+   "closing": "A closing is done only once the water is clear and balanced.",
+   "shared_pool": "A public, shared or HOA pool: a tech with a pool operator certificate on file.",
+   "prep_for_reminder": [
+    "Keep pets inside",
+    "Leave the gate unlocked, or the code on the secure page",
+    "Leave the pump's power on",
+    "Don't add any chemicals yourself",
+    "At the shop: hose the filter off, and turn off the breaker before anyone unhooks a pump"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Someone home: the code at the gate or door, entered by the tech. Nobody home (plan visits, outdoor work): no code; the tech uses the gate code shown that day, and DONE with photos confirms it.",
+   "gate": "The gate is latched on every visit, with a photo. A gate found open is latched, photographed and reported to the customer that day.",
+   "chemicals": "Only the tech measures, adds and takes away chemicals. Nothing is left at the pool or handed to the customer. Each visit logs the water test: chlorine, pH, alkalinity and what was added.",
+   "equipment": "Checked on every first visit. Repairs are quoted before any work.",
+   "closing": "Only once the water is clear and balanced, or algae grows under the cover.",
+   "lockout": "The gate code fails with nobody home: the tech texts it, the customer gets a link for a new code, and the tech waits 15 minutes, then leaves. A trip fee only if the owner confirms it.",
+   "drop_off": "At the shop, the code is given at the counter when the filter, pump or pool robot is left. Status words IN and READY. READY comes with a photo. Pick-up only by the customer or someone they name.",
+   "changes_at_visit": "A repair is quoted before any work. A right to cancel where the state's rules give one for work sold at the home. A second green-pool visit only at the price agreed with the quote.",
+   "proof_done": "The water test before and after, photos of the water, the filter and the latched gate, and DONE."
+  },
+  "pf.money": {
+   "start": "Pool service: a card saved at booking and charged at DONE. Some owners take nothing at booking and have Rosie text the bill after each visit; then no fee can be charged. The shop: nothing taken; paid at the counter at pick-up.",
+   "plans": "Each plan visit is charged at its own DONE, or once a month for that month's visits, told the day before. Rosfield's $2 counts once a month for a plan.",
+   "deposits": "None on visits, clean-ups or green pools: a card is saved for the trip fee. A bigger equipment job sold as its own quote (a new filter, pump or heater) may take a deposit when it's signed, within the state's caps (the examples: 25% of a $640 new filter, $800 of a $2,400 upgrade). Deposit cap: from the state form.",
+   "fees": "Late cancel and can't get in: the business's own trip fee (the example: $89), never more than the visit's price. The owner confirms each one; no answer, no fee. A move for weather is free.",
+   "chemicals": "Included in the weekly plan and the clean-ups. Never sold in booking texts.",
+   "repairs": "Quoted before any work, with the business's own warranty if it gives one (the example: 1 year on labor).",
+   "tips": "No tip line unless the owner turns it on.",
+   "tax": "A sales tax line only where the state taxes pool service or parts, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking.",
+   "warranty_plans": "A home warranty with a pool add-on may pay for an equipment repair. The owner checks it by hand and bills the plan the business's own way; the customer pays any share.",
+   "promise": "A clean-up comes with the example business's 3-day promise: a free return if the water isn't clear. A green pool has no free return: its signed estimate sets a second visit at $95 instead."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate codes, lock combos and alarm codes",
+    "Where a key is hidden",
+    "Whether children live at the home"
+   ],
+   "photos": "Photos of the pool and the yard go only to the customer and the business.",
+   "chemical_questions": "Rosie never answers chemical questions. The tech's own answer is passed on.",
+   "languages": "English and Spanish.",
+   "minors": "Nobody under 18 books. A teen at home isn't the booking's adult."
+  },
+  "pf.staff": {
+   "skills": [
+    "Weekly service and clean-ups",
+    "Green pools",
+    "Openings and closings",
+    "Equipment repair, under the company's license",
+    "Leak detection",
+    "Hot tubs",
+    "Pressure washing",
+    "At the shop: filter cleaning, pump and motor repair, pool robots"
+   ],
+   "certificates": "A pool operator certificate on file to serve public, shared or HOA pools, where the state's health rules ask for one. A lapsed one takes the tech off those bookings until it's renewed.",
+   "crews": "One tech per visit.",
+   "licenses": "None per person unless the state's form says so. Repairs go under the company's license.",
+   "new_person_ok": "A tech the customer hasn't booked is offered by text first. With no answer, the visit moves to the booked tech's next open time, with no fee.",
+   "who_oks": "The owner OKs quotes over the limit. The office manager may too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "plans": [
+    "The plan's terms show before any card: how often, the price a visit, when it's charged, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking, and the terms are texted back.",
+    "One reply ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask.",
+    "A plan can pause for the winter after a closing and restart with the spring opening. The customer is told the date and price before the first charge after a pause.",
+    "Any reminder the state's rules require before a plan renews or restarts."
+   ],
+   "add_on_at_home": "A right to cancel where the state's rules give one for work sold at the home.",
+   "written_contract": "Above an amount, where the state's rules require it.",
+   "license_on_papers": "Where the state requires it, the license number shows on quotes, the confirmation and receipts for licensed work.",
+   "pool_barrier": "Where the state's rules require a self-closing, self-latching gate or a barrier, the tech never leaves it open, and an open gate is reported.",
+   "landlord": "Equipment repair at a rented home may need the owner's OK.",
+   "records": "7 years, with the water test logs and gate photos."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "The gate code fails with nobody home: the tech waits 15 minutes, then leaves; the owner decides any fee.",
+    "A gate found open: latched, photographed and reported that day.",
+    "A freeze is forecast: the tech asks the customer to keep the pump running, and checks the pipes after if it was off.",
+    "Lightning or a storm: the visit moves, with no fee.",
+    "Water still cloudy at a closing: the closing moves, and a second visit is done only at the price agreed with the quote.",
+    "A chemical question from the customer: it goes to the tech, and Rosie never answers it.",
+    "Equipment found broken: quoted first; the customer can say yes later, and it's noted for the next visit.",
+    "A loose safety cover reported: fixed first on the route, free.",
+    "Skip, pause or end a plan; a winter pause and a spring restart; a plan's price change.",
+    "A filter, pump or pool robot not picked up: reminders; a storage fee only after written notice, if the owner starts it.",
+    "Several open bookings (the plan's next visits): which one is asked first."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "firststeps",
+   "dropoff",
+   "photos",
+   "tips",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Nico and Toni (shop techs)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Derek and Luis (pool techs)",
+   "cust": "Alex M. (customer) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nico"
+  },
+  "B": {
+   "staff": "Derek"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Pool work is never sent now, and the shop's work isn't either."
+   ],
+   [
+    "the Groom's package",
+    "the pool robot rebuild"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the shop show photos of the work?"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Filter clean plan · every 3 months"
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Filter clean every 3 months"
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a filter clean plan, every 3 months."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Jan 30 · 10:00am"
+   ],
+   [
+    "Shorter is fine",
+    "Still coming"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken when they book"
+   ],
+   [
+    "3:00pm · Avery",
+    "3:00pm drop-off"
+   ],
+   [
+    "2:00pm · Avery",
+    "2:00pm drop-off"
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer.",
+    "It's a hot tub filter clean, a 2:00pm drop-off today, for a new customer."
+   ],
+   [
+    "accept the beard trim today at 2:00pm with Avery",
+    "accept the hot tub filter clean, a 2:00pm drop-off today"
+   ],
+   [
+    "a Kids cut (12 and under)",
+    "a quick filter rinse"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The end cap on my filter came back cracked."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says a filter's end cap came back cracked today"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you rinse a filter while I wait?"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24 · 11:00am drop-off · filter clean"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything the shop tech should know?"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. filter clean Sat 11am"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds slots side by side, within the day's drop-off number."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Both go in one drop-off slot, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds mower repair to Lee Pool Shop."
+   ],
+   [
+    "NEW massage",
+    "NEW mower repair"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Mower repair for Lee Pool Shop: is it the same company?"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A pool shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no shop tech. A day shows only if a shop tech with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Pool Shop · drop-off"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a tow"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 bench test; priced at the counter"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A filter clean is rated, so the shop takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like a pump rebuild after a bench test"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Pool Shop sent you a proposal: a pump rebuild."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Pump rebuild"
+   ],
+   [
+    "your first color plan visit",
+    "your pump rebuild drop-off"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of your pump and its label"
+   ],
+   [
+    "Gloss to finish",
+    "New shaft seal"
+   ],
+   [
+    "gloss",
+    "shaft seal"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A company license for repairs where the state asks. Weekly visits and clean-ups have set prices. A green pool is priced from photos. Someone in the water stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Filters, pumps and pool robots are dropped off at the shop and picked up when ready. Water tests are walk-ins."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Nico can still check the filter in, at the same price, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Lee Pool Shop's visits are drop-offs. A repair shop, a tailor or a groomer works the same way."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A pool example: a sparking pump gets 'stay out of the water and away from the pump'."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A pool club drops off five filters on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 100 sq ft cartridge, 2 years old. Replace by next summer."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your filter clean is part of a plan, every 3 months."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like chemical fumes or someone in the water."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My pool turned green since I booked. Should I still bring the filter in?"
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the filter cleaned Saturday is still dirty in the pleats."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "For a sparking pump: stay out of the water, and turn off the breaker only if it's safe."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop off a second filter at the same time?"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Pool service · pressure washing"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a pool service or a pool shop"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a filter clean every 3 months."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Filter deep clean (acid soak)"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group drop-off together"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The pleats are still dirty."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Nico stopped Alex M.'s filter clean."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like my pool filter cleaned on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero que limpien el filtro de mi piscina el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a filter clean every 3 months"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Nico tests it"
+   ],
+   [
+    "plumbing and electrical",
+    "pool service and pressure washing"
+   ],
+   [
+    "Signature cut and shave",
+    "Filter deep clean"
+   ],
+   [
+    "like a skin-test result",
+    "like the filter's size and age"
+   ],
+   [
+    "A barbershop has none.",
+    "A pool shop has none."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s filter clean."
+   ],
+   [
+    "also does color and",
+    "also does motor repairs and"
+   ],
+   [
+    "Water heater flush",
+    "Hot tub clean"
+   ],
+   [
+    "A color correction",
+    "A motor repair"
+   ],
+   [
+    "a color correction",
+    "a motor repair"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pool Service's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pool Service"
+   ],
+   [
+    "barber, color and",
+    "shop tech, motor repairs and"
+   ],
+   [
+    "a package of cuts",
+    "a package of filter cleans"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pool Shop"
+   ],
+   [
+    "Color correction",
+    "Motor repair"
+   ],
+   [
+    "color correction",
+    "motor repair"
+   ],
+   [
+    "Only the consult",
+    "Only the bench test"
+   ],
+   [
+    "Groom's package",
+    "Pool robot rebuild"
+   ],
+   [
+    "Drain clearing",
+    "Pool clean-up"
+   ],
+   [
+    "2 Consult only",
+    "2 Bench test only"
+   ],
+   [
+    "service, color",
+    "service, motor repairs"
+   ],
+   [
+    "Panel upgrade",
+    "Whole house wash"
+   ],
+   [
+    "signature cut",
+    "filter deep clean"
+   ],
+   [
+    "Color and cut",
+    "Pump seal"
+   ],
+   [
+    "color and cut",
+    "pump seal"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Pool Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Deck Wash"
+   ],
+   [
+    "1200 Main St",
+    "250 Harbor Rd"
+   ],
+   [
+    "water heater",
+    "green pool"
+   ],
+   [
+    "Consult only",
+    "Bench test only"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "$25 consult",
+    "$25 bench test"
+   ],
+   [
+    "the consult",
+    "the bench test"
+   ],
+   [
+    "color quote",
+    "pump quote"
+   ],
+   [
+    "a staff cut",
+    "a filter clean for the office pool"
+   ],
+   [
+    "Electrical",
+    "Pressure washing"
+   ],
+   [
+    "electrical",
+    "pressure washing"
+   ],
+   [
+    "Barbershop",
+    "Pool shop"
+   ],
+   [
+    "barbershop",
+    "pool shop"
+   ],
+   [
+    "Beard trim",
+    "Hot tub filter clean"
+   ],
+   [
+    "beard trim",
+    "hot tub filter clean"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "88 Elm St",
+    "71 Cedar Ave"
+   ],
+   [
+    "on Elm St",
+    "on Cedar Ave"
+   ],
+   [
+    "Skin fade",
+    "Filter grid clean"
+   ],
+   [
+    "skin fade",
+    "filter grid clean"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "MP045210",
+    "PC045210"
+   ],
+   [
+    "Plumbing",
+    "Pool service"
+   ],
+   [
+    "plumbing",
+    "pool service"
+   ],
+   [
+    "Kids cut",
+    "Quick filter rinse"
+   ],
+   [
+    "kids cut",
+    "quick filter rinse"
+   ],
+   [
+    "Haircuts",
+    "Filter cleans"
+   ],
+   [
+    "haircuts",
+    "filter cleans"
+   ],
+   [
+    "cut hair",
+    "work the shop counter"
+   ],
+   [
+    "Plumber",
+    "Pool tech"
+   ],
+   [
+    "plumber",
+    "pool tech"
+   ],
+   [
+    "barbers",
+    "shop techs"
+   ],
+   [
+    "Haircut",
+    "Filter clean"
+   ],
+   [
+    "haircut",
+    "filter clean"
+   ],
+   [
+    "Jordan",
+    "Derek"
+   ],
+   [
+    "Barber",
+    "Shop tech"
+   ],
+   [
+    "barber",
+    "shop tech"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Riley",
+    "Nico"
+   ],
+   [
+    "Avery",
+    "Toni"
+   ],
+   [
+    "like a burst pipe",
+    "like a tow"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "barbershops set it",
+    "pool shops set it"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Filters, pumps and pool robots, dropped off here."
+   ],
+   [
+    "a perm, which isn't on the shop's list",
+    "a pool heater install, which isn't on the shop's list"
+   ],
+   [
+    "skin fade",
+    "filter clean"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't put in pool heaters"
+   ],
+   [
+    "skin fades",
+    "filter cleans"
+   ]
+  ],
+  "B": [
+   [
+    "Every plumbing service, to start",
+    "Every pool service, to start"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Pool work is never sent now, and the shop's work isn't either."
+   ],
+   [
+    "One of the shop's barbers",
+    "One of the shop's techs"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Test results and Derek's notes"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Pool Service's quote for your new pump and filter."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 new pump and filter, 3 stages"
+   ],
+   [
+    "when the pipes are in",
+    "when the new pump is in"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I add chlorine before you come?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone clean my pool this Thursday? What does it cost?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds lawn care to Lee Pool Service."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW lawn care"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Lawn care for Lee Pool Service: is it the same company?"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a tow"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 equipment upgrade"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your equipment upgrade"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like replacing the old pool heater Derek noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a new pool heater, from Derek's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Replace the old heater"
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It's urgent. Can someone come tonight?"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Urgent visit"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the pump seal only, $165. Leave the pump lid."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "fixes the pump seal today, $165. The $80 pump lid stays good until Thu Oct 29."
+   ],
+   [
+    "LATE camera report",
+    "LATE leak report"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A company license for repairs where the state asks. Weekly visits and clean-ups have set prices. A green pool is priced from photos. Someone in the water stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Filters, pumps and pool robots are dropped off at the shop and picked up when ready. Water tests are walk-ins."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Pool Service does pool service and pressure washing, not pool building. Nothing was saved. You can look for a pool builder near you."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone out of the water and away from the pump."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the pool's size, if you can see the bottom, the filter, dogs and the gate."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No entre al agua y aléjese de la bomba. Apague el interruptor solo si es seguro."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep everyone out of the water, and don't add any chemicals yourself."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My pool is cloudy and the filter's dirty. Can someone clean it Thursday morning, then come every week? I'm in Springfield."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Derek found bare wires at your pool light and stopped that part of the work."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay out of the water and away from the pump. Shut off its breaker only if it's safe."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Pool Service doesn't do, like building a new pool."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For pool service, someone in the water, chemical fumes or a gas smell stops the booking."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Derek finds bare wires at the pool light. The plug-in says a pool tech stops there"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A pool example: a sparking pump gets 'stay out of the water and away from the pump'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My pool pump is sparking."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My gas pool heater got wet in a flood. Is it safe to turn back on?"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your pool, and a pool tech will price the job."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone in the water, chemical fumes, a sparking pump or a gas smell."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE cartridge filter, 2 years old. Pump seal weeping: check next week."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how big is the pool, and can you see the bottom?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Derek finds a worn pump seal and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Derek found the problem. Here's the price to fix it today."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Derek went to get a part and will be back about 9:30am."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s pool, cleaned Thu Oct 22, is cloudy again."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The pump is quoted at the visit, as a repair."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your clean-up comes with a free return, so this visit is free."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Derek also check the pool for a leak?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace the pump seal, leaking"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? La bomba de mi piscina echa chispas."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a pool clean-up at two rentals every month"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Derek look at my hot tub next week?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Derek cracked a deck tile at Alex M.'s."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the promise or warranty lasts."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE cloudy water, chlorine 0, pH 8.0"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a noisy pump."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay alguien en el agua?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The pool is getting cloudier now."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Derek also look at my noisy pump?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD bare wires at the pool light, stopped"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please keep the dog inside and the gate unlocked."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is anyone in the water?"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with the soonest times first."
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "he's the one who does green pools"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Pool service · pressure washing"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Derek finds the pump seal leaking."
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Home Warranty, with the pool add-on."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The water turns cloudy again 2 days later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The water's cloudy again."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Derek left leaves and dirt on the deck."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 seal 165 lid 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: work near the pool light"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Filter deep clean (acid soak)"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the pump turned off now?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: bare wires at the pool light"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a deck tile"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Derek cracks a deck tile"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is in the water."
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing the pump seal"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the leak report link"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the pump seal"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the pump seal"
+   ],
+   [
+    "the sink is now overflowing",
+    "the pool is getting cloudier"
+   ],
+   [
+    "next week's drain cleaning",
+    "next month's clean-up"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Bare wires at the pool light"
+   ],
+   [
+    "Water heater replacement",
+    "Green-pool cleanup"
+   ],
+   [
+    "water heater replacement",
+    "green-pool cleanup"
+   ],
+   [
+    "plumbing and electrical",
+    "pool service and pressure washing"
+   ],
+   [
+    "Sewer camera inspection",
+    "Leak detection"
+   ],
+   [
+    "sewer camera inspection",
+    "leak detection"
+   ],
+   [
+    "Jordan found more work.",
+    "Derek found more work."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Pool clean-up"
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 15,000 gallons. Yes, but it's cloudy."
+   ],
+   [
+    "Under the sink, before",
+    "Pool, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked deck tile"
+   ],
+   [
+    "Cabinet floor, before",
+    "Equipment, before"
+   ],
+   [
+    "your new pipes are in",
+    "your new pump is in"
+   ],
+   [
+    "for a bathroom drain",
+    "for a hot tub clean"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Pump seal · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 pump seal quote"
+   ],
+   [
+    "leehomeservices.com",
+    "leepoolservice.com"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 pump seal work"
+   ],
+   [
+    "Sewer camera report",
+    "Leak detection report"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay nadie en el agua."
+   ],
+   [
+    "also does color and",
+    "also does motor repairs and"
+   ],
+   [
+    "Insurance pays part",
+    "A warranty pays part"
+   ],
+   [
+    "Water heater flush",
+    "Hot tub clean"
+   ],
+   [
+    "water heater flush",
+    "hot tub clean"
+   ],
+   [
+    "the shutoff valves",
+    "the pump seal"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pool Service's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pool Service"
+   ],
+   [
+    "camera inspection",
+    "leak detection"
+   ],
+   [
+    "the kitchen drain",
+    "the pool clean-up"
+   ],
+   [
+    "Supply line · $80",
+    "Pump lid and O-ring · $80"
+   ],
+   [
+    "barber, color and",
+    "shop tech, motor repairs and"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pool Shop"
+   ],
+   [
+    "plumbing license",
+    "pool contractor license"
+   ],
+   [
+    "Plumbing license",
+    "Pool contractor license"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa clean-up"
+   ],
+   [
+    "Drain clearings",
+    "Pool clean-ups"
+   ],
+   [
+    "Drain clearing",
+    "Pool clean-up"
+   ],
+   [
+    "drain clearing",
+    "pool clean-up"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 clean-up"
+   ],
+   [
+    "Panel upgrade",
+    "Whole house wash"
+   ],
+   [
+    "water heaters",
+    "green pools"
+   ],
+   [
+    "Kitchen drain",
+    "Pool clean-up"
+   ],
+   [
+    "cut your hair",
+    "clean your filter"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Pool Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Deck Wash"
+   ],
+   [
+    "1200 Main St",
+    "250 Harbor Rd"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Water heater",
+    "Green pool"
+   ],
+   [
+    "water heater",
+    "green pool"
+   ],
+   [
+    "shop's chair",
+    "shop's counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Leak repair",
+    "Pump repair"
+   ],
+   [
+    "leak repair",
+    "pump repair"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "Electrical",
+    "Pressure washing"
+   ],
+   [
+    "electrical",
+    "pressure washing"
+   ],
+   [
+    "Barbershop",
+    "Pool shop"
+   ],
+   [
+    "barbershop",
+    "pool shop"
+   ],
+   [
+    "Yard drain",
+    "Pool clean-up"
+   ],
+   [
+    "yard drain",
+    "pool clean-up"
+   ],
+   [
+    "Beard trim",
+    "Hot tub filter clean"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "88 Elm St",
+    "71 Cedar Ave"
+   ],
+   [
+    "MP045210",
+    "PC045210"
+   ],
+   [
+    "Plumbing",
+    "Pool service"
+   ],
+   [
+    "plumbing",
+    "pool service"
+   ],
+   [
+    "cut hair",
+    "work the shop counter"
+   ],
+   [
+    "Plumber",
+    "Pool tech"
+   ],
+   [
+    "plumber",
+    "pool tech"
+   ],
+   [
+    "Haircut",
+    "Filter clean"
+   ],
+   [
+    "haircut",
+    "filter clean"
+   ],
+   [
+    "Jordan",
+    "Derek"
+   ],
+   [
+    "Barber",
+    "Shop tech"
+   ],
+   [
+    "barber",
+    "shop tech"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Riley",
+    "Nico"
+   ],
+   [
+    "Avery",
+    "Toni"
+   ],
+   [
+    "flush",
+    "hot tub clean"
+   ],
+   [
+    "like a burst pipe",
+    "like a tow"
+   ],
+   [
+    "sewer camera report",
+    "leak detection report"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Keep everyone out of the water. Get the wiring fixed first"
+   ],
+   [
+    "repipe",
+    "equipment upgrade"
+   ],
+   [
+    "Repipe",
+    "Equipment upgrade"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "a leaking hose on my pool pump"
+   ],
+   [
+    "My sink won't drain",
+    "My filter won't drain"
+   ],
+   [
+    "kitchen sink",
+    "pool pump"
+   ],
+   [
+    "the sink still full of water",
+    "the pump still running"
+   ],
+   [
+    "under the sink",
+    "by the pool pump"
+   ],
+   [
+    "a faucet check",
+    "a filter check"
+   ],
+   [
+    "dripping faucet",
+    "leaking pump"
+   ],
+   [
+    "faucet",
+    "pump"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "draining a neighbor's pool without asking"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Pump motor and shaft seal"
+   ],
+   [
+    "clear the drain",
+    "clear the skimmer"
+   ],
+   [
+    "$179 drain",
+    "$179 clean-up"
+   ],
+   [
+    "it won't drain",
+    "the pump won't run"
+   ],
+   [
+    "drain clearing",
+    "pool clean-up"
+   ],
+   [
+    "won't drain",
+    "won't start"
+   ],
+   [
+    "drain clearings",
+    "pool clean-ups"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off at Lee Pool Shop, Sat Oct 24, leaves a pool filter at the counter, and picks it up clean two days later. Walk-ins bring pool water for a free test. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Pool Service for 9 Willow Ct: a pool clean-up first, Thu Oct 22 between 8 and 10am with Derek, then a visit every week. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 filter clean. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+    "photos|none|counter": "A new pump seal, priced at $90 from photos of the pump and its label. Booked once it's OK'd; paid at pick-up.",
+    "visit|none|counter": "A pump motor that hums but won't start, priced at the counter after a $25 bench test. Paid at pick-up."
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "$35",
+     "name": "Filter clean"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Pump seal"
+    },
+    "visit|*|*": {
+     "name": "Motor repair"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Basket and filter rinse",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "photos|card|card",
+    "visit|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 pool clean-up first, then a weekly plan. A card is saved and charged $179 when Derek texts DONE.",
+    "list|none|bill": "A $179 pool clean-up. Nothing is taken. Rosie texts the bill after the visit.",
+    "photos|card|card": "A green pool, priced from photos at $640. Sam OKs it. The card is charged at DONE.",
+    "visit|card|card": "A leaking pump, priced at the visit. Only the $89 trip fee is promised. The card is charged at DONE."
+   },
+   "amounts": {
+    "list|card|*": {
+     "fee": "$89"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Pool clean-up"
+    },
+    "photos|card|*": {
+     "fee": "$89"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Green-pool cleanup"
+    },
+    "visit|card|*": {
+     "fee": "$89"
+    },
+    "visit|*|*": {
+     "name": "Pump repair"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Hot tub filter clean",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-plan": {
+     "flow": "B",
+     "name": "Weekly service plan visit",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$45",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Leak detection",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$199",
+      "paid": "$199",
+      "fee": "$89"
+     }
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "heater",
+  "drips"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in gives the state's form: what to ask, and what stops pool service from going live. Where Sam works, the state licenses pool equipment repair.",
+    "more": [
+     "Cleaning alone needs no license. Equipment repair is offered only once it's set up.",
+     "It's the company's license. Pool techs work under it, so none is asked of them.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state asks for insurance or a bond, the form asks for it here too.",
+     "Where only a city or county licenses this work, Sam gives that license the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses pool equipment repair. It's the company's license, not each tech's. What's the company's pool contractor license number? It can be yours, or your license holder's."
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, PC045210"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or county licenses no pool work, pool service takes this branch: the registration only.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Pressure washing goes live on the company's own details. Each person is offered once they join and Sam says yes.",
+    "more": [
+     "Pressure washing needs no state license where Sam works.",
+     "Where a state's form asks for one, it's asked here, like any license."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Pressure washing needs no state license where you work. AI assistants can book it once your pressure washing tech joins and you say yes. You'll add your people at the end. Next, Lee Pool Shop: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "The shop's work needs no license where Sam works, so a filter can be cleaned at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state licenses the shop's work, its form asks for the license here instead.",
+     "Each shop tech can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pool Service. Sam Lee added you to the team for pool service and pressure washing jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Derek"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Derek replies YES, then checks what Sam set. One reply covers every kind of work Derek does.",
+    "more": [
+     "No license number is asked: techs work under the company's license.",
+     "Derek's pool operator certificate is on file, so he can be sent to shared pools.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Luis, Nico and Toni join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Derek"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Pool Service! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Derek Price · Lee Pool Service",
+        "lines": [
+         "Every pool service job, and pressure washing",
+         "Pool operator certificate on file",
+         "Sees gate codes on visit days",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Derek"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Derek"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "Only Derek has a pool operator certificate on file, so only he is offered for public, shared or HOA pools."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. No tech needs a license of their own here, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Derek: pool service and pressure washing",
+         "Luis: pool service",
+         "Nico: the shop, motor repairs and home visits",
+         "Toni: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pool plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Pool techs and shop techs are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: visits, repairs and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Pool and shop techs need no license of their own: repairs go under the company's license (pf.license, pf.staff). A pool operator certificate is a skill on the Team page (S2-15)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Pool work is never sent now: even a stopped pump gets the soonest time (pf.services)."
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "Omar walks in on Saturday with a jar of pool water and no booking. He texts the number on the sign at the door, or the shop adds him on the portal's Today page.",
+    "more": [
+     "A water test is free and takes about 5 minutes.",
+     "Booked drop-offs come first. Water tests fill the gaps between them.",
+     "The wait comes from the counter's bookings and the line, never a guess.",
+     "His text gets the danger check first, like every message."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Walk-in for a water test"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Pool Shop. You're 3rd in line for a water test, about 15 minutes. We'll text you when you're next.",
+      {
+       "card": {
+        "title": "Wait line · Lee Pool Shop",
+        "lines": [
+         "3rd in line · about 15 minutes",
+         "Water test · free"
+        ]
+       },
+       "buttons": [
+        "Leave the line"
+       ],
+       "stop": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "When the test counter is about to be free, Omar gets a text with his check-in code. Nico is told who's next.",
+    "more": [
+     "Omar has 10 minutes to come back. If he doesn't, the next person is called, and Omar moves down one place.",
+     "The test is free. Nico explains the results; Rosie never answers chemical questions.",
+     "A walk-in is free: no $2."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're next! Please come in and give this code at the counter.",
+      {
+       "code": "2718",
+       "buttons": [
+        "On my way",
+        "Leave the line"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Next from the line: Omar, water test.",
+      {
+       "as": "Nico"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "A walk-in drop-off, like a filter or a pump, is checked in at the counter now. The shop notes the item, its condition and the mobile. Then it goes on like any drop-off.",
+    "more": [
+     "The price, or the customer's OK, comes before any work.",
+     "READY is texted when it's done, with the pick-up hours and anything due.",
+     "The plug-in says how many drop-offs a day the shop takes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: the filter's size and how many cartridges. A bigger filter takes longer to soak and dry.",
+     "Questions that only add detail come later, once a time is saved."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "How big is the filter, and how many cartridges?"
+     ],
+     [
+      "cust",
+      "agent",
+      "One cartridge, about 100 square feet."
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What is the pump doing, and do you know its make?"
+       ],
+       [
+        "cust",
+        "agent",
+        "It drips where the motor meets the pump. The label is on the side."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What does the motor do when it's switched on?"
+       ],
+       [
+        "cust",
+        "agent",
+        "It hums but won't start."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "For a drop-off, the times are drop-off slots, set by how many items the shop takes in a day. No shop tech's free hours show: once the item is in, it goes to a shop tech with the skill.",
+    "more": [
+     "Sam set the daily number at sign-up. A full day isn't shown.",
+     "The AI passes on the filter's size. No name or street address yet.",
+     "Nobody can pay to be shown higher.",
+     "A day shows only if a shop tech with the skill is in. Motor repairs show only the days Nico works.",
+     "Pick-up comes once it's READY, in the pick-up hours."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A filter clean at Lee Pool Shop is $35, paid at the counter. Nothing is taken to book. Drop-off times:",
+      {
+       "times": [
+        "Sat Oct 24 · 11:00am drop-off",
+        "Sat Oct 24 · 2:00pm drop-off",
+        "Mon Oct 26 · 9:00am drop-off"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:list+before:none+after:counter": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "A filter clean at Lee Pool Shop is $35, paid at the counter. Nothing is taken to book. Drop-off times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Mon Oct 26 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos": {
+      "does": "The drop-off times come by text, right after Nico's price. They are slots by the shop's daily number, not a shop tech's hours.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Here are drop-off times for your pump seal, at the $90 Nico set.",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Mon Oct 26 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "does": "The drop-off times come by text, right after Nico's price. They are slots by the shop's daily number, not a shop tech's hours.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Here are drop-off times for your pump seal. It's $90, paid at the counter. Nothing is taken to book.",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Mon Oct 26 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "A motor repair at Lee Pool Shop is priced at the counter, after a bench test. Only the $25 bench test is owed, even if you say no. Drop-off times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Mon Oct 26 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:counter": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "A motor repair at Lee Pool Shop is priced at the counter, after a bench test. Only the $25 bench test is owed, even if you say no. You pay at the counter. Drop-off times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Mon Oct 26 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No shop tech is named: once the item is in, the shop gives it to a shop tech with the skill.",
+    "more": [
+     "A wish for one shop tech goes in the notes, and the shop follows it where it can."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "The times came by text on this path, so Alex replies to Rosie's text with a drop-off time.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "A"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex brings the filter to the counter. Alex reads the code from the confirmation or the reminder, and Nico texts it in.",
+    "more": [
+     "At Lee Pool Shop, the visit is a drop-off: the code is given when the item is left.",
+     "The desk can type the code on the portal's Today page instead.",
+     "The code also confirms the visit for Rosfield's $2."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "It's 11:00am, and Alex brings the pump to the counter. Alex reads the code from the confirmation or the reminder, and Nico texts it in."
+     },
+     "price:visit": {
+      "does": "It's 11:00am, and Alex brings the pump motor to the counter. Alex reads the code from the confirmation or the reminder, and Nico texts it in."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M., Sat 11:00am. One cartridge filter, 100 sq ft."
+     ],
+     [
+      "san",
+      "cust",
+      "Your filter is checked in at Lee Pool Shop with Nico. We'll text you when it's ready. Thanks, Alex!"
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "Checked in: Alex M., Sat 11:00am. One pump, for a new seal."
+       ],
+       [
+        "san",
+        "cust",
+        "Your pump is checked in at Lee Pool Shop with Nico. We'll text you when it's ready. Thanks, Alex!"
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "Checked in: Alex M., Sat 11:00am. One pump motor, for a bench test."
+       ],
+       [
+        "san",
+        "cust",
+        "Your pump motor is checked in at Lee Pool Shop with Nico. We'll text you the price after the bench test. Thanks, Alex!"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "Lee Pool Shop's main path above is the drop-off. This branch is a mail-in: a part shipped to the shop has no code, so DONE comes when it arrives.",
+    "more": [
+     "At pick-up, the item goes only to the customer or someone they name.",
+     "Next come the before notes, the price or the OK, and the work. READY and the pick-up come after the work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Nico cleans the cartridge over 2 days: a soak, a rinse and a dry. Only what was booked is done, and anything Alex said yes to.",
+    "more": [
+     "Nico texts IN and READY as it goes.",
+     "Next, Alex hears it's ready, picks it up and pays at the counter."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "Nico puts in the new pump seal and runs the pump on the test bench. Only what was booked is done, and anything Alex said yes to."
+     },
+     "price:visit": {
+      "does": "Nico repairs the motor as Alex OK'd and runs it on the test bench. Only what Alex said yes to is done."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "t": "Mon Oct 26, 2:00pm",
+    "does": "The cartridge is clean and dry. Nico texts READY with a photo. Rosie tells Alex in the shop's name: what was done, the pick-up times and anything due.",
+    "more": [
+     "Only Alex, or someone Alex names, can pick it up.",
+     "Anything still due is paid at the counter at pick-up.",
+     "Alex can reply within 24 hours if something's wrong, and Sam is told.",
+     "Sent inside text hours. A late READY waits for 9am."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "READY Alex M.",
+      {
+       "photos": [
+        "Filter, clean"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your filter is clean and ready at Lee Pool Shop.",
+      {
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "What was done: on your page, with a photo",
+         "Pick-up: any time the shop is open",
+         "Bring the code you used to drop it off",
+         "Anything due: paid at the counter",
+         "Something wrong? Reply within 24 hours"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/r/a7"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "The new seal is in, and the pump runs dry. Nico texts READY with a photo. Rosie tells Alex in the shop's name: what was done, the pick-up times and anything due.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "READY Alex M.",
+        {
+         "photos": [
+          "Pump, new seal"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your pump is ready at Lee Pool Shop, with its new seal.",
+        {
+         "card": {
+          "title": "Ready for pick-up",
+          "lines": [
+           "What was done: on your page, with a photo",
+           "Pick-up: any time the shop is open",
+           "Bring the code you used to drop it off",
+           "Anything due: paid at the counter",
+           "Something wrong? Reply within 24 hours"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/a7"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit": {
+      "does": "The motor is repaired and runs on the test bench. Nico texts READY with a photo. Rosie tells Alex in the shop's name: what was done, the pick-up times and anything due.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "READY Alex M.",
+        {
+         "photos": [
+          "Motor, on the test bench"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your pump motor is repaired and ready at Lee Pool Shop.",
+        {
+         "card": {
+          "title": "Ready for pick-up",
+          "lines": [
+           "What was done: on your page, with a photo",
+           "Pick-up: any time the shop is open",
+           "Bring the code you used to drop it off",
+           "Anything due: paid at the counter",
+           "Something wrong? Reply within 24 hours"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/a7"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "t": "Mon Oct 26, 5:10pm",
+    "does": "Alex gives the drop-off code at pick-up, or the person Alex named on the secure page shows an ID. The item is shown at the counter, and handed over once anything due is paid.",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: the item stays, and they're asked to come back with Alex's code.",
+     "Anything due is paid at the counter, the shop's own way.",
+     "A mailed-in part is sent back instead, once anything due is paid.",
+     "Not picked up by the end of the pick-up hours: it goes as 'An item isn't picked up', after the visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Show Alex the item, and hand it over once anything due is paid."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "At Lee Pool Shop, Alex pays at pick-up, Mon Oct 26."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "t": "Mon Oct 26, 7:00pm",
+    "does": "A couple of hours after the pick-up, inside text hours. One question, with one tap on a page, so a rating is never mixed up with a reply to a booking text.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for visiting Lee Pool Shop! How was your filter clean?",
+      {
+       "card": {
+        "title": "Rate your visit",
+        "lines": [
+         "Lee Pool Shop · Mon Oct 26",
+         "1 to 5 stars, one tap on the page"
+        ],
+        "button": "Rate it",
+        "link": "rosfield.com/r/a2"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Filters, pumps and water samples are handled at the shop or at the home, never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A filter, pump or robot drop-off is never booked for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for pool shop work."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee Pool Shop books a drop-off slot, not a shop tech's time: the item goes to a shop tech with the skill once it's in (A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee Pool Shop books a drop-off slot, not a shop tech's time: the item goes to a shop tech with the skill once it's in (A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee Pool Shop books a drop-off slot, not a shop tech's time: the item goes to a shop tech with the skill once it's in (A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no shop tech. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The pool shop's work needs no first step."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "An item waits in its drop-off slot, so a shop tech running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "Shop work has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The shop's plans are paid at the counter after each visit, so no plan charge is texted (A7-54 says a plan paid at the counter gets none)."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The item is left at the shop: READY and the pick-up follow the work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for pool shop work."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Shop work is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A water test's results come at the counter, at once; READY is the result of a drop-off (A8-50)."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "Shop work is one drop-off at a time; a bigger job is quoted at the counter (A8-24)."
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Pool Service",
+       "At the customer's place",
+       "Company's pool contractor license PC045210",
+       "Yes"
+      ],
+      [
+       "Derek Price",
+       "Lee Pool Service",
+       "At the customer's place",
+       "None needed · pool operator certificate on file",
+       "Once Sam says yes"
+      ],
+      [
+       "Luis Moore",
+       "Lee Pool Service",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Pool Service",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Nico Chen",
+       "Lee Pool Shop",
+       "At the shop, and home visits",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Toni Diaz",
+       "Lee Pool Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A license shows as the business gave it, never as 'checked by Rosie'. The shop has a registration instead.",
+     "The first price shows every fee the customer must pay. The shop takes nothing and charges no fee, so the preview says so.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee Pool Shop",
+      "71 Cedar Ave, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Filter clean $35 ($40 from Nov 2) · Filter grid clean $40 · Hot tub filter clean $20"
+     ],
+     [
+      "To book",
+      "Nothing taken · no fee · paid at the counter at pick-up"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie · no license needed"
+     ],
+     [
+      "Lee Pool Service",
+      "Pool service · within 25 miles of 250 Harbor Rd, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-08",
+    "say": [
+     [
+      "cust",
+      "san",
+      "The pleats are still dirty."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says the filter picked up Monday is still dirty in the pleats.",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Pool Shop will fix it for free. Pick a time:",
+      {
+       "times": [
+        "Tue Oct 27 · 11:00am drop-off",
+        "Wed Oct 28 · 3:00pm drop-off"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-09",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I get my money back for the filter clean?"
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. asked for money back for the filter clean picked up Mon Oct 26.",
+      {
+       "buttons": [
+        "Refund it",
+        "Keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-16",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M.'s bank opened a dispute about a payment for Mon Oct 26. Rosie's record is ready.",
+      {
+       "card": {
+        "title": "Dispute · Mon Oct 26 payment",
+        "lines": [
+         "The booking, the check-in and every text"
+        ],
+        "button": "See the record",
+        "link": "rosfield.com/d/a12"
+       },
+       "buttons": [
+        "Send the record",
+        "Let Alex keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "Nothing has to be brought for shop work: the item itself is the drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A pool shop's services need no written contract (A5-19 said so)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The shop sells its packages only at the shop, never on the booking page (A5-22 said so)."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "the shop and the pool visits never leave a child in the booking"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in gives the state's form: what to ask, and what stops pool service from going live. Where Sam works, the state licenses pool equipment repair.",
+    "more": [
+     "Cleaning alone needs no license. Equipment repair is offered only once it's set up.",
+     "It's the company's license. Pool techs work under it, so none is asked of them.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state asks for insurance or a bond, the form asks for it here too.",
+     "Where only a city or county licenses this work, Sam gives that license the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses pool equipment repair. It's the company's license, not each tech's. What's the company's pool contractor license number? It can be yours, or your license holder's."
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, PC045210"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or county licenses no pool work, pool service takes this branch: the registration only.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Pressure washing goes live on the company's own details. Each person is offered once they join and Sam says yes.",
+    "more": [
+     "Pressure washing needs no state license where Sam works.",
+     "Where a state's form asks for one, it's asked here, like any license."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Pressure washing needs no state license where you work. AI assistants can book it once your pressure washing tech joins and you say yes. You'll add your people at the end. Next, Lee Pool Shop: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "The shop's work needs no license where Sam works, so a filter can be cleaned at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-38",
+    "more": [
+     "Where a state licenses the shop's work, its form asks for the license here instead.",
+     "Each shop tech can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pool Service. Sam Lee added you to the team for pool service and pressure washing jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Derek"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Derek replies YES, then checks what Sam set. One reply covers every kind of work Derek does.",
+    "more": [
+     "No license number is asked: techs work under the company's license.",
+     "Derek's pool operator certificate is on file, so he can be sent to shared pools.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Luis, Nico and Toni join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Derek"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Pool Service! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Derek Price · Lee Pool Service",
+        "lines": [
+         "Every pool service job, and pressure washing",
+         "Pool operator certificate on file",
+         "Sees gate codes on visit days",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Derek"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Derek"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "Only Derek has a pool operator certificate on file, so only he is offered for public, shared or HOA pools."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. No tech needs a license of their own here, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Derek: pool service and pressure washing",
+         "Luis: pool service",
+         "Nico: the shop, motor repairs and home visits",
+         "Toni: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pool plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Pool techs and shop techs are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: visits, repairs and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Pool and shop techs need no license of their own: repairs go under the company's license (pf.license, pf.staff). A pool operator certificate is a skill on the Team page (S2-15)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Pool work is never sent now: even a stopped pump gets the soonest time (pf.services)."
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "The price comes from the pool's size: up to 20,000 gallons here.",
+     "A first visit is a clean-up with an equipment check. A pool whose bottom can't be seen is priced from photos instead, as a green pool."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-43",
+    "more": [
+     "Alex's plan, a visit every week after the clean-up, is the plan branch. Its visits keep the same weekday and window."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Alex wants a visit every week after the clean-up. Lee Pool Service offers a weekly plan, so the AI shows the terms.",
+    "more": [
+     "The AI never offers a plan the customer didn't ask for.",
+     "Each plan visit keeps the first visit's weekday, window and tech.",
+     "The plan's terms show on the secure page before any card, and the plan gets its own yes.",
+     "Each visit gets its own reminder. Nobody needs to be home: the tech uses the gate code.",
+     "Rosfield's $2 counts once a month for a plan."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "After the clean-up, can you come every week?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee Pool Service's weekly plan is $45 a visit, chemicals included, on Thursdays with the same tech. It runs until you end it. Want it?",
+      {
+       "buttons": [
+        "Yes, every week",
+        "Just the clean-up"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "A lock combo is typed on the page the same way. Only the tech on the job sees it.",
+     "The tech latches the gate at the end of every visit, with a photo.",
+     "Dogs: where they'll be during the visit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "does": "The page shows the plan's terms: a visit every week, $45 a visit with chemicals, paid after each visit. It says how to skip, pause or end, too. Alex says yes to them on their own.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Weekly pool service · every week",
+        "lines": [
+         "$45 a visit, chemicals included",
+         "Charged to your card after each visit",
+         "Same weekday, window and tech as the first visit",
+         "Runs until you end it",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "The plan's terms, before any card:",
+        {
+         "card": {
+          "title": "Weekly pool service · every week",
+          "lines": [
+           "$45 a visit, chemicals included",
+           "We text you the bill after each visit",
+           "Same weekday, window and tech as the first visit",
+           "Runs until you end it",
+           "Skip, pause or end any time, by text"
+          ]
+         },
+         "buttons": [
+          "I agree",
+          "Just this visit"
+         ]
+        }
+       ]
+      ]
+     }
+    },
+    "form": [
+     [
+      "How often",
+      "Every week, after the clean-up"
+     ],
+     [
+      "Price a visit",
+      "$45, chemicals included"
+     ],
+     [
+      "When it is paid",
+      "After each visit, the same way as this visit"
+     ],
+     [
+      "Skip, pause or end",
+      "Any time, by text"
+     ],
+     [
+      "I agree to the plan's terms",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes, so Alex has them in writing.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "Yes: every week",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to the plan on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: how often, the price a visit, when the card is charged, and that it runs until Alex ends it.",
+           "Plan visits need nobody home. Derek uses the gate code, shown to him only on the day.",
+           "Ending it takes one reply. Visits already done stay paid.",
+           "Any reminder the state's rules require for a running plan comes from the plug-in."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your weekly plan with Lee Pool Service is set.",
+            {
+             "card": {
+              "title": "Weekly pool service · $45 a visit",
+              "lines": [
+               "Starts Thu Oct 29 · arriving 8–10am · Derek",
+               "Your saved card is charged after each visit",
+               "Runs until you end it"
+              ]
+             },
+             "buttons": [
+              "End the plan"
+             ]
+            }
+           ]
+          ],
+          "vary": {
+           "price:photos": {
+            "t": "Mon Oct 19, 7:59pm"
+           },
+           "after:bill": {
+            "say": [
+             [
+              "san",
+              "cust",
+              "Your weekly plan with Lee Pool Service is set.",
+              {
+               "card": {
+                "title": "Weekly pool service · $45 a visit",
+                "lines": [
+                 "Starts Thu Oct 29 · arriving 8–10am · Derek",
+                 "We text you the bill after each visit",
+                 "Runs until you end it"
+                ]
+               },
+               "buttons": [
+                "End the plan"
+               ]
+              }
+             ]
+            ]
+           }
+          },
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-08",
+    "more": [
+     "Cancelling the first visit also ends the plan that starts after it. The text says so before Alex taps."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-17",
+    "does": "A what-if: on plan visits and outdoor work, like Kim's pool clean-up, nobody needs to be home. There's no code. DONE with photos confirms it.",
+    "more": [
+     "Derek lets himself in with the gate code, shown to him only on the day.",
+     "He latches the gate at the end and photographs it.",
+     "Kim gets the photos and has 24 hours to say if something's wrong. Sam is told of any reply."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE",
+      {
+       "photos": [
+        "Clear pool",
+        "Gate, latched"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Pool Service finished your pool visit, and the gate is latched. Here are the photos. Reply within 24 hours if something's wrong.",
+      {
+       "photos": [
+        "Clear pool",
+        "Gate, latched"
+       ],
+       "as": "Kim L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "The plug-in adds: latch the gate every visit, with a photo, and bring all chemicals. Nothing is left at the pool."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-16",
+    "more": [
+     "For pool service, chemical questions always go to the tech. Rosie never answers them, and asks Alex not to open, add or mix anything."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-32",
+    "more": [
+     "A pool plan can also pause for the winter after a closing.",
+     "It restarts with the spring opening. Morgan hears the date and price before the first charge."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "For pool service: a water test before any work, then photos of the water and the equipment."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Extra work is done only when Alex says yes. Rosie never offers it in its texts."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-32",
+    "more": [
+     "For pool service, a gate found open on arrival is latched, photographed and sent to Alex the same way.",
+     "A freeze warning before a visit goes the same way: Derek asks Alex to keep the pump running."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "does": "Derek sees the filter tank cracked at the base. He sends photos, and prices a new filter from them at $640, over Sam's $500 limit. It's its own job, so Sam OKs the photo quote first.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 640 filter tank cracked at the base, replace",
+      {
+       "photos": [
+        "Filter tank, cracked at the base",
+        "Its label"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Derek quotes a new filter for Alex M. from his photos: $640. It's over your $500 limit.",
+      {
+       "card": {
+        "title": "New filter · $640",
+        "lines": [
+         "Priced from Derek's photos at Thu's visit",
+         "Its own job, on another day"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Derek found that your filter tank is cracked. Here's the price for a new filter, from his photos, as its own visit.",
+      {
+       "card": {
+        "title": "New filter · $640",
+        "lines": [
+         "Priced from Derek's photos · OK'd by Sam",
+         "25% deposit to book: $160",
+         "Good for 7 days"
+        ],
+        "button": "See it and book",
+        "link": "rosfield.com/q/r4w"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 9:55am",
+    "does": "Back to Alex, Thu 9:55am: the money is in. The receipt goes out by text and email, with the plug-in's promise or warranty.",
+    "vary": {
+     "price:photos": {
+      "t": "Thu Oct 22, 10:05am",
+      "does": "Back to Alex, Thu 10:05am: the money is in. The receipt goes out by text and email, with the second visit's price from the estimate."
+     },
+     "price:photos+after:card": {
+      "t": "Thu Oct 22, 10:05am",
+      "does": "Back to Alex, Thu 10:05am: the money is in. The receipt goes out by text and email, with the second visit's price from the estimate.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid: $640 to Lee Pool Service. Not clear in 3 days? Reply here: a second visit is $95, as in your estimate.",
+        {
+         "card": {
+          "title": "Receipt · $640",
+          "lines": [
+           "Green-pool cleanup · $640",
+           "Charged to your saved card",
+           "Thu Oct 22 · Derek",
+           "Your card stays saved for a second visit, if one is needed"
+          ]
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit": {
+      "t": "Thu Oct 22, 10:05am",
+      "does": "Back to Alex, Thu 10:05am: the money is in. The receipt goes out by text and email, with the repair's warranty."
+     },
+     "price:visit+after:card": {
+      "t": "Thu Oct 22, 10:05am",
+      "does": "Back to Alex, Thu 10:05am: the money is in. The receipt goes out by text and email, with the repair's warranty."
+     },
+     "after:card": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid: $179 to Lee Pool Service. Not clear in 3 days? Reply here for a free return visit.",
+        {
+         "card": {
+          "title": "Receipt · $179",
+          "lines": [
+           "Pool clean-up · $179",
+           "Charged to your saved card",
+           "Thu Oct 22 · Derek",
+           "Your card stays saved for your weekly plan"
+          ]
+         }
+        }
+       ]
+      ]
+     },
+     "price:list+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid: $179 to Lee Pool Service. Not clear in 3 days? Reply here for a free return visit.",
+        {
+         "card": {
+          "title": "Receipt · $179",
+          "lines": [
+           "Pool clean-up · $179",
+           "Thu Oct 22 · Derek",
+           "Your weekly plan's bills come after each visit"
+          ]
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "does": "The water turns cloudy again 2 days later. It's inside the clean-up's 3-day promise, so Sam OKs a free return visit.",
+    "more": [
+     "A free return is booked at $0, with its own check-in code.",
+     "The plug-in says how long the promise or warranty lasts."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The water's cloudy again."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M.'s pool, cleaned Thu Oct 22, is cloudy again. It's inside the 3-day promise.",
+      {
+       "buttons": [
+        "Book a free return",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry about that. Your clean-up comes with a free return, so this visit is free.",
+      {
+       "times": [
+        "Mon Oct 26 · arriving 8–10am · Derek",
+        "Tue Oct 27 · arriving 8–10am · Derek"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "The pool is still cloudy 3 days later. The signed estimate set a second visit at $95 for this, so Sam OKs offering it at that price.",
+      "more": [
+       "The second visit gets its own check-in code, and the $95 is charged to the saved card at its DONE.",
+       "Anything more than the estimate's $95 needs Alex's yes first."
+      ],
+      "say": [
+       [
+        "cust",
+        "san",
+        "My pool still isn't clear."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s green pool, cleaned Thu Oct 22, isn't clear after 3 days. The signed estimate sets a second visit at $95.",
+        {
+         "buttons": [
+          "Offer the $95 visit",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry it isn't clear yet. Your estimate includes a second visit for $95, charged to your saved card when it's done. Pick a time:",
+        {
+         "times": [
+          "Mon Oct 26 · arriving 8–10am · Derek",
+          "Tue Oct 27 · arriving 8–10am · Derek"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-58",
+    "more": [
+     "Pool work is never sent now, so every visit gets the day list and an on-my-way text. The steps below show Alex's Thursday visit."
+    ],
+    "vary": {
+     "price:photos": {
+      "more": [
+       "A green pool priced from photos is never sent now either, so it gets the day list and an on-my-way text."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 9:50am",
+    "vary": {
+     "price:photos+after:card": {
+      "t": "Thu Oct 22, 10:00am",
+      "does": "The green pool is shocked, brushed and filtered, and it clears over the next days. Derek texts DONE, and the saved card is charged the agreed price.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE"
+       ],
+       [
+        "san",
+        "staff",
+        "Done: Alex M., Thu 8–10am."
+       ]
+      ]
+     },
+     "price:visit+after:card": {
+      "t": "Thu Oct 22, 10:00am",
+      "does": "The pump is fixed. Derek texts DONE, and the saved card is charged the price Alex OK'd.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE"
+       ],
+       [
+        "san",
+        "staff",
+        "Done: Alex M., Thu 8–10am."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-25",
+    "t": "Thu Oct 22, 9:50am",
+    "vary": {
+     "price:photos": {
+      "t": "Thu Oct 22, 10:00am"
+     },
+     "price:visit": {
+      "t": "Thu Oct 22, 10:00am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 9:52am"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Pool work is never sent now: even a stopped pump gets the soonest time (pf.services)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Pool work is never sent now: even a stopped pump gets the soonest time (pf.services)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Pool work is never sent now: even a stopped pump gets the soonest time (pf.services)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Pool work is never sent now: even a stopped pump gets the soonest time (pf.services)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Pool visits are booked in arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Pool visits are visits, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Pool visits book a tech's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "The pool plug-in names no form to sign."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Pool service has no group bookings with a smallest size."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A pool tech never looks after a child; an adult on the booking must be there when someone's home."
+   },
+   {
+    "op": "words",
+    "at": "B4-13",
+    "does": "With times to pick, all with Derek, since only Derek does green pools here. A card is saved when Morgan books, and charged after the job.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Pool Service can clean up your green pool for $640.",
+      {
+       "card": {
+        "title": "Green-pool cleanup · $640",
+        "lines": [
+         "A card saved when you book",
+         "Charged after the job"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/q/mp"
+       },
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "The shop's services happen at the shop, and the filter clean also at the customer's home. Each place gets its own price, and its own money before and after.",
+    "more": [
+     "At the shop, nothing is taken when they book. Everything is paid at the counter at pick-up.",
+     "A filter clean at home is a home visit: $75, on a card saved when booking and charged when it's done."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any done at a customer's home? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your shop, paid at the counter, your own way",
+         "Nothing taken when they book",
+         "Picked up when it's ready"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "A at their home too, 75, card saved"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. For a filter clean, the customer picks the place and sees both prices first.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Filter clean at the shop",
+          "$35",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Filter clean at their home",
+          "$75",
+          "Card saved",
+          "Charged at DONE"
+         ],
+         [
+          "Grid clean, hot tub filter, quick rinse",
+          "$40, $20, $25",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Filter deep clean",
+          "$55",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Pool robot rebuild",
+          "$140",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Pump seal",
+          "From photos",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Motor repair",
+          "At the counter",
+          "Nothing taken",
+          "At the counter"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Nothing is taken when the customer books: their YES books the drop-off. Nothing is held, and there's no fee.",
+    "more": [
+     "Without a card, a no-show can't be charged, and the shop asks for none.",
+     "A home visit saves a card instead, like any visit at a home."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Shop services work like this:",
+      {
+       "card": {
+        "title": "Nothing taken",
+        "lines": [
+         "The customer's YES books the drop-off",
+         "No card, so no fee",
+         "Paid at the counter at pick-up"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Pool Service",
+       "At the customer's place",
+       "Company's pool contractor license PC045210",
+       "Yes"
+      ],
+      [
+       "Derek Price",
+       "Lee Pool Service",
+       "At the customer's place",
+       "None needed · pool operator certificate on file",
+       "Once Sam says yes"
+      ],
+      [
+       "Luis Moore",
+       "Lee Pool Service",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Pool Service",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Nico Chen",
+       "Lee Pool Shop",
+       "At the shop, and home visits",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Toni Diaz",
+       "Lee Pool Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A license shows as the business gave it, never as 'checked by Rosie'. The shop has a registration instead.",
+     "The first price shows every fee the customer must pay. The shop takes nothing and charges no fee, so the preview says so.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee Pool Shop",
+      "71 Cedar Ave, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Filter clean $35 ($40 from Nov 2) · Filter grid clean $40 · Hot tub filter clean $20"
+     ],
+     [
+      "To book",
+      "Nothing taken · no fee · paid at the counter at pick-up"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie · no license needed"
+     ],
+     [
+      "Lee Pool Service",
+      "Pool service · within 25 miles of 250 Harbor Rd, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-13",
+    "vary": {
+     "before:card+after:card": {
+      "say": [
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Lee Pool Service can clean up your green pool for $640, priced by Derek from your photos.",
+        {
+         "card": {
+          "title": "Green-pool cleanup · $640",
+          "lines": [
+           "Charged to your saved card when the job's done",
+           "A card saved for an $89 fee if nobody's home or you cancel late",
+           "A second visit if it isn't clear in 3 days: $95",
+           "A written estimate to sign when you book"
+          ],
+          "button": "Pick a time",
+          "link": "rosfield.com/q/r3"
+         }
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Sam OK'd your $640 price for Alex M. It's been sent.",
+        {
+         "as": "Derek"
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B5-35",
+    "form": [
+     [
+      "Green-pool cleanup · $640",
+      "Written estimate and terms"
+     ],
+     [
+      "Second visit, if not clear in 3 days",
+      "$95, as agreed here"
+     ],
+     [
+      "Alex M.",
+      "Signed"
+     ],
+     [
+      "Lee Pool Service",
+      "Sam signs next"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-08",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Cancel your pool clean-up (Thu 8–10am)? It's free. Your weekly plan starts after it, so it ends too.",
+      {
+       "buttons": [
+        "Cancel it",
+        "Keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-10",
+    "more": [
+     "Kim's card is saved for the $89 trip fee. Sam can charge it, or not.",
+     "Sam gets one reminder. No answer 24 hours after he was first asked: no fee, and Kim is told.",
+     "Nobody was let in, so there's no $2 for Rosie."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Derek couldn't get into Kim L.'s yard: the gate code failed, and Kim didn't answer in 15 minutes.",
+      {
+       "card": {
+        "title": "Charge the $89 trip fee?",
+        "lines": [
+         "Kim agreed to the fee rules when booking",
+         "It goes on her saved card"
+        ]
+       },
+       "buttons": [
+        "Charge $89",
+        "No fee"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Derek couldn't get through your gate and has left. Reply here to pick a new time.",
+      {
+       "as": "Kim L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "A pool is booked one at a time: a shared or HOA pool is one job, booked by its manager."
+   },
+   {
+    "op": "words",
+    "at": "B8-61",
+    "does": "A what-if: the problem is on the business's side, like a pump part the job needs that isn't in. Nothing is charged.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Derek can't start today: the part this job needs isn't in yet. Nothing is charged. We'll text you once it's in, to pick a new time.",
+      {
+       "card": {
+        "title": "Not started · nothing charged",
+        "lines": [
+         "Thu Oct 22 · Derek",
+         "Anything paid goes back in full"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Derek couldn't start at Alex M.'s: the part isn't in. Nothing was charged."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-14",
+    "does": "The work is priced at the visit, like a pump repair. Only the {{fee:$89}} trip fee is promised now. Derek quotes it there, and Alex says yes before any work.",
+    "more": [
+     "At booking: {{pay.asks}}.",
+     "The price: {{pay.price}}.",
+     "The {{fee:$89}} counts toward the work's price.",
+     "Alex is told before the yes: the {{fee:$89}} trip fee is owed, even after a no to the price.",
+     "No full price can be taken, since the price isn't known yet."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "pool work is never named-only: a rating is asked for every job"
+   },
+   {
+    "op": "words",
+    "at": "B9-22",
+    "does": "Say Morgan's plan is billed once a month. Both visits go on one bill on the 1st. This is that path's one bill.",
+    "more": [
+     "Each visit still gets its own code or DONE, and each line shows its date and work.",
+     "After it, the same rules as any bill: card or link, a decline, unpaid after 4 days.",
+     "Hours billed against a quoted range: each visit's hours add to a running total the payer can see.",
+     "Before a visit would pass the top, the customer's own yes first."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Pool Service: your October visits. Think this is wrong? Reply here, and it goes to Sam.",
+      {
+       "list": {
+        "head": [
+         "Date",
+         "Visit",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Tue Oct 20",
+          "Visit 1",
+          "$45"
+         ],
+         [
+          "Wed Oct 21",
+          "Visit 2",
+          "$45"
+         ]
+        ]
+       },
+       "pay": {
+        "amount": "$90",
+        "what": "October's visits",
+        "link": "rosfield.com/p/m10"
+       },
+       "as": "Morgan",
+       "stop": "first"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-52",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Tomorrow, Sun Nov 1, your plan charges $90 to your saved card for October's two visits. Think this is wrong? Reply here, and it goes to Sam.",
+      {
+       "card": {
+        "title": "Plan charge · $90",
+        "lines": [
+         "Visit 1 · Tue Oct 20 · $45",
+         "Visit 2 · Wed Oct 21 · $45"
+        ],
+        "button": "See your plan",
+        "link": "rosfield.com/c/m10"
+       },
+       "as": "Morgan",
+       "stop": "first"
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "From: cleaner. Pool service runs like house cleaning: weekly plan visits at the customer's place, often with nobody home (a gate code instead of a lockbox), a card saved and charged at DONE, a first visit before the plan, repairs or heavy jobs priced at the visit, and a drop-off shop on the less usual side. The plumber pilot fits only the repair part, which the cleaner pilot's visit path already holds.\nFlow B is the usual side: Lee Pool Service (pool service, plus pressure washing as its second kind of work). Main story: a $179 pool clean-up Thu Oct 22, 8 to 10am with Derek, then a weekly plan at $45 a visit, chemicals included, from Thu Oct 29. Flow A is the less usual side: Lee Pool Shop, Sam's second company, where customers drop off filters, pumps and pool robots, and walk in with pool water for a free test (A3-20, A3-21: a line for the next person; A3-35: drop-offs checked in at once). Main story: a $35 filter clean dropped off Sat Oct 24, ready Mon Oct 26.\nMoney paths: B lists list|card|card (main), list|none|bill, list|hold|card, photos|card|card (a green pool priced from photos, Sam OKs it over $500) and visit|card|card (a pump repair quoted at the visit; only the $89 trip fee promised). A lists list|none|counter (main), photos|none|counter (a pump seal priced from photos of the pump and its label) and visit|none|counter (a motor repair priced at the counter after a $25 bench test). The old flowchart and check files show a card saved and charged when done, a trip fee if the tech can't get in, and repairs quoted first: no deposits, no paying in full ahead.\nSign-up words follow that: S1-13, S1-16, S1-17 and S1-18 no longer give the green pool a 25% deposit or the hot tub clean a paid-in-full price (both hold the $89 trip fee, like the others), and the shop's S1-42 and S1-45 take nothing at booking (only a home filter clean saves a card). S1-47, S1-49 and S1-51 drop the shop's $20 fee. Section 11 and 12 what-ifs follow too: S11-09 (Morgan's green pool saves a card), S11-56 (a hot tub clean moves from the hold to a saved card; the shop's home filter clean from a card to the bill), S12-26 (a $179 charge made twice, not a prepaid one), A5-21 (the shop's plan takes nothing at booking on every listed path), and A7-02's 'A plan charge is due' is off (the shop's plans are paid at the counter).\nDeposits appear only on bigger equipment jobs sold as their own quote (B8-28's $640 new filter, B8-62 and B9-21's $2,400 upgrade): the plug-in allows them there, within the state's caps.\nLicenses: pool service takes the license branch at S1-60 (S1-23 words): where Sam works the state licenses pool equipment repair, and it's the company's pool contractor license; cleaning alone needs none. S1-60 keeps both branches (splitsKept), since some states license no pool work (S1-61 more says so). Pressure washing (S1-39 words) and the shop (S1-63 branch 2) give the registration only. S2-28 takes 'No person license': techs work under the company's license. A pool operator certificate for public, shared or HOA pools is a skill on the Team page (S2-15 more, S2-06 words), and B4-15's master line now reads 'like a certified pool operator for an HOA pool'.\nNever sent now: pool work gets the soonest time instead (a stopped pump waits for the next open window). Off: B4-81 '1 Sent now', B4-16 'Send someone now', B6-03 'Sent now', B7-55 and B8-58 'Sent now' branches, S2-30 '1 Yes'; B8-58 words say so.\nTimes: every clock runs forward on every listed path. A pool clean-up takes about 1½ hours (checked in 8:20am, DONE 9:50am, receipt 9:55am, rating 11:00am); a green pool's first visit about 1¾ hours on site (DONE 10:00am: shock, brush, clean the filter; the pool clears over the next days); a pump repair DONE 10:00am. The bill on list|none|bill goes at 9:52am (B9-06). The plan's terms text follows its booking on the photos path (B6-x02 7:59pm). Flow A: drop-off Sat 11:00am, READY Mon Oct 26 2:00pm, pick-up 5:10pm, rating 7:00pm (A8-50, A8-54, A10-02).\nNames: Jordan and Casey become pool techs Derek and Luis (Jordan is 'he' in the master; both names fit); Riley and Avery become shop techs Nico and Toni. The master's partner Jamie becomes Taylor (the cleaner pilot's Jamie). Addresses: 9 Willow Ct (Alex), 250 Harbor Rd (Lee Pool Service), 71 Cedar Ave (Lee Pool Shop). Master numbers are kept: $179 clean-up, $150 hot tub clean, $640 green pool from photos, $245 pump repair at the visit ($165 seal + $80 lid), $89 trip fee, $199 leak detection, $160 pump seal found at the visit; at the shop $35 filter clean, $40 grid clean, $20 hot tub filter, $25 quick rinse, $55 filter deep clean, $140 pool robot rebuild, $90 pump seal from photos, $25 bench test.\nDrop-off slots: like the cleaner pilot's rug shop, the pool shop books drop-off slots that name no shop tech (A4-66 'A drop-off slot', A4-67 words); off: 'A person's time' and the other A4-66 branches, A4-15 'Asks for Nico by name', A7-02 'Nico runs late', A7-59 'Booked by name', S11-87 and S11-90 'Booked by name' in flow A. Section 11 and 12 shop what-ifs name drop-off times, not a tech (rename pairs).\nOff in flow A (side branches the shop never has): A4-24 'A child', A4-28 'A series for one job' and 'A plan or insurance', A4-54 'The plan's benefit check', A7-02 plan check, weather, crew, set date, minimum, form and first-step branches, A4-43's first-step branches (no first step), A5-24's damage hold, A8-32 'A child goes home', 'Nico's next one starts late' and 'A visit over several days', A9-15 'Insurance pays part', A10-06 'Results ready later', 'Rented items come back' and 'The shop sends a proposal'. 'An item isn't picked up' stays on: a filter or pump can be left at the shop.\nOff in flow B: B4-38's form, B5-26's damage hold, B7-05's form and group branches, B7-56's set date, crew and no-person branches (a pool visit is one tech and can always move), B8-67's 'child in the pro's care', B8-22 and B8-71's delivery, B8-65's outside check, B10-07 and B10-29's permit inspection, B10-07's rented fan. Kept: B8-72 (a pool robot taken to the shop), B8-62 (an equipment upgrade as its own job), B4-62 (a home warranty with the pool add-on), B10-25 (a leak detection report).\nKept word: 'leak'. Leak detection, a leaking pump and a pump that leaks again are pool work; every visible 'leak' was read and none is about plumbing.\nPromise vs warranty: a clean-up or a green pool comes with the example business's 3-day promise (a free return if the water isn't clear); a pump repair keeps the 1-year labor warranty (B10-01 and B10-08 words and variants).\nStand-in: B7-56 'One person, by name' keeps the master's default (a stand-in with the skill, offered first; no reply keeps the time with the stand-in), the way the old flowchart sent the owner in Derek's place. Only Derek does green pools here, so the photos path offers new times with Derek.\nSeasonal plans (a winter pause after a closing, a restart with the spring opening) are in the plug-in's rules, B7-32 more, and the gap 'Seasonal plans: pause and restart'. The old flowchart's freeze warning and if-needed third visit are gaps too ('A pro's update before the visit', 'Extra work agreed ahead, up to a limit'), with B8-32 more and the plug-in's edges holding them for now.\nPlug-in splits kept (both branches used, service by service or state by state): A8-02, S1-60 in A; S1-60, B4-57, B4-78, B8-69, B8-70, B8-72 in B.\nreview (Oct 22): the plan's screen (B5-21) shows a weekly $45 plan; S1-47's 'no fee' pair runs before 'the Groom's package'; S11-57's shop preview takes nothing and shows a registration; S2-21 shows no license for techs who need none; a green pool's estimate sets a second visit at $95 (B4-13, B4-61, B10-01, B10-08 on the photos path), not a free return; B7-08's cancel text says the plan ends too; B8-53 follows Kim's money (card, hold or nothing); A10-08, A10-09 and A10-16 name the pick-up day; side branches pool never has are off (B4-43 group, seats, host visit days, crew, lead time; B4-38 and B7-05 first steps; B6-03 and A6-01 expert reads; S1-58 set days; A8-02 missing items; A5-19 contract; A5-01 pack on the page). The plug-in names labor at $120 an hour, the bill path, the home warranty add-on and the green pool's second visit.\nreview (Oct 22, more): B8-61's business-side example is a pump part that isn't in (pool work needs no permit); B10-08's title reads 'Books a return visit' (free on a clean-up or under warranty, $95 for a green pool's agreed second visit).\ntouch-up 4 (Oct 23): keep 'heater' and 'drips': pool heaters, and a pump seal that drips, are real pool service words.\nRefit Q06 (Oct 27, 2026): money A list|none|counter (main), photos|none|counter, visit|none|counter; B list|card|card (main), list|none|bill, photos|card|card, visit|card|card. Amounts: A $35 filter clean, $90 pump seal, visit = motor repair (priced at the counter); B $179 clean-up, $640 green pool, $89 trip fee on card paths and on the full-price row; services: basket rinse $20 (A), hot tub filter clean $150, weekly plan visit $45 (both with the $89 fee), leak detection $199 paid in full (B). Facts plans, firststeps, dropoff, photos, tips, extrawork; no switches. Sign-up money ops (S1-13, S1-14, S1-21, A5-21, S11-56, S12-26) removed; hold wording removed; plan bill and plan charge set to $45 a visit (B9-22, B7-52).",
+ "splitsKept": {
+  "A": [
+   "S1-60"
+  ],
+  "B": [
+   "S1-60",
+   "B5-34",
+   "B4-78",
+   "B8-69",
+   "B8-72"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "the Groom's package",
+    "May the shop show photos of your hair?",
+    "Haircut plan · every 4 weeks",
+    "Haircut every 4 weeks · Riley",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "Shorter is fine",
+    "A card saved for the $20 fee",
+    "3:00pm · Avery",
+    "2:00pm · Avery",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer.",
+    "accept the beard trim today at 2:00pm with Avery",
+    "a Kids cut (12 and under)",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "Do you do kids cuts? My son is 8.",
+    "Wants Saturday morning, with Riley",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Anything Riley should know?",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "takes jobs sent now, like a burst pipe",
+    "Promises the $25 consult; priced at the chair",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "Add photos of your hair",
+    "Gloss to finish",
+    "gloss",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "A barbershop has none, so nothing is sent here.",
+    "Can my son wait in the shop during my cut?",
+    "Plumbing JP031552 · electrical JE30417",
+    "could mean a salon or a barbershop",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Riley stopped Alex M.'s cut.",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "once Riley sees the hair",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "like a skin-test result",
+    "A barbershop has none.",
+    "Stopped Alex M.'s cut.",
+    "also does color and",
+    "A color correction",
+    "a color correction",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "barber, color and",
+    "a package of cuts",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Only the consult",
+    "Groom's package",
+    "Drain clearing",
+    "2 Consult only",
+    "service, color",
+    "Panel upgrade",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "water heater",
+    "Consult only",
+    "at the chair",
+    "At the chair",
+    "house calls",
+    "House calls",
+    "$25 consult",
+    "the consult",
+    "color quote",
+    "a staff cut",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "88 Elm St",
+    "on Elm St",
+    "Skin fade",
+    "skin fade",
+    "the chair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Riley",
+    "Avery",
+    "like a burst pipe",
+    "visit fee",
+    "barbershops set it",
+    "Classic cuts, fades and hot towel shaves.",
+    "a perm, which isn't on the shop's list",
+    "skin fade",
+    "doesn't do perms",
+    "skin fades"
+   ],
+   "B": [
+    "Every plumbing service, to start",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "One of the shop's barbers",
+    "Video and Jordan's notes",
+    "Here's Lee Home Services' quote for your repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "when the pipes are in",
+    "Can I run the dishwasher before you come?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "takes jobs sent now, like a burst pipe",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "like an overflowing drain",
+    "It's overflowing. Can someone come tonight?",
+    "Overflowing kitchen drain",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "LATE camera report",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Your drain is under warranty, so this visit is free.",
+    "Can Jordan also run a camera down my sewer line?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "The plug-in says how long the warranty lasts.",
+    "BEFORE old water stain on the cabinet floor",
+    "Say Alex also asks about a dripping faucet.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "Can Jordan also look at a dripping faucet?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Then the booking goes on, marked urgent.",
+    "he's the one who replaces water heaters",
+    "Plumbing JP031552 · electrical JE30417",
+    "Jordan finds corroded shutoff valves.",
+    "Willow Home Warranty, the basic plan.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "Jordan cracks the cabinet floor",
+    "No. It doesn't smell like gas.",
+    "replacing both shutoff valves",
+    "Texts the camera report link",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "the sink is now overflowing",
+    "next week's drain cleaning",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Jordan found more work.",
+    "Kitchen drain clearing",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Cracked cabinet floor",
+    "Cabinet floor, before",
+    "your new pipes are in",
+    "for a bathroom drain",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "leehomeservices.com",
+    "the $160 valve work",
+    "Sewer camera report",
+    "No. No huele a gas.",
+    "also does color and",
+    "Insurance pays part",
+    "Water heater flush",
+    "water heater flush",
+    "the shutoff valves",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "camera inspection",
+    "the kitchen drain",
+    "Supply line · $80",
+    "barber, color and",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "BOOK Tessa drain",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "Panel upgrade",
+    "water heaters",
+    "Kitchen drain",
+    "cut your hair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Water heater",
+    "water heater",
+    "shop's chair",
+    "at the chair",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Yard drain",
+    "yard drain",
+    "42 Oak St",
+    "88 Elm St",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "flush",
+    "like a burst pipe",
+    "sewer camera report",
+    "Call a mold cleanup company first",
+    "repipe",
+    "Repipe",
+    "visit fee",
+    "a leaking pipe under my sink",
+    "My sink won't drain",
+    "kitchen sink",
+    "the sink still full of water",
+    "under the sink",
+    "a faucet check",
+    "dripping faucet",
+    "faucet",
+    "tapping a neighbor's water line without asking",
+    "Shutoff valve and wall pipe",
+    "clear the drain",
+    "$179 drain",
+    "it won't drain",
+    "drain clearing",
+    "won't drain",
+    "drain clearings"
+   ]
+  },
+  "A": {
+   "S1-23": "39941a5377",
+   "S1-61": "7421d186d5",
+   "S1-38": "b50b0bd4e8",
+   "S1-43": "e16d5048f3",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-15": "4a64408afc",
+   "S2-22": "6fe11c094c",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A3-20": "b8251d2535",
+   "A4-50": "6f43775326",
+   "A4-14": "95c7ffcfab",
+   "A4-15": "db5792db95",
+   "A8-03": "7accda6f86",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-43": "7b0f73c701",
+   "A8-50": "0f26abfc87",
+   "A8-54": "bc2f9467fd",
+   "A9-03": "219c966588",
+   "A10-02": "c9223be948",
+   "A4-01": "7e7a61082c",
+   "A4-24": "0a292df05b",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A7-93": "46cca94e45",
+   "A7-94": "6490d5d8e6",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "S2-21": "bf6617b6d3",
+   "S11-57": "a3996ae84e",
+   "A10-08": "b60e30f285",
+   "A10-09": "f211279325",
+   "A10-16": "9d654e2a1d",
+   "A8-02": "15f418fec4",
+   "A5-19": "5d5db6f3c1",
+   "A5-01": "6c5c5c2f87",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S1-23": "5b2324d920",
+   "S1-61": "e30e71f65d",
+   "S1-38": "6301c86637",
+   "S1-43": "dd3ae2a1a9",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-15": "4a64408afc",
+   "S2-22": "6fe11c094c",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-07": "9d0dbc90ad",
+   "B4-43": "fc9855955a",
+   "B4-44": "514c8ab30c",
+   "B4-34": "74ff52d83d",
+   "B5-21": "925b7342ed",
+   "B6-13": "ed1f412f7d",
+   "B7-08": "278986b3ba",
+   "B8-17": "dcff722a6d",
+   "B6-14": "dfd03ee673",
+   "B7-16": "3177c3701b",
+   "B7-32": "0ca33c9fa6",
+   "B8-18": "530038d2b8",
+   "B8-23": "dd780a2ec8",
+   "B8-32": "1cfd4f7afa",
+   "B10-01": "814aa1fde7",
+   "B10-08": "01bac94fd8",
+   "B8-58": "6a101417a1",
+   "B8-41": "6e8e9825b2",
+   "B10-25": "3e0bd84dd3",
+   "B9-06": "f091432f2d",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B7-90": "a5b8b2fe42",
+   "B8-67": "b66ffbd04d",
+   "B4-13": "ecedd7f044",
+   "S2-21": "bf6617b6d3",
+   "S11-57": "2f34f23d8a",
+   "B5-35": "1de0d2312d",
+   "B8-10": "5c9d4b937f",
+   "B8-61": "79d4d31102",
+   "B4-14": "bea6443957",
+   "B10-32": "7713bff255",
+   "B9-22": "f691bde396",
+   "B7-52": "62f5c3d1b4"
+  }
+ }
+}

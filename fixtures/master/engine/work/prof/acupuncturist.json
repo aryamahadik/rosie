@@ -1,0 +1,2831 @@
+{
+ "id": "acupuncturist",
+ "name": "Acupuncturist",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "dentist",
+ "plugin": {
+  "pf.license": {
+   "need": "always where the state licenses acupuncture: each acupuncturist holds their own active license from the state's board, under the title that state uses; a few states issue none (a switch from the state form)",
+   "noLicense": "where the state issues no acupuncture license: the business registration only, where the state asks; each acupuncturist's national board certificate kept on file as the business's own word, never shown as checked (Rosie's rule)",
+   "who": "each person; the business too where the state's form registers acupuncture clinics or their owners",
+   "ask": "each acupuncturist's license number in their invite reply (or the owner sends it); the business's registration number from the owner, where the state asks",
+   "check": "each number on the state board's official lookup; a person on Rosie's team checks within 1 business day when the lookup can't be read; the national board certificate and a clean-needle course record are kept on file as the business's own word",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "herbs": "herbal consults only for a person with the herbal training or certificate the state's form asks for (a switch); the example: herbal consults wait for Noah's certificate",
+   "away": "home visits only where the state's rules allow acupuncture away from a clinic (a switch); the license covers the place where the patient is seen",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every booking is handled as health information, cash-pay clinics included",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance on file where the state's form asks for it"
+  },
+  "pf.services": {
+   "shape": "visits with one acupuncturist, each with a set length; at the clinic each visit also needs one of the treatment rooms; a new patient's first visit is longer (a health talk, then treatment); follow-ups after it; a treatment plan of weekly follow-ups is suggested in person, never pushed, and booked only with the patient's own yes",
+   "examples": "the example businesses' own prices (Lee Acupuncture Clinic and Lee Home Acupuncture), kept from Rosie's example numbers, not a standard; a plan pays its own fee, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "First visit (health talk and treatment)",
+     "price": "$140",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the clinic",
+     "before": "a card saved for the $40 fee",
+     "after": "at the front desk",
+     "note": "new patients; first-visit times are kept apart in Sam's booking rules"
+    },
+    {
+     "name": "Follow-up treatment",
+     "price": "$35",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic",
+     "before": "a card saved for the $20 fee; nothing when a plan or a claim pays",
+     "after": "at the front desk; where Sam sets a time with nobody at the desk (the example: Iris's Saturday mornings), the saved card at DONE"
+    },
+    {
+     "name": "Acupressure, no needles",
+     "price": "$40",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the clinic",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk",
+     "note": "for anyone who'd rather not have needles"
+    },
+    {
+     "name": "Cupping, added to a visit",
+     "price": "$20",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "at the clinic",
+     "before": "with the visit",
+     "after": "with the visit"
+    },
+    {
+     "name": "Follow-up and cupping",
+     "price": "$55",
+     "kind": "one price",
+     "length": "75 min",
+     "where": "at the clinic",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Child's visit (12 and under), no needles",
+     "price": "$25",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the clinic",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk",
+     "note": "a parent or guardian books and stays; only Iris does them"
+    },
+    {
+     "name": "5-visit package",
+     "price": "$160",
+     "kind": "a pack of 5 follow-ups",
+     "length": "5 visits",
+     "where": "sold at the clinic only",
+     "before": "paid at the clinic, in person",
+     "after": "each booking uses one visit",
+     "note": "never offered in a booking text; unused visits refunded on request (Rosie's rule)"
+    },
+    {
+     "name": "Electro-acupuncture",
+     "price": "no extra charge at the example clinic",
+     "kind": "part of a treatment",
+     "length": "within a visit",
+     "where": "both places",
+     "before": "-",
+     "after": "-",
+     "note": "only when the acupuncturist decides; never with a pacemaker or other electronic implant"
+    },
+    {
+     "name": "Home treatment",
+     "price": "$179",
+     "kind": "one price",
+     "length": "60 min, with a portable table",
+     "where": "at the patient's home",
+     "before": "the $89 trip fee held; nothing when a plan or a claim pays",
+     "after": "Rosie texts the bill, the saved card at DONE, or the business bills the plan"
+    },
+    {
+     "name": "First home visit (health talk and treatment)",
+     "price": "$199 ($249 with Sam)",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the patient's home",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Home follow-up",
+     "price": "$150",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the patient's home",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill",
+     "note": "a weekly series is booked only with the patient's own yes"
+    },
+    {
+     "name": "Trip fee",
+     "price": "$89",
+     "kind": "one price",
+     "length": "each home visit",
+     "where": "at the patient's home",
+     "before": "held for self-pay home visits",
+     "after": "counts toward the bill"
+    },
+    {
+     "name": "Herbal consult",
+     "price": "$149 (herbal follow-up $99)",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the patient's home",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill",
+     "note": "only with the herbalist's certificate where the state asks; the herbs themselves are sold at the consult, at their own price"
+    }
+   ],
+   "capacity": "one patient per acupuncturist; the clinic's 3 treatment rooms are booked with the person; at home, one portable table",
+   "nobodyHome": "never: the patient is always there",
+   "online": "off: acupuncture is hands-on, so there are no video visits at the example businesses"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, your child, or someone you help",
+    "new or returning patient (a new patient gets the first visit)",
+    "which visit: the business's own visit types only, never a symptom typed into the AI",
+    "how you'll pay: yourself, or a plan by name only (a health plan, the VA, a work-injury or car-accident claim)",
+    "days and times that suit you"
+   ],
+   "afterTime": [
+    "anything that helps at the visit, like a wheelchair or an interpreter",
+    "for a home visit: who meets the acupuncturist at the door, and a quiet room with space for the table"
+   ],
+   "securePage": [
+    "birth date",
+    "the plan's member ID and a photo of the card, or the claim number",
+    "health history: medicines, conditions, allergies",
+    "the health flags the acupuncturist reads before the visit: pregnant or could be, blood thinners or a bleeding problem, a pacemaker or other implant, fainting with needles",
+    "consent to treatment and the privacy notice; the health answers get their own yes",
+    "a parent's or guardian's consent for anyone under 18"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for a child (the child's visit, with no needles); a guardian or health care agent for an adult who can't consent; a minor alone only where the state's rules let minors consent (a switch)",
+   "neverAsked": "symptoms, reasons or results are never asked or typed in the AI chat; only a visit type from the list and the time pass through the AI"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, sudden weakness or numbness, a drooping face, or a sudden very bad headache",
+     "say": "This sounds like an emergency. Call 911 now. Don't wait for an acupuncture visit.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a fall with a head injury, or someone who can't get up",
+     "say": "Call 911 now.",
+     "booking": "no booking until they're safe; otherwise the safety steps come first, then the booking goes on"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "pain, stress or poor sleep with nothing else",
+     "what": "matched to the business's own visit types; Rosie never judges how urgent it is, and gives no health advice"
+    },
+    {
+     "words": "a new fever",
+     "what": "the safety step 'rest at home: the visit can move with no fee', then the booking goes on"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history, the health flags and the consent",
+     "when": "on the secure page only, never by text; due the day before a first visit (a same-day visit: before the time is held); one reminder",
+     "who": "every new patient; a returning patient's history stays on file a year, with a short health update before each visit",
+     "result": "not done by its due date: Sam keeps the visit (filled in on the secure page at the desk or the door, before any needles), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The acupuncturist reads the health answers",
+     "when": "after booking, before the visit (A7-x01, B7-x01)",
+     "who": "every patient",
+     "result": "nothing stands out: the visit stays; a flag to talk over: the acupuncturist calls first and may change the treatment (no electro-acupuncture with a pacemaker; other points in pregnancy; acupressure with no needles at its own price); not right for acupuncture now: the acupuncturist calls and says who to see, then the visit is cancelled with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk or Sam, by hand",
+     "who": "every patient who names a plan or a claim",
+     "result": "covered, part covered, not covered (self-pay with the estimate notice), or can't check now (checked later; the patient may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day (the example clinic's rule), or sooner where the rules require it",
+     "who": "every self-pay patient",
+     "result": "a to-do for the front desk with its due date; one estimate can cover a series of follow-ups"
+    },
+    {
+     "name": "A doctor's referral or OK",
+     "when": "before the visit, where a plan or the state's rules ask for one (a switch)",
+     "who": "the business gets it, office to office",
+     "result": "not in by the due time: Sam calls; the visit moves with no fee, or goes ahead at the self-pay price with the patient's yes"
+    },
+    {
+     "name": "A reaction last time",
+     "when": "at booking",
+     "who": "a patient who felt faint at an earlier visit",
+     "result": "the booking waits for the owner's OK; the reason stays in the record, never in a text"
+    }
+   ],
+   "prep": "wear loose clothes; eat a light meal first; finish the health update; at home: a quiet room with space for the table"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the check-in code at the front desk (where Sam sets a time with nobody at the desk, like Iris's Saturday mornings alone, the acupuncturist enters it); at home: the code at the door, from the patient or whoever lets the acupuncturist in",
+   "beforeWork": "the acupuncturist goes over the health answers and how the patient feels today before any needles (a tongue and pulse check is a usual part), in the business's own chart",
+   "needles": "single-use sterile needles only, counted in and out at every visit",
+   "changes": "feels faint: the needles come out, the patient lies flat with water, gentle hands-on work instead, noted for next time; no needles wanted: cupping or acupressure at the agreed price; a fever or another sign the plug-in names: no needles that day; electro-acupuncture only when the acupuncturist decides, never with a pacemaker or other implant",
+   "done": "the check-in code or DONE; the treatment notes (points used, needle count, any reaction) stay in the business's own chart and on the secure page, never in a text",
+   "after": "the acupuncturist checks how the patient feels before they get up; a treatment plan is suggested in person, never pushed, and booked only if the patient asks",
+   "away": "a portable table and single-use needles; at home the patient is always there; no photos of the patient"
+  },
+  "pf.money": {
+   "before": "at the clinic: a card saved for the $20 fee (a late cancel or a missed visit; $40 for the first visit), nothing charged; nothing saved when a plan or a claim pays, or for a fee-free patient; at home: the $89 trip fee held for self-pay; a card saved where Sam sets a service to be charged at DONE; nothing taken when a plan or a claim pays",
+   "after": "at the clinic: paid at the front desk, the clinic's own way (a card, an HSA or FSA card, or cash); where Sam sets a time with nobody at the desk (the example: Iris's Saturday mornings), the saved card is charged at DONE, as the patient agreed at booking; at home: Rosie texts the bill, or the saved card is charged at DONE; a plan or a claim: the business bills it its own way",
+   "plans": "some health plans, the VA's community care, and work-injury or car-accident claims cover acupuncture; only the plan's name passes through the AI; the front desk or Sam checks the benefit by hand and records it; the patient's share is an estimate; a plan that won't pay this business turns into self-pay with the estimate notice",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "packages": "a 5-visit package (the example clinic's own price, $160), sold only at the clinic, never in a booking text; a booking uses one of its visits; unused visits refunded on request (Rosie's rule)",
+   "fees": "the late-cancel or missed-visit fee: $20 at the example clinic ($40 for the first visit), up to the $89 trip fee at home; only when the owner confirms it; the same fee for every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; their texts say 'No fee to cancel or miss'",
+   "receipts": "a receipt with the codes a plan needs (a superbill), on the secure page, on request",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form (no deposits at the example businesses); fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts to a patient carry only the business's name, the date, the time, the place, money lines and a secure link: never the visit type, the reason, the health answers or any result; a clinic text names no acupuncturist; a home visit keeps the acupuncturist's name for the door check",
+   "staff": "texts to the owner and staff use the patient's initials, the time, the visit type from the list and a link; never a health detail (that's on the secure page: 'notes added')",
+   "healthTexts": "a health question or update texted in is never answered by Rosie: it goes to the acupuncturist on the secure page, and the patient is told who will call",
+   "languages": "English and Spanish",
+   "minors": "a child's texts go to the parent or guardian"
+  },
+  "pf.staff": {
+   "licenses": "each acupuncturist's own license, per state, for the place where the patient is seen",
+   "skills": "every acupuncturist: first visits, follow-ups, cupping and acupressure; child's visits only for those trained in them (the example: Iris); herbal consults only with the herbal certificate where the state's form asks (the example: Noah); home visits only for those Sam clears",
+   "supervision": "none for a licensed acupuncturist; a student works only under supervision, where the state's rules allow it at all (a switch); none at the example businesses",
+   "oks": "the owner OKs same-day visits, a booking after a reaction last time, and anything the acupuncturist flags",
+   "standIn": "another licensed acupuncturist may stand in, on a time the patient picks or OKs; the notes go with the booking on the secure side; only the acupuncturist decides what's safe",
+   "away": "home visits: the acupuncturists Sam clears, each with a portable table"
+  },
+  "pf.rules": {
+   "records": "treatment records kept by the business for as long as the state's rules require; a delete request removes only Rosie's own booking details",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "the license and the title shown where the state asks",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "referral": "a doctor's referral or diagnosis first, only where a plan or the state's rules ask (a switch)",
+   "healthData": "a separate yes for health answers on the secure page (Rosie's rule); any state's own health-data law comes from that state's form",
+   "packages": "any state's rule for prepaid visits comes from the state's form; unused visits refunded on request (Rosie's rule)",
+   "ads": "no claims of cures or results; a license is shown as the business gives it; Rosie doesn't check it; a national board certificate shows only as the business's own word",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen, ending on time (a shorter treatment at the same price); later: moved with no fee, as the acupuncturist decides",
+   "healthChange": "a health change before the visit (a new medicine, a pregnancy): Rosie never answers; the acupuncturist calls; the visit stays unless the patient moves or cancels it, with no fee",
+   "notRight": "after reading the answers, the acupuncturist decides acupuncture isn't right now: calls first, says who to see, then the visit is cancelled with no fee",
+   "faint": "feels faint at the visit: needles out, lie flat, water; noted for next time; the next booking waits for the owner's OK",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (filled in on the secure page at the desk or the door before any needles), moves it, or cancels with no fee",
+   "standIn": "an acupuncturist out: a stand-in who does that visit, offered first, or new times with no fee; a child's visit stays with Iris",
+   "planChange": "the plan check comes back not covered: self-pay with the estimate, or a free cancel",
+   "twoBookings": "a patient with a series of follow-ups open: Rosie asks which one before any change",
+   "urgent": "no visits sent now; a same-day visit for sudden pain gets the soonest time, once Sam OKs it",
+   "weather": "none at the clinic; at home, a storm that stops travel: Sam moves the visit with no fee",
+   "children": "a child is never left alone with the acupuncturist: a parent or guardian stays",
+   "needlestick": "an acupuncturist's needlestick: the visit stops, Sam is told at once, and another acupuncturist finishes or the patient gets a new time with no fee"
+  },
+  "pf.facts": [
+   "planbill",
+   "forms",
+   "firststeps",
+   "children",
+   "aftercare"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Acupuncture Clinic",
+   "staff": "Iris and Mia (acupuncturists)",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Home Acupuncture",
+   "staff": "Noah and Leo (acupuncturists), who bring a portable table",
+   "cust": "Alex M. (patient, at home and not driving for a few weeks) · other patients",
+   "other": "Others (a family member who pays, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Iris"
+  },
+  "B": {
+   "staff": "Noah"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most acupuncture clinics set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Acupuncture, acupressure and cupping."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery treat patients; Riley also sees children and makes home visits."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a spine adjustment, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do spine adjustments."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An acupuncturist's example: chest pain or trouble breathing gets 'call 911 now'."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "An acupuncturist's example: 'A first visit needs the health history first. Filled it in at Lee's in the last year?'"
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE added for A.M. on the secure page."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the visit's address, after a missed check."
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for a first visit), only if a card was saved and you say yes"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Board prices never need one"
+   ],
+   [
+    "MP045210",
+    "AC045210"
+   ],
+   [
+    "Someone calls for a dentist",
+    "Someone calls for an eye doctor"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "I need to move my cleaning.",
+    "I need to move my eye exam."
+   ],
+   [
+    "Color always stays with Riley.",
+    "A child's visit always stays with Riley."
+   ],
+   [
+    "rents a chair",
+    "rents a room"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Tai chi for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds tai chi classes to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW tai chi"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lena",
+    "Maya"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A follow-up is rated, so the shop takes the first branch."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a follow-up plan with Riley, every 6 months."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat May 1 · 10:00am"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the clinic show photos of your tongue?"
+   ],
+   [
+    "photos of your hair",
+    "photos of your tongue"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's acupuncture takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Follow-up plan · every 6 months"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Sensitivity gel · $15"
+   ],
+   [
+    "gloss",
+    "sensitivity gel"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Acupuncture Clinic LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Acupuncture's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Acupuncture Clinic"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Acupuncture"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Acupuncture and Lee Herbal"
+   ],
+   [
+    "plumbing and electrical",
+    "home acupuncture and herbal consults"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home acupuncture and herbal consults"
+   ],
+   [
+    "1200 Main St",
+    "500 Main St"
+   ],
+   [
+    "88 Elm St",
+    "60 Harbor St"
+   ],
+   [
+    "Riley Chen",
+    "Iris Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Mia Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Noah Price"
+   ],
+   [
+    "Casey Moore",
+    "Leo Moore"
+   ],
+   [
+    "Riley",
+    "Iris"
+   ],
+   [
+    "Avery",
+    "Mia"
+   ],
+   [
+    "Jordan",
+    "Noah"
+   ],
+   [
+    "Casey",
+    "Leo"
+   ],
+   [
+    "a barber",
+    "an acupuncturist"
+   ],
+   [
+    "A barber",
+    "An acupuncturist"
+   ],
+   [
+    "electrical",
+    "herbal consults"
+   ],
+   [
+    "Electrical",
+    "Herbal consults"
+   ],
+   [
+    "plumber",
+    "acupuncturist"
+   ],
+   [
+    "plumbing",
+    "home acupuncture"
+   ],
+   [
+    "Plumbing",
+    "Home acupuncture"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "Barbershop",
+    "Clinic"
+   ],
+   [
+    "barbers",
+    "acupuncturists"
+   ],
+   [
+    "barber",
+    "acupuncturist"
+   ],
+   [
+    "Barber",
+    "Acupuncturist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Follow-up and cupping"
+   ],
+   [
+    "Signature cut and shave",
+    "Follow-up and cupping"
+   ],
+   [
+    "signature cut",
+    "follow-up and cupping"
+   ],
+   [
+    "Groom's package",
+    "First visit"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "herbal formula"
+   ],
+   [
+    "Color and cut",
+    "Herbal formula"
+   ],
+   [
+    "color correction",
+    "pain visit"
+   ],
+   [
+    "Color correction",
+    "Pain visit"
+   ],
+   [
+    "kids cuts",
+    "child's visits"
+   ],
+   [
+    "Kids cut",
+    "Child's visit"
+   ],
+   [
+    "kids cut",
+    "child's visit"
+   ],
+   [
+    "a skin fade",
+    "an acupressure visit"
+   ],
+   [
+    "A skin fade",
+    "An acupressure visit"
+   ],
+   [
+    "Skin fade",
+    "Acupressure visit"
+   ],
+   [
+    "a beard trim",
+    "cupping"
+   ],
+   [
+    "A beard trim",
+    "Cupping"
+   ],
+   [
+    "beard trim",
+    "cupping"
+   ],
+   [
+    "Beard trim",
+    "Cupping"
+   ],
+   [
+    "haircuts",
+    "follow-ups"
+   ],
+   [
+    "Haircuts",
+    "Follow-ups"
+   ],
+   [
+    "haircut",
+    "follow-up"
+   ],
+   [
+    "Haircut",
+    "Follow-up"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "child's visits"
+   ],
+   [
+    "Color",
+    "Child's visits"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "priced at the chair",
+    "priced in the treatment room"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the treatment room"
+   ],
+   [
+    "set at the chair",
+    "set in the treatment room"
+   ],
+   [
+    "quote at the chair",
+    "quote in the treatment room"
+   ],
+   [
+    "is at the chair",
+    "is in the treatment room"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Drain clearing",
+    "Home treatment"
+   ],
+   [
+    "water heaters",
+    "herbs"
+   ],
+   [
+    "water heater",
+    "herb plan"
+   ],
+   [
+    "Panel upgrade",
+    "Herb plan"
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "labor",
+    "extra time"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a follow-up on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a follow-up every 6 months"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a follow-up every 6 months."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A parent books follow-ups for three children on one morning."
+   ],
+   [
+    "staff cut",
+    "staff follow-up"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My sore muscle got worse. Can I still come in?"
+   ],
+   [
+    "like a skin-test result",
+    "like the points used and any reaction"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "My point has been sore since the treatment."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una cita de acupuntura el sábado."
+   ],
+   [
+    "A step-free door on Elm St",
+    "A step-free door on Harbor St"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Harbor St"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bib clip ripped my shirt collar."
+   ],
+   [
+    "says the cape clip ripped",
+    "says the bib clip ripped"
+   ]
+  ],
+  "B": [
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most acupuncture clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules acupuncture clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Acupuncture, acupressure and cupping."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery treat patients; Riley also sees children and makes home visits."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like acupuncture at home."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a home acupuncture visit."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An acupuncturist's example: chest pain or trouble breathing gets 'call 911 now'."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can an acupuncturist come to my home this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa home treatment Thu 12-2 Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Acupuncture at my place' fits a home treatment."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a treatment outside the license."
+   ],
+   [
+    "can clear the drain",
+    "can come for a home treatment"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is there a quiet room with space for a portable table?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home treatment needs none."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also add cupping?"
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "If you have chest pain or trouble breathing, call 911 now."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan and Alex agree to add cupping."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's portable table scuffs the floor, and Jordan texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's table scuffed the floor at A.M.'s."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left used cotton balls on the floor."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on my floor this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come back for another treatment next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a home follow-up."
+   ],
+   [
+    "It's a leak under the sink, today, arriving 3–5pm, with Jordan.",
+    "It's a home treatment, today, arriving 3–5pm, with Jordan."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the visit's address, after a missed check."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A question about the visit? Reply here."
+   ],
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or nobody home: up to the $89 trip fee, only if a card was saved and you say yes"
+   ],
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every visit is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line"
+   ],
+   [
+    "MP045210",
+    "AC045210"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomeacupuncture.com"
+   ],
+   [
+    "never takes more than the visit fee",
+    "never takes more than the trip fee"
+   ],
+   [
+    "Someone calls for a dentist",
+    "Someone calls for an eye doctor"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "I need to move my cleaning.",
+    "I need to move my eye exam."
+   ],
+   [
+    "rents a chair",
+    "rents a room"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Nutrition counseling for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds nutrition counseling to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW nutrition counseling"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "does the cupping today, $165. The $80 acupressure stays good until Thu Oct 29."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 herb plan, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your herb plan"
+   ],
+   [
+    "Repipe · $2,400",
+    "Herb plan · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the second visit is done, $800 at the finish"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your herb plan"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a longer plan for the sore spot Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a longer plan, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A longer plan for the sore spot"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's acupuncture takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "like a move-out day",
+    "like a move to another home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Acupuncture LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Acupuncture's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Acupuncture Clinic"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Acupuncture"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Acupuncture and Lee Herbal"
+   ],
+   [
+    "plumbing and electrical",
+    "home acupuncture and herbal consults"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home acupuncture and herbal consults"
+   ],
+   [
+    "1200 Main St",
+    "500 Main St"
+   ],
+   [
+    "88 Elm St",
+    "60 Harbor St"
+   ],
+   [
+    "42 Oak St",
+    "31 Linden Ave"
+   ],
+   [
+    "Riley Chen",
+    "Iris Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Mia Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Noah Price"
+   ],
+   [
+    "Casey Moore",
+    "Leo Moore"
+   ],
+   [
+    "Riley",
+    "Iris"
+   ],
+   [
+    "Avery",
+    "Mia"
+   ],
+   [
+    "Jordan",
+    "Noah"
+   ],
+   [
+    "Casey",
+    "Leo"
+   ],
+   [
+    "a barber",
+    "an acupuncturist"
+   ],
+   [
+    "a plumber",
+    "an acupuncturist"
+   ],
+   [
+    "electrical",
+    "herbal consults"
+   ],
+   [
+    "Electrical",
+    "Herbal consults"
+   ],
+   [
+    "plumbing license",
+    "acupuncture license"
+   ],
+   [
+    "Plumbing license",
+    "Acupuncture license"
+   ],
+   [
+    "plumber",
+    "acupuncturist"
+   ],
+   [
+    "plumbing",
+    "home acupuncture"
+   ],
+   [
+    "Plumbing",
+    "Home acupuncture"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "barbers",
+    "acupuncturists"
+   ],
+   [
+    "barber",
+    "acupuncturist"
+   ],
+   [
+    "Barber",
+    "Acupuncturist"
+   ],
+   [
+    "haircut",
+    "follow-up"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "color",
+    "child's visits"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the treatment room"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home treatment"
+   ],
+   [
+    "drain clearing",
+    "home treatment"
+   ],
+   [
+    "Drain clearing",
+    "Home treatment"
+   ],
+   [
+    "Water heater replacement",
+    "Herb plan"
+   ],
+   [
+    "water heater replacement",
+    "herb plan"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up"
+   ],
+   [
+    "water heater flush",
+    "home follow-up"
+   ],
+   [
+    "water heaters",
+    "herbs"
+   ],
+   [
+    "water heater",
+    "herb plan"
+   ],
+   [
+    "Water heater",
+    "Herb plan"
+   ],
+   [
+    "leak repair",
+    "pain visit"
+   ],
+   [
+    "Leak repair",
+    "Pain visit"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "Sewer camera inspection",
+    "First home visit"
+   ],
+   [
+    "sewer camera inspection",
+    "first home visit"
+   ],
+   [
+    "Panel upgrade",
+    "Herb plan"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me duele mucho una muela."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if chest pain or trouble breathing starts."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene dolor en el pecho o le falta el aire?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: do you have chest pain, or trouble breathing?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tengo dolor en el pecho."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't have chest pain."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si tiene dolor en el pecho o le falta el aire, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If you have chest pain or trouble breathing, call 911."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for an acupuncture visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like chest pain or trouble breathing, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like braces"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: chest pain, trouble breathing, a drooping face or a sudden very bad headache."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a loose herb plan."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Which room are you in at Alex's home?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "home warranty",
+    "health plan"
+   ],
+   [
+    "the warranty company",
+    "the plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Alex says yes before any work",
+    "Alex says yes first"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and insurance card ready."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the pain is worse now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The pain is worse now."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan runs Pine Court care home, with a repeat plan: treatments for two residents every 6 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's treatments?"
+   ],
+   [
+    "Rental 1",
+    "Resident 1"
+   ],
+   [
+    "Rental 2",
+    "Resident 2"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 cupping 165 acupressure 80"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Cupping · $165"
+   ],
+   [
+    "Supply line · $80",
+    "acupressure · $80"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 20 cupping"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "cupping, $20"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Cupping · $20"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Cupping"
+   ],
+   [
+    "The $160 valve quote",
+    "The $20 cupping"
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "adding cupping for $20"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD no safe outlet for the table, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: no safe outlet for the table"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the treatment"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the care home to fix the outlet first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the wall by the bed"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed wall"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 home treatment"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M. added on the secure page"
+   ],
+   [
+    "the shutoff valves",
+    "the cupping"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My muscle has been sore since the treatment."
+   ],
+   [
+    "with the store's receipt",
+    "with the supplier's receipt"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. A check within 30 days is free, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the acupressure report is ready"
+   ],
+   [
+    "Sewer camera report",
+    "acupressure report"
+   ],
+   [
+    "Drain clearings already booked",
+    "Home treatments already booked"
+   ],
+   [
+    "The repair price",
+    "The treatment price"
+   ],
+   [
+    "the repair price",
+    "the treatment price"
+   ],
+   [
+    "Book the repair",
+    "Book the treatment"
+   ],
+   [
+    "labor",
+    "extra time"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The pain is worse today. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 herb plan"
+   ],
+   [
+    "flush",
+    "follow-up"
+   ],
+   [
+    "faucet",
+    "herb plan"
+   ],
+   [
+    "the shutoff valve",
+    "the cupping"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "Visit fee"
+ ],
+ "story": {
+  "A": "Sam Lee, a licensed acupuncturist, signs up two companies by text. Then Alex books a follow-up with Iris at Lee Acupuncture Clinic, for Sat Oct 24 at 11:00am. Iris reads Alex's health update before the visit, and Alex pays at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who can't drive for a few weeks, books a home treatment with Lee Home Acupuncture at 31 Linden Ave. Noah brings a portable table Thu Oct 22, arriving 8 to 10am. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 follow-up with Iris. A card is saved only for the clinic's $20 fee. Alex pays at the front desk.",
+    "list|none|counter": "The same follow-up when a health plan or a claim pays, or for a fee-free patient. Nothing is taken. The desk checks the plan, and Alex pays any share at the front desk.",
+    "list|card|card": "The same follow-up where Sam set Iris's Saturday mornings to run with nobody at the front desk. So the saved card is charged when Iris texts DONE, as Alex agreed."
+   },
+   "amounts": {
+    "*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Follow-up treatment"
+    },
+    "list|none|*": {
+     "price": "$35",
+     "name": "Follow-up treatment"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|own",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 home treatment. A card is saved for the $89 trip fee, owed only for a late cancel or nobody home. Rosie texts the bill when Noah texts DONE.",
+    "list|none|own": "The same home treatment when a health plan or a claim pays. Nothing is taken. Lee Home Acupuncture bills the plan its own way.",
+    "list|card|card": "The same home treatment with a card saved. It's charged $179 when Noah texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Home treatment"
+    },
+    "list|none|*": {
+     "price": "$179",
+     "name": "Home treatment"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's acupuncture companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Acupuncture records stay with the clinic as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For an acupuncture visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever brings the patient to the clinic."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Acupuncture books people (an acupuncturist), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Acupuncture runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No acupuncture is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "An acupuncture visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "An acupuncture visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "An acupuncture visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the clinic: the patient is in the treatment room."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's acupuncture visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "Lee Acupuncture Clinic's services happen only at the clinic. Home visits are Lee Home Acupuncture's (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "No video visits: acupuncture is hands-on (pf.services.online)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "Follow-ups are booked as a series from the treatment plan, with Alex's own yes (A4-31), not as an open-ended plan."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Each acupuncture visit is one patient with one acupuncturist."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every acupuncture visit has the health questions: on file from the first visit, or filled in on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "No acupuncture visit needs a written contract: the 5-visit package is bought at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No open-ended plans: follow-ups are booked as a series (A4-31)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The 5-visit package is sold only at the clinic, never while booking (pf.money.packages)."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No open-ended plans at the clinic (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No open-ended plans at the clinic (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No open-ended plans at the clinic (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Each visit is paid at the visit."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each visit is paid at the visit, even in a series."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Nothing is signed at a clinic visit that comes with a right to cancel: the package is bought at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A treatment plan is suggested in person, never sent to sign (pf.visit.after)."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "An acupuncture visit has nothing to fix or redo for free."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "No results come later: nothing is sent to a lab."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the clinic."
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "For chest pain, trouble breathing, a drooping face or a sudden very bad headache: call 911 now. Don't wait for an acupuncture visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-37",
+    "more": [
+     "The desk also notes how many visits the plan pays for this year, and if it asks for a doctor's referral.",
+     "The share is the plan's estimate, not a promise. The clinic bills the plan after the visit."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "line": [
+       "6.1",
+       "7.16"
+      ],
+      "who": "staff",
+      "via": "page",
+      "t": "Thu Oct 22, 9:00am",
+      "title": "Iris reads Alex's health update",
+      "does": "Before the visit, Iris reads Alex's health update on the secure page. Nothing stands out, so the visit stays as booked.",
+      "more": [
+       "Rosie never judges the answers. Only the acupuncturist decides what's safe.",
+       "A flag to talk over, like a new pacemaker: Iris calls Alex first. Iris may change the treatment, like no electro-acupuncture.",
+       "Not right for acupuncture now: Iris calls and says who to see. The clinic cancels with no fee ('A first step's result comes in').",
+       "The answers stay on the secure page. Nothing about them goes in a text, to Alex or to the team."
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-45",
+    "more": [
+     "For acupuncture, the notes are the points used, the needle count and any reaction, typed on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-20",
+    "more": [
+     "Lee Acupuncture Clinic sends the claim itself, to the plan or to a work-injury or car-accident claim.",
+     "Alex pays the estimated share at the front desk.",
+     "A balance after the plan pays is billed by the clinic, never by Rosie's text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-42",
+    "more": [
+     "For acupuncture: drink water and rest today. Some soreness or a small bruise can happen. Anything worse goes to the acupuncturist."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A clinic runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "A clinic takes no drop-offs."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When patients book, do you take anything? Each service starts the way most acupuncture clinics set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your clinic, paid at the front desk, your own way",
+         "When they book: a card saved for the $20 fee you OK ($40 for a first visit)",
+         "With a plan or a claim: nothing taken, and you bill it your own way",
+         "Free on your board: nothing taken, nothing after"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "First visit",
+          "$140"
+         ],
+         [
+          "Follow-up treatment",
+          "$35"
+         ],
+         [
+          "Acupressure, no needles",
+          "$40"
+         ],
+         [
+          "Cupping, added to a visit",
+          "$20"
+         ],
+         [
+          "Follow-up and cupping",
+          "$55"
+         ],
+         [
+          "Child's visit, no needles",
+          "$25"
+         ],
+         [
+          "5-visit package",
+          "$160, at the clinic only"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:deposit+after:card": {
+      "addSay": [],
+      "addMore": []
+     },
+     "after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Saturday mornings Iris works alone: charge the saved card then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Saturday mornings: the saved card is charged when the visit is done. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, Saturday mornings are paid by the saved card at DONE."
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Acupuncture is health care, sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's acupuncture companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "An acupuncture visit always needs the patient there."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Home acupuncture takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for acupuncture (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "An acupuncture visit always needs the patient there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the acupuncturist's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Acupuncture books people (an acupuncturist), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Acupuncture runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No acupuncture is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Home acupuncture books a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "An acupuncture visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Home acupuncture sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No acupuncture visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No acupuncture visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Lee Home Acupuncture works only at the patient's home. The clinic is Lee Acupuncture Clinic (flow A)."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "No video visits: acupuncture is hands-on (pf.services.online)."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "Follow-ups are booked as a series from the treatment plan, with Alex's own yes (B4-45), not as an open-ended plan."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "Each home visit is one patient with one acupuncturist."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "No",
+    "why": "Every home visit has the health questions: on file, or filled in on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A home acupuncture visit is one list price, under any amount that needs a contract, and nothing is sold to sign at the home."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No open-ended plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No open-ended plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No open-ended plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No open-ended plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "No home acupuncture bill comes near $500, and Sam keeps bank transfer off (S1-57)."
+   },
+   {
+    "op": "off",
+    "at": "B8-97",
+    "label": "A finding stops the work",
+    "why": "Nothing in a home stops part of an acupuncture visit. A health reason is 'Stopped or done differently'."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Alex is there for the whole visit, so no update is texted."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Each home visit is paid after that visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each home visit is billed on its own, even in a series."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at a home visit (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at a home visit (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "An acupuncture visit has no warranty or free redo."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A treatment plan is suggested in person, never sent to sign (pf.visit.after)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "No report comes later from a home visit."
+   },
+   {
+    "op": "more",
+    "at": "B4-27",
+    "more": [
+     "A caregiver at the home can get the code instead, when a mobile is given for them."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-63",
+    "more": [
+     "Lee Home Acupuncture sends the claim itself, to the plan or to a work-injury or car-accident claim."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "B7-55",
+    "steps": [
+     {
+      "id": "B7-x01",
+      "line": [
+       "6.1",
+       "7.16"
+      ],
+      "who": "staff",
+      "via": "page",
+      "t": "Tue Oct 20, 9:00am",
+      "title": "Noah reads Alex's health update",
+      "does": "Before the visit, Noah reads Alex's health update on the secure page. Nothing stands out, so the visit stays as booked.",
+      "more": [
+       "Rosie never judges the answers. Only the acupuncturist decides what's safe.",
+       "A flag to talk over, like a new blood thinner: Noah calls Alex first. Noah may change the treatment.",
+       "Not right for acupuncture now: Noah calls and says who to see. The visit is cancelled with no fee ('A first step changes the job').",
+       "The answers stay on the secure page. Nothing about them goes in a text, to Alex or to the team."
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "gives": []
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-35",
+    "more": [
+     "For acupuncture: drink water and rest today. Some soreness or a small bruise can happen. Anything worse goes to the acupuncturist."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-44",
+    "more": [
+     "For acupuncture, the notes are the points used, the needle count and any reaction."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "A plan or a claim is billed by the business its own way (list|none|own): Rosie never texts a plan's share."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When patients book, do you take anything? Each service starts the way most home acupuncture practices set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every home visit, to start",
+        "lines": [
+         "Where: at the patient's home",
+         "When they book: a card saved for the $89 trip fee you OK",
+         "After the visit: Rosie sends the bill",
+         "With a plan or a claim: nothing taken, and you bill it your own way"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Home treatment",
+          "$179"
+         ],
+         [
+          "First home visit",
+          "$199"
+         ],
+         [
+          "Home follow-up",
+          "$150"
+         ],
+         [
+          "Herbal consult",
+          "$149"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:deposit+after:own": {
+      "addSay": [],
+      "addMore": []
+     },
+     "after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Plan and claim patients: I bill them my own way"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A visit a plan or a claim pays: nothing taken, and you bill it your own way. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, a visit a plan or a claim pays is billed Sam's own way."
+      ]
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Self-pay home visits: charge the saved card when the visit is done"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Self-pay home visits: the saved card is charged at DONE. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, self-pay home visits are paid by the saved card at DONE."
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Acupuncture is health care, sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28"
+  ]
+ },
+ "notes": "From: dentist (the clinic pilot). Why: acupuncture runs like the dentist's clinic, not like a chair: a new patient's first visit is longer, health questions are asked only on the secure page and read by the licensed person before the visit, plans and work-injury or car-accident claims sometimes pay, self-pay patients get a price-estimate notice, and no $2 is charged for a health practice. Its private-text rules and no-$2 sentences carry over; its care-home world, dental services and visit-priced and photo-priced paths don't.\nNames: Sam Lee, a licensed acupuncturist, owns Lee Home Acupuncture LLC (the master's main company: home acupuncture and herbal consults, 500 Main St, leehomeacupuncture.com) and Lee Acupuncture Clinic LLC (the second company: the clinic, 60 Harbor St). Flow A's story is at the clinic; flow B's at Alex's home, 31 Linden Ave, where Alex can't drive for a few weeks.\nPeople: Riley and Avery became Iris and Mia (acupuncturists at the clinic; only Iris does the child's visits). Jordan and Casey became Noah and Leo (home visits; only Noah does herbal consults, once his herbal certificate checks out). Lena, the master's form example, is Maya. Sam, Pat and Alex M. stay.\nKinds of work: plumbing became home acupuncture, electrical became herbal consults (it waits for the herbalist's certificate, where the state's form asks), the barbershop became the clinic. Licenses are each acupuncturist's own (a switch); a few states issue no acupuncture license, so the no-license branches (S1-60, S1-63, S2-28) stay as switches (splitsKept): registration only, and the national board certificate kept as the business's own word.\nPrices: the master's numbers are kept as the example businesses' own prices, so every sum and fee stays right. Clinic: follow-up $35 (60 min), acupressure with no needles $40, cupping added $20, follow-up and cupping $55, child's visit $25, first visit $140 (90 min), a 5-visit package $160 sold at the clinic only. Home: home treatment $179 (60 min), first home visit $199 ($249 with Sam), home follow-up $150, the $89 trip fee, herbal consult $149. Fees: $20 at the clinic ($40 for the first visit), up to the $89 trip fee at home. They're examples, not a standard.\nMoney A: list|card|counter is the main path (a card saved only for the $20 fee, paid at the front desk by card, HSA card or cash). list|none|counter when a health plan or a work-injury or car-accident claim pays, or for a fee-free patient (the desk checks the plan, the share at the front desk). list|card|card for Saturday mornings, when Iris works alone with nobody at the desk (the saved card at DONE, as the old flowchart's 'the saved card with her OK'). Left out: holds, deposits, paid in full, Rosfield's bill, photos and visit pricing (every acupuncture price is on the list).\nMoney B: list|hold|bill is the main path (the $89 trip fee held, Rosie texts the bill at DONE). list|none|own when a plan or a claim pays (the business bills it). list|card|card when a card is saved and charged at DONE. Left out: deposits, paid in full, photos and visit pricing. The tip branch stays off (no tips for health visits).\nSign-up words follow these paths: S1-12/S1-13/S1-16/S1-17/S1-18 read back the home services (all $89 held, then the bill), S1-41/S1-42/S1-45 to S1-47 the clinic (card saved for the fee, at the front desk; Saturday mornings at DONE). No service is priced from photos or at the visit, so S11-08's quote OK is off, and S1-57 keeps bank transfer off.\nNo $2: the pilot's no-$2 sentences carry over with acupuncture's words (S1-26, S11-93, A9-21, B9-18, S11-63's screen, S11-64, S11-92).\nPrivate texts: patient texts carry only the business, date, time, place, money and a link (pf.messages.never); clinic texts name no acupuncturist; home-visit texts keep Noah's name for the door check; owner and staff texts use initials (a build pass turns 'Alex M.' into 'A.M.' in visible owner and staff texts) and say only 'notes added' for health notes.\nOwn steps: A7-x01 and B7-x01, the acupuncturist reads the health update after booking, before the visit (the old flowchart's ac18); a change or a 'not right now' runs through A7-34 to A7-36 and B7-37 to B7-59, reworded for acupuncture (a call first, acupressure with no needles, or a free cancel).\nClocks: A main path Wed Oct 21 7:15pm booking, Thu Oct 22 9:00am read, Fri Oct 23 10:00am reminder, Sat Oct 24 11:00am check-in, 12:00pm done (60-minute follow-up), 12:05pm paid, 12:06pm receipt, 4:00pm rating. B: Mon Oct 19 6:40pm booking, Tue Oct 20 9:00am read, Wed Oct 21 10:00am reminder, Thu Oct 22 8:20am check-in, 9:25am DONE (60-minute home treatment), 9:27am bill, 9:30am receipt, 11:00am rating.\nOff for acupuncture: walk-ins (A3-32 keeps 'No walk-ins'), the home branch and video at A4-01 and B4-01 (each company works in one place; no video visits), repeat plans (follow-ups are a series, A4-31 and B4-45), groups, held items, contracts (A5-19, B4-57), damage holds, crews, set dates, minimums, drop-offs, rentals, items left or taken, reports, proposals, warranties and free fixes, weather, lab orders, payer top amounts, extra work sold at the home, stages, bills for many visits, goods, pay over time, bank transfer, and the day-before hold at the clinic (no clinic service holds money).\nKept on: A4-43's first steps (on file, a doctor's referral the plan asks for, a reaction last time, the health forms), A7-61 (a stand-in, or nobody else for a child's visit) and A8-02, with acupuncture words.\nPilot words gone: a build pass maps the pilot's dental words in pairs no reader of this profession sees (hidden money paths) to neutral acupuncture words, and drops the pilot's ops on steps this profession never shows.\nNot taken from the old flowchart: the 15-minute hold (the master's 10 minutes stays), the $50 fee (the master's $20 example), the 20-minute no-show mark (the master's 15), Medicare's details (kept as a switch: a plan that won't pay this business turns into self-pay with the notice), IntakeQ and the other outside software (outdated: Rosie is the software now), and Washington's health-data law applied everywhere (each state's own form instead).\nKept words: none.\nReview, Oct 23: the no-reply stand-in never moves a patient (A7-21, B7-22: Sam calls; not reached by the visit, nobody is moved or sent; S11-46, S11-49 the same), as pf.staff.standIn and the old ac20o say. Iris's Saturday mornings with nobody at the desk are a setting Sam makes on the list|card|card path only: the main and plan paths' sign-up (S1-42) no longer sets them, S11-56 shows turning it on, and A9-01's Saturday-afternoon line shows only there. Off: A6-01's and B6-03's expert-read branches (the read comes after booking), A8-03's roster and drop-off branches, B9-19's plan share billed by Rosie.\nRefit Oct 27 2026 (R13) to the REDESIGN 2 master: facts planbill, forms, firststeps, children, aftercare (the 5-visit package is sold at the clinic, outside booking: no packs fact); switch sensitive (health care: no rating); A set start times, B arrival windows, free cancel until 24 hours before. The $89 home trip fee is no longer held (D66): a card is saved for it as the late-cancel or nobody-home fee. Every legacy words op dropped; kept the own health-update steps (A7-x01, B7-x01), the more lines and the off ops on live branches; own words only on S1-13 (the money card, both flows). Kept words: 'leak' (a privacy leak), 'visit fee' (the master's rule for a price set at the visit).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "We'd share only where they're working, only after a missed check.",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Color quotes come to you first. Board prices never need one",
+    "MP045210",
+    "Someone calls for a dentist",
+    "Elm Street Dental",
+    "I need to move my cleaning.",
+    "Color always stays with Riley.",
+    "rents a chair",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "May the shop show photos of your hair?",
+    "photos of your hair",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "a barber",
+    "A barber",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "a beard trim",
+    "A beard trim",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "Color",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "quote at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "home warranty plan",
+    "labor",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "like a skin-test result",
+    "The cut is uneven on one side.",
+    "Quiero un corte el sábado.",
+    "A step-free door on Elm St",
+    "Step-free door on Elm St",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped"
+   ],
+   "B": [
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "My kitchen drain is clogged.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "can clear the drain",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Jordan finds corroded shutoff valves.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today, arriving 3–5pm, with Jordan.",
+    "We'd share only where they're working, only after a missed check.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "MP045210",
+    "leehomeservices.com",
+    "never takes more than the visit fee",
+    "Someone calls for a dentist",
+    "Elm Street Dental",
+    "I need to move my cleaning.",
+    "rents a chair",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "like a move-out day",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "a barber",
+    "a plumber",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "haircut",
+    "house calls",
+    "color",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Panel upgrade",
+    "credited to the repair",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "the warranty company",
+    "A plan or warranty pays",
+    "Alex says yes before any work",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote",
+    "replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "The kitchen drain is clogged again.",
+    "with the store's receipt",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "Drain clearings already booked",
+    "The repair price",
+    "the repair price",
+    "Book the repair",
+    "labor",
+    "Labor",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "$2,400 repipe",
+    "flush",
+    "faucet",
+    "the shutoff valve"
+   ]
+  },
+  "A": {
+   "S1-29": "fb61245096",
+   "A10-21": "08514557c8",
+   "A4-64": "b98f95b738",
+   "S1-26": "776159519e",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A4-01": "9d65299834",
+   "A4-28": "c8e677520c",
+   "A4-43": "c17d56f766",
+   "A5-19": "5d5db6f3c1",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A9-15": "bd2a17c3c5",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A3-24": "78e61fd50f",
+   "A4-37": "4ee9e74e71",
+   "A7-01": "afb51b5e1b",
+   "A8-45": "6589a6b4d4",
+   "A9-20": "0cfe0e1776",
+   "A10-42": "4f28189298",
+   "A8-03": "7fe61cccf5",
+   "S1-13": "eca22651fd",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "S1-29": "592bd8f1a2",
+   "B8-03": "ac9d404766",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-26": "776159519e",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-01": "826f4058c2",
+   "B4-43": "fc9855955a",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-06": "f091432f2d",
+   "B8-97": "1e3f69ef38",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B10-05": "a326ea3c0b",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B4-27": "4b45128d2c",
+   "B4-63": "49ce39c037",
+   "B10-35": "5ed99b23b3",
+   "B8-44": "3847104a93",
+   "S1-13": "6964bfbe60",
+   "B10-32": "7713bff255"
+  }
+ }
+}

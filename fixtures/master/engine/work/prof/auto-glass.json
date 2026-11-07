@@ -1,0 +1,6918 @@
+{
+ "id": "auto-glass",
+ "name": "Auto glass",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "auto-repair",
+ "plugin": {
+  "pf.license": {
+   "need": "if: where the state registers repair shops that do glass work, or licenses auto glass workers",
+   "ask": [
+    "The shop's repair-shop registration number, where the state has one",
+    "Each glass tech's auto glass license, where the state licenses glass workers",
+    "A glazing license for home glass, where the state's rules require one"
+   ],
+   "who": "both: the shop, and each glass tech where the state licenses them",
+   "check": "none: Rosie never looks up, checks or confirms a license, permit or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "a registration the state requires that the owner says the business lacks keeps that kind of work offline; a tech without a license the state requires isn't offered",
+   "show": "switch: the registration number on offers, the confirmation and the receipt, where the state's rules require it",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "garage liability and cover for customers' cars, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'"
+  },
+  "pf.services": {
+   "pattern": "set service: mobile jobs at set start times (the example shop: 8am and 1pm), or a drop-off slot at the shop",
+   "list": [
+    {
+     "name": "Chip repair",
+     "price": "one price by the number of chips (the example shop: $79 for the first, $20 each extra)",
+     "length": "about 30 minutes; the car can be driven right after",
+     "place": "at the shop while the customer waits, or at the customer's home or work",
+     "before": "mobile: a card saved for the trip fee; at the shop: nothing taken",
+     "after": "billed to the customer's insurer, or the bill Rosie texts, or at the counter"
+    },
+    {
+     "name": "Windshield, aftermarket glass",
+     "price": "set by the car's year, make and model, from the shop's list (the example: a 2021 RAV4, $389)",
+     "length": "about 75 minutes to fit, then the glue maker's safe drive-away time before the car moves (the example: 60 minutes)",
+     "place": "at the shop as a drop-off, or at the customer's home or work",
+     "before": "mobile: a card saved for the trip fee; at the shop: nothing taken",
+     "after": "billed to the customer's insurer, or the bill Rosie texts, or at the counter"
+    },
+    {
+     "name": "Windshield, the carmaker's own glass (OEM)",
+     "price": "set by the car, from the shop's list (the example: $300 more than aftermarket)",
+     "length": "as above; a special order, so the earliest time is 3 business days out",
+     "place": "as above"
+    },
+    {
+     "name": "Camera calibration (lane-keeping, auto-braking)",
+     "price": "one price, always its own line on a windshield for a car with a camera (the example: $199)",
+     "length": "about 45 minutes, after the safe drive-away time, on a level spot",
+     "place": "on site where the spot is level; otherwise finished in the shop's bay at no extra charge",
+     "not_sure": "checked on site, and the line comes off if it isn't needed"
+    },
+    {
+     "name": "Side or back glass",
+     "price": "set by the car; the owner OKs each one first",
+     "length": "about 60 minutes",
+     "place": "at the shop, or at the customer's home or work"
+    },
+    {
+     "name": "Mobile service",
+     "price": "no extra fee inside the travel area (the example: 25 miles)",
+     "place": "the customer's home or work"
+    }
+   ],
+   "capacity": "one windshield per glass tech per start time; the shop's level calibration bay and the target kit are saved like equipment",
+   "glass_lead_time": "no time is offered before the glass can arrive: aftermarket glass the next business day by 11am, the carmaker's own in 3 business days (the example shop's supplier)",
+   "nobody_home": "a car parked at home or work can be done with nobody at it: the keys are left as agreed, like at a front desk, and DONE comes with a photo",
+   "warranty": "on the receipt: workmanship against leaks and wind noise for as long as the customer owns the car (the example shop's own term)",
+   "online": "no"
+  },
+  "pf.questions": {
+   "before_times": [
+    "How big is the damage, and where: a chip smaller than a quarter, a crack under 6 inches, or bigger? Is it in the driver's view?",
+    "Year, make and model",
+    "Does the car have lane-keeping or auto-braking? Yes, no or not sure",
+    "Insurance or paying yourself? Only the insurer's name goes through the AI",
+    "Which glass: aftermarket, or the carmaker's own (each with its price and earliest day)",
+    "For a mobile job: home or work, and the town"
+   ],
+   "after_time": [
+    "Where the car will be parked: a driveway, a garage or a lot; covered or open; flat",
+    "Where the keys will be if nobody is at the car",
+    "A stick-on toll tag on the glass?"
+   ],
+   "secure_page_only": [
+    "The street address and the parking spot",
+    "The VIN (a photo of the door sticker)",
+    "A photo of the damage (optional)",
+    "The insurance claim number"
+   ],
+   "who_may_book": "an adult: the car's owner, or someone the owner lets book it; for a teen's car, a parent books and says yes to prices",
+   "repair_or_replace": "the shop's own rule: a chip smaller than a quarter or a crack under 6 inches, out of the driver's view, can be repaired; bigger is a new windshield"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "a crash with someone hurt"
+   ],
+   "stop_action": "'Call 911' first; no booking until everyone is safe",
+   "dont_drive_words": [
+    "a crack in the driver's line of sight",
+    "glass that's loose, sagging or shattered",
+    "a new windshield before its safe drive-away time"
+   ],
+   "dont_drive_action": "Rosie says: don't drive the car; a mobile glass tech can come to where it's parked. The booking goes on.",
+   "mobile_stops": [
+    "rain, or a wet car in an open spot: new glass goes in only on a dry car",
+    "rust on the frame under the molding: no new glass until a body shop repairs it",
+    "no level spot to calibrate: the calibration is finished in the shop's bay"
+   ],
+   "after_the_job": "the car isn't driven before the glue maker's safe drive-away time (an industry standard, not a law); the ready text says when it's safe",
+   "can_continue": "yes, after the don't-drive steps"
+  },
+  "pf.first_steps": {
+   "required": "none before the visit",
+   "before_the_visit": "the glass is ordered for the car once it's booked; the visit waits for it to arrive",
+   "prep_for_reminder": [
+    "Leave the keys where the glass tech can get them, or bring them",
+    "Clear the dashboard",
+    "A stick-on toll tag can't move to new glass: plan for a new one",
+    "For a mobile job: park on flat ground, under a roof if rain is likely"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "mobile: the code at the car, as at any door; with nobody at the car (keys at a front desk), no code: DONE with a photo. At the shop: the code at the counter when the car is left",
+   "before_work": "photos of the car all round; the new glass checked against the car's features, like the camera bracket; a look under the moldings for rust",
+   "work": "cut out the old glass, clean and prime the frame, set the new glass in urethane, tape the moldings; the old glass leaves with the glass tech",
+   "drive_away": "the car sits for the glue maker's safe drive-away time before it moves",
+   "calibration": "to the carmaker's spec with a target kit and a scan tool on a level spot; can't pass on site: a written warning, and it's finished in the shop's bay at no extra charge",
+   "status_words": [
+    "IN",
+    "GLASS SET",
+    "CALIBRATING",
+    "READY"
+   ],
+   "done_proof": "DONE (or READY at the shop) once the safe drive-away time has passed and the calibration passed; the report goes with the ready text",
+   "aftercare": "leave the tape on 24 hours and skip car washes for 48 hours, counted from DONE",
+   "wrong_glass": "found before the old glass is touched: nothing is charged, and a return visit is offered once the right glass arrives"
+  },
+  "pf.money": {
+   "before": "mobile: a card saved for the $89 trip fee (a cancel after 6pm the day before, or no keys or car); at the shop: nothing taken to book",
+   "after": "the shop bills the customer's insurer itself, the business's own way; a cash job or a deductible: the bill Rosie texts (a pay link, or a card on the glass tech's phone), or at the counter",
+   "insurance": "the customer files the claim and picks the shop; the owner checks it by hand before the time is final (covered, the customer pays part, not covered, can't check now); an insurer may pay only for aftermarket glass, so the customer pays the difference for the carmaker's own",
+   "fees": "the trip fee only if the owner confirms it each time",
+   "deposit": "none",
+   "tips": "no tip line",
+   "tax": "the shop's tax rate on parts and labor",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies",
+   "holds": "none: no hold is taken on any card (D66)"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "The VIN or the plate",
+    "The insurance claim number or policy",
+    "The street address and parking spot, except to the glass tech on the job",
+    "A gate or door code"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a teen's car go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "chip repair",
+    "windshields",
+    "side and back glass",
+    "camera calibration",
+    "mobile jobs"
+   ],
+   "licenses": "each glass tech's license, where the state licenses glass workers",
+   "supervision": "an apprentice works only with a licensed glass tech, where the state's rules require it",
+   "who_oks": "the owner OKs insurance checks, side and back glass, and every fee",
+   "stand_in": "only someone with the same skill; calibration only by a tech trained on the target kit; the customer is asked first"
+  },
+  "pf.rules": {
+   "written_estimate": "switch: a written estimate before the work: from the state form",
+   "calibration_notice": "switch: a written notice of whether the driver-assist camera needs calibrating: from the state form",
+   "show_number": "switch: the shop's state registration number on offers, the confirmation and the receipt: from the state form",
+   "claim_rules": "switch: the state's insurance glass rules (who picks the shop, deductibles, assignment of benefits, gifts for a claim): from the state form",
+   "no_gifts": "Rosie's rule everywhere: no gifts, coupons or rebates for making a claim, and no deductible waived or paid",
+   "no_assignment": "Rosie's rule everywhere: no assignment of insurance benefits is taken through Rosie",
+   "weather": "Rosie's rule: new glass goes in only on a dry car; a move for weather never costs the customer",
+   "records": "7 years; the calibration report kept with the job"
+  },
+  "pf.edges": {
+   "applies": [
+    "Rain forecast for a car in an open spot: the owner keeps it, or new times with no fee",
+    "The glass arrives cracked or late: new times with no fee",
+    "Wrong glass at the car: stopped before any work, no charge, a return visit",
+    "Rust under the molding: no work, no charge, a body shop first",
+    "No keys at the desk: a 15-minute wait, then the owner decides the trip fee",
+    "The camera won't calibrate on site: a written warning, finished in the shop's bay",
+    "A crack spreads before the visit: the don't-drive steps",
+    "The insurer won't pay: the customer's own price shown first",
+    "A leak or wind noise later: a free warranty visit",
+    "A late cancel: the trip fee only if the owner confirms"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork",
+   "planbill"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Nina and Leo (glass techs at the shop)",
+   "other": "Others (a bank, a parent, an insurer)"
+  },
+  "B": {
+   "staff": "Tyler and Mateo (mobile glass techs)",
+   "other": "Others (a bank, an insurer)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nina"
+  },
+  "B": {
+   "staff": "Tyler"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Windshields, side glass and calibration."
+   ],
+   [
+    "two skin fades",
+    "two chip repairs"
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you their safety contact."
+   ],
+   [
+    "Book Alex M. again Sat Nov 21, 11am",
+    "Book Alex M. back glass Sat Nov 21, 11am"
+   ],
+   [
+    "a beard trim",
+    "new wiper blades"
+   ],
+   [
+    "Takes the plan's name first",
+    "Takes the insurer's name first"
+   ],
+   [
+    "A plan or insurance",
+    "Insurance pays"
+   ],
+   [
+    "Bills the plan first; Alex pays a share",
+    "Bills the insurer first; Alex pays a share"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants Saturday morning, a drop-off"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24, 11:00am drop-off · windshield"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A windshield and a side window on one car work the same way."
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley?",
+    "Cancel your Sat 11:00am drop-off?"
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At the shop, a teen's car comes with a parent, so nothing more happens."
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "New wiper blades are on the price board: $20."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. windshield Sat 11am drop-off"
+   ],
+   [
+    "Skin fade · $40",
+    "Chip repair · $79"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for a chip repair at $69, an old price. Rosie answers with the real price, $79."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A chip repair at Lee's Auto Glass is $79, not $69. Here are the open times at $79."
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2.",
+    "Sam raises the chip repair to $89 for visits from Mon Nov 2."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35.",
+    "Saved: chip repair $89 for visits from Mon Nov 2. Chip repairs already booked keep $79."
+   ],
+   [
+    "raise haircut to 40",
+    "raise chip repair to 89"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds window tinting to Lee's Auto Glass."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Window tinting for Lee's Auto Glass: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW window tinting"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Auto Glass doesn't do dent repair."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Windshields and Lee Home Glass."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero cambiar el parabrisas el sábado."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A glass shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no glass tech. A day shows only if a tech who calibrates cameras is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Auto Glass · drop-off"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A glass job is rated, so the shop takes the first branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like the cracked back glass Nina noted, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Auto Glass sent you a proposal: the back glass Nina noted."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Back glass"
+   ],
+   [
+    "3 visits with Riley",
+    "One visit · about 2 hours"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The work is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a drop-off time for the back glass:"
+   ],
+   [
+    "Drain clearing",
+    "Windshield replacement"
+   ],
+   [
+    "a package of cuts",
+    "a package of chip repairs"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many glass shops are registered at one address"
+   ],
+   [
+    "patch test",
+    "frame check"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A broken window could mean a glass shop or a glazier."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A glass shop's plug-in adds its own danger words, like a crack in the driver's view."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A glass shop's example: a crack in the driver's view gets 'don't drive it'."
+   ],
+   [
+    "A barbershop's services need none.",
+    "A glass shop needs none at booking."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a fleet's vans together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A delivery company books chip repairs for five vans on one morning. Rosie finds bays side by side across Nina and Leo."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "There's a new scratch on my dashboard."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says there's a new scratch on the dashboard"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "There's wind noise at highway speed."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Saturday's windshield has wind noise"
+   ],
+   [
+    "Riley looks, then prices it",
+    "Nina checks it, then prices it"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the leak check; the price stays open"
+   ],
+   [
+    "Checks in a drop-off or mail-in",
+    "Checks in a car left at the shop"
+   ],
+   [
+    "Follows up on an item left behind",
+    "Follows up on a car left behind"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Side window"
+   ],
+   [
+    "a skin-test result",
+    "a calibration result"
+   ],
+   [
+    "color and house calls",
+    "calibration and mobile visits"
+   ],
+   [
+    "color, house calls",
+    "calibration, mobile visits"
+   ],
+   [
+    "Consult only",
+    "Leak check only"
+   ],
+   [
+    "photos of your hair",
+    "photos of the damage"
+   ],
+   [
+    "a cut on Saturday",
+    "a chip repair on Saturday"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a fleet's chip check every 4 weeks"
+   ],
+   [
+    "a cut every 4 weeks",
+    "a chip check every 4 weeks"
+   ],
+   [
+    "for a staff cut",
+    "for a staff car's chip"
+   ],
+   [
+    "during my cut",
+    "while my windshield is done"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s job"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Auto Glass"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Glass'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Glass"
+   ],
+   [
+    "electrical license",
+    "glazing license"
+   ],
+   [
+    "Electrical",
+    "Home glass"
+   ],
+   [
+    "electrical",
+    "home glass"
+   ],
+   [
+    "plumber",
+    "glass tech"
+   ],
+   [
+    "Plumbing",
+    "Mobile auto glass"
+   ],
+   [
+    "plumbing",
+    "mobile auto glass"
+   ],
+   [
+    "Barbershop",
+    "Glass shop"
+   ],
+   [
+    "barbershop",
+    "glass shop"
+   ],
+   [
+    "Barber license",
+    "Auto glass license"
+   ],
+   [
+    "barbers",
+    "glass techs"
+   ],
+   [
+    "barber",
+    "glass tech"
+   ],
+   [
+    "Barber",
+    "Glass tech"
+   ],
+   [
+    "cut hair",
+    "replace car glass"
+   ],
+   [
+    "MP045210",
+    "AG045210"
+   ],
+   [
+    "EC22871",
+    "GZ22871"
+   ],
+   [
+    "BS20981",
+    "SR20981"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Nina texts READY once Alex's car is safe to drive and the camera passed. Alex hears what was done, the pick-up hours, and anything due."
+   ],
+   [
+    "READY Sofia G. Photo added.",
+    "READY Alex M."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your car is ready for pick-up at Lee's Auto Glass. It's safe to drive."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Mon to Sat, 8am to 6pm"
+   ],
+   [
+    "4471",
+    "5160"
+   ],
+   [
+    "Sofia",
+    "Alex"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Leo"
+   ],
+   [
+    "Jordan",
+    "Tyler"
+   ],
+   [
+    "Casey",
+    "Mateo"
+   ],
+   [
+    "88 Elm St",
+    "640 Harbor Rd"
+   ],
+   [
+    "Elm St",
+    "Harbor Rd"
+   ],
+   [
+    "1200 Main St",
+    "2200 Bay Rd"
+   ],
+   [
+    "Haircuts",
+    "Windshields"
+   ],
+   [
+    "haircuts",
+    "windshields"
+   ],
+   [
+    "A haircut",
+    "A windshield"
+   ],
+   [
+    "a haircut",
+    "a windshield"
+   ],
+   [
+    "Haircut",
+    "Windshield + calibration"
+   ],
+   [
+    "haircut",
+    "windshield"
+   ],
+   [
+    "kids cuts",
+    "side windows"
+   ],
+   [
+    "a kids cut",
+    "a side window"
+   ],
+   [
+    "Kids cut",
+    "Side window"
+   ],
+   [
+    "kids cut",
+    "side window"
+   ],
+   [
+    "Skin fade",
+    "Chip repair"
+   ],
+   [
+    "Beard trim",
+    "Wiper blades"
+   ],
+   [
+    "beard trim",
+    "wiper blades"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Mirror refit"
+   ],
+   [
+    "Signature cut and shave",
+    "Mirror refit"
+   ],
+   [
+    "signature cut",
+    "mirror refit"
+   ],
+   [
+    "Groom's package",
+    "Back glass"
+   ],
+   [
+    "Color and cut",
+    "Rear quarter glass"
+   ],
+   [
+    "color and cut",
+    "rear quarter glass"
+   ],
+   [
+    "Color correction",
+    "Leak fix"
+   ],
+   [
+    "color correction",
+    "leak fix"
+   ],
+   [
+    "color quote",
+    "back glass price"
+   ],
+   [
+    "$25 consult",
+    "$25 leak check"
+   ],
+   [
+    "Only the consult",
+    "Only the leak check"
+   ],
+   [
+    "the consult",
+    "the leak check"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the job?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the shop"
+   ],
+   [
+    "priced at the chair",
+    "priced at the shop"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "chairs",
+    "bays"
+   ],
+   [
+    "House calls",
+    "Mobile visits"
+   ],
+   [
+    "house calls",
+    "mobile visits"
+   ],
+   [
+    "a house call",
+    "a mobile visit"
+   ],
+   [
+    "water heater",
+    "back glass"
+   ],
+   [
+    "Panel upgrade",
+    "Storefront glass"
+   ],
+   [
+    "like a burst pipe",
+    "like a smashed side window"
+   ],
+   [
+    "$35",
+    "$588"
+   ],
+   [
+    "hot towel",
+    "calibration"
+   ],
+   [
+    "shave",
+    "calibration"
+   ],
+   [
+    "skin fade",
+    "chip repair"
+   ],
+   [
+    "perm",
+    "chip repair"
+   ]
+  ],
+  "B": [
+   [
+    "like 'Where will the car be parked: a driveway, a garage or a lot?'",
+    "like 'Where will the car be parked?'"
+   ],
+   [
+    "Real danger, like a crack in the driver's view or loose glass, gets the don't-drive steps first.",
+    "Real danger, like a crack in the driver's view, gets the don't-drive steps first."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, my windshield has a crack. A text back is fine."
+   ],
+   [
+    "My sink won't drain",
+    "My windshield has a chip"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "using a neighbor's car without asking"
+   ],
+   [
+    "Towing",
+    "Mobile glass"
+   ],
+   [
+    "towing",
+    "mobile glass"
+   ],
+   [
+    "cracks the cabinet floor",
+    "cracks the windshield"
+   ],
+   [
+    "overflowing drain at night",
+    "a cracked windshield at night"
+   ],
+   [
+    "drain clearings",
+    "windshield checks"
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you their safety contact."
+   ],
+   [
+    "water is off on Main St",
+    "the road is closed on Main St"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Glass warranty: if there's a leak or wind noise, reply here."
+   ],
+   [
+    "1-year labor warranty",
+    "glass warranty"
+   ],
+   [
+    "jobs over $500",
+    "jobs over $1,000"
+   ],
+   [
+    "7am on the visit day",
+    "6pm the day before"
+   ],
+   [
+    "7am Thu",
+    "6pm Wed"
+   ],
+   [
+    "Sam bills Alex the business's own way",
+    "Sam bills the insurer his own way"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Side and back glass show only Tyler's times: he's the one who replaces back glass."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the mobile auto glass one now, and the home glass and shop ones when Sam gets to them."
+   ],
+   [
+    "arriving 8–10am",
+    "starting at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starting at 1:00pm"
+   ],
+   [
+    "arriving 10am–12pm",
+    "starting at 1:00pm"
+   ],
+   [
+    "Thu 8–10am",
+    "Thu 8:00am"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "arriving 2–4pm",
+    "starting at 1:00pm"
+   ],
+   [
+    "A plan or warranty pays",
+    "Insurance pays"
+   ],
+   [
+    "plumbing visit",
+    "windshield visit"
+   ],
+   [
+    "Thu 12-2 Casey",
+    "Thu 1pm Casey"
+   ],
+   [
+    "MOVE Alex to Thu 12pm",
+    "MOVE Alex to Thu 1pm"
+   ],
+   [
+    "the $89 fee",
+    "the $89 trip fee"
+   ],
+   [
+    "doesn't go in until",
+    "doesn't start until"
+   ],
+   [
+    "not roofing",
+    "not body work"
+   ],
+   [
+    "a roofer near you",
+    "a body shop near you"
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the windshield replacement to $619 for visits from Mon Nov 2."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise windshield replacement to 619"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW window tinting"
+   ],
+   [
+    "Heating and cooling",
+    "Window tinting"
+   ],
+   [
+    "heating and cooling",
+    "window tinting"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drive the car before you come?"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Windshields and Lee Home Glass."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Auto Glass can replace your windshield at the shop, or at your home, for $588."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's bay is in the other flow."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 fleet windshields, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Mobile Glass' quote for your fleet's windshields."
+   ],
+   [
+    "Repipe · $2,400",
+    "Fleet windshields · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 after the first vans, $800 at the finish"
+   ],
+   [
+    "repipe",
+    "fleet job"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both vans' chip checks go on one bill on the 1st."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the cracked back glass Tyler noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Mobile Glass sent you a proposal for new back glass, from Tyler's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · New back glass"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Tyler fix a chip on my other car next week?"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Tyler left bits of glass on the seat."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My windshield is cracked."
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 8 inches, low on the passenger side. A 2021 Toyota RAV4, and it beeps when I drift."
+   ],
+   [
+    "a leak under the sink",
+    "a leak at the windshield"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the dashboard and park on flat ground."
+   ],
+   [
+    "a drain cleaning at two rentals",
+    "chip repairs for two work vans"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's chip repairs"
+   ],
+   [
+    "clear a yard drain",
+    "replace a windshield at work"
+   ],
+   [
+    "Yard drain",
+    "Car at work"
+   ],
+   [
+    "yard drain",
+    "car at work"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa windshield"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Windshield + calibration"
+   ],
+   [
+    "Kitchen drain",
+    "Windshield"
+   ],
+   [
+    "Drain clearing",
+    "Windshield replacement"
+   ],
+   [
+    "drain clearing",
+    "windshield replacement"
+   ],
+   [
+    "clear the drain",
+    "replace the windshield"
+   ],
+   [
+    "your new pipes are in",
+    "the first vans are done"
+   ],
+   [
+    "a roof leak",
+    "a dented door"
+   ],
+   [
+    "Video and Jordan's notes",
+    "The report and Tyler's notes"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Tyler finds the driver's side mirror glass cracked."
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "replace the cracked side mirror glass"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the side mirror glass"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the side mirror glass"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing the side mirror glass"
+   ],
+   [
+    "shutoff valves",
+    "side mirror glass"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a delivery company books chip repairs for 4 vans at one yard."
+   ],
+   [
+    "Each unit's notes",
+    "Each van's notes"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Harbor Mutual. I have glass cover."
+   ],
+   [
+    "home warranty plan",
+    "car insurance"
+   ],
+   [
+    "home warranty",
+    "car insurance"
+   ],
+   [
+    "supply house",
+    "glass supplier"
+   ],
+   [
+    "Rental 1",
+    "Van 1"
+   ],
+   [
+    "Rental 2",
+    "Van 2"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the dashboard"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched dashboard"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Tyler scratched the dashboard in Alex M.'s car. The before photo shows no scratch."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the crack has spread into the driver's view."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The crack spread across to my side now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Please don't drive the car with a crack in your view. Tyler can come to where it's parked."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a crack in the driver's view or loose glass, gets the don't-drive steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Wind noise starts 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My new windshield whistles on the highway."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s windshield, put in Thu Oct 22, has wind noise."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your windshield is under warranty"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My side window is smashed. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Tyler also fix a chip on my other car?"
+   ],
+   [
+    "$160 valve quote",
+    "$160 mirror glass quote"
+   ],
+   [
+    "$160 valve work",
+    "$160 mirror glass work"
+   ],
+   [
+    "a bathroom drain",
+    "a chip on your other car"
+   ],
+   [
+    "Drain clearings",
+    "Windshields"
+   ],
+   [
+    "kitchen drain",
+    "windshield"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The leak is a reseal, priced at the visit."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many glass shops are registered at one address"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A glass shop's example: a crack in the driver's view gets 'don't drive it'."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Una piedra rompió el parabrisas."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A rock cracked my windshield."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told not to drive with a crack in her view, and to call 911 if anyone is hurt."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿La grieta le tapa la vista?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the crack in your view?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Está abajo, del lado del pasajero."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It's low, on the passenger side."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si la grieta le tapa la vista, no maneje. Si alguien está herido, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If the crack blocks your view, don't drive. If anyone is hurt, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For auto glass, someone hurt in a crash stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurt, call 911 now. The glass can wait."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My windshield is cracked. Is it safe to drive to work?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how big is the damage, and is it in the driver's view? What car is it, and does it have lane-keeping?"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Where will the car be parked: a driveway, a garage or a lot?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE small chip in the hood paint. Dashboard clear."
+   ],
+   [
+    "Under the sink, before",
+    "Windshield, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Dashboard, before"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 588 windshield"
+   ],
+   [
+    "245 valve 165 supply line 80",
+    "245 reseal 165 moldings 80"
+   ],
+   [
+    "Shutoff valve",
+    "Reseal"
+   ],
+   [
+    "Supply line",
+    "Moldings"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE aftermarket glass with the camera bracket. Lane camera calibrated to Toyota's spec. Old glass taken away."
+   ],
+   [
+    "a dripping faucet",
+    "a chip in the windshield"
+   ],
+   [
+    "color and house calls",
+    "calibration and mobile visits"
+   ],
+   [
+    "color, house calls",
+    "calibration, mobile visits"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Auto Glass"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Glass'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Glass"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobileglass.com"
+   ],
+   [
+    "plumbing license",
+    "auto glass license"
+   ],
+   [
+    "Plumbing license",
+    "Auto glass license"
+   ],
+   [
+    "electrical license",
+    "glazing license"
+   ],
+   [
+    "Electrical license",
+    "Glazing license"
+   ],
+   [
+    "Electrical",
+    "Home glass"
+   ],
+   [
+    "electrical",
+    "home glass"
+   ],
+   [
+    "plumber",
+    "glass tech"
+   ],
+   [
+    "Plumbing",
+    "Mobile auto glass"
+   ],
+   [
+    "plumbing",
+    "mobile auto glass"
+   ],
+   [
+    "barbershop",
+    "glass shop"
+   ],
+   [
+    "barbers",
+    "glass techs"
+   ],
+   [
+    "barber",
+    "glass tech"
+   ],
+   [
+    "Barber",
+    "Glass tech"
+   ],
+   [
+    "cut hair",
+    "replace car glass"
+   ],
+   [
+    "MP045210",
+    "AG045210"
+   ],
+   [
+    "EC22871",
+    "GZ22871"
+   ],
+   [
+    "BS20981",
+    "SR20981"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Leo"
+   ],
+   [
+    "Jordan",
+    "Tyler"
+   ],
+   [
+    "Casey",
+    "Mateo"
+   ],
+   [
+    "88 Elm St",
+    "640 Harbor Rd"
+   ],
+   [
+    "Elm St",
+    "Harbor Rd"
+   ],
+   [
+    "42 Oak St",
+    "18 Pine Ct"
+   ],
+   [
+    "1200 Main St",
+    "2200 Bay Rd"
+   ],
+   [
+    "A haircut",
+    "A windshield"
+   ],
+   [
+    "a haircut",
+    "a windshield"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "house calls",
+    "mobile visits"
+   ],
+   [
+    "Water heater flush",
+    "Chip repair"
+   ],
+   [
+    "water heater flush",
+    "chip repair"
+   ],
+   [
+    "Water heater replacement",
+    "Back glass replacement"
+   ],
+   [
+    "water heater replacement",
+    "back glass replacement"
+   ],
+   [
+    "water heaters",
+    "back windows"
+   ],
+   [
+    "Water heater",
+    "Back glass"
+   ],
+   [
+    "water heater",
+    "back glass"
+   ],
+   [
+    "Sewer camera inspection",
+    "Camera calibration"
+   ],
+   [
+    "sewer camera inspection",
+    "camera calibration"
+   ],
+   [
+    "Sewer camera report",
+    "Calibration report"
+   ],
+   [
+    "sewer camera report",
+    "calibration report"
+   ],
+   [
+    "camera inspection",
+    "camera calibration"
+   ],
+   [
+    "camera report",
+    "calibration report"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Panel upgrade",
+    "Storefront glass"
+   ],
+   [
+    "under my sink",
+    "in my windshield"
+   ],
+   [
+    "under the sink",
+    "at the windshield"
+   ],
+   [
+    "like a burst pipe",
+    "like a smashed side window"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 moldings stay good until Thu Oct 29."
+   ],
+   [
+    "shutoff valve",
+    "side mirror glass"
+   ],
+   [
+    "$179",
+    "$588"
+   ],
+   [
+    "$150",
+    "$79"
+   ],
+   [
+    "pipe",
+    "glass"
+   ],
+   [
+    "sink",
+    "windshield"
+   ],
+   [
+    "drain",
+    "chip"
+   ],
+   [
+    "faucet",
+    "wiper"
+   ],
+   [
+    "cabinet",
+    "dash"
+   ],
+   [
+    "water line",
+    "glass line"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off at Lee's Auto Glass, Sat Oct 24, for a cracked windshield on a 2021 RAV4. Nina sets the new glass, waits out the safe drive-away time, and calibrates the lane camera in the bay. Alex picks the car up at about 2:15pm and pays at the counter.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Glass to replace a cracked windshield in the driveway at 18 Pine Ct, with the lane camera calibrated. Tyler starts Thu Oct 22 at 8:00am, and the car is safe to drive at about 11:00am. On the main path, Alex's car insurance pays, and Sam bills the insurer himself."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $588 windshield with calibration at the shop. Nothing is taken to book, and Alex pays at the counter at pick-up. On an insurance job the shop bills the insurer, and Alex pays any share at the counter."
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "$588",
+     "name": "Windshield with calibration"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|own",
+   "combos": [
+    "list|card|own",
+    "list|card|bill"
+   ],
+   "examples": {
+    "list|card|own": "The main story: a $588 windshield with calibration in Alex's driveway. A card is saved for the $89 trip fee. Alex's insurer pays, and Sam bills it himself, so Rosie sends no bill.",
+    "list|card|bill": "The same windshield paid by Alex, or the share an insurer leaves to Alex. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89"
+    },
+    "list|*|*": {
+     "price": "$588",
+     "fee": "$89",
+     "name": "Windshield with calibration, in the driveway"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "trip fee"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B5-34",
+   "B8-69"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked glass job pays Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Glass work books glass techs and the shop's bays, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Glass work runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Glass work is never sent now: the glass is ordered for the car first, and mobile jobs start at set times."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The auto glass plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee's Auto Glass books drop-off slots, set by its bays and techs (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no glass tech. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A car waits in its drop-off slot, so a glass tech running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child is never left at a glass shop: a teen's car is dropped off and picked up by the parent."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A glass job is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "A glass job is ready the same day. A car left overnight stays inside with no fee, and Sam calls Alex."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "Glass is set by the customer's answers: the year, make and model pick the price.",
+     "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your mobile auto glass services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Mobile auto glass prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Mobile auto glass price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Windshield + calibration",
+          "By car · $588 for a 2021 RAV4"
+         ],
+         [
+          "Windshield, no camera",
+          "By car · $389 for a 2021 RAV4"
+         ],
+         [
+          "Chip repair",
+          "$79, then $20 each extra chip"
+         ],
+         [
+          "Side or back glass",
+          "By car · you OK each one"
+         ],
+         [
+          "Camera calibration alone",
+          "$199"
+         ],
+         [
+          "Trip fee",
+          "$89, only for a late cancel or no car"
+         ],
+         [
+          "Labor",
+          "$120 an hour, 1-hour minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "With 1, the glass tech texts DONE with the total. Rosie reads it back, then texts the customer the bill with a pay link.",
+    "more": [
+     "The customer can reply 1 to use the saved card instead.",
+     "On an insurance job, the bill is only the customer's own share.",
+     "Rosie sends no reminders of its own about a bill.",
+     "A declined card gets one pay link. Still unpaid after 4 days, Sam is asked.",
+     "No tip line: Sam leaves it off. Rosie never asks for a tip itself."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Set: for jobs paid after, I text the bill once your glass tech texts DONE.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Windshield + calibration",
+          "By car",
+          "Card saved",
+          "Rosie texts the bill"
+         ],
+         [
+          "Chip repair",
+          "$79",
+          "Card saved",
+          "Rosie texts the bill"
+         ],
+         [
+          "Side or back glass",
+          "By car, you OK it",
+          "Card saved",
+          "Rosie texts the bill"
+         ],
+         [
+          "Camera calibration alone",
+          "$199",
+          "Card saved",
+          "Rosie texts the bill"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Add a tip line to the bills I text?",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam stops saving a card for chip repairs, for new bookings only. Each change is read back first.",
+    "more": [
+     "Chip repairs already booked keep their saved card.",
+     "A change never touches a booking already made.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-30",
+    "does": "Some work takes urgent jobs sent now, like a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "more": [
+     "Auto glass is never sent now: the glass is ordered for the car first. The shop takes none either."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Where the state licenses glass workers and glaziers, each person may add one, like Sam's four here. None is checked by Rosie.",
+     "Where it doesn't, the second branch: nobody is asked for one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Auto glass needs one only where the state registers glass shops or licenses glass workers.",
+     "Here it does, so Sam's three take the license step."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "Each kind of work has its own plug-in. The auto glass shop's says the state registers the shop, here, and licenses each glass tech."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. The VIN, the plate and the claim number never go in a text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee's Auto Glass: your card was charged twice for the same fee. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $89",
+        "lines": [
+         "Trip fee · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Dee W."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Dee W.'s $89 trip fee was charged twice. The second charge is refunded, and Dee is told."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "Rosie suggests rules to start from, never a blank form. Sam keeps them, and keeps the 1pm start each weekday for same-day chip repairs.",
+    "more": [
+     "Sam can change each rule now, by text later, or in the portal.",
+     "The portal is the business's website for Rosie, where owners change prices, hours and rules.",
+     "Kept times are offered only for that kind of job or customer.",
+     "Sam sets when kept times open to everyone, so they don't go unused.",
+     "A booking keeps the rules it was made with, even if Sam changes them later.",
+     "Mobile glass starts at set times: 8am and 1pm. Each start holds one windshield for each glass tech.",
+     "Glass work is never sent now: a same-day time shows only if the glass is on the shelf."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are my suggested starting rules for mobile auto glass. You can change any of them.",
+      {
+       "list": {
+        "head": [
+         "Rule",
+         "Setting"
+        ],
+        "rows": [
+         [
+          "Open",
+          "Mon–Fri 7:30am–5:30pm"
+         ],
+         [
+          "Start times",
+          "8am and 1pm"
+         ],
+         [
+          "Notice",
+          "Glass on the shelf, or ordered in"
+         ],
+         [
+          "Books ahead",
+          "Up to 60 days"
+         ],
+         [
+          "Same-day jobs",
+          "Ask you first"
+         ],
+         [
+          "Free to cancel",
+          "Until 6pm the day before"
+         ],
+         [
+          "After that, or no car or keys",
+          "The $89 trip fee, only if you say so"
+         ],
+         [
+          "Travel area",
+          "25 miles from 2200 Bay Rd"
+         ],
+         [
+          "If your person can't come",
+          "Offer a stand-in, same time and price"
+         ]
+        ]
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Want to keep some times for one kind of job? Other bookings can't take them.",
+      {
+       "buttons": [
+        "No",
+        "Keep some times"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 Keep 1pm for same-day chip repairs"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "card": {
+        "title": "Kept for same-day chip repairs",
+        "lines": [
+         "Mon–Fri · 1pm start",
+         "Other jobs can't take it",
+         "Opens to everyone at 10am that day"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The home glass plug-in loads the same way, with its own services and license form.",
+     "Storefront glass is a free estimate visit, then a quote.",
+     "AI assistants find Lee Mobile Glass under mobile auto glass and under home glass."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Home glass next. Send a photo of your home glass prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Home glass prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Home glass price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Window pane replaced",
+          "$149"
+         ],
+         [
+          "Shower door installed",
+          "$189"
+         ],
+         [
+          "Labor",
+          "$120 an hour, 1-hour minimum"
+         ],
+         [
+          "Storefront glass",
+          "Free estimate, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like mobile auto glass. Send only what's different.",
+      {
+       "card": {
+        "title": "Home glass, set like mobile auto glass",
+        "lines": [
+         "At the customer's place",
+         "A card saved for the $89 trip fee",
+         "Paid after the job, the way you picked for mobile auto glass",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Glass is priced by the car: the AI asks the year, make and model first.",
+     "The long services show how much time they take, so the bay is saved for all of it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the shop's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Windshield + calibration",
+          "By car · $588 for a 2021 RAV4 · 3 hours"
+         ],
+         [
+          "Windshield, no camera",
+          "By car · $389 · 2¼ hours"
+         ],
+         [
+          "Chip repair",
+          "$79, then $20 each extra · 30 min"
+         ],
+         [
+          "Side or back glass",
+          "By car · you OK each one · 1 hour"
+         ],
+         [
+          "Camera calibration alone",
+          "$199 · 45 min"
+         ],
+         [
+          "Wiper blades",
+          "$20 a pair"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where glass work outside the shop is allowed, and who may go. Rosie checks that before the mobile visit is offered.",
+    "more": [
+     "Each state's own rule comes from its own form, never one rule for all.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "Sam keeps Rosie's suggested rules with one tap.",
+     "Nothing is taken at the shop, so there's no fee to charge.",
+     "Pat OKs only Lee Mobile Glass prices over $500. At the shop, only Sam OKs prices."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Prices on the board never need your OK. Should side and back glass prices come to you first?",
+      {
+       "buttons": [
+        "Yes, every time",
+        "Send them",
+        "Over an amount"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "These are the booking rules I suggest:",
+      {
+       "card": {
+        "title": "Lee's Auto Glass · booking rules",
+        "lines": [
+         "Hours: from your Google listing",
+         "Drop-off slots: 8am, 11am and 1pm",
+         "Free to cancel, and no fee for a no-show",
+         "Same-day bookings and new customers ask you first",
+         "If a glass tech can't come: another who does that service, same time and price"
+        ]
+       },
+       "buttons": [
+        "Keep these",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-27",
+    "does": "Each company has its own Stripe account and terms. The shop takes nothing when booking, so it can go live before its Stripe is set.",
+    "more": [
+     "Until then, a mobile visit from the shop books with a YES and no card.",
+     "Customers see the shop once Sam says yes."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The shop is its own company, so it needs Stripe in its own name. Until then, its mobile visits save no card.",
+      {
+       "card": {
+        "title": "Stripe · Lee's Auto Glass",
+        "lines": [
+         "About 5 minutes",
+         "For the card saved on mobile visits"
+        ],
+        "button": "Connect Stripe",
+        "link": "rosfield.com/pay/s02"
+       },
+       "buttons": [
+        "Do it now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "OK. Here's Lee's Auto Glass the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee's Auto Glass",
+        "lines": [
+         "Preview, with its terms"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Jumping ahead to the next morning, Tue Oct 20 at 9:10am. Sam texts MORE and picks up where he left off. Once the shop's Stripe is connected, its mobile visits save a card.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "MORE"
+     ],
+     [
+      "san",
+      "owner",
+      "Welcome back! One thing is waiting: Stripe for Lee's Auto Glass.",
+      {
+       "card": {
+        "title": "Stripe · Lee's Auto Glass",
+        "lines": [
+         "About 5 minutes",
+         "Turns on the card saved for mobile visits"
+        ],
+        "button": "Connect Stripe",
+        "link": "rosfield.com/pay/s02"
+       }
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Done"
+     ],
+     [
+      "san",
+      "owner",
+      "Connected. Mobile visits from the shop now save a card for the trip fee."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "more": [
+     "The example follows the money choice at the top. Here, it's a $588 windshield with the camera calibrated."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can Lee's Auto Glass replace my cracked windshield on Saturday? It's a 2021 Toyota RAV4."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on.",
+    "more": [
+     "A glass shop's example: a crack in the driver's view gets 'don't drive it. A glass tech can come to the car'.",
+     "Then the booking goes on, as a mobile visit or at the shop."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-01",
+    "does": "No danger, so the booking goes on. A windshield is offered at the shop and at the customer's place, so Alex picks.",
+    "more": [
+     "At the shop, no address or travel check is needed. The shop's address goes in the confirmation.",
+     "At the shop, the camera is calibrated on its level floor.",
+     "A windshield at home is a mobile visit, as the other flow shows. The price is the same.",
+     "Glass can't be fitted by video or phone."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee's Auto Glass can replace your windshield at the shop, or come to your home. Both are $588. Where would you like it?",
+      {
+       "buttons": [
+        "At the shop",
+        "At my home"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "agent",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-03",
+    "more": [
+     "For a glass shop, the parts also hold the glass's arrival days and the level bay for calibration."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: how big the damage is and where, the car, and if it has lane-keeping. A crack in the driver's view gets the don't-drive steps first.",
+     "A chip smaller than a quarter gets a $79 chip repair instead.",
+     "If it's a teen's car, a parent books it."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "How big is the damage, and is it in the driver's view? What car is it, and does it have lane-keeping?"
+     ],
+     [
+      "cust",
+      "agent",
+      "About 8 inches, low on the passenger side. A 2021 Toyota RAV4, and it beeps when I drift."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-06",
+    "does": "An 8-inch crack can't be repaired, so it's a new windshield. With the camera calibrated, it's $588 on the shop's board. It never needs Sam's OK.",
+    "more": [
+     "Aftermarket glass for a 2021 RAV4 is $389. The calibration is its own line: $199.",
+     "The carmaker's own glass is $300 more, and it comes in 3 business days.",
+     "Rosie never guesses a price. If the answers don't settle it, the AI asks the plug-in's question that does."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "For a drop-off, the times are drop-off slots, set by the shop's bays and glass techs. No tech is named: once the car is in, it goes to a tech with the skill.",
+    "more": [
+     "Times start once the glass can be in: aftermarket glass comes the next business day by 11am.",
+     "A windshield slot holds about 3 hours: 75 minutes to fit, 60 to set, and 45 to calibrate.",
+     "A day shows only if a tech who calibrates cameras is in. Here, that's Nina.",
+     "Nobody can pay to be shown higher.",
+     "Pick-up comes once it's READY, in the pick-up hours."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A windshield with the camera calibrated is $588 at Lee's Auto Glass. Drop-off times:",
+      {
+       "times": [
+        "Sat Oct 24 · 11:00am drop-off",
+        "Mon Oct 26 · 8:00am drop-off",
+        "Mon Oct 26 · 1:00pm drop-off"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No glass tech is named: once the car is in, the shop gives it to a tech with the skill.",
+    "more": [
+     "A wish for one glass tech goes in the notes, and the shop follows it where it can."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Anything Nina should know? Will you wait in the lounge, or leave the car?"
+     ],
+     [
+      "cust",
+      "agent",
+      "I'll leave the car. There's a toll tag on the glass."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "The plug-in says what each service needs: a bay, the target kit, or two glass techs.",
+     "A time shows only if the person and the things are all free."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-41",
+    "more": [
+     "A glass shop's example: a written estimate, and a notice that the camera needs calibrating, where the state's rules require them.",
+     "The booking records that the notice was said.",
+     "Any paper owed after booking becomes a to-do for the shop, with its due date. Sam is reminded once before it's late."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says if this work needs a first step, like a form or a waiver. Glass work needs none: the glass is ordered once the car is booked.",
+    "more": []
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "For a drop-off, Alex gives the code at the counter when leaving the car."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A6-15",
+    "steps": [
+     {
+      "id": "A6-x01",
+      "line": [
+       "6.4",
+       "4.29"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Wed Oct 21, 7:23pm",
+      "title": "Asks Sam to order the glass",
+      "does": "Rosie never orders parts. Sam orders the glass for Alex's car from his supplier, then taps Ordered. The drop-off needs it in.",
+      "more": [
+       "Aftermarket glass comes the next business day by 11am: here, Thu Oct 22, in time for Saturday.",
+       "No tap by 10am the next day: one reminder. Still none by 5pm the day before: Sam is asked to call Alex.",
+       "Glass that comes in cracked or wrong is something ordered that's late: new times, with no fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Booked: Alex M., Sat Oct 24, 11:00am drop-off. Please order the glass.",
+        {
+         "card": {
+          "title": "Order · aftermarket windshield",
+          "lines": [
+           "2021 Toyota RAV4, with the camera bracket",
+           "VIN on the job page",
+           "Needed by Fri Oct 23"
+          ]
+         },
+         "buttons": [
+          "Ordered"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "owner"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex brings the car to the shop. The reminder said to bring the keys and clear the dashboard.",
+    "more": [
+     "Examples: the keys, or a spare for a key fob.",
+     "The reminder already said what to bring.",
+     "The code is taken only once nothing required is missing. No keys stops it (the next branch)."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex leaves the car at the counter. Alex reads the code from the confirmation, and Nina texts it in.",
+    "more": [
+     "After hours, the keys go in the shop's key drop. Then there's no code: Nina texts IN once she has the car and keys.",
+     "The desk can type the code on the portal's Today page instead.",
+     "The code also confirms the visit for Rosfield's $2."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "does": "From Nina's phone, or the portal's Today page at the desk. This confirms the visit for Rosfield's $2. Alex hears the car is in.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M.'s car, Sat 11:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "Lee's Auto Glass has your car, and Nina starts on it now. It should be ready about 2:15pm."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "A car left after hours goes in as a drop-off. The keys go in the shop's key drop. There's no code: Nina texts IN once she has the car and keys.",
+    "more": [
+     "The signed drop-off page stands in for the code.",
+     "Next come the walk-around notes, then the new glass, the wait and the calibration.",
+     "Updates, READY and the pick-up come after the work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex at the counter, Sat 11:00am. Nina walks around the car with Alex, and notes what's already there before any work.",
+    "more": [
+     "She photographs the glass, the dashboard and the paint around the frame.",
+     "She checks the new glass matches the car, like the camera bracket, and looks under the moldings for rust.",
+     "It's kept with the booking, and Alex can see it on the secure page.",
+     "A damage claim or a later complaint is checked against it."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE small chip in the hood paint. Toll tag on the glass.",
+      {
+       "photos": [
+        "Windshield, before",
+        "Dashboard, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s car as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A8-32",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 12:30pm",
+      "title": "Nina sets the new windshield",
+      "does": "Nina cuts out the cracked glass, primes the frame and sets the new windshield in urethane. The car sits still until the glue holds.",
+      "more": [
+       "She tapes the moldings, and the old glass goes for recycling.",
+       "The safe drive-away time comes from the glue maker's chart: 60 minutes here. It's an industry standard, not a law.",
+       "The old toll tag can't move to the new glass. It goes back to Alex at pick-up."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "GLASS SET Alex M."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved. The car can't move until 1:30pm."
+       ]
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.safety"
+      ],
+      "tells": [
+       "staff"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-32",
+    "steps": [
+     {
+      "id": "A8-x02",
+      "line": [
+       "8.12",
+       "8.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 1:30pm",
+      "title": "Nina calibrates the camera in the bay",
+      "does": "The safe drive-away time is over. Nina calibrates the lane camera to Toyota's spec, on the shop's level floor with the target kit.",
+      "more": [
+       "It takes about 45 minutes. The report is saved with the job.",
+       "If it won't pass, Sam calls Alex before pick-up. Alex gets a written warning that lane-keeping may not work right yet."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CALIBRATING Alex M."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Nina finishes: the glass is set, the safe drive-away time is over, and the camera passed. She texts READY.",
+    "more": [
+     "The work is what Alex booked, and anything Alex said yes to after.",
+     "Next, READY goes to Alex, and Alex picks up the car and pays at the counter."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-11",
+    "more": [
+     "For a windshield, Nina's status words are IN, GLASS SET, CALIBRATING and READY.",
+     "Say Nina finds the rearview mirror loose on its mount. She texts EXTRA 35 mirror mount.",
+     "Alex gets the added line and the new total, $623, with yes or skip. The yes is logged with the time and the phone."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "t": "Sat Oct 24, 2:15pm"
+   },
+   {
+    "op": "more",
+    "at": "A8-50",
+    "more": [
+     "For a windshield, Nina texts READY only after the safe drive-away time and a passed calibration.",
+     "The calibration report comes with READY. The tape stays on 24 hours, and no car wash for 48."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "At pick-up, Nina shows Alex the new glass, the moldings and the calibration report. A fix Alex asks for now is done before paying.",
+    "more": [
+     "Alex gets the old toll tag back, to swap for a new one.",
+     "A fix at the walk-through costs nothing extra.",
+     "Anything new needs Alex's yes and its price first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: aftermarket windshield with the camera bracket. Lane camera calibrated and passed. Old toll tag given back."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-01",
+    "more": [
+     "The shop's warranty on leaks and wind noise, for as long as Alex owns the car, is on its receipt."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "t": "Sat Oct 24, 5:00pm"
+   },
+   {
+    "op": "words",
+    "at": "A9-20",
+    "does": "Alex's insurer pays all but the $100 deductible. Lee's Auto Glass bills the insurer the shop's own way, and Alex pays the $100 at the counter.",
+    "more": [
+     "The share is set by Alex's policy, not by Rosie.",
+     "Rosie's rule: no deductible is waived, paid or rebated, and no gift is given for a claim."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-53",
+    "does": "A what-if for a job billed to car insurance. Only the insurer's name passes through the AI. The desk checks the claim later, while the time is saved.",
+    "more": [
+     "An insurer may pay only for aftermarket glass. The carmaker's own glass then costs Alex the difference.",
+     "Alex files the claim and picks the shop. No assignment of benefits is taken through Rosie."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-37",
+    "does": "A what-if for a job billed to car insurance. The desk checks the claim on the insurer's glass line, then records it. The time stays saved up to 30 minutes.",
+    "more": [
+     "The insurer's name came before the times. The claim number is only on the secure page.",
+     "No answer in 30 minutes counts as 'Can't check now'."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "Claim check needed for a new booking. Check it, then pick one.",
+      {
+       "card": {
+        "title": "Claim check",
+        "lines": [
+         "The insurer and claim number are on the booking"
+        ],
+        "button": "Open the booking",
+        "link": "rosfield.com/b/p1"
+       },
+       "buttons": [
+        "Covered",
+        "Only part is covered",
+        "Not covered",
+        "Can't check now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-37",
+    "does": "Covered: the customer's share, like a deductible, shows before the yes.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Your insurance covers this windshield. Your share is the $100 deductible, paid at the counter."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-37",
+    "does": "Only part is covered: the insurer pays for aftermarket glass only. The difference for the carmaker's own glass shows before the yes.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Your insurer pays for aftermarket glass only. The carmaker's own glass costs you $300 more."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-37",
+    "does": "Not covered: the shop's own price shows. The customer keeps the time, or lets it go.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Your insurer doesn't cover this windshield. The shop's price is $588, paid at the counter. You can keep the time or let it go."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-37",
+    "does": "Can't check now: still booked. The desk checks by the next business day. Not covered: the customer may cancel free.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "We couldn't check your claim yet. You can still book. If it isn't covered, you can cancel free."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "Omar walks in on Saturday with a chip in his windshield and no booking. He texts the number on the sign at the door, or the shop adds him on the portal's Today page.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Walk-in for a chip repair"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee's Auto Glass. You're 3rd in line for a chip repair, about 40 minutes. We'll text you when you're next.",
+      {
+       "card": {
+        "title": "Wait line · Lee's Auto Glass",
+        "lines": [
+         "3rd in line · about 40 minutes",
+         "Chip repair · $79, paid at the counter"
+        ]
+       },
+       "buttons": [
+        "Leave the line"
+       ],
+       "stop": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're next! Please come in and give this code at the counter.",
+      {
+       "code": "2718",
+       "buttons": [
+        "On my way",
+        "Leave the line"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Next from the line: Omar, chip repair."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the glass techs themselves. Nina can go over it at your visit. For anything sooner, call Lee's Auto Glass at (555) 010-0177."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-02",
+    "does": "Alex picks home. A windshield at home is the same $588, paid after the job, with a card saved for the trip fee. From here, Alex follows the other flow."
+   },
+   {
+    "op": "words",
+    "at": "A5-21"
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "does": "Sam says yes, with a change, like a later ready time. Rosie reads it back, then asks Alex. Here, the car is ready at 4:00pm, not 2:15pm.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Yes, but ready at 4pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. the Sat Oct 24 11:00am drop-off, ready about 4:00pm?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another change"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-17",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee's Auto Glass can take your booking, with one change:",
+      {
+       "card": {
+        "title": "Windshield + calibration",
+        "lines": [
+         "Sat Oct 24 · 11:00am drop-off",
+         "Ready about 4:00pm, not 2:15pm",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say the crack spreads into the driver's view before Saturday. The plug-in's danger words are checked first. Then Nina is asked how the car should come in.",
+    "more": [
+     "A crack in the driver's view means don't drive it. Alex gets the don't-drive steps first.",
+     "The booking stays. A glass tech can come to the car instead, as a mobile visit.",
+     "A question only a pro should answer gets the shop's line, (555) 010-0177."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The crack spread across to my side. Can I still drive it in Saturday?"
+     ],
+     [
+      "san",
+      "cust",
+      "Please don't drive it with a crack in your view. We've asked Nina what's best."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. (Sat 11:00am) says the crack is now in the driver's view. How should the car come in?",
+      {
+       "buttons": [
+        "A mobile visit",
+        "Keep the drop-off",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Nina says a glass tech can come to your car instead, at the same time and price.",
+      {
+       "buttons": [
+        "Switch to my place",
+        "Keep the drop-off"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "Where the state's rules require a notice before the work, Rosie sends it in time, on a secure page. Here: the written estimate and the camera notice.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Before your visit, please read and sign the written estimate and the camera notice.",
+      {
+       "card": {
+        "title": "Written estimate · camera notice",
+        "lines": [
+         "Glass $389 · calibration $199",
+         "Where the state's rules require them"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/n/a5"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-32",
+    "does": "Say Owen H. has a chip check plan for his work van, every 4 weeks. He can skip one visit, pause the plan or end it. Nina is told.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I skip this one? I'll be away."
+     ],
+     [
+      "san",
+      "cust",
+      "Your chip check is part of a plan, every 4 weeks. What would you like?",
+      {
+       "card": {
+        "title": "Chip check every 4 weeks",
+        "lines": [
+         "This one: Sat Oct 31 · 10:00am",
+         "Next: Sat Nov 28 · 10:00am"
+        ]
+       },
+       "buttons": [
+        "Skip this one",
+        "Pause the plan",
+        "End the plan"
+       ],
+       "as": "Owen H."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-54",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your chip check plan with Lee's Auto Glass charges your saved card tomorrow.",
+      {
+       "card": {
+        "title": "Plan charge · $79",
+        "lines": [
+         "Chip check · Sat Oct 31 · 10:00am drop-off",
+         "Charged Sat Oct 31, after the visit"
+        ]
+       },
+       "buttons": [
+        "Skip this one",
+        "Pause the plan"
+       ],
+       "as": "Owen H."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-55",
+    "does": "Sam raises the chip check to $89 on the portal. Plans get 30 days' notice, so Owen is texted the same day: $89 a visit from Sat Nov 21.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee's Auto Glass is changing the price of your chip check plan.",
+      {
+       "card": {
+        "title": "Chip check plan · every 4 weeks",
+        "lines": [
+         "Now $79 a visit",
+         "$89 a visit from Sat Nov 21",
+         "Your Sat Oct 31 visit stays $79"
+        ]
+       },
+       "buttons": [
+        "Keep the plan",
+        "End the plan"
+       ],
+       "as": "Owen H."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-23",
+    "does": "The glass ordered for Dana's visit came in cracked, and the new one is late. Rosie offers later times with no fee, since the shop changed the plan.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "The glass for Dana R. came in cracked. The new one comes Mon Nov 2, after her visit."
+     ],
+     [
+      "san",
+      "cust",
+      "The glass for your Sat Oct 31 visit came in cracked. The new one comes Mon Nov 2. Pick a later time, with no fee.",
+      {
+       "times": [
+        "Tue Nov 3 · 8:00am drop-off",
+        "Thu Nov 5 · 11:00am drop-off"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Cancel, no fee"
+        ]
+       ],
+       "as": "Dana"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-23",
+    "does": "Say another customer, Tess L., has a camera calibration this Sat at 2:00pm. The target kit breaks, so each booking that needs it is offered a new time, with no fee.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Calibration kit broken until Mon"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Tess. The calibration kit for your Sat 2:00pm visit is broken until Monday. Pick a new time, with no fee.",
+      {
+       "times": [
+        "Mon Oct 26 · 8:00am drop-off",
+        "Tue Oct 27 · 11:00am drop-off"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Cancel, no fee"
+        ]
+       ],
+       "as": "Tess L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "Covered: the booking stands. The customer's share, like a deductible, shows in the text.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Good news: your insurer covers the windshield. Your share is the $100 deductible, paid at the counter. Your booking stands."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "Not covered: the customer sees the shop's own price before any yes. They keep the time at that price, or cancel with no fee.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your insurer won't pay for this windshield. Keep it at $588, or cancel with no fee.",
+      {
+       "buttons": [
+        "Keep it at $588",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-70",
+    "does": "Alex is running late for the drop-off, and Nina is told. The car is done today if there's room, or at the next open time.",
+    "more": [
+     "No fee for the move, unless the plug-in's late rule says so and Sam confirms.",
+     "No reply in 30 minutes: the car is done when there's room, and Alex is told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Running 30 minutes late, sorry!"
+     ],
+     [
+      "san",
+      "cust",
+      "No problem. Drop it off when you can. If there's room, it's done today, or else Monday at 8:00am.",
+      {
+       "buttons": [
+        "That's fine",
+        "A later time"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. (11:00am) is about 30 minutes late with the car."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-33",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. wants the cracked back glass done. Own visit."
+     ],
+     [
+      "san",
+      "cust",
+      "You asked Nina about new back glass. It's its own visit, priced for your car, and Sam OKs the price first.",
+      {
+       "card": {
+        "title": "Back glass",
+        "lines": [
+         "Its own visit · priced for your car"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/b/a9"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-51",
+    "more": [
+     "The customer's side: the keys or the car aren't there.",
+     "The shop's side: the glass is wrong for the car, or a part is missing.",
+     "No code was taken, so the visit doesn't count for Rosfield's $2.",
+     "The plug-in says what's required, and what counts as a conflict."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M. The keys weren't left with the car."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-56",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Nina couldn't start today's visit: the car's keys weren't left. Once you have them, you can book again here.",
+      {
+       "card": {
+        "title": "Nothing charged",
+        "lines": [
+         "Nothing was taken, and there's no fee"
+        ],
+        "button": "Book again",
+        "link": "rosfield.com/b/a5"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nina couldn't start Alex M.'s 11:00am: the keys weren't left with the car. Nothing was taken, so there's no fee."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-61",
+    "does": "Say it's on the shop's side instead: the glass that came is wrong for the car. Nothing is charged, and Alex and Sam are told.",
+    "more": [
+     "Sam orders the right glass. Alex hears its day, and picks a new time with no fee.",
+     "Any hold is released, and anything paid is refunded in full."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M. The glass has the wrong camera bracket."
+     ],
+     [
+      "san",
+      "cust",
+      "Nina couldn't start today's visit: the glass doesn't fit your RAV4's camera. It's on our side, so nothing is charged. We'll text you times once the right glass is in.",
+      {
+       "card": {
+        "title": "Nothing charged",
+        "lines": [
+         "Nothing was taken, and there's no fee"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nina couldn't start Alex M.'s 11:00am: the glass has the wrong camera bracket. Nothing was charged. Please order the right glass."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: the car stays, and the person is asked to come back with Alex's code.",
+     "Anything due is paid at pick-up, the business's own way.",
+     "A car not picked up by closing stays inside overnight, with no fee, and Sam calls Alex.",
+     "For a car, the keys are handed over only then, and Nina shows the new glass and the report (the next step)."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-20",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Do you fix chips too? My other car has one."
+     ],
+     [
+      "san",
+      "cust",
+      "Yes: a chip repair is $79, about 30 minutes. Want a time?",
+      {
+       "times": [
+        "Sat Nov 14 · 10:00am drop-off",
+        "Sat Nov 14 · 12:30pm drop-off"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-03",
+    "does": "Dee is booked, and Leo is told. Dee's text goes out at 9:00am, when her text hours start. Nothing is taken at the shop."
+   },
+   {
+    "op": "words",
+    "at": "A6-05",
+    "does": "Politely, with no reason given. Nothing was taken, so nothing needs to be given back."
+   },
+   {
+    "op": "words",
+    "at": "A4-12",
+    "does": "With times to pick, at any open drop-off time. Side and back glass is priced for each car, so Sam OKs it first.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee's Auto Glass can do your rear quarter glass for $90.",
+      {
+       "card": {
+        "title": "Rear quarter glass · $90",
+        "lines": [
+         "Priced for your car",
+         "Paid at the counter"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/q/nk"
+       },
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "After 'Can't check now' at booking, the desk checks the claim by the next business day and records it. The customer hears at once.",
+    "more": [
+     "No answer by the end of that day: Sam is asked to check it.",
+     "Only part covered works like Not covered, for the part the insurer won't pay."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "Claim check due for a booking made before it could be checked.",
+      {
+       "card": {
+        "title": "Claim check",
+        "lines": [
+         "The insurer and claim number are on the booking"
+        ],
+        "button": "Open the booking",
+        "link": "rosfield.com/b/p2"
+       },
+       "buttons": [
+        "Covered",
+        "Not covered"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee's Auto Glass",
+      "640 Harbor Rd, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Windshield + calibration $588 · Chip repair $79 · Wiper blades $20"
+     ],
+     [
+      "To book",
+      "Nothing taken · paid at the counter"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Mobile Glass",
+      "Mobile auto glass · within 25 miles of 2200 Bay Rd · a card saved for the $89 trip fee"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-09",
+    "does": "Sam set every side and back glass price to come to him first. Say another customer, Nia K., asks for a rear quarter glass for her car. Nina prices it for the car at $90.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nina's back glass price needs your OK.",
+      {
+       "card": {
+        "title": "Rear quarter glass · $90",
+        "lines": [
+         "For Nia K. · priced for her car",
+         "Lee's Auto Glass"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Sat Oct 24 at Lee's Auto Glass:",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Service"
+        ],
+        "rows": [
+         [
+          "10:00am",
+          "Ben T.",
+          "Chip repair"
+         ],
+         [
+          "11:00am",
+          "Alex M.",
+          "Windshield + calibration"
+         ],
+         [
+          "11:30am",
+          "Dana R.",
+          "Wiper blades"
+         ],
+         [
+          "2:00pm",
+          "Tess L.",
+          "Camera calibration"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open them",
+        "link": "rosfield.com/d/r24"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "At the shop, a windshield is paid at the counter at pick-up, and nothing is taken to book.",
+     "On an insurance job the shop bills the insurer, and Alex pays any share at the counter.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's each service, as the plug-in starts it. Send only what's different.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At the shop, paid at the counter at pick-up",
+         "Nothing taken to book"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "before:none+after:counter": {
+      "more": [
+       "On this path, a windshield takes nothing before: the customer's YES books it, and nothing is taken."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Windshield with calibration: $588, nothing taken to book, paid at the counter.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Windshield with calibration",
+            "$588",
+            "Nothing taken",
+            "At the counter"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "the work has no form to sign; the claim is the customer's own"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked glass job pays Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Glass work books glass techs and the shop's bays, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Glass work runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Glass work is never sent now: the glass is ordered for the car first, and mobile jobs start at set times."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The auto glass plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Mobile glass jobs start at set times, 8am and 1pm (the second branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Mobile glass jobs start at set times, 8am and 1pm (the second branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile glass jobs start at set times, 8am and 1pm (the second branch)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Glass work is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Glass work is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Glass work is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A glass tech never minds a child: an adult on the booking must be there, or the keys left as agreed."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for glass on a car."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "Glass is set by the customer's answers: the year, make and model pick the price.",
+     "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your mobile auto glass services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Mobile auto glass prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Mobile auto glass price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Windshield + calibration",
+          "By car · $588 for a 2021 RAV4"
+         ],
+         [
+          "Windshield, no camera",
+          "By car · $389 for a 2021 RAV4"
+         ],
+         [
+          "Chip repair",
+          "$79, then $20 each extra chip"
+         ],
+         [
+          "Side or back glass",
+          "By car · you OK each one"
+         ],
+         [
+          "Camera calibration alone",
+          "$199"
+         ],
+         [
+          "Trip fee",
+          "$89, only for a late cancel or no car"
+         ],
+         [
+          "Labor",
+          "$120 an hour, 1-hour minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "With 1, the glass tech texts DONE with the total. Rosie reads it back, then texts the customer the bill with a pay link.",
+    "more": [
+     "The customer can reply 1 to use the saved card instead.",
+     "On an insurance job, the bill is only the customer's own share.",
+     "Rosie sends no reminders of its own about a bill.",
+     "A declined card gets one pay link. Still unpaid after 4 days, Sam is asked.",
+     "No tip line: Sam leaves it off. Rosie never asks for a tip itself."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Set: for jobs paid after, I text the bill once your glass tech texts DONE.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Windshield + calibration",
+          "By car",
+          "Card saved",
+          "Rosie texts the bill"
+         ],
+         [
+          "Chip repair",
+          "$79",
+          "Card saved",
+          "Rosie texts the bill"
+         ],
+         [
+          "Side or back glass",
+          "By car, you OK it",
+          "Card saved",
+          "Rosie texts the bill"
+         ],
+         [
+          "Camera calibration alone",
+          "$199",
+          "Card saved",
+          "Rosie texts the bill"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Add a tip line to the bills I text?",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam stops saving a card for chip repairs, for new bookings only. Each change is read back first.",
+    "more": [
+     "Chip repairs already booked keep their saved card.",
+     "A change never touches a booking already made.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-30",
+    "does": "Some work takes urgent jobs sent now, like a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "more": [
+     "Auto glass is never sent now: the glass is ordered for the car first. The shop takes none either."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Where the state licenses glass workers and glaziers, each person may add one, like Sam's four here. None is checked by Rosie.",
+     "Where it doesn't, the second branch: nobody is asked for one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Auto glass needs one only where the state registers glass shops or licenses glass workers.",
+     "Here it does, so Sam's three take the license step."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Each kind of work has its own plug-in. The auto glass shop's says the state registers the shop, here, and licenses each glass tech."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. The VIN, the plate and the claim number never go in a text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Glass: your card was charged twice for the same payment. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $79",
+        "lines": [
+         "Chip repair bill · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Nora S."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nora S.'s $79 chip repair bill was charged twice. The second charge is refunded, and Nora is told."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "Rosie suggests rules to start from, never a blank form. Sam keeps them, and keeps the 1pm start each weekday for same-day chip repairs.",
+    "more": [
+     "Sam can change each rule now, by text later, or in the portal.",
+     "The portal is the business's website for Rosie, where owners change prices, hours and rules.",
+     "Kept times are offered only for that kind of job or customer.",
+     "Sam sets when kept times open to everyone, so they don't go unused.",
+     "A booking keeps the rules it was made with, even if Sam changes them later.",
+     "Mobile glass starts at set times: 8am and 1pm. Each start holds one windshield for each glass tech.",
+     "Glass work is never sent now: a same-day time shows only if the glass is on the shelf."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are my suggested starting rules for mobile auto glass. You can change any of them.",
+      {
+       "list": {
+        "head": [
+         "Rule",
+         "Setting"
+        ],
+        "rows": [
+         [
+          "Open",
+          "Mon–Fri 7:30am–5:30pm"
+         ],
+         [
+          "Start times",
+          "8am and 1pm"
+         ],
+         [
+          "Notice",
+          "Glass on the shelf, or ordered in"
+         ],
+         [
+          "Books ahead",
+          "Up to 60 days"
+         ],
+         [
+          "Same-day jobs",
+          "Ask you first"
+         ],
+         [
+          "Free to cancel",
+          "Until 6pm the day before"
+         ],
+         [
+          "After that, or no car or keys",
+          "The $89 trip fee, only if you say so"
+         ],
+         [
+          "Travel area",
+          "25 miles from 2200 Bay Rd"
+         ],
+         [
+          "If your person can't come",
+          "Offer a stand-in, same time and price"
+         ]
+        ]
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Want to keep some times for one kind of job? Other bookings can't take them.",
+      {
+       "buttons": [
+        "No",
+        "Keep some times"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 Keep 1pm for same-day chip repairs"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "card": {
+        "title": "Kept for same-day chip repairs",
+        "lines": [
+         "Mon–Fri · 1pm start",
+         "Other jobs can't take it",
+         "Opens to everyone at 10am that day"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The home glass plug-in loads the same way, with its own services and license form.",
+     "Storefront glass is a free estimate visit, then a quote.",
+     "AI assistants find Lee Mobile Glass under mobile auto glass and under home glass."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Home glass next. Send a photo of your home glass prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Home glass prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Home glass price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Window pane replaced",
+          "$149"
+         ],
+         [
+          "Shower door installed",
+          "$189"
+         ],
+         [
+          "Labor",
+          "$120 an hour, 1-hour minimum"
+         ],
+         [
+          "Storefront glass",
+          "Free estimate, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like mobile auto glass. Send only what's different.",
+      {
+       "card": {
+        "title": "Home glass, set like mobile auto glass",
+        "lines": [
+         "At the customer's place",
+         "A card saved for the $89 trip fee",
+         "Paid after the job, the way you picked for mobile auto glass",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "Glass is priced by the car: the AI asks the year, make and model first.",
+     "The long services show how much time they take, so the bay is saved for all of it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the shop's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Windshield + calibration",
+          "By car · $588 for a 2021 RAV4 · 3 hours"
+         ],
+         [
+          "Windshield, no camera",
+          "By car · $389 · 2¼ hours"
+         ],
+         [
+          "Chip repair",
+          "$79, then $20 each extra · 30 min"
+         ],
+         [
+          "Side or back glass",
+          "By car · you OK each one · 1 hour"
+         ],
+         [
+          "Camera calibration alone",
+          "$199 · 45 min"
+         ],
+         [
+          "Wiper blades",
+          "$20 a pair"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "The shop's services happen at the shop, and the windshield also at the customer's place. Nothing is taken when booking: the customer pays at the counter.",
+    "more": [
+     "The plug-in's starting answer at the shop is nothing taken, so a YES books it.",
+     "A windshield at home is a mobile visit for the same $588, with a card saved for the $89 trip fee.",
+     "Insurance jobs: the shop bills the insurer, and the customer pays any share at the counter."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any done at a customer's place too? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your shop, paid at the counter, your own way",
+         "Nothing taken when they book"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "A at their place too, card saved for the 89 trip fee"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. For a windshield, the customer picks the place.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Windshield + calibration at the shop",
+          "By car",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Windshield + calibration at their place",
+          "By car",
+          "Card saved for the $89 trip fee",
+          "Rosie texts the bill"
+         ],
+         [
+          "Chip repair, side or back glass",
+          "$79, by car",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Camera calibration alone",
+          "$199",
+          "Nothing taken",
+          "At the counter"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where glass work outside the shop is allowed, and who may go. Rosie checks that before the mobile visit is offered.",
+    "more": [
+     "Each state's own rule comes from its own form, never one rule for all.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Nothing is taken when the customer books at the shop: a YES books it. No card is saved, so no fee can be charged.",
+    "more": [
+     "A late cancel or a no-show costs nothing at the shop.",
+     "The glass ordered for a no-show goes back on the shelf for the next car like it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Shop jobs work like this:",
+      {
+       "card": {
+        "title": "Nothing taken at the shop",
+        "lines": [
+         "A YES books it",
+         "No card, so no fee",
+         "Paid at the counter at pick-up"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "Anything added at the counter, like new wiper blades, is priced first and paid there.",
+     "Insurance jobs: the shop bills the insurer its own way, and the customer pays any share at the counter.",
+     "Rosie never asks for a tip."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "Sam keeps Rosie's suggested rules with one tap.",
+     "Nothing is taken at the shop, so there's no fee to charge.",
+     "Pat OKs only Lee Mobile Glass prices over $500. At the shop, only Sam OKs prices."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Prices on the board never need your OK. Should side and back glass prices come to you first?",
+      {
+       "buttons": [
+        "Yes, every time",
+        "Send them",
+        "Over an amount"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "These are the booking rules I suggest:",
+      {
+       "card": {
+        "title": "Lee's Auto Glass · booking rules",
+        "lines": [
+         "Hours: from your Google listing",
+         "Drop-off slots: 8am, 11am and 1pm",
+         "Free to cancel, and no fee for a no-show",
+         "Same-day bookings and new customers ask you first",
+         "If a glass tech can't come: another who does that service, same time and price"
+        ]
+       },
+       "buttons": [
+        "Keep these",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Each company has its own Stripe account and terms. The shop takes nothing when booking, so it can go live before its Stripe is set.",
+    "more": [
+     "Until then, a mobile visit from the shop books with a YES and no card.",
+     "Customers see the shop once Sam says yes."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The shop is its own company, so it needs Stripe in its own name. Until then, its mobile visits save no card.",
+      {
+       "card": {
+        "title": "Stripe · Lee's Auto Glass",
+        "lines": [
+         "About 5 minutes",
+         "For the card saved on mobile visits"
+        ],
+        "button": "Connect Stripe",
+        "link": "rosfield.com/pay/s02"
+       },
+       "buttons": [
+        "Do it now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "OK. Here's Lee's Auto Glass the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee's Auto Glass",
+        "lines": [
+         "Preview, with its terms"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Jumping ahead to the next morning, Tue Oct 20 at 9:10am. Sam texts MORE and picks up where he left off. Once the shop's Stripe is connected, its mobile visits save a card.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "MORE"
+     ],
+     [
+      "san",
+      "owner",
+      "Welcome back! One thing is waiting: Stripe for Lee's Auto Glass.",
+      {
+       "card": {
+        "title": "Stripe · Lee's Auto Glass",
+        "lines": [
+         "About 5 minutes",
+         "Turns on the card saved for mobile visits"
+        ],
+        "button": "Connect Stripe",
+        "link": "rosfield.com/pay/s02"
+       }
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Done"
+     ],
+     [
+      "san",
+      "owner",
+      "Connected. Mobile visits from the shop now save a card for the trip fee."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "A rock cracked my windshield. Can someone replace it at my home Thursday morning? My insurance should pay. I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "A glass shop's plug-in adds its own words: a crack in the driver's view, or loose or shattered glass. Those get 'don't drive it' first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: how big the damage is and where, what car it is, and if it has lane-keeping.",
+     "Its danger words: a crack in the driver's view, or loose or shattered glass.",
+     "Its first steps: none. The glass is ordered for the car once it's booked.",
+     "Who can stand in for whom, and how the visit is checked in: the code at the car.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-07",
+    "does": "An 8-inch crack can't be repaired, so it's a new windshield. With the lane camera calibrated, it's $588, straight from Sam's list.",
+    "more": [
+     "Aftermarket glass for a 2021 RAV4 is $389. The camera calibration is its own line: $199.",
+     "A chip smaller than a quarter, out of the driver's view, gets a $79 chip repair instead.",
+     "The carmaker's own glass is $300 more, and it comes in 3 business days.",
+     "Not sure about a camera? The glass tech checks, and the $199 comes off if it isn't needed.",
+     "List prices never need Sam's OK."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-83",
+    "does": "The plug-in, or Sam for each service, says what is booked and how its times read. Mobile auto glass starts at set times: 8am and 1pm."
+   },
+   {
+    "op": "words",
+    "at": "B4-84",
+    "does": "Each glass tech fits one windshield per start, at 8am or 1pm. So the times read 'starts at 8:00am', not a window.",
+    "more": [
+     "The confirmation, the reminder and the on-my-way text say the same start.",
+     "Times start once the glass can be there: aftermarket glass comes the next business day by 11am.",
+     "Each start holds about 3 hours: 75 minutes to fit, 60 to set, and 45 to calibrate.",
+     "Only people free, skilled and licensed for the place are shown, soonest first."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Mobile Glass can replace your windshield and calibrate the camera for $588, billed after the job. A card is saved for an $89 trip fee if you cancel late or the car isn't there. Start times:",
+      {
+       "times": [
+        "Thu Oct 22 · starting at 8:00am · Tyler",
+        "Thu Oct 22 · starting at 1:00pm · Mateo",
+        "Fri Oct 23 · starting at 8:00am · Tyler"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-34",
+    "more": [
+     "Alex's $588 windshield is under that amount, so it needs none.",
+     "A bigger job over the amount, like a $640 back glass, gets a contract to sign first.",
+     "Sam can also ask for a contract on any service, at sign-up or in the portal."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-05",
+    "does": "Alex's card is saved through Stripe, in the business's own account. Nothing is charged now. It's there for the $89 trip fee Sam confirms, if Alex cancels late or the car isn't there.",
+    "form": [
+     [
+      "Card",
+      "Apple Pay or card · saved, not charged"
+     ],
+     [
+      "I agree",
+      "Only the charges shown: the $89 trip fee if I cancel after 6pm Wed, or the car or keys aren't there"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-14",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "line": [
+       "6.4",
+       "4.29"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Mon Oct 19, 6:49pm",
+      "title": "Asks Sam to order the glass",
+      "does": "Rosie never orders parts. Sam orders the glass for Alex's car from his supplier, then taps Ordered. The visit needs it in.",
+      "more": [
+       "Aftermarket glass comes the next business day by 11am, so it's in on Wed for Thursday.",
+       "No tap by 10am the next day: one reminder. Still none by 5pm the day before: Sam is asked to call Alex.",
+       "Glass that comes in cracked or wrong is a part that's late: new times, with no fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Booked: Alex M., Thu Oct 22, 8:00am, Tyler. Please order the glass.",
+        {
+         "card": {
+          "title": "Order · aftermarket windshield",
+          "lines": [
+           "2021 Toyota RAV4, with the camera bracket",
+           "VIN on the job page",
+           "Needed by Wed Oct 21"
+          ]
+         },
+         "buttons": [
+          "Ordered"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "owner"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "more": [
+     "Each job shows what to bring, from the plug-in, like the glass, the urethane and the calibration kit.",
+     "Alex's access notes from booking show too, like where to park.",
+     "No OMW by 7:45: Tyler is nudged, then Sam."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Thu Oct 22. Text OMW when you leave.",
+      {
+       "card": {
+        "title": "Answers, photos and gate codes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open the day",
+        "link": "rosfield.com/d/j22"
+       },
+       "list": {
+        "head": [
+         "Start",
+         "Customer",
+         "Job"
+        ],
+        "rows": [
+         [
+          "8:00am",
+          "Alex M. · 18 Pine Ct",
+          "Windshield + calibration"
+         ],
+         [
+          "12:00pm",
+          "Drew · Bay Rd",
+          "Chip repair"
+         ],
+         [
+          "1:00pm",
+          "Kim L. · at work",
+          "Windshield, car at work"
+         ]
+        ]
+       },
+       "as": "Tyler"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 7:40am",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler from Lee Mobile Glass is on the way, about 20 minutes. When Tyler arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in.",
+      {
+       "photos": [
+        "Tyler, from Lee Mobile Glass"
+       ],
+       "photoLink": "rosfield.com/m/r4",
+       "code": "3906",
+       "buttons": [
+        [
+         "2",
+         "It isn't Tyler"
+        ]
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "At the car, ask Alex M. for their check-in code and text it here."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 8:00am"
+   },
+   {
+    "op": "more",
+    "at": "B8-04",
+    "more": [
+     "Alex hands over the keys once the code is in."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "t": "Thu Oct 22, 8:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "t": "Thu Oct 22, 8:05am"
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Here: the new glass matches the car's features, like the camera bracket.",
+     "Tyler also looks under the old moldings for rust before he cuts."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "B8-22",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 22, 9:15am",
+      "title": "Tyler sets the new windshield",
+      "does": "Tyler cuts out the cracked glass, primes the frame and sets the new windshield in urethane. Now the car must sit still while the glue sets.",
+      "more": [
+       "He tapes the moldings, and the old glass leaves with him.",
+       "The safe drive-away time comes from the glue maker's chart: 60 minutes here. It's an industry standard, not a law.",
+       "Alex hears the car isn't ready to drive yet, and when it should be."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "GLASS SET Alex M."
+       ],
+       [
+        "san",
+        "cust",
+        "Your new windshield is in. Please don't drive the car yet: the glue needs time to set. Tyler calibrates the camera next.",
+        {
+         "card": {
+          "title": "Glass set · not ready to drive",
+          "lines": [
+           "Safe to drive once the camera is done",
+           "About 11:00am"
+          ]
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.safety"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-22",
+    "steps": [
+     {
+      "id": "B8-x02",
+      "type": "split",
+      "line": [
+       "8.12",
+       "8.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 22, 10:15am",
+      "title": "Tyler calibrates the lane camera",
+      "q": "Does the calibration pass?",
+      "does": "The safe drive-away time is over. Tyler calibrates the lane camera to Toyota's spec, with a target kit and a scan tool on the flat driveway.",
+      "more": [
+       "It takes about 45 minutes. The report is saved with the job.",
+       "The plug-in's rule: a camera that won't calibrate on site is finished in the shop's bay, at no extra charge."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CALIBRATING Alex M."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "Passes",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Can't calibrate here",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x03",
+          "type": "split",
+          "line": [
+           "8.19",
+           "4.19"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Thu Oct 22, 10:40am",
+          "title": "Books the bay to finish the camera",
+          "q": "Does Alex take the bay time?",
+          "does": "Alex's driveway isn't level enough, so the camera won't calibrate there. Alex gets a written warning and a time in the shop's bay, at no extra charge.",
+          "more": [
+           "Until it's done, lane-keeping and auto-braking may not work right.",
+           "It's the same booking: visit 2, at Lee Mobile Glass' bay, 2200 Bay Rd. One $2 for both.",
+           "The glass is safe once the drive-away time is over, so DONE still comes today."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "CANT CALIBRATE Alex M. driveway not level"
+           ],
+           [
+            "san",
+            "cust",
+            "Your new windshield is in, but the camera couldn't be calibrated in your driveway. Until it is, lane-keeping and auto-braking may not work right. Drive with extra care.",
+            {
+             "card": {
+              "title": "Finish the calibration · no charge",
+              "lines": [
+               "Lee Mobile Glass bay · 2200 Bay Rd",
+               "Fri Oct 23 · 8:00am · about 45 minutes"
+              ]
+             },
+             "buttons": [
+              "Take it",
+              "Another time"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.visit",
+           "pf.safety"
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Takes it",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Another time, or no reply by 5pm",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "B8-x04",
+              "line": [
+               "11.22"
+              ],
+              "who": "san",
+              "to": "owner",
+              "via": "msg",
+              "title": "Asks Sam to call Alex",
+              "does": "Alex hasn't taken the bay time by 5pm. Sam calls to set one. Fri 8:00am stays saved until they talk.",
+              "say": [
+               [
+                "san",
+                "owner",
+                "Alex M. hasn't taken Fri 8:00am to finish the camera calibration. Please call Alex: the number is on the job page."
+               ],
+               [
+                "san",
+                "cust",
+                "Sam from Lee Mobile Glass will call you about the calibration time. Fri 8:00am stays saved until you talk."
+               ]
+              ],
+              "tells": [
+               "owner",
+               "cust"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "t": "Thu Oct 22, 11:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 11:00am",
+    "does": "The safe drive-away time is over, and the camera passed. Tyler texts DONE with the total, so Rosie can text the bill."
+   },
+   {
+    "op": "after",
+    "at": "B8-41",
+    "steps": [
+     {
+      "id": "B8-x05",
+      "line": [
+       "8.12",
+       "10.14"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 11:00am",
+      "title": "Tells Alex the car is safe to drive",
+      "does": "Alex hears the car is ready, with the calibration report and the aftercare. The tape and car wash times count from DONE.",
+      "more": [
+       "The report is saved with the job, where the state's rules require it.",
+       "If the camera goes to the bay, this text says the glass is safe, and the camera waits for its time."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Done: your new windshield is in, and the camera passed. It's safe to drive now.",
+        {
+         "card": {
+          "title": "Ready to drive",
+          "lines": [
+           "Leave the tape on until Fri 11am",
+           "No car wash until Sat 11am"
+          ],
+          "button": "Calibration report",
+          "link": "rosfield.com/r/r4"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-17",
+    "does": "Rosie sends nothing to Alex about money. Sam bills Alex's insurer, or Alex, the business's own way. Rosfield's $2 goes on its monthly bill.",
+    "more": [
+     "Sam can mark it paid in the portal, for the records.",
+     "Rosie's rule: no gift, rebate or waived deductible for a claim."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Tyler marked Alex M.'s job done. Bill it your own way.",
+      {
+       "card": {
+        "title": "Alex M. · Windshield + calibration",
+        "lines": [
+         "$588 · Thu Oct 22 · Tyler",
+         "Insurer and claim number on the job page"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 11:02am"
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 11:05am"
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 1:00pm"
+   },
+   {
+    "op": "words",
+    "at": "B9-22",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Glass: your October chip checks.",
+      {
+       "list": {
+        "head": [
+         "Date",
+         "Place",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Tue Oct 20",
+          "Van 1",
+          "$79"
+         ],
+         [
+          "Wed Oct 21",
+          "Van 2",
+          "$79"
+         ]
+        ]
+       },
+       "pay": {
+        "amount": "$158",
+        "what": "October's chip checks",
+        "link": "rosfield.com/p/m10"
+       },
+       "as": "Morgan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-52",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Tomorrow, Sun Nov 1, your plan charges $158 to your saved card for October's two chip checks.",
+      {
+       "card": {
+        "title": "Plan charge · $158",
+        "lines": [
+         "Van 1 · Tue Oct 20 · $79",
+         "Van 2 · Wed Oct 21 · $79"
+        ],
+        "button": "See your plan",
+        "link": "rosfield.com/c/m10"
+       },
+       "as": "Morgan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-25",
+    "does": "Alex's car insurance pays all but Alex's $100 deductible. Sam bills the insurer the business's own way. Alex gets a bill for the $100.",
+    "more": [
+     "The share is set by Alex's policy, not by Rosie.",
+     "If the insurer pays less, Sam decides before anything more goes to Alex.",
+     "Rosie's rule: no deductible is waived, paid or rebated."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Glass: your share of today's windshield. Your car insurance covers the rest.",
+      {
+       "pay": {
+        "amount": "$100",
+        "what": "your deductible",
+        "link": "rosfield.com/p/r4i"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-62",
+    "does": "Alex's car insurance should pay, so before the times the AI asks only the insurer's name. Alex files the claim and picks the shop.",
+    "more": [
+     "The claim number goes only on the secure page, never through the AI.",
+     "Sam checks the claim once a time is saved and the secure page is open.",
+     "An insurer may pay only for aftermarket glass. The carmaker's own glass then costs Alex the difference."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Which insurer should pay? Just its name here. The claim number goes on the secure page."
+     ],
+     [
+      "cust",
+      "agent",
+      "Harbor Mutual. I have glass cover."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "Alex named Harbor Mutual, and added the claim number on the secure page. Sam checks the claim on the insurer's glass line. His answer decides what Alex pays.",
+    "more": [
+     "Sam checks it now: the time is saved, and Rosie has Alex's mobile.",
+     "The time stays saved up to 1 hour for the check. Alex's text keeps to text hours.",
+     "No answer from Sam in 30 minutes: one nudge, and Alex hears when to expect news.",
+     "Alex files the claim. No assignment of benefits is taken through Rosie."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M. wants Harbor Mutual to pay for this windshield. Check the claim, then pick one.",
+      {
+       "card": {
+        "title": "Claim check · Alex M.",
+        "lines": [
+         "Thu Oct 22 · starting at 8:00am · Tyler",
+         "Windshield + calibration · $588",
+         "The claim number is on the secure page"
+        ],
+        "button": "See the claim",
+        "link": "rosfield.com/w/am"
+       },
+       "buttons": [
+        "Covered",
+        "Alex pays part",
+        "Not covered",
+        "Can't check now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "Sam says the insurer covers it all. Alex is told, and books as usual. Sam bills the insurer the business's own way.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your car insurance covers this windshield. You pay nothing.",
+      {
+       "card": {
+        "title": "Claim check · Covered",
+        "lines": [
+         "Lee Mobile Glass bills Harbor Mutual"
+        ],
+        "button": "Finish booking",
+        "link": "rosfield.com/c/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "The insurer covers it, less Alex's $100 deductible. Alex sees the share before the yes, then books or lets the time go.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your car insurance covers this windshield, less your $100 deductible.",
+      {
+       "card": {
+        "title": "Claim check · Covered in part",
+        "lines": [
+         "Your share: $100, after the job"
+        ],
+        "button": "See your share",
+        "link": "rosfield.com/c/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "The insurer won't pay for it. Alex sees the $588 price, then books or lets the time go. Nothing is charged until the yes.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your car insurance doesn't cover this windshield. You can still book at $588, or let it go.",
+      {
+       "card": {
+        "title": "Claim check · Not covered",
+        "lines": [
+         "Nothing has been charged"
+        ],
+        "button": "See the price",
+        "link": "rosfield.com/c/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Say Alex asks for a chip check on two work vans every 3 months. Lee Mobile Glass offers that as a plan, so the AI shows its terms.",
+    "more": [
+     "The AI never offers a plan the customer didn't ask for.",
+     "A plan needs its own yes: its terms show on the secure page, before any card.",
+     "Each visit is booked and paid like a single one, with its own reminder and code.",
+     "Alex can skip, pause or end the plan by text. Rosfield's $2 counts once a month for a plan."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can you also check our two work vans for chips every 3 months?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee Mobile Glass has a chip check plan, $79 a van each visit. Each visit is booked and paid like a single one. Want it every 3 months?",
+      {
+       "buttons": [
+        "Yes, every 3 months",
+        "Just this once"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "does": "The page shows the chip check plan's terms: how often, the price a visit, and when it's charged. It says how to skip, pause or end, too. Alex says yes to them on their own.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Chip check plan · 2 vans",
+        "lines": [
+         "$79 a van, every 3 months",
+         "Each visit is booked and paid like this one",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ],
+    "form": [
+     [
+      "How often",
+      "Every 3 months"
+     ],
+     [
+      "Price a visit",
+      "$79 a van"
+     ],
+     [
+      "When it's charged",
+      "Each visit, like a single booking"
+     ],
+     [
+      "Skip, pause or end",
+      "Any time, by text"
+     ],
+     [
+      "I agree to the plan's terms",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-51",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your chip check plan's price is changing.",
+      {
+       "card": {
+        "title": "Plan price · from Mon Nov 23",
+        "lines": [
+         "$89 a van (now $79)",
+         "Visits before Nov 23 stay $79"
+        ],
+        "button": "See your plan",
+        "link": "rosfield.com/c/m10"
+       },
+       "as": "Morgan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I drive to lunch right after, on Thursday?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can I drive to lunch right after, on Thursday?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler says yes: it should be safe to drive about 11:00am. Skip car washes for 2 days."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-28",
+    "does": "Sam texts that the glass for Alex's car came in cracked. Alex gets new times after the new glass is in, or a free cancel.",
+    "more": [
+     "The business caused the move, so there's no fee.",
+     "No reply in 24 hours: Sam calls Alex."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "Alex M.'s windshield came in cracked. The new one comes Mon by 11."
+     ],
+     [
+      "san",
+      "cust",
+      "The windshield for your RAV4 came in cracked, so Lee Mobile Glass ordered another. It comes Monday.",
+      {
+       "times": [
+        "Mon Oct 26 · starting at 1:00pm · Tyler",
+        "Tue Oct 27 · starting at 8:00am · Tyler"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Cancel, no fee"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-17",
+    "does": "A what-if: Kim's car is parked at work, with the keys at the front desk. Nobody needs to be at the car, so there's no code. DONE with a photo confirms it.",
+    "more": [
+     "Kim gets the photo and has 24 hours to say if something's wrong. Sam is told of any reply.",
+     "The front desk hands Tyler the keys, as Kim set on the secure page.",
+     "The text says when the car is safe to drive."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE",
+      {
+       "photos": [
+        "The new windshield"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Mobile Glass finished your windshield at work. It's safe to drive after 3:30pm. The keys are at the front desk. Reply within 24 hours if something's wrong.",
+      {
+       "photos": [
+        "The new windshield"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-52",
+    "t": "",
+    "does": "A what-if: Kim's car is at work for a 1:00pm start, with the keys at the front desk. The desk doesn't have them. Tyler texts it, and Kim has 15 minutes.",
+    "more": [
+     "Kim can bring the keys down, or pick a new time.",
+     "Tyler waits by the car."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NO KEYS at the front desk, Kim L."
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler is at your car, but the front desk doesn't have your keys. Can you bring them in the next 15 minutes?",
+      {
+       "buttons": [
+        "Bringing them",
+        "Pick a new time"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-10",
+    "t": "",
+    "does": "No keys in 15 minutes, so Tyler leaves for his next job. Sam decides about the $89 trip fee, under the rules Kim agreed to.",
+    "more": [
+     "Kim's card is saved for the trip fee. Sam can charge it, or not.",
+     "Sam gets one reminder. No answer 24 hours after he was first asked: no fee, and Kim is told.",
+     "Nobody checked in, so there's no $2 for Rosie."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Tyler couldn't get Kim L.'s keys at the front desk, and Kim didn't answer in 15 minutes.",
+      {
+       "card": {
+        "title": "Charge the $89 trip fee?",
+        "lines": [
+         "Kim agreed to the fee rules when booking"
+        ]
+       },
+       "buttons": [
+        "Charge $89",
+        "No fee"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler couldn't get your keys and has left. Reply here to pick a new time."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-54",
+    "more": [
+     "The customer's side: the car isn't there, or its keys aren't.",
+     "The business's side: the glass is wrong for the car, or a part is missing."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CANT START wrong glass: the camera bracket doesn't fit this RAV4"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-61",
+    "does": "A what-if: the glass Tyler brought has the wrong camera bracket for Alex's car. Tyler stops before touching the old windshield. Nothing is charged.",
+    "more": [
+     "The work never started, so there's no $2.",
+     "Sam orders the right glass. Alex hears its day, and picks a new time with no fee."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Tyler can't start today: the glass we brought doesn't fit your RAV4's camera. He stopped before touching your windshield. Nothing is charged.",
+      {
+       "card": {
+        "title": "Not started · nothing charged",
+        "lines": [
+         "Thu Oct 22 · Tyler",
+         "The right glass comes Mon Oct 26",
+         "We'll text you times once it's in"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Tyler couldn't start at Alex M.'s: the glass has the wrong camera bracket. Nothing was charged. Please order the right glass."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Glass. We got your voicemail about a chip in the windshield. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Mobile Glass · Chip repair",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about a chip in the windshield. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants the chip fixed this week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If anyone is hurt, call 911 now. The glass can wait."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said someone was hurt in a crash. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "Someone hurt in a crash",
+         "Told to call 911 first"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-48",
+    "does": "Say Alex also wants new wiper blades. Both go in one booking, with one start time and one code.",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can Tyler also put on new wiper blades?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes: $20 a pair. Both fit in the same 8:00am start."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "more": [
+     "A late start moves the ready time too, and the text says the new one.",
+     "That works, or no reply, keeps the visit.",
+     "Move my visit: Alex picks a new time, as when Alex moves it."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 20"
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler is running about 20 minutes late. He'll start about 8:20am, and the car should be ready about 11:20am.",
+      {
+       "buttons": [
+        "That works",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "more": [
+     "The plug-in names which notices: a written estimate, or a notice that the camera needs calibrating.",
+     "Not signed by the visit: the visit waits, as with a first step not done in time.",
+     "A copy stays with the job for 7 years."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Before Tyler starts, please read and sign the written estimate and the camera notice for your car.",
+      {
+       "card": {
+        "title": "Written estimate · camera notice",
+        "lines": [
+         "Glass $389 · calibration $199",
+         "Where the state's rules require them"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/n/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-31",
+    "does": "Alex asks to add new wiper blades. They're on the price list at $20, so Alex sees the price and says yes first.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Tyler also put on new wiper blades?"
+     ],
+     [
+      "san",
+      "cust",
+      "Yes, Tyler has them in the van.",
+      {
+       "card": {
+        "title": "Wiper blades · $20",
+        "lines": [
+         "Thu Oct 22 · starting at 8:00am · Tyler",
+         "Paid after the job, with the rest"
+        ]
+       },
+       "buttons": [
+        "Add it",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M.'s insurance claim still needs your check before Thursday's visit.",
+      {
+       "card": {
+        "title": "Claim check · Alex M.",
+        "lines": [
+         "The insurer and claim number are on the secure page"
+        ],
+        "button": "See the claim",
+        "link": "rosfield.com/w/am"
+       },
+       "buttons": [
+        "Covered",
+        "Covered, Alex pays part",
+        "Not covered"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Mobile Glass checked your claim. Harbor Mutual won't pay for this windshield, so the $588 price applies. You can keep the visit, or cancel with no fee.",
+      {
+       "buttons": [
+        "Keep the visit",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-19",
+    "does": "Glass jobs have their price before the visit: from the list for the car, or a side or back glass Sam OKs."
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "does": "Tyler sees the back glass cracked at a corner. He sends photos, and prices a new one at $640, over Sam's $500 limit. It's its own job, so Sam OKs it first.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 640 back glass cracked at the corner, replace",
+      {
+       "photos": [
+        "Back glass, cracked at the corner",
+        "The crack, up close"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Tyler quotes a new back glass for Alex M. from his photos: $640. It's over your $500 limit.",
+      {
+       "card": {
+        "title": "Back glass replacement · $640",
+        "lines": [
+         "Priced from Tyler's photos at Thu's visit",
+         "Its own job, on another day"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Tyler found a crack in your back glass. Here's the price for a new one, from his photos, as its own visit.",
+      {
+       "card": {
+        "title": "Back glass replacement · $640",
+        "lines": [
+         "Priced from Tyler's photos · OK'd by Sam",
+         "Paid after the job · a card saved for the trip fee",
+         "Good for 7 days"
+        ],
+        "button": "See it and book",
+        "link": "rosfield.com/q/r4w"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE getting a molding clip, back 9:30"
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler went to get a clip for the molding and will be back about 9:30am. Your car should now be ready about 11:30am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "does": "Alex's job runs long, so Tyler will reach Kim about 1:30pm, 30 minutes after the start. Kim just hears the new times.",
+    "more": [
+     "Kim can change the time with no fee.",
+     "Can't make it at all: Sam is asked who goes, or Kim gets new times with no fee."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 30"
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler from Lee Mobile Glass is running behind and expects to start on your car about 1:30pm. It should be ready about 4:30pm.",
+      {
+       "buttons": [
+        "That works",
+        "Change the time"
+       ],
+       "as": "Kim L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "does": "A what-if: Alex's back glass comes a day after the windshield, so the job takes two days. Alex hears the plan at the start. Each day gets its own on-my-way text and code."
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Mon 8am"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Nora S. Mon Oct 26, starting at 8:00am?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Glass. It can't do 1:00pm today, but it offered another time:",
+      {
+       "card": {
+        "title": "Windshield replacement · $588",
+        "lines": [
+         "Mon Oct 26 · starting at 8:00am · Mateo",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ],
+       "stop": true,
+       "as": "Nora S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-13",
+    "does": "With times to pick, all with Tyler, since only Tyler replaces back glass here. A card is saved for the trip fee, and it's paid after the job.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Glass can replace your back glass for $640.",
+      {
+       "card": {
+        "title": "Back glass replacement · $640",
+        "lines": [
+         "Paid after the job",
+         "A card saved for the $89 trip fee"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/q/mp"
+       },
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-14",
+    "does": "Or a cancel with no fee. Lin's card is saved for the trip fee only, and nothing is charged. If texts are off, Sam calls."
+   },
+   {
+    "op": "words",
+    "at": "S11-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Hi Sam, it's Rosie, recording as always. One request waits for Lee Mobile Glass. It's a chip repair today at 1:00pm with Tyler, $79. Accept it?"
+     ],
+     [
+      "owner",
+      "san",
+      "Yeah, take it."
+     ],
+     [
+      "san",
+      "owner",
+      "Reading it back: accept the chip repair today at 1:00pm, with Tyler. Say yes to go ahead."
+     ],
+     [
+      "owner",
+      "san",
+      "Yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Tyler finds rust on the frame under the old molding, before he cuts. New glass can't bond to it, so he stops. Alex gets a written note and the photo.",
+    "more": [
+     "The note says what was found, what wasn't done and why, and which kind of business to call.",
+     "It never names a company.",
+     "Nothing was done, so nothing is charged.",
+     "Sam is told, and the note and photos stay with the job.",
+     "Alex can text when the frame is fixed, and the windshield is booked then."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD rust on the frame under the molding, stopped",
+      {
+       "photos": [
+        "Rust under the molding"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler found rust on the frame around your windshield and stopped before removing it. New glass can't be bonded safely until it's repaired.",
+      {
+       "card": {
+        "title": "Safety note · 18 Pine Ct",
+        "lines": [
+         "Found: rust on the frame under the molding",
+         "Not done: the new windshield, for now",
+         "Call a body shop first",
+         "Nothing is charged today"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "If Alex named an insurer before the times, Sam checks it here. The time is saved and the secure page is open, so Alex can get texts. A cash job skips this."
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee's Auto Glass",
+      "640 Harbor Rd, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Windshield + calibration $588 · Chip repair $79 · Wiper blades $20"
+     ],
+     [
+      "To book",
+      "Nothing taken · paid at the counter"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Mobile Glass",
+      "Mobile auto glass · within 25 miles of 2200 Bay Rd · a card saved for the $89 trip fee"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-10",
+    "does": "Any price made for one customer over Sam's $500 limit comes to him first. Here, it's Tyler's $640 price for Morgan P.'s back glass, set for her car.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Tyler's price is over your $500 limit.",
+      {
+       "card": {
+        "title": "Back glass replacement · $640",
+        "lines": [
+         "For Morgan P. · priced for her car",
+         "Lee Mobile Glass"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-41",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Today, Fri Oct 23, for each business:",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee's Auto Glass",
+          "1 missed visit · nothing waits on you · first tomorrow: 10:00am"
+         ],
+         [
+          "Lee Mobile Glass",
+          "1 missed visit · 1 fee question for you · next job: Mon 8:00am, Tyler"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58"
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "more": [
+     "Here it books right away: it isn't for today, and the price is from the list or already OK'd.",
+     "Glass work is never sent now: the glass is ordered for the car first.",
+     "A side or back glass waits for Sam's OK, and an insurance job for his claim check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Where the car will be",
+      "In the driveway, open and flat"
+     ],
+     [
+      "Keys",
+      "I'll be there with them"
+     ],
+     [
+      "VIN",
+      "A photo of the door sticker, added"
+     ],
+     [
+      "Claim number, if an insurer pays",
+      "Typed here only"
+     ],
+     [
+      "Gate or door code",
+      "None"
+     ]
+    ],
+    "does": "On the page, Alex adds how to get in and anything Tyler should know. None of it changes the price."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "A mobile windshield: a card saved for the $89 trip fee.",
+     "On an insurance job, the insurer pays and Sam bills it himself.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's each service, as the plug-in starts it. Send only what's different.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At the customer's place: a card saved for the $89 trip fee",
+         "Insurance: Sam bills the insurer"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "more": [
+       "On this path, the insurer's share is texted as a bill after DONE."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Windshield: $588, card saved for the $89 trip fee, the share texted as a bill.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Windshield with calibration",
+            "$588",
+            "Card saved for the $89 fee",
+            "The bill, after DONE"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "a windshield job is never named-only"
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "more": [
+     "The plug-in's danger words are checked first. Then the pro is asked: come in, come in sooner, or move it with no fee.",
+     "Real danger, like a crack in the driver's view, gets the don't-drive steps first. If anyone is at risk, the text says to call 911.",
+     "Something that could start again, like gas or a fire, still gets the safety message.",
+     "The plug-in's urgent words ring the on-call person at once, at any hour.",
+     "An earlier time shows its price first. No reply: the visit stays as booked. A pick: Tyler and Mateo are told.",
+     "The plug-in may name who reviews this kind of update, like a supervising analyst or a nurse.",
+     "That person gets a private flag the same day, never the words.",
+     "Where the plug-in says, the next visit waits for their OK: Sam is told, and the customer may cancel free.",
+     "Safe default: the visit stays as booked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "more": [
+     "The plug-in's questions that don't change the time or price go here, like 'Where will the car be parked?'",
+     "The open 'anything Tyler should know?' is asked here, never through the AI.",
+     "A gate or door code shows to Tyler only on the day of the visit. It's typed only here, never in a text.",
+     "A building's limits, like work only 9am to 4pm or a booked elevator, are typed here as entry notes.",
+     "What helps at the door: knock hard, text at the door, or more time. A blind customer says the code through the door.",
+     "A health need that keeps someone safe, like an allergy, reaches the person on the job.",
+     "A request to change a rule for a disability goes to Sam. Any need costs nothing, and nothing asks why.",
+     "A private detail that came anyway moves here and isn't repeated. One never kept, like a full card number, is deleted.",
+     "Access from an outside party, like a building or an agent, comes by their own forwarded link.",
+     "Emergency contact fields, where the plug-in asks. The business calls the contact; Rosie never texts them.",
+     "A person-in-care mark, where it applies, works like a child's at hand-off.",
+     "Safe default: save the answer as given; Tyler asks at the visit.",
+     "A car in an open spot gets a weather check the day before: new glass goes in only on a dry car."
+    ]
+   }
+  ]
+ },
+ "notes": "Refit R11 (Tue Oct 27 2026, frozen master, refit-Q01). Started from the auto-repair pilot (drop-off pattern): a glass job is a set service at the shop (drop-off, calibration in the bay) or mobile in the driveway (set start times), with the insurer's claim handled by the customer and the shop.\nNames: Sam Lee's main company is Lee Mobile Glass LLC (mobile windshield work in the driveway; techs Tyler and Mateo; the master's Lee Home Services). His second company is Lee's Auto Glass LLC (the shop: techs Nina and Leo; the master's Lee's Barbershop, 88 Elm St).\nFacts: dropoff (a car left at the shop for the job), extrawork (a part or a second item found at the visit), planbill (an insurer pays part; the shop bills the insurer). Settings: set start in both flows (the shop's drop-off slot; mobile start times); free cancel 24 hours before. No switches: no2 is off (the $2 applies to every booking, D97); no license or insurance is checked by Rosie (D96).\nMoney, flow A (at the shop): list|none|counter (main: a $588 windshield with calibration; nothing is taken to book; Alex pays at the counter at pick-up; on an insurance job the shop bills the insurer and Alex pays any share at the counter). No fee: nothing was taken.\nMoney, flow B (mobile, in the driveway): list|card|own (main: the $588 windshield with calibration; a card saved for the $89 trip fee, which applies only to a late cancel, a no-show, or no keys or car; the insurer pays and Sam bills it himself, so Rosie sends no bill); list|card|bill (the insurer's share texted as a bill after DONE; the same card saved for the $89 trip fee).\nRemoved: the money vary keys with holds, the old sign-up money cards (the $89 and holds), the 'Plumbing' and water words renamed to glass, the old 'A person's time' off op (the tech's time is A4-67, the drop-off split keeps it lit), the child and named-only splits (off). B4-34's access line and B7-17's danger lines are rewritten in full, shorter.\nNot sure (for the verifier): (1) the insurer's share on list|card|bill reads the full $588 as the bill, the share is the insurer's own number, not set here; (2) the $89 trip fee is the late-cancel or no-show fee only (the trip itself is in the price), per the plug-in's fees line; (3) the windshield's warranty line reads 'glass warranty' (workmanship against leaks and wind noise, the shop's own term).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "two skin fades",
+    "Sam named you their emergency contact.",
+    "Book Alex M. again Sat Nov 21, 11am",
+    "a beard trim",
+    "Takes the plan's name first",
+    "A plan or insurance",
+    "Bills the plan first; Alex pays a share",
+    "Wants Saturday morning, with Riley",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Cancel your Sat 11:00am visit with Riley?",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "A beard trim is on the price board: $20.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "Skin fade · $40",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2.",
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35.",
+    "raise haircut to 40",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "like Lee Plumbing and Lee Electric.",
+    "Quiero un corte el sábado.",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Pick a time for your first color plan visit:",
+    "Drain clearing",
+    "a package of cuts",
+    "many barbers, salons and groomers are licensed to their shop",
+    "patch test",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop's services need none.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "Riley looks, then prices it",
+    "Only the consult; the price stays open",
+    "Checks in a drop-off or mail-in",
+    "Follows up on an item left behind",
+    "Kids cut (12 and under)",
+    "a skin-test result",
+    "color and house calls",
+    "color, house calls",
+    "Consult only",
+    "photos of your hair",
+    "a cut on Saturday",
+    "Books a cut every 4 weeks",
+    "a cut every 4 weeks",
+    "for a staff cut",
+    "during my cut",
+    "Alex M.'s cut",
+    "in the chair",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershop",
+    "Barber license",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "READY Sofia G. Photo added.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "4471",
+    "Sofia",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "$25 consult",
+    "Only the consult",
+    "the consult",
+    "What happens at the chair?",
+    "Priced at the chair",
+    "priced at the chair",
+    "Paid at the chair",
+    "At the chair",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "a house call",
+    "water heater",
+    "Panel upgrade",
+    "like a burst pipe",
+    "$35",
+    "hot towel",
+    "shave",
+    "skin fade",
+    "perm"
+   ],
+   "B": [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "My sink won't drain",
+    "tapping a neighbor's water line without asking",
+    "towing",
+    "cracks the cabinet floor",
+    "overflowing drain at night",
+    "drain clearings",
+    "Sam named you their emergency contact.",
+    "water is off on Main St",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "1-year labor warranty",
+    "jobs over $500",
+    "7am on the visit day",
+    "Sam bills Alex the business's own way",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "A plan or warranty pays",
+    "plumbing visit",
+    "Thu 12-2 Casey",
+    "MOVE Alex to Thu 12pm",
+    "the $89 fee",
+    "doesn't go in until",
+    "not roofing",
+    "a roofer near you",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "raise drain clearing to 199",
+    "NEW heating and cooling",
+    "Heating and cooling",
+    "heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "like Lee Plumbing and Lee Electric.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "repipe",
+    "Both rentals' visits go on one bill on the 1st.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "Just the kitchen sink.",
+    "a leak under the sink",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals",
+    "next week's drain cleaning",
+    "clear a yard drain",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "your new pipes are in",
+    "a roof leak",
+    "Video and Jordan's notes",
+    "Jordan finds corroded shutoff valves.",
+    "replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "shutoff valves",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "supply house",
+    "Rental 1",
+    "Rental 2",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also run a camera down my sewer line?",
+    "$160 valve quote",
+    "$160 valve work",
+    "a bathroom drain",
+    "Drain clearings",
+    "kitchen drain",
+    "The faucet is a leak repair, quoted at the visit.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Is the sink still full of water?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "DONE 179 drain",
+    "245 valve 165 supply line 80",
+    "Shutoff valve",
+    "Supply line",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "a dripping faucet",
+    "color and house calls",
+    "color, house calls",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "plumbing license",
+    "Plumbing license",
+    "electrical license",
+    "Electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumbing",
+    "plumbing",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "A haircut",
+    "a haircut",
+    "at the chair",
+    "rents a chair",
+    "house calls",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "camera inspection",
+    "camera report",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Panel upgrade",
+    "under my sink",
+    "under the sink",
+    "like a burst pipe",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "shutoff valve",
+    "$179",
+    "$150",
+    "pipe",
+    "sink",
+    "drain",
+    "faucet",
+    "cabinet",
+    "water line"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-29": "ed36650e05",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A7-93": "46cca94e45",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A10-06": "a9f01f141d",
+   "S1-12": "41b86c1e72",
+   "S1-21": "913a9558f4",
+   "S11-56": "bd841a4732",
+   "S2-28": "549fd7ae22",
+   "S1-60": "235c90a3c3",
+   "S13-22": "5324c9a041",
+   "S12-26": "7b7e6af034",
+   "S1-38": "b50b0bd4e8",
+   "S1-43": "e16d5048f3",
+   "S1-27": "5ba5f5753a",
+   "A3-02": "223044a79d",
+   "A3-23": "4a8b7c72a2",
+   "A4-01": "7e7a61082c",
+   "A4-03": "c24298dc38",
+   "A4-50": "6f43775326",
+   "A4-06": "e9e9bb848b",
+   "A4-14": "95c7ffcfab",
+   "A4-65": "fa7ec0389d",
+   "A4-41": "15813954ee",
+   "A4-43": "c17d56f766",
+   "A6-14": "b17b52115e",
+   "A6-15": "1e6395c2f5",
+   "A8-02": "15f418fec4",
+   "A8-03": "7accda6f86",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-23": "e3a35f7f9e",
+   "A8-32": "632f2b5b40",
+   "A8-43": "7b0f73c701",
+   "A8-11": "d5522790d9",
+   "A8-50": "0f26abfc87",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A10-01": "77ff9c7550",
+   "A10-02": "c9223be948",
+   "A9-20": "0cfe0e1776",
+   "A4-53": "55eb876b45",
+   "A4-37": "4ee9e74e71",
+   "A3-20": "b8251d2535",
+   "A3-26": "9e3630dc0b",
+   "A4-02": "433e3cd172",
+   "A5-21": "15fe900660",
+   "A6-04": "fe10e3d360",
+   "A6-17": "63319c6f2d",
+   "A7-13": "e41528a397",
+   "A7-74": "b3ec278ce4",
+   "A7-32": "0f63100be0",
+   "A7-54": "1c3b16257d",
+   "A7-55": "6f2143030d",
+   "A7-23": "90bc4b1137",
+   "A7-70": "da4cede3e2",
+   "A8-33": "561bc291a5",
+   "A8-51": "71142aa1fa",
+   "A8-56": "d9d9786f63",
+   "A8-61": "7c0489caf3",
+   "A8-54": "bc2f9467fd",
+   "A10-20": "f082cec9f8",
+   "A6-03": "7171a00636",
+   "A6-05": "0e69163f75",
+   "A4-12": "fa876afeec",
+   "S11-57": "a3996ae84e",
+   "A4-09": "b215034fb7",
+   "A8-01": "750bd94ee4",
+   "S1-13": "eca22651fd"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-29": "69d8f12a68",
+   "B4-83": "a7473a80ea",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B9-06": "f091432f2d",
+   "S1-12": "0bea92643b",
+   "S1-21": "334e0a791c",
+   "S11-56": "8b6c6c101f",
+   "S2-28": "549fd7ae22",
+   "S1-60": "235c90a3c3",
+   "S1-38": "6301c86637",
+   "S13-22": "9c91065dc1",
+   "S12-26": "8368479b9d",
+   "S1-43": "dd3ae2a1a9",
+   "B3-02": "74ad1f98f2",
+   "B3-17": "3eb7d7f259",
+   "B4-04": "df3ea4b2f5",
+   "B4-07": "9d0dbc90ad",
+   "B4-84": "549b5c1a9d",
+   "B5-34": "917f89b62f",
+   "B5-05": "f6c200764e",
+   "B6-14": "dfd03ee673",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B8-22": "50d78f1af0",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B9-17": "24b5acdf89",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B9-22": "f691bde396",
+   "B7-52": "62f5c3d1b4",
+   "B9-25": "ba71e46cce",
+   "B4-62": "9769228e39",
+   "B4-63": "49ce39c037",
+   "B4-44": "514c8ab30c",
+   "B5-21": "925b7342ed",
+   "B7-51": "7910e2fa9f",
+   "B7-16": "3177c3701b",
+   "B7-28": "deeed1f8a0",
+   "B8-17": "dcff722a6d",
+   "B8-52": "6f008512da",
+   "B8-10": "5c9d4b937f",
+   "B8-54": "0f180048ca",
+   "B8-61": "79d4d31102",
+   "B3-04": "31447caa31",
+   "B3-19": "2f53161fb2",
+   "B4-48": "8a955b9849",
+   "B7-18": "d53cef58f7",
+   "B7-61": "342b55fd9b",
+   "B7-31": "1b4da1dea9",
+   "B8-19": "11e79a26d8",
+   "B8-23": "dd780a2ec8",
+   "B8-32": "1cfd4f7afa",
+   "B8-37": "3ce85cf051",
+   "B6-06": "1d676278da",
+   "B4-13": "ecedd7f044",
+   "S11-14": "5a5607d715",
+   "S11-38": "58d27fc71e",
+   "B8-30": "a1ef4983e4",
+   "S11-57": "2f34f23d8a",
+   "B4-10": "c21b3d3450",
+   "S11-41": "b9894f01ce",
+   "S11-58": "3461928783",
+   "B4-34": "74ff52d83d",
+   "S1-13": "6964bfbe60",
+   "B10-32": "7713bff255",
+   "B7-17": "ac1fd212f3"
+  }
+ }
+}

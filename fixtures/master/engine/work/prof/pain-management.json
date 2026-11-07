@@ -1,0 +1,6221 @@
+{
+ "id": "pain-management",
+ "name": "Pain management",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "chiropractor",
+ "plugin": {
+  "pf.license": {
+   "need": "each doctor the owner names holds their own state medical license; the clinic where the state's form asks",
+   "who": "each person; the clinic too where the state's form asks for it",
+   "ask": "the owner gives each license number in plain words, by text or on the secure page; Rosie keeps it as the owner's own word",
+   "check": "none: Rosie looks no license up and checks none (D96); the owner is responsible for the licenses they add",
+   "blocks": "Rosie books only the work the owner says it is licensed for; a doctor the owner says is not licensed for a service is not offered it",
+   "away": "home visits only where the owner says the state allows them",
+   "acupuncture": "none: the clinic offers no acupuncture",
+   "xray": "scans only where the owner says the clinic is registered for them; ordered by the doctor",
+   "video": "off: exams and procedures are in person; no visit is booked by video or phone",
+   "agreement": "the clinic's own privacy notice, shown on the secure page before the first booking",
+   "renewals": "the owner keeps the license numbers up to date; Rosie does not track renewals",
+   "insurance": "malpractice insurance only as the owner's own word, if the owner adds it"
+  },
+  "pf.services": {
+   "shape": "visit types in the clinic's exam rooms, each with a set length; a first visit is a history, an exam and a plan of care, with no procedure that day; procedures are done only in the clinic's procedure room, on the doctor's order and after the patient's consent; a plan of care's visits are booked as a series only with the patient's own yes, and each is paid when it happens",
+   "examples": "the example clinic's own prices (Lee Pain Care and Lee Mobile MD), not a standard; a plan pays its own share, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "New patient evaluation (history, exam, and a plan of care; no procedure on the first visit)",
+     "price": "$180",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic",
+     "before": "nothing taken (a card saved only for a procedure visit)",
+     "after": "at the front desk: the self-pay price, or the plan's share",
+     "note": "new patients are seen in their own time slots (Sam's booking rules)"
+    },
+    {
+     "name": "Follow-up visit (from the plan of care)",
+     "price": "$95",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "a plan of care's follow-ups; each is paid when it happens"
+    },
+    {
+     "name": "Medication check (added to a visit)",
+     "price": "$60",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "added to a visit, at the clinic",
+     "before": "nothing taken",
+     "after": "with the visit, at the front desk"
+    },
+    {
+     "name": "Procedure visit (in the procedure room; the doctor's order, a consent signed, and a ride home)",
+     "price": "$450",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the clinic, in the procedure room",
+     "before": "a card saved for the $150 missed-visit fee",
+     "after": "at the front desk after the visit: the self-pay price, or the plan's share; a plan's approval is asked first where the plan asks"
+    },
+    {
+     "name": "Claim visit (an auto or work injury)",
+     "price": "billed to the claim",
+     "kind": "set by the claim",
+     "length": "60 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "the clinic bills the claim its own way",
+     "note": "the claim number goes on the secure page first, and the desk confirms the claim before the visit"
+    },
+    {
+     "name": "First home visit (history, exam, and a medication review; no procedure at home)",
+     "price": "$260",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the patient's home",
+     "before": "a card saved for the $100 missed-visit fee, or nothing taken",
+     "after": "the saved card charged when the doctor texts DONE, or Rosie texts the bill"
+    },
+    {
+     "name": "Home follow-up (from the plan of care)",
+     "price": "$150",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the patient's home",
+     "before": "a card saved for the $100 fee, or nothing taken",
+     "after": "the saved card charged at DONE, or Rosie texts the bill"
+    },
+    {
+     "name": "Extended home visit (a longer visit)",
+     "price": "$320",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the patient's home",
+     "before": "a card saved for the $100 fee, or nothing taken",
+     "after": "the saved card charged at DONE, or Rosie texts the bill",
+     "note": "the new price is shown first, and the patient says yes"
+    },
+    {
+     "name": "Missed-visit fee",
+     "price": "$150 for a procedure; $100 for a home visit",
+     "kind": "a fee",
+     "where": "both places",
+     "note": "only from a saved card, and only when the owner confirms it"
+    }
+   ],
+   "capacity": "one patient per exam room; the procedure room is booked with the procedure visit; a doctor's home visit is booked like a person",
+   "nobodyHome": "never: the patient is always there",
+   "online": "off: exams and procedures are in person"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, or for someone you help (adults only: 18 and over)",
+    "new or returning patient (a new patient gets the 60-minute new patient evaluation)",
+    "which visit: the clinic's own visit types only, never a symptom typed into the AI",
+    "a car accident or a work injury (then it's billed to that claim)",
+    "a health plan (its name only), Medicare, or paying yourself",
+    "mornings, midday or evenings"
+   ],
+   "afterTime": [
+    "anything that helps at the visit, like the step-free door or an interpreter",
+    "at home: who will be there, where to park, and a clear space for the doctor"
+   ],
+   "securePage": [
+    "birth date",
+    "plan member ID and a photo of the insurance card",
+    "for a car accident or a work injury: the claim number and the adjuster",
+    "health history: the reason, past care, medicines, allergies, and pregnancy",
+    "consent to care, after the doctor's main risks are explained, and the privacy notice",
+    "for a procedure: the name of the person who will drive home"
+   ],
+   "whoMayBook": "an adult for themselves; a guardian or health care agent for an adult who can't consent (papers on file). No visit is booked for anyone under 18: the clinic refers a minor to a pediatric clinic",
+   "neverAsked": "symptoms, the reason for the visit and results are never asked or typed in the AI chat; words typed there are checked for danger, then not kept"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, a sudden very bad headache, or sudden weakness, numbness, a drooping face or slurred speech",
+     "say": "This needs help now. Call 911. Don't wait for a clinic visit.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a fever, chills, or a hot, swollen or leaking place after a procedure or an injection; numbness in the groin or inner thighs; new trouble controlling the bladder or bowels; or leg weakness that's getting worse",
+     "say": "This needs a doctor now. Go to an emergency room, or call 911. Don't wait for a clinic visit.",
+     "booking": "no booking; the same words texted before a visit get the same message, the owner is told and calls, and the visit stays unless the patient cancels, with no fee"
+    },
+    {
+     "words": "taking too much medicine or an overdose, or thoughts of ending a life",
+     "say": "Call 911 now. For thoughts of self-harm you can also call or text 988, any time.",
+     "booking": "no booking; the owner is told at once and calls"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a planned follow-up, a medication check, or a check-in on a plan of care",
+     "what": "books as usual; Rosie only matches words and never judges how serious anything is"
+    }
+   ],
+   "owner": "the clinic's own red-flag list, set with its doctors at sign-up, is the stop list above; Sam can add words that go to the clinic's own line (A3-26)",
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history and consent",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+     "who": "every new patient; returning patients once a year, or when their health changes",
+     "result": "the consent is signed after the doctor explains the main risks, before any procedure; not done by its due date: Sam keeps the visit (signed on the secure page at the desk first), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered (the copay, visits left), some services only, not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "The approval for a procedure",
+     "when": "before the procedure day, where the plan asks for one",
+     "who": "every patient booked for a procedure visit",
+     "result": "approved: the procedure stays; not approved: no procedure is booked, and the visit stays at the self-pay price or the patient may cancel free"
+    },
+    {
+     "name": "The claim for a car accident or a work injury",
+     "when": "on the secure page while booking; the desk confirms it before the visit",
+     "who": "every patient whose visit is billed to a claim",
+     "result": "no claim confirmed: the visit stays at the self-pay price, or a free cancel"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day, or sooner where the rules require it",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "A re-exam before more procedures",
+     "when": "before the next procedure",
+     "who": "a returning patient with no exam in the last 12 months",
+     "goodFor": "12 months (the example clinic's rule)",
+     "result": "the doctor goes on, suggests another plan, or refers the patient to another doctor"
+    }
+   ],
+   "prep": "arrive 15 minutes early; bring a photo ID, the insurance card, a list of current medicines, and any past scans; for a procedure day, arrange a ride home (the desk confirms it on the secure page)"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the check-in code at the front desk, with a photo ID; at home: the code at the door",
+   "beforeWork": "the doctor reads the health history, takes the history and examines before any procedure, with their own danger checks",
+   "changes": "a scan only if the doctor orders it, with the price shown first and the patient's yes; a procedure only on the doctor's own order, after the consent, and with the plan's approval where the plan asks; something that needs another doctor first means no procedure, the visit is paid, and notes go to the doctor the patient names; a plan of care is suggested in person, stays on the secure page, and is never pushed",
+   "carePlan": "a plan of care's visits are booked as a series only with the patient's own yes by text; one reply stops any visit, or all that are left",
+   "done": "the check-in code or DONE; notes, scans and medicine records stay in the clinic's own records, shared with the patient only in person, never in Rosie or a text",
+   "away": "home visits are consults and medication checks only; no procedure or scan is done at home"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking at the clinic; a card saved only for a procedure visit (the clinic's $150 missed-visit fee), never for a consult; at home: a card saved for the $100 missed-visit fee and charged at DONE, or nothing saved and Rosie texts the bill; a claim visit: nothing taken",
+   "plans": "the plans the clinic takes (its own list); the front desk checks each by hand and records it: active or not, the copay and the deductible; the share is an estimate, not a promise; a procedure's approval is asked where the plan asks",
+   "claims": "an auto or work injury visit is billed to that claim, the business's own way; the claim details go only on the secure page",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "packages": "none: each visit is paid when it happens; the clinic sells no prepaid visits",
+   "fees": "the missed-visit fee: $150 for a procedure and $100 for a home visit (the example's own), only from a saved card and only when the owner confirms it; the same fee for every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; a Medicare patient pays a fee only if every patient does; their texts say 'No fee to cancel or miss'",
+   "after": "at the clinic: the self-pay price or the plan's share at the front desk, its own way; the clinic sends the plan's claim; a balance after the plan pays is billed by the clinic, not by Rosie's text; at home: the saved card charged at DONE, or Rosie texts the bill; a claim is billed the business's own way",
+   "rosfield": "the $2 per booking applies, as for every profession: a flat service fee for each booking Rosie's AI makes, not a share of the price; no membership is sold here, so no 1% applies. Card payments also carry Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form; fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)",
+   "repeatPlans": "a repeating visit plan (like a medication check every 4 weeks) is booked only with its own yes; each visit is paid when it happens, like a single visit: at the front desk at the clinic, or at home by the saved card at DONE or Rosfield's bill; no monthly plan charge and nothing paid ahead"
+  },
+  "pf.messages": {
+   "never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the medicines, procedures, results or the doctor's name (at home, the doctor's name stays, for the door check)",
+   "staff": "texts to the owner and staff use the patient's initials only (A.M., never Alex M.) and never the reason for the visit",
+   "healthQuestions": "Rosie never answers a health or medicine question; it goes to the clinic, which calls the patient",
+   "languages": "English and Spanish",
+   "minors": "no visits for anyone under 18 (the clinic refers a minor to a pediatric clinic), so no minor's text is sent",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the doctor"
+  },
+  "pf.staff": {
+   "licenses": "each doctor's own state medical license, as the owner gives it",
+   "skills": "doctors: exams, plans of care, medication checks and procedures in the procedure room; the front desk: check-in, plan checks, approvals, estimates and payment; only people cleared for home visits go to homes",
+   "supervision": "a medical assistant works only while a doctor is in the building, as the clinic's own rule",
+   "oks": "the owner OKs same-day visits, any price made for one patient (for a procedure, every one), and anything a doctor flags",
+   "standIn": "a doctor out: another doctor takes their patients where there's room, and the patient chooses; the patient never hears why someone is out",
+   "away": "the home-visit team: Dr. Ruiz and Dr. Lind"
+  },
+  "pf.rules": {
+   "records": "clinic records are kept by the clinic as long as the state's rules require; a delete request removes only Rosie's own booking details, never the clinic's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "consent": "written consent after the main risks are explained, before any procedure, where the state's rules require it",
+   "prepaid": "prepaid visits follow the state's rules (written terms, a cancel, a refund of unused visits); the example clinic sells none",
+   "showLicense": "the license shown where the state asks: posted at the clinic, and on a home visit",
+   "minors": "no visits for anyone under 18 at this clinic",
+   "host": "none: no workplace days here",
+   "ads": "no free-visit or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form; no medicine is ordered, refilled or discussed through Rosie"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen, in the time left; later: the front desk may move the visit, with no fee (Rosie never moves it itself)",
+   "standIn": "a doctor out: another doctor with room, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any procedure), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "redFlagBefore": "red-flag words texted before a visit: the emergency room message; the owner is told and calls; the visit stays unless the patient cancels, with no fee",
+   "referral": "something in the exam needs another doctor first: no procedure, the visit is paid, and notes go to the doctor the patient names",
+   "carePlan": "a plan of care's visits are booked only with the patient's own yes; one reply stops any visit or all that are left; no sales texts",
+   "twoBookings": "a patient with several plan of care visits open: Rosie asks which one before any change",
+   "healthQuestion": "a question about medicines or what to do before a visit goes to the clinic; Rosie gives no advice",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): a sudden flare-up gets the soonest same-day time, with the owner's OK; the red-flag words get the emergency room or 911 message",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "plans",
+   "planbill",
+   "forms",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Pain Care",
+   "staff": "Dr. Okafor and Dr. Patel (physicians) and the front desk",
+   "cust": "Alex M. (a new patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Mobile MD",
+   "staff": "Dr. Ruiz and Dr. Lind (physicians), who visit homes",
+   "cust": "Alex M. (a new patient, at home) · other patients",
+   "other": "Others (a family member, a guardian or health care agent, a plan or a claim)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dr. Okafor"
+  },
+  "B": {
+   "staff": "Dr. Ruiz"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "color and cut",
+    "pain check"
+   ],
+   [
+    "Color and cut",
+    "Pain check"
+   ],
+   [
+    "The chairs",
+    "The exam rooms"
+   ],
+   [
+    "A chair, ready",
+    "A exam room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a doctor who rents a room,"
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free exam room:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "How would you like it on top?",
+    "Where does it hurt most?"
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter visit in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter visit."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during my visit?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please wear loose, comfy clothes on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please wear loose, comfy clothes."
+   ],
+   [
+    "the customer is already in the chair",
+    "the patient is already in the exam room"
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped A.M.'s visit."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the visit and answers questions."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a sign to check first, stopped"
+   ],
+   [
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed",
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed"
+   ],
+   [
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each kind of work may keep its own trade name, like Lee House Calls and Lee Procedure."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pain clinics set it."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pain clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pain clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Follow-up visits, exams and medication check."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "House calls and procedure, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A procedure visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see patients; Riley also does medication checks and house calls."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: doctor, medication review, house calls"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: doctor, medication review and house calls"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a nerve block, which isn't on the clinic's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Pain Care doesn't do nerve blocks."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: follow-up in 4 weeks"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a first visit, so the times fit it."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "A booking added after the list goes to Jordan at once, in its own text.",
+    "A booking added after the list goes to Jordan at once, by text."
+   ],
+   [
+    "New times with Jordan; a free cancel stays open",
+    "New times; a free cancel stays open"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Any question about your care? Reply here. How was your visit with Jordan?"
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "First house call $179 ($199 from Nov 2) · Home follow-up $150"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like a first visit on Saturday."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a booking for Saturday."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a doctor come to my home this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa house call Thu 12-2 Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I'd like a first home visit' fits a first house call."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like treating someone who never said yes to care."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A house call happens only at the patient's home, so nothing is asked."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check?",
+    "A commonly paired add-on is one line on the card: 'Adding medication check?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Is the visit for you, or for someone you help?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes more than one visit, like a care plan of weekly follow-up visits."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a second visit."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also see me for a second visit?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The second visit is booked at the same time, priced there."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like the pain check."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 care plan is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it still hurts"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 house call needs none."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: Jordan does procedure."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also see me for a second visit?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the visit needs to move."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The visit moves to Friday, and Alex asks for a later time."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Please don't wait: if this is an emergency, call 911 now."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds something a medication check would cover."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 medication check"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Extra for A.M.: a medication check, $60."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Medication check · $60"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $60 check price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the medication check for $60."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a sign that needs a medical doctor first."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan stopped part of today's visit for your safety. The note is on your secure page."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: something to check first"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the procedure"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your own doctor first"
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · today's visit"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's table scuffs the floor and Jordan texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's table scuffed the floor at A.M.'s."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 house call"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan was rushed and didn't explain the care plan."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the floor where the table stood."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan see me again next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a home follow-up."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a visit for today,"
+   ],
+   [
+    "M.P. would like to talk about the water heater quote before booking.",
+    "M.P. would like to talk about the care plan quote before booking."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the first house call from a card saved for the $100 fee to nothing saved."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every clinic service, and medication review"
+   ],
+   [
+    "about the job",
+    "about the visit"
+   ],
+   [
+    "Keeps each job inside the license",
+    "Keeps each visit inside the license"
+   ],
+   [
+    "no jobs sent now",
+    "no visits sent now"
+   ],
+   [
+    "Any jobs already booked?",
+    "Any visits already booked?"
+   ],
+   [
+    "The jobs already on it",
+    "The visits already on it"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "next job:",
+    "next visit:"
+   ],
+   [
+    "Someone calls for a dentist",
+    "Someone calls for a doctor's office"
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Clinic? I need to move my visit."
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Clinic"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A second kind of work for Lee Pain Care: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds a second kind of work to Lee Pain Care."
+   ],
+   [
+    "NEW massage",
+    "NEW second kind of work"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "clinic's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute check-in"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a closed door or a power cut"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A visit is rated, so the clinic takes the first branch."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a follow-up visit plan with Riley, every 4 weeks."
+   ],
+   [
+    "photos of your hair",
+    "photos of your insurance card"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Pain care takes no jobs sent now, at the clinic or on home visits."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Follow-up plan · every 4 weeks"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Medication check · $60"
+   ],
+   [
+    "gloss",
+    "a medication check"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Pain Care LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile MD's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pain Care"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile MD"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee House Calls and Lee Medication Checks"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile pain care and medication checks"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile pain care and medication checks"
+   ],
+   [
+    "1200 Main St",
+    "275 Oak Ave"
+   ],
+   [
+    "88 Elm St",
+    "18 Birch Rd"
+   ],
+   [
+    "Riley Chen",
+    "Ines Okafor"
+   ],
+   [
+    "Avery Diaz",
+    "Paul Patel"
+   ],
+   [
+    "Jordan Price",
+    "Ruth Ruiz"
+   ],
+   [
+    "Casey Moore",
+    "Gil Lind"
+   ],
+   [
+    "Riley",
+    "Okafor"
+   ],
+   [
+    "Avery",
+    "Dr. Patel"
+   ],
+   [
+    "Jordan",
+    "Dr. Ruiz"
+   ],
+   [
+    "Casey",
+    "Dr. Lind"
+   ],
+   [
+    "electrical",
+    "procedure"
+   ],
+   [
+    "Electrical",
+    "Procedure"
+   ],
+   [
+    "plumber",
+    "doctor"
+   ],
+   [
+    "Plumber",
+    "Doctor"
+   ],
+   [
+    "plumbing",
+    "mobile pain care"
+   ],
+   [
+    "Plumbing",
+    "Mobile pain care"
+   ],
+   [
+    "barbershop",
+    "pain clinic"
+   ],
+   [
+    "Barbershop",
+    "Pain clinic"
+   ],
+   [
+    "barbers",
+    "doctors"
+   ],
+   [
+    "Barbers",
+    "Doctors"
+   ],
+   [
+    "barber",
+    "doctor"
+   ],
+   [
+    "Barber",
+    "Doctor"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "New patient evaluation"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "New patient evaluation"
+   ],
+   [
+    "Signature cut and shave",
+    "New patient evaluation"
+   ],
+   [
+    "Signature cut and shave",
+    "New patient evaluation"
+   ],
+   [
+    "hot towel shave",
+    "medication review"
+   ],
+   [
+    "signature cut",
+    "re-exam"
+   ],
+   [
+    "Signature cut",
+    "New patient evaluation"
+   ],
+   [
+    "Groom's package",
+    "Imaging review"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color correction",
+    "follow-up visit"
+   ],
+   [
+    "Color correction",
+    "Follow-up visit"
+   ],
+   [
+    "kids cuts",
+    "follow-up visits"
+   ],
+   [
+    "Kids cut",
+    "Follow-up visit"
+   ],
+   [
+    "kids cut",
+    "follow-up visit"
+   ],
+   [
+    "Kids cut",
+    "Follow-up visit"
+   ],
+   [
+    "a skin fade",
+    "a follow-up visit"
+   ],
+   [
+    "A skin fade",
+    "A follow-up visit"
+   ],
+   [
+    "skin fade",
+    "follow-up visit"
+   ],
+   [
+    "Skin fade",
+    "Follow-up visit"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Dr. Okafor orders scans"
+   ],
+   [
+    "beard trim",
+    "medication check"
+   ],
+   [
+    "Beard trim",
+    "Medication check"
+   ],
+   [
+    "haircuts",
+    "new patient evaluations"
+   ],
+   [
+    "Haircuts",
+    "New patient evaluations"
+   ],
+   [
+    "haircut",
+    "new patient evaluation"
+   ],
+   [
+    "Haircut",
+    "New patient evaluation"
+   ],
+   [
+    "color",
+    "medication review"
+   ],
+   [
+    "Color",
+    "Medication review"
+   ],
+   [
+    "a patch test",
+    "an exam"
+   ],
+   [
+    "patch test",
+    "exam"
+   ],
+   [
+    "a consult",
+    "an exam"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "Consult",
+    "Exam"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "set at the chair",
+    "set at the visit"
+   ],
+   [
+    "quote at the chair",
+    "quote at the visit"
+   ],
+   [
+    "is at the chair",
+    "is at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "First house call"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up"
+   ],
+   [
+    "Panel upgrade",
+    "Medication care plan"
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "home warranty",
+    "health plan"
+   ],
+   [
+    "warranty plan",
+    "health plan"
+   ],
+   [
+    "labor",
+    "care day time"
+   ],
+   [
+    "flush",
+    "follow-up visit"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a first visit on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a follow-up visit every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a follow-up visit every 4 weeks."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A friend books visits for four people on one morning."
+   ],
+   [
+    "staff cut",
+    "staff visit"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "Can I still come in Saturday?"
+   ],
+   [
+    "like a skin-test result",
+    "like the date of the last scans"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una primera cita el sábado."
+   ],
+   [
+    "A step-free door on Elm St",
+    "A step-free door on Birch Rd"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Birch Rd"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The chair's arm tore my sweater."
+   ],
+   [
+    "says the cape clip ripped",
+    "says the table's clip tore"
+   ],
+   [
+    "a clinic",
+    "an office"
+   ],
+   [
+    "A clinic",
+    "A clinic"
+   ],
+   [
+    "rents a chair",
+    "rents a room"
+   ],
+   [
+    "MP045210",
+    "DC045210"
+   ],
+   [
+    "JP031552",
+    "DC031552"
+   ],
+   [
+    "JE30417",
+    "LA30417"
+   ],
+   [
+    "BS20981",
+    "CR20981"
+   ],
+   [
+    "EC22871",
+    "AR22871"
+   ],
+   [
+    "Water heater replacement",
+    "Procedure session"
+   ],
+   [
+    "Sewer camera inspection",
+    "Pain check"
+   ],
+   [
+    "sewer camera inspection",
+    "pain check"
+   ],
+   [
+    "drain clearings",
+    "first house calls"
+   ],
+   [
+    "Drain clearings",
+    "First house calls"
+   ],
+   [
+    "drain clearing",
+    "first house call"
+   ],
+   [
+    "Drain clearing",
+    "First house call"
+   ],
+   [
+    "water heater quote",
+    "care plan quote"
+   ],
+   [
+    "finds chairs side by side",
+    "finds open times side by side"
+   ]
+  ],
+  "B": [
+   [
+    "color and cut",
+    "pain check"
+   ],
+   [
+    "Color and cut",
+    "Pain check"
+   ],
+   [
+    "The chairs",
+    "The exam rooms"
+   ],
+   [
+    "A chair, ready",
+    "A exam room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a doctor who rents a room,"
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free exam room:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "How would you like it on top?",
+    "Where does it hurt most?"
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter visit in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter visit."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during my visit?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please wear loose, comfy clothes on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please wear loose, comfy clothes."
+   ],
+   [
+    "the customer is already in the chair",
+    "the patient is already in the exam room"
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped A.M.'s visit."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the visit and answers questions."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a sign to check first, stopped"
+   ],
+   [
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed",
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed"
+   ],
+   [
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each kind of work may keep its own trade name, like Lee House Calls and Lee Procedure."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pain clinics set it."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pain clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pain clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Follow-up visits, exams and medication check."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "House calls and procedure, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A procedure visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see patients; Riley also does medication checks and house calls."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: doctor, medication review, house calls"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: doctor, medication review and house calls"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a nerve block, which isn't on the clinic's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Pain Care doesn't do nerve blocks."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: follow-up in 4 weeks"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a first visit, so the times fit it."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "A booking added after the list goes to Jordan at once, in its own text.",
+    "A booking added after the list goes to Jordan at once, by text."
+   ],
+   [
+    "New times with Jordan; a free cancel stays open",
+    "New times; a free cancel stays open"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Any question about your care? Reply here. How was your visit with Jordan?"
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "First house call $179 ($199 from Nov 2) · Home follow-up $150"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like a first visit on Saturday."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a booking for Saturday."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a doctor come to my home this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa house call Thu 12-2 Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I'd like a first home visit' fits a first house call."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like treating someone who never said yes to care."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A house call happens only at the patient's home, so nothing is asked."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check?",
+    "A commonly paired add-on is one line on the card: 'Adding medication check?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Is the visit for you, or for someone you help?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes more than one visit, like a care plan of weekly follow-up visits."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a second visit."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also see me for a second visit?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The second visit is booked at the same time, priced there."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like the pain check."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 care plan is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it still hurts"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 house call needs none."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: Jordan does procedure."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also see me for a second visit?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the visit needs to move."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The visit moves to Friday, and Alex asks for a later time."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Please don't wait: if this is an emergency, call 911 now."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds something a medication check would cover."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 medication check"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Extra for A.M.: a medication check, $60."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Medication check · $60"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $60 check price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the medication check for $60."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a sign that needs a medical doctor first."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan stopped part of today's visit for your safety. The note is on your secure page."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: something to check first"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the procedure"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your own doctor first"
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · today's visit"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's table scuffs the floor and Jordan texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's table scuffed the floor at A.M.'s."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 house call"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan was rushed and didn't explain the care plan."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the floor where the table stood."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan see me again next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a home follow-up."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a visit for today,"
+   ],
+   [
+    "M.P. would like to talk about the water heater quote before booking.",
+    "M.P. would like to talk about the care plan quote before booking."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the first house call from a card saved for the $100 fee to nothing saved."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My back hurts a lot."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me duele mucho la espalda."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Should I stop my blood thinner before the visit?"
+   ],
+   [
+    "no open times for this job",
+    "no open times for this visit"
+   ],
+   [
+    "about the job",
+    "about the visit"
+   ],
+   [
+    "Books one job for a group",
+    "Books one visit for a group"
+   ],
+   [
+    "Keeps each job inside the license",
+    "Keeps each visit inside the license"
+   ],
+   [
+    "no jobs sent now",
+    "no visits sent now"
+   ],
+   [
+    "Any jobs already booked?",
+    "Any visits already booked?"
+   ],
+   [
+    "The jobs already on it",
+    "The visits already on it"
+   ],
+   [
+    "job texts",
+    "visit texts"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "Ask Sam about your jobs.",
+    "Ask Sam about your visits."
+   ],
+   [
+    "more jobs today",
+    "more visits today"
+   ],
+   [
+    "next job:",
+    "next visit:"
+   ],
+   [
+    "Someone calls for a dentist",
+    "Someone calls for a doctor's office"
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Clinic? I need to move my visit."
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Clinic"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilemd.com"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Nutrition coaching for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds nutrition coaching to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW nutrition coaching"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a closed door or a power cut"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 scan stays good until Thu Oct 29."
+   ],
+   [
+    "One booking, so one $2 for the whole job.",
+    "It's one booking for the whole job."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 care plan, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your care plan"
+   ],
+   [
+    "Repipe · $2,400",
+    "Care plan · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the try-in is done, $800 at the finish"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your care plan"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "no proof Alex may have this work done",
+    "no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Pain care takes no jobs sent now, at the clinic or on home visits."
+   ],
+   [
+    "The work never started, so there's no $2.",
+    "The work never started."
+   ],
+   [
+    "One booking, so no second $2.",
+    "The extra stays part of the one booking."
+   ],
+   [
+    "No visit, so no $2.",
+    "No visit."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "like a move-out day",
+    "like a move to another home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile MD LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile MD's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pain Care"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile MD"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee House Calls and Lee Medication Checks"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile pain care and medication checks"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile pain care and medication checks"
+   ],
+   [
+    "1200 Main St",
+    "275 Oak Ave"
+   ],
+   [
+    "88 Elm St",
+    "18 Birch Rd"
+   ],
+   [
+    "42 Oak St",
+    "9 Hollis Ct"
+   ],
+   [
+    "Riley Chen",
+    "Ines Okafor"
+   ],
+   [
+    "Avery Diaz",
+    "Paul Patel"
+   ],
+   [
+    "Jordan Price",
+    "Ruth Ruiz"
+   ],
+   [
+    "Casey Moore",
+    "Gil Lind"
+   ],
+   [
+    "Riley",
+    "Dr. Okafor"
+   ],
+   [
+    "Avery",
+    "Dr. Patel"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Goes over the exam; offers a plan"
+   ],
+   [
+    "Jordan",
+    "Dr. Ruiz"
+   ],
+   [
+    "Casey",
+    "Dr. Lind"
+   ],
+   [
+    "electrical",
+    "procedure"
+   ],
+   [
+    "Electrical",
+    "Procedure"
+   ],
+   [
+    "plumbing license",
+    "pain care license"
+   ],
+   [
+    "Plumbing license",
+    "Pain care license"
+   ],
+   [
+    "plumber",
+    "doctor"
+   ],
+   [
+    "Plumber",
+    "Doctor"
+   ],
+   [
+    "plumbing",
+    "mobile pain care"
+   ],
+   [
+    "Plumbing",
+    "Mobile pain care"
+   ],
+   [
+    "barbershop",
+    "pain clinic"
+   ],
+   [
+    "Barbershop",
+    "Pain clinic"
+   ],
+   [
+    "barbers",
+    "doctors"
+   ],
+   [
+    "Barbers",
+    "Doctors"
+   ],
+   [
+    "barber",
+    "doctor"
+   ],
+   [
+    "Barber",
+    "Doctor"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "New patient evaluation"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "New patient evaluation"
+   ],
+   [
+    "hot towel shave",
+    "medication review"
+   ],
+   [
+    "Signature cut",
+    "New patient evaluation"
+   ],
+   [
+    "beard trim",
+    "medication check"
+   ],
+   [
+    "Beard trim",
+    "Medication check"
+   ],
+   [
+    "haircut",
+    "new patient evaluation"
+   ],
+   [
+    "Haircut",
+    "New patient evaluation"
+   ],
+   [
+    "color",
+    "medication review"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "First house call"
+   ],
+   [
+    "Kitchen drain clearing",
+    "First house call"
+   ],
+   [
+    "drain clearing",
+    "first house call"
+   ],
+   [
+    "Drain clearing",
+    "First house call"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up"
+   ],
+   [
+    "water heater flush",
+    "home follow-up"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up"
+   ],
+   [
+    "leak repair",
+    "follow-up visit"
+   ],
+   [
+    "Leak repair",
+    "Follow-up visit"
+   ],
+   [
+    "service call fee",
+    "home fee"
+   ],
+   [
+    "service call",
+    "home fee"
+   ],
+   [
+    "Service call fee",
+    "Home fee"
+   ],
+   [
+    "Service call",
+    "Home fee"
+   ],
+   [
+    "Sewer camera inspection",
+    "Extended home visit"
+   ],
+   [
+    "sewer camera inspection",
+    "extended home visit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Extended home visit"
+   ],
+   [
+    "Panel upgrade",
+    "Medication care plan"
+   ],
+   [
+    "credited to the repair",
+    "credited to the visit"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene la cara hinchada o fiebre?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face swollen, or do you have a fever?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tengo fiebre."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't have a fever."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se le hincha la cara con fiebre, vaya a urgencias o llame al 911."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a pain care visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like braces"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face or jaw with a fever, or trouble breathing or swallowing."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Which room are you in at Alex's home?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "home warranty",
+    "health plan"
+   ],
+   [
+    "warranty plan",
+    "health plan"
+   ],
+   [
+    "the warranty company",
+    "the plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Alex says yes before any work",
+    "Alex says yes first"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and insurance card ready."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan runs Pine Court home, with a repeat plan: follow-up visits for two patients every 6 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's follow-up visits?"
+   ],
+   [
+    "Rental 1",
+    "Resident 1"
+   ],
+   [
+    "Rental 2",
+    "Resident 2"
+   ],
+   [
+    "Kitchen drain",
+    "First house call"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "Supply line · $80",
+    "scan · $80"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD no safe outlet for the chair, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: no safe outlet for the chair"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the procedure"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the home to fix the outlet first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the wall by the bed"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed wall"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 first house call"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M.: next follow-up visit in 6 months. Bring the scan unit then."
+   ],
+   [
+    "The kitchen drain",
+    "The first house call"
+   ],
+   [
+    "with the store's receipt",
+    "with the lab's receipt"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. A check within 30 days is free, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the scan report is ready"
+   ],
+   [
+    "Sewer camera report",
+    "scan report"
+   ],
+   [
+    "Drain clearings already booked",
+    "First house calls already booked"
+   ],
+   [
+    "The repair price",
+    "The visit price"
+   ],
+   [
+    "the repair price",
+    "the visit price"
+   ],
+   [
+    "The repair price",
+    "The visit price"
+   ],
+   [
+    "Book the repair",
+    "Book the visit"
+   ],
+   [
+    "to the repair",
+    "to the visit"
+   ],
+   [
+    "labor",
+    "care day time"
+   ],
+   [
+    "Labor",
+    "Care day time"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It hurts a lot. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back in my room 30 minutes late, sorry!"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 care plan"
+   ],
+   [
+    "drying fan",
+    "loaner TENS unit"
+   ],
+   [
+    "flush",
+    "follow-up visit"
+   ],
+   [
+    "a clinic",
+    "an office"
+   ],
+   [
+    "A clinic",
+    "A clinic"
+   ],
+   [
+    "rents a chair",
+    "rents a room"
+   ],
+   [
+    "MP045210",
+    "DC045210"
+   ],
+   [
+    "JP031552",
+    "DC031552"
+   ],
+   [
+    "JE30417",
+    "LA30417"
+   ],
+   [
+    "BS20981",
+    "CR20981"
+   ],
+   [
+    "EC22871",
+    "AR22871"
+   ],
+   [
+    "· arriving 8–10am",
+    "· starts at 8:00am"
+   ],
+   [
+    "· arriving 12–2pm",
+    "· starts at 12:00pm"
+   ],
+   [
+    "arriving 8–10am",
+    "starting at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starting at 12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "2–4pm",
+    "2:00pm"
+   ],
+   [
+    "the new arrival time",
+    "the new start time"
+   ],
+   [
+    "Water heater replacement",
+    "Procedure session"
+   ],
+   [
+    "Sewer camera inspection",
+    "Pain check"
+   ],
+   [
+    "sewer camera inspection",
+    "pain check"
+   ],
+   [
+    "drain clearings",
+    "first house calls"
+   ],
+   [
+    "Drain clearings",
+    "First house calls"
+   ],
+   [
+    "drain clearing",
+    "first house call"
+   ],
+   [
+    "Drain clearing",
+    "First house call"
+   ],
+   [
+    "water heater quote",
+    "care plan quote"
+   ],
+   [
+    "finds chairs side by side",
+    "finds open times side by side"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "house call"
+ ],
+ "story": {
+  "A": "Sam Lee, a pain physician, signs up two companies by text. Then Alex, a new patient, books a first visit with Dr. Okafor at Lee Pain Care for Sat Oct 24 at 11:00am. The health history and the consent are on the secure page, Dr. Okafor offers a plan of care without pushing it, and Alex pays at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who can't get to a clinic for now, books a first home visit with Lee Mobile MD at home, 9 Hollis Ct. Dr. Ruiz comes Thu Oct 22 at 8:00am. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $180 new patient evaluation with Dr. Okafor. Nothing is taken. Alex pays at the front desk: the self-pay price, or a plan's share.",
+    "list|card|counter": "A procedure visit at the clinic: a card is saved for the $150 missed-visit fee, and Alex pays the $450 at the front desk after the visit."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$150"
+    },
+    "list|*|*": {
+     "price": "$180",
+     "name": "New patient evaluation"
+    },
+    "list|card|*": {
+     "price": "$450",
+     "fee": "$150",
+     "name": "Procedure visit"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Medication check",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$60"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|none|own"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: a $260 first home visit with Dr. Ruiz. A card is saved for the $100 missed-visit fee, and charged $260 when Dr. Ruiz texts DONE.",
+    "list|none|bill": "The same home visit with nothing saved. Rosie texts the $260 bill when Dr. Ruiz texts DONE.",
+    "list|none|own": "A home visit after a car accident. Nothing is taken, and the office bills the auto claim its own way."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$100"
+    },
+    "list|*|*": {
+     "price": "$260",
+     "name": "First home visit"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Home medication check",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$60"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A3-22",
+    "more": [
+     "Also a fever or a hot, swollen place after a procedure, or new groin numbness or bladder trouble."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "For the plug-in's own danger words, like a fever after a procedure, the AI shows its words instead:",
+     "'This needs a doctor now. Go to an emergency room, or call 911. Don't wait for a clinic visit.'",
+     "Signs of a stroke or a heart attack get 'Call 911 now'."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-37",
+    "more": [
+     "The desk also notes how often the plan pays for visits and procedures, and when Alex last had one.",
+     "The share is the plan's estimate, not a promise. The clinic bills the plan after the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-42",
+    "more": [
+     "The page also asks the birth date, and a plan's member ID and card photo if a plan pays.",
+     "The health history and the consent are on it too. Alex can finish them later, and the reminder asks again.",
+     "The page also repeats the right to a written price estimate."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "The health history and the consent are signed on the secure page, never by text.",
+     "They're due the day before. A returning patient's forms stay on file for a year."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For a visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever brings the patient to the clinic."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-18",
+    "more": [
+     "Dr. Patel sees new patients too, so Dr. Patel can do the whole first visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Pain Care, the forms are the health history and the consent to care.",
+     "They're filled in and signed only on the secure page, never by text.",
+     "Kept: the patient signs on the secure page at the front desk, before any procedure."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-35",
+    "more": [
+     "Here: Dr. Okafor finds a sign that needs another doctor first, so there's no procedure today.",
+     "The history and the exam were done, so the visit is paid. Dr. Okafor sends the notes to the doctor Alex names."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-20",
+    "more": [
+     "Lee Pain Care sends the claim itself. Alex pays the estimated share at the front desk.",
+     "A balance after the plan pays is billed by the clinic, never by Rosie's text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Clinic records stay with the clinic as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A sudden flare-up gets the soonest same-day time instead, once Sam OKs it. Red-flag words get the emergency message."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 per booking applies to every profession; the no-$2 choice is off."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A pain visit books people, a doctor by name, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Pain care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No pain care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the clinic: the patient is at the front desk."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Adults only: no child is booked for a visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "S1-43",
+    "why": "Every visit is at the clinic, so no clinic service is checked for a home. Home visits are Lee Mobile MD's, under its own plug-in."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "The clinic books no visits at a home. Home visits are Lee Mobile MD's, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Pain care is in person: no visit is booked by video or phone (the plug-in's video switch is off)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The example clinic sells no prepaid packages or memberships: each visit is paid when it happens."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The example clinic sells no packs or memberships, at booking or at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The clinic sells no prepaid plans or contracts at the visit, so nothing comes with a cancel period."
+   },
+   {
+    "op": "off",
+    "at": "A10-32",
+    "label": "Signs: work at their place",
+    "why": "The clinic's visits are all at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Pain care has no redo. A worry after a visit is handled as a reaction, below."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the clinic: the patient is always there."
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "label": "Safety steps, then go on",
+    "why": "Pain care has no safety steps that let a booking go on: its danger words stop the booking."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The clinic's plans are paid at the front desk after each visit, so no plan charge is ever texted (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your clinic, paid at the front desk, your own way",
+         "When they book: a card saved, for a $150 fee you OK",
+         "Free on your board: nothing taken, nothing after",
+         "Home visits: allowed where you are, for those cleared"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "New patient evaluation",
+          "$180"
+         ],
+         [
+          "Follow-up visit",
+          "$95"
+         ],
+         [
+          "Medication check",
+          "$60"
+         ],
+         [
+          "Procedure visit",
+          "$450"
+         ],
+         [
+          "Claim visit",
+          "Billed to the claim"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:deposit+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:full": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your clinic, paid at the front desk, your own way",
+           "When they book: a card saved, for a $150 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Home visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "New patient evaluation",
+            "$180"
+           ],
+           [
+            "Follow-up visit",
+            "$95"
+           ],
+           [
+            "Medication check",
+            "$60"
+           ],
+           [
+            "Procedure visit",
+            "$450"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "title": "Books a new patient evaluation and a check"
+   },
+   {
+    "op": "off",
+    "at": "S2-11",
+    "why": "D96: Rosie looks no license up; the owner's word is kept on the own step after it."
+   },
+   {
+    "op": "after",
+    "at": "S2-11",
+    "steps": [
+     {
+      "id": "A2-x01",
+      "line": [
+       "2.4"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "title": "Keeps each person's license as the owner gave it",
+      "does": "Each license number a person gave is kept as the owner's own word. Rosie looks nothing up and checks nothing.",
+      "more": [
+       "A background check or certificate the owner names is kept as the owner's word, with the date and renew-by."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Kept as you gave it. Rosie doesn't look licenses up, so you confirm them on the next card."
+       ]
+      ],
+      "needs": [
+       "added",
+       "pf.license"
+      ],
+      "gives": [
+       "license_checked"
+      ],
+      "sec": 2
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "label": "The number isn't found",
+    "why": "D96: no license lookup runs, so no number is ever 'not found'."
+   },
+   {
+    "op": "words",
+    "at": "S1-02",
+    "more": [
+     "Rosie matches Sam's words to the closest kinds of work, and Sam picks. A pick-list helps.",
+     "The first kind named is set up first. Sam can pick another.",
+     "Means 'One isn't on the list yet': a service with a visit that Rosie has no plug-in for.",
+     "Means 'Not a service we book': goods with no visit, delivery only, renting a thing alone, or work the law bars.",
+     "Gift cards are never set up either.",
+     "Never: set up any of those.",
+     "Safe default: draft it as new work, offline until Rosie's team reviews it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-03",
+    "more": [
+     "It matches the work to the closest booking pattern, like a home visit or an appointment at the business.",
+     "The services come from the owner's own price list.",
+     "The checklist has 15 blocks, shown on the screen. Each starts from its safe default, and a no skips that block.",
+     "Each answer sets a switch or a fact, like sensitive work, classes or results later. The screen names every fact each block sets.",
+     "Protective facts start on: contracts, crews and forms.",
+     "Only the business's clear no turns a protective fact off. Silence or a skipped block keeps it on, so its question is never hidden.",
+     "Block 6 also sets one bill for many visits. Deposit or fee caps show as suggested owner rules (S1-21).",
+     "Block 12's 'a pro alone' sets a check-out timer, which runs only with an emergency contact (S1-78, S2-06).",
+     "Is this health care? A yes means the health privacy agreement is signed first (S1-71, S1-72).",
+     "Each price-list service is still matched to Rosie's known kinds of work, line by line (S1-12). A no to block 5 never skips that.",
+     "Licenses are the owner's own word: Rosie looks no license up, and every service is kept to the owner's words.",
+     "The plug-in is a draft, offline until it's reviewed. Sam hears the result within 1 business day.",
+     "If the license rules are unclear, that work stays offline, saved.",
+     "Never: make up a rule. Only the owner's own words and the checklist count."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "title": "Asks if this work needs a license",
+    "does": "The license question comes before prices and money. The state may license the business itself, and each person. The owner says which licenses the work needs.",
+    "more": [
+     "The plug-in names the licenses and who issues them: a state, a city or the federal government. None named, none asked.",
+     "Rosie looks no license up and checks none. The owner's own word is what counts, and it is kept as given.",
+     "Safe default: ask for the license the business holds, and book only the work the owner says it is licensed for.",
+     "Nothing is booked on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "One question: the license number the business works under, as the owner gives it. Rosie does not look it up.",
+    "more": [
+     "Whose license it is comes from the owner's own words: the business's, the owner's, or a license holder's.",
+     "A license holder gives their own number after their invite, by text or on the secure page. Rosie does not check it.",
+     "Where the rules ask for insurance or a bond, the owner may add it here too, as its own word.",
+     "Licenses: S13-43. A license claim shows as the owner's word, not as checked.",
+     "Never: let a license stand for control (S1-75), or say a license is checked.",
+     "Safe default: the owner's word is kept, and that work is booked only as the owner says it is licensed."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state may license the business itself, and each person. What's the license number? You can skip it if your work doesn't need one."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. I've kept it as your own word. Rosie doesn't look it up. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks only for the business registration, where one is required, and keeps it as the owner's word.",
+    "more": [
+     "Insured or bonded shows only once the owner says so.",
+     "The registration's name and number must match the listing. Stripe's name check reads it (S1-27).",
+     "Customers see no license claim. Each person is asked for nothing either, unless the plug-in names something.",
+     "A price-list service that is a licensed kind of work still takes its license step (S1-12). Registration never covers it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business registration number, if it has one. I'll keep it as your own word."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's kept as your word, and nothing is looked up. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-32",
+    "title": "The ID and control checks come back",
+    "does": "Nothing shows to AI assistants until the ID and the control of the business are confirmed. Licenses are the owner's word and are not looked up.",
+    "more": [
+     "Means 'Confirmed in minutes': the ID and the control of the business check out.",
+     "Means 'The ID doesn't match': the ID check can't match the photo to the selfie.",
+     "Control still with Rosie's team (S1-75): that company stays offline, setup saved, while the rest goes on.",
+     "Never: show a business to AI assistants before the ID and control are confirmed.",
+     "Safe default: nothing goes live until a person confirms it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Dr. Okafor"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Pain Care! Please fill in your secure page. Licenses are kept as you give them.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "License numbers: here, or by text",
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t02"
+       },
+       "form": [
+        "Doctor license number",
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Dr. Okafor"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 8am",
+      {
+       "as": "Dr. Okafor"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Ines Okafor · Lee Pain Care",
+        "lines": [
+         "Every clinic service, and medication review",
+         "License: on file, as given Oct 19",
+         "Hours: the clinic's hours",
+         "Languages: English and Spanish",
+         "Day list: 8am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Dr. Okafor"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Dr. Okafor"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "title": "The licenses are on file; asks Sam",
+    "does": "Nobody is offered to customers until the owner says yes. Rosie asks about everyone at once.",
+    "more": [
+     "Each person's license is as they gave it: Sam confirms it with this yes.",
+     "Where the plug-in sets a timer, anyone with no emergency contact is named on this card (S2-06).",
+     "Means '1 Yes, all of them': a clear yes to let them take bookings.",
+     "Never: offer anyone to customers before Sam's yes.",
+     "Safe default: they stay off the calendar, and Sam's morning list asks again."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone's licenses are on file as you gave them, and nothing is looked up. You confirm them. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Dr. Ruiz: mobile pain care and medication checks",
+         "Dr. Lind: mobile pain care",
+         "Dr. Okafor: doctor, medication review and house calls",
+         "Dr. Patel: doctor"
+        ]
+       },
+       "buttons": [
+        "Yes, all of them",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "title": "Asks if each person needs a license",
+    "does": "Decides if each person added gives a license number. Some work needs one each, some only the business. The owner says which.",
+    "more": [
+     "The owner's own word decides, and Rosie looks nothing up.",
+     "A background check or certificate the owner names is kept as the owner's word: who ran it, when, and renew-by.",
+     "Safe default: no person license, unless the business's license form names one."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B4-28",
+    "more": [
+     "For a self-pay patient, the notice is the right to a written price estimate. Alex pays, so the AI says it here.",
+     "Lee Mobile MD emails it within 1 business day, or sooner where the rules say so."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "The page also asks the birth date, and a plan's member ID and card photo if a plan pays.",
+     "The health history and the consent are on it too. Alex can finish them before the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-20",
+    "more": [
+     "Dr. Lind does first home visits too, so Dr. Lind can do the whole visit."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A home visit always needs the patient there."
+   },
+   {
+    "op": "more",
+    "at": "B9-17",
+    "more": [
+     "Here, the office bills Alex's auto claim for the visit, from the claim details on the secure page.",
+     "Rosie sends nothing about money."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Clinic records stay with the business as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a home visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever meets the doctor at the home."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "For a home visit, the forms are the health history and the consent to care.",
+     "Kept: the patient, or the person who decides, signs them on the secure page at the door before any care."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 per booking applies to every profession; the no-$2 choice is off."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Mobile pain care takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for pain care (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A home visit always needs the patient there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "Adults only: no child is booked for a home visit (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A pain visit books people, a doctor by name, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Pain care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No pain care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A home visit starts at a set time, not in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A home visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile pain care sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No home visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No home visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "S1-43",
+    "why": "Every clinic visit is at the clinic, so no clinic service is checked for a home. Home visits are Lee Mobile MD's, under its own plug-in."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Each company works in one place: home visits are Lee Mobile MD's, and clinic visits Lee Pain Care's."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Pain care is in person, so no visit is booked by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "No home visit is over the plug-in's amount, and the business sells no prepaid plans, so none needs a contract."
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "label": "Safety steps, then go on",
+    "why": "Pain care has no safety steps that let a booking go on: its danger words stop the booking."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "No home visit is paid in stages: each visit is paid when it happens."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "The owner of the home never pays for a home visit: nobody is asked about the owner."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Pain care has no warranty or free redo. A worry after a visit comes in as a reply to the aftercare tips."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "No scans or tests are taken at a home visit, so no report comes later."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Each visit is paid when it happens, so a bank transfer is not used for a home visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A home-visit plan's visits are each paid when they happen, so no plan charge is ever texted (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "A home-visit plan's visits are each billed when they happen, never on one monthly bill (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "B6-16",
+    "why": "Nobody is on call for pain care, so no job is texted to a doctor first (S2-27)."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At the patient's home, your own way",
+         "When they book: a card saved, for a $100 fee you OK",
+         "Free on your board: nothing taken, nothing after",
+         "Clinic visits: allowed where you are, for those cleared"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "First home visit",
+          "$260"
+         ],
+         [
+          "Home follow-up",
+          "$150"
+         ],
+         [
+          "Home medication check",
+          "$60"
+         ],
+         [
+          "Claim visit",
+          "Billed to the claim"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:card+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:card+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:card+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:full": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pain clinics set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At the patient's home, your own way",
+           "When they book: a card saved, for a $100 fee you OK",
+           "Free on your board: nothing taken, nothing after",
+           "Clinic visits: allowed where you are, for those cleared"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "First home visit",
+            "$260"
+           ],
+           [
+            "Home follow-up",
+            "$150"
+           ],
+           [
+            "Home medication check",
+            "$60"
+           ],
+           [
+            "Claim visit",
+            "Billed to the claim"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "S2-11",
+    "why": "D96: Rosie looks no license up; the owner's word is kept on the own step after it."
+   },
+   {
+    "op": "after",
+    "at": "S2-11",
+    "steps": [
+     {
+      "id": "B2-x01",
+      "line": [
+       "2.4"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "title": "Keeps each person's license as the owner gave it",
+      "does": "Each license number a person gave is kept as the owner's own word. Rosie looks nothing up and checks nothing.",
+      "more": [
+       "A background check or certificate the owner names is kept as the owner's word, with the date and renew-by."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Kept as you gave it. Rosie doesn't look licenses up, so you confirm them on the next card."
+       ]
+      ],
+      "needs": [
+       "added",
+       "pf.license"
+      ],
+      "gives": [
+       "license_checked"
+      ],
+      "sec": 2
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "label": "The number isn't found",
+    "why": "D96: no license lookup runs, so no number is ever 'not found'."
+   },
+   {
+    "op": "words",
+    "at": "S1-02",
+    "more": [
+     "Rosie matches Sam's words to the closest kinds of work, and Sam picks. A pick-list helps.",
+     "The first kind named is set up first. Sam can pick another.",
+     "Means 'One isn't on the list yet': a service with a visit that Rosie has no plug-in for.",
+     "Means 'Not a service we book': goods with no visit, delivery only, renting a thing alone, or work the law bars.",
+     "Gift cards are never set up either.",
+     "Never: set up any of those.",
+     "Safe default: draft it as new work, offline until Rosie's team reviews it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-03",
+    "more": [
+     "It matches the work to the closest booking pattern, like a home visit or an appointment at the business.",
+     "The services come from the owner's own price list.",
+     "The checklist has 15 blocks, shown on the screen. Each starts from its safe default, and a no skips that block.",
+     "Each answer sets a switch or a fact, like sensitive work, classes or results later. The screen names every fact each block sets.",
+     "Protective facts start on: contracts, crews and forms.",
+     "Only the business's clear no turns a protective fact off. Silence or a skipped block keeps it on, so its question is never hidden.",
+     "Block 6 also sets one bill for many visits. Deposit or fee caps show as suggested owner rules (S1-21).",
+     "Block 12's 'a pro alone' sets a check-out timer, which runs only with an emergency contact (S1-78, S2-06).",
+     "Is this health care? A yes means the health privacy agreement is signed first (S1-71, S1-72).",
+     "Each price-list service is still matched to Rosie's known kinds of work, line by line (S1-12). A no to block 5 never skips that.",
+     "Licenses are the owner's own word: Rosie looks no license up, and every service is kept to the owner's words.",
+     "The plug-in is a draft, offline until it's reviewed. Sam hears the result within 1 business day.",
+     "If the license rules are unclear, that work stays offline, saved.",
+     "Never: make up a rule. Only the owner's own words and the checklist count."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "title": "Asks if this work needs a license",
+    "does": "The license question comes before prices and money. The state may license the business itself, and each person. The owner says which licenses the work needs.",
+    "more": [
+     "The plug-in names the licenses and who issues them: a state, a city or the federal government. None named, none asked.",
+     "Rosie looks no license up and checks none. The owner's own word is what counts, and it is kept as given.",
+     "Safe default: ask for the license the business holds, and book only the work the owner says it is licensed for.",
+     "Nothing is booked on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "One question: the license number the business works under, as the owner gives it. Rosie does not look it up.",
+    "more": [
+     "Whose license it is comes from the owner's own words: the business's, the owner's, or a license holder's.",
+     "A license holder gives their own number after their invite, by text or on the secure page. Rosie does not check it.",
+     "Where the rules ask for insurance or a bond, the owner may add it here too, as its own word.",
+     "Licenses: S13-43. A license claim shows as the owner's word, not as checked.",
+     "Never: let a license stand for control (S1-75), or say a license is checked.",
+     "Safe default: the owner's word is kept, and that work is booked only as the owner says it is licensed."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state may license the business itself, and each person. What's the license number? You can skip it if your work doesn't need one."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. I've kept it as your own word. Rosie doesn't look it up. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks only for the business registration, where one is required, and keeps it as the owner's word.",
+    "more": [
+     "Insured or bonded shows only once the owner says so.",
+     "The registration's name and number must match the listing. Stripe's name check reads it (S1-27).",
+     "Customers see no license claim. Each person is asked for nothing either, unless the plug-in names something.",
+     "A price-list service that is a licensed kind of work still takes its license step (S1-12). Registration never covers it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business registration number, if it has one. I'll keep it as your own word."
+     ],
+     [
+      "owner",
+      "san",
+      "EX-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's kept as your word, and nothing is looked up. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-32",
+    "title": "The ID and control checks come back",
+    "does": "Nothing shows to AI assistants until the ID and the control of the business are confirmed. Licenses are the owner's word and are not looked up.",
+    "more": [
+     "Means 'Confirmed in minutes': the ID and the control of the business check out.",
+     "Means 'The ID doesn't match': the ID check can't match the photo to the selfie.",
+     "Control still with Rosie's team (S1-75): that company stays offline, setup saved, while the rest goes on.",
+     "Never: show a business to AI assistants before the ID and control are confirmed.",
+     "Safe default: nothing goes live until a person confirms it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Dr. Ruiz"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Mobile MD! Please fill in your secure page. Licenses are kept as you give them.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "License numbers: here, or by text",
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t01"
+       },
+       "form": [
+        "Pain care license number",
+        "Procedure license number",
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Dr. Ruiz"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 7am",
+      {
+       "as": "Dr. Ruiz"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Ruth Ruiz · Lee Mobile MD",
+        "lines": [
+         "Every mobile pain care job, and procedure jobs",
+         "Licenses: on file, as given Oct 19",
+         "Hours: Mon–Fri 7:30am–5:30pm",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Dr. Ruiz"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Dr. Ruiz"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "title": "The licenses are on file; asks Sam",
+    "does": "Nobody is offered to customers until the owner says yes. Rosie asks about everyone at once.",
+    "more": [
+     "Each person's license is as they gave it: Sam confirms it with this yes.",
+     "Where the plug-in sets a timer, anyone with no emergency contact is named on this card (S2-06).",
+     "Means '1 Yes, all of them': a clear yes to let them take bookings.",
+     "Never: offer anyone to customers before Sam's yes.",
+     "Safe default: they stay off the calendar, and Sam's morning list asks again."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone's licenses are on file as you gave them, and nothing is looked up. You confirm them. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Dr. Ruiz: mobile pain care and medication checks",
+         "Dr. Lind: mobile pain care",
+         "Dr. Okafor: doctor, medication review and house calls",
+         "Dr. Patel: doctor"
+        ]
+       },
+       "buttons": [
+        "Yes, all of them",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "title": "Asks if each person needs a license",
+    "does": "Decides if each person added gives a license number. Some work needs one each, some only the business. The owner says which.",
+    "more": [
+     "The owner's own word decides, and Rosie looks nothing up.",
+     "A background check or certificate the owner names is kept as the owner's word: who ran it, when, and renew-by.",
+     "Safe default: no person license, unless the business's license form names one."
+    ]
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "notes": "Built Tue Oct 27 2026 (K6, Haiku) from chiropractor. Clinic of physicians: exams, plans of care, medication checks, procedures in a procedure room on the doctor's order. Adults only (18 and over): no children fact, no child steps; a minor is referred to a pediatric clinic. Facts: plans, planbill, forms, extrawork. Switch: sensitive on (health). No $2 off: the $2 applies (D97); S1-62's no-$2 branch is off. Licenses optional and not verified (D96): pf.license says so; the license steps keep the owner's word, the lookup split S2-11 is off and replaced by an own step (A2-x01 / B2-x01); the lookup-not-found branch of S1-32 is off. Money A: list|none|counter (main, $180 new patient evaluation), list|card|counter (procedure visit $450, $150 fee on a card). Money B: list|card|card (main, $260 first home visit, $100 fee charged at DONE), list|none|bill, list|none|own (claim). Added services paid at the visit or on the bill (D91). Stop words: chest pain, stroke signs, a fever or a hot swollen place after a procedure, bladder or groin numbness, overdose or self-harm (911 and 988). Example names and prices are the example clinic's own (Lee Pain Care, Lee Mobile MD). Keep: leak, visit fee, house call.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "color and cut",
+    "Color and cut",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "A chair renter asked for by name",
+    "Access, like a step-free chair:",
+    "My employer pays for this cut.",
+    "How would you like it on top?",
+    "Riley can do a shorter cut in the time left",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "the customer is already in the chair",
+    "Stopped A.M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed",
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "Every shop service, color and house calls",
+    "about the job",
+    "Keeps each job inside the license",
+    "no jobs sent now",
+    "Any jobs already booked?",
+    "The jobs already on it",
+    "3 jobs",
+    "next job:",
+    "Someone calls for a dentist",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Elm Street Dental",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "photos of your hair",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut and shave",
+    "hot towel shave",
+    "signature cut",
+    "Signature cut",
+    "Groom's package",
+    "groom's party",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Kids cut",
+    "a skin fade",
+    "A skin fade",
+    "skin fade",
+    "Skin fade",
+    "Alex adds a beard trim",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "a consult",
+    "consult",
+    "Consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "quote at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "Panel upgrade",
+    "home warranty plan",
+    "home warranty",
+    "warranty plan",
+    "labor",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "like a skin-test result",
+    "Quiero un corte el sábado.",
+    "A step-free door on Elm St",
+    "Step-free door on Elm St",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped",
+    "a clinic",
+    "A clinic",
+    "rents a chair",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "BS20981",
+    "EC22871",
+    "Drain clearing",
+    "finds chairs side by side"
+   ],
+   "B": [
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "HAZARD mold behind the sink wall, stopped",
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed",
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "A booking added after the list goes to Jordan at once, in its own text.",
+    "New times with Jordan; a free cancel stays open",
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "My kitchen drain is clogged.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Safety note · your home",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "DONE 179 drain",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "M.P. would like to talk about the water heater quote before booking.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "no open times for this job",
+    "about the job",
+    "Books one job for a group",
+    "Keeps each job inside the license",
+    "no jobs sent now",
+    "Any jobs already booked?",
+    "The jobs already on it",
+    "job texts",
+    "3 jobs",
+    "Ask Sam about your jobs.",
+    "more jobs today",
+    "next job:",
+    "Someone calls for a dentist",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Elm Street Dental",
+    "leehomeservices.com",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "One booking, so one $2 for the whole job.",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "stage 2 of your repipe",
+    "CANT START no proof Alex may have this work done",
+    "no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The work never started, so there's no $2.",
+    "One booking, so no second $2.",
+    "No visit, so no $2.",
+    "LATE camera report Mon Oct 26",
+    "like a move-out day",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan and Alex check the work",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "hot towel shave",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "color",
+    "consult",
+    "shops",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater flush",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera inspection",
+    "Panel upgrade",
+    "credited to the repair",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "warranty plan",
+    "the warranty company",
+    "A plan or warranty pays",
+    "Alex says yes before any work",
+    "Please clear the cabinet under the sink.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "Kitchen drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Supply line · $80",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The kitchen drain",
+    "with the store's receipt",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "Drain clearings already booked",
+    "The repair price",
+    "the repair price",
+    "The repair price",
+    "Book the repair",
+    "to the repair",
+    "labor",
+    "Labor",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "$2,400 repipe",
+    "drying fan",
+    "flush",
+    "a clinic",
+    "A clinic",
+    "rents a chair",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "BS20981",
+    "EC22871",
+    "· arriving 8–10am",
+    "· arriving 12–2pm",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "2–4pm",
+    "the new arrival time",
+    "Water heater replacement",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Drain clearings",
+    "drain clearing",
+    "Drain clearing",
+    "water heater quote"
+   ]
+  },
+  "A": {
+   "A3-22": "0057d8fc9f",
+   "A3-24": "78e61fd50f",
+   "A4-37": "4ee9e74e71",
+   "A4-42": "7f259bddbf",
+   "A4-43": "c17d56f766",
+   "A4-64": "b98f95b738",
+   "A7-18": "b98d7c1744",
+   "A7-74": "b3ec278ce4",
+   "A8-35": "a67e890a5b",
+   "A9-20": "0cfe0e1776",
+   "A10-21": "08514557c8",
+   "S2-31": "320ac5e4cb",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "S1-43": "e16d5048f3",
+   "A4-01": "7e7a61082c",
+   "A5-01": "6c5c5c2f87",
+   "A10-05": "63c3536c7a",
+   "A10-32": "9f84638bce",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A7-94": "6490d5d8e6",
+   "A10-34": "78c2d9a6a3",
+   "S1-13": "eca22651fd",
+   "A4-34": "9f322d96aa",
+   "S2-11": "07b9eace96",
+   "S1-32": "60f59eda70",
+   "S1-02": "cc33089d5b",
+   "S1-03": "d7ef9ac411",
+   "S1-60": "235c90a3c3",
+   "S1-23": "39941a5377",
+   "S1-61": "7421d186d5",
+   "S2-06": "6b01a08c94",
+   "S2-22": "6fe11c094c",
+   "S2-28": "549fd7ae22"
+  },
+  "B": {
+   "B4-28": "506d267aaf",
+   "B4-29": "9234c5ed40",
+   "B7-20": "364245afef",
+   "B8-03": "ac9d404766",
+   "B9-17": "24b5acdf89",
+   "B10-17": "b5f4aef51b",
+   "B4-74": "bae5529af9",
+   "B7-61": "342b55fd9b",
+   "S1-62": "c4f497de12",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "S1-43": "dd3ae2a1a9",
+   "B4-01": "15f683e6cb",
+   "B5-34": "917f89b62f",
+   "B3-17": "3eb7d7f259",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B7-91": "7132851ec1",
+   "B10-32": "7713bff255",
+   "B6-16": "d428d8c29e",
+   "S1-13": "6964bfbe60",
+   "S2-11": "07b9eace96",
+   "S1-32": "60f59eda70",
+   "S1-02": "e00621fff5",
+   "S1-03": "d7ef9ac411",
+   "S1-60": "235c90a3c3",
+   "S1-23": "5b2324d920",
+   "S1-61": "e30e71f65d",
+   "S2-06": "b78d25d6e2",
+   "S2-22": "6fe11c094c",
+   "S2-28": "549fd7ae22"
+  }
+ }
+}

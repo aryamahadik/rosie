@@ -1,0 +1,3430 @@
+{
+ "id": "energy-audit",
+ "name": "Home energy auditor",
+ "style": "Service",
+ "pattern": "service",
+ "from": "inspector",
+ "plugin": {
+  "pf.license": {
+   "need": "Where the state, a utility program or the business's own rules require it, each auditor holds a current energy auditor or building performance credential (a building analyst or rater certification), and the company holds its own registration or contractor license. Some states license nobody: then registration only. Combustion safety testing needs an auditor trained for it.",
+   "ask": "Each auditor's credential name and number. The company's registration or license number, where the state's form asks for one.",
+   "who_holds": "Each auditor holds their own credential. The company holds its own registration where the state asks. A new-home energy rating is done only by a certified rater.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "Where the state requires licensed or certified auditors: no audit is offered until the company's and the auditor's numbers check out. A rating is offered only with a certified rater.",
+   "insurance_bond": "General liability insurance where the state's form requires it. Shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word. The auditor spends hours inside the home.",
+   "shown_to_customers": "The auditor's credential or license number on offers, confirmations and the report, where the state's rules require it.",
+   "not_this_work": "Installing insulation, air sealing, heating or cooling equipment, windows or solar, and filing rebate paperwork. They are other businesses' work, never booked under the auditor's plug-in. An auditor never sells the upgrades they recommend at a home they audited."
+  },
+  "pf.services": {
+   "pattern": "Set service: one audit visit at the home, priced by the home's size, with a written report later.",
+   "list": [
+    {
+     "name": "Home energy audit",
+     "price_kind": "set by the customer's answers (square feet, house or condo, year built)",
+     "example": "house up to 2,500 sq ft: $349; 2,501 to 4,000 sq ft: $449; condo or townhouse: $249 (the example business's own prices)",
+     "length": "about 3 hours on site: a blower door test, an infrared scan, a duct check and a combustion safety test, then a results walk-through; the report follows in about 3 business days",
+     "where": "at the home; an adult stays for the whole visit",
+     "money": "card saved at booking; charged at DONE"
+    },
+    {
+     "name": "Condo or townhouse audit",
+     "price_kind": "one price",
+     "example": "$249, about 2 hours",
+     "where": "at the home",
+     "money": "card saved at booking; charged at DONE"
+    },
+    {
+     "name": "New-home energy rating (the second kind of work)",
+     "price_kind": "quoted from the plans first",
+     "example": "a certified rater tests the house at framing and at the end",
+     "where": "at the home"
+    },
+    {
+     "name": "Large property evaluation",
+     "price_kind": "set by the auditor at the visit from the size; only the $89 trip fee is promised before",
+     "example": "a large home with an addition: priced on site; the fee never depends on what is found",
+     "where": "at the home"
+    },
+    {
+     "name": "Multi-unit or very large home",
+     "price_kind": "quoted from the listing, the bills and photos first",
+     "example": "a 4-unit building: $640, with a deposit; Sam OKs any quote over $500",
+     "where": "at the home"
+    },
+    {
+     "name": "Test-out after upgrades",
+     "price_kind": "one price",
+     "example": "$150, about 1 hour: a blower door retest after air sealing or insulation",
+     "where": "at the home",
+     "money": "booked like the first audit; paid in full when booking (the example business's setting)"
+    },
+    {
+     "name": "Duct leakage test",
+     "price_kind": "one price, an add-on",
+     "example": "$199 (about 45 minutes); $249 when Sam goes himself",
+     "where": "at the home"
+    },
+    {
+     "name": "Crawl space moisture check",
+     "price_kind": "one price, an add-on at the visit",
+     "example": "$160, only if the client says yes first",
+     "where": "at the home"
+    },
+    {
+     "name": "Trip fee",
+     "price_kind": "one price",
+     "example": "$89: only for a late cancel or no way in that Sam confirms, or a return visit when part of the home could not be tested",
+     "where": "never booked alone"
+    },
+    {
+     "name": "Report walk-through, bill review and upgrade plans (at Lee Energy Office)",
+     "price_kind": "one price each",
+     "example": "30-minute report walk-through $35; bill review $20; upgrade priority list $40; second opinion on another audit $55; whole-house upgrade plan, about 2½ hours, $140; at the home $75 (the example office's own prices)",
+     "where": "at the office, by video, or at the home",
+     "money": "card saved for the $20 fee; paid at the office after"
+    }
+   ],
+   "start_times": "Set starts, like 8:00am and 1:00pm. The results walk-through comes at the end of the visit.",
+   "notice": "2 days' notice by default. A sooner time only if Sam says yes.",
+   "capacity": "One auditor per audit. A rating only with a certified rater.",
+   "nobody_home": "No: an adult (18 or older) stays for the whole visit, because the tests run in every room and the heating system is used.",
+   "online": "Report walk-throughs and upgrade plans can be done by video.",
+   "not_offered": "Installing upgrades, filing rebate or incentive paperwork, home inspections, and any promise of savings.",
+   "partner_work": "None. Rosie never names or refers an installer."
+  },
+  "pf.questions": {
+   "before_times": [
+    "The town or ZIP, and the kind of home: a house, a condo or townhouse, or several units",
+    "About how many square feet, and the year built",
+    "What bothers you: drafts, hot or cold rooms, high bills, a damp attic or crawl space",
+    "How it is heated and cooled: gas, oil, electric or a heat pump, if you know",
+    "Add-ons: a duct leakage test",
+    "Do you own the home or rent it?"
+   ],
+   "after_a_time": [
+    "Pets at the home, and where they'll be",
+    "Can an adult stay for the whole visit, about 3 hours?",
+    "Is there a wood stove, a fireplace or a gas appliance we should know about?",
+    "Will you come for the results walk-through at the end?"
+   ],
+   "secure_page_only": [
+    "The street address",
+    "The utility account number and the last 12 months of bills",
+    "Photos of the furnace, water heater and attic hatch"
+   ],
+   "who_may_book": "An adult 18 or older who owns the home, or a tenant. A tenant gives the landlord's yes for any area the tenant cannot enter, like a shared attic or a boiler room; those areas are left out and listed as not tested. An adult must stay for the whole visit."
+  },
+  "pf.safety": {
+   "words": [
+    "a gas smell",
+    "sparks or smoke",
+    "a carbon monoxide alarm",
+    "live wires hanging down",
+    "flooding up to the outlets"
+   ],
+   "what_happens": [
+    "A gas smell, sparks, smoke or a carbon monoxide alarm: whoever is there gets out first, then calls 911 and the gas company from outside. No booking until the home is safe.",
+    "Live wires hanging down or flooding up to the outlets: stay away from that area, and call 911 if anyone is in danger. The audit can be booked for the rest of the home; the auditor will not enter that area.",
+    "At the visit, a combustion safety test that shows dangerous carbon monoxide or backdrafting stops the test: the auditor tells the household to open windows and leave if needed, and gives 911 and the gas company. The audit goes on only when it is safe."
+   ],
+   "booking_goes_on": "No, for gas, sparks, smoke or a carbon monoxide alarm. Yes, with the unsafe area left out, for live wires or flooding."
+  },
+  "pf.first_steps": {
+   "access": "An adult stays for the whole visit and lets the auditor into every room, the attic, the crawl space or basement, and the heating system.",
+   "documents": "The last 12 months of energy bills, added on the secure page, if you have them.",
+   "prep_for_reminder": [
+    "Last 12 months of energy bills on the secure page",
+    "Clear the way to the attic hatch, crawl space or basement, furnace, water heater and electrical panel",
+    "No fire in a fireplace or wood stove for 24 hours before, and the ashes cleaned out",
+    "Pets put away, and windows and doors closed",
+    "Leave the thermostat where you normally keep it"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "The adult at home gives the check-in code to the auditor at the door. The code and DONE confirm the visit.",
+   "entry_codes": "Nothing is left unlocked: the adult at home opens the door.",
+   "what_is_checked": "A blower door test of the whole house, an infrared scan of walls and ceilings, a duct check, a combustion safety test of gas and oil appliances, and the attic, walls, windows, doors and lighting, with photos.",
+   "not_tested": "Anything that can't be reached or safely tested, like a closed-off crawl space or a suspect attic insulation, is listed as not tested. A return visit is offered for the trip fee, with the client's OK.",
+   "walk_through": "A results walk-through at the end: where air leaks and heat escapes, and the safety readings. Savings and rebates are in the report; nothing is promised on the spot.",
+   "changes_at_visit": "An add-on (a duct leakage test, a crawl space moisture check) only if the client says yes first, priced before it is done. The fee never depends on the upgrades the client buys.",
+   "proof_done": "The check-in code at the start and DONE from the auditor's phone, with photos. The report follows by the date promised.",
+   "report": "An energy report with ranked upgrades and estimated savings, sent on a secure link by the date promised at booking (the example: 3 business days). Rosie tracks the date.",
+   "report_release": "Sam picks per service: the report goes out at once, or once the bill is paid. Where the state's rules forbid holding a report, it goes out at once."
+  },
+  "pf.money": {
+   "start": "Audits: a card saved at booking, charged at DONE. Walk-throughs and plans at the office: a card saved for the fee, paid at the office after.",
+   "other_ways": "Nothing taken and the bill texted after; paid in full when booking (a test-out); a deposit and the rest on the bill for a multi-unit building quoted first.",
+   "deposits": "None by default on a set-price audit. A multi-unit building quoted from details may take a deposit; the cap, if any, comes from the state form.",
+   "fees": "Late cancel, or no way in at the start time: the business's own trip fee (the example: $89). A return visit when part of the home could not be tested: the trip fee. Sam confirms each one; no answer, no fee.",
+   "fee_rule": "The fee never depends on the upgrades the client buys, the rebates the client gets, or the savings found.",
+   "tips": "No tip line.",
+   "tax": "A sales tax line only where the state taxes audit services, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Door and alarm codes",
+    "The street address in a first text to someone new",
+    "The utility account number and the bills: only the secure link",
+    "Findings, photos and the report: only the secure link"
+   ],
+   "who_gets_texts": "The client, and the adult who stays at the home only after their own yes.",
+   "languages": "English and Spanish.",
+   "minors": "Nobody under 18 books, and an adult 18 or older must be home for the visit."
+  },
+  "pf.staff": {
+   "skills": [
+    "Home energy audits",
+    "Condo and townhouse audits",
+    "Multi-unit buildings",
+    "Duct leakage tests",
+    "Test-outs after upgrades",
+    "New-home energy ratings (certified rater)",
+    "Report walk-throughs and upgrade plans at the office"
+   ],
+   "licenses": "Each auditor's own credential, where the state, a program or the business requires it. Ratings only by a certified rater.",
+   "stand_in": "Another auditor with the same credential and skills may stand in, with the client's OK first.",
+   "supervision": "A trainee audits only with a credentialed auditor on the job, where the rules allow trainees.",
+   "who_oks": "Sam OKs quotes over $500 and every fee. Pat, the office manager, may too; Sam's answer wins."
+  },
+  "pf.rules": {
+   "fee_independence": "The audit fee can't depend on the upgrades the client buys or the rebates the client gets.",
+   "no_upgrade_sales": "No upgrade or installation work at a home this business audited, for the time the state's rules set. Sam can keep it as the business's own rule anywhere.",
+   "report_deadline": "The report reaches the client by the date promised at booking. A later date is told to the client before the old one passes. Rosie tracks the date.",
+   "weather": "A blower door test needs light wind, and an infrared scan needs a wide gap between inside and outside air. The visit moves to the next good day with no fee.",
+   "license_shown": "The credential or license number on offers, confirmations and the report, where the state's rules require it.",
+   "records": "5 years, or longer where the state's rules ask: the report, the readings and the photos."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "Wind or a small temperature gap makes the tests unreliable: the visit moves to the next good day, with no fee.",
+    "A combustion safety test shows dangerous carbon monoxide or backdrafting: the test stops, the household is told to open windows and leave if needed, and 911 and the gas company are given.",
+    "The adult at home has to leave, or nobody answers the door: the visit is a no-show only after the safety check and a call; the trip fee is Sam's to confirm.",
+    "A fireplace or wood stove was burning, or the ashes were not cleaned out: the blower door test is skipped, listed as not tested, and a return visit is offered for the trip fee.",
+    "An area can't be reached or safely tested (a closed-off crawl space, suspect attic insulation): it is listed as not tested.",
+    "A tenant can't enter a shared area: it is left out unless the landlord says yes.",
+    "The client asks the auditor to install the upgrades: Rosie says this business doesn't do installs at a home it audited.",
+    "The client asks for rebate paperwork: Rosie says this business doesn't file it; the report lists the upgrades.",
+    "The report runs late: the client hears the new date before the old one passes."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "results",
+   "photos",
+   "video",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "6pm the day before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Maya and Nora (energy advisors at the office)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Owen and Felix (energy auditors)",
+   "cust": "Alex M. (homeowner) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Maya"
+  },
+  "B": {
+   "staff": "Owen"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "'A trim' or 'a fade' fits",
+    "'A quick chat' or 'a second look' fits"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, but make it shorter' goes back to the times."
+   ],
+   [
+    "Add photos of your hair,",
+    "Add photos or drawings,"
+   ],
+   [
+    "Alex's employer for a staff cut.",
+    "Alex's employer for a staff walk-through."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this walk-through."
+   ],
+   [
+    "means the shorter cut.",
+    "means the shorter walk-through."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the last 12 months of bills on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring the last 12 months of bills."
+   ],
+   [
+    "Shop's side.",
+    "The office's side."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Riley sums up the walk-through. A last question is answered before paying, at no extra cost."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Energy plan quotes come to you first. List prices never need one"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A test-out's example: 'A test-out needs a first audit. Had one with us in the last year?'"
+   ],
+   [
+    "like a patch test with a wait, or a screening",
+    "like a bills upload with a wait, or a prep check"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "New-home rating: priced from the plans first"
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a bill review. Rosie finds one time long enough for both, with one auditor, and adds the prices: $35 and $20."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A walk-through is rated, so the office takes the first branch."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $90 energy plan quote. Sam taps Call, and the call goes out from the office's number."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Maya can do a shorter walk-through in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a report walk-through at the office or at the house."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A walk-through for Alex and a second opinion for a co-owner work the same way. Both are asked before the times."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds new-home energy ratings to Lee Energy Office. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Energy Office can book you from now on, at the office and for walk-throughs at the home."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Maya, so Maya's next times show. Energy plans always stay with Maya."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some jobs take several visits, like a whole-house upgrade plan done in two meetings."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop.",
+    "You're all set: Lee Energy Office can book you from now on, at the office."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in's example: a gas smell at a home gets 'leave, then call 911 and the gas company'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only at a shop or an office."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The report for this review wasn't sent."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like what worries the client most."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: high winter bills, cold back bedroom. Wants a test-out after the air sealing."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like to go over my energy report on Saturday."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says coffee spilled on a laptop bag in the meeting room today."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "New-home energy ratings for Lee Energy Office: is it the same company?"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Ben's AI asks for upgrade priority list at $35, an old price."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a whole-house upgrade plan is $140, about 2½ hours. Want a time?"
+   ],
+   [
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Lee Energy Office will go over it again for free. Pick a time:"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No work here is sent now: audits and reviews are always booked ahead."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's walk-through skipped the attic question."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Upgrade priority list at Lee Energy Office is $40, not $35."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero repasar mi informe de energía el sábado."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the office show photos from your visit? Yes / No"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A report walk-through could mean an energy office or an auditor."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my spouse join the walk-through?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, upgrade plans and walk-throughs at the home"
+   ],
+   [
+    "Avery at the shop, Casey for plumbing.",
+    "Nora at the office, Felix for home energy audits."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Maya also does energy plans and walk-throughs at the home"
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the office's list"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Coffee spilled on my laptop bag in the meeting room."
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Report walk-throughs at the office work like this:"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Maya: energy plans and walk-throughs at the home"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Second opinion on an audit"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you plan the upgrades for a new addition too?"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a report walk-through by video"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The walk-through skipped my question about the attic."
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like report walk-throughs?"
+   ],
+   [
+    "plumbing and electrical",
+    "home energy audit and new-home energy rating"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home energy audit and new-home energy rating"
+   ],
+   [
+    "Signature cut and shave",
+    "Second opinion on an audit"
+   ],
+   [
+    "Hours: the shop's hours",
+    "Hours: the office's hours"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your drawings"
+   ],
+   [
+    "Haircuts work like this",
+    "Report walk-throughs work like this"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Energy Office LLC"
+   ],
+   [
+    "Color and cut · $90",
+    "Addition energy plan · $90"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Energy Audits'"
+   ],
+   [
+    "Water heater flush",
+    "Test-out after upgrades"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Energy Audits"
+   ],
+   [
+    "Groom's package ·",
+    "Whole-house upgrade plan ·"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Energy Office"
+   ],
+   [
+    "Color correction",
+    "Energy plan"
+   ],
+   [
+    "Only at the shop",
+    "Only at the office"
+   ],
+   [
+    "Groom's package",
+    "whole-house upgrade plan"
+   ],
+   [
+    "Book a free fix",
+    "Book a free follow-up"
+   ],
+   [
+    "Drain clearing",
+    "Home energy audit"
+   ],
+   [
+    "A barbershop's",
+    "An energy office's"
+   ],
+   [
+    "signature cut",
+    "second opinion on an audit"
+   ],
+   [
+    "Avery: barber",
+    "Nora: report walk-throughs"
+   ],
+   [
+    "1 color quote",
+    "1 energy plan quote"
+   ],
+   [
+    "1 At the shop",
+    "1 At the office"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Audits"
+   ],
+   [
+    "Lee Electric",
+    "Lee Ratings"
+   ],
+   [
+    "1200 Main St",
+    "75 Lake St"
+   ],
+   [
+    "barbershop's",
+    "energy office's"
+   ],
+   [
+    "at the chair",
+    "at the office"
+   ],
+   [
+    "At the chair",
+    "At the office"
+   ],
+   [
+    "At your shop",
+    "At your office"
+   ],
+   [
+    "A barbershop",
+    "An energy office"
+   ],
+   [
+    "house calls",
+    "walk-throughs at the home"
+   ],
+   [
+    "House calls",
+    "Walk-throughs at the home"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "NEW massage",
+    "NEW energy ratings for new homes"
+   ],
+   [
+    "electrical",
+    "new-home energy rating"
+   ],
+   [
+    "Electrical",
+    "New-home energy rating"
+   ],
+   [
+    "barbershop",
+    "energy office"
+   ],
+   [
+    "Barbershop",
+    "Energy office"
+   ],
+   [
+    "Beard trim",
+    "Bill review"
+   ],
+   [
+    "beard trim",
+    "bill review"
+   ],
+   [
+    "house call",
+    "walk-through at the home"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "At my home",
+    "At the home"
+   ],
+   [
+    "88 Elm St",
+    "18 Mill Rd"
+   ],
+   [
+    "on Elm St",
+    "on Mill Rd"
+   ],
+   [
+    "Barbering",
+    "Report walk-throughs"
+   ],
+   [
+    "Skin fade",
+    "Upgrade priority list"
+   ],
+   [
+    "skin fade",
+    "upgrade priority list"
+   ],
+   [
+    "plumbing",
+    "home energy audit"
+   ],
+   [
+    "Plumbing",
+    "Home energy audit"
+   ],
+   [
+    "Haircuts",
+    "Report walk-throughs"
+   ],
+   [
+    "haircuts",
+    "report walk-throughs"
+   ],
+   [
+    "a barber",
+    "an auditor"
+   ],
+   [
+    "A barber",
+    "An auditor"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "JP031552",
+    "EX-2055"
+   ],
+   [
+    "MP045210",
+    "EX-3068"
+   ],
+   [
+    "plumber",
+    "auditor"
+   ],
+   [
+    "Plumber",
+    "Auditor"
+   ],
+   [
+    "barbers",
+    "auditors"
+   ],
+   [
+    "Haircut",
+    "Report walk-through"
+   ],
+   [
+    "haircut",
+    "report walk-through"
+   ],
+   [
+    "JE30417",
+    "EX-4071"
+   ],
+   [
+    "EC22871",
+    "EX-5084"
+   ],
+   [
+    "BS20981",
+    "EX-6097"
+   ],
+   [
+    "barber",
+    "auditor"
+   ],
+   [
+    "Barber",
+    "Auditor"
+   ],
+   [
+    "Jordan",
+    "Owen"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "Riley",
+    "Maya"
+   ],
+   [
+    "Avery",
+    "Nora"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached on a job?"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most energy offices set it."
+   ],
+   [
+    "A neighborhood energy office on Mill Rd. Classic cuts, fades and hot towel shaves.",
+    "An energy office on Mill Rd. Report walk-throughs, upgrade priority list and second opinions."
+   ],
+   [
+    "A water heater job",
+    "A home energy audit"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the office's list.",
+    "Alex asks for mold removal, which isn't on the office's list."
+   ],
+   [
+    "two skin fades",
+    "two report walk-throughs"
+   ],
+   [
+    "a parent stays for a kids cut",
+    "a parent stays for a report walk-through"
+   ],
+   [
+    "Kids cut",
+    "Phone question"
+   ],
+   [
+    "Color and cut",
+    "Energy plan"
+   ],
+   [
+    "color and cut",
+    "energy plan"
+   ],
+   [
+    "Style consult",
+    "Quick question by phone"
+   ],
+   [
+    "the $89 service-call fee",
+    "the $89 trip fee"
+   ],
+   [
+    "Home energy audit for homes in Springfield. Home energy audit and water heaters, within 25 miles.",
+    "Home energy audits in Springfield. Houses, condos and small buildings, within 25 miles."
+   ],
+   [
+    "Lee Energy Office doesn't do perms.",
+    "Lee Energy Office doesn't do mold removal."
+   ],
+   [
+    "The chairs",
+    "The meeting room"
+   ],
+   [
+    "A chair, ready",
+    "A desk, ready"
+   ]
+  ],
+  "B": [
+   [
+    "Free until 7am on the visit day.",
+    "Free until 6pm the day before."
+   ],
+   [
+    "Free cancel lasts until 7am on the visit day.",
+    "Free cancel lasts until 6pm the day before."
+   ],
+   [
+    "1 hour's notice",
+    "2 days' notice"
+   ],
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first, since an adult has to be home"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "The bill after the visit, with a pay link"
+   ],
+   [
+    "After that, or nobody home:",
+    "After that, or nobody home:"
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Say Kim L.'s condo needs nobody home."
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $349 audit needs none."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I change the thermostat before you come?"
+   ],
+   [
+    "says no. Please wait until the job is done.",
+    "says no. Please leave the thermostat where you normally keep it."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "New-home rating: priced from the plans first"
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can start the home energy audit at a set time"
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says a very large home is priced from the listing's photos and bills first. No time is saved while it's priced."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Owen finds bare live wires in the crawl space. The plug-in says an auditor stays out of an unsafe area, so Alex gets a written note and the photo."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee Energy Office for a report walk-through instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A very large home is priced at the visit: only the $89 trip fee was promised. The fee never depends on what the audit finds."
+   ],
+   [
+    "Your $800 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then.",
+    "Your $640 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a duct leakage test. Both go in one booking, with one start time and one code."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Energy Office can go over your report at the office for $35, or at the home for $75. Where would you like it?"
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Ivy's AI asks for a home energy audit at $299, an old price. Rosie answers with the real price, $349."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a report walk-through at the office or at the house."
+   ],
+   [
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "One of the office's auditors does walk-throughs at the home. Sam set each place's price and money at sign-up."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs a paper first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone out of the basement, and to leave and call 911 if there's a gas smell."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Energy Office can book you from now on, at the office and for walk-throughs at the home."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A home energy audit with Lee Energy Audits is $349, not $299. Here are the open times at $349."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A duct leakage test is $199 more, the same morning. The audit runs about 45 minutes longer."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No entren al sótano y mantengan lejos a los niños y las mascotas. Si huele a gas, salgan y llamen al 911."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 9:52am on Owen's phone, you said yes to a crawl space moisture check for $160."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Owen is moving boxes away from the attic hatch. The audit moves to about 8:30am."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Owen's times show: that is the one who audits buildings with several units."
+   ],
+   [
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "Lee Energy Audits: $640 for your 4-unit building audit. Pay by card, or by bank transfer."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My bills are high and the back rooms are cold. Can an auditor come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Each customer gets a 4-digit check-in code, and gives it to the plumber at the door.",
+    "Each customer gets a 4-digit check-in code, and gives it to the auditor on the day."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Owen found bare live wires in the crawl space and didn't go in."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay out of the basement, and keep children and pets away. If you smell gas, get out and call 911."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Owen cracked a ceiling tile at 31 Cedar Ct. The before photo shows no crack."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A walk-through at the home goes on in this flow. The office is in the other flow."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the multi-unit audit quote before booking."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop.",
+    "You're all set: Lee Energy Office can book you from now on, at the office."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in's example: water up to the outlets gets 'stay away from that area'."
+   ],
+   [
+    "With Sam's yes, electrical and the shop now show to AI assistants too.",
+    "With Sam's yes, new-home energy rating and the office now show to AI assistants too."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a building manager books audits of 4 units at one address."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? There is water up to the outlets in the basement, and I need an energy audit."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: a crawl space moisture check, $160. Sent to Alex."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My basement flooded last week. Is it safe to run the furnace?"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only at a shop or an office."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your furnace and attic, and an auditor will price the audit."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can an auditor look at a house this Thursday? What does it cost?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE attic hatch in the hall closet, boxes in front. Old gas furnace in the basement."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the home energy audit to $375 for visits from Mon Nov 2."
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "A job priced at the visit never takes more than its trip fee."
+   ],
+   [
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "New-home energy rating and Lee Energy Office now show to AI assistants too."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Audits already booked keep $349, even after Nov 2."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 crawl space moisture check offer is good for 7 days."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No work here is sent now: audits and reviews are always booked ahead."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your audit price is with Lee Energy Audits."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 crack gauge set, damp crawl space"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hay agua hasta los enchufes en el sótano y necesito una auditoría de energía."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A report walk-through could mean an energy office or an auditor."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old water stain on the hall ceiling"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The cold weather is coming. What's the soonest you can come?"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Owen also run a duct test?"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your audit this time"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD bare live wires in the crawl space, stayed out"
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Alex's home in Springfield is inside it."
+   ],
+   [
+    "Casey for plumbing, Avery at the shop.",
+    "Felix for home energy audits, Nora at the office."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Maya also does energy plans and walk-throughs at the home"
+   ],
+   [
+    "Alex was told to keep the door closed",
+    "Alex was told to stay back"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Maya: energy plans and walk-throughs at the home"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The report missed the drafty attic hatch."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Crawl space moisture check · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not audited: the crawl space"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Second opinion on an audit"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the wiring made safe first"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: bare live wires in the crawl space"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE attic hatch blocked by boxes, clearing it"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a ceiling tile at the attic hatch"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the house lived in? Any pets? Can an adult stay home?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa duct leakage test Thu 1pm Felix"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the report link"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Crawl space moisture check"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Bare wires in the crawl space"
+   ],
+   [
+    "Water heater replacement",
+    "4-unit building audit"
+   ],
+   [
+    "water heater replacement",
+    "4-unit building audit"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Owen's notes"
+   ],
+   [
+    "plumbing and electrical",
+    "home energy audit and new-home energy rating"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home energy audit and new-home energy rating"
+   ],
+   [
+    "Sewer camera inspection",
+    "Duct leakage test"
+   ],
+   [
+    "sewer camera inspection",
+    "duct leakage test"
+   ],
+   [
+    "Jordan found more work.",
+    "Owen suggests one more check."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home energy audit"
+   ],
+   [
+    "stage 2 of your repipe",
+    "the 4-unit building audit"
+   ],
+   [
+    "Under the sink, before",
+    "Front of the house, before"
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 1,850 sq ft, built in 1978. No add-ons."
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Duct leakage test"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Energy Audits LLC"
+   ],
+   [
+    "Cabinet floor, before",
+    "Hall ceiling, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked ceiling tile"
+   ],
+   [
+    "leehomeservices.com",
+    "leeenergyaudits.com"
+   ],
+   [
+    "Sewer camera report",
+    "Energy report"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Energy Audits'"
+   ],
+   [
+    "Water heater flush",
+    "Test-out after upgrades"
+   ],
+   [
+    "water heater flush",
+    "test-out after upgrades"
+   ],
+   [
+    "Every shop service",
+    "Every office service"
+   ],
+   [
+    "the shutoff valves",
+    "the crawl space moisture check"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Energy Audits"
+   ],
+   [
+    "the kitchen drain",
+    "the home energy audit"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Energy Office"
+   ],
+   [
+    "plumbing license",
+    "home energy audit license"
+   ],
+   [
+    "Plumbing license",
+    "Home energy audit license"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "like a roof leak",
+    "like an installer for the upgrades"
+   ],
+   [
+    "arriving 8–10am",
+    "starting 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starting 1:00pm"
+   ],
+   [
+    "Drain clearing",
+    "Home energy audit"
+   ],
+   [
+    "drain clearing",
+    "home energy audit"
+   ],
+   [
+    "plumbing visit",
+    "home energy audit"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 349 home energy audit"
+   ],
+   [
+    "Avery: barber",
+    "Nora: report walk-throughs"
+   ],
+   [
+    "2 At the shop",
+    "2 At the office"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Audits"
+   ],
+   [
+    "Lee Electric",
+    "Lee Ratings"
+   ],
+   [
+    "1200 Main St",
+    "75 Lake St"
+   ],
+   [
+    "barbershop's",
+    "energy office's"
+   ],
+   [
+    "sewer camera",
+    "duct leakage test"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "at the chair",
+    "at the office"
+   ],
+   [
+    "At your shop",
+    "At your office"
+   ],
+   [
+    "house calls",
+    "walk-throughs at the home"
+   ],
+   [
+    "House calls",
+    "Walk-throughs at the home"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "At my home.",
+    "My own home."
+   ],
+   [
+    "electrical",
+    "new-home energy rating"
+   ],
+   [
+    "Electrical",
+    "New-home energy rating"
+   ],
+   [
+    "barbershop",
+    "energy office"
+   ],
+   [
+    "Barbershop",
+    "Energy office"
+   ],
+   [
+    "Beard trim",
+    "Bill review"
+   ],
+   [
+    "beard trim",
+    "bill review"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "At my home",
+    "At the home"
+   ],
+   [
+    "88 Elm St",
+    "18 Mill Rd"
+   ],
+   [
+    "on Elm St",
+    "on Mill Rd"
+   ],
+   [
+    "42 Oak St",
+    "31 Cedar Ct"
+   ],
+   [
+    "a plumber",
+    "an auditor"
+   ],
+   [
+    "10am–12pm",
+    "1:00pm"
+   ],
+   [
+    "plumbing",
+    "home energy audit"
+   ],
+   [
+    "Plumbing",
+    "Home energy audit"
+   ],
+   [
+    "a barber",
+    "an auditor"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "JP031552",
+    "EX-2055"
+   ],
+   [
+    "MP045210",
+    "EX-3068"
+   ],
+   [
+    "plumber",
+    "auditor"
+   ],
+   [
+    "Plumber",
+    "Auditor"
+   ],
+   [
+    "Haircut",
+    "Report walk-through"
+   ],
+   [
+    "JE30417",
+    "EX-4071"
+   ],
+   [
+    "EC22871",
+    "EX-5084"
+   ],
+   [
+    "BS20981",
+    "EX-6097"
+   ],
+   [
+    "barber",
+    "auditor"
+   ],
+   [
+    "Barber",
+    "Auditor"
+   ],
+   [
+    "Jordan",
+    "Owen"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "1:00pm"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "Riley",
+    "Maya"
+   ],
+   [
+    "Avery",
+    "Nora"
+   ],
+   [
+    "$179",
+    "$349"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached on a job?"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Your report comes by the date on your booking."
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "A neighborhood energy office on Mill Rd. Classic cuts, fades and hot towel shaves.",
+    "An energy office on Mill Rd. Report walk-throughs, upgrade priority list and second opinions."
+   ],
+   [
+    "A water heater job",
+    "A home energy audit"
+   ],
+   [
+    "two drain clearings",
+    "two home energy audits"
+   ],
+   [
+    "Water pressure check",
+    "Quick question by phone"
+   ],
+   [
+    "the $89 service-call fee",
+    "the $89 trip fee"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, only for a late cancel or no way in"
+   ],
+   [
+    "E 25% deposit after the quote. C paid in full when they book",
+    "C paid in full when they book"
+   ],
+   [
+    "25% deposit",
+    "Card saved for the $89 fee"
+   ],
+   [
+    "Leak repair",
+    "Large property evaluation"
+   ],
+   [
+    "Labor",
+    "Crawl space moisture check"
+   ],
+   [
+    "$120 an hour",
+    "$160"
+   ],
+   [
+    "2-hour windows",
+    "start times 8:00am and 1:00pm"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a home energy audit, today,"
+   ],
+   [
+    "accept the leak repair for today",
+    "accept the home energy audit for today"
+   ],
+   [
+    "Accepted: the leak repair today",
+    "Accepted: the home energy audit today"
+   ],
+   [
+    "Alex M. · water heater",
+    "Alex M. · 4-unit building"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 4-unit building is over the plug-in's amount, so it gets a quote to sign."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about an energy audit for my house. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a home energy audit.",
+    "'Can someone check the house before I buy?' fits a home energy audit."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the way to the attic hatch."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found water damage in the basement this morning."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how big is the house, and what year was it built?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, an adult can stay home"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like promising savings the house can't deliver."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a duct leakage test? Say so.'"
+   ],
+   [
+    "Say Owen cracks the cabinet floor and texts a photo.",
+    "Say Owen scuffs the hallway floor and texts a photo."
+   ],
+   [
+    "Owen finds corroded shutoff valves.",
+    "Owen finds signs of moisture in the attic."
+   ],
+   [
+    "Home energy audit for homes in Springfield. Home energy audit and water heaters, within 25 miles.",
+    "Home energy audits in Springfield. Houses, condos and small buildings, within 25 miles."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most energy offices start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules energy offices often set."
+   ],
+   [
+    "Saved: home energy audit $199 for visits from Mon Nov 2. Drain clearings already booked keep $349. Home energy audit plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: home energy audit $375 for visits from Mon Nov 2. Audits already booked keep $349."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Audits already booked keep only their saved card."
+   ],
+   [
+    "The chairs",
+    "The meeting room"
+   ],
+   [
+    "A chair, ready",
+    "A desk, ready"
+   ],
+   [
+    "a camera inspection",
+    "a duct leakage test"
+   ],
+   [
+    "can clear the drain",
+    "can do the home energy audit"
+   ],
+   [
+    "run a camera down my sewer line",
+    "run a duct test"
+   ],
+   [
+    "Kitchen drain",
+    "Home energy audit"
+   ],
+   [
+    "Yard drain",
+    "Condo audit"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex, who has the audit report for a house, books a 30-minute report walk-through with Maya at Lee Energy Office, Sam's office, for Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, a homeowner with high winter bills, books Lee Energy Audits: Owen audits the house at 31 Cedar Ct on Thu Oct 22 from 8:00am, Alex is home all morning, the results walk-through is at 11:00am, and the report follows Fri. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 report walk-through. A card is saved for the office's $20 fee. Alex pays at the office after.",
+    "list|none|counter": "A $35 report walk-through. Nothing is taken: a YES books it. Alex pays at the office after.",
+    "list|full|none": "A second opinion on another company's audit, $55, paid in full when booking.",
+    "list|card|card": "A $35 report walk-through on a Saturday morning, when Maya works alone with no front desk: the saved card is charged when she texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Report walk-through"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Report walk-through"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Second opinion on an audit"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Bill review",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Second opinion on an audit",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|full|none",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $349 home energy audit. A card is saved and charged $349 when Owen texts DONE. The report follows Fri.",
+    "list|none|bill": "A $349 home energy audit. Nothing is taken. Rosie texts the bill after, and the report goes out once it's paid.",
+    "list|full|none": "A $150 test-out after upgrades, paid in full when booking.",
+    "photos|deposit|bill": "A 4-unit building, priced from the listing and bills at $640. Sam OKs it. A $160 deposit now, the $480 rest on the bill after."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Home energy audit"
+    },
+    "list|*|*": {
+     "price": "$349",
+     "name": "Home energy audit"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Test-out after upgrades"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "4-unit building audit"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "4-unit building audit"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Duct leakage test",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$199",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Test-out after upgrades",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    }
+   }
+  }
+ },
+ "keep": [
+  "Trip fee",
+  "trip fee",
+  "Grace",
+  "leak",
+  "color"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28",
+   "S1-38"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-23",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where your office is, the state asks for a registration. What's the company's registration number?"
+     ],
+     [
+      "owner",
+      "san",
+      "EX-6097"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state asks for no credential for energy advice, a report walk-through needs none either. Its form says so."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Are your audit prices the same, whoever goes?",
+      {
+       "buttons": [
+        "Yes, the same",
+        "Some charge differently"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 The duct leakage test is 249 if I go myself"
+     ],
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Duct leakage test",
+          "You",
+          "$249"
+         ],
+         [
+          "Duct leakage test",
+          "Anyone else",
+          "$199"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Home energy audit, new-home energy rating and report walk-throughs all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The auditor's plug-in adds no agreement for Sam to sign with Rosie before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Audits and report walk-throughs book a person's time, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: audits and report walk-throughs are booked one client at a time."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "An audit is never sent now: it needs a signed agreement and access set up first, so the soonest open time is offered instead."
+   },
+   {
+    "op": "words",
+    "at": "A4-01",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A report walk-through at Lee Energy Office is $35 at the office or by video, or $75 at the home. Where would you like it?",
+      {
+       "buttons": [
+        "At the office",
+        "At the home"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "agent",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-23",
+    "does": "Say another customer, Tess L., has a whole-house upgrade plan this Sat at 2:00pm. The meeting room's big screen breaks, so each booking that needs it is offered a change, with no fee.",
+    "more": [
+     "The plug-in says what each service needs, like a room, a tool or a crew.",
+     "No reply in 24 hours: Sam is asked to call.",
+     "Bookings that don't need it aren't touched."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "Meeting room screen broken until Mon"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Tess. The big screen for your Sat 2:00pm energy plan is broken. Keep it, with the plans on paper, or pick a new time, with no fee.",
+      {
+       "buttons": [
+        "Keep it on paper",
+        "A new time",
+        "Cancel, no fee"
+       ],
+       "as": "Tess"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "A report walk-through is an one-time meeting, never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Report walk-throughs are one client at a time; a co-buyer is added as one more person."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a report walk-through."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "No form is signed for a report walk-through."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The office sells no packages."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The office sells no packages."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A report walk-through is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "A report walk-through fixes nothing, so nothing gets worse before it."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "A report walk-through is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "A report walk-through is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "A report walk-through is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "Nothing at a report walk-through stops it for a hazard."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A report walk-through is billed once."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a report walk-through."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The office never sells repair or other work after a review."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A report walk-through has no result that comes later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the office to pick up."
+   },
+   {
+    "op": "more",
+    "at": "A4-01",
+    "more": [
+     "By video: the code is read out at the start."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "Here: a report walk-through by video, for a client who is out of town."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "more": [
+     "No answer in 10 minutes: it goes to Sam, and Alex hears the office was asked.",
+     "At night, Alex is told it waits for the morning. Sam is texted at 8am.",
+     "A question only an auditor may answer: 'Maya will go over it at your walk-through. Urgent: call (555) 010-0177.' The office sees it."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my spouse join the walk-through?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can my spouse join the walk-through?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Maya says yes. Your spouse is welcome."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A report walk-through books an auditor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A report walk-through books an auditor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A report walk-through books an auditor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A report walk-through is never booked for a child: the client is an adult buyer, seller or owner."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the office: Alex stays for the meeting."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A report walk-through is rated."
+   },
+   {
+    "op": "words",
+    "at": "S11-40",
+    "does": "Nia K. asked to talk about the $140 whole-house upgrade plan before booking. Sam taps Call, and the call goes out from the office's number.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nia K. would like to talk about the whole-house upgrade plan before booking.",
+      {
+       "buttons": [
+        "Call Nia"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Felix Moore"
+     ],
+     [
+      "Company",
+      "Lee Energy Audits"
+     ],
+     [
+      "Kinds of work",
+      "Home energy audit"
+     ],
+     [
+      "Jobs",
+      "Home energy audit, new-home energy rating, test-out after upgrades"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7:30am–5:30pm"
+     ],
+     [
+      "Felix agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the office: a parent stays."
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[6 contact cards] Owen and Felix do home energy audits; Owen does new-home ratings too, as a certified rater. Maya and Nora do report walk-throughs and upgrade lists at the office; Maya also goes to the home. Pat is my office manager, for prices over $500. Jules rents a desk, with their own customers."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Owen: energy audits and new-home ratings",
+         "Felix: energy audits",
+         "Maya: walk-throughs, upgrade lists, walk-throughs at the home",
+         "Nora: walk-throughs and upgrade lists at the office",
+         "Pat: office manager, OKs Lee Energy Audits prices over $500",
+         "Jules: own customers, gets a link to sign up as their own business"
+        ]
+       },
+       "buttons": [
+        "Yes, all agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S2-15",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Are your audit prices the same, whoever goes?",
+      {
+       "buttons": [
+        "Yes, the same",
+        "Some charge differently"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 The duct leakage test is 249 if I go myself"
+     ],
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Duct leakage test",
+          "You",
+          "$249"
+         ],
+         [
+          "Duct leakage test",
+          "Anyone else",
+          "$199"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Home energy audit, new-home energy rating and report walk-throughs all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The auditor's plug-in adds no agreement for Sam to sign with Rosie before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Audits and report walk-throughs book a person's time, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: audits and report walk-throughs are booked one client at a time."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "An audit is never sent now: it needs a signed agreement and access set up first, so the soonest open time is offered instead."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "An audit carries no repair warranty. A missed item goes to Sam as a complaint."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "An auditor never sells more work at a home it audited."
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "does": "Back to Alex, later that day: the visit is done. The receipt goes out by text and email. An audit carries no repair warranty, so the receipt points to the report."
+   },
+   {
+    "op": "more",
+    "at": "B10-07",
+    "more": [
+     "For an audit, the report always comes later: it's the branch 'A report is ready later'."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-13",
+    "does": "Rosie never argues or admits fault. Sam decides if Owen goes back to look. A refund goes through the portal.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "The report missed the drafty attic hatch."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. isn't happy with the Thu Oct 22 audit: \"The report missed the drafty attic hatch.\""
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-16",
+    "does": "A week later, Alex texts the same number. Rosie answers by the plug-in's rule: this business doesn't install upgrades, so it can't take the work.",
+    "more": [
+     "The plug-in says this business never installs upgrades at a home it audited.",
+     "Sam can keep that rule anywhere, as the business's own.",
+     "Rosie never names or sells another business.",
+     "A new audit starts a new booking, with a new code. Nothing is asked twice."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can your team do the attic insulation Owen recommended?"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Energy Audits doesn't install upgrades, and never at a home it audited. An insulation company can help. You may already know one."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At the walk-through, Alex asks for a test-out once the air sealing is done. Owen texts NEXT, and Alex gets times to pick, since it's inside the 60 days Sam books ahead.",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the customer asks.",
+     "It's booked like the first one, with its own code.",
+     "No reply in 24 hours: the times are let go, and nothing more is sent."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: test-out after the air sealing"
+     ],
+     [
+      "san",
+      "cust",
+      "Owen says you'd like a test-out after the air sealing: $150, about 1 hour. Pick a time:"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-25",
+    "t": "Fri Oct 23, 9:00am",
+    "more": [
+     "Where the state's rules set a deadline, Rosie tracks it and reminds Sam the day before.",
+     "A later date needs Alex's OK in writing, where those rules require it.",
+     "Paid by the bill: the report goes out once it's paid, as Sam set."
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your energy report will be ready Mon Oct 26. We'll text you a secure link then."
+       ]
+      ]
+     }
+    },
+    "does": "Say Alex was told at DONE that the energy report comes Fri Oct 23, the date promised at booking. On that day, Rosie checks it's ready."
+   },
+   {
+    "op": "words",
+    "at": "B10-19",
+    "more": [
+     "Nothing from the report goes in the text itself.",
+     "The report stays with Alex's records.",
+     "Questions about it: Alex replies here, and Owen calls back.",
+     "Savings are estimates in the report, never promised in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-26",
+    "more": [
+     "Where the state's rules set the deadline, a later date needs Alex's OK in writing first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Each audit is billed on its own. A new build's phase audits are each their own booking."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance or warranty pays for a home energy audit."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "A landlord never pays for an audit: the client pays."
+   },
+   {
+    "op": "more",
+    "at": "B9-06",
+    "more": [
+     "Sam's setting for this service: the report goes out once the bill is paid.",
+     "Where the state's rules forbid holding a report, it goes out at once."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B9-11",
+    "more": [
+     "The report stays held until it's paid, as Sam set. Rosie never chases: Sam follows up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "A test that can't run is no extra. It is listed as not tested, and a return visit for the $89 trip fee needs Alex's OK."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Near the end, Owen walks Alex through the results. The savings and any rebates are in the report; nothing is promised on the spot.",
+    "more": [
+     "Here: the attic hatch and the rim joists leak air, and the old furnace is the biggest user.",
+     "The plug-in names what was tested: the whole house, the ducts, the walls and attic, and the gas appliances.",
+     "Anything that couldn't be tested is listed as not tested.",
+     "The full report, with photos, follows by the date promised."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "Owen walks Alex through the results for the 4-unit building. The savings and any rebates are in the report; nothing is promised on the spot.",
+      "more": [
+       "The plug-in names what was tested: each unit, the shared attic and the boiler room.",
+       "Anything that couldn't be tested is listed as not tested.",
+       "The full report follows by the date promised."
+      ]
+     }
+    },
+    "t": "Thu Oct 22, 11:00am"
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "An audit fixes nothing, so a problem at the house getting worse doesn't change the booking. Danger at the house goes through the danger check on every message."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "An audit is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "An audit is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "An audit is never a plan."
+   },
+   {
+    "op": "more",
+    "at": "B7-10",
+    "more": [
+     "The sale falling through is an ordinary late cancel: only the notice counts, never the reason."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-28",
+    "does": "Something a job needs is out. Here, the duct tester is in for repair until Monday. Each booking that needs it, like Tessa's duct leakage test, is offered new times, with no fee.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Duct tester in for repair until Mon"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Tessa. The duct tester for your duct leakage test tomorrow is in for repair. Pick a new time, with no fee."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "An audit is an one-time visit, never a plan."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "An audit is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "An audit is an one-time visit. A test-out visit later is its own booking."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a home energy audit."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "An audit is never sent now."
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: the square feet, the year built, what bothers the client, how the home is heated, and any add-ons.",
+     "Its danger words: a gas smell, sparks, smoke, or a carbon monoxide alarm.",
+     "Its first steps: an adult who stays for the visit, and the bills on the secure page.",
+     "Who can stand in for whom, and how the visit is checked in: the code at the door, then DONE.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-83",
+    "does": "The plug-in, or Sam for each service, says what is booked and how its times read. It can be a person in a window or at a set start, a stay, a seat or no person. An audit starts at a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Audits start at a set time, like 8:00am or 1:00pm, never in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "An audit is one visit, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Audits book an auditor's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "An audit is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "An audit is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "An auditor never looks after a child. An adult must be there if anyone is."
+   },
+   {
+    "op": "words",
+    "at": "B9-22",
+    "does": "A what-if: say Morgan, an investor buying two rentals, asked for one bill a month instead of a bill after each audit. Both audits go on one bill on the 1st.",
+    "more": [
+     "Each audit still gets its own code or DONE.",
+     "Each line shows the audit's date and place.",
+     "Each audit is its own booking, so each counts for Rosfield's $2."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Energy Audits: your October audits.",
+      {
+       "list": {
+        "head": [
+         "Date",
+         "Place",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Tue Oct 20",
+          "Rental 1",
+          "$349"
+         ],
+         [
+          "Wed Oct 21",
+          "Rental 2",
+          "$349"
+         ]
+        ]
+       },
+       "pay": {
+        "amount": "$850",
+        "what": "October's audits",
+        "link": "rosfield.com/p/m10"
+       },
+       "as": "Morgan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Energy Audits: $640 for your 4-unit building audit. Pay by card, or by bank transfer.",
+      {
+       "pay": {
+        "amount": "$640",
+        "what": "the 4-unit building audit",
+        "link": "rosfield.com/p/h2"
+       },
+       "as": "Harper J."
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your $640 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then.",
+      {
+       "as": "Harper J."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "does": "Sam adds solar readiness checks to Lee Energy Audits. It brings its own plug-in, and only what's new is asked.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW solar readiness checks"
+     ],
+     [
+      "san",
+      "owner",
+      "Solar readiness checks for Lee Energy Audits: is it the same company?"
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like home energy audit?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-26",
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "LATE report Wed Oct 28"
+       ],
+       [
+        "san",
+        "cust",
+        "Your energy report needs a little more time. It will be ready Wed Oct 28."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-30",
+    "vary": {
+     "price:photos": {
+      "t": "Wed Oct 28, 10:00am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Felix Moore"
+     ],
+     [
+      "Company",
+      "Lee Energy Audits"
+     ],
+     [
+      "Kinds of work",
+      "Home energy audit"
+     ],
+     [
+      "Jobs",
+      "Home energy audit, new-home energy rating, test-out after upgrades"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7:30am–5:30pm"
+     ],
+     [
+      "Felix agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after an audit, as in flow A."
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[6 contact cards] Owen and Felix do home energy audits; Owen does new-home ratings too, as a certified rater. Maya and Nora do report walk-throughs and upgrade lists at the office; Maya also goes to the home. Pat is my office manager, for prices over $500. Jules rents a desk, with their own customers."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Owen: energy audits and new-home ratings",
+         "Felix: energy audits",
+         "Maya: walk-throughs, upgrade lists, walk-throughs at the home",
+         "Nora: walk-throughs and upgrade lists at the office",
+         "Pat: office manager, OKs Lee Energy Audits prices over $500",
+         "Jules: own customers, gets a link to sign up as their own business"
+        ]
+       },
+       "buttons": [
+        "Yes, all agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "An adult stays for the whole audit: the tests run in every room and the heating system is used."
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "t": "Thu Oct 22, 6:45am"
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 7:40am"
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 8:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 11:30am"
+   },
+   {
+    "op": "more",
+    "at": "B8-29",
+    "more": [
+     "A combustion test that shows dangerous carbon monoxide ends it. The auditor tells everyone to leave, and gives 911 and the gas company."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-10",
+    "more": [
+     "A late cancel is judged only by the notice given. The fee never depends on the reason."
+    ]
+   }
+  ]
+ },
+ "notes": "Kept words: 'Trip fee' (the $89 fee for a late cancel or no way in, the parent's word too), 'Grace' (the master's grace time), 'leak' and 'color' (the master's shared safety and fairness lines, S13-40 lists color among protected traits).\nNew profession on the REDESIGN 2 master (batch S1, Tue Oct 27 2026), started from the refitted inspector overlay (set 'from'): an energy audit is a set visit at the home with a written report later, like an inspection. It differs on purpose: an adult stays for the whole visit (the blower door, the infrared scan and the combustion test run in every room), so the parent's lockbox, agent-access and signed-agreement steps are not carried and the master's own check-in stands (the code at the door). The 'Nobody needs to be home' branch of B8-03 is off.\nFlow B is the usual side: Lee Energy Audits (home energy audits of houses, condos and small multi-unit buildings, with new-home energy ratings as the second kind of work, done only by a certified rater). Flow A is Lee Energy Office, Sam's office: a 30-minute report walk-through, bill review, upgrade lists and a whole-house upgrade plan, at the office, by video or at the home.\nPrices are the example business's own: home energy audit $349 (house up to 2,500 sq ft), condo $249, test-out after upgrades $150 (paid in full), duct leakage test $199 ($249 when Sam goes), crawl space moisture check $160, a multi-unit building quoted from the listing and bills at $640 (Sam OKs over $500), trip fee $89. Flow A: report walk-through $35, bill review $20, upgrade priority list $40, second opinion on an audit $55, whole-house upgrade plan $140, at the home $75.\nMoney, flow B: main list|card|card (a card saved at booking, charged at DONE), list|none|bill (the bill after; the report goes out once it is paid), list|full|none (a test-out paid in full), photos|deposit|bill (a multi-unit building quoted first: $160 deposit, $480 on the bill). Flow A: list|card|counter (main), list|none|counter, list|full|none, list|card|card. No visit-priced path: the fee never depends on the upgrades bought, the rebates won or the savings found.\nWho must not be booked (pf.questions, pf.safety): anyone under 18; a home with a gas smell, smoke or sparks or a carbon monoxide alarm sounding (no booking until safe); a home where no adult can stay the whole visit (the audit needs one); a tenant for areas the landlord has not OK'd (left out, listed as not tested). Installation work and rebate paperwork are not offered.\nDanger words (pf.safety): a gas smell, sparks or smoke, a carbon monoxide alarm (no booking until safe); live wires hanging down and flooding up to the outlets (booking goes on, that area left out). At the visit, a combustion safety test showing dangerous carbon monoxide ends the test (B8-29 more line). The danger-first call (B3-11, B3-18) uses water up to the outlets, so the two steps read as one conversation. 'High bills', 'drafts' and 'a cold room' are the everyday reasons to book and are not stop words.\nSettings: arrive a set start (8:00am and 1:00pm), cutoff 6pm the day before; booking choices limited to a set time. Nothing is sent now. Weather (wind, a small temperature gap) moves the visit with no fee (pf.rules, S13-56). The fact `documents` is not listed, so the master's signed-contract branch is hidden and 'No contract needed' stands.\nRename pairs: only the inspector's pairs that match the frozen master were kept and re-worded for energy audits; addresses and credential numbers are made up (EX-1042 style). The master's 'Leak repair' sign-up row reads 'Large property evaluation' (priced at the visit by size). The report date in the examples is the next day (Fri Oct 23) like the parent's; the real turnaround is the owner's setting (the plug-in's example: 3 business days).\nFor the verifier: an adult staying the whole visit is my reading of how audits run (the blower door test needs the auditor to move through every room); a business that lets an auditor in with a lockbox would need the parent's design instead. The credential name is generic on purpose.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "'A trim' or 'a fade' fits",
+    "'Yes, make it a fade' goes back to the times.",
+    "Add photos of your hair,",
+    "Alex's employer for a staff cut.",
+    "My employer pays for this cut.",
+    "means the shorter cut.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "Shop's side.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Color quotes come to you first. Board prices never need one",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "like a patch test with a wait, or a screening",
+    "Panel upgrade: a free estimate, then a quote",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "May the shop show photos of your hair? Yes / No",
+    "A haircut could mean a salon or a barbershop.",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "Avery at the shop, Casey for plumbing.",
+    "Riley also does color and house calls",
+    "Takes the price from the shop's board",
+    "The cape clip ripped my shirt collar.",
+    "Haircuts at the shop work like this:",
+    "Riley: barber, color and house calls",
+    "Signature cut and hot towel shave",
+    "Do you do kids cuts? My son is 8.",
+    "like a 15-minute style consult",
+    "The cut is uneven on one side.",
+    "Does it work like haircuts?",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "Hours: the shop's hours",
+    "Priced from your photos",
+    "Haircuts work like this",
+    "Lee's Barbershop LLC",
+    "Color and cut · $90",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Groom's package ·",
+    "Lee's Barbershop",
+    "Color correction",
+    "Only at the shop",
+    "Groom's package",
+    "Book a free fix",
+    "Drain clearing",
+    "A barbershop's",
+    "signature cut",
+    "Avery: barber",
+    "1 color quote",
+    "1 At the shop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "barbershop's",
+    "at the chair",
+    "At the chair",
+    "At your shop",
+    "A barbershop",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "At the shop",
+    "at the shop",
+    "NEW massage",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "the shop's",
+    "The shop's",
+    "Shop front",
+    "At my home",
+    "88 Elm St",
+    "on Elm St",
+    "Barbering",
+    "Skin fade",
+    "skin fade",
+    "plumbing",
+    "Plumbing",
+    "Haircuts",
+    "haircuts",
+    "a barber",
+    "A barber",
+    "the shop",
+    "The shop",
+    "JP031552",
+    "MP045210",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "JE30417",
+    "EC22871",
+    "BS20981",
+    "barber",
+    "Barber",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "or can't be reached while care is due?",
+    "visit fee",
+    "Each service starts the way most barbershops set it.",
+    "A water heater job",
+    "two skin fades",
+    "a parent stays for a kids cut",
+    "Kids cut",
+    "Color and cut",
+    "color and cut",
+    "Style consult",
+    "the $89 service-call fee",
+    "The chairs",
+    "A chair, ready"
+   ],
+   "B": [
+    "Free until 7am on the visit day.",
+    "Free cancel lasts until 7am on the visit day.",
+    "1 hour's notice",
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "After that, or nobody home:",
+    "Say Kim L.'s yard drain needs nobody home.",
+    "The $179 drain needs none.",
+    "Can I run the dishwasher before you come?",
+    "says no. Please wait until the job is done.",
+    "Panel upgrade: a free estimate, then a quote",
+    "can start the sewer camera inspection at a set time",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Your $800 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Each customer gets a 4-digit check-in code, and gives it to the plumber at the door.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "With Sam's yes, electrical and the shop now show to AI assistants too.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "A job priced at the visit never takes more than the visit fee.",
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Your water heater price is with Lee Home Services.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "A haircut could mean a salon or a barbershop.",
+    "BEFORE old water stain on the cabinet floor",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also look at a dripping faucet?",
+    "couldn't price your water heater this time",
+    "HAZARD mold behind the sink wall, stopped",
+    "Alex's home in Springfield is inside it.",
+    "Casey for plumbing, Avery at the shop.",
+    "Riley also does color and house calls",
+    "Alex was told to keep the door closed",
+    "Riley: barber, color and house calls",
+    "Jordan left a mess under the sink.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Is the sink still full of water?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "LATE camera report Mon Oct 26",
+    "Texts the camera report link",
+    "Replace both shutoff valves",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "Video and Jordan's notes",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Jordan found more work.",
+    "Kitchen drain clearing",
+    "stage 2 of your repipe",
+    "Under the sink, before",
+    "Just the kitchen sink.",
+    "Tessa · Drain clearing",
+    "Lee Home Services LLC",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "leehomeservices.com",
+    "Sewer camera report",
+    "Lee Home Services'",
+    "Water heater flush",
+    "water heater flush",
+    "Every shop service",
+    "the shutoff valves",
+    "Lee Home Services",
+    "the kitchen drain",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "Service call fee",
+    "service call fee",
+    "like a roof leak",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "Drain clearing",
+    "drain clearing",
+    "plumbing visit",
+    "DONE 179 drain",
+    "Avery: barber",
+    "2 At the shop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "barbershop's",
+    "sewer camera",
+    "Service call",
+    "service call",
+    "at the chair",
+    "At your shop",
+    "house calls",
+    "House calls",
+    "Price board",
+    "At the shop",
+    "at the shop",
+    "At my home.",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "beard trim",
+    "the shop's",
+    "Shop front",
+    "At my home",
+    "88 Elm St",
+    "on Elm St",
+    "42 Oak St",
+    "a plumber",
+    "plumbing",
+    "Plumbing",
+    "a barber",
+    "the shop",
+    "The shop",
+    "JP031552",
+    "MP045210",
+    "plumber",
+    "Plumber",
+    "Haircut",
+    "JE30417",
+    "EC22871",
+    "BS20981",
+    "barber",
+    "Barber",
+    "Jordan",
+    "8–10am",
+    "12–2pm",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$179",
+    "or can't be reached while care is due?",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "visit fee",
+    "A water heater job",
+    "two drain clearings",
+    "Water pressure check",
+    "the $89 service-call fee",
+    "$89, credited to the repair",
+    "E 25% deposit after the quote. C paid in full when they book",
+    "25% deposit",
+    "Leak repair",
+    "Labor",
+    "$120 an hour",
+    "2-hour windows",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today",
+    "Accepted: the leak repair today",
+    "Alex M. · water heater",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Yes, it won't drain",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Drain clearings already booked keep only their saved card.",
+    "The chairs",
+    "A chair, ready",
+    "a camera inspection",
+    "can clear the drain",
+    "run a camera down my sewer line",
+    "Kitchen drain",
+    "Yard drain"
+   ]
+  },
+  "A": {
+   "S1-23": "39941a5377",
+   "S1-61": "7421d186d5",
+   "S2-15": "4a64408afc",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A7-23": "90bc4b1137",
+   "A4-28": "c8e677520c",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-96": "d540b91653",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-86": "c989a99e52",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A4-36": "f261af1660",
+   "A7-12": "05f64179a4",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "S11-40": "0f0f0a5c8f",
+   "S11-48": "03f824b27b",
+   "A8-67": "e9fd748fc5",
+   "S2-02": "b2094081ee"
+  },
+  "B": {
+   "S2-15": "4a64408afc",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-01": "814aa1fde7",
+   "B10-07": "3737f1d1c8",
+   "B10-13": "584c827fda",
+   "B10-16": "c7a47a391c",
+   "B10-18": "3d7ba16539",
+   "B10-25": "3e0bd84dd3",
+   "B10-19": "4806f6eed8",
+   "B10-26": "b5ea3157f0",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B9-11": "9525d5f9c9",
+   "B8-23": "dd780a2ec8",
+   "B8-39": "aa75251207",
+   "B7-93": "4d6f89e473",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B7-10": "b5b9295e82",
+   "B7-28": "deeed1f8a0",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B4-04": "df3ea4b2f5",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B9-22": "f691bde396",
+   "B9-26": "d356566ab1",
+   "S11-58": "3461928783",
+   "B10-30": "5ecd3ded96",
+   "S11-48": "6fd1c7b7b9",
+   "B10-32": "7713bff255",
+   "S2-02": "b2094081ee",
+   "B8-03": "ac9d404766",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-41": "6e8e9825b2",
+   "B8-29": "fdaaa492b3"
+  }
+ }
+}

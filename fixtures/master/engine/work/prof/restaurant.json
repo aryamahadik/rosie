@@ -1,0 +1,2551 @@
+{
+ "id": "restaurant",
+ "name": "Restaurant",
+ "style": "Table",
+ "pattern": "table",
+ "plugin": {
+  "pf.license": {
+   "need": "where the state's rules require it: a food service permit for the restaurant, and a caterer's permit for cooking at a customer's place or an event; a liquor license for any bar service",
+   "holder": "the business holds the permits; each person holds a food handler card or an alcohol server permit only where the state's rules require it",
+   "ask": "the permit number and the name on it, from the restaurant's state form",
+   "check": "a person on Rosie's team checks the state's or the county's lookup within 1 business day; where no lookup exists, identity plus what the business says",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "Rosie reminds 30 days before a permit's date and checks again on it",
+   "insurance": "liability insurance for events at a customer's place or a venue, when the venue or the state's rules ask for proof"
+  },
+  "pf.services": {
+   "shape": "tables by party size and sitting (the table is the bookable space, not a person: the owner lists each space and its size at sign-up); the menu and its prices show; cooking at a customer's home or event is its own service",
+   "examples": "the example restaurant's own prices (Lee's Bistro, and Lee Catering for cooking away from it), not a standard",
+   "list": [
+    {
+     "name": "Table for 1 to 5",
+     "price": "free to book; the menu shows its prices (set brunch $35 a person)",
+     "kind": "the menu",
+     "length": "brunch 90 min, dinner 2 hours",
+     "where": "at the restaurant",
+     "before": "nothing: a YES books it",
+     "after": "the bill at the table, the restaurant's own way"
+    },
+    {
+     "name": "Table for 6 to 10 (the long table)",
+     "price": "free to book; the menu shows",
+     "kind": "the menu",
+     "length": "2 hours",
+     "where": "at the restaurant",
+     "before": "a card saved, if the owner wants it, only for a no-show or late-cancel fee the owner confirms ($20 a person in the example)",
+     "after": "the bill at the table, the restaurant's own way"
+    },
+    {
+     "name": "Back room (11 to 20)",
+     "price": "free to book; the menu or a set menu shows",
+     "kind": "the menu",
+     "length": "3 hours",
+     "where": "at the restaurant",
+     "before": "a card saved, as for 6 or more; the owner OKs it first",
+     "after": "the bill at the table"
+    },
+    {
+     "name": "Chef's Table (a tasting at the kitchen counter, up to 6)",
+     "price": "$140 a person",
+     "kind": "one price a person",
+     "length": "2½ hours",
+     "where": "at the restaurant",
+     "before": "nothing, or a card saved for 6",
+     "after": "the bill at the table"
+    },
+    {
+     "name": "Cake service (the kitchen plates the party's own cake)",
+     "price": "$20 a table",
+     "kind": "an extra on a booking",
+     "where": "at the restaurant",
+     "before": "nothing",
+     "after": "on the bill at the table"
+    },
+    {
+     "name": "Bar seats",
+     "price": "walk-in only",
+     "kind": "not bookable",
+     "where": "at the restaurant"
+    },
+    {
+     "name": "Brunch at home for 4 (Lee Catering)",
+     "price": "$179, plus the $89 travel fee inside 25 miles",
+     "kind": "one price",
+     "length": "the chef arrives in a 2-hour window; about 3 hours",
+     "where": "at the customer's place",
+     "before": "the $89 travel fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Dinner party for 8 (Lee Catering)",
+     "price": "priced from the customer's answers and kitchen photos ($640 in the example)",
+     "kind": "quoted first",
+     "length": "about 5 hours with shopping and cleanup",
+     "where": "at the customer's place or a venue",
+     "before": "a 25% deposit once the price is OK'd",
+     "after": "the rest on the bill, or charged to the saved card at DONE"
+    },
+    {
+     "name": "Cooking class at home (Lee Catering)",
+     "price": "$150",
+     "kind": "one price",
+     "length": "2 hours",
+     "where": "at the customer's place",
+     "before": "a deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Bar service (Lee Catering)",
+     "price": "the example's own hourly rate",
+     "kind": "per hour, 3-hour minimum",
+     "where": "at the customer's place or a venue",
+     "before": "a deposit",
+     "after": "the bill",
+     "note": "only with the liquor license and a bartender's own permit where the state's rules require it"
+    }
+   ],
+   "capacity": "seats and tables, typed once: which tables join for big parties; the long table seats 6 to 10, the back room 11 to 20",
+   "times": "every 15 minutes inside the restaurant's hours; same-day bookings until 1 hour before; up to 30 days ahead",
+   "notBookings": "delivery and takeout orders aren't bookings: not part of Rosie at launch",
+   "nobodyHome": "only for meal prep a chef leaves in the fridge; DONE with a photo"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "party size (sets the table and whether a card is saved)",
+    "brunch or dinner",
+    "inside, patio or back room (patio times only in good weather)",
+    "for cooking away: the address, the guest count and the kitchen"
+   ],
+   "afterTime": [
+    "the occasion (free text, optional)",
+    "a high chair or a step-free way in",
+    "a seating wish (not promised)",
+    "a cake to bring (the cake service)"
+   ],
+   "securePageOnly": [
+    "food allergies and diet needs: only on the secure page, with their own yes, shown only to the host and the kitchen for that booking"
+   ],
+   "told": "anyone ordering alcohol shows ID at the table (21 and over)",
+   "whoMayBook": "an adult (18 or over) books for the party; a teen asks a parent; for an event at a venue, the person who rents it, or someone they authorize"
+  },
+  "pf.safety": {
+   "words": [
+    "someone is choking",
+    "a severe allergic reaction now: a swelling face or throat, trouble breathing",
+    "someone collapsed",
+    "a fire, or a gas smell in the kitchen at a home event"
+   ],
+   "what": "the generic screen: call 911 now, no booking in that chat; Rosie gives no medical advice and names no medicine",
+   "goesOn": "an allergy asked about for a future booking is not an emergency: it goes on the secure page, and booking continues"
+  },
+  "pf.first_steps": {
+   "atTheRestaurant": "none",
+   "away": "for events of 20 or more guests, a menu tasting at Lee's Bistro first, if the owner sets it; kitchen photos come with the quote",
+   "prep": "the reminder says what's needed: arrive within the 15-minute grace time; for cooking at home, a clear counter, working oven and the guest count"
+  },
+  "pf.visit": {
+   "checkIn": "one check-in code per table, given at the host stand; the host texts it or types it on the Today page, or taps the name (marked done); away: the code from whoever is at the door",
+   "grace": "15 minutes after the time; then the host may give the table away and mark a no-show",
+   "atTheTable": "the server checks the allergy note with the party before ordering, and checks ID for alcohol (21 and over), the restaurant's own steps",
+   "changes": "a bigger party is seated only if a table fits; a cake service or anything extra is said before it's added",
+   "waitlist": "a freed table is offered by text to one party at a time, 15 minutes to take it; walk-ins join the same list at the host stand",
+   "done": "the check-in code (or the name tapped) proves the visit; away, DONE from the chef"
+  },
+  "pf.money": {
+   "atTheRestaurant": "nothing charged upfront; a card saved only for parties of 6 or more, if the owner wants it, only for a no-show or late-cancel fee the owner confirms; never a hold, deposit or the full price for a table",
+   "fee": "the owner's own fee, a set amount a person (the example's $20 a person); never more than the state's limit; no answer, no fee",
+   "after": "the bill is paid at the table, the restaurant's own way; Rosie texts no bill at the restaurant",
+   "charges": "any automatic gratuity or service charge (the example: 20% for 6 or more, all to the staff) is shown before the yes, in the confirmation and in the reminder",
+   "tips": "at the table, the restaurant's own way; on a bill Rosie texts for cooking away, a tip line if the owner turns it on",
+   "away": "the travel fee held, or a deposit once a quote is OK'd; the deposit cap from the state form",
+   "tax": "the restaurant's own; on a texted bill, the tax line the owner sets",
+   "noSale": "reservations are never sold or resold"
+  },
+  "pf.messages": {
+   "neverInText": "allergies, diet or health needs, gate or door codes",
+   "deleteAfter": "an allergy note is shown only for that booking and deleted the morning after the visit; the booking keeps only 'note given, deleted on <date>'",
+   "languages": "English and Spanish",
+   "minors": "a teen's booking goes to a parent"
+  },
+  "pf.staff": {
+   "byName": "nobody is booked by name at the restaurant: the table is booked, and whoever runs the host stand checks the party in",
+   "roles": "hosts (the host stand and the Today page), chefs (cooking away), bartenders (bar service)",
+   "licenses": "a food handler card or an alcohol server permit for each person only where the state's rules require it",
+   "standIn": "any host can run the host stand; a chef going away needs the caterer's skills set by the owner",
+   "oks": "the owner (and the office manager, if set) OKs big parties, the back room and quotes over the limit"
+  },
+  "pf.rules": {
+   "listing": "where the state's rules require it, a signed listing agreement before any table is offered (a switch from the state form)",
+   "fees": "a no-show fee only with the customer's yes when booking, and only within the state's limits",
+   "alcohol": "alcohol only to guests 21 or over with ID; bar service only under the liquor license",
+   "records": "booking records 7 years; allergy notes deleted the morning after",
+   "showPermit": "show a permit number where the state's rules require it",
+   "contracts": "a written event agreement above the amount the state's rules set, for cooking away"
+  },
+  "pf.edges": {
+   "partySize": "the party grows or shrinks: re-seated if a table fits; dropping under 6 releases the saved card",
+   "lateParty": "the table is held 15 minutes; a text saying they're late keeps it if a table is still free",
+   "runningBehind": "the table before runs long: the host texts LATE, the party is told, and can change with no fee",
+   "noShow": "marked by the host after the grace time; any fee only from a saved card, only once the owner confirms",
+   "weather": "patio times close when the forecast is over the owner's limit; the party is offered inside or a new time",
+   "allergy": "a severe allergy the kitchen can't serve safely: the party is told before the visit, and can cancel with no fee",
+   "walkIns": "walk-ins join the walk-in list, apart from the booking waitlist; they pay at the table and carry no $2",
+   "waitlist": "a full day: the party joins the waitlist; a freed table is offered to one party at a time, with 30 minutes to take it",
+   "sentNow": "never: a table is booked ahead or walked in, and a chef shops and preps first, so nobody is on call",
+   "default": "every other edge case is handled the generic way"
+  },
+  "pf.facts": [
+   "spaces",
+   "groups",
+   "tips"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "step-free door on Elm St",
+    "step-free door on Grove St"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Set brunch plan · every Saturday"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A restaurant books a table or a space."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A meal is rated, so the restaurant takes the first branch."
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a standing brunch at the long table, every Saturday."
+   ],
+   [
+    "This one: Sat Oct 31 · 10:00am",
+    "This one: Sat Oct 31 · 11:00am"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 11:00am"
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more, like a private party in the back room, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Bistro sent you a proposal: a private party in the back room."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Private party for 16"
+   ],
+   [
+    "3 visits with Riley",
+    "Back room · Sat Dec 12, evening"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The party is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick the time for your private party:"
+   ],
+   [
+    "Sat Nov 14 · 11:00am · Riley",
+    "Sat Dec 12 · 7:00pm · back room"
+   ],
+   [
+    "Sat Nov 21 · 11:00am · Riley",
+    "Sat Dec 12 · 8:00pm · back room"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the restaurant show photos from your brunch?"
+   ],
+   [
+    "Avery, not Riley",
+    "patio, not the long table"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A tasting could mean a restaurant or a cooking class."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books brunch every Saturday"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for the same table every Saturday at 11:00am. Sam allows standing bookings, so Rosie books the first and saves the next ones."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a party of 14 in the back room"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A party of 14 asks for one dinner. Only the back room seats 11 to 20, so it's saved, and Sam OKs it first."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books brunch and a cake service"
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds the cake service. It goes on the same booking, and its $20 is added to the bill at the table."
+   ],
+   [
+    "Riley texts LATE",
+    "Devon texts LATE"
+   ],
+   [
+    "Notes what's there before the work",
+    "Checks the allergy note at the table"
+   ],
+   [
+    "Stops, and sends a written note",
+    "Skips the dish, and sends a written note"
+   ],
+   [
+    "Riley helps; Sam is told at once",
+    "Staff help; Sam is told at once"
+   ],
+   [
+    "Riley finishes the work",
+    "The party finishes brunch"
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next table at the host stand"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Offers a make-good, if Sam says so"
+   ],
+   [
+    "Alex asks for a fix",
+    "Alex says a dish was wrong"
+   ],
+   [
+    "An item isn't picked up",
+    "Something left at the table"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Grove St"
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a table on Saturday."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una mesa el sábado."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A caterer's example: a gas smell in a home kitchen gets 'don't light the stove'."
+   ],
+   [
+    "for a staff cut",
+    "for a team lunch"
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex's party needs the long table, so only its times show."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Bistro · long table"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "One guest's allergy is more serious than I said. Can the kitchen still cook for us?"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "The kitchen asks for a day to plan for it, so Devon suggests a new time, with no fee. Pick one:"
+   ],
+   [
+    "Riley asked for the move, so there's no fee.",
+    "The restaurant asked for the move, so there's no fee."
+   ],
+   [
+    "The problem gets worse",
+    "An allergy turns out serious"
+   ],
+   [
+    "6 bookings · Riley 3, Avery 3",
+    "6 tables · brunch 4, dinner 2"
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: 10:00am, table for 4"
+   ],
+   [
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "That's a question for the kitchen itself. The host can pass it on at your visit."
+   ],
+   [
+    "the number customers call for what only a barber should answer.",
+    "the number customers call for what only the restaurant's staff should answer."
+   ],
+   [
+    "Sat 11am Riley",
+    "Sat 11am"
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am",
+    "BOOK Alex M. brunch 8 Sat 11am"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants Saturday brunch, for 8"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24, 11:00am · brunch for 8"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks. What would you like?",
+    "Your table is a standing booking, every Saturday at 11:00am. What would you like?"
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Brunch every Saturday · 11:00am"
+   ],
+   [
+    "Haircut · $35",
+    "Brunch for 8 · $35 a person"
+   ],
+   [
+    "Book this haircut?",
+    "Book this table?"
+   ],
+   [
+    "· Riley",
+    "· long table"
+   ],
+   [
+    "· Avery",
+    "· patio"
+   ],
+   [
+    "with Riley",
+    "at the long table"
+   ],
+   [
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "One request waits for Lee's Bistro. It's the back room for 12 today at 2:00pm, for a new customer. Accept it?"
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Reading it back: accept the back room for 12 today at 2:00pm. Say yes to go ahead."
+   ],
+   [
+    "with Avery",
+    "on the patio"
+   ],
+   [
+    "one service can have two places with different money, like a haircut at the shop or at home.",
+    "one service can have two places with different money, like brunch at the restaurant or at home."
+   ],
+   [
+    "MP045210",
+    "CP045210"
+   ],
+   [
+    "EC22871",
+    "LQ22871"
+   ],
+   [
+    "BS20981",
+    "FS20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: a restaurant's permit often covers only its own kitchen."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Devon: host, back room and chef's visits"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every table, the back room and chef's visits"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Food handler FH031552 · server permit AS30417"
+   ],
+   [
+    "code at the chair",
+    "code at the host stand"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds cooking classes to Lee's Bistro."
+   ],
+   [
+    "NEW massage",
+    "NEW cooking classes"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Cooking classes for Lee's Bistro: is it the same company?"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like the tables?"
+   ],
+   [
+    "Haircuts work like this",
+    "Tables work like this"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "A card saved for 6 or more"
+   ],
+   [
+    "A barber can work at both, on one calendar.",
+    "A host can work at both, on one calendar."
+   ],
+   [
+    "Panel upgrade",
+    "Full bar for a wedding"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Catering"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Bistro LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Bistro"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Private Chefs"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bar Service"
+   ],
+   [
+    "plumbing and electrical",
+    "catering and bar service"
+   ],
+   [
+    "Barbershop",
+    "Restaurant"
+   ],
+   [
+    "barbershop",
+    "restaurant"
+   ],
+   [
+    "Plumbing",
+    "Catering"
+   ],
+   [
+    "plumbing",
+    "catering"
+   ],
+   [
+    "Electrical",
+    "Bar service"
+   ],
+   [
+    "electrical",
+    "bar service"
+   ],
+   [
+    "plumber",
+    "chef"
+   ],
+   [
+    "Plumber",
+    "Chef"
+   ],
+   [
+    "barbers",
+    "hosts"
+   ],
+   [
+    "barber",
+    "host"
+   ],
+   [
+    "Barber",
+    "Host"
+   ],
+   [
+    "Groom's package",
+    "Chef's Table"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Sunday supper"
+   ],
+   [
+    "Signature cut and shave",
+    "Sunday supper"
+   ],
+   [
+    "signature cut",
+    "Sunday supper"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids brunch (12 and under)"
+   ],
+   [
+    "Kids cut",
+    "Kids brunch"
+   ],
+   [
+    "kids cut",
+    "kids brunch"
+   ],
+   [
+    "Skin fade",
+    "Prix fixe lunch"
+   ],
+   [
+    "skin fade",
+    "prix fixe lunch"
+   ],
+   [
+    "Beard trim",
+    "Cake service"
+   ],
+   [
+    "beard trim",
+    "cake service"
+   ],
+   [
+    "Color and cut",
+    "Custom party menu"
+   ],
+   [
+    "color and cut",
+    "custom party menu"
+   ],
+   [
+    "Color correction",
+    "Market-price tasting"
+   ],
+   [
+    "color correction",
+    "market-price tasting"
+   ],
+   [
+    "color quote",
+    "menu quote"
+   ],
+   [
+    "Haircuts",
+    "Set brunches"
+   ],
+   [
+    "haircuts",
+    "set brunches"
+   ],
+   [
+    "Haircut",
+    "Set brunch"
+   ],
+   [
+    "haircut",
+    "set brunch"
+   ],
+   [
+    "house calls",
+    "chef's visits"
+   ],
+   [
+    "house call",
+    "chef's visit"
+   ],
+   [
+    "House calls",
+    "Chef's visits"
+   ],
+   [
+    "at the chair",
+    "at the table"
+   ],
+   [
+    "the chair",
+    "the table"
+   ],
+   [
+    "the shop's",
+    "the restaurant's"
+   ],
+   [
+    "The shop's",
+    "The restaurant's"
+   ],
+   [
+    "the shop",
+    "the restaurant"
+   ],
+   [
+    "The shop",
+    "The restaurant"
+   ],
+   [
+    "shop's",
+    "restaurant's"
+   ],
+   [
+    "shops",
+    "restaurants"
+   ],
+   [
+    "shop",
+    "restaurant"
+   ],
+   [
+    "Drain clearing",
+    "Home brunch"
+   ],
+   [
+    "Water heater flush",
+    "Cooking class at home"
+   ],
+   [
+    "water heaters",
+    "dinner parties"
+   ],
+   [
+    "water heater",
+    "dinner party"
+   ],
+   [
+    "Riley",
+    "Devon"
+   ],
+   [
+    "Avery",
+    "Mara"
+   ],
+   [
+    "Jordan",
+    "Nico"
+   ],
+   [
+    "Casey",
+    "Lena"
+   ],
+   [
+    "1200 Main St",
+    "410 Main St"
+   ],
+   [
+    "88 Elm St",
+    "36 Grove St"
+   ],
+   [
+    "like a burst pipe",
+    "like a car that won't start"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most restaurants set it."
+   ],
+   [
+    "A neighborhood restaurant on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood restaurant on Elm St. Brunch, dinner and a long table for parties."
+   ],
+   [
+    "The chairs",
+    "The dining room"
+   ],
+   [
+    "A chair, ready",
+    "A table, set"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "like a chair renter,",
+    "like a pop-up chef who rents the kitchen,"
+   ],
+   [
+    "Devon and Mara cut hair; Devon also does color and chef's visits.",
+    "Devon and Mara run the dining room; Devon also does chef's visits."
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents the kitchen on Mondays, with their own customers."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the restaurant's list.",
+    "Alex asks for a wedding cake, which isn't on the restaurant's list."
+   ],
+   [
+    "Lee's Bistro doesn't do perms.",
+    "Lee's Bistro doesn't make wedding cakes."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A first step's example: 'A cooking class needs a short form first.' A table has none."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free table:"
+   ],
+   [
+    "A chair renter asked for by name:",
+    "A pop-up chef asked for by name:"
+   ],
+   [
+    "like 'How would you like it on top?'",
+    "like 'A high chair for the table?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "A high chair for the table? (optional)"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A server spilled coffee on my jacket."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a server spilled coffee on a jacket today."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: likes the window table; one guest is vegetarian"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you have a kids' menu? My son is 8."
+   ],
+   [
+    "Lee's Bistro: you now have two skin fades on Sat Nov 7.",
+    "Lee's Bistro: you now have two tables on Sat Nov 7."
+   ],
+   [
+    "Sat Oct 24 · 6:00pm · Table for 4",
+    "Sat Oct 24 · 11:00am · Long table for 8"
+   ],
+   [
+    "Sat Oct 24 · 7:30pm · Table for 6",
+    "Sat Oct 24 · 12:30pm · Long table for 8"
+   ]
+  ],
+  "B": [
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I start cooking the sides before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Everything is cooked fresh at the visit."
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Monthly cooking class plan"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Family dinner · Tue Oct 20 · $179"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Family dinner · Wed Oct 21 · $179"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both family dinners go on one bill on the 1st."
+   ],
+   [
+    "Rental 1",
+    "Family dinner"
+   ],
+   [
+    "Rental 2",
+    "Family dinner"
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "A chef can cook it at home."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the holiday party Alex asked Nico about"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Catering sent you a proposal for your holiday party, from Nico's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Holiday party for 20"
+   ],
+   [
+    "like a move-out day",
+    "like a wedding day"
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee's Bistro for brunch instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. A table at the restaurant is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Bistro serves brunch at the restaurant, $35 a person, or a chef cooks it at your home, $75 a person. Where would you like it?"
+   ],
+   [
+    "It's a leak under the sink,",
+    "It's a late lunch for 4,"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Brunch at home for 4"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Can a chef cook brunch for 4 at my home Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hoy se quemó un sartén, pero ya está apagado. Necesito un chef."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A pan burned today, but it's out. I need a chef."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A caterer's example: a pan fire that's out gets 'turn off the stove, and open a window'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to turn off the stove and open a window. If smoke comes back, she leaves and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Apague la estufa y abra una ventana. Si vuelve el humo o el fuego, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Turn off the stove and open a window. If smoke or flames come back, get out and call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For catering, a gas smell, a fire or someone choking stops the booking."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My gas oven clicks but won't light. Is it safe to keep trying?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a chef cook a garden party lunch this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa brunch Thu 12-2 Lena"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a food truck for a fair."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Catering does catering and bar service, not food trucks. Nothing was saved. You can look for a food truck near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the guest count, the meal, the kitchen, and allergies on the secure page."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, a fire, someone choking or a severe allergic reaction."
+   ],
+   [
+    "Just the kitchen sink.",
+    "4 of us. Pancakes, please!"
+   ],
+   [
+    "Electric.",
+    "Four."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a dinner party is priced from kitchen photos, so Rosie's first text asks for them."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your kitchen and your menu ideas, and a chef will price the dinner."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms.",
+    "Say Alex asks for a cooking class every month. Lee Home Services offers that as a plan, so the AI shows its terms."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you do a cooking class every month, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Catering has a monthly class plan, $150 a visit. Each visit is booked and paid like a single one. Want it every month?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say an office manager books lunch for 4 teams at one address. It's one booking with one code, given by whoever lets the chef in."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each team's notes go to the chef, one line each."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a bartender."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can you send a bartender too?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. Nico can tend bar too, from the bar service price list. Both fit in the same arrival window."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is your oven working?"
+   ],
+   [
+    "he's the one who replaces water heaters.",
+    "he's the one who cooks dinner parties."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a gas smell, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "My oven stopped working."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "If you smell gas, leave and call 911. If not, Nico brings burners and cooks on the stovetop, at the same price."
+   ],
+   [
+    "The problem gets worse",
+    "The oven stops working"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can you add a dessert table for the brunch?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a family dinner at home, twice a month."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's family dinner?"
+   ],
+   [
+    "Kitchen drain",
+    "Brunch for 4"
+   ],
+   [
+    "Yard drain",
+    "Garden party"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE small scorch mark on the counter"
+   ],
+   [
+    "Under the sink, before",
+    "Counter, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Stove, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Cooking is priced before the visit, from the list or a quote. Nothing is priced at the door."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 dessert course for the table"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: a dessert course, $160. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Dessert course · $160"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 dessert quote is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to a dessert course for $160."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Nico finds the oven's power cord frayed. The plug-in says a chef doesn't use it, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD oven cord frayed, oven not used"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Frayed oven cord"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Nico found your oven's cord frayed, so Nico didn't use the oven."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a frayed oven cord"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: baking, so dishes were made on the stovetop"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the oven checked before using it"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Nico needs eggs from the store."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting eggs, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Nico went to get eggs and will be back about 9:30am. Brunch should be ready by 11am."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE chipped serving platter"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Chipped serving platter"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Nico chipped a serving platter at Alex M.'s. The before photo shows no chip."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 brunch"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE small oven: bring sheet pans next time. The kids loved the pancakes."
+   ],
+   [
+    "the shutoff valves",
+    "the dessert course"
+   ],
+   [
+    "the kitchen drain",
+    "the brunch for 4"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your wedding weekend"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Event rentals · $165"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Dessert course"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "A meal has no warranty. Any make-good is Sam's call."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The eggs came out cold at my brunch."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M. says the eggs came out cold at the Thu Oct 22 brunch."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. Your next visit comes with a free dessert course."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Nico left the kitchen a mess."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Nico cook again next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Nico's next times for a brunch at home."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Nico to come back next fall for a dinner party."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: dinner party, next fall"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the dinner party you asked Nico about in late Aug 2027."
+   ],
+   [
+    "Lee Home Services' own name",
+    "Lee Catering's own name"
+   ],
+   [
+    "leehomeservices.com",
+    "leecatering.com"
+   ],
+   [
+    "one service can have two places with different money, like a haircut at the shop or at home.",
+    "one service can have two places with different money, like brunch at the restaurant or at home."
+   ],
+   [
+    "MP045210",
+    "CP045210"
+   ],
+   [
+    "EC22871",
+    "LQ22871"
+   ],
+   [
+    "BS20981",
+    "FS20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: a restaurant's permit often covers only its own kitchen."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Devon: host, back room and chef's visits"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Food handler FH031552 · server permit AS30417"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds event staffing to Lee Catering."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW event staffing"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Event staffing for Lee Catering: is it the same company?"
+   ],
+   [
+    "Panel upgrade",
+    "Full bar for a wedding"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, credited to the bill"
+   ],
+   [
+    "Service call fee",
+    "Travel fee"
+   ],
+   [
+    "Service call",
+    "Travel fee"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Catering LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Catering's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Catering"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Bistro"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Private Chefs"
+   ],
+   [
+    "plumbing and electrical",
+    "catering and bar service"
+   ],
+   [
+    "Barbershop",
+    "Restaurant"
+   ],
+   [
+    "barbershop",
+    "restaurant"
+   ],
+   [
+    "Plumbing",
+    "Catering"
+   ],
+   [
+    "plumbing",
+    "catering"
+   ],
+   [
+    "Electrical",
+    "Bar service"
+   ],
+   [
+    "electrical",
+    "bar service"
+   ],
+   [
+    "plumber",
+    "chef"
+   ],
+   [
+    "Plumber",
+    "Chef"
+   ],
+   [
+    "barber",
+    "host"
+   ],
+   [
+    "Barber",
+    "Host"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Sunday supper"
+   ],
+   [
+    "Beard trim",
+    "Cake service"
+   ],
+   [
+    "beard trim",
+    "cake service"
+   ],
+   [
+    "Haircut",
+    "Set brunch"
+   ],
+   [
+    "haircut",
+    "set brunch"
+   ],
+   [
+    "house calls",
+    "chef's visits"
+   ],
+   [
+    "House calls",
+    "Chef's visits"
+   ],
+   [
+    "at the chair",
+    "at the table"
+   ],
+   [
+    "the shop's",
+    "the restaurant's"
+   ],
+   [
+    "the shop",
+    "the restaurant"
+   ],
+   [
+    "The shop",
+    "The restaurant"
+   ],
+   [
+    "shops",
+    "restaurants"
+   ],
+   [
+    "shop",
+    "restaurant"
+   ],
+   [
+    "yard drain",
+    "garden party"
+   ],
+   [
+    "Drain clearings",
+    "Home brunches"
+   ],
+   [
+    "drain clearings",
+    "home brunches"
+   ],
+   [
+    "Drain clearing",
+    "Home brunch"
+   ],
+   [
+    "drain clearing",
+    "home brunch"
+   ],
+   [
+    "Water heater replacement",
+    "Dinner party for 8"
+   ],
+   [
+    "water heater replacement",
+    "dinner party for 8"
+   ],
+   [
+    "Water heater flush",
+    "Cooking class at home"
+   ],
+   [
+    "water heaters",
+    "dinner parties"
+   ],
+   [
+    "water heater",
+    "dinner party"
+   ],
+   [
+    "Water heater",
+    "Dinner party"
+   ],
+   [
+    "Sewer camera inspection",
+    "Dessert table"
+   ],
+   [
+    "sewer camera inspection",
+    "dessert table"
+   ],
+   [
+    "service call fee",
+    "travel fee"
+   ],
+   [
+    "service call",
+    "travel fee"
+   ],
+   [
+    "Leak repair",
+    "Custom event menu"
+   ],
+   [
+    "leak repair",
+    "custom event menu"
+   ],
+   [
+    "Riley",
+    "Devon"
+   ],
+   [
+    "Avery",
+    "Mara"
+   ],
+   [
+    "Jordan",
+    "Nico"
+   ],
+   [
+    "Casey",
+    "Lena"
+   ],
+   [
+    "1200 Main St",
+    "410 Main St"
+   ],
+   [
+    "88 Elm St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "55 Cedar Ave"
+   ],
+   [
+    "like a burst pipe",
+    "like a car that won't start"
+   ],
+   [
+    "camera inspection",
+    "dessert table"
+   ],
+   [
+    "A neighborhood restaurant on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood restaurant on Elm St. Brunch, dinner and a long table for parties."
+   ],
+   [
+    "The chairs",
+    "The dining room"
+   ],
+   [
+    "A chair, ready",
+    "A table, set"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "like a chair renter,",
+    "like a pop-up chef who rents the kitchen,"
+   ],
+   [
+    "Devon and Mara cut hair; Devon also does color and chef's visits.",
+    "Devon and Mara run the dining room; Devon also does chef's visits."
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents the kitchen on Mondays, with their own customers."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most caterers start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules restaurants often set."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a chef cooking brunch at my home. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a home brunch.",
+    "'Can a chef cook brunch at my place?' fits a home brunch."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like serving alcohol to guests under 21."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my own kitchen."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A home brunch needs no permit, so the first open times are this week."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a dessert course? Say so.'"
+   ],
+   [
+    "Lee Catering asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Catering asks: is the meal at a home, an office or somewhere else? And how many guests, and is the stove working?"
+   ],
+   [
+    "Lee Catering can clear the drain:",
+    "Lee Catering can cook it:"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a gas stove"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home brunch needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the counter by the stove."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that two more guests are coming."
+   ],
+   [
+    "Nico finds corroded shutoff valves.",
+    "Alex asks Nico for a dessert course too."
+   ],
+   [
+    "Say Nico cracks the cabinet floor and texts a photo.",
+    "Say Nico cracks a serving dish and texts a photo."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A problem with the meal? Reply here within 2 days."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Two days later, Alex says the dessert never came. Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a stain on the counter this morning."
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books brunch for 8 at Lee's Bistro, Sat Oct 24 at 11:00am, for a sister's birthday. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Catering to cook at 55 Cedar Ave, and Nico arrives Thu Oct 22 between 8 and 10am. The meal depends on the money choice: brunch for 4, or a dinner party for 8."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: brunch for 8 at the long table, free to book. A card is saved only for the $20-a-person no-show fee ($160 for 8) that Sam confirms. The bill is paid at the table.",
+    "list|none|counter": "Brunch for 2. Nothing is taken and no card is saved: a YES books it. The bill is paid at the table."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$160",
+     "name": "Brunch for 8"
+    },
+    "list|none|*": {
+     "fee": "$0",
+     "name": "Brunch for 2",
+     "price": "$70"
+    },
+    "list|card|*": {
+     "price": "$280"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|card|card",
+    "photos|deposit|bill",
+    "photos|deposit|card"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: brunch at home for 4, $179. A card is saved for the $89 travel fee, kept only for a late cancel or a no-show. Nico texts DONE, and Rosie texts the bill.",
+    "list|card|card": "Brunch at home for 4, $179. A card is saved and charged $179 when Nico texts DONE.",
+    "photos|deposit|bill": "A dinner party for 8, priced from kitchen photos at $640. Sam OKs it, since it's over $500. A $160 deposit now, the rest on the bill.",
+    "photos|deposit|card": "The $640 dinner party. A $160 deposit now, and the $480 rest charged to the saved card when Nico marks it done."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Brunch at home for 4"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Brunch at home for 4"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Dinner party for 8"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Dinner party for 8"
+    }
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Devon and Mara (hosts)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Nico and Lena (chefs)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a bank, a venue, a company)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Devon"
+  },
+  "B": {
+   "staff": "Nico"
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted from photos first",
+    "why": "A table is never quoted: the menu shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted at the visit",
+    "why": "A table is never quoted: the menu shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A8-24",
+    "label": "Priced at the visit",
+    "why": "A table is never quoted: the menu shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A9-01",
+    "label": "Nothing more",
+    "why": "The bill is paid at the table, the restaurant's own way, as the plug-in sets."
+   },
+   {
+    "op": "off",
+    "at": "A9-01",
+    "label": "Rosie sends the bill",
+    "why": "The bill is paid at the table, the restaurant's own way, as the plug-in sets."
+   },
+   {
+    "op": "off",
+    "at": "A9-01",
+    "label": "Saved card charged",
+    "why": "The bill is paid at the table, the restaurant's own way, as the plug-in sets."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "The bill is paid at the table, the restaurant's own way, as the plug-in sets."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "The bill is paid at the table, the restaurant's own way, as the plug-in sets."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a meal."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a meal."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A table checks in with one code for the whole party."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at a restaurant; takeout isn't a booking."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A meal has no results that come later."
+   },
+   {
+    "op": "more",
+    "at": "S1-81",
+    "more": [
+     "Sam lists the bistro's tables for 1 to 5, and the long table for 6 to 10.",
+     "The back room fits 11 to 20. The patio has its own hours: it opens only in good weather.",
+     "Bar seats stay walk-in only. Lee Catering books its chefs, so it lists no spaces."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Catering and bar service need the state's permit where its rules require one, so Sam gives it (S1-23)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked table and chef's visit pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each host, chef and bartender sends a food handler card or server permit where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable: a cooking class at home is booked like any chef's visit."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Neither company takes jobs sent now: a table is booked ahead or walked in, and a chef shops and preps first."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A meal is never served by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "The restaurant books a table or a space, never a person's time (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The restaurant books a table or a space, never a person's time (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The restaurant books a table or a space, never a person's time (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A table needs no first step: no consult, test or form comes first."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A table needs no paper or ID through Rosie. The server's ID check for alcohol is the restaurant's own."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at a restaurant: the party is at the table."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A meal is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "A standing table is paid at the table, so no plan charge goes on a saved card (pf.money)."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child stays with the party at the table."
+   },
+   {
+    "op": "words",
+    "at": "A4-62",
+    "more": [
+     "The owner lists the spaces and their sizes at sign-up.",
+     "The code, the reminder and the money work the same way.",
+     "Nobody is booked by name. If staff are out, nothing moves for the customer: the owner just staffs it.",
+     "A restaurant's plug-in lists its tables, the back room and their sizes.",
+     "Spaces are counted by date, so a space booked all day isn't shown for any time that day.",
+     "It carries A4-14's must-carry lines, the needs line, and its time rules."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B4-06",
+    "label": "Quoted at the visit",
+    "why": "Cooking for a customer is priced before the visit: from the menu, or quoted from the customer's answers and photos."
+   },
+   {
+    "op": "off",
+    "at": "B8-19",
+    "label": "Priced at the visit",
+    "why": "Cooking for a customer is priced before the visit: from the menu, or quoted from the customer's answers and photos."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a meal."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a meal."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A meal has no report that comes later."
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "Allergies and diet needs go only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-45",
+    "more": [
+     "Anyone served alcohol shows ID to the bartender, 21 and over. Only Lee Catering's bar service pours it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "The chef also goes over the allergy note with Alex before cooking. No text ever says what it is."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Catering is never sent now: a chef shops and preps first, so B4-19 shows the soonest times."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Catering is never sent now, so no chef is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Catering is never sent now."
+   },
+   {
+    "op": "more",
+    "at": "S1-81",
+    "more": [
+     "Sam lists the bistro's tables for 1 to 5, and the long table for 6 to 10.",
+     "The back room fits 11 to 20. The patio has its own hours: it opens only in good weather.",
+     "Bar seats stay walk-in only. Lee Catering books its chefs, so it lists no spaces."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Catering and bar service need the state's permit where its rules require one, so Sam gives it (S1-23)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked table and chef's visit pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each host, chef and bartender sends a food handler card or server permit where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable: a cooking class at home is booked like any chef's visit."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Neither company takes jobs sent now: a table is booked ahead or walked in, and a chef shops and preps first."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A meal is never served by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Catering books a chef in a 2-hour arrival window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Catering books a chef in a 2-hour arrival window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "No form comes first: an event agreement is the contract (B4-57)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Catering is never sent now, so the day list and OMW always come first."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Catering books a chef in a 2-hour arrival window (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A chef never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A meal is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "B8-68",
+    "why": "No child is left in the chef's care."
+   }
+  ]
+ },
+ "notes": "Refit Oct 27 (REDESIGN 2 master): old words ops (74 in A) and ops on removed steps dropped; trade `more` lines kept (tables and rooms at sign-up; allergies only on the secure page; alcohol ID; the chef checks the allergy note); one words op on A4-62 (a restaurant's plug-in lists its tables); facts spaces, groups, tips; settings arrive A setstart, B window, cutoff A 24 hours before, B 2 days before; amounts per path with name (A fee $160 = $20 a person for 8); own record rows in A (pay.price / pay.left / pay.staff: free to book, the bill paid at the table); D66: no holds, the rest of a deposit on the saved card at the end or on the bill; rename pairs re-pointed to today's words.\nNames: Sam Lee's main company is Lee Catering LLC (410 Main St; chefs cook and serve at a customer's home or event, with bar service as its second kind of work). His second company is Lee's Bistro LLC (36 Grove St), the restaurant. The master's shape is kept: flow A's story is at the second company (the restaurant), flow B's at the main one.\nStaff: Devon and Mara are hosts at Lee's Bistro (the master's Riley and Avery); Nico and Lena are Lee Catering's chefs (Jordan and Casey). Nico also tends bar. Alex's home is 55 Cedar Ave.\nPrices are the example's own, not a standard: set brunch $35 a person, kids brunch $15, cake service $20 a table, Chef's Table $140 a person, no-show fee $20 a person for 6 or more, a 20% tip for 6 or more; away: brunch at home for 4 $179, $89 travel fee, dinner party for 8 from photos $640, cooking class $150, dessert table $199.\nTables, not people, are booked at the restaurant: the master's space booking. Sign-up says the bistro books tables and lists them (S2-25, S2-26), and at A4-66 (what's booked) the restaurant takes 'A space or a table': A4-62 shows the open tables. Times show a table or an area (the long table, the patio), never a host. One check-in code covers the whole table, given at the host stand.\nThe plug-in's money for tables: the menu shows, nothing is charged upfront, a card is saved only for 6 or more (if the owner wants it, only for a fee the owner confirms), and the bill is paid at the table. So flow A turns off: photos and at-the-visit pricing, the hold, deposit and full-price branches, the rest due on a fixed day, the day-before hold, and the bill, saved-card and nothing-more branches after. No deposit on a starting price, so no visit+deposit path.\nFlow A also turns off what never happens at a table: plans or insurance paying, a series of visits, video sessions, the first-step split (no first step for a table), class rosters, drop-offs, a bigger job, visits over several days, a child handed to an adult, results later, rented items, a crew one person short, a host's set date, something required missing, and a storage fee for something left behind.\nA host out, a host's day off or last day: the master's 'no person booked' branches (A7-60, S11-88, S11-91, D37). Sam names who covers, and no booking moves. The 'booked by name' branches are off in flow A; flow B (chefs) keeps them and turns the 'not by name' ones off.\nThe automatic tip for 6 or more is named before the yes, in the confirmation and the reminder (master rule S13-17, plus a gap).\nAllergies are a sensitive answer under the master's rule S13-05: asked only on the secure page with their own yes, shown only to the host and kitchen (or the chef), checked at the table, and deleted the morning after (plug-in pf.messages, plus a more line on S13-05).\nAlcohol: anyone ordering it shows ID to the server, 21 and over: the restaurant's own check, not a Rosie step. Bar service away needs the liquor license and a bartender's own permit where the state's rules require it.\nWaitlist: the master's (A4-15 'Joins the waitlist', A4-60, A4-61): a freed table goes by text to one party at a time, 30 minutes each. Walk-ins wait for a table that fits (A3-32's 'A table or space that fits', A3-34), pay at the table and carry no $2.\nDelivery and takeout aren't bookings: the AI is told so, and nothing is booked.\nOwner's OK: parties up to 10 book at once; the back room (11 to 20) asks Sam first. The main story (8) books at once.\nFlow B maps the home-repair what-ifs to cooking: a landlord's OK becomes a venue's OK, a landlord paying becomes a company paying, a part becomes a special order, a hazard is a frayed oven cord, damage is a chipped platter, the rented fan becomes rented chafing dishes, the faucet left at the shop becomes a cake stand.\nFlow B turns off quotes at the visit (cooking is priced before), plan or insurance paying, a part going to the shop, and a report ready later. The full price stays on for Lee Catering (a ticketed cooking class can be prepaid) but isn't one of the profession's paths.\nFlow B keeps the master's 2-hour arrival windows; the dinner party's 8-10am window covers shopping and prep.\nWarranties: a meal carries none. The master's warranty claim becomes a make-good (a free dessert or a free return visit), always Sam's call.\nLarge rename lists carry whole master sentences (sentence pairs first, then words), so the overlay keeps few ops while both flows read as restaurant and catering work.\nNeither company takes jobs sent now: S2-30 takes 'No: never sent now' (S2-31), and flow B takes 'Never sent now' at B4-81 (B4-82 shows the soonest times), B7-55 and B8-58, with the sent-now branches off (B4-16, B6-03).\nFlow B also turns off the outside check partway (B8-65) and the permit inspection after the visit; a landlord's top amount becomes the company's, and the storage fee follows the cake stand.\nPlug-in splits (master v1.2, D24): each company needs its permit and pays the $2 (S1-60, S1-62, S1-63, S1-65, S11-92, S11-94); each person has a permit where the state's rules require one (S2-28); no classes on a timetable (S2-32); no children's ban (A4-70); no damage hold when booked (A5-24, B5-26); a table is held 15 minutes when the party runs late (A7-70); nothing is left at a restaurant (A8-53); a meal is rated (A10-34). Flow A: no first step or form (A4-43). Flow B: a tasting first for events of 20 or more (B4-38 'Yes'), arrival windows (B4-83), the venue or company matters (B4-78), and a chef booked by name, or a date that can't move, or a crew (B7-56).\nWhole what-ifs that never happen at a table stay off at their branch (a crew one short, a host's set date, too few booked to run, a form not done); their plug-in splits go with them.\nFinal pass (FIX-pilot-final): Pat OKs only Lee Catering prices over $500 (S1-47). Plug-in splits decided: B4-83 keeps only arrival windows (a seat and 'No person named' off), B8-67 an adult must be there; splitsKept (every branch, service by service): S1-29 (a listing agreement only where the state's rules require it), S2-25 (the bistro books tables, Lee Catering books chefs), B4-57 (an event agreement over the amount), B8-69 and B8-70 (meal prep with nobody home; a dinner party needs someone home), B8-71 (rented tables delivered and set up, or no delivery). B9-27's 'Not today' and 'OK some lines' are off: catering is never priced at the door.\nReview (Oct 22, evening): A10-01 sends no text on the nothing-saved path (the restaurant's variant had lost the master's 'sends nothing'); S1-30 names the listing agreement, not a health privacy agreement; A7-02's 'A plan charge is due' is off and Owen's standing table is paid at the table; leftover barber and plumbing words cleared (perms, a patch test for hair dye, a barber's chair, camera inspections, a rating plate, a yard drain 'clearing', a new water heater, a lead-safe notice, rentals in Morgan's plan, 'Lee Catering'' without its s); the cooking class plan reads monthly throughout; the first step in flow B is a menu tasting, not an estimate visit.\nTouch-up 2 (Oct 23): Ben's no-show (S11-23 to S11-28) follows the card rule. On the card path it's his Fri table for 6, so a card was saved, and the fee is $20 a person for 6: $120 (asked, charged, reminded). On the nothing-taken path it's a table for 4: no card, so no fee. The fee-free what-if (S11-35) names no party size, since it shows on both paths. His Sat 10:00am table for 4 on the day list (A8-01) is a different booking and saves no card.\nTouch-up 2, part 2 (Oct 23): Dee's same-day patio lunch (S11-03, S11-04) is a party of 6, so her saved card follows the rule: only for the $20-a-person fee, said in her confirmation. Her later 'card was only saved' lines (S11-06, S11-84, S11-86) and the long-table offer (S11-80) stay right. The AI preview (S11-57) says tables for 1 to 5 take nothing, and 6 or more save a card only for the $20-a-person fee.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "step-free door on Elm St",
+    "Haircut plan · every 4 weeks",
+    "A barbershop books a person's time.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "This one: Sat Oct 31 · 10:00am",
+    "Next: Sat Nov 28 · 10:00am",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Pick a time for your first color plan visit:",
+    "Sat Nov 14 · 11:00am · Riley",
+    "Sat Nov 21 · 11:00am · Riley",
+    "May the shop show photos of your hair?",
+    "Avery, not Riley",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Books a haircut and a beard trim",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Riley texts LATE",
+    "Notes what's there before the work",
+    "Stops, and sends a written note",
+    "Riley helps; Sam is told at once",
+    "Riley finishes the work",
+    "Books the next visit at the chair",
+    "Books a free fix, if Sam says so",
+    "Alex asks for a fix",
+    "An item isn't picked up",
+    "Step-free door on Elm St",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "for a staff cut",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Riley suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "Riley asked for the move, so there's no fee.",
+    "The problem gets worse",
+    "6 bookings · Riley 3, Avery 3",
+    "first tomorrow: 10:00am, Riley",
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "the number customers call for what only a barber should answer.",
+    "Sat 11am Riley",
+    "BOOK Alex M. haircut Sat 11am",
+    "Wants Saturday morning, with Riley",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Your haircut is part of a plan with Riley, every 4 weeks. What would you like?",
+    "Haircut every 4 weeks · Riley",
+    "Haircut · $35",
+    "Book this haircut?",
+    "· Riley",
+    "· Avery",
+    "with Riley",
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "with Avery",
+    "one service can have two places with different money, like a haircut at the shop or at home.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "Plumbing JP031552 · electrical JE30417",
+    "code at the chair",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Does it work like haircuts?",
+    "Haircuts work like this",
+    "A card saved for the $20 fee",
+    "A barber can work at both, on one calendar.",
+    "Panel upgrade",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Barbershop",
+    "barbershop",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "barber",
+    "Barber",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Kids cut (12 and under)",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "house call",
+    "House calls",
+    "at the chair",
+    "the chair",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shop's",
+    "shops",
+    "shop",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "1200 Main St",
+    "88 Elm St",
+    "like a burst pipe",
+    "Each service starts the way most barbershops set it.",
+    "The chairs",
+    "A chair, ready",
+    "We'd share only where they're working, only after a missed check.",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Access, like a step-free chair:",
+    "A chair renter asked for by name:",
+    "like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Sat Oct 24 · 6:00pm · Table for 4",
+    "Sat Oct 24 · 7:30pm · Table for 6"
+   ],
+   "B": [
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Yes, every year",
+    "Yearly water heater flush plan",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "Both rentals' visits go on one bill on the 1st.",
+    "Rental 1",
+    "Rental 2",
+    "One of the shop's barbers does house calls.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "like a move-out day",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "It's a leak under the sink,",
+    "Kitchen drain clearing",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Electric.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Is the sink still full of water?",
+    "he's the one who replaces water heaters.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "The problem gets worse",
+    "Can Jordan also run a camera down my sewer line?",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Kitchen drain",
+    "Yard drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves · $160",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Jordan needs a part from the supply house.",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "the kitchen drain",
+    "stage 2 of your repipe",
+    "Shutoff valve · $165",
+    "Replace both shutoff valves",
+    "The plug-in says how long the warranty lasts.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Home Services' own name",
+    "leehomeservices.com",
+    "one service can have two places with different money, like a haircut at the shop or at home.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Riley: barber, color and house calls",
+    "Plumbing JP031552 · electrical JE30417",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Panel upgrade",
+    "$89, credited to the repair",
+    "Service call fee",
+    "Service call",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "plumbing and electrical",
+    "Barbershop",
+    "barbershop",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "barber",
+    "Barber",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "at the chair",
+    "the shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "yard drain",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "service call",
+    "Leak repair",
+    "leak repair",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "like a burst pipe",
+    "camera inspection",
+    "The chairs",
+    "A chair, ready",
+    "We'd share only where they're working, only after a missed check.",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Like tapping a neighbor's water line without asking.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "'Adding a faucet check? Say so.'",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "I found water damage under the sink this morning."
+   ]
+  },
+  "A": {
+   "A4-05": "8b3e838019",
+   "A8-24": "c802ca35ab",
+   "A9-01": "bad55310a4",
+   "A9-15": "bd2a17c3c5",
+   "A4-28": "c8e677520c",
+   "A8-03": "7fe61cccf5",
+   "A10-45": "855be6050a",
+   "S1-81": "f0ed865d46",
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S2-28": "578f6c41b7",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "9d65299834",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-02": "15f418fec4",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "A4-62": "013378a92d"
+  },
+  "B": {
+   "B4-06": "223e119ea0",
+   "B8-19": "11e79a26d8",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B4-34": "74ff52d83d",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "S1-81": "f0ed865d46",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S2-28": "578f6c41b7",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "826f4058c2",
+   "B4-83": "93095f28e5",
+   "B4-38": "9539521dc7",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "B8-68": "8ede790b60"
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-29",
+   "S1-80"
+  ],
+  "B": [
+   "B5-34",
+   "B8-69",
+   "B8-71",
+   "S1-29",
+   "S1-80"
+  ]
+ },
+ "slots": {
+  "A": {
+   "pay.price": [
+    {
+     "when": {
+      "after": [
+       "counter"
+      ],
+      "recOff": [
+       "paid",
+       "several",
+       "credit"
+      ],
+      "booking": [
+       "self"
+      ]
+     },
+     "text": "Free to book · the bill is paid at the table"
+    }
+   ],
+   "pay.left": [
+    {
+     "when": {
+      "after": [
+       "counter"
+      ],
+      "recOff": [
+       "paid",
+       "several",
+       "credit"
+      ],
+      "booking": [
+       "self"
+      ]
+     },
+     "text": "The bill, paid at the table"
+    }
+   ],
+   "pay.staff": [
+    {
+     "when": {
+      "after": [
+       "counter"
+      ],
+      "recOff": [
+       "paid",
+       "several",
+       "credit"
+      ],
+      "booking": [
+       "self"
+      ]
+     },
+     "text": "Nothing paid · the bill is paid at the table"
+    }
+   ]
+  }
+ }
+}

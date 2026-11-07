@@ -1,0 +1,3060 @@
+{
+ "id": "handyman",
+ "name": "Handyman",
+ "style": "Home visit",
+ "pattern": "fix",
+ "from": "plumber",
+ "plugin": {
+  "pf.license": {
+   "need": "Set by each state's form, and sometimes the city's: none, a registration, or a home repair license. Many forms ask for one only above a job size they set.",
+   "who holds it": "The business, where the form asks. Each person only where the form licenses people. Lead-safe work needs a certified person on the job, where the rules require it.",
+   "what to ask": [
+    "The company's home repair license or registration number, where the state or city has one",
+    "Each person's lead-safe certificate, for work that disturbs paint in an older home, where the rules require it",
+    "Insurance proof, where the form asks for it"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "job size limit": "Where the form licenses work only above a job size, Rosie checks each job against it: at booking, when a task is added by text, and at the visit. Over it: only the part that fits is offered.",
+   "jobs at one address": "Where the form counts jobs at one address together, they're added up, so no job is split to stay under the limit.",
+   "trade work": "Electrical, plumbing, gas, heating and cooling, roofing and structural work need their own trade license. A handyman never books them.",
+   "renewals": "Reminders before each expiry, on the dates the owner picks. A lapsed license pauses new bookings for that work.",
+   "insurance or bond": "Liability insurance, and a bond where the form asks for one.",
+   "background checks": "Only where the form asks.",
+   "at the workshop": "Repairs at the business's own shop: the form says if a license is needed. Safe default: the business registration on file."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Ridgeline Home Repair's own list)": [
+    {
+     "service": "Trip fee",
+     "price kind": "one price",
+     "price": "$89, taken off the job",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill",
+     "note": "Goes on the jobs below; not booked alone. It's the late-cancel and nobody-home fee too."
+    },
+    {
+     "service": "TV mounting (up to 65 inches, the customer's bracket, cords in a cover on the wall)",
+     "price kind": "one price",
+     "price": "$179, the $89 trip fee included",
+     "length": "60 to 90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill",
+     "note": "Cords inside the wall need a new outlet, which is electrical work: not booked"
+    },
+    {
+     "service": "Door repair (sticks, sags or won't latch)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 trip fee is promised",
+     "length": "60 to 90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Furniture assembly (up to 3 pieces)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "2 hours",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Fence repair (a few sections)",
+     "price kind": "quoted from photos, or after a free estimate visit",
+     "price": "the quote (the example: $640)",
+     "length": "1 to 2 days",
+     "place": "at the customer's place",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill",
+     "note": "Only the handymen with the fence skill. A written estimate to sign, where the state's form asks for one above an amount."
+    },
+    {
+     "service": "Repair walk-through (a written list of fixes and prices)",
+     "price kind": "by person",
+     "price": "with Tomás $199, with Sam $249",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill",
+     "note": "The list comes by a secure link later"
+    },
+    {
+     "service": "Gutter cleaning (one-story home)",
+     "price kind": "one price",
+     "price": "$179",
+     "length": "90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill",
+     "note": "Nobody needs to be home. Not in rain or high wind."
+    },
+    {
+     "service": "Small drywall patch (up to 6 inches)",
+     "price kind": "one price",
+     "price": "$95",
+     "place": "at the customer's place",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Re-caulk a tub or shower",
+     "price kind": "one price",
+     "price": "$59",
+     "length": "45 min",
+     "place": "at the customer's place",
+     "note": "Never over a soft or wet wall: that's a plumber's job first"
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum; $140 with Tomás",
+     "place": "at the customer's place",
+     "note": "Goes on quoted jobs; not booked alone"
+    }
+   ],
+   "at the business (the example: Ridgeline Workshop's price list)": [
+    {
+     "service": "Screen repair (one window screen, new mesh)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "both: at the shop, or at the customer's home as a $75 home visit paid in full",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Door planing (a sticking door, brought in)",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "New latch or handle, fitted",
+     "price kind": "one price",
+     "price": "$20",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Drawer fix (sticks, or a loose front)",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Storm window repair (new glass and screen)",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the shop",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Chair set re-glued (up to 4 wooden chairs)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours, or a drop-off",
+     "place": "at the shop",
+     "before": "a card saved for the $40 fee (over 2 hours)",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Furniture repair (a broken leg or a split top)",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $90)",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "The owner OKs each quote. Only Nadia does them."
+    },
+    {
+     "service": "Cabinet door repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $25 consult is promised",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Video check of a repair (15 min)",
+     "price kind": "the owner's own price",
+     "place": "at the business (a video session)",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Only where the owner offers it"
+    }
+   ],
+   "never booked": "Electrical (light fixtures, switches, outlets, ceiling fans, hardwired smoke alarms, cords inside the wall), plumbing, gas, heating and cooling, roofing, structural work, work that needs a permit, and kitchen or bath remodels. The customer is pointed to the licensed trade, at booking or at the visit.",
+   "several tasks": "Tasks on one visit add up: their times set the visit's length, and their prices the job's total.",
+   "capacity": "One handyman per booking. A heavy mirror or a fence can need two. The workshop's clamp bench takes one furniture repair at a time.",
+   "skills each needs": "Fence work needs the fence skill. Lead-safe work needs the lead-safe certificate. Furniture repairs at the shop need the furniture skill.",
+   "nobody home": "Outdoor work with its own access, like gutters or a fence: nobody needs to be home. DONE comes with a photo. Indoor work needs an adult home the whole visit.",
+   "online": "A video check only, where the owner offers it. No repair is done by video.",
+   "materials": "Anchors, screws, cord covers, patch and caulk are included. Other materials at cost with the receipt, agreed before work.",
+   "guarantee": "The owner's own (the example: 90 days on workmanship), shown on the receipt.",
+   "aftercare": "Re-caulking: keep the shower dry for about 24 hours. Re-glued chairs: don't sit on them for a day.",
+   "extras": "Travel inside the service area only (the example: 25 miles). No tax line unless the owner sets a rate."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "Which tasks, picked from the list",
+    "For a TV: its size, whether they have the bracket, and the wall: drywall, plaster or brick",
+    "Cords in a cover on the wall, or inside it (inside: an electrician first)",
+    "For pictures or shelves: how many, how big and how heavy",
+    "For furniture: how many pieces, and are they still boxed",
+    "At the workshop: which item, and its size"
+   ],
+   "after a time is picked": [
+    "How high the TV goes (most pick the screen's center at about 42 inches)",
+    "Who will be there: an adult must be home the whole visit for indoor work",
+    "Parking, stairs and pets",
+    "Own or rent, and who pays: the customer, or the landlord or manager",
+    "The year the home was built: only for tasks that drill into or patch painted walls"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "A photo of each spot",
+    "Gate or lock codes",
+    "The landlord's or manager's name and mobile",
+    "The card"
+   ],
+   "who may book": "An adult. A renter books, and the landlord or manager OKs it where they pay, or where the lease asks for an OK to drill. A person the owner of the home names may book for them."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "Sparks, a burning smell, or a gas smell",
+     "says": "Leave the house now and keep everyone out. Don't flip switches. From outside, call 911, and the gas company for a gas smell.",
+     "booking": "No booking: it isn't a job for a handyman."
+    },
+    {
+     "words": "Someone hurt, or a ceiling or wall coming down",
+     "says": "Get everyone away from it and call 911.",
+     "booking": "No booking until it's safe; the customer can come back."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "Broken glass",
+     "says": "Keep people and pets away, and cover the window. If someone is cut, call 911."
+    },
+    {
+     "words": "A TV, mirror or shelf pulling loose",
+     "says": "Take it down with a second person if it's safe, or keep everyone away from it."
+    },
+    {
+     "words": "Water dripping through a ceiling or a wall",
+     "says": "Turn off the water at the main shut-off, and stay away from outlets. That's a plumber's job first."
+    }
+   ],
+   "found at the visit": "A hidden problem, like a soft wet wall, wiring or rot: the handyman stops that task, doesn't cover it up, takes a photo, and Rosie texts a written note saying which licensed trade to call. The booked tasks keep their price.",
+   "at the workshop": "Broken glass is carried in taped and wrapped. Old furniture with lead paint isn't sanded at the shop.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "Photos of each spot",
+     "for": "Every home job; a new customer's job waits for the owner's OK on them",
+     "timing": "On the secure page, before the booking is confirmed"
+    },
+    {
+     "step": "An estimate visit (free), or photos first",
+     "for": "Fence repair and other big jobs",
+     "timing": "Before the quote; the owner picks which"
+    },
+    {
+     "step": "A lead-safe work notice",
+     "for": "Tasks that disturb painted walls in a home built before the year the rules set",
+     "timing": "On the secure page before the visit, where the rules require it"
+    },
+    {
+     "step": "The owner's OK",
+     "for": "New customers, and same-day jobs",
+     "timing": "Before the booking is confirmed"
+    },
+    {
+     "step": "A hardware match (the old hinge or latch brought in)",
+     "for": "A special-order part at the workshop",
+     "timing": "At least 2 days before; good for 3 months"
+    }
+   ],
+   "prep for the reminder": [
+    "Clear the wall or the area where the work goes",
+    "Have the TV bracket, the pictures or the boxed furniture out",
+    "Put pets in another room",
+    "At the workshop: bring the item with all its parts; tape and wrap broken glass"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code at the door. The on-my-way text names the handyman, with a photo. An adult stays home the whole visit for indoor work.",
+   "check-in at the workshop": "The code at the counter (the handyman or the desk types it). A drop-off gets its code when the item is left, and READY when it's done.",
+   "before work": "The handyman checks each spot against the booking photos. A different wall (plaster, not drywall) is a price change to the same task: priced and OK'd before drilling.",
+   "quotes at the visit": "The handyman texts the quote with its lines before any work. The customer may OK part of it. The quote stays good 7 days.",
+   "extra work": "Quoted by text up to the owner's limit (the example: $500). Above it, the owner OKs it first. Each added task must fit the state form's job size limit, as the owner confirms.",
+   "work sold at the home": "A written right to cancel for tasks added at the home, where the rules require it. A price change to a task already booked isn't a new sale.",
+   "outside the license": "A task that needs a licensed trade is pointed to that trade in writing, and the booked tasks go on.",
+   "proof it's done": "The handyman texts DONE with the bill's lines, and after photos. Nobody home needed: DONE with a photo."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's place: a card saved for the $89 trip fee, and Rosie texts the bill after the job",
+    "An owner may take nothing up front, or save a card only (the old example took nothing)",
+    "Some owners have the saved card charged at DONE",
+    "At the workshop: nothing taken before; a card saved for the $20 fee; paid at the counter. Over 2 hours: a card saved for the $40 fee"
+   ],
+   "limits": [
+    "Work quoted at the visit: nothing more than the trip fee is taken before",
+    "Deposits only on quoted big jobs (the example: 25% on a fence repair). Deposit cap: from the state form",
+    "Late cancel or nobody home: the $89 trip fee. The owner confirms each one; no answer, no fee",
+    "Emergency prices: where the state's rules limit prices in a declared emergency, those limits apply"
+   ],
+   "materials": "At cost with the receipt, agreed before work; bought after, they go on the bill.",
+   "tips": "Off by default; the owner can add a tip line to the bill.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Gate or lock codes, card details, and photos from inside the home: these stay on the secure page.",
+   "languages": "English and Spanish.",
+   "danger words": "Sparks, a burning smell or gas always get the safety message first, before anything else."
+  },
+  "pf.staff": {
+   "levels": "No person license by default. Each person's own license only where the state's form licenses people.",
+   "skills": [
+    "TV and wall mounting",
+    "Doors and hardware",
+    "Furniture assembly",
+    "Fence work",
+    "Drywall patch and caulking",
+    "Gutters and ladder work",
+    "Workshop furniture repairs"
+   ],
+   "supervision": "A helper works only with a handyman on the job. A helper is never sent alone by default.",
+   "special work": "Lead-safe work only by people with the lead-safe certificate, where the rules require it. Ladder work over the plug-in's height only by people with the ladder skill.",
+   "who OKs what": "The owner OKs new customers' jobs, fees, quotes over the limit and same-day jobs. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "Another handyman with the same skill, at the same window and price."
+  },
+  "pf.rules": {
+   "job size limit": "A license or registration above a job size, and jobs at one address counted together: from the state form.",
+   "written estimate": "A written estimate or contract before work above an amount: from the state form.",
+   "right to cancel": "A written right to cancel for tasks sold at the home: where the rules require it, with the days and the refund time they set.",
+   "words on papers": "What the listing and papers must say, or must never say (like 'contractor' for a business without that license): from the state form.",
+   "lead-safe work": "Lead-safe work rules for older homes: where the rules require it.",
+   "permits": "Work that needs a permit isn't handyman work: it's pointed to a licensed contractor.",
+   "declared emergency": "Price limits in a declared emergency: where the state's rules require it.",
+   "guarantee": "The owner's own (the example: 90 days on workmanship), shown on the receipt.",
+   "records": "7 years, as for every kind of work."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for handyman work:",
+   "handyman": [
+    "A task that needs a licensed trade (a light fixture, a leak, a gas line): pointed elsewhere at booking or at the visit, in writing",
+    "A job over the state form's job size limit: only the part that fits is offered",
+    "A task added by text or at the visit: priced first, checked against the limit, and a right to cancel where the rules require it",
+    "The wall isn't what the photos showed: a price change OK'd before drilling",
+    "A hidden problem behind a wall (soft and wet, wiring, rot): stop, photo, and a written note",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "A renter whose landlord pays or must OK drilling: the landlord's OK first, or the renter pays instead",
+    "A TV or shelf pulling loose before the visit: the safety steps, then the soonest time",
+    "At the workshop: an item that can't be fixed, broken glass, or a drop-off nobody picks up"
+   ]
+  },
+  "pf.facts": [
+   "photos",
+   "documents",
+   "firststeps",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "doesn't do perms.",
+    "doesn't do tile reglaze."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Do you have a chair near a mirror and a plug?",
+    "Is there a power outlet by the wall?"
+   ],
+   [
+    "barbershops",
+    "repair crews"
+   ],
+   [
+    "fades and hot towel shaves",
+    "mounting and door fixes"
+   ],
+   [
+    "skin fades",
+    "mounting visits"
+   ],
+   [
+    "asks for a perm",
+    "asks for a tile reglaze"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "a loose cabinet door"
+   ],
+   [
+    "My sink won't drain",
+    "My door won't latch"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "drilling into a neighbor's wall without asking"
+   ],
+   [
+    "Haircut every 4 weeks",
+    "Rental screen plan, every 4 weeks"
+   ],
+   [
+    "Haircut plans",
+    "Rental screen plans"
+   ],
+   [
+    "Haircut plan",
+    "Rental screen plan"
+   ],
+   [
+    "haircut plan",
+    "rental screen plan"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license or registration where the state's form asks, often above a job size. TV mounts have a set price. Door repairs are priced at the visit. Sparks or a gas smell stop the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A license only where the state's form asks. Otherwise, the business registration. Screen repair, door planing and drawer fixes at the shop. Home visits too."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two screens from one house work the same way. Both are asked before the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley can still fit the repair if you're here by 11:20, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A chair set can be a drop-off: Alex leaves the chairs, and picks them up when they're ready."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A handyman's example: broken glass gets 'keep everyone away from it'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a flooded basement."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a clamp scratched the screen frame today."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The handyman plug-in adds its own: sparks, a burning smell or a gas smell."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Handyman work and the shop take no jobs sent now."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "fiberglass mesh, new spline, corners re-set"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for a cracked pane: tape it, wrap it in a towel, and carry it flat."
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "Some parts of the item are missing."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A sticking door could mean a handyman or a locksmith"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop the screen off and come back later?"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A new latch is on the price list: $20."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Lead-safe LS031552 · painting"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The clamp scratched my screen frame."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's screen came loose at one corner"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you fix sticking drawers too?"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks",
+    "Alex manages rentals, and asks for a set slot every 4 weeks to fix a torn screen from the apartments"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Storm window repair (glass and screen)"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a drawer fix is $25"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a repair"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The new screen came loose at one corner."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout"
+   ],
+   [
+    "Color always stays with Riley",
+    "Furniture repairs always stay with Riley"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Screen repair, door planing and drawer fixes"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a screen fixed on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero arreglar un mosquitero el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a screen slot every 4 weeks"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A screen repair needs the screen, with its frame."
+   ],
+   [
+    "like a skin-test result",
+    "like the screen's size"
+   ],
+   [
+    "Signature cut and shave",
+    "Storm window repair"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Drawer fix"
+   ],
+   [
+    "plumbing and electrical",
+    "handyman and painting"
+   ],
+   [
+    "color and house calls",
+    "furniture repairs and home visits"
+   ],
+   [
+    "photos of your hair",
+    "photos of your furniture"
+   ],
+   [
+    "Plumbing price list",
+    "Handyman price list"
+   ],
+   [
+    "color, house calls",
+    "furniture repairs, home visits"
+   ],
+   [
+    "Lee Home Services'",
+    "Ridgeline Home Repair's"
+   ],
+   [
+    "electrical license",
+    "painting license"
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't rewire lamps."
+   ],
+   [
+    "Lee Home Services",
+    "Ridgeline Home Repair"
+   ],
+   [
+    "Groom's package ·",
+    "Chair set ·"
+   ],
+   [
+    "like a burst pipe",
+    "like a lockout"
+   ],
+   [
+    "Color correction",
+    "Cabinet repair"
+   ],
+   [
+    "color correction",
+    "cabinet repair"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "Lee's Barbershop",
+    "Ridgeline Workshop"
+   ],
+   [
+    "plumbing service",
+    "handyman service"
+   ],
+   [
+    "Gloss to finish",
+    "New hinges"
+   ],
+   [
+    "Shorter is fine",
+    "I'll be there"
+   ],
+   [
+    "Groom's package",
+    "chair set re-glue"
+   ],
+   [
+    "Drain clearing",
+    "TV mounting"
+   ],
+   [
+    "Color and cut",
+    "Furniture repair"
+   ],
+   [
+    "color and cut",
+    "furniture repair"
+   ],
+   [
+    "sees the hair",
+    "sees the door"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s repair"
+   ],
+   [
+    "Panel upgrade",
+    "Whole-house painting"
+   ],
+   [
+    "Signature cut",
+    "Storm window repair"
+   ],
+   [
+    "signature cut",
+    "storm window repair"
+   ],
+   [
+    "groom's party",
+    "landlord's screens"
+   ],
+   [
+    "Lee Plumbing",
+    "Ridgeline Handyman"
+   ],
+   [
+    "Lee Electric",
+    "Ridgeline Painting"
+   ],
+   [
+    "Jordan Price",
+    "Tomás Reyes"
+   ],
+   [
+    "1200 Main St",
+    "600 River Rd"
+   ],
+   [
+    "a beard trim",
+    "a new latch"
+   ],
+   [
+    "plumbing job",
+    "handyman job"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "Casey Moore",
+    "Darnell Brooks"
+   ],
+   [
+    "a skin fade",
+    "door planing"
+   ],
+   [
+    "A skin fade",
+    "Door planing"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "NEW massage",
+    "NEW refinishing"
+   ],
+   [
+    "does color",
+    "does furniture repairs"
+   ],
+   [
+    "Barbershop",
+    "Workshop"
+   ],
+   [
+    "barbershop",
+    "workshop"
+   ],
+   [
+    "Electrical",
+    "Painting"
+   ],
+   [
+    "electrical",
+    "painting"
+   ],
+   [
+    "Riley Chen",
+    "Nadia Park"
+   ],
+   [
+    "Avery Diaz",
+    "Luis Ortiz"
+   ],
+   [
+    "Beard trim",
+    "New latch"
+   ],
+   [
+    "beard trim",
+    "new latch"
+   ],
+   [
+    "patch test",
+    "hardware match"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color plan",
+    "repair plan"
+   ],
+   [
+    "Color plan",
+    "Repair plan"
+   ],
+   [
+    "88 Elm St",
+    "19 Mill St"
+   ],
+   [
+    "kids cuts",
+    "drawer fixes"
+   ],
+   [
+    "Skin fade",
+    "Door planing"
+   ],
+   [
+    "skin fade",
+    "door planing"
+   ],
+   [
+    "Electric.",
+    "Two, still boxed."
+   ],
+   [
+    "Kids cut",
+    "Drawer fix"
+   ],
+   [
+    "kids cut",
+    "drawer fix"
+   ],
+   [
+    "Haircuts",
+    "Screen repairs"
+   ],
+   [
+    "haircuts",
+    "screen repairs"
+   ],
+   [
+    "cut hair",
+    "work the shop counter"
+   ],
+   [
+    "JP031552",
+    "LS031552"
+   ],
+   [
+    "MP045210",
+    "HR045210"
+   ],
+   [
+    "barbers'",
+    "handymen's"
+   ],
+   [
+    "plumbing",
+    "handyman work"
+   ],
+   [
+    "Plumbing",
+    "Handyman work"
+   ],
+   [
+    "EC22871",
+    "PC22871"
+   ],
+   [
+    "JE30417",
+    "LS030417"
+   ],
+   [
+    "BS20981",
+    "2020-1187"
+   ],
+   [
+    "Haircut",
+    "Screen repair"
+   ],
+   [
+    "haircut",
+    "screen repair"
+   ],
+   [
+    "barbers",
+    "handymen"
+   ],
+   [
+    "the cut",
+    "the repair"
+   ],
+   [
+    "massage",
+    "furniture refinishing"
+   ],
+   [
+    "Massage",
+    "Furniture refinishing"
+   ],
+   [
+    "plumber",
+    "handyman"
+   ],
+   [
+    "Plumber",
+    "Handyman"
+   ],
+   [
+    "Jordan",
+    "Tomás"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "barber",
+    "handyman"
+   ],
+   [
+    "Barber",
+    "Handyman"
+   ],
+   [
+    "Drains",
+    "TV mounts"
+   ],
+   [
+    "gloss",
+    "new hinges"
+   ],
+   [
+    "A cut",
+    "A repair"
+   ],
+   [
+    "Casey",
+    "Darnell"
+   ],
+   [
+    "Riley",
+    "Nadia"
+   ],
+   [
+    "Avery",
+    "Luis"
+   ],
+   [
+    "a cut",
+    "a repair"
+   ],
+   [
+    "Drain",
+    "TV mount"
+   ],
+   [
+    "Leaks",
+    "Door repairs"
+   ],
+   [
+    "valve",
+    "door"
+   ],
+   [
+    "cuts",
+    "repairs"
+   ],
+   [
+    "leak",
+    "door"
+   ],
+   [
+    "Leak",
+    "Door"
+   ],
+   [
+    "wall pipe",
+    "wall anchor"
+   ],
+   [
+    "water heaters",
+    "small repairs"
+   ],
+   [
+    "water heater",
+    "small repair"
+   ],
+   [
+    "sink",
+    "vanity"
+   ],
+   [
+    "pipe",
+    "rail"
+   ]
+  ],
+  "B": [
+   [
+    "doesn't do perms.",
+    "doesn't do tile reglaze."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Do you have a chair near a mirror and a plug?",
+    "Is there a power outlet by the wall?"
+   ],
+   [
+    "barbershops",
+    "repair crews"
+   ],
+   [
+    "fades and hot towel shaves",
+    "mounting and door fixes"
+   ],
+   [
+    "skin fades",
+    "mounting visits"
+   ],
+   [
+    "asks for a perm",
+    "asks for a tile reglaze"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "a loose cabinet door"
+   ],
+   [
+    "My sink won't drain",
+    "My door won't latch"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "drilling into a neighbor's wall without asking"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license or registration where the state's form asks, often above a job size. TV mounts have a set price. Door repairs are priced at the visit. Sparks or a gas smell stop the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A license only where the state's form asks. Otherwise, the business registration. Screen repair, door planing and drawer fixes at the shop. Home visits too."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which tasks, the TV's size, the wall type, and where the cords go."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone away from the glass, and to call 911 if someone is cut."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs a special-order part first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the handyman plug-in now, and painting's and the workshop's when Sam gets to them."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantenga a todos lejos del vidrio roto y cubra la ventana. Si alguien se cortó, llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Take the TV down with a second person if it's safe, or keep everyone away from it."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My TV mount is wobbly, and I want a new one put up. Can a handyman come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "rehangs the door today, $165. The $80 latch quote stays good until Thu Oct 29."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Ridgeline Home Repair doesn't do, like a new light fixture."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep everyone away from the broken glass, and cover the window. If someone is cut, call 911."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Tomás found the wall by your tub soft and wet, so he didn't re-caulk it."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like sparks, a gas smell or a TV about to fall, gets the safety steps first."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For handyman work, sparks, a burning smell or a gas smell stops the booking."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Tomás finds the wall by the tub soft and wet. The plug-in says a handyman stops there"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A handyman's example: broken glass gets 'keep everyone away from it'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a flooded basement."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A window's glass broke."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My ceiling fan sparked when I turned it on. Is it safe to use?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: sparks, a burning smell or a gas smell."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a handyman clean the gutters this Thursday? What does it cost?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE TV on two studs. Plaster above the window: bring masonry bits next time."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Tomás sees why the door sticks and texts the price with its lines."
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd rehanging the door only, $165. Leave the latch."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Tomás found why the door sticks. Here's the price to fix it today."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Ridgeline Home Repair has a gutter plan, $150 a visit."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The closet door is a door repair, quoted at the visit."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s cord cover, put up Thu Oct 22, is peeling off the wall."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Handyman work and the shop take no jobs sent now."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Tomás says no. He brings the anchors and screws."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for gutter cleaning twice a year."
+   ],
+   [
+    "for the water heater flush you asked Jordan about",
+    "for the gutter cleaning you asked Jordan about"
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: gutter cleaning, next fall"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Se rompió el vidrio de una ventana."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 rehang both closet doors, sagging"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan cracked a floor tile at Alex M.'s."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you clean my gutters twice a year, too?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "gutter cleaning at two rentals every 3 months"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Tomás look at my bathroom door next week?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the old mount is pulling away from the wall."
+   ],
+   [
+    "come back next fall for a water heater flush",
+    "come back next fall to clean the gutters"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The mount is pulling out of the wall now, and the TV tilts."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE an old scuff on the wall"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a sticking closet door."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It's pulling out of the wall. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Tomás also look at a sticking closet door?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan needs a part from the hardware store."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Do I need to buy anchors or screws?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD soft wet wall by the tub, stopped"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the area where Tomás will work."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Tomás finds the wall by the tub soft and wet."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Lead-safe LS031552 · painting"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Tomás sees both closet doors sagging."
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a special-order part that isn't in"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The cord cover peels off the wall 2 weeks later."
+   ],
+   [
+    "old water stain on the cabinet floor",
+    "a scuff on the wall where the TV goes"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The cord cover under the TV is peeling off the wall."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 rehang 165 latch 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the tub caulking"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Tomás left drywall dust on the floor."
+   ],
+   [
+    "sent you a proposal for new pipes",
+    "sent you a proposal for new deck boards"
+   ],
+   [
+    "Is the sink still full of water?",
+    "How high should the TV go?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a soft, wet wall by the tub"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a floor tile"
+   ],
+   [
+    "run a camera down my sewer line?",
+    "walk through the house and list what needs fixing?"
+   ],
+   [
+    "clear the cabinet under the sink",
+    "clear the wall where the TV goes"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Jordan cracks a floor tile"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout"
+   ],
+   [
+    "Drain clearings already booked",
+    "TV mountings already booked"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Gutter plan, twice a year"
+   ],
+   [
+    "can cut your hair at the shop",
+    "can fix your screen at the shop"
+   ],
+   [
+    "replacing both shutoff valves",
+    "rehanging both closet doors"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Screen repair, door planing and drawer fixes"
+   ],
+   [
+    "plumbing and electrical work",
+    "handyman work and painting"
+   ],
+   [
+    "Your drain is under warranty",
+    "Your TV mount is under the guarantee"
+   ],
+   [
+    "replace both shutoff valves",
+    "rehang both closet doors"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Rehang both closet doors"
+   ],
+   [
+    "My kitchen drain is clogged",
+    "My TV mount is wobbly"
+   ],
+   [
+    "Does it work like plumbing?",
+    "Does it work like your handyman jobs?"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's gutter cleaning"
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Soft, wet wall by the tub"
+   ],
+   [
+    "valve 165 supply line 80",
+    "rehang 165 latch 80"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Tomás's notes"
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every 6 months?"
+   ],
+   [
+    "Water heater replacement",
+    "Fence repair"
+   ],
+   [
+    "water heater replacement",
+    "fence repair"
+   ],
+   [
+    "Plumbing works like this",
+    "Your handyman jobs work like this"
+   ],
+   [
+    "plumbing and electrical",
+    "handyman and painting"
+   ],
+   [
+    "Sewer camera inspection",
+    "Repair walk-through"
+   ],
+   [
+    "sewer camera inspection",
+    "repair walk-through"
+   ],
+   [
+    "replacing the old pipes",
+    "replacing the worn deck boards"
+   ],
+   [
+    "credited to the repair",
+    "taken off the job"
+   ],
+   [
+    "Just the kitchen sink.",
+    "65 inches, on drywall. I have a new bracket."
+   ],
+   [
+    "Under the sink, before",
+    "Work area, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your deck repair"
+   ],
+   [
+    "Kitchen drain clearing",
+    "TV mounting"
+   ],
+   [
+    "drain is clogged again",
+    "mount is loose again"
+   ],
+   [
+    "replaces water heaters",
+    "repairs fences"
+   ],
+   [
+    "Plumbing never pauses.",
+    "Handyman work keeps going meanwhile."
+   ],
+   [
+    "color and house calls",
+    "furniture repairs and home visits"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked floor tile"
+   ],
+   [
+    "1-year labor warranty",
+    "90-day guarantee"
+   ],
+   [
+    "when the pipes are in",
+    "when the new boards are down"
+   ],
+   [
+    "your new pipes are in",
+    "your new deck boards are down"
+   ],
+   [
+    "Replace the old pipes",
+    "Replace the worn deck boards"
+   ],
+   [
+    "flush my water heater",
+    "put my furniture together"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Rehang the door · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 closet door quote"
+   ],
+   [
+    "Drain clearing plans",
+    "TV mounting plans"
+   ],
+   [
+    "for a bathroom drain",
+    "for a door repair"
+   ],
+   [
+    "leehomeservices.com",
+    "ridgelinehomerepair.com"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 closet door work"
+   ],
+   [
+    "both shutoff valves",
+    "both closet doors"
+   ],
+   [
+    "Sewer camera report",
+    "Repair list"
+   ],
+   [
+    "sewer camera report",
+    "repair list"
+   ],
+   [
+    "heating and cooling",
+    "pressure washing"
+   ],
+   [
+    "Heating and cooling",
+    "Pressure washing"
+   ],
+   [
+    "Plumbing price list",
+    "Handyman price list"
+   ],
+   [
+    "color, house calls",
+    "furniture repairs, home visits"
+   ],
+   [
+    "Lee Home Services'",
+    "Ridgeline Home Repair's"
+   ],
+   [
+    "the shutoff valves",
+    "the closet doors"
+   ],
+   [
+    "clear a yard drain",
+    "clean the gutters"
+   ],
+   [
+    "Water heater flush",
+    "Furniture assembly"
+   ],
+   [
+    "water heater flush",
+    "furniture assembly"
+   ],
+   [
+    "electrical license",
+    "painting license"
+   ],
+   [
+    "Electrical license",
+    "Painting license"
+   ],
+   [
+    "Lee Home Services",
+    "Ridgeline Home Repair"
+   ],
+   [
+    "like a burst pipe",
+    "like a lockout"
+   ],
+   [
+    "Supply line · $80",
+    "New latch · $80"
+   ],
+   [
+    "a dripping faucet",
+    "a sticking closet door"
+   ],
+   [
+    "camera inspection",
+    "repair walk-through"
+   ],
+   [
+    "the kitchen drain",
+    "the TV mount"
+   ],
+   [
+    "The kitchen drain",
+    "The TV mount"
+   ],
+   [
+    "drain clogs again",
+    "mount loosens again"
+   ],
+   [
+    "Lee's Barbershop",
+    "Ridgeline Workshop"
+   ],
+   [
+    "drain is clogged",
+    "mount is loose"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "$89 service call",
+    "$89 trip fee"
+   ],
+   [
+    "my bathroom sink",
+    "my bathroom door"
+   ],
+   [
+    "the kitchen sink",
+    "the living room"
+   ],
+   [
+    "plumbing service",
+    "handyman service"
+   ],
+   [
+    "plumbing license",
+    "home repair license"
+   ],
+   [
+    "Plumbing license",
+    "Home repair license"
+   ],
+   [
+    "plumbing plug-in",
+    "handyman plug-in"
+   ],
+   [
+    "Yes, every year",
+    "Yes, twice a year"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 deck repair"
+   ],
+   [
+    "clear the drain",
+    "mount the TV"
+   ],
+   [
+    "dripping faucet",
+    "sticking door"
+   ],
+   [
+    "drain clearing",
+    "TV mounting"
+   ],
+   [
+    "Drain clearing",
+    "TV mounting"
+   ],
+   [
+    "under the sink",
+    "by the TV wall"
+   ],
+   [
+    "Under the sink",
+    "By the TV wall"
+   ],
+   [
+    "plumbing visit",
+    "handyman visit"
+   ],
+   [
+    "Panel upgrade",
+    "Whole-house painting"
+   ],
+   [
+    "camera report",
+    "repair list"
+   ],
+   [
+    "Kitchen drain",
+    "TV mount"
+   ],
+   [
+    "kitchen drain",
+    "TV mount"
+   ],
+   [
+    "shutoff valve",
+    "door rehang"
+   ],
+   [
+    "Shutoff valve",
+    "Door rehang"
+   ],
+   [
+    "cabinet floor",
+    "floor below"
+   ],
+   [
+    "Cabinet floor",
+    "Floor below"
+   ],
+   [
+    "Lee Plumbing",
+    "Ridgeline Handyman"
+   ],
+   [
+    "Lee Electric",
+    "Ridgeline Painting"
+   ],
+   [
+    "Jordan Price",
+    "Tomás Reyes"
+   ],
+   [
+    "1200 Main St",
+    "600 River Rd"
+   ],
+   [
+    "Water heater",
+    "Fence"
+   ],
+   [
+    "for the leak",
+    "for the door"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "plumbing job",
+    "handyman job"
+   ],
+   [
+    "Casey Moore",
+    "Darnell Brooks"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "valve quote",
+    "closet door quote"
+   ],
+   [
+    "cuts a hand",
+    "hurts a hand"
+   ],
+   [
+    "Leak repair",
+    "Door repair"
+   ],
+   [
+    "leak repair",
+    "door repair"
+   ],
+   [
+    "a roof leak",
+    "a light fixture"
+   ],
+   [
+    "supply line",
+    "latch"
+   ],
+   [
+    "Supply line",
+    "New latch"
+   ],
+   [
+    "clogs again",
+    "comes loose again"
+   ],
+   [
+    "does color",
+    "does furniture repairs"
+   ],
+   [
+    "Barbershop",
+    "Workshop"
+   ],
+   [
+    "barbershop",
+    "workshop"
+   ],
+   [
+    "Electrical",
+    "Painting"
+   ],
+   [
+    "electrical",
+    "painting"
+   ],
+   [
+    "Riley Chen",
+    "Nadia Park"
+   ],
+   [
+    "Avery Diaz",
+    "Luis Ortiz"
+   ],
+   [
+    "beard trim",
+    "new latch"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "valve work",
+    "closet door work"
+   ],
+   [
+    "flush plan",
+    "gutter plan"
+   ],
+   [
+    "yard drain",
+    "gutters"
+   ],
+   [
+    "Yard drain",
+    "Gutters"
+   ],
+   [
+    "88 Elm St",
+    "19 Mill St"
+   ],
+   [
+    "42 Oak St",
+    "31 Linden Ave"
+   ],
+   [
+    "Electric.",
+    "Two, still boxed."
+   ],
+   [
+    "new pipes",
+    "new deck boards"
+   ],
+   [
+    "cut hair",
+    "work the shop counter"
+   ],
+   [
+    "JP031552",
+    "LS031552"
+   ],
+   [
+    "MP045210",
+    "HR045210"
+   ],
+   [
+    "the leak",
+    "the door"
+   ],
+   [
+    "plumbing",
+    "handyman work"
+   ],
+   [
+    "Plumbing",
+    "Handyman work"
+   ],
+   [
+    "EC22871",
+    "PC22871"
+   ],
+   [
+    "JE30417",
+    "LS030417"
+   ],
+   [
+    "BS20981",
+    "2020-1187"
+   ],
+   [
+    "Haircut",
+    "Screen repair"
+   ],
+   [
+    "haircut",
+    "screen repair"
+   ],
+   [
+    "barbers",
+    "handymen"
+   ],
+   [
+    "the cut",
+    "the repair"
+   ],
+   [
+    "leaking",
+    "sticking"
+   ],
+   [
+    "clogged",
+    "loose"
+   ],
+   [
+    "plumber",
+    "handyman"
+   ],
+   [
+    "Plumber",
+    "Handyman"
+   ],
+   [
+    "Jordan",
+    "Tomás"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "barber",
+    "handyman"
+   ],
+   [
+    "Barber",
+    "Handyman"
+   ],
+   [
+    "repipe",
+    "deck repair"
+   ],
+   [
+    "Repipe",
+    "Deck repair"
+   ],
+   [
+    "Drains",
+    "TV mounts"
+   ],
+   [
+    "a leak",
+    "a sticking door"
+   ],
+   [
+    "A leak",
+    "A door repair"
+   ],
+   [
+    "valves",
+    "closet doors"
+   ],
+   [
+    "faucet",
+    "closet door"
+   ],
+   [
+    "Casey",
+    "Darnell"
+   ],
+   [
+    "Riley",
+    "Nadia"
+   ],
+   [
+    "Avery",
+    "Luis"
+   ],
+   [
+    "drain",
+    "TV mount"
+   ],
+   [
+    "Drain",
+    "TV mount"
+   ],
+   [
+    "flush",
+    "assembly"
+   ],
+   [
+    "Leaks",
+    "Door repairs"
+   ],
+   [
+    "valve",
+    "door"
+   ],
+   [
+    "cuts",
+    "repairs"
+   ],
+   [
+    "leak",
+    "door"
+   ],
+   [
+    "Leak",
+    "Door"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a licensed plumber first"
+   ],
+   [
+    "wall pipe",
+    "wall anchor"
+   ],
+   [
+    "water heaters",
+    "small repairs"
+   ],
+   [
+    "water heater",
+    "small repair"
+   ],
+   [
+    "sink",
+    "vanity"
+   ],
+   [
+    "pipe",
+    "rail"
+   ]
+  ]
+ },
+ "cast": {
+  "A": {
+   "staff": "Nadia and Luis (handymen at the workshop)"
+  },
+  "B": {
+   "staff": "Tomás and Darnell (handymen)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nadia"
+  },
+  "B": {
+   "staff": "Tomás"
+  }
+ },
+ "keep": [
+  "electrician",
+  "electrical",
+  "plumber",
+  "cabinet",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings a torn window screen to the counter at Ridgeline Workshop, Sam's repair shop, and Nadia fixes it on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Ridgeline Home Repair at 31 Linden Ave, and Tomás comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: a TV mount, a door, furniture or a fence."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 screen repair at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+    "list|none|counter": "A $35 screen repair. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|full|none": "The $55 storm window repair, paid in full when booking.",
+    "photos|card|counter": "A furniture repair, priced from Alex's photos at $90. A card is saved for the $20 fee. Booked once Sam OKs it.",
+    "visit|card|counter": "A cabinet door repair, priced at the counter. A card is saved for the $20 fee; only the $25 consult is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Screen repair"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Screen repair"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Storm window repair"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Furniture repair"
+    },
+    "visit|*|*": {
+     "name": "Cabinet door repair"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Door planing",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$40",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Storm window repair",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "visit|card|bill",
+    "visit|none|bill",
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 TV mounting. A card is saved for the $89 trip fee. Rosie texts the bill after the job.",
+    "list|none|bill": "A $179 TV mounting. Nothing is taken before. Rosie texts the bill after the job.",
+    "list|card|card": "A $179 TV mounting. A card is saved and charged $179 when Tomás texts DONE.",
+    "visit|card|bill": "A door repair, priced at the visit. A card is saved for the $89 trip fee; Rosie texts the bill.",
+    "visit|none|bill": "A door repair, priced at the visit. Nothing is taken before. Rosie texts the bill after the job.",
+    "photos|deposit|bill": "A fence repair priced from photos at $640. A $160 deposit once the quote is OK'd; the $480 rest on the bill.",
+    "list|full|none": "Furniture assembly, $150, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "TV mounting"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "TV mounting"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Furniture assembly"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "Fence repair"
+    },
+    "visit|*|*": {
+     "name": "Door repair"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "TV mounting",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$179",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Furniture assembly",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-59",
+   "S11-87",
+   "S11-90",
+   "A7-15",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28",
+   "B5-34",
+   "B8-69",
+   "B8-72"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Handyman work, painting and the workshop all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Handymen are booked, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: home visits, workshop repairs and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Handyman work is booked ahead and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "words",
+    "at": "A4-32",
+    "does": "A landlord brings in eight window screens from one building, on one morning. Rosie finds counter spots side by side across Nadia and Luis."
+   },
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "A handyman's video check shows the item on the call. Nadia says what to bring, or if a handyman should come to the home."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-85",
+    "more": [
+     "Electrical work, like rewiring a lamp, needs a licensed electrician. The AI can look for one."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The workshop's plug-in names no form to sign. Its first steps are a hardware match, or a paper the shop gets, like a warranty claim number."
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "It can't be fixed",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.19",
+        "8.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Sat Oct 24, 11:15am",
+       "title": "Offers a new screen, or a handyman at home",
+       "does": "Nadia finds the screen's frame bent and cracked, so it can't be fixed. Nothing is charged for the repair. Alex picks a new screen at the counter, or a handyman at home.",
+       "more": [
+        "A new screen is made at the shop's own price, once Alex says yes.",
+        "A handyman at home is a new booking with Ridgeline Home Repair, at the customer's place.",
+        "Sam sets any price for the time spent, as with a visit stopped early.",
+        "No answer: nothing more is done, and Alex takes the old screen home."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "Alex M.'s screen frame is bent and cracked. It can't be fixed."
+        ],
+        [
+         "san",
+         "cust",
+         "Nadia found the screen's frame bent and cracked, so it can't be fixed. Nothing is charged for the repair. What would you like?",
+         {
+          "buttons": [
+           "A new screen here",
+           "A handyman at home",
+           "Take it back"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.services"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The workshop books a handyman's time, or a drop-off slot for a chair set. No class seats."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The workshop books a handyman's time, or a drop-off slot. No spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at the workshop is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Workshop repairs are rated, like every repair."
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "The owner sets the daily number at sign-up. A full day isn't shown.",
+     "Pick-up comes once it's READY, in the pick-up hours.",
+     "At the workshop, a chair set left to re-glue is a drop-off: the shop takes a few a day."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Handyman work: no child is left with the crew or alone at the counter; minors are never booked"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Handyman work, painting and the workshop all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Handymen are booked, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: home visits, workshop repairs and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Handyman work is booked ahead and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Handyman work is never sent now, so 'Send someone now' is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for handyman work, so no job is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Every handyman job has a set time, so it gets the reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Every handyman job has a set time, so it gets the day list and the on-my-way text."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Handyman work books a handyman in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in handyman work is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A home visit books a handyman in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "An adult stays home for the whole visit: the handyman waits for the adult on the booking."
+   },
+   {
+    "op": "after",
+    "at": "B4-06",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "line": [
+       "1.9",
+       "4.22"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks the job against the owner's limit",
+      "does": "Where the state's form licenses handyman work only up to a job size, Rosie adds up the tasks and checks the total. Alex's job fits, so the times come next.",
+      "more": [
+       "Over the limit: only the tasks that fit are offered. The rest is pointed to a licensed contractor.",
+       "A task that needs a trade license, like electrical work, is never booked here.",
+       "The same check runs when a task is added by text, and on each quote at the visit.",
+       "Priced from photos or at the visit: the check runs on the quote, before it's sent.",
+       "No limit in the state's form: there's nothing to check."
+      ],
+      "needs": [
+       "pf.license",
+       "pf.services"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-04",
+    "more": [
+     "Here it's Sam's rule for new customers: he looks at the photos of each spot first. A returning customer books at once."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-31",
+    "more": [
+     "The new total is checked against the job size limit the owner gave too. Over it, the task isn't added, and Alex is told why."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Tomás checks each spot against the booking photos. If one differs, like a plaster wall, the price change is OK'd before work."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "The new total is checked against the job size limit the owner gave too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-30",
+    "more": [
+     "Here, Alex had asked at the visit for the tub's caulk to be redone. Caulking over a wet wall would hide the problem.",
+     "If water spreads, Alex is told to turn off the water at the main shut-off."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Alex asks for another trade's work",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "4.26",
+        "8.8"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Thu Oct 22, 9:30am",
+       "title": "Points Alex to a licensed trade, in writing",
+       "does": "Alex asks Tomás to swap the hall light fixture too. That's electrical work, which a handyman can't do. Tomás says so, and Rosie texts it so Alex has it in writing.",
+       "more": [
+        "The plug-in lists the work that needs another trade's license.",
+        "The note names the kind of business to call, never a company.",
+        "Nothing is added or charged, and the booked work goes on.",
+        "Sam sees the note with the job."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "TRADE Alex M. asked for the hall light fixture to be swapped"
+        ],
+        [
+         "san",
+         "cust",
+         "Swapping a light fixture is electrical work, so Ridgeline Home Repair can't do it. A licensed electrician can, and your AI can find one. Today's work goes on as planned."
+        ]
+       ],
+       "needs": [
+        "pf.services",
+        "pf.license"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Handyman jobs are not named-only work: every finished job asks for a rating (the plug-in's answer)"
+   }
+  ]
+ },
+ "notes": "Pilot: home repair (the example: Ridgeline Home Repair, with its Ridgeline Workshop counter). Flow A: the customer brings a small item to the workshop counter (screen repair, door planing, latch or handle, drawer fix, storm window, chair re-glue, furniture repair, cabinet door). Flow B: a handyman goes to the home (TV mounting, door repair, furniture assembly, fence repair from photos, a repair walk-through).\nPlug-in facts: photos, documents, firststeps, extrawork. Switches: cancelright on in flow B only (a fence or a job sold at the home with a contract: the master's B8-78 cancel window); sensitive, welfare and no2 off (the $2 is paid, D97). Settings: arrive setstart in flow A, window in flow B; cutoff 24 hours before.\nFlow A money: list|card|counter (main; $35 screen repair, a card saved for the shop's $20 fee, paid at the counter), list|none|counter (nothing taken), list|full|none ($55 storm window repair, paid in full), photos|card|counter ($90 furniture repair from photos; card for $20; Sam OKs), visit|card|counter (cabinet door repair priced at the counter; card for $20; only the $25 consult promised). No holds.\nFlow B money: list|card|bill (main; $179 TV mounting; a card saved for the $89 trip fee; the bill after the job), list|none|bill ($179, nothing taken), list|card|card ($179, the card charged when DONE), visit|card|bill and visit|none|bill (door repair priced at the visit; the $89 trip fee on a card), photos|deposit|bill (fence repair from photos, $640: $160 deposit once the quote is OK'd, $480 rest on the bill; $89 fee), list|full|none ($150 furniture assembly, paid in full). The $89 is the trip fee (the late-cancel and no-show fee).\nRemoved in this refit: legacy money words ops (vary keys by price and before), the A7-13 and B6-03 money lines, the B8-58 \"never sent now\" line (sent now is not a fact here), the \"$40 fee held\" and \"$89 held\" wording (a card is saved instead), all dead off ops. Own steps kept (none new). Branches kept: \"It can't be fixed\" (A8-32), \"Alex asks for another trade's work\" (B8-22).\nLicenses: optional wording, never checked by Rosie (D96); electrical work is for a licensed electrician (the business's own word where the state requires one).\nChildren: 'Yes: a child may be left' is off at the counter; the rating split 'No: named-only work' is off (every finished job asks a rating).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "doesn't do perms.",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "barbershops",
+    "fades and hot towel shaves",
+    "skin fades",
+    "asks for a perm",
+    "Haircut every 4 weeks",
+    "Haircut plans",
+    "Haircut plan",
+    "haircut plan",
+    "rents a chair",
+    "chairs",
+    "chair",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "#2 on the sides, scissors on top, low beard line",
+    "A barbershop has none, so nothing is sent here.",
+    "The signed form this service needs is missing.",
+    "A haircut could mean a salon or a barbershop",
+    "Can my son wait in the shop during my cut?",
+    "A beard trim is on the price board: $20.",
+    "Plumbing JP031552 · electrical JE30417",
+    "The cape clip ripped my shirt collar.",
+    "Saturday's cut is uneven on one side",
+    "Do you do kids cuts? My son is 8.",
+    "Alex asks for a cut every 4 weeks",
+    "Signature cut and hot towel shave",
+    "a Kids cut (12 and under) is $25",
+    "like a 15-minute style consult",
+    "The cut is uneven on one side.",
+    "like a burst pipe or a lockout",
+    "Color always stays with Riley",
+    "Haircut, fade and beard trim",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "like a skin-test result",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "plumbing and electrical",
+    "color and house calls",
+    "photos of your hair",
+    "Plumbing price list",
+    "color, house calls",
+    "Lee Home Services'",
+    "electrical license",
+    "doesn't do perms.",
+    "Lee Home Services",
+    "Groom's package ·",
+    "like a burst pipe",
+    "Color correction",
+    "color correction",
+    "the shop's board",
+    "Lee's Barbershop",
+    "plumbing service",
+    "Gloss to finish",
+    "Shorter is fine",
+    "Groom's package",
+    "Drain clearing",
+    "Color and cut",
+    "color and cut",
+    "sees the hair",
+    "Alex M.'s cut",
+    "Panel upgrade",
+    "Signature cut",
+    "signature cut",
+    "groom's party",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "a beard trim",
+    "plumbing job",
+    "color quote",
+    "Casey Moore",
+    "a skin fade",
+    "A skin fade",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "NEW massage",
+    "does color",
+    "Barbershop",
+    "barbershop",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "house call",
+    "color plan",
+    "Color plan",
+    "88 Elm St",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "Electric.",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "JP031552",
+    "MP045210",
+    "barbers'",
+    "plumbing",
+    "Plumbing",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "the cut",
+    "massage",
+    "Massage",
+    "plumber",
+    "Plumber",
+    "Jordan",
+    "Elm St",
+    "barber",
+    "Barber",
+    "Drains",
+    "gloss",
+    "A cut",
+    "Casey",
+    "Riley",
+    "Avery",
+    "a cut",
+    "Drain",
+    "Leaks",
+    "valve",
+    "cuts",
+    "leak",
+    "Leak",
+    "water heaters",
+    "water heater",
+    "pipe"
+   ],
+   "B": [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "barbershops",
+    "fades and hot towel shaves",
+    "a leaking pipe under my sink",
+    "My sink won't drain",
+    "tapping a neighbor's water line without asking",
+    "rents a chair",
+    "chair",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Jordan says no. Please wait until the job is done.",
+    "Say Alex asks for a water heater flush every year.",
+    "for the water heater flush you asked Jordan about",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Can you flush my water heater every year, too?",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Alex texts that the sink is now overflowing.",
+    "come back next fall for a water heater flush",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Say Alex also asks about a dripping faucet.",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also look at a dripping faucet?",
+    "Jordan needs a part from the supply house.",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "Jordan finds mold behind the sink wall.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Jordan finds corroded shutoff valves.",
+    "like a permit it needed that isn't in",
+    "The drain clogs again 2 weeks later.",
+    "old water stain on the cabinet floor",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "sent you a proposal for new pipes",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "run a camera down my sewer line?",
+    "clear the cabinet under the sink",
+    "Jordan cracks the cabinet floor",
+    "like a burst pipe or a lockout",
+    "Drain clearings already booked",
+    "Yearly water heater flush plan",
+    "can cut your hair at the shop",
+    "replacing both shutoff valves",
+    "Haircut, fade and beard trim",
+    "plumbing and electrical work",
+    "Your drain is under warranty",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "My kitchen drain is clogged",
+    "Does it work like plumbing?",
+    "next week's drain cleaning",
+    "like an overflowing drain",
+    "Mold behind the sink wall",
+    "valve 165 supply line 80",
+    "Video and Jordan's notes",
+    "Want it every 12 months?",
+    "Water heater replacement",
+    "water heater replacement",
+    "Plumbing works like this",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "replacing the old pipes",
+    "credited to the repair",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "Kitchen drain clearing",
+    "drain is clogged again",
+    "replaces water heaters",
+    "Plumbing never pauses.",
+    "color and house calls",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "1-year labor warranty",
+    "when the pipes are in",
+    "your new pipes are in",
+    "Replace the old pipes",
+    "flush my water heater",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "Drain clearing plans",
+    "for a bathroom drain",
+    "leehomeservices.com",
+    "the $160 valve work",
+    "both shutoff valves",
+    "Sewer camera report",
+    "sewer camera report",
+    "heating and cooling",
+    "Heating and cooling",
+    "Plumbing price list",
+    "color, house calls",
+    "Lee Home Services'",
+    "the shutoff valves",
+    "clear a yard drain",
+    "Water heater flush",
+    "water heater flush",
+    "electrical license",
+    "Electrical license",
+    "Lee Home Services",
+    "like a burst pipe",
+    "Supply line · $80",
+    "a dripping faucet",
+    "camera inspection",
+    "the kitchen drain",
+    "The kitchen drain",
+    "drain clogs again",
+    "Lee's Barbershop",
+    "drain is clogged",
+    "service call fee",
+    "Service call fee",
+    "$89 service call",
+    "my bathroom sink",
+    "the kitchen sink",
+    "plumbing service",
+    "plumbing license",
+    "Plumbing license",
+    "plumbing plug-in",
+    "Yes, every year",
+    "a $2,400 repipe",
+    "clear the drain",
+    "dripping faucet",
+    "drain clearing",
+    "Drain clearing",
+    "under the sink",
+    "Under the sink",
+    "plumbing visit",
+    "Panel upgrade",
+    "camera report",
+    "Kitchen drain",
+    "kitchen drain",
+    "shutoff valve",
+    "Shutoff valve",
+    "cabinet floor",
+    "Cabinet floor",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "Water heater",
+    "for the leak",
+    "service call",
+    "Service call",
+    "plumbing job",
+    "Casey Moore",
+    "house calls",
+    "House calls",
+    "Price board",
+    "valve quote",
+    "cuts a hand",
+    "Leak repair",
+    "leak repair",
+    "a roof leak",
+    "supply line",
+    "Supply line",
+    "clogs again",
+    "does color",
+    "Barbershop",
+    "barbershop",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "house call",
+    "valve work",
+    "flush plan",
+    "yard drain",
+    "Yard drain",
+    "88 Elm St",
+    "42 Oak St",
+    "Electric.",
+    "new pipes",
+    "cut hair",
+    "JP031552",
+    "MP045210",
+    "the leak",
+    "plumbing",
+    "Plumbing",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "the cut",
+    "leaking",
+    "clogged",
+    "plumber",
+    "Plumber",
+    "Jordan",
+    "Elm St",
+    "barber",
+    "Barber",
+    "repipe",
+    "Repipe",
+    "Drains",
+    "a leak",
+    "A leak",
+    "valves",
+    "faucet",
+    "Casey",
+    "Riley",
+    "Avery",
+    "drain",
+    "Drain",
+    "flush",
+    "Leaks",
+    "valve",
+    "cuts",
+    "leak",
+    "Leak",
+    "Call a mold cleanup company first",
+    "wall pipe",
+    "water heaters",
+    "water heater",
+    "sink",
+    "pipe"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-32": "d5a284a416",
+   "A4-36": "f261af1660",
+   "A4-85": "f164e7b264",
+   "A4-43": "c17d56f766",
+   "A8-32": "632f2b5b40",
+   "A4-66": "f622d7fe12",
+   "A10-34": "78c2d9a6a3",
+   "A4-14": "95c7ffcfab",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B4-06": "223e119ea0",
+   "B6-04": "6d888abcaa",
+   "B7-31": "1b4da1dea9",
+   "B8-18": "530038d2b8",
+   "B8-23": "dd780a2ec8",
+   "B8-30": "a1ef4983e4",
+   "B8-22": "50d78f1af0",
+   "B10-32": "7713bff255"
+  }
+ }
+}

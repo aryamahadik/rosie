@@ -1,0 +1,2445 @@
+{
+ "id": "pediatrician",
+ "name": "Pediatrician",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "dentist",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each pediatrician (MD or DO), nurse practitioner, physician assistant and nurse holds their own active license from the state where the child is during the visit; which roles need which license comes from the state's form (a switch)",
+   "who": "each person; the practice too where the state's form registers medical offices or their owners",
+   "ask": "each person's license number in their invite reply (or the owner sends it); the practice's registration number from the owner",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "video": "a video visit only with someone licensed in the state where the child will be during the visit; nobody licensed there: no video times, and an office visit is offered instead",
+   "away": "home visits only where the state's rules allow them, with any home-visit registration the state's form asks for (a switch)",
+   "lactation": "breastfeeding help: the lactation consultant's certification on file; a state license only where the state's form asks for one (a switch)",
+   "vaccines": "shots from the state's free vaccine program only under the practice's own enrollment, where the state's form asks for one (a switch)",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance where the state's form asks for it",
+   "claims": "'board-certified' is shown as given by the business, not checked by Rosie"
+  },
+  "pf.services": {
+   "shape": "visits with a set length, booked with a pediatrician or a nurse practitioner by name; well-child visits follow the office's own schedule of ages; same-day sick times open each morning; the shots due at a visit are chosen by the clinician there and never paid up front, and a flu shot can also be booked on its own as a nurse visit; a newborn's visit at home has a 2-hour arrival window",
+   "examples": "the example offices' own prices (Lee Family Pediatrics and Lee Newborn Care), not a standard; a plan pays its own in-network fee, and the family's share is an estimate",
+   "list": [
+    {
+     "name": "Well-child visit (by age, with any shots due)",
+     "price": "billed to the child's plan; self-pay $195",
+     "kind": "one price",
+     "length": "30 min (40 min for a new family's first visit)",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "any share at the front desk",
+     "note": "booked on the office's schedule of ages; the next one is booked at checkout"
+    },
+    {
+     "name": "Sick visit (same day)",
+     "price": "billed to the child's plan, any copay at the front desk; self-pay $140",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "any copay at the front desk",
+     "note": "same-day times open at 7am, for current patients first; Sam OKs a new family's same-day visit"
+    },
+    {
+     "name": "Video visit (current patients)",
+     "price": "billed to the child's plan; self-pay $140",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "by video, counted as at the office",
+     "before": "nothing taken",
+     "after": "any share taken by the front desk, the office's own way",
+     "note": "only while the child is in a state where the clinician is licensed"
+    },
+    {
+     "name": "Flu shot (nurse visit)",
+     "price": "billed to the child's plan; self-pay $20 for the shot visit",
+     "kind": "one price",
+     "length": "10 min",
+     "where": "at the office",
+     "before": "nothing taken, never paid up front",
+     "after": "any share at the front desk",
+     "note": "a nurse gives it on the clinician's order; often added to another visit"
+    },
+    {
+     "name": "Sports or school physical",
+     "price": "$40 self-pay, or billed to the plan where it pays",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the office, or on a school's physicals day",
+     "before": "nothing taken",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Teen private visit",
+     "price": "set by the office (a switch, so no plan statement reaches a parent)",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "the office's own way, only with the teen",
+     "note": "only the visit types the office marks private, where the state's rules let a teen consent alone"
+    },
+    {
+     "name": "Newborn home visit (weight, feeding and a check of the baby)",
+     "price": "$179 ($199 when Sam goes himself); billed to the baby's plan, or self-pay",
+     "kind": "one price",
+     "length": "60 min, in a 2-hour arrival window",
+     "where": "at the family's home",
+     "before": "nothing taken",
+     "after": "the office bills the plan its own way; self-pay: Rosfield's bill after DONE",
+     "note": "in the baby's first days home"
+    },
+    {
+     "name": "Breastfeeding help",
+     "price": "$150 at home, $120 at the office; billed to the plan where it pays, or self-pay",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the family's home, or at the office",
+     "before": "nothing taken",
+     "after": "the office bills the plan its own way; self-pay: Rosfield's bill after DONE",
+     "note": "with the lactation consultant"
+    },
+    {
+     "name": "Follow-up weight check at home",
+     "price": "$89; billed to the baby's plan, or self-pay",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the family's home",
+     "before": "nothing taken",
+     "after": "as for the newborn home visit"
+    }
+   ],
+   "capacity": "one child per visit; a sibling is added as a second person on the same booking, each with their own time",
+   "nobodyHome": "never: a parent or guardian is always there",
+   "online": "video visits for current patients, counted as at the office, with the check-in code read out at the start"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "the child's first name and age (the birth date only on the secure page)",
+    "a current patient or a new family",
+    "which visit: the office's own visit types only, never a symptom typed into the AI",
+    "a plan (its name only) or self-pay",
+    "for a video visit: which state the child will be in"
+   ],
+   "afterTime": [
+    "anything the office should know to help, like needing an interpreter",
+    "the parent's or guardian's name and mobile"
+   ],
+   "securePage": [
+    "the child's birth date",
+    "how the person booking is related to the child",
+    "the plan's member ID, the plan holder and a photo of the plan card",
+    "the health history and changes since the last visit",
+    "the vaccine record",
+    "the consent and the privacy notice",
+    "who else may bring the child, with the parent's signed OK",
+    "whether an interpreter is needed"
+   ],
+   "whoMayBook": "a parent or legal guardian, or an adult the family's record names; either parent may, unless the office holds a court order that limits it (Rosie follows the record, never the caller's word alone); a teen alone only for the visit types the office marks private, where the state's rules let a minor consent (a switch); a child under 13 never books, and nothing about them is kept",
+   "whoMayBring": "a switch: a parent or legal guardian brings the child; another adult (a grandparent, a sitter) only with the parent's signed OK on the secure page; the office may ask for a parent at a first visit, or where the state's rules require one",
+   "neverAsked": "symptoms, reasons or results are never asked or typed in the AI chat"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "trouble breathing, won't wake up, blue lips, or a seizure",
+     "say": "Call 911 now. Rosie can't book care for an emergency.",
+     "booking": "no booking; the same words in a later text get 911 again, and any visit stays booked"
+    },
+    {
+     "words": "swallowed medicine or a chemical",
+     "say": "Call Poison Help now at 1-800-222-1222. If the child isn't breathing or won't wake up, call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "nurseLine": [
+    {
+     "words": "the office's own list of signs for its nurse line (the example office lists a fever in a baby under 3 months)",
+     "say": "Please call the office's nurse line now: (555) 010-0177, option 2. If it's an emergency, call 911.",
+     "booking": "no booking by the AI until the nurse has talked with the parent"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a sick child with nothing on the lists above",
+     "what": "matched to the office's own sick visit; Rosie never judges how sick a child is"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history, changes since the last visit, the vaccine record and the consent",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before check-in); one reminder before it's due",
+     "who": "every new family; current patients before each well-child visit",
+     "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the front desk first), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every family that names a plan",
+     "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the family may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay families",
+     "when": "told while booking; sent within 1 business day (the example office's rule), or sooner where the rules require it",
+     "who": "every family paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "A new family's records from the last doctor",
+     "when": "asked for on the secure page; the office gets them, office to office",
+     "who": "every new family",
+     "result": "a to-do for the front desk; the first visit goes ahead without them"
+    },
+    {
+     "name": "Sam's OK for a new family",
+     "when": "before the first visit is booked",
+     "who": "every new family",
+     "result": "OK: booked; no: told kindly, nothing kept"
+    }
+   ],
+   "prep": "arrive 10 minutes early; bring the plan card, and the vaccine record if it isn't on file; a parent or guardian comes with the child, or an adult the parent named with a signed OK; at home: the baby's last weight from the hospital, if you have it"
+  },
+  "pf.visit": {
+   "checkIn": "at the office: the check-in code at the front desk, and the desk checks the adult is the parent or guardian, or the adult the parent named; a video visit: the code read out at the start; at home: the code from the parent at the door",
+   "beforeWork": "the nurse checks the child's weight and height and the changes since the last visit, before the exam",
+   "changes": "the clinician picks the shots due at the visit, from the child's age and record; a test is added only with the parent's yes, with any self-pay price first; more care is booked as its own visit only if the parent asks",
+   "done": "the check-in code or DONE; the visit notes, results and vaccine record stay in the office's own records, never in Rosie or a text; the next well-child visit is booked at checkout",
+   "away": "at home: the nurse practitioner brings a baby scale; a parent or guardian is there for the whole visit",
+   "childLeft": "never: the adult who brought the child stays for the whole visit"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking (the office bills the child's plan); a card saved only where the office turns on its no-show fee, never for a fee-free family; shots are never paid up front; at home: nothing taken",
+   "plans": "the plans the office takes (its own list); the front desk checks each plan by hand and records it; the share is an estimate, not a promise",
+   "selfPay": "a self-pay family is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "vaccines": "shots are never paid up front; a child in the state's free vaccine program is never turned away for not paying the shot fee, and any shot fee stays within the program's limit (a switch from the state's form)",
+   "fees": "the no-show fee: $20 at the example office, only when the owner confirms it; the same fee for every family who may be charged one",
+   "feeFree": "a switch: no fee ever for families whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "at the office: any share at the front desk, the office's own way; a balance after the plan pays is billed by the office, not by Rosie's text; a video visit's share is taken by the front desk its own way; at home: the office bills the plan its own way, or Rosie texts a self-pay family the bill after DONE",
+   "private": "a teen's private visit: how it's billed is the office's switch, so no plan statement reaches a parent; Rosie sends no bill or receipt about it to anyone but the teen",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form (no deposits are taken); fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the reason, symptoms, shots, results or the clinician's name (at a home visit the clinician's name stays, for the door check)",
+   "staff": "texts to the owner and staff carry no health detail either: the child's initials, the time and a link; the visit type and any notes about the child are on the secure page",
+   "languages": "English and Spanish; the secure page asks if the family needs an interpreter, and the office is told",
+   "minors": "texts go to the parent or guardian; a teen's private visit is texted only to the teen's own phone, with no visit type, and never shows on a parent's list or in the family's texts; a child under 13 never texts Rosie, and nothing about them is kept",
+   "medical": "a medical question is never answered, saved or passed on: 911 if it's an emergency, then the nurse line or the patient portal"
+  },
+  "pf.staff": {
+   "licenses": "each pediatrician's, nurse practitioner's, physician assistant's and nurse's own license, per state",
+   "skills": "pediatricians and nurse practitioners: well-child visits, sick visits, new families, video visits and newborn home visits; nurses: flu shots and shot-only visits on the clinician's order; the lactation consultant: breastfeeding help; only people cleared for home visits go to homes",
+   "supervision": "a nurse practitioner or physician assistant works within the state's rules for supervision or a collaboration agreement (a switch from the state's form)",
+   "oks": "the owner OKs a new family's first visit, same-day times for a new family, and anything a nurse flags",
+   "standIn": "a pediatrician out: the nurse practitioner may take the visit, with the parent's yes; nobody is moved without it",
+   "away": "the home visit team is the people cleared for home visits, with a baby scale"
+  },
+  "pf.rules": {
+   "records": "a child's records are kept by the office as long as the state's rules require (a child's records may be kept longer); a delete request removes only Rosie's own booking details, never the office's records",
+   "copies": "a parent's copy of the child's records within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "the license shown where the state asks: posted at the office, and on a visit away from it",
+   "minors": "who may consent for a child, which visit types a teen may book alone, and from what age (a switch from the state form)",
+   "custody": "either parent may book unless the office marks a limit it holds, like a court order; anyone else only if the family's record names them",
+   "language": "free language help where the rules require it, like for practices that take Medicaid",
+   "host": "a school physicals day only under the school's written OK and its sign-in rules (S1-58); the example sets none",
+   "ads": "no free-visit or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen; later, the desk may offer a new time (the office decides; Rosie never changes the booking itself)",
+   "officeLate": "when the office runs late, a new time costs nothing",
+   "standIn": "a pediatrician out: the nurse practitioner, with the parent's yes, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page at the front desk first), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "twoBookings": "a family with visits open for two children: Rosie asks which one before any change",
+   "worse": "a child seems worse before the visit: the 911 or Poison Help words if they match, the nurse line if it's on the office's list; Rosie never judges it, and the visit stays booked",
+   "healthQuestion": "a question about medicine or care before the visit: never answered by Rosie; 911 if it's an emergency, then the nurse line or the portal",
+   "siblings": "a sibling added to a booking gets their own time with the same clinician",
+   "newborn": "a newborn visit that can't happen as booked: the soonest open window comes first, with no fee, and the nurse line is named in the text",
+   "other": "all other edge cases the generic way",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): a sick child gets the soonest same-day time; the danger words get 911"
+  },
+  "pf.facts": [
+   "children",
+   "forms",
+   "planbill",
+   "video",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Family Pediatrics",
+   "staff": "Nina (pediatrician) and Elena (pediatric nurse practitioner)",
+   "cust": "Alex M. (parent of Mia, 4) · other families",
+   "other": "Others (a bank, another parent or guardian, a plan)"
+  },
+  "B": {
+   "business": "Lee Newborn Care",
+   "staff": "Felix (nurse practitioner and lactation consultant) and Hugo (nurse practitioner), who visit with a baby scale",
+   "cust": "Alex M. (parent of Leo, born Sat Oct 17) · other families",
+   "other": "Others (a bank, another parent or guardian, a plan, a school)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nina"
+  },
+  "B": {
+   "staff": "Felix"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Skin fade · $40",
+    "Visit · details on the page"
+   ],
+   [
+    "asked overnight for a skin fade today.",
+    "asked overnight for a visit today."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A shots visit could mean a pediatrician or a pharmacy."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a well-child visit and a sports physical"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A well-child visit is rated, so the shop takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's health care takes no jobs sent now, at the office or away."
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Family Pediatrics LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Family Pediatrics"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Newborn Care"
+   ],
+   [
+    "plumbing and electrical",
+    "newborn care and breastfeeding help"
+   ],
+   [
+    "88 Elm St",
+    "215 Alder St"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Elena"
+   ],
+   [
+    "Jordan",
+    "Felix"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "electrical",
+    "breastfeeding help"
+   ],
+   [
+    "Electrical",
+    "Breastfeeding help"
+   ],
+   [
+    "plumber",
+    "pediatrician"
+   ],
+   [
+    "Plumber",
+    "Pediatrician"
+   ],
+   [
+    "plumbing",
+    "newborn care"
+   ],
+   [
+    "Plumbing",
+    "Newborn care"
+   ],
+   [
+    "barbershop",
+    "pediatric office"
+   ],
+   [
+    "Barbershop",
+    "Pediatric office"
+   ],
+   [
+    "barbers",
+    "pediatricians"
+   ],
+   [
+    "barber",
+    "pediatrician"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "skin fade",
+    "sports physical"
+   ],
+   [
+    "Skin fade",
+    "Sports physical"
+   ],
+   [
+    "beard trim",
+    "flu shot"
+   ],
+   [
+    "haircut",
+    "well-child visit"
+   ],
+   [
+    "Haircut",
+    "Well-child visit"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "priced at the chair",
+    "priced in the exam room"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the exam room"
+   ],
+   [
+    "is at the chair",
+    "is in the exam room"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Sat Oct 24 · 11:00am · Nina",
+    "Sat Oct 24 · 11:00am"
+   ],
+   [
+    "Nina · Sat Oct 24",
+    "Your Sat Oct 24 visit"
+   ],
+   [
+    "Nina marked you as not here",
+    "The office marked you as not here"
+   ],
+   [
+    "How was your visit with Nina?",
+    "How was your visit?"
+   ],
+   [
+    "Why: many pediatricians, salons and groomers are licensed to their office.",
+    "Why: in many states, health care away from an office has its own rules."
+   ],
+   [
+    "It's 11:00am, and Alex is in the exam room. Alex reads the code from the confirmation or the reminder, and Nina texts it in.",
+    "It's Sat 11:00am, and Alex is at the front desk. Alex reads the code from the confirmation or the reminder, and the desk enters it."
+   ],
+   [
+    "What happens at the front desk?",
+    "What happens in the exam room?"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "Each kind of work may keep its own trade name, like Lee Newborn care and Lee Electric.",
+    "Each kind of work may keep its own trade name, like Lee Newborn Care and Lee Lactation."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pediatric offices set it."
+   ],
+   [
+    "Signature cut and shave",
+    "Sports physical"
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, a visit would take a deposit. Lee Family Pediatrics never does."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free. E paid when they book. A at their home too, 75, paid when they book",
+    "J: a newborn weight check in the first 2 weeks, free. Shots never paid when they book. Nothing is taken for any visit."
+   ],
+   [
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "On this path, a newborn weight check is free: nothing before, nothing after."
+   ],
+   [
+    "On this path, the color and cut takes nothing before, once Nina's photo quote is OK'd.",
+    "On this path, a visit is priced from photos. Lee Family Pediatrics never does."
+   ],
+   [
+    "On this path, the color and cut takes a $20 deposit once its photo quote is OK'd.",
+    "On this path, a visit is priced from photos. Lee Family Pediatrics never does."
+   ],
+   [
+    "On this path, the color and cut is paid in full once its photo quote is OK'd.",
+    "On this path, a visit is priced from photos. Lee Family Pediatrics never does."
+   ],
+   [
+    "On this path, color correction takes nothing before. Only the $25 consult is promised.",
+    "On this path, a visit is priced in the exam room. Lee Family Pediatrics never does."
+   ],
+   [
+    "On this path, color correction takes the $25 consult as a deposit, toward the final price.",
+    "On this path, a visit would take a deposit. Lee Family Pediatrics never does."
+   ],
+   [
+    "Haircuts at the office work like this:",
+    "Well-child visits at the office work like this:"
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Sports physical · $40"
+   ],
+   [
+    "Free: nothing to pay, now or after. Once Nina checks the photos, the customer's YES books the color touch-up.",
+    "Free: nothing to pay, now or after. The customer's YES books the newborn weight check."
+   ],
+   [
+    "Color touch-up · checked from photos",
+    "Newborn weight check · free"
+   ],
+   [
+    "A card is saved when the customer books, and nothing is charged. For the color and cut, it's charged only for the office's $20 fee, and only after Sam says yes.",
+    "A card is saved when the customer books, and nothing is charged. It's charged only for the office's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "The color and cut works like this:",
+    "A sick visit works like this:"
+   ],
+   [
+    "The color and cut can be paid in full once Nina's photo quote is OK'd, like $90. Nothing more is owed after.",
+    "Lee Family Pediatrics never takes a visit's price up front."
+   ],
+   [
+    "Color and cut · $90, from photos",
+    "Sick visit · $140"
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Color correction can work this way, with only the $25 consult promised.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Every visit can work this way."
+   ],
+   [
+    "Color correction · priced in the exam room",
+    "Sick visit · $140"
+   ],
+   [
+    "A card is saved when the customer books, and nothing is charged. For the color correction, it's charged only for the office's $20 fee, and only after Sam says yes.",
+    "A card is saved when the customer books, and nothing is charged. It's charged only for the office's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "Color correction works like this:",
+    "A video visit works like this:"
+   ],
+   [
+    "Sam picks a deposit for color correction. It is from $110, set at the front desk. So the $25 consult is taken at booking, toward the final price.",
+    "Lee Family Pediatrics takes no deposits."
+   ],
+   [
+    "Color correction · $25 deposit",
+    "Video visit · $140"
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the front desk.",
+    "Lee Family Pediatrics takes no deposits."
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "New family visit · $195"
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "Lee Family Pediatrics takes no deposits."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "Lee Family Pediatrics takes no deposits."
+   ],
+   [
+    "Nothing is taken, and no card is asked for. Once Nina's photo quote is OK'd, the customer's YES books it. The color and cut can work this way.",
+    "Nothing is taken, and no card is asked for. The customer's YES books it. A sick visit can work this way."
+   ],
+   [
+    "Color and cut · priced from photos",
+    "Sick visit · $140"
+   ],
+   [
+    "The color and cut can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90. The rest is paid at the visit, or on the bill after.",
+    "Lee Family Pediatrics takes no deposits."
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Sick visit · $140"
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee, only where the card is saved for it and you say yes. Never for a fee-free family"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "A new family's first visit comes to you first. Listed visits never need one"
+   ],
+   [
+    "A neighborhood pediatric office on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood pediatric office on Alder St. Well-child visits, sick visits and shots."
+   ],
+   [
+    "Newborn care for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Newborn care at families' homes in Springfield. Newborn visits and weight checks, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A newborn home visit"
+   ],
+   [
+    "[6 contact cards] Felix and Hugo do newborn care; Felix does breastfeeding help too, at $140 an hour. Nina and Elena cut hair; Nina also does color and home visits. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Felix and Hugo do newborn care; Felix does breastfeeding help too, at $150 a visit. Nina and Elena see children at the office; Nina also does home visits. Pat is my office manager, for prices over $500. Jules is a nurse, for shot visits."
+   ],
+   [
+    "Nina: pediatrician, color, home visits",
+    "Nina: pediatrician, home visits"
+   ],
+   [
+    "Barber license number",
+    "Medical license number"
+   ],
+   [
+    "Every office service, color and home visits",
+    "Every office visit and home visits"
+   ],
+   [
+    "Nina: pediatrician, color and home visits",
+    "Nina: pediatrician and home visits"
+   ],
+   [
+    "A pediatrician's example: water near outlets gets 'shut off the main valve'.",
+    "A pediatrician's example: a child who swallowed medicine gets 'call Poison Help now'."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for a pizza place: a wrong number."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the office's list.",
+    "Alex asks for ear piercing, which isn't on the office's list."
+   ],
+   [
+    "Lee Family Pediatrics doesn't do perms.",
+    "Lee Family Pediatrics doesn't do ear piercing."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A first step's example: 'A new family's first visit needs the health history first. Fill it in on the secure page.'"
+   ],
+   [
+    "A well-child visit for Alex and a kids cut for a child work the same way.",
+    "A visit for Mia and a visit for her brother work the same way."
+   ],
+   [
+    "A price set at the visit: any visit fee, and that it's owed even after a no to the price.",
+    "A price set at the visit: any starting price, and that it's owed even after a no to the price."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "You told us the visit is for your child, and that you're their parent. Their details go on the secure page."
+   ],
+   [
+    "Color always stays with Nina.",
+    "A new family's first visit stays with Nina."
+   ],
+   [
+    "Beard trim · $20",
+    "Flu shot · $20"
+   ],
+   [
+    "A part or anything new is priced first, and needs the customer's yes before it's ordered. No new visit fee.",
+    "A test or anything new is priced first, and needs the parent's yes before it's done. No new starting price."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The exam table paper tore my jacket."
+   ],
+   [
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "A.M. says the exam table tore a jacket today."
+   ],
+   [
+    "At the office, a parent stays for a kids cut, so nothing more happens.",
+    "At the office, a parent stays for every visit, so nothing more happens."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: Mia is shy with new people; start with the parent's questions"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you see teens for sports physicals? My son is 14."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a sports physical is $40 self-pay, or billed to your plan. Want a time?"
+   ],
+   [
+    "1 color quote",
+    "1 new family's first visit"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about a new family's first visit."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Sports physicals already booked keep $40, even after Nov 2."
+   ],
+   [
+    "Saved: well-child visit $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Well-child visit plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: sports physical $45 for visits from Mon Nov 2. Sports physicals already booked keep $40."
+   ],
+   [
+    "Haircuts already booked keep only their saved card.",
+    "Visits already booked keep only their saved card."
+   ],
+   [
+    "Well-child visit $35 ($40 from Nov 2) · Sports physical $40 · Beard trim $20",
+    "Well-child visit $195 · Sports physical $40 ($45 from Nov 2) · Flu shot $20"
+   ],
+   [
+    "Newborn care · within 25 miles of 1200 Main St, Springfield",
+    "Newborn care · within 25 miles of 410 Main St, Springfield"
+   ],
+   [
+    "Sam adds massage to Lee Family Pediatrics.",
+    "Sam adds hearing tests to Lee Family Pediatrics."
+   ],
+   [
+    "NEW massage",
+    "NEW hearing tests"
+   ],
+   [
+    "Massage for Lee Family Pediatrics: is it the same company?",
+    "Hearing tests for Lee Family Pediatrics: is it the same company?"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like well-child visits?"
+   ],
+   [
+    "Haircuts work like this",
+    "Well-child visits work like this"
+   ],
+   [
+    "Only they get the code, and give it to Nina at the front desk. That shows Nina really came.",
+    "Only they get the code, and give it at the front desk. That shows they really came."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "A step-free door on Elm St, and parking in the back.",
+    "A step-free door on Alder St, and parking in the back."
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Step-free door on Alder St · parking in the back"
+   ],
+   [
+    "'A neighborhood pediatric office on Elm St.' · 3 pictures",
+    "'A neighborhood pediatric office on Alder St.' · 3 pictures"
+   ],
+   [
+    "Please use the side door on Oak St.",
+    "Please use the side door on Birch St."
+   ],
+   [
+    "Beard trim",
+    "Flu shot"
+   ],
+   [
+    "Kids cut",
+    "Sports physical"
+   ],
+   [
+    "Groom's package",
+    "New family visit"
+   ],
+   [
+    "Color and cut",
+    "Sick visit"
+   ],
+   [
+    "Color correction",
+    "Video visit"
+   ],
+   [
+    "Color touch-up",
+    "Newborn weight check"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked Mia's visit before the times, so the times fit it."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the front desk, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at the start of a video call."
+   ],
+   [
+    "only the part done is charged; the visit fee is owed",
+    "only the part done is charged; the starting price is owed"
+   ],
+   [
+    "Can my son wait in the office during my cut?",
+    "Can my older son wait in the waiting room during Mia's visit?"
+   ],
+   [
+    "like 'How would you like it on top?'",
+    "like 'Anything the office should know to help?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Does your family need an interpreter? (optional)"
+   ],
+   [
+    "May the office show photos of your hair? Yes / No",
+    "May the office leave a voicemail? Yes / No"
+   ],
+   [
+    "Reminder: your visit is Sat at 11:00am with Nina.",
+    "Reminder: your visit is Sat at 11:00am."
+   ],
+   [
+    "Moved: your Sat 11:00am visit is now Sat 3:00pm, with Nina.",
+    "Moved: your Sat 11:00am visit is now Sat 3:00pm."
+   ],
+   [
+    "Lee Family Pediatrics · with Nina",
+    "Lee Family Pediatrics"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Nina? It's free.",
+    "Cancel your Sat 11:00am visit? It's free."
+   ],
+   [
+    "Pick a new time with Nina by 7pm today,",
+    "Pick a new time by 7pm today,"
+   ],
+   [
+    "Tue Oct 27, 11:00am, with Nina.",
+    "Tue Oct 27, 11:00am."
+   ],
+   [
+    "Sat Oct 24 · with Nina",
+    "Sat Oct 24"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the plan card on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring the plan card."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Pizza? I'd like to order a large pie."
+   ],
+   [
+    "haircut",
+    "checkup"
+   ],
+   [
+    "Barber",
+    "Pediatrician"
+   ],
+   [
+    "barber",
+    "pediatrician"
+   ],
+   [
+    "Haircuts",
+    "Checkups"
+   ],
+   [
+    "haircuts",
+    "checkups"
+   ]
+  ],
+  "B": [
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's health care takes no jobs sent now, at the office or away."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Newborn Care's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Family Pediatrics"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Newborn Care"
+   ],
+   [
+    "plumbing and electrical",
+    "newborn care and breastfeeding help"
+   ],
+   [
+    "1200 Main St",
+    "410 Main St"
+   ],
+   [
+    "88 Elm St",
+    "215 Alder St"
+   ],
+   [
+    "42 Oak St",
+    "27 Spruce St"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Elena"
+   ],
+   [
+    "Jordan",
+    "Felix"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "electrical",
+    "breastfeeding help"
+   ],
+   [
+    "Electrical",
+    "Breastfeeding help"
+   ],
+   [
+    "plumber",
+    "pediatrician"
+   ],
+   [
+    "Plumber",
+    "Pediatrician"
+   ],
+   [
+    "plumbing",
+    "newborn care"
+   ],
+   [
+    "Plumbing",
+    "Newborn care"
+   ],
+   [
+    "barbershop",
+    "pediatric office"
+   ],
+   [
+    "Barbershop",
+    "Pediatric office"
+   ],
+   [
+    "barbers",
+    "pediatricians"
+   ],
+   [
+    "barber",
+    "pediatrician"
+   ],
+   [
+    "beard trim",
+    "flu shot"
+   ],
+   [
+    "haircut",
+    "well-child visit"
+   ],
+   [
+    "Haircut",
+    "Well-child visit"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Newborn home visit"
+   ],
+   [
+    "drain clearing",
+    "newborn home visit"
+   ],
+   [
+    "service call",
+    "starting price"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Felix needs a part from the supply house.",
+    "Felix needs supplies from the van."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 newborn home visit"
+   ],
+   [
+    "Why: many pediatricians, salons and groomers are licensed to their office.",
+    "Why: in many states, health care away from an office has its own rules."
+   ],
+   [
+    "Each kind of work may keep its own trade name, like Lee Newborn care and Lee Electric.",
+    "Each kind of work may keep its own trade name, like Lee Newborn Care and Lee Lactation."
+   ],
+   [
+    "only the part done is charged; the visit fee is owed",
+    "only the part done is charged; the starting price is owed"
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "A job priced at the visit never takes more than the starting price."
+   ],
+   [
+    "Newborn care for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Newborn care at families' homes in Springfield. Newborn visits and weight checks, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A newborn home visit"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pediatric offices start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pediatric offices often set."
+   ],
+   [
+    "A neighborhood pediatric office on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood pediatric office on Alder St. Well-child visits, sick visits and shots."
+   ],
+   [
+    "[6 contact cards] Felix and Hugo do newborn care; Felix does breastfeeding help too, at $140 an hour. Nina and Elena cut hair; Nina also does color and home visits. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Felix and Hugo do newborn care; Felix does breastfeeding help too, at $150 a visit. Nina and Elena see children at the office; Nina also does home visits. Pat is my office manager, for prices over $500. Jules is a nurse, for shot visits."
+   ],
+   [
+    "Nina: pediatrician, color, home visits",
+    "Nina: pediatrician, home visits"
+   ],
+   [
+    "Nina: pediatrician, color and home visits",
+    "Nina: pediatrician and home visits"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for a pizza place: a wrong number."
+   ],
+   [
+    "My kitchen drain is clogged. Can a pediatrician come Thursday morning? I'm in Springfield.",
+    "We just brought our baby home. Can a nurse practitioner come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero una visita en casa para mi bebé."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'd like a home visit for my baby."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a home visit for my newborn. A text back is fine."
+   ],
+   [
+    "A pediatrician's example: water near outlets gets 'shut off the main valve'.",
+    "A pediatrician's example: a gas smell gets 'take the baby outside, then call 911'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to take the baby outside and call 911 if there's a gas smell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si huele a gas, salga con el bebé y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If you smell gas, take the baby outside and call 911."
+   ],
+   [
+    "For newborn care, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For newborn care, trouble breathing, blue lips, a seizure or a baby who won't wake up stops the booking."
+   ],
+   [
+    "A gas smell at the home",
+    "A baby who won't wake up"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: trouble breathing, blue lips, a seizure, or a baby who won't wake up."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Leo has a small rash. Is it safe to wait for the visit?"
+   ],
+   [
+    "Can a pediatrician clear a yard drain this Thursday?",
+    "Can a nurse practitioner make a newborn home visit this Thursday?"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the baby's first name and age in days, and a plan or self-pay."
+   ],
+   [
+    "'My sink won't drain' fits a newborn home visit.",
+    "'Can someone weigh my baby at home?' fits a newborn home visit."
+   ],
+   [
+    "like a roof leak.",
+    "like an eye exam."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a sick note for a child nobody has seen."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding breastfeeding help? Say so.'"
+   ],
+   [
+    "Lee Newborn Care asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Newborn Care asks: is the visit at a home, or somewhere else? And how old is the baby, in days?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Leo is 5 days old."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about breastfeeding help. Both go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Felix also look at a dripping faucet?",
+    "Can Felix also help with breastfeeding?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. Breastfeeding help is billed the same way. Both fit in the same arrival window."
+   ],
+   [
+    "A price set at the visit: any visit fee, and that it's owed even after a no to the price.",
+    "A price set at the visit: any starting price, and that it's owed even after a no to the price."
+   ],
+   [
+    "Lee Newborn Care can clear the drain:",
+    "Lee Newborn Care can make the home visit:"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A job over the plug-in's amount gets an estimate to sign. A newborn visit never is."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is there a quiet room for the visit?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a quiet room for the visit?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, the nursery"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 newborn home visit needs none."
+   ],
+   [
+    "A.M. · Drain clearing · Thu Oct 22 · arriving 8–10am · Felix",
+    "A.M. · Thu Oct 22 · arriving 8–10am · Felix"
+   ],
+   [
+    "On the photos path, only Felix's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Felix's times show: Felix is the one who does twin visits."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a quiet room and a flat surface ready."
+   ],
+   [
+    "Can Felix also run a camera down my sewer line?",
+    "Can Felix also help with breastfeeding at the visit?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Breastfeeding help · $150"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can the visit be in the living room?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that Leo is fussier since last night."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Leo is fussier since last night."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Hugo can come sooner, at the same price.",
+    "If Leo has trouble breathing or won't wake up, call 911 now. Hugo can come sooner, at the same price."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scratch on the changing table"
+   ],
+   [
+    "Under the sink, before",
+    "Changing table, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Changing table, before"
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 starting price was promised.",
+    "A sick home visit is priced at the visit: only the $89 starting price was promised."
+   ],
+   [
+    "Felix finds corroded shutoff valves.",
+    "Felix suggests an added test at the visit."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 40 added test, details on the page"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: an added test, $40. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Added test · $40"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $40 test price is good for 7 days."
+   ],
+   [
+    "Copy: at 8:52am on Felix's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Felix's phone, you said yes to the added test for $40."
+   ],
+   [
+    "No new visit fee.",
+    "No new starting price."
+   ],
+   [
+    "After 'Not today', DONE carries only the visit fee.",
+    "After 'Not today', DONE carries only the starting price."
+   ],
+   [
+    "Felix finds mold behind the sink wall. The plug-in says a pediatrician stops there, so Alex gets a written note and the photo.",
+    "Felix finds heavy smoke in the baby's room. The plug-in says a nurse practitioner stops there, so Alex gets a written note."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD heavy smoke in the baby's room, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Smoke in the baby's room"
+   ],
+   [
+    "Felix found mold behind the wall under your sink and stopped that part of the work.",
+    "Felix found heavy smoke in the baby's room and stopped that part of the visit."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: heavy smoke in the baby's room"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the exam in that room"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Air the room out, then call the office to finish"
+   ],
+   [
+    "Say Felix cracks the cabinet floor and texts a photo.",
+    "Say Felix knocks over a lamp and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE knocked over a lamp, cracked base"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked lamp base"
+   ],
+   [
+    "Felix cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "Felix cracked a lamp base at A.M.'s. The before photo shows no crack."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE bring the bigger baby scale next time."
+   ],
+   [
+    "Felix left a mess under the sink.",
+    "Felix left the used wipes on the changing table."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on the changing table this morning."
+   ],
+   [
+    "Can Felix look at my bathroom sink next week?",
+    "Can Felix come back for a weight check next week?"
+   ],
+   [
+    "Sure. Here are Felix's next times for a bathroom drain.",
+    "Sure. Here are Felix's next times for a weight check."
+   ],
+   [
+    "At DONE, Alex asks Felix to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Felix to come back next fall for a home visit."
+   ],
+   [
+    "NEXT A.M. asks: water heater flush, 12 months",
+    "NEXT A.M. asks: home visit, 12 months"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Felix about in late Aug 2027.",
+    "We'll text you times for the home visit you asked Felix about in late Aug 2027."
+   ],
+   [
+    "Drain clearing · $179",
+    "Home visit · $179"
+   ],
+   [
+    "It's a leak under the sink, today, arriving 3–5pm, with Felix. The starting price is $89.",
+    "It's a home visit, today, arriving 3–5pm, with Felix. The price is $179."
+   ],
+   [
+    "accept the leak repair for today",
+    "accept the home visit for today"
+   ],
+   [
+    "Accepted: the leak repair today",
+    "Accepted: the home visit today"
+   ],
+   [
+    "M.P. would like to talk about the water heater quote before booking.",
+    "M.P. would like to talk about a home visit before booking."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Visits already booked keep $179, even after Nov 2."
+   ],
+   [
+    "Saved: newborn home visit $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: newborn home visit $199 for visits from Mon Nov 2. Visits already booked keep $179."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Visits already booked keep only their saved card."
+   ],
+   [
+    "Newborn home visit $179 ($199 from Nov 2) · Water heater flush $150",
+    "Newborn home visit $179 ($199 from Nov 2) · Breastfeeding help $150"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Newborn Care.",
+    "Sam adds hearing tests to Lee Newborn Care."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW hearing tests"
+   ],
+   [
+    "Heating and cooling for Lee Newborn Care: is it the same company?",
+    "Hearing tests for Lee Newborn Care: is it the same company?"
+   ],
+   [
+    "Water heater flush",
+    "Breastfeeding help"
+   ],
+   [
+    "Water heater replacement",
+    "Twin newborn visit"
+   ],
+   [
+    "Water pressure check",
+    "Weight check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Weight check"
+   ],
+   [
+    "Leak repair",
+    "Sick home visit"
+   ],
+   [
+    "Service call",
+    "Trip charge"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "water is off on Main St after 2pm, so afternoon jobs may run late.",
+    "roadwork on Main St after 2pm, so afternoon visits may run late."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like trouble breathing, gets the safety steps first."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Hugo",
+    "BOOK Tessa home visit Thu 12-2 Hugo"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "It's for my newborn, Leo, and I'm 18 or older."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A newborn visit needs no first step, so the first open times are this week."
+   ],
+   [
+    "$179, paid after the job",
+    "$179, billed after the visit"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Questions after the visit? Call the office."
+   ],
+   [
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Add a free weight check after a newborn visit. Nothing is taken for any visit."
+   ],
+   [
+    "Warranty fix",
+    "Free weight check"
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Pizza? I'd like to order a large pie."
+   ],
+   [
+    "Barber",
+    "Pediatrician"
+   ],
+   [
+    "barber",
+    "pediatrician"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "color",
+  "checkup"
+ ],
+ "story": {
+  "A": "Sam Lee, a pediatrician, signs up two companies by text. Then Alex books a well-child visit for Mia, 4, with Nina at Lee Family Pediatrics, for Sat Oct 24 at 11:00am. The desk checks Mia's plan by hand, the health forms and vaccine record stay on the secure page, and any share is paid at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, home with baby Leo, books a newborn home visit with Lee Newborn Care. Felix, a nurse practitioner, comes Thu Oct 22, arriving 8 to 10am, with a baby scale. The office bills Leo's plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: Mia's well-child visit with Nina, billed to her plan. Nothing is taken. The desk checks the plan, and any share is paid at the front desk. Sick visits, shots and self-pay visits are paid the same way.",
+    "list|card|counter": "The same visit where the office turns on its $20 no-show fee. A card is saved for it, never for a fee-free family."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Well-child visit"
+    },
+    "list|*|*": {
+     "price": "$195",
+     "name": "Well-child visit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a $179 newborn home visit for Leo with Felix. Nothing is taken. The office bills Leo's plan its own way.",
+    "list|none|bill": "The same visit, paid by the family itself: nothing is taken, and Rosie texts the $179 bill when Felix texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "name": "Newborn home visit"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Newborn home visit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-42",
+    "more": [
+     "For a child's visit, the page also asks the birth date, the plan's member ID and a photo of the card.",
+     "The health history, vaccine record and consent forms are on it too. Alex can finish them later, and the reminder asks again."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Health records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Family Pediatrics, the forms are the health history, the vaccine record and the consent.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Health care always needs a license: each pediatrician and nurse practitioner, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Health care books people (a pediatrician or a nurse practitioner), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Health care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each pediatrician and nurse practitioner holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No health care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A child's visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A child's visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A child's visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the office: the patient is in the exam room."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's child's visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "No repeat plan: well-child visits follow the office's schedule of ages, and the next one is booked at checkout (A10-07)."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "Another adult",
+    "why": "Every patient here is a child. Another adult books only if the family's record names them (A4-25)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The example office sells no plans or memberships: well-child visits are billed to the child's plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plan here (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plan here (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plan here (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The example office sells no packages or memberships: visits are billed to the child's plan."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The example office sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Nothing sold at a pediatric visit comes with a cancel period."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A pediatric office sends no proposals: more care is booked as its own visit (A8-34)."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Health care has no free-fix visit: a worry after a visit goes to the nurse line (A10-25)."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Results come only through the office's own patient portal, never in Rosie's texts (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at a pediatric office."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The office runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is left at a pediatric office."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care for children is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "New families are welcome; a new family's first visit waits for Sam's OK instead."
+   },
+   {
+    "op": "off",
+    "at": "A4-80",
+    "label": "Adults only: it's for a child",
+    "why": "A pediatric office sees children."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "For a child's visit, the page also asks the birth date, the plan's member ID and a photo of the card.",
+     "The health history, vaccine record and consent forms are on it too. Alex can finish them before the visit."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A child's visit always needs the patient there."
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Health records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Newborn care takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for health care (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A child's visit always needs the patient there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the pediatrician's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Health care always needs a license: each pediatrician and nurse practitioner, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Health care books people (a pediatrician or a nurse practitioner), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Health care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each pediatrician and nurse practitioner holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No health care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Newborn care books a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A child's visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Newborn care sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No child's visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No child's visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "No repeat plan: newborn care is a few visits in the first weeks, each booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "No newborn visit needs a written contract."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "No newborn care is billed in stages."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No repeat plan here (B4-43), so there's no monthly bill for visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "A plan visit is billed the office's own way. Rosfield's bill is only for a self-pay family."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam set cards only (S1-57), and no bill here is that big."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Nobody else pays at booking here (B4-78)."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Health care has no free-fix visit: a worry after a visit goes to the nurse line (B10-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "No proposals: more care is booked as its own visit (B10-18)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Results come only through the office's own patient portal, never in Rosie's texts (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "An adult the booker acts for",
+    "why": "Newborn care sees babies only. A baby's legal guardian books the way a parent does."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care for children is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "B4-92",
+    "label": "Adults only: it's for a child",
+    "why": "Newborn care is for babies."
+   },
+   {
+    "op": "off",
+    "at": "B8-68",
+    "why": "A parent or guardian is there for the whole home visit; no child is handed over."
+   }
+  ]
+ },
+ "notes": "Refit Oct 27 (REDESIGN 2 master): old words ops dropped (the master now words each step and reads the plug-in); facts children, forms, planbill, video, extrawork; switch sensitive; no $2; amounts per path with name; own record rows say the plan is billed (pay.price, pay.left, pay.staff); the teen private visit is the master's A4-90 now; rename pairs re-pointed to today's master words (no clinician name in office texts; no visit type in owner texts).\nFrom: dentist, the clinic pilot. A pediatric office runs the same way: visits of a set length booked with a clinician by name, health forms only on the secure page, the front desk checks each plan by hand, nothing taken at booking, and no $2 for a health practice. What the dentist lacked is added: a parent or guardian books every child, who may bring a child is a switch, a teen's private visit (own branch on A4-24), the nurse line for urgent signs, same-day sick times, the well-child schedule, and shots never paid up front.\nNames: Sam Lee, a pediatrician, owns Lee Newborn Care LLC (the master's main company: newborn care and breastfeeding help, at families' homes, 410 Main St) and Lee Family Pediatrics LLC (the second company: the office, 215 Alder St). Alex M. is the parent. Flow A: Mia, 4, a well-child visit Sat Oct 24, 11:00am with Nina. Flow B: baby Leo, born Sat Oct 17, a newborn home visit Thu Oct 22, arriving 8 to 10am, with Felix at 27 Spruce St.\nPeople: Riley and Avery became Nina (pediatrician) and Elena (pediatric nurse practitioner) at the office; Jordan and Casey became Felix (nurse practitioner and lactation consultant) and Hugo (nurse practitioner) for home visits. Rosa, Marco and Hana are already names in the master, so they aren't used. A teen example is Ezra; the form example stays Grace V.\nKinds of work: plumbing became newborn care, electrical became breastfeeding help (it waits for Felix's lactation certification), the barbershop became the pediatric office. Licenses are switches from the state's form: each clinician's own license where the child is during the visit, the practice's registration where asked, a lactation certification, home-visit rules, the state vaccine program's enrollment, and supervision or collaboration for nurse practitioners.\nPrices are the example offices' own, not a standard. Office self-pay: well-child visit $195, sick visit $140, video visit $140, flu shot $20, sports physical $40 ($45 from Nov 2), a new family's first visit $195, breastfeeding help at the office $120. At home: newborn home visit $179 ($199 when Sam goes), follow-up weight check $89, breastfeeding help $150. A plan pays its own fee. The master's $35 haircut isn't used: Mia's well-child visit is billed to her plan, with a $0 share in the example.\nMoney A: list|none|counter is the main path (the desk checks the plan; any share at the front desk). It also covers a sick visit's copay, shots, self-pay visits, and a video visit's share, which the desk takes its own way. list|card|counter is only where the office turns on its $20 no-show fee, never for a fee-free family. Left out: holds, deposits and full prepay (shots and visits are never prepaid), photos and visit pricing (every visit has its price), Rosfield's bill and the saved-card charge (a balance after the plan pays is the office's own bill).\nMoney B: list|none|own is the main path (the office bills the baby's plan its own way). list|none|bill is a family paying for itself: nothing taken, and Rosie texts the $179 bill when Felix texts DONE. Left out: cards, holds, deposits, full price, photos and visit pricing.\nThe sign-up's money words follow that (S1-12 to S1-18, S1-41 to S1-49, S1-57): nothing taken, no fee unless Sam turns one on, shots never prepaid, no tip line, cards only. S11-54 and S11-56 no longer give a service a hold or a price change it never uses.\nClocks: A books Wed Oct 21, 7:15 to 7:22pm, reminds Fri 10am, day list Sat 8am, check-in 11:00am (a 30-minute visit), rating 4pm. B books Mon Oct 19, 6:40 to 6:48pm, reminds Wed 10am, day list Thu 7am, OMW 8:05, check-in 8:20, DONE 9:20 (a 60-minute visit; B8-41 t), self-pay bill 9:22 (B9-06 t), receipt 9:25 (B10-01 t), rating 11am. Lee Newborn Care opens 7:30am, as B3-03 and B3-15 say. The visit-day what-ifs in section 7 (A7-14, A7-21, A7-29; B7-18, B7-27) keep the master's times: they come after the day list and before the visit, and each branch's own clock runs forward.\nTexts: a customer text carries only the business, the date, the time and the place, never the visit type, shots or results. A's texts drop the clinician's name; B's keep it for the door check. Owner and staff texts carry the child's initials (M.M., L.M.) and a link, never the visit type or a health note (A6-15, A8-01, A8-38, B6-14, B8-01, S11-03, S11-04). Results only in person or in the office's patient portal.\nWho may book: a parent or guardian, from the family's record; either parent unless the office holds a court order; anyone else only if the record names them (A4-24, A4-25). A teen alone only for visit types the office marks private, where the state's rules allow (own steps A4-x01, A4-x02). A child under 13 is asked for a grown-up and nothing is kept (A4-27). 'Another adult' is off (A4-24): every patient is a child.\nWho may bring the child is a switch (pf.questions.whoMayBring): a parent, a guardian, or an adult the parent OKs on the secure page (A8-02, B4-27). The 'something required is missing' example is that parent's OK (A8-51 to A8-60).\nSafety: the child's 911 words, Poison Help, and the office's nurse line, (555) 010-0177 option 2, for the signs on its own list (A3-22 to A3-26, A7-12, A7-13, B3-18 to B3-21, B4-82, B7-16, B7-17, B10-22). Rosie never judges how sick a child is, and the visit stays booked.\nStand-ins: nobody is moved to another clinician without the parent's yes (old flow pd20o), so Sam turns the no-reply default off: A7-21 and B7-22 hold the time and ask Sam to call.\nWalk-ins: the example office takes none (A3-32 keeps 'No walk-ins'); a sick child gets the soonest same-day time.\nOff in A: a line for walk-ins; repeat plans, packages and memberships (A4-28, A5-01, the three A7-02 plan branches); items held; another adult; a first step booked first and its A7-02 branches; something ordered late; weather; a day-before hold; goods sold; a contract's cancel period; proposals; a free fix; results by text; items left or rented; visits over several days; class rosters and drop-offs; an expert's read; S11-08 photo quotes.\nOff in B: the owner or landlord question (B4-78 keeps 'No: nobody asks'); repeat plans; stock; a first step booked first or with a lead time; a contract; plan branches in B5 and B7; first steps not done or changing the job; a lab order; weather; a bigger job, another payer, a delivery, several days and items to the office (B8-22); stages, a monthly bill, parts and a plan's share billed by Rosie (B9-19); bank transfer and a family payer (B9-06); a free check, proposals, reports, items not taken back and rentals (B10-07); seats in a class; a live line; a guardian for an adult; an expert's read; S11-08.\nsplitsKept: A7-61 (who else may do it: Elena may, or nobody) and A8-02 (all here, or something missing). Every other plug-in split has its unused branches off.\nThe pilot's words on money paths this work doesn't list are dropped, so those paths show the master's own words. Kept words: none.\nFlow B's less usual side is a newborn home visit, with Lee Newborn Care; a video visit is flow A's third place (A4-01, A4-36), for current patients, only with a clinician licensed where the child will be.\nReview, Oct 23: the no-reply stand-in never moves a family (A7-21, B7-22: not reached by the visit, nobody is moved and the parent gets new times; S11-46, S11-49 ask Sam to call). A3-23 now goes on with the 911 words and the nurse line; the nurse-line signs stop at A3-26. Customer texts lost the last visit types and the clinician in A7-22; owner and staff texts use initials. B9-19 pay over time is off. B S12-20 to S12-22 use $189, since $199 is Sam's own price.",
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Skin fade · $40",
+    "asked overnight for a skin fade today.",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a haircut and a beard trim",
+    "price board",
+    "shop's board",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "plumbing and electrical",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "groom's party",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Each service starts the way most barbershops set it.",
+    "Signature cut and shave",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "J: a color touch-up in the first 2 weeks, checked from photos, free. E paid when they book. A at their home too, 75, paid when they book",
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "On this path, the color and cut takes a $20 deposit once its photo quote is OK'd.",
+    "On this path, the color and cut is paid in full once its photo quote is OK'd.",
+    "On this path, color correction takes nothing before. Only the $25 consult is promised.",
+    "On this path, color correction takes the $25 consult as a deposit, toward the final price.",
+    "Signature cut and hot towel shave · $55",
+    "Color touch-up · checked from photos",
+    "The color and cut works like this:",
+    "Color and cut · $90, from photos",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Color correction can work this way, with only the $25 consult promised.",
+    "Color correction works like this:",
+    "Color correction · $25 deposit",
+    "Groom's package · $40 deposit",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "Color and cut · priced from photos",
+    "Color and cut · $20 deposit",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Color quotes come to you first. Board prices never need one",
+    "A water heater job",
+    "Barber license number",
+    "Someone calls for a dentist: a wrong number.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A price set at the visit: any visit fee, and that it's owed even after a no to the price.",
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "Beard trim · $20",
+    "A part or anything new is priced first, and needs the customer's yes before it's ordered. No new visit fee.",
+    "The cape clip ripped my shirt collar.",
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "1 color quote",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Haircuts already booked keep only their saved card.",
+    "NEW massage",
+    "Does it work like haircuts?",
+    "Haircuts work like this",
+    "We'd share only where they're working, only after a missed check.",
+    "A step-free door on Elm St, and parking in the back.",
+    "Step-free door on Elm St · parking in the back",
+    "Please use the side door on Oak St.",
+    "Beard trim",
+    "Kids cut",
+    "Groom's package",
+    "Color and cut",
+    "Color correction",
+    "Color touch-up",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "only the part done is charged; the visit fee is owed",
+    "like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "haircut",
+    "Barber",
+    "barber",
+    "Haircuts",
+    "haircuts"
+   ],
+   "B": [
+    "like a burst pipe or a lockout",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "shop",
+    "Shop",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "service call",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "A plan or warranty pays",
+    "DONE 179 drain",
+    "only the part done is charged; the visit fee is owed",
+    "A job priced at the visit never takes more than the visit fee.",
+    "A water heater job",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Someone calls for a dentist: a wrong number.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "A gas smell at the home",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "like a roof leak.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "A price set at the visit: any visit fee, and that it's owed even after a no to the price.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Sewer camera inspection · $199",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves · $160",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No new visit fee.",
+    "After 'Not today', DONE carries only the visit fee.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "I found water damage under the sink this morning.",
+    "NEXT A.M. asks: water heater flush, 12 months",
+    "Drain clearing · $179",
+    "accept the leak repair for today",
+    "Accepted: the leak repair today",
+    "M.P. would like to talk about the water heater quote before booking.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Drain clearings already booked keep only their saved card.",
+    "NEW heating and cooling",
+    "Water heater flush",
+    "Water heater replacement",
+    "Water pressure check",
+    "Sewer camera inspection",
+    "Leak repair",
+    "Service call",
+    "We'd share only where they're working, only after a missed check.",
+    "water is off on Main St after 2pm, so afternoon jobs may run late.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "$179, paid after the job",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Warranty fix",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Barber",
+    "barber"
+   ]
+  },
+  "A": {
+   "A4-42": "7f259bddbf",
+   "A10-21": "08514557c8",
+   "A7-74": "b3ec278ce4",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A4-28": "c8e677520c",
+   "A4-24": "0a292df05b",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A8-03": "7accda6f86",
+   "A10-34": "78c2d9a6a3",
+   "A4-43": "c17d56f766",
+   "A4-80": "624ec2e303"
+  },
+  "B": {
+   "B4-29": "9234c5ed40",
+   "B8-03": "ac9d404766",
+   "B10-17": "b5f4aef51b",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-43": "fc9855955a",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B4-32": "fcfe092e37",
+   "B10-32": "7713bff255",
+   "B4-92": "36a6823417",
+   "B8-68": "8ede790b60"
+  }
+ },
+ "slots": {
+  "A": {
+   "pay.price": [
+    {
+     "when": {
+      "after": [
+       "counter"
+      ],
+      "recOff": [
+       "paid",
+       "several",
+       "credit"
+      ],
+      "booking": [
+       "self"
+      ]
+     },
+     "text": "Billed to your plan; any share is paid at the front desk ({{due}} self-pay)"
+    }
+   ],
+   "pay.left": [
+    {
+     "when": {
+      "after": [
+       "counter"
+      ],
+      "recOff": [
+       "paid",
+       "several",
+       "credit"
+      ],
+      "booking": [
+       "self"
+      ]
+     },
+     "text": "Any share after your plan, paid at the front desk ({{due}} self-pay)"
+    }
+   ],
+   "pay.staff": [
+    {
+     "when": {
+      "after": [
+       "counter"
+      ],
+      "recOff": [
+       "paid",
+       "several",
+       "credit"
+      ],
+      "booking": [
+       "self"
+      ]
+     },
+     "text": "Nothing paid yet · the desk checks the plan and takes any share"
+    }
+   ]
+  },
+  "B": {
+   "pay.price": [
+    {
+     "when": {
+      "after": [
+       "own"
+      ],
+      "recOff": [
+       "paid",
+       "several",
+       "credit"
+      ],
+      "booking": [
+       "self"
+      ]
+     },
+     "text": "Lee Newborn Care bills your plan its own way ({{due}} self-pay)"
+    }
+   ],
+   "pay.staff": [
+    {
+     "when": {
+      "after": [
+       "own"
+      ],
+      "recOff": [
+       "paid",
+       "several",
+       "credit"
+      ],
+      "booking": [
+       "self"
+      ]
+     },
+     "text": "Nothing paid yet · the office bills the plan its own way"
+    }
+   ]
+  }
+ }
+}

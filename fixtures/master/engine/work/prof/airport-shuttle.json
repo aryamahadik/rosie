@@ -1,0 +1,3365 @@
+{
+ "id": "airport-shuttle",
+ "name": "Airport shuttle",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "home-care",
+ "plugin": {
+  "pf.license": {
+   "need": "Where the state's rules or the local for-hire authority require it: a passenger carrier permit for the company, with each vehicle inspected and listed. Where the airport's rules require it, a ground-transport permit to pick up and drop off there. Elsewhere, the business registration.",
+   "federal": "Federal operating authority and a USDOT number where federal rules require them (trips across state lines in vehicles built for 9 or more people, driver included): a generic federal switch.",
+   "ask": "The permit number, where the state's form asks for one. Any airport permit. The vehicle list: type, seats, plate and inspection date. Proof of commercial auto insurance. Any USDOT number.",
+   "who_holds": "The company holds the permit, the vehicle inspections and the insurance. Each driver holds a driver's license for the vehicle and passes the checks below.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "A required permit that the owner says the business lacks keeps that work offline. A vehicle past its inspection date is never offered. A pickup at an airport that needs a permit the company doesn't hold is never offered there.",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance_bond": "Commercial auto liability at the level the state's rules set. It is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Every driver: a driving-record check, and a background check where the state's rules require it, and always as the example company's own rule. Drug and alcohol testing where federal or state rules require it.",
+   "express_company": "The scheduled express line, Sam's second company, needs a permit of its own only where the state's rules ask for one for scheduled runs. Elsewhere it gives its registration only.",
+   "not_this_work": "Rides that need medical care on the way, and chartered buses for large groups, aren't offered here. They are for an ambulance service or a bus charter company."
+  },
+  "pf.services": {
+   "pattern": "Set service: a ride between a home, hotel or office and the airport, at a set pickup time worked back from the flight. Flow A is a seat on the company's scheduled express van from its own stop.",
+   "list": [
+    {
+     "name": "Private ride to or from the airport",
+     "price_kind": "one fare by distance, for the whole van",
+     "example": "$75 within 15 miles of the airport, then $4 a mile beyond (the example company's own price); up to 3 riders and 3 bags each",
+     "where": "pickup at the rider's home, hotel or office; or at the airport, to go home",
+     "money": "paid in full when booking; a regular rider on a standing order saves a card and is charged at each drop-off"
+    },
+    {
+     "name": "Shared door-to-door seat",
+     "price_kind": "one fare per person",
+     "example": "$38 a seat; the van picks up other riders on the way, so the pickup is a 30-minute window around the time shown",
+     "where": "at the rider's home or hotel",
+     "money": "paid in full when booking"
+    },
+    {
+     "name": "Group van",
+     "price_kind": "priced from the request",
+     "example": "9 to 14 riders, priced by the owner after the trip details are read (for example $640); the owner OKs it",
+     "money": "a card saved, charged when the ride is done"
+    },
+    {
+     "name": "Round trip",
+     "price_kind": "two rides booked together: out, then back",
+     "example": "Each ride is its own booking, with its own code and its own charge. The ride home from the airport is booked with the flight number, and moves with the flight.",
+     "note": "Both can be booked in one chat."
+    },
+    {
+     "name": "Flight pickup wait",
+     "price_kind": "the driver tracks the flight",
+     "example": "the first 60 minutes after landing are free (the example company's rule). After that, $15 for each extra 30 minutes, priced first, and the rider says yes",
+     "money": "added at the visit: nothing taken before; paid with the ride"
+    },
+    {
+     "name": "Extras",
+     "price_kind": "added to the ride",
+     "example": "an extra stop on the way $15; an extra bag beyond three $5 each; a child seat $10 each, booked ahead; a night pickup (10pm to 5am) $20",
+     "money": "added at the visit with a yes first; paid with the ride, never before"
+    },
+    {
+     "name": "Standing order",
+     "price_kind": "each ride at its list price",
+     "example": "the same airport ride on set days, like every Monday at 5:30am",
+     "money": "a repeat plan with its own yes; each ride charged at its own drop-off"
+    },
+    {
+     "name": "Hotel or company account",
+     "price_kind": "list prices, billed once a month",
+     "example": "a hotel or a company books rides for its guests or staff; the rider sees no prices",
+     "money": "nothing taken at booking; one bill a month"
+    },
+    {
+     "name": "Express seat (flow A)",
+     "price_kind": "one price per seat",
+     "example": "round trip $35; one way $20; a seat with extra bags $40; seat for two $55; four seats booked together $140. The example timetable runs every day from 4:30am to 10:30pm, every 30 minutes",
+     "money": "paid in full when booking; a hotel can be billed one bill a month instead"
+    }
+   ],
+   "capacity": "A private ride has one vehicle and one driver, up to 3 riders and 3 bags each (a van holds up to 8 riders). A shared seat is one of the vehicle's seats. An express van has 14 seats. No two bookings share a seat.",
+   "nobody_home": "No. The rider must be at the pickup. The pickup may be a hotel lobby, a curb or a terminal door.",
+   "online": "No. Rides are in person.",
+   "same_day": "Same-day rides only when a vehicle and a driver are free, soonest first. Nothing is sent now and nobody is on call.",
+   "not_offered": "Rides that need medical care on the way; chartered coaches; luggage-only deliveries; rides for a child riding alone."
+  },
+  "pf.questions": {
+   "before_times": [
+    "Where the pickup is (a home, a hotel, an office or the airport) and the town",
+    "Which airport and terminal, and whether the ride is to the airport or from it",
+    "The flight time (it sets the pickup time), and for a ride from the airport, the flight number",
+    "How many riders and how many bags",
+    "Any children riding, in age groups (under 4, 4 to 7, 8 and up), for the right child seat",
+    "One way or round trip, and the time for the return"
+   ],
+   "after_a_time": [
+    "The rider's own mobile, so the driver can reach them",
+    "Which door, gate or lobby to use",
+    "Any stop on the way"
+   ],
+   "secure_page_only": [
+    "The street address and the flight number",
+    "A gate or building code",
+    "The names of the children riding",
+    "The card"
+   ],
+   "who_may_book": "An adult rider for themselves, or for others in the party. A hotel or a company for its guests or staff. A rider under 18 rides only with an adult, and a parent or guardian books for them."
+  },
+  "pf.safety": {
+   "words": [
+    "someone hurt or ill right now",
+    "a crash or a danger on the road",
+    "a threat to a driver or a rider",
+    "words about suicide or self-harm"
+   ],
+   "what_happens": [
+    "Someone hurt or ill right now: 'Call 911 now. This is a ride service, not an ambulance.' No booking until they're safe.",
+    "Suicide or self-harm: 'Call or text 988 now; call 911 if anyone is in danger right now.' No booking in that chat; the owner is told, never the words.",
+    "A rider who needs medical care on the way: not booked. 'This ride needs an ambulance.'",
+    "A rider too unwell, impaired or abusive to ride safely: the driver may refuse the ride. The owner decides about a fee, and a refund if the ride was paid for.",
+    "A crash or a breakdown: the driver makes the rider safe, calls 911 if anyone is hurt, then the owner. The owner sends another vehicle or arranges a ride."
+   ],
+   "go_on": [
+    "A child riding: booked with the right child seat, which the rider brings or books ahead (the state's rules decide the age and size).",
+    "A wheelchair or walker: booked in the accessible van with 24 hours' notice. If none is free, the owner says so before any yes.",
+    "A service animal rides free; a pet rides only in a carrier.",
+    "Items that aren't carried: fuel, fireworks and anything else the state's rules bar."
+   ],
+   "booking_goes_on": "No, for an emergency or crisis words. Yes, for the go-on cases."
+  },
+  "pf.first_steps": {
+   "none": "No first step. A ride is booked from the pickup, the airport and the flight time.",
+   "standing_order": "A standing order is set up once with its own yes from the rider, then re-confirmed every month. A change re-books the rides; no reply: the owner is told and the rides stay as booked.",
+   "prep_for_reminder": [
+    "Have your bags by the door 10 minutes before the pickup time",
+    "Keep your flight number handy; the driver tracks the flight for a ride from the airport",
+    "Bring your child seat, or tell us if you booked ours"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "At pickup, the rider gives the check-in code to the driver at the door, lobby or curb. At the airport, the driver meets the rider at the door the rider named.",
+   "during": "The driver loads the bags, checks that every rider has a seat belt, and drives the route. The driver drops the rider at the terminal door they named.",
+   "flight_tracking": "For a ride from the airport, the driver tracks the flight. The pickup moves with a late landing, free. The first 60 minutes after landing are free to wait.",
+   "wait_at_pickup": "The driver waits up to 10 minutes past the pickup time, then calls the rider. After 15 minutes the owner decides; a fee only if the rider agreed to it. A rider who is late for the flight because of the van is the company's side: no fee.",
+   "bags": "At loading, the driver photographs the bags and notes any scuffs. These photos are of luggage only, never of a person.",
+   "done": "DONE when the rider is dropped at the terminal door or the address. Then the saved card is charged, where one was saved.",
+   "extra_work": "An extra stop or bags asked for during the ride: priced first, and the rider says yes. It is paid with the ride, never before.",
+   "proof": "Pickup and drop-off times and miles, recorded by the driver."
+  },
+  "pf.money": {
+   "start": "A private ride or a shared seat is paid in full when booking. A regular rider on a standing order saves a card and takes nothing up front. A hotel or company account takes nothing at booking.",
+   "deposits": "None by default. A group van takes a card saved; where the state's rules cap fees or deposits, the cap.",
+   "fees": "A late cancel (under 24 hours) or a no-show at the pickup: up to $30 of the $75 paid (the example company's own), only if the owner confirms it. Never when the flight was delayed or cancelled, or when the company caused the miss. Anything above the fee goes back.",
+   "refunds": "A cancel in time goes back in full. A flight the airline cancels: no fee, and the owner decides the refund.",
+   "account": "A hotel or company account takes nothing at booking. Rosie texts one bill a month for its riders' rides.",
+   "plans": "A standing order is charged ride by ride, at each drop-off. A price change is told 30 days ahead, and needs the rider's yes.",
+   "tips": "No tip line. Riders may tip the driver in cash.",
+   "tax": "A tax or airport fee line only where the state or the airport requires it, shown before the yes.",
+   "rosfield_fee": "The usual $2 per confirmed booking, paid by the company. A round trip is two bookings."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "The street address with the flight number, together",
+    "Gate and building codes",
+    "The names of the children riding"
+   ],
+   "texts_carry": "The company, the driver's first name, the day, the pickup time and street, and a secure link. The driver's text for a ride from the airport carries the rider's first name and the terminal door.",
+   "languages": "English and Spanish.",
+   "minors": "A minor's texts go to the parent or guardian. Nobody under 18 books."
+  },
+  "pf.staff": {
+   "skills": [
+    "Private and shared rides in a car or van",
+    "The accessible van (securement training)",
+    "Group van (a larger vehicle, with the license it needs)",
+    "Child seats fitted correctly"
+   ],
+   "licenses": "Each driver: a driver's license for the vehicle (a commercial license with a passenger endorsement where federal or state rules require it), a driving-record check, a background check where the state's rules require it, and drug and alcohol testing where federal or state rules require it. No professional person license.",
+   "supervision": "A new driver rides along with a trained driver first.",
+   "stand_in": "Riders book a ride, not a named driver. Any driver with the right vehicle may take it, and the rider is told the driver's name.",
+   "who_oks": "The owner OKs group vans, accessible-van rides, hotel and company accounts, and every fee, and sets each driver's skills. The office manager may OK prices too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "permit": "Where the state's or the airport's rules require it: the permit number shown, vehicle inspections and driver checks.",
+   "records": "Trip records (pickup and drop-off times, miles, the code or a signature): 7 years, or longer where the state's rules ask.",
+   "child_seats": "Child seats follow the state's rules for age, height and weight. The driver doesn't start the ride if a child has no fitting seat.",
+   "seat_belts": "Every rider has a seat belt. The driver doesn't start the ride with more riders than seat belts.",
+   "drivers": "Federal hours-of-service and drug and alcohol testing rules for drivers who need a commercial license.",
+   "accessibility": "Federal accessibility rules for wheelchair lifts and securement, where they apply."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "The flight is delayed: the pickup moves with it, with no fee and no extra wait charge.",
+    "The flight is cancelled: the ride is cancelled with no fee, and the owner decides the refund.",
+    "The rider isn't at the pickup: the driver waits 10 minutes, then calls; after 15 minutes the owner decides.",
+    "More riders or bags than booked: the extra is priced first; with more riders than seat belts, the ride doesn't start as booked.",
+    "A child with no fitting seat: the ride doesn't start until a seat is fitted or another van brings one.",
+    "A driver is out: another driver with the right vehicle takes it; the rider is told the new name.",
+    "A breakdown or a crash: the driver makes the rider safe, then the owner sends another vehicle.",
+    "Ice, snow or a closed road: a ride may move; a rider with a flight to catch is told as early as possible.",
+    "A bag is lost or scuffed: the loading photos are the record, and the owner decides."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "monthlybill",
+   "extrawork",
+   "classes"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Wes and Dara (express drivers)",
+   "cust": "Alex M. (customer, rides to the airport) · other customers",
+   "other": "Others (a sister who rides along; a hotel that pays; a bank)"
+  },
+  "B": {
+   "staff": "Hector and Priya (drivers)",
+   "cust": "Alex M. (customer, books a ride to the airport) · other customers",
+   "other": "Others (a sister who rides along; a hotel that pays; a bank)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Wes"
+  },
+  "B": {
+   "staff": "Hector"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Oct 24 · 11:00am · Airport run · 4 seats left"
+   ],
+   [
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "Sat Oct 24 · 11:30am · Airport run · 8 seats left"
+   ],
+   [
+    "Haircut at home · $75",
+    "Seat for two with bags · $75"
+   ],
+   [
+    "'s cut. The note",
+    "'s ride. The note"
+   ],
+   [
+    "a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "a $20 fee, only if the full price was taken and you say yes"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your stop, paid in full when they book"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: paid in full; a late cancel may keep up to $20 if you OK it"
+   ],
+   [
+    "Free on your board: nothing taken, nothing after",
+    "Free fare check: nothing taken, nothing after"
+   ],
+   [
+    "Haircut at the shop",
+    "Express seat"
+   ],
+   [
+    "Haircut at their home",
+    "Seat for two with bags"
+   ],
+   [
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "E paid when they book. A paid when they book too"
+   ],
+   [
+    "A nothing before, and at their home too, 75, paid when they book. E paid when they book",
+    "A nothing before, and one bill after. E paid when they book"
+   ],
+   [
+    "Card saved for the $20 fee",
+    "Paid in full"
+   ],
+   [
+    "Other days: paid at the chair",
+    "Other days: paid when booked"
+   ],
+   [
+    "Set. For a haircut, the customer picks the place and sees both prices first.",
+    "Set. For an express seat, the customer picks a seat and sees the prices first."
+   ],
+   [
+    "Barbering workshop",
+    "Airport run"
+   ],
+   [
+    "Each shows its teacher, room and seats left.",
+    "Each shows its driver, vehicle and seats left."
+   ],
+   [
+    "If the teacher is out",
+    "If the driver is out"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Which terminal door do you want? (optional)"
+   ],
+   [
+    "How would you like it on top?",
+    "Which terminal door do you want?"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Covered stop on Orchard Way · parking in the back"
+   ],
+   [
+    "A step-free door on Elm St, and parking in the back.",
+    "A covered stop on Orchard Way, and parking in the back."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a wheelchair-ready van:"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, but make it Sunday' goes back to the times."
+   ],
+   [
+    "'s cut. I put a note and a photo on the page.",
+    "'s ride. I put a note on the page."
+   ],
+   [
+    "The note and photo are on the secure page.",
+    "The note is on the secure page."
+   ],
+   [
+    "on the page, with a photo.",
+    "on the page."
+   ],
+   [
+    "Please use the side door on Oak St.",
+    "Please use the side door on Orchard Way."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If there's a problem with the ride, reply here."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither airport shuttle nor the express line takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every ride is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line · hotel and company accounts get one bill a month"
+   ],
+   [
+    "Saturdays: a tip line on the bill",
+    "One bill a month, no tip line"
+   ],
+   [
+    "cuts a hand",
+    "hurts a wrist"
+   ],
+   [
+    "cut my hand",
+    "wrenched my wrist"
+   ],
+   [
+    "That's the class's teacher, or the table's server. Never whoever checks it in.",
+    "That's the run's driver. Never whoever checks it in."
+   ],
+   [
+    "A booking with no named person, like a class seat or a table, counts for the person who gives the work.",
+    "A booking with no named person, like an express seat, counts for the person who gives the work."
+   ],
+   [
+    "A teacher's time off or a closed room shows on the Team page, like anyone's.",
+    "A driver's time off or a vehicle out of service shows on the Team page, like anyone's."
+   ],
+   [
+    "Sets the class timetable from a photo",
+    "Sets the express timetable from a photo"
+   ],
+   [
+    "The owner sends a photo of the class schedule, and Rosie reads it back. Each class gets its day and time, who teaches and the room. It also gets the spots Rosie can book and the fewest it needs to run.",
+    "The owner sends a photo of the express timetable, and Rosie reads it back. Each run gets its day and time, its driver and its vehicle. It also gets the seats Rosie can book."
+   ],
+   [
+    "A cancelled class returns anything paid to everyone, and each person is told.",
+    "A cancelled run returns anything paid to everyone, and each person is told."
+   ],
+   [
+    "Class packs and memberships come from the price list, and can be bought while booking.",
+    "Express seats come from the price list. Packs and memberships aren't offered."
+   ],
+   [
+    "Safe default: no timetable yet, so its classes aren't bookable, with one reminder.",
+    "Safe default: no timetable yet, so its runs aren't bookable, with one reminder."
+   ],
+   [
+    "This kind of work runs classes. Send a photo of your class schedule, and I'll read it back. How many can Rosie book per class? Keep the rest for walk-ins and other platforms. A connected reservation or class system replaces this number.",
+    "This kind of work runs on a timetable. Send a photo of your express schedule, and I'll read it back. How many seats can Rosie book per run? Keep the rest for walk-ins and other platforms. A connected reservation or booking system replaces this number."
+   ],
+   [
+    "Your class timetable",
+    "Your express timetable"
+   ],
+   [
+    "Each class, its day and time",
+    "Each run, its day and time"
+   ],
+   [
+    "Who teaches it, and the room",
+    "Who drives it, and the vehicle"
+   ],
+   [
+    "Lee Home Services's",
+    "Lee Airport Rides'"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Driver's license checked · group van training"
+   ],
+   [
+    "Plumbing MP045210",
+    "Airport shuttle EX-1042"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Hector: private rides and group vans, drives the group van"
+   ],
+   [
+    "the state asks for a plumbing license for the company, and one for each plumber sent out",
+    "the state asks for a passenger carrier permit for the company, and checks each driver"
+   ],
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Airport shuttle needs a company permit, and a driver check for each driver."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "MP045201",
+    "EX-1024"
+   ],
+   [
+    "EC22871",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-5081"
+   ],
+   [
+    "BS20918",
+    "EX-5018"
+   ],
+   [
+    "plumbing license",
+    "airport shuttle permit"
+   ],
+   [
+    "electrical license",
+    "group van permit"
+   ],
+   [
+    "barbershop license",
+    "express line permit"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Every day 4:00am–11:00pm · set pickup times · 2 hours' notice · up to 60 days ahead"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Every group van: Sam reads the trip details first"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An express van line on Orchard Way. A scheduled van from its stop to the airport, every 30 minutes."
+   ],
+   [
+    "The shop front",
+    "The express stop"
+   ],
+   [
+    "The chairs",
+    "The van seats"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Elm Street Dental",
+    "Oak Street Dental"
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's hotel. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Wes can hold the shuttle until 11:05am, or you can move to a later run, at the same price. No reply by 11:05am means the later run."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Wes checks the ride with Alex. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Means 'Matched': the request fits a listed service, in any words. 'A seat on Saturday's run' fits an express seat."
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer's flight moves before the run, and they ask if they can still ride."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee Airport Line about your Sat 11:00am run: please be at the stop 15 minutes early."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please be at the stop 15 minutes early on Saturday."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the company keep your flight number for this run? Yes / No"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My sister pays for this seat."
+   ],
+   [
+    "A chair, ready",
+    "The express van, ready"
+   ],
+   [
+    "Style consult",
+    "Fare check"
+   ],
+   [
+    "Color and cut · $90",
+    "Charter van · $90"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a child seat is $20. Want a time?"
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the stop, at a drop-off, or at the start of a video call."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Hector and Priya drive the airport vans; Hector also drives the group van. Wes and Dara drive the express line; Wes drives a van too. Pat is my office manager, for prices over $500. Jules runs a car of their own, with their own riders."
+   ],
+   [
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. A rider under 18 rides only with an adult, so nothing more happens."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Airport rides are never sent now, so nobody is on call."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex asks for a ride with a nurse on board, which isn't on the company's list. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter.",
+    "Now money. When customers book, do you take anything? Each service starts the way most airport shuttle companies set it. Send only what's different, by letter."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Airport Line can book you from now on, on the shuttle and in the vans. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "Some services start with a first step on the same visit, like a patch test with a wait, or a screening. It comes before the price and the work.",
+    "Some services start with a first step on the same visit, like a check of the flight number. It comes before the price and the work."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Alex wants a ride from home instead: a private ride, $75, with the full price paid. From here it's the other flow, where the business goes to the customer."
+   ],
+   [
+    "The plug-in says a color and cut is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says a charter run is priced for each request, so Rosie's first text asks for the details. No time is saved while it's priced."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some rides repeat on set days, like a standing order. Where the plug-in says so, all the times are picked now."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "The express seat, $35, is paid in full when booked. Nothing more is owed after."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A first-step example: 'First ride? Have your flight number ready.'"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds cruise port rides to Lee Airport Line. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Airport rides in Springfield: private rides, shared seats and group vans, within 25 miles."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms. Nothing was saved. Other businesses nearby may.",
+    "Lee Airport Line doesn't carry riders who need medical care on the way. Nothing was saved. An ambulance service may."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An express van line on Orchard Way. A scheduled van from its stop to the airport, every 30 minutes."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Charter prices come to you first. List prices never need one"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: waits by the side door."
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Van rides from home: allowed where you are, for those cleared"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Cruise port rides for Lee Airport Line: is it the same company?"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the shuttle door caught a coat sleeve today."
+   ],
+   [
+    "Goes on as a house call, in the other flow.",
+    "Goes on as a van ride from home, in the other flow."
+   ],
+   [
+    "Goes on as a house call in the other flow.",
+    "Goes on as a van ride from home in the other flow."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shuttle run, and van rides from home"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Wes: shuttle driver, vans too"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Wes: shuttle driver, vans too"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the stop, and van rides from home"
+   ],
+   [
+    "Goes on as a house call",
+    "Goes on as a van ride from home"
+   ],
+   [
+    "A water heater job",
+    "A van ride from a rider's home"
+   ],
+   [
+    "Color and cut",
+    "Charter van"
+   ],
+   [
+    "NEW massage",
+    "NEW cruise port rides"
+   ],
+   [
+    "Kids cut",
+    "Off-peak seat"
+   ],
+   [
+    "From the price list or photos, the price is set.",
+    "From the price list, or made for the request, the price is set."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: the express line may need a permit of its own."
+   ],
+   [
+    "3 jobs",
+    "3 rides"
+   ],
+   [
+    "next job:",
+    "next ride:"
+   ],
+   [
+    "An AI that asks for the shop by name hears only that: no reason, and no other shops.",
+    "An AI that asks for the company by name hears only that: no reason, and no other businesses."
+   ],
+   [
+    "1 color quote",
+    "1 price to OK"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 price."
+   ],
+   [
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "Rosie is the company's booking software. Its only outside links are the drivers' phone calendars and Stripe."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book me a seat on Lee Airport Line's express to the airport on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero un asiento en la camioneta al aeropuerto el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a seat on Saturday."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. seat Sat 11am Wes"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The airport shuttle plug-in adds its own danger words, like someone hurt or a crash."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An airport shuttle example: a hurt rider gets 'call 911 now'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Then the booking goes on."
+   ],
+   [
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Sam set this line at sign-up: the number riders call for what only a driver or dispatcher should answer."
+   ],
+   [
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "That's a question for the airline. Wes can go over boarding at the stop."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants the Saturday run"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a fare check"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A seat could mean an airport shuttle or a city bus."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a seat every Thursday"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for a seat every Thursday. The company offers a standing order. Rosie books the first run and saves the next ones on the same day and time."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a seat and a companion seat"
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a child. Rosie finds two seats on the same run and adds the prices: $35 and $20."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A seat for Alex and a seat for a child work the same way. Both are asked before the times."
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the company's list"
+   ],
+   [
+    "on the shop's board",
+    "on the company's price list"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A shuttle books a seat on a run."
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything Wes should know?"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "My sister will ride too. Can I pay for it?"
+   ],
+   [
+    "A barbershop has none.",
+    "A shuttle seat has none."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Standing order · every Thursday"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A run always stays with its driver."
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code to the driver at the stop when you board."
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code to the driver at the stop."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my sister wait at the stop with me?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My flight moved to Tuesday. Can I still ride Saturday?"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Dara suggests moving your seat to Tuesday's run, with no fee."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Wes can hold the shuttle until 11:05am, or you can move to a later run, at the same price."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can I add a seat for my sister on Saturday?"
+   ],
+   [
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "There is a seat for it. Add a seat for your sister to your Sat 11:00am run?"
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a standing order, a seat every Thursday."
+   ],
+   [
+    "the Groom's package",
+    "the group of four seats"
+   ],
+   [
+    "Groom's package",
+    "Group of four seats"
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex arrives at the stop. If the plug-in asks for something to bring, the driver checks it first. An express seat needs nothing."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair.",
+    "It's 11:00am, and Alex is at the stop."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens at the stop?"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A child seat is on the price list: $20."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The shuttle door caught my coat sleeve."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the flight number."
+   ],
+   [
+    "Alex pays at the chair",
+    "Alex pays at the stop"
+   ],
+   [
+    "DONE 35 haircut",
+    "DONE 35 express seat"
+   ],
+   [
+    "My company is paying for this one.",
+    "My hotel is paying for this one."
+   ],
+   [
+    "A long job or a course can be paid in stages the plug-in sets.",
+    "A long project can be paid in stages the plug-in sets."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A ride is rated, so the company takes the first branch."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next run at the stop"
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a ride leads to more, like a standing order after the first seat."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Airport Line sent you a proposal: a standing seat every Thursday."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Standing order"
+   ],
+   [
+    "3 visits with Riley",
+    "3 runs"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The plan's runs are booked like any booking, each with its own money choices and confirmation."
+   ],
+   [
+    "Color correction",
+    "Special pickup"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Can my child ride with me? My child is 8."
+   ],
+   [
+    "Priced from your photos",
+    "Priced for your request"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Airport Rides'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Airport Rides"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Airport Line LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Airport Line"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Private Rides"
+   ],
+   [
+    "Lee Electric",
+    "Lee Group Vans"
+   ],
+   [
+    "plumbing and electrical",
+    "airport shuttle and group van service"
+   ],
+   [
+    "1200 Main St",
+    "520 Ferry Rd"
+   ],
+   [
+    "88 Elm St",
+    "61 Orchard Way"
+   ],
+   [
+    "on Elm St",
+    "on Orchard Way"
+   ],
+   [
+    "$89",
+    "$30"
+   ],
+   [
+    "Drain clearing",
+    "Private ride"
+   ],
+   [
+    "Plumbing",
+    "Airport shuttle"
+   ],
+   [
+    "plumbing",
+    "airport shuttle"
+   ],
+   [
+    "Electrical",
+    "Group van service"
+   ],
+   [
+    "electrical",
+    "group van service"
+   ],
+   [
+    "Barbershop",
+    "Express line"
+   ],
+   [
+    "barbershop",
+    "express line"
+   ],
+   [
+    "Barbering",
+    "Express line"
+   ],
+   [
+    "Plumber",
+    "Driver"
+   ],
+   [
+    "plumber",
+    "driver"
+   ],
+   [
+    "barbers",
+    "express drivers"
+   ],
+   [
+    "Barber",
+    "Express driver"
+   ],
+   [
+    "barber",
+    "express driver"
+   ],
+   [
+    "Haircuts",
+    "Express seats"
+   ],
+   [
+    "haircuts",
+    "express seats"
+   ],
+   [
+    "Haircut",
+    "Express seat"
+   ],
+   [
+    "haircut",
+    "express seat"
+   ],
+   [
+    "At the chair",
+    "At the stop"
+   ],
+   [
+    "at the chair",
+    "at the stop"
+   ],
+   [
+    "the chair",
+    "the stop"
+   ],
+   [
+    "The shop's",
+    "The company's"
+   ],
+   [
+    "the shop's",
+    "the company's"
+   ],
+   [
+    "The shop",
+    "The company"
+   ],
+   [
+    "the shop",
+    "the company"
+   ],
+   [
+    "Shop",
+    "Company"
+   ],
+   [
+    "shop",
+    "company"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Seat for two"
+   ],
+   [
+    "Signature cut and shave",
+    "Seat for two"
+   ],
+   [
+    "Skin fade",
+    "Seat with extra bags"
+   ],
+   [
+    "skin fade",
+    "seat with extra bags"
+   ],
+   [
+    "Beard trim",
+    "Child seat"
+   ],
+   [
+    "beard trim",
+    "child seat"
+   ],
+   [
+    "the price board",
+    "the price list"
+   ],
+   [
+    "Jordan",
+    "Hector"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "Riley",
+    "Wes"
+   ],
+   [
+    "Avery",
+    "Dara"
+   ],
+   [
+    "service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service-call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "skin fades",
+    "seats with extra bags"
+   ],
+   [
+    "Rental 1",
+    "Express seat"
+   ],
+   [
+    "Rental 2",
+    "Express seat"
+   ],
+   [
+    "Water heater",
+    "Special pickup"
+   ],
+   [
+    "kids cut",
+    "child seat"
+   ]
+  ],
+  "B": [
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first · only when a vehicle and a driver are free"
+   ],
+   [
+    "Same-day jobs",
+    "Same-day rides"
+   ],
+   [
+    "After the job: Rosie sends the bill",
+    "After the job: nothing more to pay"
+   ],
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: up to the $30 late-cancel fee, only if the full price or a card was taken and you say yes"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your stop, paid in full when they book"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: paid in full; a late cancel may keep up to $20 if you OK it"
+   ],
+   [
+    "Free on your board: nothing taken, nothing after",
+    "Free fare check: nothing taken, nothing after"
+   ],
+   [
+    "Every plumbing service, to start",
+    "Every ride, to start"
+   ],
+   [
+    "Each service starts the way most plumbing businesses set it.",
+    "Each service starts the way most airport shuttle companies set it."
+   ],
+   [
+    "$89, credited to the repair",
+    "$30, only if agreed"
+   ],
+   [
+    "a card saved for the $89 service-call fee you OK",
+    "the full price paid, with a $30 late-cancel fee you OK"
+   ],
+   [
+    "E 25% deposit after the quote. C paid in full when they book",
+    "C paid in full when they book. E a card saved"
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For airport rides, someone hurt or ill right now, or a danger on the road, stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Call 911 now. This is a ride service, not an ambulance."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI described an emergency. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "An emergency"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hurt or ill, a crash on the road, or a threat to a driver or rider."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first. If anyone is at risk, the text says to call 911.",
+    "Real danger, like someone hurt or a crash, gets the safety steps first. If anyone is at risk, the text says to call 911."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Airport Rides does airport rides, not medical rides. Nothing was saved. You can ask your doctor's office about a medical ride."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A ride could mean a taxi or an airport shuttle."
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Airport shuttle books a set pickup time."
+   ],
+   [
+    "Yes, every year",
+    "Yes, as a standing order"
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This ride needs the flight number first. It takes a minute, and the pickup time waits for it."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Book a second van first"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan hits a road closure on the route."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is taking a detour around a road closure. The drop-off is now about 9:30am."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE road closed, detour, drop-off 9:30"
+   ],
+   [
+    "water is off on Main St after 2pm, so afternoon jobs may run late",
+    "roadwork closes Ferry Rd after 2pm, so afternoon rides may run late"
+   ],
+   [
+    "The photos open only on the secure page, never in the text. Photos of a person or a body never go by text.",
+    "The trip details open only on the secure page, never in the text. Photos of a person never go by text."
+   ],
+   [
+    "Prices it from Alex's photos",
+    "Prices it from Alex's trip details"
+   ],
+   [
+    "from the customer's photos and answers",
+    "from the trip details and answers"
+   ],
+   [
+    "Photos and answers added",
+    "Trip details and answers added"
+   ],
+   [
+    "From the photos and answers",
+    "From the trip details and answers"
+   ],
+   [
+    "priced by Jordan, from photos",
+    "priced by Hector, from the trip details"
+   ],
+   [
+    "Priced by Jordan, from your photos",
+    "Priced by Hector, from your trip details"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If there's a problem with the ride, reply here."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither airport shuttle nor the express line takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every ride is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line · hotel and company accounts get one bill a month"
+   ],
+   [
+    "Saturdays: a tip line on the bill",
+    "One bill a month, no tip line"
+   ],
+   [
+    "cuts a hand",
+    "hurts a wrist"
+   ],
+   [
+    "cut my hand",
+    "wrenched my wrist"
+   ],
+   [
+    "That's the class's teacher, or the table's server. Never whoever checks it in.",
+    "That's the run's driver. Never whoever checks it in."
+   ],
+   [
+    "A booking with no named person, like a class seat or a table, counts for the person who gives the work.",
+    "A booking with no named person, like an express seat, counts for the person who gives the work."
+   ],
+   [
+    "A teacher's time off or a closed room shows on the Team page, like anyone's.",
+    "A driver's time off or a vehicle out of service shows on the Team page, like anyone's."
+   ],
+   [
+    "Sets the class timetable from a photo",
+    "Sets the express timetable from a photo"
+   ],
+   [
+    "The owner sends a photo of the class schedule, and Rosie reads it back. Each class gets its day and time, who teaches and the room. It also gets the spots Rosie can book and the fewest it needs to run.",
+    "The owner sends a photo of the express timetable, and Rosie reads it back. Each run gets its day and time, its driver and its vehicle. It also gets the seats Rosie can book."
+   ],
+   [
+    "A cancelled class returns anything paid to everyone, and each person is told.",
+    "A cancelled run returns anything paid to everyone, and each person is told."
+   ],
+   [
+    "Class packs and memberships come from the price list, and can be bought while booking.",
+    "Express seats come from the price list. Packs and memberships aren't offered."
+   ],
+   [
+    "Safe default: no timetable yet, so its classes aren't bookable, with one reminder.",
+    "Safe default: no timetable yet, so its runs aren't bookable, with one reminder."
+   ],
+   [
+    "This kind of work runs classes. Send a photo of your class schedule, and I'll read it back. How many can Rosie book per class? Keep the rest for walk-ins and other platforms. A connected reservation or class system replaces this number.",
+    "This kind of work runs on a timetable. Send a photo of your express schedule, and I'll read it back. How many seats can Rosie book per run? Keep the rest for walk-ins and other platforms. A connected reservation or booking system replaces this number."
+   ],
+   [
+    "Your class timetable",
+    "Your express timetable"
+   ],
+   [
+    "Each class, its day and time",
+    "Each run, its day and time"
+   ],
+   [
+    "Who teaches it, and the room",
+    "Who drives it, and the vehicle"
+   ],
+   [
+    "Lee Home Services's",
+    "Lee Airport Rides'"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Driver's license checked · group van training"
+   ],
+   [
+    "Plumbing MP045210",
+    "Airport shuttle EX-1042"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Hector: private rides and group vans, drives the group van"
+   ],
+   [
+    "The state licenses the shop itself, and each barber. What's the shop's license number?",
+    "The state asks for a permit for the express line, and a driver check for each driver. What's the company's permit number?"
+   ],
+   [
+    "The state licenses the barbershop itself, and each barber.",
+    "Where the state asks, the express line holds a permit, and each driver passes a driver check."
+   ],
+   [
+    "Thanks. The state licenses plumbing for the company and each plumber. What's the license number Lee Home Services works under?",
+    "Thanks. Where the state asks, group van service needs a permit for the company and a driver check for each driver. What's the permit number Lee Airport Rides works under?"
+   ],
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Airport shuttle needs a company permit, and a driver check for each driver."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "MP045201",
+    "EX-1024"
+   ],
+   [
+    "EC22871",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-5081"
+   ],
+   [
+    "BS20918",
+    "EX-5018"
+   ],
+   [
+    "plumbing license",
+    "airport shuttle permit"
+   ],
+   [
+    "electrical license",
+    "group van permit"
+   ],
+   [
+    "barbershop license",
+    "express line permit"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Every day 4:00am–11:00pm · set pickup times · 2 hours' notice · up to 60 days ahead"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Every group van: Sam reads the trip details first"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An express van line on Orchard Way. A scheduled van from its stop to the airport, every 30 minutes."
+   ],
+   [
+    "The shop front",
+    "The express stop"
+   ],
+   [
+    "The chairs",
+    "The van seats"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Elm Street Dental",
+    "Oak Street Dental"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. I'm flying out Thursday."
+   ],
+   [
+    "Water pressure check",
+    "Fare check"
+   ],
+   [
+    "A chair, ready",
+    "The express van, ready"
+   ],
+   [
+    "The drop-off and pick-up times come with the dates. The confirmation and the reminder show both days.",
+    "The start and end times come with the dates. The confirmation and the reminder show both days."
+   ],
+   [
+    "Thu Oct 22 to Sat Oct 24 · drop-off 8–10am · Jordan",
+    "Thu Oct 22 to Sat Oct 24 · pickup 8:00am · Hector"
+   ],
+   [
+    "Fri Oct 23 to Sun Oct 25 · drop-off 8–10am · Casey",
+    "Fri Oct 23 to Sun Oct 25 · pickup 8:00am · Priya"
+   ],
+   [
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Hector asks in person and opens Alex's page on Hector's own phone. Alex taps there, never Hector."
+   ],
+   [
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Hector texts OMW before driving. The person at the door gets the driver's name and photo, the arrival time and the code to give."
+   ],
+   [
+    "Unsure who's at the door? Call the business line: it says only the pro's first name, and whether his code was entered.",
+    "Unsure who's at the door? Call the business line: it says only the driver's first name, and whether the driver's code was entered."
+   ],
+   [
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there. The receipt goes to Alex their way.",
+    "Hector opens Alex's pay page on Hector's own phone, and Alex pays there. The receipt goes to Alex their way."
+   ],
+   [
+    "A job sent now: the pro is told at once, before he sets out.",
+    "Rides are never sent now: the driver is told at once when a ride is called off."
+   ],
+   [
+    "Water heater replacement · $640",
+    "Group van · $640"
+   ],
+   [
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos. Open times come next.",
+    "Lee Airport Rides priced your group van at {{price:$90}}, once the trip details were read. Open times come next."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Hector and Priya drive the airport vans; Hector also drives the group van. Wes and Dara drive the express line; Wes drives a van too. Pat is my office manager, for prices over $500. Jules runs a car of their own, with their own riders."
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like asking a driver to carry fuel cans. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note."
+   ],
+   [
+    "This is Rosie, the automated booking assistant for Lee Home Services. Add photos of your water heater, and a plumber will price the job. Need access, more time or a language? Tell us.",
+    "This is Rosie, the automated booking assistant for Lee Airport Rides. Add the trip details on the secure page. Lee Airport Rides will read them and price the van. Need access, more time or a language? Tell us."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "The request is for work Lee Airport Rides doesn't do, like a ride with a nurse on board. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: private rides at $80 for rides from Mon Nov 2. Rides already booked keep $75. Standing orders go to $80 from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for the same airport ride every Monday. Lee Airport Rides offers that as a standing order, so the AI shows its terms. Each ride is booked and paid like a single one."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush. Jordan texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder.",
+    "At DONE, Alex asks Hector about a ride home next month. Hector texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder."
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that the street is icy this morning. Rosie runs the plug-in's danger check again, then asks the driver. Priya can come sooner, so that's offered."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Airport rides are never sent now, so nobody is on call."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Say Morgan has a standing order: an airport ride every Monday at 8:00am. They can skip one ride, pause the plan or end it. The driver is told."
+   ],
+   [
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted. Alex signs or declines it on the secure page.",
+    "Say Sam sends a proposal for a standing order after the first ride. Alex signs or declines it on the secure page."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Airport Line can book you from now on, on the shuttle and in the vans. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Airport Rides. It's a ride, today, starts at 3:00pm, with Hector. The late-cancel fee is $30. Accept it?"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Airport Rides asks: is the pickup at a home, a hotel or somewhere else? And which airport and terminal, and how many riders and bags?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Airport Rides has standing orders at $75 a ride. Each ride is booked and paid like a single one. Want it every Monday?"
+   ],
+   [
+    "Jordan priced a water heater replacement for Alex M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you.",
+    "A ride for Alex M. was priced. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you."
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Airport Rides books up to 60 days ahead. We'll text you times for the rides you asked Hector about in late Aug 2027."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Hector scuffs a suitcase against the door frame and texts a photo of the bag. It's checked against the loading photos, and Sam decides how to make it right."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Please wait inside until the driver texts, and keep the path to the door clear of ice. Priya can come sooner, at the same price."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says a group van is priced from the trip details. So Rosie's first text asks for them on the secure page. No time is saved while it's priced."
+   ],
+   [
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a driver take Kim to the airport this Thursday morning? What does it cost?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Hector finds more riders than seat belts. The plug-in says a driver stops there, so Alex gets a written note."
+   ],
+   [
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Reminder: your ride is tomorrow, pickup at 8:00am, with Hector. {{pay.cancel}}. Have your bags by the door and your flight number ready."
+   ],
+   [
+    "Sorry, Lee Home Services couldn't price your water heater this time. Nothing was booked or charged. You can ask again.",
+    "Sorry, Lee Airport Rides couldn't price your ride this time. Nothing was booked or charged. You can ask again."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A ride's price is set before the ride: a fare by distance. Only work priced at the visit would take the other branch."
+   ],
+   [
+    "Your water heater visit wasn't booked, since the document wasn't signed in time. Nothing was charged for this visit.",
+    "Your ride wasn't booked, since the trip details weren't filled in on time. Nothing was charged for this ride."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules airport shuttle companies often set. Your call: keep them, or change any. They become the company's own rules."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Means 'Matched': the request fits a listed service, in any words. 'I need a lift to the airport Thursday' fits a ride."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a stop at a hotel on the way. Both go in one booking, with one pickup and one code."
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "The plug-in's questions that don't change the time or price go here, like 'Which terminal door do you want?'"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds cruise port rides to Lee Airport Rides. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Reading it back: accept the leak repair for today, starts at 3:00pm, with Jordan. Say yes to go ahead.",
+    "Reading it back: accept the ride for today, starts at 3:00pm, with Hector. Say yes to go ahead."
+   ],
+   [
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Your trip details are waiting on the secure page. Your Thu time is saved until 7:45pm today."
+   ],
+   [
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Hector finds two extra bags at the door. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Your water heater price is with Lee Home Services. We'll let you know by 12:00pm Tue either way.",
+    "Your ride price is with Lee Airport Rides. We'll let you know by 12:00pm Tue either way."
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most airport shuttle companies start. Is it right? Send only what's different."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if anyone is hurt or sick."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the pickup is, the flight time, and how many riders and bags."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si alguien está herido o enfermo ahora, llame al 911 y quédese con la persona."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A stop at a hotel is $15, on the same ride. Both fit in one pickup."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Hector's phone, you said yes to two extra bags for $10."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, rides need no written estimate or contract. The price shows before the yes."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some rides repeat on set days, like the same airport ride every Monday."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the group van path, only Hector's times show: Hector is the one who drives the group van."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Airport rides in Springfield: private rides, shared seats and group vans, within 25 miles."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I need a ride to the airport Thursday at 8:00am. Two of us, three bags. I'm in Springfield."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If anyone is hurt or sick, call 911 now and stay with them."
+   ],
+   [
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Lee Airport Rides can pick up your dad at a set time. {{pay.asks}}:"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Hector found more riders than seat belts, so the ride couldn't start as booked. Please book a second van."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 group van is priced by Sam after the trip details are read, so Sam OKs it first."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a stop at a hotel? Say so.'"
+   ],
+   [
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Alex M. isn't happy with the Thu Oct 22 ride: \"Hector was late.\""
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "An express van line on Orchard Way. A scheduled van from its stop to the airport, every 30 minutes."
+   ],
+   [
+    "Price needed: Alex M., water heater replacement. Price it before anyone says yes.",
+    "Price needed: Alex M., a group van. Price it before anyone says yes."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Hector scuffed a suitcase at Alex M.'s. The loading photo shows no scuff."
+   ],
+   [
+    "Alex M. didn't sign the water heater contract in time, so nothing was booked.",
+    "Alex M. didn't fill in the trip details in time, so nothing was booked."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Airport Rides sent you a proposal for a standing order, from Hector's notes."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An airport shuttle example: a hurt rider gets 'call 911 now'."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Private ride $75 ($80 from Nov 2) · Shared seat $38"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need a ride to the airport on Thursday."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the ride price before booking."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can I bring a can of camping fuel in the van?"
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Here it's every ride: the pickup is at a set time."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Cruise port rides for Lee Airport Rides: is it the same company?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a ride to the airport on Thursday. A text back is fine."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE use the side gate. The front is blocked."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: two extra bags, $10. Sent to Alex."
+   ],
+   [
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Accepted: the ride today, starts at 3:00pm, with Hector."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Rides already booked keep $107, even after Nov 2."
+   ],
+   [
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Send Alex M. $600 for the group van, not $640?"
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Rides already booked keep only their saved card."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Hector's next times for another ride."
+   ],
+   [
+    "Alex M. asks: Can I run the dishwasher before you come?",
+    "Alex M. asks: Can my sister ride along?"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. Hector keeps the pickup at 8:00am, as booked."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on my suitcase after the ride."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Hector also stop at a hotel to pick up my friend?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito un transporte al aeropuerto el jueves."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 10 two extra bags"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Hector take me every Monday, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Hector take me again next week?"
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: a ride home next month"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien está herido o enfermo ahora?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The street is icy this morning."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE two bags, one scuffed corner"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Hector also stop at a hotel?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my sister ride along?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD more riders than seat belts, stopped"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt or sick right now?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next Monday's ride?"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Wes: express driver, vans too"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. To the airport, two riders, three bags."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Two extra bags · $10"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the ride to the airport"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Hector seemed rushed today."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Wes: express driver, vans too"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Which terminal door do you want?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: more riders than seat belts"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed a suitcase corner"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A standing order"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa ride Thu 12pm Priya"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is hurt or sick right now."
+   ],
+   [
+    "Alex M.: water heater replacement",
+    "Alex M.: a group van"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Standing order: every Monday"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra stop at a hotel · $15"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the express stop, and rides from home"
+   ],
+   [
+    "Mold behind the sink wall",
+    "More riders than seat belts"
+   ],
+   [
+    "Water heater replacement",
+    "Group van"
+   ],
+   [
+    "Sewer camera inspection",
+    "Night pickup"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from the trip details"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW cruise port rides"
+   ],
+   [
+    "Under the sink, before",
+    "Bags, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Trunk, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed suitcase"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está herido ni enfermo ahora."
+   ],
+   [
+    "Alex M. · water heater",
+    "Alex M. · ride"
+   ],
+   [
+    "Yes, it won't drain",
+    "Door 3 at the terminal. Wait at the curb."
+   ],
+   [
+    "A water heater job",
+    "A van ride from a rider's home"
+   ],
+   [
+    "Water heater flush",
+    "Shared seat"
+   ],
+   [
+    "the shutoff valves",
+    "the extra bags"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 75 ride"
+   ],
+   [
+    "Leak repair",
+    "Wait after landing"
+   ],
+   [
+    "Quoted from photos first",
+    "Priced from the trip details first"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: the express line may need a permit of its own."
+   ],
+   [
+    "3 jobs",
+    "3 rides"
+   ],
+   [
+    "next job:",
+    "next ride:"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the trip details"
+   ],
+   [
+    "Something of Alex's is damaged",
+    "A bag of Alex's is damaged"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Hector and Alex check the bags"
+   ],
+   [
+    "The quote stays open 7 days",
+    "The price stays open 7 days"
+   ],
+   [
+    "Drain clearing · $179",
+    "Private ride · $75"
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote.",
+    "Morgan P. asked to talk about the $640 price."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise private rides to 80"
+   ],
+   [
+    "Ask Sam about your jobs.",
+    "Ask Sam about your rides."
+   ],
+   [
+    "one address tried to book more jobs today than the plug-in allows",
+    "one address tried to book more rides today than the plug-in allows"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Airport Rides LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Airport Rides'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Airport Rides"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Airport Line"
+   ],
+   [
+    "leehomeservices.com",
+    "leeairportrides.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Private Rides"
+   ],
+   [
+    "Lee Electric",
+    "Lee Group Vans"
+   ],
+   [
+    "plumbing and electrical",
+    "airport shuttle and group van service"
+   ],
+   [
+    "1200 Main St",
+    "520 Ferry Rd"
+   ],
+   [
+    "42 Oak St",
+    "27 Birch Ln"
+   ],
+   [
+    "88 Elm St",
+    "61 Orchard Way"
+   ],
+   [
+    "on Elm St",
+    "on Orchard Way"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "an $89",
+    "a $30"
+   ],
+   [
+    "$89",
+    "$30"
+   ],
+   [
+    "$179",
+    "$75"
+   ],
+   [
+    "arriving 8–10am",
+    "pickup at 8:00am"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Private ride"
+   ],
+   [
+    "Drain clearing",
+    "Private ride"
+   ],
+   [
+    "drain clearing",
+    "private ride"
+   ],
+   [
+    "Plumbing",
+    "Airport shuttle"
+   ],
+   [
+    "plumbing",
+    "airport shuttle"
+   ],
+   [
+    "Electrical",
+    "Group van service"
+   ],
+   [
+    "electrical",
+    "group van service"
+   ],
+   [
+    "Barbershop",
+    "Express line"
+   ],
+   [
+    "barbershop",
+    "express line"
+   ],
+   [
+    "Plumber",
+    "Driver"
+   ],
+   [
+    "plumber",
+    "driver"
+   ],
+   [
+    "barbers",
+    "express drivers"
+   ],
+   [
+    "Barber",
+    "Express driver"
+   ],
+   [
+    "barber",
+    "express driver"
+   ],
+   [
+    "Haircut",
+    "Express seat"
+   ],
+   [
+    "haircut",
+    "express seat"
+   ],
+   [
+    "at the chair",
+    "at the stop"
+   ],
+   [
+    "the chair",
+    "the stop"
+   ],
+   [
+    "The shop's",
+    "The company's"
+   ],
+   [
+    "the shop's",
+    "the company's"
+   ],
+   [
+    "The shop",
+    "The company"
+   ],
+   [
+    "the shop",
+    "the company"
+   ],
+   [
+    "Shop",
+    "Company"
+   ],
+   [
+    "shop",
+    "company"
+   ],
+   [
+    "beard trim",
+    "hotel stop"
+   ],
+   [
+    "Jordan",
+    "Hector"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "Riley",
+    "Wes"
+   ],
+   [
+    "Avery",
+    "Dara"
+   ],
+   [
+    "Add photos",
+    "Add the trip details"
+   ],
+   [
+    "service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service-call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "camera inspection",
+    "stop at a hotel"
+   ],
+   [
+    "drain clearings",
+    "private rides"
+   ],
+   [
+    "Kitchen drain",
+    "Private ride"
+   ],
+   [
+    "kitchen drain",
+    "private ride"
+   ],
+   [
+    "Yard drain",
+    "Private ride"
+   ],
+   [
+    "yard drain",
+    "private ride"
+   ],
+   [
+    "the water heater quote",
+    "the group van price"
+   ],
+   [
+    "Rental 1",
+    "Private ride"
+   ],
+   [
+    "Rental 2",
+    "Private ride"
+   ],
+   [
+    "25% deposit",
+    "A card saved"
+   ],
+   [
+    "The rest after",
+    "Card at DONE"
+   ],
+   [
+    "Priced from photos",
+    "Priced from the trip details"
+   ],
+   [
+    "From photos",
+    "From the trip details"
+   ],
+   [
+    "$120 an hour",
+    "$5 each"
+   ],
+   [
+    "$179",
+    "$75"
+   ],
+   [
+    "$150",
+    "$38"
+   ],
+   [
+    "$199",
+    "$20"
+   ],
+   [
+    "$160",
+    "$10"
+   ],
+   [
+    "$89",
+    "$30"
+   ],
+   [
+    "600",
+    "250"
+   ],
+   [
+    "Labor",
+    "Extra bag"
+   ],
+   [
+    "Water heater fix",
+    "Extra stop on the way"
+   ],
+   [
+    "$358",
+    "$150"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a seat on Lee Airport Line's express van from the Orchard Way stop to the airport, leaving at 11:00am on Sat Oct 24, paid in full. Wes drives. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Airport Rides for a ride from home at 27 Birch Ln to the airport: pickup at 8:00am on Thu Oct 22 for an 11:30am flight, two riders, three bags. Hector drives. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a $35 seat on Lee Airport Line's express van from the stop to the airport, leaving Sat at 11:00am, paid in full when booking.",
+    "list|none|bill": "A hotel books express seats for its guests. Nothing is taken when it books, and Rosie texts the hotel one bill a month."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Express seat"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Express seat"
+    },
+    "list|full|*": {
+     "price": "$35",
+     "paid": "$35",
+     "name": "Express seat"
+    }
+   }
+  },
+  "B": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|card",
+    "list|none|bill",
+    "photos|card|card"
+   ],
+   "examples": {
+    "list|full|none": "The main story: Alex's private ride from home to the airport, Thu Oct 22, pickup at 8:00am for an 11:30am flight. $75 for the van, paid in full when booking. Hector drives.",
+    "list|card|card": "A regular rider's standing order: the same airport ride every Monday at 8:00am. A card is saved, and each ride is charged when Hector texts DONE.",
+    "list|none|bill": "A hotel books a guest's ride on its account. Nothing is taken at booking, and Rosie texts the hotel one bill a month.",
+    "photos|card|card": "A group van for 12 riders, priced by Sam after the trip details are read: $640. A card is saved, and it's charged when the ride is done."
+   },
+   "labels": {
+    "price": {
+     "photos": "Priced from the trip details"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$30",
+     "name": "Private ride"
+    },
+    "list|*|*": {
+     "price": "$75",
+     "name": "Private ride"
+    },
+    "list|full|*": {
+     "price": "$75",
+     "paid": "$75",
+     "name": "Private ride"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Group van"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "Caregiver",
+  "caregiver",
+  "color"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S1-82"
+  ],
+  "B": [
+   "S1-60",
+   "S1-82"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "Each ride is charged at its own drop-off, never as a plan charge on a set day.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Riders book a seat on a run or a driver and a van, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Drivers hold no professional license with a public lookup. The driver's license and checks are asked at S2-29.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "A ride service pays Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The ride plug-in names no agreement to sign before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Rides are never sent now: every ride is booked ahead, and same-day rides show the soonest times first.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The express line sells seats on a timetable.",
+    "label": "A person's time"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The express line sells seats on a timetable.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The express line sells seats on a timetable.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "A ride needs no form signed first.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "why": "Nothing is required to board the express van.",
+    "label": "Missing, but it can go on"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "why": "Nothing is required to board the express van.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left with the company.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A rider under 18 rides only with an adult.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "A ride may be rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "why": "An express run goes out whether it is full or not.",
+    "label": "Too few booked to run"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "why": "A seat has nothing to fix. A complaint goes to Sam.",
+    "label": "Alex asks for a fix"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Hector and Alex check the bags, and that nothing is left in the van. Anything wrong is fixed first, and the loading photos settle any claim."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Standing orders are charged ride by ride at each drop-off, never as a plan charge on a set day.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "A ride service pays Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The ride plug-in names no agreement to sign before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Rides are never sent now: every ride is booked ahead, and same-day rides show the soonest times first.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Rides are never sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Rides are never sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Riders book a driver and a van, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Drivers hold no professional license with a public lookup. The driver's license and checks are asked at S2-29.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "Rides start at the rider's place. The express seat is the other company's.",
+    "label": "Both places: the customer picks"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A pickup is a set time, worked back from the flight.",
+    "label": "1 Arrival windows"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Rides have no stays.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Flow B rides are door-to-door rides, not express seats.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "A ride needs no form signed first.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A rider under 18 rides only with an adult.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "The rider must be at the pickup.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B8-96",
+    "why": "A ride is done in one trip.",
+    "label": "It needs another day"
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "why": "A ride has nothing to fix. A complaint goes to Sam.",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "A ride may be rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "branch",
+    "at": "B7-89",
+    "branch": {
+     "label": "The flight time changes",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.2",
+        "7.3"
+       ],
+       "who": "cust",
+       "to": "san",
+       "via": "msg",
+       "t": "Wed Oct 21, 4:00pm",
+       "title": "The flight moves; the pickup moves with it",
+       "does": "The airline moves the flight, and Alex texts the new time. Rosie works the pickup back from it and offers the nearest open pickup. A move because the flight changed is free, even after free cancel ends.",
+       "more": [
+        "The pickup is worked back from the new flight time: drive time plus the time the airport asks for.",
+        "For a ride from the airport, the driver tracks the flight and the pickup moves with a late landing.",
+        "No driver is free at the new time: Alex picks another time, or cancels with no fee.",
+        "No answer: the booked pickup stands."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "My flight moved to 1:15pm. Can the pickup move?"
+        ],
+        [
+         "san",
+         "cust",
+         "Sure. The pickup can be Thu at 10:00am with Hector. No fee, since the flight moved.",
+         {
+          "buttons": [
+           "Move it",
+           "Keep 8:00am"
+          ]
+         }
+        ],
+        [
+         "san",
+         "staff",
+         "Change: A.M. moved the Thu pickup to 10:00am.",
+         {
+          "as": "Hector"
+         }
+        ]
+       ],
+       "rule": "Rosie's rule: a time set by someone else's schedule moves with it, with no fee. Why: the rider didn't choose the change.",
+       "needs": [
+        "booked"
+       ],
+       "gives": [],
+       "tells": [
+        "cust",
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B7-89",
+    "branch": {
+     "label": "The flight is cancelled",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x02",
+       "line": [
+        "7.2",
+        "7.3"
+       ],
+       "who": "cust",
+       "to": "san",
+       "via": "msg",
+       "t": "Wed Oct 21, 4:30pm",
+       "title": "The flight is cancelled; the ride is off",
+       "does": "The airline cancels the flight, and Alex tells Rosie. A cancelled flight is on Sam's fee-free list, so the ride goes as a cancel in time. There is no fee, and what was paid goes back.",
+       "more": [
+        "Rosie never judges the reason. The plug-in names a cancelled flight as a reason that never carries a fee.",
+        "Sam is told, with no fee question.",
+        "Alex can book a new ride for the new flight in the same chat."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "My flight was cancelled. Please call off my ride."
+        ],
+        [
+         "san",
+         "cust",
+         "I'm sorry about the flight. Your Thu ride with Hector is called off with no fee, and the $75 you paid goes back to your card."
+        ],
+        [
+         "san",
+         "staff",
+         "Cancelled: Alex M., Thu 8:00am. The flight was cancelled.",
+         {
+          "as": "Hector"
+         }
+        ]
+       ],
+       "rule": "Rosie's rule: a flight the airline cancels never carries a fee. Why: the rider didn't choose the change.",
+       "needs": [
+        "booked"
+       ],
+       "gives": [],
+       "tells": [
+        "cust",
+        "staff"
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "notes": "From home-care (refitted 9:21am Tue Oct 27, not edited). No sample or test-drive base exists for this work. Why home-care: a set service that goes to the customer's place, a person at the door who gives a code, a stand-in only for another driver with the same vehicle, and standing orders. Everything else was written for an airport shuttle: private door-to-door rides, shared seats, group vans, flight tracking, bags and child seats.\nFlow B is the real work: Lee Airport Rides (kinds of work: airport shuttle; group van service). Alex M. books a private ride from home at 27 Birch Ln to the airport: pickup Thu Oct 22 at 8:00am for an 11:30am flight, two riders, three bags, $75 (within 15 miles; $4 a mile beyond), paid in full when booking; Hector drives. Flow A is the less usual side: Lee Airport Line, Sam's second company, a scheduled express van from its own stop to the airport every 30 minutes (fact classes: seats in a session), Sat Oct 24 at 11:00am, a $35 express seat paid in full.\nPrices (the example company's own; sign-up cards keep the master's numbers): B private ride $75, shared seat $38, group van $640 (priced by the owner after the trip details), stop $15, extra bag $5, night pickup $20, child seat $10, fee $30. A seat $35, seat with bags $40, child seat $20, off-peak $25, seat for two $55, four seats $140, fee $20.\nMoney B: list|full|none is the main path (paid in full; a cancel in time goes back in full; a late cancel or no-show keeps up to $30 of $75 if the owner confirms). list|card|card is a regular rider's standing order (a card saved, each ride charged at DONE). list|none|bill is a hotel or company account (one bill a month, fact monthlybill). photos|card|card is a group van priced after the trip details (label 'Priced from the trip details'; Sam OKs it: over his $500). Money A: list|full|none (main) and list|none|bill (a hotel). 'The plan charge is due' branches are off (no charge on a set day).\nFacts: plans, monthlybill, extrawork, classes. No switches (not a health practice; ratings are asked). Settings: set start, cutoff 24 hours before. Never sent now. Children ride only with an adult; age groups, never exact ages, and names only on the secure page.\nOwn steps B7-x01 (the flight moves, the pickup moves with it, free, even after free cancel ends) and B7-x02 (the airline cancels the flight: a reason on Sam's fee-free list, so it goes as a cancel in time: no fee, and what was paid goes back; the master's B7-10 already has the fee-free list), both branches of B7-89, Wed Oct 21 after the 10:00am reminder.\nLuggage: the loading photos are of bags only, never of a person (B8-18 is the master's generic 'photographs what the work will touch' line; pf.visit says bags only). Flight number and address are never in a text together.\nOff: spaces or things; each-person license; both places, arrival windows, stays, seats in flow B; a form first; a child in the pro's care; nobody needs to be home; 'needs another day'; 'Alex asks for a fix'; rating off-branch 'named-only'. Kept words: leak, Caregiver, caregiver, color. Staff names Hector, Priya, Wes, Dara; licenses EX-1042 format.\nNot sure of: (1) paid in full as the main B path (most airport shuttles prepay, but a card saved is also common: both are listed); (2) the free 60 minutes after landing and the $4 a mile are example numbers; (3) the group van over 8 riders needing a larger license (stated as a generic switch).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "Haircut at home · $75",
+    "'s cut. The note",
+    "a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Free on your board: nothing taken, nothing after",
+    "Haircut at the shop",
+    "Haircut at their home",
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "A nothing before, and at their home too, 75, paid when they book. E paid when they book",
+    "Card saved for the $20 fee",
+    "Other days: paid at the chair",
+    "Set. For a haircut, the customer picks the place and sees both prices first.",
+    "Barbering workshop",
+    "Each shows its teacher, room and seats left.",
+    "If the teacher is out",
+    "How would you like it on top? (optional)",
+    "How would you like it on top?",
+    "Step-free door on Elm St · parking in the back",
+    "A step-free door on Elm St, and parking in the back.",
+    "Access, like a step-free chair:",
+    "'Yes, make it a fade' goes back to the times.",
+    "'s cut. I put a note and a photo on the page.",
+    "The note and photo are on the secure page.",
+    "on the page, with a photo.",
+    "Please use the side door on Oak St.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Saturdays: a tip line on the bill",
+    "That's the class's teacher, or the table's server. Never whoever checks it in.",
+    "A booking with no named person, like a class seat or a table, counts for the person who gives the work.",
+    "A teacher's time off or a closed room shows on the Team page, like anyone's.",
+    "Sets the class timetable from a photo",
+    "The owner sends a photo of the class schedule, and Rosie reads it back. Each class gets its day and time, who teaches and the room. It also gets the spots Rosie can book and the fewest it needs to run.",
+    "A cancelled class returns anything paid to everyone, and each person is told.",
+    "Class packs and memberships come from the price list, and can be bought while booking.",
+    "Safe default: no timetable yet, so its classes aren't bookable, with one reminder.",
+    "This kind of work runs classes. Send a photo of your class schedule, and I'll read it back. How many can Rosie book per class? Keep the rest for walk-ins and other platforms. A connected reservation or class system replaces this number.",
+    "Your class timetable",
+    "Each class, its day and time",
+    "Who teaches it, and the room",
+    "Plumbing JP031552 · electrical JE30417",
+    "Plumbing MP045210",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "BS20918",
+    "electrical license",
+    "barbershop license",
+    "Panel upgrade: a free estimate, then a quote",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The shop front",
+    "The chairs",
+    "Price board",
+    "Elm Street Dental",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "May the shop show photos of your hair? Yes / No",
+    "My employer pays for this cut.",
+    "A chair, ready",
+    "Style consult",
+    "Color and cut · $90",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "Some services start with a first step on the same visit, like a patch test with a wait, or a screening. It comes before the price and the work.",
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "The plug-in says a color and cut is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lee's Barbershop doesn't do perms. Nothing was saved. Other businesses nearby may.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Color quotes come to you first. Board prices never need one",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "House calls: allowed where you are, for those cleared",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Goes on as a house call, in the other flow.",
+    "Goes on as a house call in the other flow.",
+    "Every shop service, color and house calls",
+    "Riley: barber, color and house calls",
+    "Riley: barber, color, house calls",
+    "At the shop, and house calls",
+    "Goes on as a house call",
+    "A water heater job",
+    "Color and cut",
+    "NEW massage",
+    "Kids cut",
+    "From the price list or photos, the price is set.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "3 jobs",
+    "next job:",
+    "An AI that asks for the shop by name hears only that: no reason, and no other shops.",
+    "1 color quote",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "Wants Saturday morning, with Riley",
+    "like a 15-minute style consult",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Books a haircut and a beard trim",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Takes the price from the shop's board",
+    "on the shop's board",
+    "A barbershop books a person's time.",
+    "Anything Riley should know?",
+    "It's a gift for my brother. Can I pay for it?",
+    "A barbershop has none.",
+    "Haircut plan · every 4 weeks",
+    "Color always stays with Riley.",
+    "Give this code at the chair when you arrive.",
+    "Give this code at the chair.",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Can I add a beard trim on Saturday?",
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "the Groom's package",
+    "Groom's package",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "It's 11:00am, and Alex is at the chair.",
+    "What happens at the chair?",
+    "A beard trim is on the price board: $20.",
+    "The cape clip ripped my shirt collar.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "Alex pays at the chair",
+    "DONE 35 haircut",
+    "My company is paying for this one.",
+    "A long job or a course can be paid in stages the plug-in sets.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Books the next visit at the chair",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Color correction",
+    "Do you do kids cuts? My son is 8.",
+    "Priced from your photos",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "on Elm St",
+    "$89",
+    "Drain clearing",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Barbering",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "At the chair",
+    "at the chair",
+    "the chair",
+    "The shop's",
+    "the shop's",
+    "The shop",
+    "the shop",
+    "Shop",
+    "shop",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "the price board",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "service-call fee",
+    "skin fades",
+    "kids cut"
+   ],
+   "B": [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Same-day jobs",
+    "After the job: Rosie sends the bill",
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Every plumbing service, to start",
+    "Each service starts the way most plumbing businesses set it.",
+    "$89, credited to the repair",
+    "a card saved for the $89 service-call fee you OK",
+    "E 25% deposit after the quote. C paid in full when they book",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first. If anyone is at risk, the text says to call 911.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "A haircut could mean a salon or a barbershop.",
+    "Plumbing books a 2-hour window.",
+    "Yes, every year",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Call a mold cleanup company first",
+    "Jordan needs a part from the supply house.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "UPDATE getting a part, back 9:30",
+    "water is off on Main St after 2pm, so afternoon jobs may run late",
+    "The photos open only on the secure page, never in the text. Photos of a person or a body never go by text.",
+    "Prices it from Alex's photos",
+    "from the customer's photos and answers",
+    "Photos and answers added",
+    "From the photos and answers",
+    "priced by Jordan, from photos",
+    "Priced by Jordan, from your photos",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "cuts a hand",
+    "cut my hand",
+    "That's the class's teacher, or the table's server. Never whoever checks it in.",
+    "A booking with no named person, like a class seat or a table, counts for the person who gives the work.",
+    "A teacher's time off or a closed room shows on the Team page, like anyone's.",
+    "Sets the class timetable from a photo",
+    "The owner sends a photo of the class schedule, and Rosie reads it back. Each class gets its day and time, who teaches and the room. It also gets the spots Rosie can book and the fewest it needs to run.",
+    "A cancelled class returns anything paid to everyone, and each person is told.",
+    "Class packs and memberships come from the price list, and can be bought while booking.",
+    "Safe default: no timetable yet, so its classes aren't bookable, with one reminder.",
+    "This kind of work runs classes. Send a photo of your class schedule, and I'll read it back. How many can Rosie book per class? Keep the rest for walk-ins and other platforms. A connected reservation or class system replaces this number.",
+    "Your class timetable",
+    "Each class, its day and time",
+    "Who teaches it, and the room",
+    "Lee Home Services's",
+    "Plumbing JP031552 · electrical JE30417",
+    "Plumbing MP045210",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "MP045210",
+    "MP045201",
+    "EC22871",
+    "BS20981",
+    "plumbing license",
+    "electrical license",
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Panel upgrade: a free estimate, then a quote",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The shop front",
+    "The chairs",
+    "Price board",
+    "Elm Street Dental",
+    "Me, and yes. It's my kitchen.",
+    "Water pressure check",
+    "A chair, ready",
+    "The drop-off and pick-up times come with the dates. The confirmation and the reminder show both days.",
+    "Thu Oct 22 to Sat Oct 24 · drop-off 8–10am · Jordan",
+    "Fri Oct 23 to Sun Oct 25 · drop-off 8–10am · Casey",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Unsure who's at the door? Call the business line: it says only the pro's first name, and whether his code was entered.",
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there. The receipt goes to Alex their way.",
+    "A job sent now: the pro is told at once, before he sets out.",
+    "Water heater replacement · $640",
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos. Open times come next.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "This is Rosie, the automated booking assistant for Lee Home Services. Add photos of your water heater, and a plumber will price the job. Need access, more time or a language? Tell us.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush. Jordan texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder.",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted. Alex signs or declines it on the secure page.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Jordan priced a water heater replacement for Alex M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you.",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Sorry, Lee Home Services couldn't price your water heater this time. Nothing was booked or charged. You can ask again.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Your water heater visit wasn't booked, since the document wasn't signed in time. Nothing was charged for this visit.",
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Reading it back: accept the leak repair for today, starts at 3:00pm, with Jordan. Say yes to go ahead.",
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Your water heater price is with Lee Home Services. We'll let you know by 12:00pm Tue either way.",
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Price needed: Alex M., water heater replacement. Price it before anyone says yes.",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Alex M. didn't sign the water heater contract in time, so nothing was booked.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Drain clearings already booked keep only their saved card.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Alex M. asks: Can I run the dishwasher before you come?",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "First: is anyone hurt? Do you smell gas?",
+    "Can I skip next week's drain cleaning?",
+    "Riley: barber, color and house calls",
+    "At my home. Just the kitchen sink.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Riley: barber, color, house calls",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "Proposal · Replace the old pipes",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "No. It doesn't smell like gas.",
+    "Alex M.: water heater replacement",
+    "Yearly water heater flush plan",
+    "Sewer camera inspection · $199",
+    "At the shop, and house calls",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "Sewer camera inspection",
+    "Priced from your photos",
+    "NEW heating and cooling",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "No. No huele a gas.",
+    "Alex M. · water heater",
+    "Yes, it won't drain",
+    "A water heater job",
+    "Water heater flush",
+    "the shutoff valves",
+    "DONE 179 drain",
+    "Leak repair",
+    "Quoted from photos first",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "3 jobs",
+    "next job:",
+    "Asks Alex for photos",
+    "Something of Alex's is damaged",
+    "Jordan and Alex check the work",
+    "The quote stays open 7 days",
+    "Drain clearing · $179",
+    "Morgan P. asked to talk about the $640 quote.",
+    "raise drain clearing to 199",
+    "Ask Sam about your jobs.",
+    "one address tried to book more jobs today than the plug-in allows",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "42 Oak St",
+    "88 Elm St",
+    "on Elm St",
+    "Service call fee",
+    "service call fee",
+    "Service call",
+    "service call",
+    "an $89",
+    "$89",
+    "$179",
+    "arriving 8–10am",
+    "8–10am",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "Haircut",
+    "haircut",
+    "at the chair",
+    "the chair",
+    "The shop's",
+    "the shop's",
+    "The shop",
+    "the shop",
+    "Shop",
+    "shop",
+    "beard trim",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "Add photos",
+    "service-call fee",
+    "camera inspection",
+    "drain clearings",
+    "Kitchen drain",
+    "kitchen drain",
+    "Yard drain",
+    "yard drain",
+    "the water heater quote",
+    "Rental 1",
+    "Rental 2",
+    "25% deposit",
+    "The rest after",
+    "Priced from photos",
+    "From photos",
+    "$120 an hour",
+    "$179",
+    "$150",
+    "$199",
+    "$160",
+    "$89",
+    "600",
+    "Labor",
+    "Water heater fix",
+    "$358"
+   ]
+  },
+  "A": {
+   "A7-94": "6490d5d8e6",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-02": "15f418fec4",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A7-93": "46cca94e45",
+   "A10-44": "50aad85ac2"
+  },
+  "B": {
+   "B8-39": "aa75251207",
+   "B7-91": "7132851ec1",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S2-30": "3a9ee593f3",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "B4-01": "15f683e6cb",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B8-96": "8d7fd18ef5",
+   "B10-37": "be87433467",
+   "B10-32": "7713bff255",
+   "B7-89": "889628e2d6"
+  }
+ }
+}

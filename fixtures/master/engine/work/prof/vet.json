@@ -1,0 +1,2843 @@
+{
+ "id": "vet",
+ "name": "Veterinarian",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "dentist",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each vet holds their own active license from the state's veterinary board",
+   "who": "each vet; each vet tech or assistant only where the state's form licenses, registers or certifies them; the practice too where the state issues a premises or hospital permit, and a mobile practice or unit its own permit where the state's form asks",
+   "ask": "each person's license number in their invite reply (or the owner sends it); the hospital's premises permit and the mobile practice's permit number from the owner, only where the state's form has them",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "controlled_drugs": "a switch from the state's form: each vet's federal and state controlled-drug registrations, where the form asks for them at sign-up; Rosie only notes that they're on file and when they end, and never handles drugs, orders or prescriptions",
+   "boarding": "a switch: keeping healthy pets overnight, or grooming them, needs the kennel or boarding license where the state's form asks; the example hospital boards none, so no stays are booked",
+   "video": "a switch from the state's form: video visits only where the state allows them, only for a pet a vet at the practice has examined in person, and only with a vet licensed where the pet is during the visit",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance as the business says; shown as given by the business, not checked by Rosie",
+   "shown": "the license number shows on the listing and the confirmation where the state's rules require it"
+  },
+  "pf.services": {
+   "shape": "exams of a set length booked with a vet by name; a new client's first exam is longer; surgery and dental cleanings are drop-offs, booked from a written estimate or with an exam first; goodbye visits get quiet times; house calls come in a 2-hour arrival window, a goodbye visit at home too, or at a set start time where the owner sets one",
+   "examples": "every price below is the example practices' own (Lee Animal Hospital and Lee Mobile Vet), not a standard",
+   "list": [
+    {
+     "name": "Sick or hurt pet exam",
+     "price": "the $72 exam is promised; tests and treatment get a written estimate in the exam room, OK'd before any work (the example: $461 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min; 40 min for a new client",
+     "where": "at the hospital, or at home on a house call",
+     "before": "nothing taken; a card saved only where the owner turns on the no-show fee",
+     "after": "at the front desk; at home, the bill Rosie texts"
+    },
+    {
+     "name": "Vaccine visit (a pet seen in the last 12 months)",
+     "price": "$35 at the hospital, one vaccine included; $75 at the customer's home",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the hospital, or at home where the state allows it",
+     "before": "at the hospital: nothing taken, or a card saved for the no-show fee; at home: paid in full when booking",
+     "after": "at the hospital: the front desk; at home: nothing more"
+    },
+    {
+     "name": "Puppy shots (a plan)",
+     "price": "$35 a visit, the vaccine visit's price",
+     "kind": "one price, as a plan",
+     "length": "20 min, every 3 to 4 weeks",
+     "where": "at the hospital",
+     "before": "nothing taken",
+     "after": "at the front desk after each visit",
+     "note": "the plan's terms get their own yes; skip, pause or end by text"
+    },
+    {
+     "name": "Wellness exam (a yearly checkup)",
+     "price": "$68, vaccines priced from the list",
+     "kind": "one price",
+     "length": "30 min; 40 min for a new client",
+     "where": "at the hospital",
+     "before": "nothing taken",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Recheck exam",
+     "price": "$40; free within 14 days for the same problem (the example practices' own policy)",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the hospital",
+     "before": "nothing taken",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Nail trim",
+     "price": "$20",
+     "kind": "one price",
+     "length": "10 min, or added to a visit",
+     "where": "both places"
+    },
+    {
+     "name": "Video recheck",
+     "price": "$35",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "by video, counted as at the hospital",
+     "note": "not on the example's price list; only where the state's video switch allows it, and only for a pet a vet here examined in person"
+    },
+    {
+     "name": "Cat spay or neuter",
+     "price": "$140",
+     "kind": "one price",
+     "length": "a drop-off: in at 7:30am, home by 5pm",
+     "where": "at the hospital",
+     "before": "a $40 deposit when booking, refunded in full until 24 hours before drop-off",
+     "after": "the rest at pick-up, at the front desk",
+     "note": "an exam in the last 30 days first, and the anesthesia consent signed on the secure page"
+    },
+    {
+     "name": "Dental cleaning under anesthesia, and other surgery",
+     "price": "from the written estimate given at an exam (a low and a high)",
+     "kind": "one price: the estimate's low end, with the rest priced up to its high end",
+     "length": "a drop-off day",
+     "where": "at the hospital",
+     "before": "a deposit of half the estimate's low end",
+     "after": "the rest at pick-up",
+     "note": "booked by the desk after the exam, or by the owner from the estimate's link; nothing above the high end without a new yes"
+    },
+    {
+     "name": "Goodbye visit (euthanasia) at the hospital",
+     "price": "$185, sedation included; aftercare priced on the page (a private cremation, a $25 paw print)",
+     "kind": "one price",
+     "length": "45 min, at a quiet time the hospital keeps for it, a private room and the side door",
+     "where": "at the hospital",
+     "before": "paid in full when booking, so there's no stop at the desk",
+     "after": "nothing more",
+     "note": "booked at once for the hospital's own patients; a pet it hasn't seen waits for the vet's call first"
+    },
+    {
+     "name": "House call fee",
+     "price": "$89",
+     "kind": "one price",
+     "where": "at the customer's home",
+     "before": "held when booking (the hold), released at check-in",
+     "after": "on the bill"
+    },
+    {
+     "name": "Wellness exam and vaccines at home",
+     "price": "$179, the house call included",
+     "kind": "one price",
+     "length": "45 min, in a 2-hour arrival window",
+     "where": "at the customer's home",
+     "before": "the $89 house call fee held",
+     "after": "the bill Rosie texts"
+    },
+    {
+     "name": "Sick or hurt pet at home",
+     "price": "the $89 house call and exam is promised; the vet writes an estimate at the visit, OK'd before tests or treatment (the example: $245 in all)",
+     "kind": "quoted at the visit",
+     "length": "45 to 60 min",
+     "where": "at the customer's home",
+     "before": "the $89 held",
+     "after": "the bill Rosie texts"
+    },
+    {
+     "name": "Goodbye visit at home",
+     "price": "$385, sedation included; aftercare priced on the page (a private cremation $150, a $25 paw print)",
+     "kind": "one price",
+     "length": "60 min, in a 2-hour arrival window",
+     "where": "at the customer's home",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Senior bloodwork at home",
+     "price": "$199",
+     "kind": "one price",
+     "where": "at the customer's home",
+     "before": "the $89 held",
+     "after": "the bill Rosie texts"
+    },
+    {
+     "name": "Extra time at a house call",
+     "price": "$120 an hour; $140 an hour with Owen (the example practice's own prices)",
+     "kind": "per hour",
+     "where": "at the customer's home",
+     "before": "nothing more than the visit's own money",
+     "after": "on the bill Rosie texts",
+     "note": "added to a house call, never booked alone"
+    },
+    {
+     "name": "Farm animal care (the second kind of work)",
+     "price": "the $89 farm call fee; a goat or sheep exam $149; a horse wellness exam $189; a herd health plan from a free planning visit, then a quote",
+     "where": "at the farm",
+     "before": "the $89 held",
+     "after": "the bill Rosie texts"
+    },
+    {
+     "name": "Emergencies",
+     "price": "never booked",
+     "note": "sent at once to the emergency animal hospital the owner names, open 24 hours"
+    }
+   ],
+   "capacity": "one pet per exam time with one vet; several pets in one home are booked back to back with one vet; the surgery suite is saved like equipment, and only vets who do surgery are offered for it",
+   "nobody_home": "never: an adult on the booking is with the pet",
+   "online": "none in the example; a video recheck only where the state allows it, for a pet a vet here examined in person (a switch)"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Which pet: a dog, a cat or another kind, its name and about how old",
+    "New or returning client (a new client's first exam is longer)",
+    "Which visit: sick or hurt, a checkup or vaccines, surgery or a dental cleaning from an estimate, or saying goodbye (only the hospital's own kinds; Rosie never judges how sick a pet is)",
+    "For a house call: the town or ZIP, inside the travel area"
+   ],
+   "after_time": [
+    "Nervous at the vet, or ever needed a muzzle?",
+    "Records from the last vet: upload them on the page, or the hospital asks for them",
+    "Any other pets to book at the same time?"
+   ],
+   "secure_page_only": [
+    "The pet's species, breed, age, weight, sex, and spayed or neutered",
+    "What's wrong, in the owner's own words, and since when",
+    "Medicines and allergies",
+    "The last vet's name, and the records or the vaccine history (a rabies certificate)",
+    "Pet insurance: its name only (it pays the owner back)",
+    "The street address, for a house call",
+    "'I'm 18 or older and the pet's owner, or the owner named me'",
+    "The consent forms to read ahead: anesthesia, and a goodbye visit",
+    "For a goodbye visit: 'Has the pet bitten anyone in the last 10 days?', and the aftercare choice"
+   ],
+   "who_may_book": "an adult: the pet's owner, or someone the owner names (a family member, a pet sitter, a rescue that fosters the pet); a teen sends it to a parent",
+   "never_in_chat": "no diagnosis, test result or medicine name passes through the AI; the owner's own words about what's wrong are checked for danger, then kept on the secure page"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "trouble breathing, or blue or pale gums",
+    "a possible poisoning: chocolate, rat bait, antifreeze, lilies for a cat, or someone's medicine",
+    "can't stand or walk, or collapsed",
+    "bloat signs: a swollen, hard belly, or retching with nothing coming up",
+    "a seizure",
+    "bleeding that won't stop, or hit by a car",
+    "a cat straining to pee with nothing coming out",
+    "trouble giving birth"
+   ],
+   "stop_action": "No booking, and no wait for one. Rosie says: 'This needs a vet now. Go to the nearest emergency animal hospital. The one Lee Animal Hospital works with is open 24 hours.' It gives that hospital's name, address and number, from the owner's settings. For a possible poisoning, it also gives the pet poison line the owner named at sign-up, and says it may charge a fee. Rosie never judges how sick a pet is, and never says what's wrong.",
+   "person_danger": "the general screen, always on: a person hurt or in danger, like a dog bite to a person, gets 911",
+   "go_on": "a sick or hurt pet with none of the stop words is booked as a sick or hurt exam, soonest times first; the AI adds: 'If it gets worse, or you see any of these signs, go to the emergency animal hospital now'. Simple first steps, the example practices' own: a small cut gets 'press a clean cloth on it'; a limp gets 'keep your pet quiet'; always 'never give a pet human medicine'. Nothing more: no advice on what's wrong or what to give",
+   "worse_before": "a text before the visit that the pet seems worse gets the danger check again: a stop word gets the emergency words and flags the hospital; otherwise an earlier time if one is free",
+   "bite_risk": "a pet that may bite is noted for the team (a muzzle or a calming plan), never a stop"
+  },
+  "pf.first_steps": {
+   "records": "a new client's records from the last vet: uploaded on the secure page, or the hospital asks the last vet for them (a to-do for the desk, due the day before)",
+   "on_file": "a vaccine visit needs an exam here in the last 12 months; an exam on file is checked for each later booking",
+   "pre_surgery_exam": "surgery and dental cleanings need an exam in the last 30 days first (the example hospital's rule); bloodwork is done the morning of",
+   "consents": "the anesthesia and surgery consent is signed on the secure page before drop-off; a goodbye visit's consent is read on the page ahead, and signed with the vet in person where the state's rules require it (a switch)",
+   "reaction": "a pet that had a vaccine reaction last time: the booking waits for the vet's OK",
+   "new_pet_goodbye": "a goodbye visit for a pet the practice hasn't seen: the vet calls the owner first",
+   "video": "a video recheck only for a pet a vet here examined in person",
+   "prep_for_reminder": [
+    "Bring any records and medicines",
+    "A dog on a leash, a cat in a carrier",
+    "Surgery or a dental cleaning: no food after midnight, water is OK, unless the vet says otherwise on the page",
+    "House call: the pet inside, in a quiet room"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "at the hospital: the check-in code at the front desk; a surgery or dental drop-off: the code at the desk at drop-off, with a number to reach the owner and a pick-up window; at home: the code at the door",
+   "estimate": "tests and treatment get a written estimate on the secure page (a low and a high, or one total), OK'd before any work; the owner may OK all of it, some lines or none; nothing above the high end without a new yes",
+   "found_during_surgery": "anything found under anesthesia that isn't on the estimate: the vet calls the owner first; no answer: only what was OK'd is done",
+   "drop_off": "a drop-off pet gets short updates by text (in, waking up, READY with the pick-up window); the pet goes home only with the code, to the owner or the person named on the page",
+   "surgery_not_safe": "bloodwork that morning finds it isn't safe today: the vet calls; the bloodwork is charged, and the rest of the deposit is refunded or kept for a new date",
+   "results": "test results and the diagnosis come only from the vet, by phone or in person, and stay on the secure page, never in a text",
+   "goodbye": "a quiet room or the family's own home, time with the pet first, sedation first, the owner may stay; no bill at the desk (paid ahead); the pet is marked passed after",
+   "done_proof": "the check-in code, READY and the pick-up, or DONE; the vet's notes stay in the practice's own records"
+  },
+  "pf.money": {
+   "before": "nothing taken for exams and vaccine visits; a card saved only where the owner turns on the no-show fee; a deposit for surgery and dental cleanings (the example: $40 for a cat spay; half the estimate's low end otherwise), refunded in full until 24 hours before drop-off; goodbye visits, and a vaccine visit at home, paid in full when booking; nothing kept for a goodbye visit, ever; house calls: the $89 house call fee held",
+   "after": "at the hospital: paid at the front desk, its own way (card, cash, or the hospital's financing); at home: Rosie texts the bill when the vet texts DONE, paid by the saved card or a pay link",
+   "estimate": "the bill is only what the owner OK'd on the estimate; above its high end only with a new yes",
+   "fees": "a no-show or late-cancel fee ($20 at the hospital; up to the $89 house call fee at home), only where the owner turned it on, and only when the owner confirms each one; never for a goodbye visit",
+   "insurance": "pet insurance pays the owner back after the visit: the practice gives the invoice and records for the claim; it doesn't bill the insurer, and Rosie never promises coverage or checks a plan",
+   "pay_over_time": "the practice's own financing choices, its own way; anything else the owner decides",
+   "caps": "deposit cap: from the state form",
+   "tips": "none",
+   "tax": "the business's tax rate on goods like food and medicines, where the state taxes them (a switch)",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies: a vet isn't a human health practice. For Rosfield's lawyer: do a state's rules against vets sharing fees or paying for referrals reach the $2?",
+   "plans": "a plan's visits are each booked and paid like a single visit (puppy shots at the front desk; a house call plan on the bill Rosie texts); no plan charges a saved card on a set day"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "The pet's diagnosis, test results, and medicine names or doses",
+    "What's wrong, in the owner's words",
+    "Why a team member is out",
+    "The emergency contact's number"
+   ],
+   "allowed": "texts name the pet, the vet, the visit kind (an exam, a vaccine visit, surgery day, a goodbye visit), the date, the time, the place, the price and a secure link",
+   "staff": "texts to the owner and the team carry the same, never the reason or results; those stay on the secure page",
+   "goodbye": "gentle words; nothing sold, no rating, no reminders after; once the pet is marked passed, every text about that pet stops for good, and texts about other pets in the home go on",
+   "languages": "English and Spanish",
+   "minors": "a teen's request goes to a parent, who books"
+  },
+  "pf.staff": {
+   "licenses": "each vet's own license, per state; vet techs only where the state's form credentials them; controlled-drug registrations where the state's form asks (a switch)",
+   "skills": "exams and vaccines (every vet); surgery and dental cleanings (only the vets who do them; here, Marcus); goodbye visits; house calls (here, Owen and Priya for Lee Mobile Vet, and Marcus for the hospital's vaccine visits at home); farm animals (here, Owen)",
+   "supervision": "vet techs and assistants work under a vet, as the state's rules set (a switch: a vet on site or reachable); anesthesia only with a vet on site",
+   "who_oks": "the owner OKs a goodbye visit for a pet the practice hasn't seen, same-day exams, estimates over $300 at the hospital and over $500 on a house call (a partner may OK house call prices), fees and refunds",
+   "stand_in": "another vet may take an exam or a vaccine visit; surgery moves only to another vet who does surgery, or to a new date; a goodbye visit moves to another vet only with the family's yes: with no answer, Sam calls the family, and nothing changes until then"
+  },
+  "pf.rules": {
+   "records": "the practice keeps medical records as long as the state's rules say; the owner gets a copy within the state's time; a delete removes only Rosie's own booking details",
+   "estimate": "a switch: a written estimate before treatment where the state's rules require one; the example practices always give one",
+   "goodbye_consent": "a switch: who may sign a goodbye visit's consent, and whether it's signed with the vet in person; the owner (18 or older) or someone they authorize",
+   "video": "a switch: video visits only where the state allows them, and only after an in-person exam where it says so",
+   "rabies": "a switch: rabies vaccine and certificate rules, and the bite question before a goodbye visit, from the state's or the city's form",
+   "not_picked_up": "a switch: the notice and waiting days the state sets before a pet left after a visit may be placed elsewhere",
+   "referral_fees": "a switch: where a state's rules bar vets from paying for referrals, Rosfield's lawyer checks the $2 first",
+   "license_shown": "a switch: the license number on the listing and the confirmation, from the state form",
+   "records_years": "7 years for Rosie's own booking records"
+  },
+  "pf.edges": {
+   "applies": [
+    "Emergency signs at any point: the emergency animal hospital at once, no booking",
+    "The pet seems worse before the visit: the danger check again, and the hospital is flagged",
+    "A goodbye visit: gentle words, paid ahead, no rating; the pet is marked passed, and texts about it stop",
+    "A pet that died before its visit: the owner texts, the visit is cancelled with no fee, and the pet is marked passed",
+    "A new pet for a goodbye visit: the vet calls first",
+    "Several pets: back to back with one vet; Rosie asks which booking before any change",
+    "The estimate: all of it, some lines, or none; only those are done and billed",
+    "Surgery day isn't safe: a refund of the rest of the deposit, or a new date",
+    "A pet not picked up after a drop-off: the hospital calls, then the state's notice rules",
+    "A pet that may bite: a muzzle or a calming plan noted",
+    "Up to 15 minutes late: still seen in the time left; later, the next open time",
+    "Pet insurance: the practice gives the papers; Rosie promises nothing",
+    "A no-show or a late cancel: a fee only where the owner turned it on and confirms it"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee; Rosie never diagnoses and never offers money"
+  },
+  "pf.facts": [
+   "animals",
+   "dropoff",
+   "firststeps",
+   "forms",
+   "results",
+   "video",
+   "aftercare"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Animal Hospital",
+   "staff": "Marcus and Nadia (vets)",
+   "cust": "Alex M. (Biscuit's owner) · other pet owners"
+  },
+  "B": {
+   "business": "Lee Mobile Vet",
+   "staff": "Owen and Priya (vets who make house calls)",
+   "cust": "Alex M. (Pepper's owner, at 17 Linden Ln) · other pet owners",
+   "other": "Others (a bank, a family member who pays, a pet sitter)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Marcus"
+  },
+  "B": {
+   "staff": "Owen"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most animal hospitals set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Exams, vaccines, surgery and goodbye visits."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Exams, vaccines and goodbye visits at home, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A surgery day"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see pets; Riley also does surgery and house calls."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for dog grooming, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't groom dogs."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE added for Biscuit on the secure page."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Lee's Barbershop: you now have two vaccine visits on Sat Nov 7."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the visit's address, after a missed check."
+   ],
+   [
+    "It takes no cut of card payments, except",
+    "It keeps none of card payments, except"
+   ],
+   [
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Sam Lee added you to the team for house calls and farm visits."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Vet license VT031552"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a pet emergency goes to the emergency animal hospital."
+   ],
+   [
+    "MP045210",
+    "VT045210"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states license vet care to a hospital or a permitted mobile practice."
+   ],
+   [
+    "Owen",
+    "Felix"
+   ],
+   [
+    "takes no cut of",
+    "takes no share of"
+   ],
+   [
+    "At a pick-up, the item is shown at the counter before it's paid.",
+    "At a pick-up, the go-home notes are gone over before paying."
+   ],
+   [
+    "like a detail or a repair",
+    "like after surgery"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your puppy's vaccine visit is part of a plan with Riley, every 4 weeks."
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Puppy shots every 4 weeks · Riley"
+   ],
+   [
+    "Haircut · Sat Oct 31",
+    "Puppy shots · Sat Oct 31"
+   ],
+   [
+    "show photos of the work",
+    "share photos of your pet"
+   ],
+   [
+    "Gloss to finish",
+    "Pain medicine"
+   ],
+   [
+    "gloss",
+    "pain medicine"
+   ],
+   [
+    "the $90 color quote",
+    "the $390 estimate"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Pet boarding for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds pet boarding to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW pet boarding"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una cita para mi perro el sábado."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for a pharmacy: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Oak Street Pharmacy? I need a refill."
+   ],
+   [
+    "This is Lee's Barbershop's booking line, so I can't reach Elm Street Dental.",
+    "This is Lee's Barbershop's booking line, so I can't reach Oak Street Pharmacy."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A vet's plug-in adds its own danger words: trouble breathing, a possible poisoning, can't stand, bloat signs."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A vet's example: a limp with no danger signs gets 'keep your pet quiet, and never give human pain medicine'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Biscuit's limp has no danger signs, so nothing is sent here."
+   ],
+   [
+    "Sends the 911 safety message",
+    "Sends the emergency safety message"
+   ],
+   [
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Sam set this line at sign-up: the number customers call for what only a vet should answer."
+   ],
+   [
+    "A clinic or a vet often names a nurse line or an emergency clinic here.",
+    "Lee Animal Hospital also names its emergency animal hospital here, open 24 hours."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video recheck"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A nail trim could mean a vet or a groomer."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a new puppy's shots every 4 weeks."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books puppy shots every 4 weeks"
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some visits come in a series, like a puppy's shots, 3 to 4 weeks apart."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A breeder books first shots for a litter of five puppies on one morning. Rosie finds times side by side with Riley and Avery."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two pets work the same way, like Biscuit and a new puppy, back to back. Both are asked before the times."
+   ],
+   [
+    "A barbershop bills no plans, so this never happens at Lee's Barbershop.",
+    "Pet insurance pays the owner back, so Lee's Barbershop bills no plan, and this never happens."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "An animal hospital books a vet's time, or a drop-off day for surgery."
+   ],
+   [
+    "Anything Riley should know?",
+    "Does your pet ever bite?"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's for my mom's cat, Mochi. I'll pay, and she'll bring her."
+   ],
+   [
+    "A barbershop has none.",
+    "An animal hospital has none."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the hospital share photos of your pet?"
+   ],
+   [
+    "photos of your hair",
+    "photos of your pet"
+   ],
+   [
+    "Haircut plan",
+    "Puppy shot plan"
+   ],
+   [
+    "haircut plan",
+    "puppy shot plan"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Surgery always stays with Riley."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Should I bring a stool sample for Biscuit?"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley can see your pet in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A haircut needs nothing.",
+    "An exam needs nothing more. A surgery drop-off needs its signed consent."
+   ],
+   [
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "An animal hospital runs no classes. A studio, a gym or a school does."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Lee's Barbershop takes surgery and dental drop-offs this way, in the morning by the drop-off time."
+   ],
+   [
+    "Copy: you said yes to a color correction, $125, at 11:20am on Riley's phone.",
+    "Copy: you said yes to Biscuit's $461 estimate, at 11:25am on Riley's phone."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the visit?"
+   ],
+   [
+    "Riley's price for your color correction is with the owner.",
+    "Riley's estimate for your pet is with the owner."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Biscuit's leash went missing during the visit."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says Biscuit's leash went missing today."
+   ],
+   [
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "The plug-in sets the status words, like in, waking up, ready."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like a pet that needs a muzzle or a calming plan."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Biscuit's bandage came loose."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Biscuit's bandage from Saturday came loose."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do puppy shots? We just got a puppy."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: puppy shots are $35 a visit. Want a time?"
+   ],
+   [
+    "No: named-only work",
+    "No: a goodbye visit"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Animal Hospital LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Vet's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Animal Hospital"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Vet"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee House Calls and Lee Farm Care"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile vet care and farm care"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "88 Elm St",
+    "410 Birch Ave"
+   ],
+   [
+    "Elm St",
+    "Birch Ave"
+   ],
+   [
+    "Riley Chen",
+    "Marcus Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Nadia Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Owen Price"
+   ],
+   [
+    "Casey Moore",
+    "Priya Moore"
+   ],
+   [
+    "Riley",
+    "Marcus"
+   ],
+   [
+    "Avery",
+    "Nadia"
+   ],
+   [
+    "Jordan",
+    "Owen"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "Lena",
+    "June"
+   ],
+   [
+    "electrical",
+    "farm care"
+   ],
+   [
+    "Electrical",
+    "Farm care"
+   ],
+   [
+    "plumber",
+    "vet"
+   ],
+   [
+    "plumbing",
+    "mobile vet care"
+   ],
+   [
+    "Plumbing",
+    "Mobile vet care"
+   ],
+   [
+    "A barbershop's",
+    "An animal hospital's"
+   ],
+   [
+    "A barbershop",
+    "An animal hospital"
+   ],
+   [
+    "barbershop",
+    "animal hospital"
+   ],
+   [
+    "Barbershop",
+    "Animal hospital"
+   ],
+   [
+    "Barbering",
+    "Vet care"
+   ],
+   [
+    "barbers",
+    "vets"
+   ],
+   [
+    "barber",
+    "vet"
+   ],
+   [
+    "Barber",
+    "Vet"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "hospital's price list"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Goodbye visit"
+   ],
+   [
+    "Signature cut and shave",
+    "Goodbye visit"
+   ],
+   [
+    "signature cut",
+    "goodbye visit"
+   ],
+   [
+    "Groom's package",
+    "cat spay"
+   ],
+   [
+    "groom's party",
+    "litter"
+   ],
+   [
+    "color correction",
+    "sick pet exam"
+   ],
+   [
+    "Color correction",
+    "Sick pet exam"
+   ],
+   [
+    "color and cut",
+    "cat spay"
+   ],
+   [
+    "Color and cut",
+    "Cat spay"
+   ],
+   [
+    "Kids cut",
+    "Puppy shots"
+   ],
+   [
+    "kids cut",
+    "puppy shots"
+   ],
+   [
+    "skin fade",
+    "recheck exam"
+   ],
+   [
+    "Skin fade",
+    "Recheck exam"
+   ],
+   [
+    "beard trim",
+    "nail trim"
+   ],
+   [
+    "Beard trim",
+    "Nail trim"
+   ],
+   [
+    "haircuts",
+    "vaccine visits"
+   ],
+   [
+    "Haircuts",
+    "Vaccine visits"
+   ],
+   [
+    "haircut",
+    "vaccine visit"
+   ],
+   [
+    "Haircut",
+    "Vaccine visit"
+   ],
+   [
+    "a patch test",
+    "a pre-surgery exam"
+   ],
+   [
+    "patch test",
+    "pre-surgery exam"
+   ],
+   [
+    "$25 consult",
+    "$72 exam"
+   ],
+   [
+    "a consult",
+    "an exam"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "Consult",
+    "Exam"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the exam room"
+   ],
+   [
+    "priced at the chair",
+    "priced in the exam room"
+   ],
+   [
+    "set at the chair",
+    "set in the exam room"
+   ],
+   [
+    "quote at the chair",
+    "estimate in the exam room"
+   ],
+   [
+    "price at the chair",
+    "price in the exam room"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "in the chair",
+    "in the exam room"
+   ],
+   [
+    "a chair",
+    "an exam room"
+   ],
+   [
+    "chairs",
+    "exam rooms"
+   ],
+   [
+    "$55",
+    "$185"
+   ],
+   [
+    "shops",
+    "hospitals"
+   ],
+   [
+    "shop",
+    "hospital"
+   ],
+   [
+    "Shop",
+    "Hospital"
+   ],
+   [
+    "color quote",
+    "estimate"
+   ],
+   [
+    "color",
+    "surgery"
+   ],
+   [
+    "Color",
+    "Surgery"
+   ],
+   [
+    "a cut",
+    "a visit"
+   ],
+   [
+    "cuts",
+    "visits"
+   ],
+   [
+    "cut",
+    "visit"
+   ],
+   [
+    "jobs",
+    "visits"
+   ],
+   [
+    "job",
+    "visit"
+   ],
+   [
+    "Jobs",
+    "Visits"
+   ],
+   [
+    "Job",
+    "Visit"
+   ]
+  ],
+  "B": [
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most animal hospitals start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules animal hospitals often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Exams, vaccines, surgery and goodbye visits."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Exams, vaccines and goodbye visits at home, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A surgery day"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see pets; Riley also does surgery and house calls."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My older cat hates the car and is due for shots."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a house call for my cat."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the pet's kind and age, what's wrong, and if the pet may bite."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My cat is due for shots' fits a wellness exam at home."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like selling a pet's medicine with no exam."
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a nail trim?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And what's wrong, and may your pet bite?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Pepper is off food."
+   ],
+   [
+    "can clear the drain",
+    "can see Pepper at home"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 dental surgery is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 wellness exam needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please keep Pepper in one room."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that Pepper is now breathing hard."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Pepper is breathing hard now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Call the emergency animal hospital now, or go there."
+   ],
+   [
+    "Yard drain",
+    "Nail trim"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scratch on the floor"
+   ],
+   [
+    "Under the sink, before",
+    "Exam spot, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor, before"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan examines Pepper and texts the estimate with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 blood tests 165 urine test 80"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Blood tests and X-rays · $540"
+   ],
+   [
+    "Supply line · $80",
+    "Urine test · $80"
+   ],
+   [
+    "Jordan found the leak.",
+    "Jordan examined Pepper."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Blood tests · $165"
+   ],
+   [
+    "OK'd the shutoff valve only, $165.",
+    "OK'd the blood tests only, $165."
+   ],
+   [
+    "Leave the supply line.",
+    "Leave the urine test."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "OK: Jordan runs the blood tests today, $165."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 urine test stays good until Thu Oct 29."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a loose dog in the yard that may bite."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD loose dog in the yard, stopped"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a loose dog in the yard and stopped the visit until it's put away."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a loose dog in the yard"
+   ],
+   [
+    "Mold behind the sink wall",
+    "A loose dog in the yard"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the exam, until the dog is put away"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Put the dog away, then rebook"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan knocks over a lamp and texts a photo."
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken lamp"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan broke a lamp at Alex M.'s."
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE added for Pepper on the secure page."
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Bring the cat scale next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Pepper is sick again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Pepper is sick again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s cat, seen Thu Oct 22, is sick again."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "A recheck within 14 days for the same problem is free."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on my floor this morning."
+   ],
+   [
+    "Say Alex was told at DONE that a sewer camera report comes Fri Oct 23.",
+    "Say Alex was told at DONE that the lab results come Fri Oct 23."
+   ],
+   [
+    "your sewer camera report from Thursday is ready.",
+    "the results from Thursday are ready on your secure page."
+   ],
+   [
+    "your sewer camera report needs a little more time.",
+    "the results need a little more time."
+   ],
+   [
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "the results from Thu Oct 22 are ready."
+   ],
+   [
+    "Sewer camera report",
+    "Results"
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Home wellness exams already booked keep only their saved card."
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9.",
+    "you have two house calls on Mon Nov 9."
+   ],
+   [
+    "It's a leak under the sink, today, arriving 3–5pm, with Jordan.",
+    "It's a sick pet house call, today, arriving 3–5pm, with Jordan."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the visit's address, after a missed check."
+   ],
+   [
+    "It takes no cut of card payments, except",
+    "It keeps none of card payments, except"
+   ],
+   [
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Sam Lee added you to the team for house calls and farm visits."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Vet license VT031552"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a pet emergency goes to the emergency animal hospital."
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilevet.com"
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "A sick visit priced at the visit never holds more than the house call fee."
+   ],
+   [
+    "MP045210",
+    "VT045210"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states license vet care to a hospital or a permitted mobile practice."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is Pepper an indoor cat?"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 wellness exam"
+   ],
+   [
+    "the kitchen drain",
+    "Pepper's wellness exam"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds Pepper is due for two more vaccines."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 two more vaccines Pepper is due for"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "two more vaccines, $160"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Two more vaccines · $160"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Two more vaccines"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 price for the vaccines is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160",
+    "you said yes to the two vaccines for $160"
+   ],
+   [
+    "like a roof leak",
+    "like a dog's bath"
+   ],
+   [
+    "Most bookings are one visit for one job.",
+    "Most bookings are one visit for one pet."
+   ],
+   [
+    "Some jobs take more than one visit",
+    "Some care takes more than one visit"
+   ],
+   [
+    "Jordan found more work.",
+    "Jordan found more care Pepper is due for."
+   ],
+   [
+    "Sign to book the work days",
+    "Sign to book the farm visits"
+   ],
+   [
+    "Signed: the deposit, then the work days",
+    "Signed: the deposit, then the visit days"
+   ],
+   [
+    "the water heater quote",
+    "the estimate"
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Wellness exams already booked keep $179, even after Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179.",
+    "Wellness exams already booked keep $179."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Pet grooming for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds pet grooming to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW pet grooming"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi perro se cortó una pata."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My dog cut a paw."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for a pharmacy: a wrong number."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a vet give my dog its shots at home this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa shots Thu 12-2 Casey"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿su perro respira bien? ¿Sangra mucho?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your dog breathing well? Is it bleeding a lot?"
+   ],
+   [
+    "No. No huele a gas.",
+    "Respira bien. Sangra poco."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "He's breathing fine. It's bleeding a little."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Presione un paño limpio sobre la herida. Si no deja de sangrar, vaya al hospital de emergencias para animales."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Press a clean cloth on the cut. If it won't stop bleeding, go to the emergency animal hospital."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A vet's example: a small cut with no danger signs gets 'press a clean cloth on it'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to press a cloth on the cut. If it won't stop bleeding, Rosa goes to the emergency animal hospital."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can I give my cat one of my pain pills?"
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead.",
+    "Say Alex had asked Lee's Barbershop for a vaccine visit instead."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the hospital's vets makes house calls."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The hospital's exam room is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can give the vaccine at the hospital for $35, or at your home for $75. Where would you like it?"
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services does house calls and farm care, not grooming. Nothing was saved. You can look for a groomer near you."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Pepper still won't eat. Can someone come tonight?"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for Pepper's yearly exam at home."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come for Pepper's yearly exam every year, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Home Services has a yearly wellness plan, $179 a visit."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a cat rescue books exams for 4 cats at one address."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each cat's notes go to the vet, one line each."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a nail trim for Pepper."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also trim Pepper's nails?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. A nail trim is $20, from the list."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This visit needs the old vet's records first. They take about 2 days, so the first open times are Thursday."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like a goodbye visit at home."
+   ],
+   [
+    "show photos of the work",
+    "share photos of your pet"
+   ],
+   [
+    "show photos of this job",
+    "share photos of your pet"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Jordan and Casey both make house calls, so either's times show."
+   ],
+   [
+    "your plumbing visit",
+    "your house call"
+   ],
+   [
+    "plumbing visit",
+    "house call"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can Pepper eat breakfast before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Please hold her breakfast until after the visit."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do Pepper's senior bloodwork?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan fosters dogs, with a repeat plan: a wellness exam for each of two dogs every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's visit?"
+   ],
+   [
+    "Rental 1",
+    "Juno"
+   ],
+   [
+    "Rental 2",
+    "Bear"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both dogs' visits go on one bill on the 1st."
+   ],
+   [
+    "no proof Alex may have this work done",
+    "no signed consent"
+   ],
+   [
+    "The repair price",
+    "The estimate"
+   ],
+   [
+    "the repair price",
+    "the estimate"
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Jordan's planning visit at Harper J.'s farm is for a $2,400 herd health plan."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 herd health plan, 3 visits"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 at the spring visit, $800 at the fall visit"
+   ],
+   [
+    "Harper and Sam sign. The $800 start payment is taken as the deposit, and Harper picks the work days. Each day gets its own code.",
+    "Harper and Sam sign. The $800 start payment is taken as the deposit, and Harper picks the first farm visit. Each visit gets its own code."
+   ],
+   [
+    "Pick your work days:",
+    "Pick the first farm visit:"
+   ],
+   [
+    "Mon Nov 2 to Wed Nov 4 · 8am–4pm · Jordan",
+    "Mon Nov 2 · 8am–12pm · Jordan"
+   ],
+   [
+    "Mon Nov 9 to Wed Nov 11 · 8am–4pm · Jordan",
+    "Mon Nov 9 · 8am–12pm · Jordan"
+   ],
+   [
+    "stage 2 of your repipe",
+    "visit 2 of your herd health plan"
+   ],
+   [
+    "your repipe",
+    "your herd health plan"
+   ],
+   [
+    "Repipe · $2,400",
+    "Herd health plan · $2,400"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 herd health plan"
+   ],
+   [
+    "repipe",
+    "herd health plan"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan waits on a quick call from the lab."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE waiting on the lab's call, done by 9:45"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is waiting on a quick call from the lab. The visit should be done by 9:45am."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan is bitten by a scared cat and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT cat bite on my hand, need to stop"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE knocked over a lamp, it broke"
+   ],
+   [
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "Pepper's care takes two visits: today, and Fri Oct 23, arriving 8–10am."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long a free recheck lasts."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left a mess in the bedroom."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan give my dog its shots next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a wellness exam and vaccines."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Jordan to come back next fall for Pepper's yearly exam."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: Pepper's yearly exam, 12 months"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for Pepper's yearly exam, as you asked Jordan, in late Aug 2027."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a treatment plan Jordan noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Home Services sent you a proposal for Pepper's treatment plan, from Jordan's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Pepper's treatment plan"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the results link"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Vet LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Vet's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Animal Hospital"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Vet"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee House Calls and Lee Farm Care"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile vet care and farm care"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "88 Elm St",
+    "410 Birch Ave"
+   ],
+   [
+    "42 Oak St",
+    "17 Linden Ln"
+   ],
+   [
+    "Elm St",
+    "Birch Ave"
+   ],
+   [
+    "Riley Chen",
+    "Marcus Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Nadia Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Owen Price"
+   ],
+   [
+    "Casey Moore",
+    "Priya Moore"
+   ],
+   [
+    "Riley",
+    "Marcus"
+   ],
+   [
+    "Avery",
+    "Nadia"
+   ],
+   [
+    "Jordan",
+    "Owen"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "electrical",
+    "farm care"
+   ],
+   [
+    "Electrical",
+    "Farm care"
+   ],
+   [
+    "plumbing license",
+    "vet license"
+   ],
+   [
+    "Plumbing license",
+    "Vet license"
+   ],
+   [
+    "plumber",
+    "vet"
+   ],
+   [
+    "plumbing",
+    "mobile vet care"
+   ],
+   [
+    "Plumbing",
+    "Mobile vet care"
+   ],
+   [
+    "barbershop",
+    "animal hospital"
+   ],
+   [
+    "barber",
+    "vet"
+   ],
+   [
+    "Barber",
+    "Vet"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "haircut",
+    "vaccine visit"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the exam room"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "a chair",
+    "an exam room"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Wellness exam and vaccines"
+   ],
+   [
+    "drain clearing",
+    "wellness exam and vaccines"
+   ],
+   [
+    "Drain clearing",
+    "Wellness exam and vaccines"
+   ],
+   [
+    "Water heater flush",
+    "Goodbye visit at home"
+   ],
+   [
+    "water heater flush",
+    "goodbye visit at home"
+   ],
+   [
+    "leak repair",
+    "sick pet visit"
+   ],
+   [
+    "Leak repair",
+    "Sick pet visit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Senior bloodwork at home"
+   ],
+   [
+    "sewer camera inspection",
+    "senior bloodwork at home"
+   ],
+   [
+    "service call fee",
+    "house call fee"
+   ],
+   [
+    "Service call fee",
+    "House call fee"
+   ],
+   [
+    "service call",
+    "house call fee"
+   ],
+   [
+    "Service call",
+    "House call fee"
+   ],
+   [
+    "$150",
+    "$385"
+   ],
+   [
+    "shop",
+    "hospital"
+   ],
+   [
+    "Shop",
+    "Hospital"
+   ],
+   [
+    "the shutoff valves",
+    "the vaccines"
+   ],
+   [
+    "Kitchen drain",
+    "Pepper's wellness exam"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "jobs",
+    "visits"
+   ],
+   [
+    "job",
+    "visit"
+   ],
+   [
+    "Jobs",
+    "Visits"
+   ],
+   [
+    "Job",
+    "Visit"
+   ],
+   [
+    "color",
+    "surgery"
+   ]
+  ]
+ },
+ "keep": [
+  "cleaning",
+  "Cleaning",
+  "leak",
+  "visit fee",
+  "Visit fee",
+  "house call",
+  "House call"
+ ],
+ "story": {
+  "A": "Sam Lee, a vet, signs up two companies by text. Then Alex asks for the soonest exam for Biscuit, a dog who is limping, at Lee Animal Hospital. Alex is a new client, so the old vet's records come too. Marcus sees Biscuit Sat Oct 24 at 11:00am and gives a written estimate before any tests. Alex pays at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee, a vet, signs up two companies by text. Then Alex books a house call with Lee Mobile Vet for Pepper, an older cat who hates the car. Owen comes to 17 Linden Ln Thu Oct 22, arriving 8 to 10am, and gives a written estimate before any tests. A card is saved for the $89 house call fee, and Rosie texts the bill after. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "visit|none|counter",
+   "combos": [
+    "visit|none|counter",
+    "list|none|counter",
+    "list|card|counter",
+    "list|deposit|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "visit|none|counter": "The main story: a sick or hurt pet exam. Only the $72 exam is promised. Marcus gives a written estimate before any tests, and Alex pays at the front desk.",
+    "list|none|counter": "A $35 vaccine visit for a pet seen in the last year. Nothing is taken: a YES books it. Alex pays at the front desk.",
+    "list|card|counter": "The same vaccine visit where the hospital turns on its $20 no-show fee. A card is saved for it; nothing is charged.",
+    "list|deposit|counter": "A $140 cat spay, a drop-off day. A $40 deposit when booking, and the $100 rest at pick-up.",
+    "list|full|none": "A $185 goodbye visit at the hospital, paid in full when booking, so there's no stop at the desk. Nothing is ever kept for a goodbye visit."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Vaccine visit"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Vaccine visit"
+    },
+    "visit|*|*": {
+     "fee": "$72",
+     "name": "Sick or hurt pet exam"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Cat spay"
+    },
+    "list|full|*": {
+     "price": "$185",
+     "paid": "$185",
+     "fee": "$0",
+     "name": "Goodbye visit"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|card|bill",
+   "combos": [
+    "visit|card|bill",
+    "list|card|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "visit|card|bill": "The main story: a sick cat seen at home. A card is saved; the $89 house call fee is owed even after a no to the estimate. Owen gives a written estimate before any tests, and Rosie texts the bill after.",
+    "list|card|bill": "A $179 wellness exam and vaccines at home. A card is saved for the $89 house call fee, owed only for a late cancel or nobody home, and Rosie texts the bill after.",
+    "list|full|none": "A $385 goodbye visit at home, in a 2-hour arrival window, paid in full when booking. It's fee-free: a cancel or a move always gets a full refund."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Wellness exam at home"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Wellness exam at home"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Sick pet house call"
+    },
+    "list|full|*": {
+     "price": "$385",
+     "paid": "$385",
+     "fee": "$0",
+     "name": "Goodbye visit at home"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A7-15",
+   "A8-02",
+   "A8-53",
+   "A10-34"
+  ],
+  "B": [
+   "B10-32"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Vet work always needs a license: each vet's own, from the state's veterinary board."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A vet isn't a human health practice, so vet work pays Rosfield's $2 per confirmed booking (the lawyer list checks the states' fee-sharing rules)."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No extra agreement for vet work, so nothing waits on one."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Vet visits book a vet's time; the surgery suite is saved like equipment, never sold as a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The example practices run no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each vet holds their own license (and vet techs where the state's form credentials them)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No vet visit is sent now: an emergency goes straight to the emergency animal hospital, and a sick pet gets the soonest time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A vet visit books a vet's time, or a drop-off day for surgery."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A vet visit books a vet's time, never a table or a space."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The example hospital boards no pets, so it books no stays (pf.license.boarding)."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A vet sees pets: the booking is always for a pet, made by an adult (pf.questions.who_may_book)."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Children aren't left at the hospital; a pet goes home only to its owner or the person named."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Pet insurance pays the owner back after the visit, so the hospital bills no plan (pf.money.insurance)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The hospital bills no insurer: pet insurance pays the owner back after the visit (pf.money.insurance)."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "A pet left after a visit is the hospital's call by phone, then the state's notice rules; there's no storage fee (pf.rules.not_picked_up)."
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A pet emergency gets the emergency animal hospital at once, never a booking."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The hospital's plans charge no saved card: each puppy shot visit is paid at the front desk, like a single visit (pf.money.plans)."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When pet owners book, do you take anything? Each service starts the way most animal hospitals set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your hospital, paid at the front desk, your own way",
+         "Exams and vaccine visits: nothing taken when they book",
+         "A card saved for the $20 no-show fee, only if you turn it on",
+         "Surgery: a deposit when they book, the rest at pick-up",
+         "Goodbye visits: paid in full when booked, nothing ever kept"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Sick or hurt pet exam",
+          "$72, then a written estimate"
+         ],
+         [
+          "Vaccine visit",
+          "$35"
+         ],
+         [
+          "Wellness exam",
+          "$68"
+         ],
+         [
+          "Recheck exam",
+          "$40"
+         ],
+         [
+          "Nail trim",
+          "$20"
+         ],
+         [
+          "Cat spay",
+          "$140, $40 deposit"
+         ],
+         [
+          "Goodbye visit",
+          "$185"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit+before:none+after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:full": {
+      "addSay": [],
+      "addMore": []
+     },
+     "price:visit+before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Vet work always needs a license: each vet's own, from the state's veterinary board."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A vet isn't a human health practice, so vet work pays Rosfield's $2 per confirmed booking (the lawyer list checks the states' fee-sharing rules)."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No extra agreement for vet work, so nothing waits on one."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Vet visits book a vet's time; the surgery suite is saved like equipment, never sold as a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The example practices run no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each vet holds their own license (and vet techs where the state's form credentials them)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No vet visit is sent now: an emergency goes straight to the emergency animal hospital, and a sick pet gets the soonest time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A house call is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "House calls sell no seats in a session."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A house call needs no signed contract; the goodbye visit's consent is a form on the secure page (B4-86)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No vet visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No vet visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left with the pet and the vet: an adult on the booking is there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "An adult on the booking is always with the pet."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Pet insurance pays the owner back, so no plan pays the practice (pf.money.insurance)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Pet insurance pays the owner back after the visit; the practice bills no insurer (pf.money.insurance)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "No vet visit is sent now, and nobody is on call (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "No vet visit is sent now, so this is never offered (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "The pet's owner pays; no landlord is billed for a house call (B4-78)."
+   },
+   {
+    "op": "branch",
+    "at": "B10-02",
+    "branch": {
+     "label": "No ask: a goodbye visit",
+     "steps": [],
+     "end": "merge"
+    }
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A pet emergency gets the emergency animal hospital at once, never a booking."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A house call plan charges no saved card on a set day: each visit is billed like a single visit (pf.money.plans)."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When pet owners book, do you take anything? Each service starts the way most mobile vets set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every house call, to start",
+        "lines": [
+         "Where: at the pet owner's home",
+         "When they book: a card saved for the $89 house call fee you OK",
+         "After the visit: Rosie sends the bill",
+         "Goodbye visits: paid in full when booked, nothing ever kept"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Sick pet house call",
+          "$89, then a written estimate"
+         ],
+         [
+          "Wellness exam and vaccines at home",
+          "$179"
+         ],
+         [
+          "Nail trim, added to a visit",
+          "$20"
+         ],
+         [
+          "Goodbye visit at home",
+          "$385"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:full": {
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   }
+  ]
+ },
+ "notes": "From: dentist. A vet runs like a clinic: exams of a set length with a vet by name, a longer first exam for a new client, the old vet's records as a first step, a written estimate before any test or treatment, results only from the vet, and health details kept on the secure page. Pet words (drop-off, pick-up, READY, a pet that may bite) are borrowed from groomer and boarding; nothing of the dentist's own work is left (check-prof's pilot-word check is at 0).\nNames: Sam Lee, a vet, owns Lee Mobile Vet (the master's main company: house calls and farm calls) and Lee Animal Hospital (the second company: the hospital, 410 Birch Ave). Pat is Sam's partner and OKs Lee Mobile Vet prices over $500.\nPeople: at the hospital Marcus (vet, the only surgeon) and Nadia (vet); on the mobile team Owen (vet, also farm animals) and Priya (vet). Alex M. stays the customer. Pets: Biscuit (a limping Lab, the main story A), Luna (A's cat spay path), Rufus (A's goodbye path), Pepper (an older cat, the main story B), Daisy (B's goodbye path). The master's customer Owen H. became Felix, so the two Owens never meet.\nKinds of work: plumbing became mobile vet care (house calls), electrical became farm care (it waits for Owen's license), the barbershop became the animal hospital.\nPrices are the example practices' own, not a standard: sick exam $72 (Biscuit's estimate $461 in all), vaccine visit $35 at the hospital or $75 at home, recheck $40 (free within 14 days for the same problem), nail trim $20, puppy shots $35 a visit as a plan, cat spay $140 ($40 deposit), dental cleaning from the exam's estimate (deposit half its low end), goodbye visit $185 at the hospital and $385 at home, paw print $25, private cremation $150; house call fee $89, wellness exam and vaccines at home $179, sick pet at home priced at the visit ($245 in the example), senior bloodwork at home $199; the hospital's no-show fee $20, off unless Sam turns it on.\nMoney A (all at the hospital, paid at the front desk its own way): visit|none|counter is the main path (a sick or hurt exam: only the $72 exam promised, a written estimate before any test). list|none|counter is a vaccine visit (a YES books it). list|card|counter is the same visit where Sam turns on the $20 no-show fee: a card is saved only for it. list|deposit|counter is the $140 cat spay: a $40 deposit before surgery under anesthesia, the rest at pick-up. list|full|none is the $185 goodbye visit, paid when booking so the family never stops at the desk. Left out: holds, photos, Rosfield's bill or card charge (the hospital has a front desk).\nMoney B (house calls): visit|hold|bill is the main path (a sick cat at home: the $89 house call fee held, Owen's estimate OK'd before tests, Rosie texts the bill). list|hold|bill is the $179 wellness exam and vaccines at home. list|full|none is the $385 goodbye visit at home, paid when booking, in a 2-hour arrival window. Left out: photos (a vet never prices from photos), deposits and saved-card charges at home, own-way billing. The tip branch (B9-19) is off: pf.money.tips is none.\nThe sign-up example sets money only the vet's way: S1-13 to S1-16 (house calls held, goodbye paid in full) and S1-41 to S1-47 (the hospital's list, nothing taken, the spay deposit, the goodbye paid in full, the vaccine at home $75 paid in full). Each sign-up step on flow A reads the same on every money path.\nRosfield's $2 per confirmed booking applies, paid by the business: a vet isn't a human health practice. For Rosfield's lawyer (pf.money.rosfield_2, pf.rules.referral_fees): do a state's rules against vets sharing fees or paying for referrals reach the $2?\nPrivacy: the diagnosis, test results, and medicine names or doses stay on the secure page, never in a text, to the owner or the team. Texts name the pet, the vet, the visit kind, the date, time, place, price and a secure link; staff text 'notes on the page'.\nDanger: the vet's stop words (trouble breathing, a possible poisoning, can't stand, bloat signs, a seizure, bleeding, a cat that can't pee, trouble giving birth) send the owner at once to the nearest emergency animal hospital, the one Sam named at sign-up (S1-22), with a pet poison line for a poisoning (it may charge a fee). Never a booking, never a wait. Rosie never judges how sick a pet is and never diagnoses. A pet that seems worse before the visit gets the check again (A7-13, B7-17).\nLicenses: each vet's own; vet techs and assistants only where the state's form credentials them; the hospital's premises permit and a mobile practice permit where the state issues them; controlled-drug registrations only noted where the state's form asks (Rosie handles no drugs). Video visits and boarding are switches from the state's form. No single state or city is named anywhere.\nGoodbye visits are fee-free in both flows: no warning, no late or no-show fee, a full refund or a move, nothing sold (only what the family asks for, like a paw print, priced first), no rating, and the pet marked passed so no text about it goes out again. The master's fee steps and what-ifs don't vary by service, so the overlay gives each one a goodbye-path variant (A7-06 to A7-10, A8-14 to A8-22, A8-46, A8-57 to A8-64, A10-07, A10-08, A10-25, A10-32, A10-33, B7-10, B7-14, B8-10, B8-16, B8-60, B8-66, B10-18, B10-25 and others). That is gap 'Sensitive visits, and a death'.\nWhat-ifs that named the main story's pet get the right pet on the other paths (Luna on the spay path, Rufus and Daisy on the goodbye paths), so a goodbye path never sells vaccines or sends results.\nOff: flow A's plan and insurance branches (pet insurance pays the owner back), a day-before hold failing (the hospital holds nothing), an item not picked up and rented items (A10-06), a child going home (A8-32), walk-in seats and tables; flow B's photo, landlord, plan, tip, sent-now (no on-call house calls), nobody-home, delivery, outside-check, item-to-the-shop and permit-inspection branches. Each off says why.\nPlug-in splits kept (splitsKept A): A4-43 first step (records, an exam on file, the anesthesia consent), A7-61 stand-in with the skill (only Marcus does surgery), A8-02 what to bring, A8-53 a drop-off, A10-34 a rating (never after a goodbye visit; B10-02 gets the same as its own branch).\nClocks run forward on every listed path; words ops set 't' only where the master's time didn't fit (Owen's estimate at 8:40am, B8-20).\nNot sure: whether a state lets a vaccine visit be given at home by a hospital (S1-43 checks it); whether the goodbye consent must be signed with the vet in person (a switch); the 14-day free recheck and the 24-hour spay deposit refund are the example practices' own policies.\nReview (Oct 23): goodbye paths now ask once more before a cancel, never cut a late family short, never move to another vet without the family's yes (Sam calls), and never ask the family whether a visit happened (Rosie asks the vet). Plans charge no saved card (A7-02 and B7-05 plan-charge branches off; pf.money.plans). Section 11's recheck takes nothing at booking on the paths that take nothing. Sam names a pet poison line at sign-up (S1-22).\nRefit Oct 27 2026 (R13) to the REDESIGN 2 master: facts animals, dropoff, firststeps, forms, results, video, aftercare; no switches (pet care is not sensitive work; the $2 stays); A set start times, B arrival windows, free cancel until 24 hours before. The $89 house call fee is no longer held (D66): on the visit path it's the fee owed even after a no to the estimate (B4-14), on the list path the saved card's late-cancel or nobody-home fee; goodbye visits keep nothing (fee $0). Every legacy words op dropped; own words only on S1-13 (the money card, both flows). Kept words: 'leak' (a privacy leak), 'visit fee' (the master's rule for a price set at the visit), 'house call' (the vet's own word), 'cleaning' (B3-13's wrong-number call to a dental office, the master's example).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "We'd share only where they're working, only after a missed check.",
+    "It takes no cut of card payments, except",
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "MP045210",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Owen",
+    "takes no cut of",
+    "At a pick-up, the item is shown at the counter before it's paid.",
+    "like a detail or a repair",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Haircut every 4 weeks · Riley",
+    "Haircut · Sat Oct 31",
+    "show photos of the work",
+    "Gloss to finish",
+    "gloss",
+    "the $90 color quote",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "This is Lee's Barbershop's booking line, so I can't reach Elm Street Dental.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "Sends the 911 safety message",
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "A clinic or a vet often names a nurse line or an emergency clinic here.",
+    "like a 15-minute style consult",
+    "A haircut could mean a salon or a barbershop.",
+    "Alex asks for a cut every 4 weeks.",
+    "Books a cut every 4 weeks",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A barbershop bills no plans, so this never happens at Lee's Barbershop.",
+    "A barbershop books a person's time.",
+    "Anything Riley should know?",
+    "It's a gift for my brother. Can I pay for it?",
+    "A barbershop has none.",
+    "May the shop show photos of your hair?",
+    "photos of your hair",
+    "Haircut plan",
+    "haircut plan",
+    "Color always stays with Riley.",
+    "Can my son wait in the shop during my cut?",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A haircut needs nothing.",
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Copy: you said yes to a color correction, $125, at 11:20am on Riley's phone.",
+    "What happens at the chair?",
+    "Riley's price for your color correction is with the owner.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "No: named-only work",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Lena",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "A barbershop's",
+    "A barbershop",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "barber",
+    "Barber",
+    "price board",
+    "Price board",
+    "shop's board",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "groom's party",
+    "color correction",
+    "Color correction",
+    "color and cut",
+    "Color and cut",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "a patch test",
+    "patch test",
+    "$25 consult",
+    "a consult",
+    "consult",
+    "Consult",
+    "Priced at the chair",
+    "priced at the chair",
+    "set at the chair",
+    "quote at the chair",
+    "price at the chair",
+    "at the chair",
+    "At the chair",
+    "in the chair",
+    "a chair",
+    "chairs",
+    "$55",
+    "shops",
+    "shop",
+    "Shop",
+    "color quote",
+    "color",
+    "Color",
+    "a cut",
+    "cuts",
+    "cut",
+    "jobs",
+    "job",
+    "Jobs",
+    "Job"
+   ],
+   "B": [
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "My kitchen drain is clogged.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Just the kitchen sink.",
+    "can clear the drain",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Yard drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Jordan found the leak.",
+    "Shutoff valve · $165",
+    "OK'd the shutoff valve only, $165.",
+    "Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "Jordan finds mold behind the sink wall.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "NOTE grease clog 12 ft in.",
+    "Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty, so this visit is free.",
+    "I found water damage under the sink this morning.",
+    "Say Alex was told at DONE that a sewer camera report comes Fri Oct 23.",
+    "your sewer camera report from Thursday is ready.",
+    "your sewer camera report needs a little more time.",
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "Sewer camera report",
+    "Drain clearings already booked keep only their saved card.",
+    "you have two drain clearings on Mon Nov 9.",
+    "It's a leak under the sink, today, arriving 3–5pm, with Jordan.",
+    "We'd share only where they're working, only after a missed check.",
+    "It takes no cut of card payments, except",
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "leehomeservices.com",
+    "A job priced at the visit never takes more than the visit fee.",
+    "MP045210",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Is the sink still full of water?",
+    "DONE 179 drain",
+    "the kitchen drain",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160",
+    "like a roof leak",
+    "Most bookings are one visit for one job.",
+    "Some jobs take more than one visit",
+    "Jordan found more work.",
+    "Sign to book the work days",
+    "Signed: the deposit, then the work days",
+    "the water heater quote",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Drain clearings already booked keep $179.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Someone calls for a dentist: a wrong number.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Say Alex had asked Lee's Barbershop for a haircut instead.",
+    "One of the shop's barbers does house calls.",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "show photos of the work",
+    "show photos of this job",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "your plumbing visit",
+    "plumbing visit",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "Both rentals' visits go on one bill on the 1st.",
+    "no proof Alex may have this work done",
+    "The repair price",
+    "the repair price",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Harper and Sam sign. The $800 start payment is taken as the deposit, and Harper picks the work days. Each day gets its own code.",
+    "Pick your work days:",
+    "Mon Nov 2 to Wed Nov 4 · 8am–4pm · Jordan",
+    "Mon Nov 9 to Wed Nov 11 · 8am–4pm · Jordan",
+    "stage 2 of your repipe",
+    "your repipe",
+    "Repipe · $2,400",
+    "$2,400 repipe",
+    "repipe",
+    "Jordan needs a part from the supply house.",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "DAMAGE cracked the cabinet floor",
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Texts the camera report link",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "barber",
+    "Barber",
+    "Price board",
+    "haircut",
+    "consult",
+    "at the chair",
+    "a chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "leak repair",
+    "Leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "service call",
+    "Service call",
+    "$150",
+    "shop",
+    "Shop",
+    "the shutoff valves",
+    "Kitchen drain",
+    "Labor",
+    "jobs",
+    "job",
+    "Jobs",
+    "Job",
+    "color"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A8-67": "e9fd748fc5",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "S2-31": "320ac5e4cb",
+   "A7-94": "6490d5d8e6",
+   "S1-13": "eca22651fd"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B5-34": "917f89b62f",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B9-06": "f091432f2d",
+   "B10-02": "eaf53a5e74",
+   "S2-31": "320ac5e4cb",
+   "B7-91": "7132851ec1",
+   "S1-13": "6964bfbe60"
+  }
+ }
+}

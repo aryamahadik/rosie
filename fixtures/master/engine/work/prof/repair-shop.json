@@ -1,0 +1,4139 @@
+{
+ "id": "repair-shop",
+ "name": "Electronics and device repair shop",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "auto-repair",
+ "plugin": {
+  "pf.license": {
+   "need": "if: where the state or city registers electronics repair dealers; a low-voltage license for running network cable, where the state's rules require one",
+   "ask": [
+    "The shop's repair dealer registration number, where the state or city has one",
+    "For network setup: a low-voltage license for the company and each installer, where the state's rules require one",
+    "A secondhand dealer license, only if the shop buys used devices, where the city or state requires one"
+   ],
+   "who": "the business; and each network installer, where the state licenses them. Repair technicians need no license of their own",
+   "check": "the state's or city's license lookup; where there's none, a person on Rosie's team checks within 1 business day",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance and cover for customers' devices, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'"
+  },
+  "pf.services": {
+   "pattern": "drop-off: the device is left at the shop and picked up when it's READY; a mail-in box; or an on-site visit at a home or office",
+   "list": [
+    {
+     "name": "Diagnosis for a laptop or computer",
+     "price": "one price (the example shop: $49), counted toward the repair if the customer says yes; a phone's quick check at drop-off is free",
+     "length": "about 1 hour; more time needs a new yes",
+     "place": "at the shop, or on-site",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Repair after a diagnosis (battery, charging port, board repair, data)",
+     "price": "quoted at the visit: a written estimate with parts and labor lines, OK'd before any work",
+     "place": "at the shop, or on-site",
+     "before": "nothing taken at the shop; a card saved for the on-site fee, on-site",
+     "after": "at the counter, or the bill Rosie texts with READY"
+    },
+    {
+     "name": "Phone, tablet and laptop screens, batteries and charging ports",
+     "price": "one price per model, from the shop's list",
+     "length": "about 1 hour while you wait, when the part is in stock",
+     "place": "at the shop, by mail-in, or on-site",
+     "before": "nothing taken; a deposit only when the part must be ordered in",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Tune-ups, virus removal, software restore, data transfer",
+     "price": "one price",
+     "length": "1 to 2 hours",
+     "place": "at the shop or on-site"
+    },
+    {
+     "name": "Water damage cleaning",
+     "price": "one price for the cleaning; repairs quoted after",
+     "length": "1 to 3 days",
+     "place": "at the shop"
+    },
+    {
+     "name": "Data recovery",
+     "price": "quoted after a check; the results come later, by a set date",
+     "place": "at the shop"
+    },
+    {
+     "name": "Mail-in repair",
+     "price": "the same prices; an insured prepaid box both ways, 3 to 5 days each way",
+     "place": "by mail, only from states where the shop may take repairs"
+    },
+    {
+     "name": "Laptop screen at a home or office",
+     "price": "priced from photos of the screen and its model label, since panels differ by model; over the owner's amount it needs his OK and a written estimate",
+     "place": "at the customer's place",
+     "before": "a 25% deposit orders the panel",
+     "after": "the rest on the bill Rosie texts"
+    },
+    {
+     "name": "Check-up plans",
+     "price": "an office IT check-up every 3 months, or a yearly virus check (the example: $179 and $150 a visit), each visit booked and paid like a single one",
+     "place": "at the customer's place (Lee Tech Help only)"
+    },
+    {
+     "name": "On-site visit at a home or office",
+     "price": "the on-site fee (the example: $89), counted toward the repair",
+     "place": "at the customer's place",
+     "before": "a card saved for the on-site fee",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    }
+   ],
+   "capacity": "drop-off slots every 30 minutes in open hours; one technician per device; the shop's one soldering station is saved like equipment",
+   "parts": "a part in stock is set aside for each booking; a part not in stock is ordered once the customer says yes, 1 to 3 business days",
+   "warranty": "on the receipt (the examples: 12 months on parts and labor); never for new drops, cracks or liquid damage",
+   "nobody_home": "no: someone must be there to hand over, unlock and test the device",
+   "online": "no: a device is fixed in hand"
+  },
+  "pf.questions": {
+   "before_times": [
+    "The device: what kind, make and model, picked from a list",
+    "What's wrong: screen, battery, charging, water, won't turn on, data, or something else",
+    "Has it been wet or dropped?",
+    "For an on-site visit: a home or an office, and the address"
+   ],
+   "after_time": [
+    "Any other problems, like the battery, camera or Face ID",
+    "Leave it, or wait for a quick repair",
+    "The old parts back? Yes or no"
+   ],
+   "secure_page_only": [
+    "The passcode or login: never asked in chat. It's typed on the shop's tablet at drop-off, and only if the customer agrees",
+    "The data consent: what the technician may do, and whether the device is backed up",
+    "Someone else who may pick it up, named in writing",
+    "For a mail-in: the return address"
+   ],
+   "who_may_book": "an adult: the device's owner, or someone they let bring it in; for a child's device, a parent books and says yes to prices"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "fire",
+    "smoke from a device",
+    "sparks",
+    "someone burned or hurt"
+   ],
+   "stop_action": "'Call 911' and the generic emergency steps; no booking",
+   "safety_words": [
+    "a swollen, bulging or hot battery",
+    "a burning smell",
+    "a device that got wet while plugged in"
+   ],
+   "safety_action": "Rosie says: stop using and charging it, unplug it if that's safe, keep it away from anything that burns, and don't press on it. Then the booking goes on, marked urgent, soonest times first.",
+   "during_work": "a swollen battery found during a repair: the work stops, the battery goes in a fire-safe box, and the customer gets a written note",
+   "can_continue": "yes, after the safety steps"
+  },
+  "pf.first_steps": {
+   "required": "none before the visit",
+   "at_check_in": [
+    "The data consent on the counter tablet: what the technician may do, and whether the device is backed up",
+    "The passcode, only if the customer agrees: shown only to the technician's login, and deleted at pick-up",
+    "Notes and photos of the device's condition"
+   ],
+   "prep_for_reminder": [
+    "Back up the device the night before",
+    "Bring the charger and any cable",
+    "For an on-site visit: the device charged, and a table near an outlet"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "a drop-off: the check-in code at the counter when the device is left. A mail-in has no code: DONE when the box is unpacked. On-site: the code at the door.",
+   "intake": "the device and its condition, with photos; the problem in the customer's words; the data consent; the passcode only with consent",
+   "diagnosis": "the OK'd diagnosis covers about 1 hour; more time needs a new yes; no answer is never a yes",
+   "estimate": "written, with parts and labor lines, OK'd before any work; an OK on some lines does only those",
+   "added_work": "anything over the OK'd estimate needs a new yes first, logged with the time",
+   "status_words": [
+    "IN",
+    "DIAGNOSING",
+    "WAITING ON A PART",
+    "IN REPAIR",
+    "READY"
+   ],
+   "part_test": "every new part is tested before it goes in; a faulty part is sent back and another ordered, at no extra charge",
+   "updates": "by text; by email while the device in the shop is the customer's only phone",
+   "ready": "READY says what was done, the total and the pick-up hours",
+   "pick_up": "the device goes only to the customer, or someone they named; it's shown working at the counter first",
+   "passcode": "deleted from Rosie the moment the device is handed back",
+   "done_proof": "the drop-off code, or a mail-in's DONE, checks it in; READY and the pick-up close it; on-site, the code at the door and DONE",
+   "late_drop_off": "dropped off any time before closing, and looked at next in line",
+   "unclaimed": "held 90 days, with reminders at 30 and 60 days; then written notice and the state's waiting period; the data is wiped and logged before any disposal",
+   "items_to_the_shop": "on-site: a device that needs board repair goes to the shop and comes back on a booked return"
+  },
+  "pf.money": {
+   "before": "the starting answer is nothing taken; the diagnosis is OK'd on the booking page, not charged",
+   "deposit": "only for a part ordered in for a set price: the example shop takes $40 toward a $140 Chromebook screen at the shop, and 25% toward a laptop screen priced from photos on-site; deposit cap: from the state form",
+   "after": "paid at the counter at pick-up, the shop's own way; or the bill Rosie texts with READY, if the owner turns it on; a mail-in pays by the link before it's shipped back",
+   "on_site": "a card saved for the on-site fee; the bill after DONE, or the saved card",
+   "after_a_no": "after a no to the estimate, only the OK'd diagnosis is owed",
+   "fees": "at the shop: no cancel or no-show fee to start, but a deposit for a part ordered in may be kept on a late cancel or a no-show, only if the owner says so; on-site: the saved card may be charged the on-site fee for a late cancel or nobody home, only if the owner confirms",
+   "storage": "no storage fee to start; an unclaimed device follows the state's notice and waiting rules: from the state form",
+   "tips": "no tip line to start",
+   "tax": "the shop's tax rate on parts",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "A passcode or login",
+    "What's on the device: photos, messages, files",
+    "The serial number or IMEI",
+    "A gate or door code"
+   ],
+   "phone_in_shop": "while the customer's only phone is in the shop, updates go by email; texts start again at pick-up",
+   "languages": "English and Spanish",
+   "minors": "texts about a child's device go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "phone and tablet repair",
+    "laptop and computer repair",
+    "board repair (soldering)",
+    "data recovery",
+    "water damage",
+    "on-site visits",
+    "network setup"
+   ],
+   "licenses": "no person license for device repair; a low-voltage license for network installers, where the state's rules require one",
+   "supervision": "none to start; a trainee works only while a lead technician is in, if the owner sets it",
+   "who_oks": "the owner OKs estimates over his amount, added work and any fee",
+   "stand_in": "only someone with the skill for that repair; board repair only by a technician who does it",
+   "data": "only the technician on the job sees the passcode, on the shop's own login"
+  },
+  "pf.rules": {
+   "written_estimate": "switch: a written estimate before any work over an amount: from the state form",
+   "show_registration": "switch: the shop's registration number on estimates and receipts: from the state form",
+   "parts_used": "switch: say whether parts are new, used or rebuilt, on the estimate and the receipt: from the state form",
+   "old_parts": "switch: offer the old parts back: from the state form",
+   "mail_in": "switch: which states may send mail-ins, from each state's registration rules",
+   "unclaimed_devices": "switch: how long a device is held, what notice is sent, and the waiting period: from the state form",
+   "secondhand": "switch: buying used devices needs a secondhand dealer license where the city or state requires one",
+   "data_privacy": "Rosie's rule: a passcode is kept only until pick-up, and seen only by the technician on the job",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A swollen or hot battery before the visit: the safety steps first, then the soonest time",
+    "No passcode shared: tested as far as possible, the rest with the customer at pick-up",
+    "More diagnosis time needed",
+    "No answer to the estimate",
+    "A no to the estimate",
+    "More work found",
+    "A part ordered, or late, or faulty when tested",
+    "A swollen battery found during the repair",
+    "The customer's only phone is in the shop: updates by email",
+    "A mail-in from a state where the shop isn't registered",
+    "The device isn't picked up: reminders, written notice, then a data wipe",
+    "The problem comes back under warranty",
+    "A device damaged at the shop"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "photos",
+   "extrawork",
+   "documents"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Tyler and Nina (technicians)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Ethan and Priya (technicians)",
+   "other": "Others (a bank, an office manager)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Tyler"
+  },
+  "B": {
+   "staff": "Ethan"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "My laptop won't hold a charge. Can Lee's Device Repair look at it on Saturday?"
+   ],
+   [
+    "once Riley sees the hair.",
+    "once Tyler sees the laptop."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a TV repair, which isn't on the shop's list."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Tyler use a bigger battery instead?"
+   ],
+   [
+    "asks for a toner instead of the gloss. What's the new price?",
+    "asks for a bigger battery instead. What's the new price?"
+   ],
+   [
+    "two skin fades on",
+    "two charging port cleanings on"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood repair shop on Elm St. Phones, laptops and tablets fixed."
+   ],
+   [
+    "Alex picked a kids cut for a son",
+    "Alex picked a tablet fix for a son"
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "a beard trim today at 2:00pm with Avery",
+    "a screen protector today at 2:00pm"
+   ],
+   [
+    "the beard trim today at 2:00pm with Avery",
+    "the screen protector today at 2:00pm"
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: a 10:00am drop-off"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken when they book"
+   ],
+   [
+    "haircut with Riley",
+    "computer tune-up"
+   ],
+   [
+    "Sat 11am Riley",
+    "Sat 11am drop-off"
+   ],
+   [
+    "at 11:20am on Riley's phone",
+    "at 12:25pm on Riley's phone"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Fan cleaned out · $15"
+   ],
+   [
+    "Riley quotes the rest at the chair, before any work.",
+    "Tyler writes an estimate before any repair."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was your visit with Tyler?"
+   ],
+   [
+    "Sun Oct 25 · 11:00am · Riley",
+    "Mon Oct 26 · 11:00am drop-off"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Do I need to bring the charger?"
+   ],
+   [
+    "Walk-in for a haircut",
+    "Walk-in for a screen protector"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a game console cleaning is $25."
+   ],
+   [
+    "Your item is still waiting for pick-up.",
+    "Your laptop is still waiting for pick-up."
+   ],
+   [
+    "A drop-off item isn't picked up.",
+    "A drop-off device isn't picked up."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $49 diagnosis first"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds watch repair to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Watch repair for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW watch repair"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't fix TVs."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Tech On-Site and Lee Home Networks."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero un mantenimiento de mi computadora el sábado."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A repair shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no technician. A day shows only if a technician with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Barbershop · drop-off"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like the data recovery Riley noted, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Barbershop sent you a proposal: the data recovery Riley noted."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Data recovery"
+   ],
+   [
+    "3 visits with Riley",
+    "One drop-off · about 3 days"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The work is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Drain clearing",
+    "Screen replacement"
+   ],
+   [
+    "home warranty plan",
+    "device protection plan"
+   ],
+   [
+    "a package of cuts",
+    "a package of tune-ups"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "a shop's repair dealer registration may cover only its own address"
+   ],
+   [
+    "patch test",
+    "pre-check"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A screen repair could mean a phone store or a repair shop."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A repair shop's plug-in adds device danger words, like a swollen battery."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A repair shop's example: a hot, swollen battery gets 'stop charging it, and keep it away from anything that burns'."
+   ],
+   [
+    "A barbershop's services need none.",
+    "A repair shop needs none at booking: the data consent is signed at drop-off."
+   ],
+   [
+    "Books the groom's party together",
+    "Books an office's laptops together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "An office manager books tune-ups for five laptops on one morning. Rosie finds bench time side by side across Riley and Avery."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "There's a new scratch on my laptop lid."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says there's a new scratch on the laptop lid"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The laptop shuts off at 30% again."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the laptop shuts off at 30% again since the repair"
+   ],
+   [
+    "Riley looks, then prices it",
+    "Riley diagnoses, then writes the estimate"
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the diagnosis; the estimate stays open"
+   ],
+   [
+    "Follows up on an item left behind",
+    "Follows up on a device left behind"
+   ],
+   [
+    "a skin-test result",
+    "a test result"
+   ],
+   [
+    "color and house calls",
+    "board repair and on-site visits"
+   ],
+   [
+    "color, house calls",
+    "board repair, on-site visits"
+   ],
+   [
+    "Consult only",
+    "Diagnosis only"
+   ],
+   [
+    "photos of your hair",
+    "photos of the damage"
+   ],
+   [
+    "a cut on Saturday",
+    "a tune-up on Saturday"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a tune-up every 3 months"
+   ],
+   [
+    "a cut every 4 weeks",
+    "a tune-up every 3 months"
+   ],
+   [
+    "for a staff cut",
+    "for a staff laptop"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Device Repair"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Tech Help's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Tech Help"
+   ],
+   [
+    "electrical license",
+    "low-voltage license"
+   ],
+   [
+    "Electrical",
+    "Network setup"
+   ],
+   [
+    "electrical",
+    "network setup"
+   ],
+   [
+    "plumber",
+    "technician"
+   ],
+   [
+    "Plumber",
+    "Technician"
+   ],
+   [
+    "Plumbing",
+    "On-site repair"
+   ],
+   [
+    "plumbing",
+    "on-site repair"
+   ],
+   [
+    "Barbershop",
+    "Repair shop"
+   ],
+   [
+    "barbershops",
+    "repair shops"
+   ],
+   [
+    "barbershop",
+    "repair shop"
+   ],
+   [
+    "Barber license",
+    "Repair license"
+   ],
+   [
+    "barbers",
+    "technicians"
+   ],
+   [
+    "barber",
+    "technician"
+   ],
+   [
+    "Barber",
+    "Technician"
+   ],
+   [
+    "cut hair",
+    "fix devices"
+   ],
+   [
+    "MP045210",
+    "RD045210"
+   ],
+   [
+    "EC22871",
+    "LV22871"
+   ],
+   [
+    "BS20981",
+    "RD20981"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Riley texts READY when Alex's laptop is done. Alex hears what was done, the pick-up hours, and anything due."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your laptop is ready for pick-up at Lee's Device Repair."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Mon to Sat, 10am to 6pm"
+   ],
+   [
+    "4471",
+    "5160"
+   ],
+   [
+    "Sofia",
+    "Alex"
+   ],
+   [
+    "Riley",
+    "Tyler"
+   ],
+   [
+    "Avery",
+    "Nina"
+   ],
+   [
+    "Jordan",
+    "Ethan"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "88 Elm St",
+    "240 Market St"
+   ],
+   [
+    "Elm St",
+    "Market St"
+   ],
+   [
+    "Oak St",
+    "Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "600 Pine St"
+   ],
+   [
+    "Haircuts",
+    "Computer tune-ups"
+   ],
+   [
+    "haircuts",
+    "computer tune-ups"
+   ],
+   [
+    "A haircut",
+    "A computer tune-up"
+   ],
+   [
+    "a haircut",
+    "a computer tune-up"
+   ],
+   [
+    "Haircut",
+    "Computer tune-up"
+   ],
+   [
+    "haircut",
+    "computer tune-up"
+   ],
+   [
+    "kids cuts",
+    "game console cleanings"
+   ],
+   [
+    "a kids cut",
+    "a game console cleaning"
+   ],
+   [
+    "Kids cut",
+    "Game console cleaning"
+   ],
+   [
+    "kids cut",
+    "game console cleaning"
+   ],
+   [
+    "Skin fade",
+    "Charging port cleaning"
+   ],
+   [
+    "skin fade",
+    "charging port cleaning"
+   ],
+   [
+    "fade",
+    "charging port cleaning"
+   ],
+   [
+    "Beard trim",
+    "Screen protector"
+   ],
+   [
+    "beard trim",
+    "screen protector"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Tune-up and power jack repair"
+   ],
+   [
+    "Signature cut and shave",
+    "Tune-up and power jack repair"
+   ],
+   [
+    "signature cut",
+    "tune-up and power jack repair"
+   ],
+   [
+    "Groom's package",
+    "Chromebook screen"
+   ],
+   [
+    "Color and cut",
+    "Back glass repair"
+   ],
+   [
+    "color and cut",
+    "back glass repair"
+   ],
+   [
+    "Color correction",
+    "Laptop repair"
+   ],
+   [
+    "color correction",
+    "laptop repair"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "$25 consult",
+    "$49 diagnosis"
+   ],
+   [
+    "Only the consult",
+    "Only the diagnosis"
+   ],
+   [
+    "the consult",
+    "the diagnosis"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the repair?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once diagnosed"
+   ],
+   [
+    "priced at the chair",
+    "priced once diagnosed"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "a house call",
+    "an on-site visit"
+   ],
+   [
+    "water heaters",
+    "laptop screens"
+   ],
+   [
+    "water heater",
+    "laptop screen"
+   ],
+   [
+    "Panel upgrade",
+    "Office network wiring"
+   ],
+   [
+    "like a burst pipe",
+    "like a flooded basement"
+   ],
+   [
+    "$75",
+    "$124"
+   ]
+  ],
+  "B": [
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my cracked phone screen. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My screen is cracked' fits a screen replacement."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like unlocking a phone that isn't yours."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, last night"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 phone screen needs none."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "'s phone screen, fixed Thu Oct 22, stopped responding."
+   ],
+   [
+    "Drain clearings",
+    "Screen replacements"
+   ],
+   [
+    "drain clearings",
+    "screen replacements"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Logic board repair · $540"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a screen protector? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just my phone."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Ethan scratches a desk and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the desk"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched desk"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "scratched the desk at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "heating and cooling",
+    "smart home setup"
+   ],
+   [
+    "Heating and cooling",
+    "Smart home setup"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood repair shop on Elm St. Phones, laptops and tablets fixed."
+   ],
+   [
+    "Sam adds Reese K. to Lee Home Services.",
+    "Sam adds Reese K., a network installer, to Lee Home Services."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the cracked screen and the model label, and a technician will price the job."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said their laptop is smoking."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does on-site repair and network setup, not TV repair."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a TV repair shop near you."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you check my laptop for viruses every year, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Home Services has a yearly virus check plan, $150 a visit."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a virus check every year."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly virus check plan"
+   ],
+   [
+    "water heater contract",
+    "laptop screen contract"
+   ],
+   [
+    "replaces water heaters",
+    "replaces laptop screens"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan found the problem. Here's the price to fix it today."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan finds the problem and texts the price with its lines."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the device is, what's wrong, and whether it's backed up."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I reset the phone before you come?"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Tech On-Site and Lee Home Networks."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can tune up your computer at the shop for $35, or at your home for $75."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's counter is in the other flow."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 office network install, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Home Services' quote for your office network install."
+   ],
+   [
+    "Repipe · $2,400",
+    "Office network install · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the cables are in, $800 at the finish"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 office network install"
+   ],
+   [
+    "of your repipe",
+    "of your network install"
+   ],
+   [
+    "repipe",
+    "office network install"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both offices' visits go on one bill on the 1st."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the data recovery Jordan noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Home Services sent you a proposal for data recovery, from Jordan's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Data recovery"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan look at my tablet next week?"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left a mess on my desk."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My phone screen is cracked."
+   ],
+   [
+    "Just the kitchen sink.",
+    "An iPhone 12. Touch fails at the bottom."
+   ],
+   [
+    "a leak under the sink",
+    "a computer that won't start"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please back up your phone before the visit."
+   ],
+   [
+    "a drain cleaning at two rentals",
+    "an IT check-up at two offices"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's IT check-up"
+   ],
+   [
+    "clear a yard drain",
+    "fix a phone screen"
+   ],
+   [
+    "Yard drain",
+    "Phone screen"
+   ],
+   [
+    "yard drain",
+    "phone screen"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa screen"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Phone screen replacement"
+   ],
+   [
+    "Kitchen drain",
+    "Phone screen"
+   ],
+   [
+    "Drain clearing",
+    "Screen replacement"
+   ],
+   [
+    "drain clearing",
+    "screen replacement"
+   ],
+   [
+    "clear the drain",
+    "replace the screen"
+   ],
+   [
+    "your new pipes are in",
+    "your new network cables are in"
+   ],
+   [
+    "a roof leak",
+    "a broken TV"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Scan results and Jordan's notes"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds a worn charging port."
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "replace the charging port, worn loose"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the charging port"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the charging port"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing the charging port"
+   ],
+   [
+    "shutoff valves",
+    "charging port"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say an office manager books the same job for 4 laptops at one office."
+   ],
+   [
+    "Each unit's notes",
+    "Each laptop's notes"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Device Protection, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "device protection plan"
+   ],
+   [
+    "home warranty",
+    "device protection"
+   ],
+   [
+    "supply house",
+    "parts supplier"
+   ],
+   [
+    "Rental 1",
+    "Office 1"
+   ],
+   [
+    "Rental 2",
+    "Office 2"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the phone is now getting hot."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The phone is getting hot, and the screen is lifting."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stop using and charging the phone, and keep it away from anything that burns."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen battery or a burning smell, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The screen stops responding 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My new phone screen stopped responding."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your screen is under warranty"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It went black. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also check my old hard drive for files?"
+   ],
+   [
+    "$160 valve quote",
+    "$160 charging port quote"
+   ],
+   [
+    "$160 valve work",
+    "$160 charging port work"
+   ],
+   [
+    "a bathroom drain",
+    "your tablet"
+   ],
+   [
+    "kitchen drain",
+    "phone screen"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The laptop is a computer repair, quoted at the visit."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "a shop's repair dealer registration may cover only its own address"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A screen repair could mean a phone store or a repair shop."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A repair shop's example: a hot, swollen battery gets 'stop charging it, and keep it away from anything that burns'."
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi laptop echa humo."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My laptop is smoking."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to unplug it if that's safe and step away, and to call 911 if there's a fire."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay fuego?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is there a fire?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay fuego."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no fire."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Desconéctela si es seguro, y aléjese. Si hay fuego, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Unplug it if it's safe, and step away. If there's a fire, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For on-site repair, fire, sparks or a burn stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Get away from the device now, and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My laptop got wet in a flood. Is it safe to turn it on?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "which phone is it, and does touch still work?"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the phone backed up?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE small dent on the frame, back glass fine"
+   ],
+   [
+    "Under the sink, before",
+    "Phone front, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Phone back, before"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 screen"
+   ],
+   [
+    "245 valve 165 supply line 80",
+    "245 SSD 165 memory 80"
+   ],
+   [
+    "Shutoff valve",
+    "New SSD, files copied"
+   ],
+   [
+    "Supply line",
+    "Memory upgrade"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE battery health 81%. Offer a new battery next time."
+   ],
+   [
+    "1-year labor warranty",
+    "12-month parts warranty"
+   ],
+   [
+    "a dripping faucet",
+    "a laptop that won't start"
+   ],
+   [
+    "color and house calls",
+    "board repair and on-site visits"
+   ],
+   [
+    "color, house calls",
+    "board repair, on-site visits"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Device Repair"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Tech Help's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Tech Help"
+   ],
+   [
+    "leehomeservices.com",
+    "leetechhelp.com"
+   ],
+   [
+    "plumbing license",
+    "repair dealer registration"
+   ],
+   [
+    "Plumbing license",
+    "Repair dealer registration"
+   ],
+   [
+    "electrical license",
+    "low-voltage license"
+   ],
+   [
+    "Electrical license",
+    "Low-voltage license"
+   ],
+   [
+    "Electrical",
+    "Network setup"
+   ],
+   [
+    "electrical",
+    "network setup"
+   ],
+   [
+    "plumber",
+    "technician"
+   ],
+   [
+    "Plumber",
+    "Technician"
+   ],
+   [
+    "Plumbing",
+    "On-site repair"
+   ],
+   [
+    "plumbing",
+    "on-site repair"
+   ],
+   [
+    "Barbershop",
+    "Repair shop"
+   ],
+   [
+    "barbershops",
+    "repair shops"
+   ],
+   [
+    "barbershop",
+    "repair shop"
+   ],
+   [
+    "barbers",
+    "technicians"
+   ],
+   [
+    "barber",
+    "technician"
+   ],
+   [
+    "Barber",
+    "Technician"
+   ],
+   [
+    "cut hair",
+    "fix devices"
+   ],
+   [
+    "MP045210",
+    "RD045210"
+   ],
+   [
+    "EC22871",
+    "LV22871"
+   ],
+   [
+    "BS20981",
+    "RD20981"
+   ],
+   [
+    "Riley",
+    "Tyler"
+   ],
+   [
+    "Avery",
+    "Nina"
+   ],
+   [
+    "Jordan",
+    "Ethan"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "88 Elm St",
+    "240 Market St"
+   ],
+   [
+    "Elm St",
+    "Market St"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "600 Pine St"
+   ],
+   [
+    "a haircut",
+    "a computer tune-up"
+   ],
+   [
+    "Haircut",
+    "Computer tune-up"
+   ],
+   [
+    "fade",
+    "charging port cleaning"
+   ],
+   [
+    "beard trim",
+    "screen protector"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once diagnosed"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "Water heater flush",
+    "Virus removal"
+   ],
+   [
+    "water heater flush",
+    "virus removal"
+   ],
+   [
+    "Water heater replacement",
+    "Laptop screen replacement"
+   ],
+   [
+    "water heater replacement",
+    "laptop screen replacement"
+   ],
+   [
+    "water heaters",
+    "laptop screens"
+   ],
+   [
+    "Water heater",
+    "Laptop screen"
+   ],
+   [
+    "water heater",
+    "laptop screen"
+   ],
+   [
+    "Sewer camera inspection",
+    "Data recovery check"
+   ],
+   [
+    "sewer camera inspection",
+    "data recovery check"
+   ],
+   [
+    "Sewer camera report",
+    "Data recovery report"
+   ],
+   [
+    "sewer camera report",
+    "data recovery report"
+   ],
+   [
+    "camera inspection",
+    "data recovery check"
+   ],
+   [
+    "camera report",
+    "data recovery report"
+   ],
+   [
+    "Service call fee",
+    "On-site fee"
+   ],
+   [
+    "Service call",
+    "On-site fee"
+   ],
+   [
+    "service call fee",
+    "on-site fee"
+   ],
+   [
+    "service call",
+    "on-site fee"
+   ],
+   [
+    "Panel upgrade",
+    "Office network wiring"
+   ],
+   [
+    "under my sink",
+    "on my phone"
+   ],
+   [
+    "under the sink",
+    "on the phone"
+   ],
+   [
+    "like a burst pipe",
+    "like a flooded basement"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 memory upgrade stays good until Thu Oct 29."
+   ],
+   [
+    "shutoff valve",
+    "SSD"
+   ],
+   [
+    "$75",
+    "$124"
+   ],
+   [
+    "Leak repair",
+    "Computer repair"
+   ],
+   [
+    "leak repair",
+    "computer repair"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off at Lee's Device Repair, Sat Oct 24, for a laptop that won't hold a charge. Tyler diagnoses it, orders the battery once Alex OKs the written estimate, and texts READY when it's done. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Tech Help to fix a cracked phone screen at home, at 18 Cedar Ave, and Ethan comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: the phone screen, a computer priced at the visit, or a laptop screen priced from photos."
+ },
+ "money": {
+  "A": {
+   "main": "visit|none|counter",
+   "combos": [
+    "visit|none|counter",
+    "list|none|counter",
+    "visit|none|bill",
+    "list|none|bill",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "visit|none|counter": "The main story: a laptop that won't hold a charge. Only the $49 diagnosis is promised. Tyler's written estimate is OK'd before any work, the battery is ordered, and Alex pays at the counter at pick-up.",
+    "list|none|counter": "A $35 computer tune-up from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "visit|none|bill": "The laptop repair, with the bill texted once it's ready, so Alex can pay before pick-up.",
+    "list|none|bill": "A $35 computer tune-up. Rosie texts the bill with READY.",
+    "list|deposit|counter": "A $140 Chromebook screen whose part is ordered in. A $40 deposit orders it, and the $100 rest is paid at the counter."
+   },
+   "amounts": {
+    "*": {
+     "name": "Computer tune-up"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Computer tune-up",
+     "fee": "$0"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "name": "Chromebook screen",
+     "fee": "$40"
+    },
+    "visit|*|*": {
+     "name": "Laptop repair",
+     "fee": "$0"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "visit|card|bill",
+    "list|card|card",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 phone screen at Alex's home. A card is saved for the $89 on-site fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after.",
+    "visit|card|bill": "A computer that freezes, priced at the visit. A card is saved for the $89 on-site fee.",
+    "list|card|card": "The $179 phone screen. A card is saved, and charged when Ethan texts DONE.",
+    "photos|deposit|bill": "A cracked laptop screen, priced from photos at $640. Sam OKs it. A $160 deposit orders the part, and the rest is on the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Phone screen repair"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Phone screen repair"
+    },
+    "visit|*|*": {
+     "name": "Computer repair"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Laptop screen replacement"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Laptop screen replacement"
+    }
+   }
+  }
+ },
+ "keep": [
+  "repair shop",
+  "leak",
+  "towing",
+  "Towing"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every repair, mail-in and on-site visit booked through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The device repair plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A repair shop books drop-off slots and technicians, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Device repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Device repair is never sent now: a swollen battery gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. A passcode, a login and what's on a device never go in a text."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A device is fixed in hand. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The shop sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The shop bills no plan or insurance. A customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee's Device Repair books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee's Device Repair books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee's Device Repair books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no technician. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "Device repair needs no first step: the data consent is signed at drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A device waits in its drop-off slot, so a technician running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child is never left at a repair shop: a parent drops off and picks up."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A repair is paid once: at pick-up, or by the bill."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The shop bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A repair is rated like any visit."
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "For a device, the counter takes the device, its condition and the problem in the customer's words.",
+     "The data consent is signed on the counter tablet."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-03",
+    "more": [
+     "For a repair shop, the parts also hold its drop-off slots, and which parts it keeps in stock."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "For a drop-off, Alex gives the code at the counter when leaving the device.",
+     "If the device left is Alex's only phone, updates come by email until pick-up."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "type": "split",
+      "line": [
+       "8.3",
+       "8.21"
+      ],
+      "who": "cust",
+      "to": "staff",
+      "via": "page",
+      "t": "Sat Oct 24, 11:05am",
+      "title": "Alex signs the data consent on the tablet",
+      "q": "Does Alex share the passcode?",
+      "does": "On the counter tablet, Alex says what Tyler may do with the laptop, and whether it's backed up. The passcode is asked only here, and only if Alex agrees.",
+      "more": [
+       "It's typed on the tablet, never in a chat or a text.",
+       "Only Tyler's login can see it, and only for this repair.",
+       "It's deleted from Rosie the moment the laptop is handed back.",
+       "Repairs rarely erase data, so a backup is asked about first."
+      ],
+      "form": [
+       [
+        "What Tyler may do",
+        "Test and repair the laptop"
+       ],
+       [
+        "Backed up?",
+        "Yes"
+       ],
+       [
+        "Passcode",
+        "Typed here, seen only by Tyler"
+       ],
+       [
+        "Deleted",
+        "When the laptop is handed back"
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "1 Yes, typed on the tablet",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 No: Alex unlocks it later",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x02",
+          "line": [
+           "8.3",
+           "8.19"
+          ],
+          "who": "staff",
+          "to": "san",
+          "via": "visit",
+          "title": "Tests what Tyler can without it",
+          "does": "Tyler tests what Tyler can from the login screen. Anything that needs the login, like battery health, is checked with Alex at pick-up.",
+          "more": [
+           "Nothing on the laptop is opened without the passcode.",
+           "A price that needs those checks waits for them."
+          ],
+          "needs": [
+           "pf.visit"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A8-25",
+    "steps": [
+     {
+      "id": "A8-x03",
+      "type": "split",
+      "line": [
+       "8.7",
+       "8.8"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 11:15am",
+      "title": "Tyler diagnoses within the OK'd hour",
+      "q": "Found within the OK'd hour?",
+      "does": "The $49 Alex OK'd covers about 1 hour of diagnosis. Tyler texts DIAGNOSING, and finds a worn battery and a fan full of dust.",
+      "more": [
+       "More time is new work. It needs Alex's yes first, and no answer is never a yes.",
+       "The plug-in sets the time the diagnosis covers."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "DIAGNOSING Alex M."
+       ],
+       [
+        "san",
+        "cust",
+        "Tyler is diagnosing your laptop now. You'll get a written estimate before any repair."
+       ]
+      ],
+      "needs": [
+       "visit_fee",
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Yes: found in time",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Needs more time",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x04",
+          "type": "split",
+          "line": [
+           "8.8",
+           "8.9"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Asks Alex before more diagnosis",
+          "q": "Does Alex OK more time?",
+          "does": "Tyler needs about 1 more hour to find the cause. Alex says yes before any more time is spent.",
+          "more": [
+           "Alex's yes is logged with the time and the phone it came from.",
+           "No answer in 1 hour counts as no."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Tyler needs about 1 more hour to find what's wrong with your laptop. Nothing more is done without your OK.",
+            {
+             "card": {
+              "title": "More diagnosis · $49",
+              "lines": [
+               "About 1 more hour",
+               "Or stop now: you pay the $49"
+              ]
+             },
+             "buttons": [
+              "Yes, go on",
+              "Stop here"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Yes, go on",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Stop, or no reply in 1 hour",
+            "end": "end",
+            "endText": "Diagnosis stops at the hour. Alex pays the $49 at pick-up, and the laptop comes back as it was.",
+            "steps": [
+             {
+              "id": "A8-x05",
+              "line": [
+               "8.19"
+              ],
+              "who": "san",
+              "to": "owner",
+              "via": "msg",
+              "title": "Stops at the hour; tells Sam and Alex",
+              "does": "Alex didn't OK more time, so Tyler stops at the hour. The laptop is ready as it came, and Alex owes only the $49.",
+              "say": [
+               [
+                "san",
+                "owner",
+                "Alex M. didn't OK more diagnosis, so Tyler stopped at the hour.",
+                {
+                 "card": {
+                  "title": "Alex M. · diagnosis stopped",
+                  "lines": [
+                   "$49 owed at pick-up",
+                   "Laptop as it came, not repaired"
+                  ]
+                 }
+                }
+               ],
+               [
+                "san",
+                "cust",
+                "Tyler stopped at the hour, as you chose. Your laptop is ready to pick up, not repaired.",
+                {
+                 "card": {
+                  "title": "Ready · not repaired",
+                  "lines": [
+                   "$49 diagnosis, at the counter",
+                   "Open until 6pm"
+                  ]
+                 }
+                }
+               ]
+              ],
+              "tells": [
+               "owner",
+               "cust"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "For a device, it's shown working at the counter before it's handed over."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x07",
+      "line": [
+       "8.16",
+       "13.5"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Deletes the passcode at pick-up",
+      "does": "Once Tyler has shown Alex the laptop working, and it goes back to Alex, Rosie deletes the passcode Alex typed at drop-off. The data consent stays with the booking's records.",
+      "more": [
+       "Only Tyler's login ever saw it.",
+       "If the device was Alex's only phone, updates go back to texts now."
+      ],
+      "needs": [
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-01",
+    "more": [
+     "The shop's warranty, 12 months on parts and labor here, is on its receipt."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "A repair shop books no next visit at pick-up: each repair is booked when it's needed."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A repair at the shop needs no contract before booking: the data consent is signed at drop-off, and the written estimate comes before any work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "The shop sells no plans: each repair is paid at its own pick-up, or by its own bill."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The shop sells no plans or contracts, so nothing signed at the shop has a cancel period."
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "If the device left was Alex's only phone, the READY email carries the code, or Alex shows an ID."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Where Sam works, the state registers repair dealers, and network setup needs a low-voltage license. So Sam's three take the license step.",
+     "Where a state registers no repair dealers, device repair takes the next branch: registration only."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state registers repair dealers: one registration for the company. Technicians need none of their own. What's the company's number? It can be in your name, or your business's."
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, RD045210"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The shop's registration RD20981 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way network setup was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "On-site repair",
+          "Now"
+         ],
+         [
+          "Network setup",
+          "Once you say yes"
+         ],
+         [
+          "Lee's Device Repair",
+          "Its registration is on file as given, not checked. It shows once a technician joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Nina gets the same invite. Ethan and Priya get theirs from Lee Tech Help.",
+     "Only Ethan sends a license number: a low-voltage license for network setup.",
+     "Pat gets one too, to OK prices for Lee Tech Help.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Device Repair. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Tyler"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Tech Help. Sam Lee added you to the team for on-site repair and network setup jobs. Reply YES, with your low-voltage license number, to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Ethan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Tyler replies YES, then checks what Sam set. Device repair needs no license of their own, so none is asked. One reply covers everything Tyler does for the shop.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Nina and Priya join the same way. Ethan replies YES with a low-voltage license number."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Tyler"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee's Device Repair! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Tyler Chen · Lee's Device Repair",
+        "lines": [
+         "Every shop service, board repair and on-site visits",
+         "No license needed for device repair",
+         "Hours: the shop's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Tyler"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Tyler"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Network setup licenses each installer where the state's rules require it. Device repair licenses nobody.",
+     "So only Ethan's low-voltage license is shown, as given. Tyler, Nina and Priya take the next branch."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-11",
+    "more": [
+     "The plug-in says how to check, state by state.",
+     "Where a state has no data feed, a person on Rosie's team checks within 1 business day.",
+     "Someone who needs no license, like Pat or a repair technician, isn't checked.",
+     "Sam's own registration was given at sign-up, not checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-12",
+    "does": "The state's lookup has no license with the number Ethan sent. Ethan can't be booked for network setup until it matches.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's lookup has no low-voltage license with the number Ethan sent. Check it and send the right one.",
+      {
+       "card": {
+        "title": "Ethan · license not found",
+        "lines": [
+         "Not offered for network setup until it matches",
+         "On-site repair needs no license, so that goes on"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-13",
+    "does": "The lookup shows Ethan's license as expired. Ethan stays on the team for on-site repair, and network setup waits until it shows renewed.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Ethan's low-voltage license shows as expired on the state's lookup.",
+      {
+       "card": {
+        "title": "Ethan · license expired",
+        "lines": [
+         "Stays on the team",
+         "No network setup until it shows renewed"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Your low-voltage license shows as expired on the state's lookup. Lee Tech Help can't book you for network setup until it shows renewed.",
+      {
+       "as": "Ethan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-14",
+    "does": "Ethan's license is checked again when the lookup answers. Sam hears if that takes more than 1 business day.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's license lookup is down, so Ethan's license isn't checked yet. Network setup waits until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-30",
+    "more": [
+     "No device repair is sent now. Sam's three set nobody on call: an urgent ask gets the soonest time."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent, with the soonest drop-off first.",
+    "more": [
+     "A repair shop's example: a swollen or hot battery.",
+     "It gets 'stop using and charging it, and keep it away from anything that burns'."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "A swollen battery can catch fire. Please stop using and charging it, keep it away from anything that burns, and don't press on it. The soonest drop-off times are next."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the technicians themselves. Tyler can go over it when you drop it off. For anything sooner, call Lee's Device Repair at (555) 010-0177."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No technician is named: once the device is in, the shop gives it to a technician with the skill.",
+    "more": [
+     "A wish for one technician goes in the notes, and the shop follows it where it can."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-41",
+    "more": [
+     "A repair shop's example: a written estimate before any work over an amount, where the state's rules require it.",
+     "The data consent is signed at drop-off, not now.",
+     "The booking records that the notice was said.",
+     "Any paper owed after booking becomes a to-do for the shop, with its due date. Sam is reminded once before it's late."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex brings the laptop to the shop. The reminder said to back it up, and to bring the charger.",
+    "more": [
+     "A charging fault can't be tested without the charger. A missing one stops that work (the next branch).",
+     "The reminder already said what to bring.",
+     "The code is taken only once nothing required is missing."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-51",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M. No charger, so the charging fault can't be tested."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex at the counter, Sat 11:00am. Tyler looks the laptop over with Alex, and notes what's already there before any work.",
+    "more": [
+     "Tyler notes scratches, dents and cracks, with photos, and whether it turns on.",
+     "It's kept with the booking, and Alex can see it on the secure page.",
+     "A damage claim or a later complaint is checked against it.",
+     "The plug-in names the checks, and which services need them."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE small scratch on the lid. Turns on, slow to start.",
+      {
+       "photos": [
+        "Lid, before",
+        "Screen, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s laptop as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-25",
+    "does": "Only the $49 diagnosis was promised. Tyler finds the cause, then writes the estimate and texts its lines.",
+    "more": [
+     "The estimate shows parts and labor, and whether each part is new.",
+     "The price is checked against the plug-in's rules first.",
+     "Nothing more is done until Alex says yes."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 110 new battery + 15 fan cleaning Alex M."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M.'s estimate: $110 new battery and $15 fan cleaning, $125 in all, the $49 diagnosis included. It goes to Sam first."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-26",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Tyler's estimate for Alex M.'s laptop.",
+      {
+       "card": {
+        "title": "Laptop repair · $125",
+        "lines": [
+         "New battery $110 · fan cleaning $15",
+         "The $49 diagnosis included",
+         "The battery is ordered in: 2 business days"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-29",
+    "does": "Once Sam OKs it, Alex gets the written estimate. Alex says yes to all of it, to some lines, or not today. Nothing is fixed before a yes.",
+    "more": [
+     "Each line shows its parts and labor.",
+     "Anything over the estimate needs a new yes first.",
+     "The battery isn't in stock, so it's ordered once Alex says yes.",
+     "Only Alex, or someone Alex named in writing, can say yes.",
+     "Alex is away from the shop, so no reply gets one reminder. Then Sam is asked."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Tyler found what's wrong. Here's Tyler's written estimate. Nothing is done until you say yes.",
+      {
+       "card": {
+        "title": "Laptop repair · $125",
+        "lines": [
+         "New battery, ordered in · $110",
+         "Fan cleaned out · $15",
+         "The $49 diagnosis included"
+        ]
+       },
+       "buttons": [
+        "Yes, do it",
+        "Not today",
+        "OK some lines"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks! Tyler orders the battery now. It comes Tue Oct 27, and your laptop should be ready that afternoon.",
+      {
+       "card": {
+        "title": "Estimate OK'd · $125",
+        "lines": [
+         "Battery due Tue Oct 27",
+         "Ready Tue afternoon"
+        ]
+       }
+      }
+     ]
+    ],
+    "t": "Sat Oct 24, 12:20pm"
+   },
+   {
+    "op": "words",
+    "at": "A8-30",
+    "does": "Alex says no for now. Nothing is repaired, and Alex owes only the $49 diagnosis.",
+    "more": [
+     "The estimate stays good for 7 days. Alex can still OK it on the page."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your laptop is ready to pick up as it came, not repaired. You owe only the $49 diagnosis.",
+      {
+       "card": {
+        "title": "Not repaired, as you chose",
+        "lines": [
+         "$49 diagnosis, at pick-up",
+         "Estimate good until Sat Oct 31"
+        ],
+        "button": "See the estimate",
+        "link": "rosfield.com/q/a8"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-48",
+    "does": "Alex ticks the lines to do on the secure page. Only those are done and billed. The rest of the estimate stays good for 7 days.",
+    "more": [
+     "Here Alex OKs the $110 battery and skips the $15 fan cleaning.",
+     "The bill after has only the lines Alex OK'd: $110, with the $49 diagnosis included.",
+     "The fan cleaning can be added later, at that price until Sat Oct 31."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Pick the lines to do. Only those are done and billed.",
+      {
+       "card": {
+        "title": "Tyler's estimate · $125",
+        "lines": [
+         "New battery · $110",
+         "Fan cleaned out · $15"
+        ],
+        "button": "Pick the lines",
+        "link": "rosfield.com/e/a8"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Done. Tyler orders the battery now: $110, with the diagnosis. The $15 fan cleaning price is good until Sat Oct 31."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. OK'd the battery only, $110. No fan cleaning."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "A what-if: Tyler opens a laptop and finds its battery swollen. Tyler stops, and the battery goes into a fire-safe box. Alex gets a written note.",
+    "more": [
+     "The note says what was found, what wasn't done, and why.",
+     "A new battery is quoted before any more work.",
+     "Nothing is charged for the part not done."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD swollen battery, stopped. It's in the fire-safe box.",
+      {
+       "photos": [
+        "Swollen battery"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Tyler found your laptop's battery swollen, so Tyler stopped, to keep everyone safe. A new battery is quoted before any more work.",
+      {
+       "card": {
+        "title": "A note from Lee's Device Repair",
+        "lines": [
+         "Found: a swollen battery",
+         "Not done: the rest of the repair, for now",
+         "Next: a quote for a new battery"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Tyler stopped Alex M.'s repair: a swollen battery. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Tyler finishes the work and tests the laptop. Tyler texts READY when it's done.",
+    "more": [
+     "The work is what Alex OK'd, and anything Alex said yes to after.",
+     "Next, READY goes to Alex, and Alex picks up the laptop and pays at the counter."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-11",
+    "more": [
+     "For a device, Tyler's status words are IN, DIAGNOSING, WAITING ON A PART, IN REPAIR and READY.",
+     "A moved ready time is always sent, with the new time.",
+     "A reply from the customer goes to staff, like any question.",
+     "More work found while it's in is texted with its price first. Nothing extra is done until the customer says yes.",
+     "No reply to more work in 2 hours: one reminder. Still none: Sam is asked to call, or it isn't done.",
+     "If the device left is the customer's only phone, updates go by email until pick-up."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "more": [
+     "Anything due comes with a pay link, or is paid at pick-up, as the service is set.",
+     "READY says what was done, and the total.",
+     "After a no to the estimate, READY says the laptop is back as it came, not repaired.",
+     "If the device left is the customer's only phone, READY goes by email instead.",
+     "Sent inside text hours. A late READY waits for 9am."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "At pick-up, Tyler shows Alex the laptop working, and what was done. A fix Alex asks for now is done before paying.",
+    "more": [
+     "Old parts go back to Alex if asked, or to recycling.",
+     "A fix at the walk-through costs nothing extra.",
+     "Anything new needs Alex's yes and its price first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: tune-up done. Starts in 40 seconds, was 3 minutes. Disk 80% full."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-08",
+    "say": [
+     [
+      "cust",
+      "san",
+      "The laptop shuts off at 30% again."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says the laptop shuts off at 30% again since the repair.",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee's Device Repair will fix it for free, under the 12-month warranty. Pick a drop-off time:",
+      {
+       "times": [
+        "Sat Nov 7 · 11:00am drop-off",
+        "Mon Nov 9 · 3:00pm drop-off"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-22",
+    "more": [
+     "A repair shop's example: data recovery results, on the date Alex was told.",
+     "Results go only on the secure page, never in a text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-23",
+    "does": "Alex's laptop is ready, but it isn't picked up. The shop holds a device 90 days. Rosie reminds Alex at 30 and 60 days, then Sam decides what's next.",
+    "more": [
+     "Rosie never starts a fee on its own. It's always Sam's call.",
+     "Reminders go by text, or by email while Alex's only phone is in the shop.",
+     "Two reminders only, inside text hours. No nudges after that."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your laptop is still waiting for pick-up at Lee's Device Repair. The shop holds it until Fri Jan 22, 2027.",
+      {
+       "as": "Alex",
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "Pick-up: Mon to Sat, 10am to 6pm",
+         "Held until Fri Jan 22, 2027",
+         "Bring the code you used to drop it off"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee's Device Repair. Quinn gets one invite, and replies YES. Device repair needs no license of its own, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Device Repair. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Dates come from what Sam sent. Reminders go 30 days and 7 days before. Here it's Ethan's low-voltage license, for network setup.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Sam says your low-voltage license has lapsed.",
+      {
+       "card": {
+        "title": "License renewal",
+        "lines": [
+         "Not renewed by then: off network setup from the next day"
+        ],
+        "button": "Upload the receipt",
+        "link": "rosfield.com/s/lic"
+       },
+       "as": "Ethan"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Ethan's low-voltage license expires in 30 days. I've reminded Ethan."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam turns on the bill Rosie texts with READY for laptop repairs, for new bookings only. Each change is read back first.",
+    "more": [
+     "Laptop repairs already booked are still paid at the counter.",
+     "The customer can still pay at the counter, the shop's own way.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "A repair at the shop has no cancel period. The shop sells no plans or contracts, so nothing here gets one."
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A license shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. Any deposit sits right next to it.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee's Device Repair",
+      "240 Market St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Computer tune-up $35 ($40 from Nov 2) · Charging port cleaning $40 · Screen protector $20"
+     ],
+     [
+      "To book",
+      "Nothing taken, or a deposit for a part ordered in · no cancel or no-show fee"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Tech Help",
+      "On-site repair · within 25 miles of 600 Pine St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-78",
+    "say": [
+     [
+      "san",
+      "other",
+      "This is Rosie, an automated assistant for Lee's Device Repair. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check.",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ],
+       "stop": "first",
+       "as": "Morgan Lee"
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every repair, mail-in and on-site visit booked through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The device repair plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A repair shop books drop-off slots and technicians, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Device repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Device repair is never sent now: a swollen battery gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. A passcode, a login and what's on a device never go in a text."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A device is fixed in hand, where Alex is. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty is billed: a customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "On-site repair arrives in a 2-hour window, with a named technician (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "On-site repair arrives in a 2-hour window, with a named technician (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "On-site repair arrives in a 2-hour window, with a named technician (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "On-site repair needs no first step."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Device repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Device repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Device repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A technician never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone must be there to hand over, unlock and test the device."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for a device repair."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance is billed."
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "The repair plug-in adds device danger words, like a swollen battery, smoke or a burning smell."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "The plug-in asks for a table near an outlet. The device is fixed where Alex can watch."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Device repair is never sent now (S2-30)."
+   },
+   {
+    "op": "more",
+    "at": "B8-04",
+    "more": [
+     "Alex hands over the phone once the code is in."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Ethan tests what works first, with Alex: touch, Face ID and the cameras. Alex unlocks the phone; the passcode is never shared."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Device repair is never sent now (S2-30), so there's no such button."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Someone must be there to hand over, unlock and test the device."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "Someone must be there to hand over, unlock and test the device."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Where Sam works, the state registers repair dealers, and network setup needs a low-voltage license. So Sam's three take the license step.",
+     "Where a state registers no repair dealers, device repair takes the next branch: registration only."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state registers repair dealers: one registration for the company. Technicians need none of their own. What's the company's number? It can be in your name, or your business's."
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, RD045210"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The shop's registration RD20981 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way network setup was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "On-site repair",
+          "Now"
+         ],
+         [
+          "Network setup",
+          "Once you say yes"
+         ],
+         [
+          "Lee's Device Repair",
+          "Its registration is on file as given, not checked. It shows once a technician joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Nina gets the same invite. Ethan and Priya get theirs from Lee Tech Help.",
+     "Only Ethan sends a license number: a low-voltage license for network setup.",
+     "Pat gets one too, to OK prices for Lee Tech Help.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Device Repair. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Tyler"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Tech Help. Sam Lee added you to the team for on-site repair and network setup jobs. Reply YES, with your low-voltage license number, to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Ethan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Tyler replies YES, then checks what Sam set. Device repair needs no license of their own, so none is asked. One reply covers everything Tyler does for the shop.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Nina and Priya join the same way. Ethan replies YES with a low-voltage license number."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Tyler"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee's Device Repair! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Tyler Chen · Lee's Device Repair",
+        "lines": [
+         "Every shop service, board repair and on-site visits",
+         "No license needed for device repair",
+         "Hours: the shop's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Tyler"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Tyler"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "more": [
+     "Network setup licenses each installer where the state's rules require it. Device repair licenses nobody.",
+     "So only Ethan's low-voltage license is shown, as given. Tyler, Nina and Priya take the next branch."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-11",
+    "more": [
+     "The plug-in says how to check, state by state.",
+     "Where a state has no data feed, a person on Rosie's team checks within 1 business day.",
+     "Someone who needs no license, like Pat or a repair technician, isn't checked.",
+     "Sam's own registration was given at sign-up, not checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-12",
+    "does": "The state's lookup has no license with the number Ethan sent. Ethan can't be booked for network setup until it matches.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's lookup has no low-voltage license with the number Ethan sent. Check it and send the right one.",
+      {
+       "card": {
+        "title": "Ethan · license not found",
+        "lines": [
+         "Not offered for network setup until it matches",
+         "On-site repair needs no license, so that goes on"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-13",
+    "does": "The lookup shows Ethan's license as expired. Ethan stays on the team for on-site repair, and network setup waits until it shows renewed.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Ethan's low-voltage license shows as expired on the state's lookup.",
+      {
+       "card": {
+        "title": "Ethan · license expired",
+        "lines": [
+         "Stays on the team",
+         "No network setup until it shows renewed"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Your low-voltage license shows as expired on the state's lookup. Lee Tech Help can't book you for network setup until it shows renewed.",
+      {
+       "as": "Ethan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-14",
+    "does": "Ethan's license is checked again when the lookup answers. Sam hears if that takes more than 1 business day.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's license lookup is down, so Ethan's license isn't checked yet. Network setup waits until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-30",
+    "more": [
+     "No device repair is sent now. Sam's three set nobody on call: an urgent ask gets the soonest time."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For device repair, fire, sparks, smoke or a burn stops the booking.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. Get away from the device now, and call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their laptop is smoking. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "Smoke from a laptop at the home",
+         "Told to step away and call 911"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "does": "A plug-in holds what one kind of work needs. The steps around it stay the same. Here, Rosie uses the on-site repair plug-in's booking parts.",
+    "more": [
+     "Its questions: what the device is, what's wrong, and whether it's backed up.",
+     "Its danger words: a swollen or hot battery, smoke, sparks or a burning smell.",
+     "Its first steps: none. A computer is quoted at the visit, and a laptop screen from photos.",
+     "Who can stand in for whom, and how the visit is checked in: the code at the door.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-48",
+    "more": [
+     "Here, Alex OKs the new SSD and leaves the memory upgrade. It's $165, with the $89 on-site fee in it.",
+     "Ethan's DONE has only the OK'd lines.",
+     "The memory upgrade is its own quote now, good until Thu Oct 29."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Pick the lines to do today.",
+      {
+       "card": {
+        "title": "Computer repair · pick the lines",
+        "lines": [
+         "New SSD, files copied · $165",
+         "Memory upgrade · $80"
+        ],
+        "button": "Pick lines",
+        "link": "rosfield.com/q/r4p"
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. OK'd the new SSD only, $165. No memory upgrade."
+     ],
+     [
+      "san",
+      "cust",
+      "OK: Ethan fits the new SSD today, $165. The $80 memory upgrade stays good until Thu Oct 29."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Ethan opens the phone and finds its battery swollen. The plug-in says to stop there, so Alex gets a written note and the photo.",
+    "more": [
+     "The note says what was found, what wasn't done and why, and what to do next.",
+     "A swollen battery isn't safe to work on at a home. The phone goes to the workbench in a fire-safe bag.",
+     "Only the work done is charged.",
+     "Sam is told, and the note and photos stay with the job."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD battery swollen, stopped. Phone in the fire-safe bag.",
+      {
+       "photos": [
+        "Swollen battery"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Ethan found the phone's battery swollen and stopped, to keep you safe. Please don't charge it.",
+      {
+       "card": {
+        "title": "Safety note · 18 Cedar Ave",
+        "lines": [
+         "Found: a swollen battery",
+         "Not done: the screen, for now",
+         "Next: a new battery at the workbench"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-54",
+    "more": [
+     "The customer's side: an ID, or proof of the right to the work, like the owner's OK for a work device.",
+     "The business's side: a conflict, a wrong part, or Alex isn't eligible."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CANT START work device, no OK from the company yet"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-69",
+    "does": "The plug-in marks work that can be done with nobody home. Device repair has none: someone must be there to hand over and unlock the device."
+   },
+   {
+    "op": "words",
+    "at": "S11-41",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Today, Fri Oct 23, for each business:",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee's Device Repair",
+          "1 missed visit · nothing waits on you · first tomorrow: 10:00am"
+         ],
+         [
+          "Lee Tech Help",
+          "1 missed visit · 1 fee question for you · next job: Mon 8 to 10am, Ethan"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: screen replacement $199 for visits from Mon Nov 2. Screen replacements already booked keep $179. Plans keep their own prices."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A license shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. Any deposit sits right next to it.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee's Device Repair",
+      "240 Market St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Computer tune-up $35 ($40 from Nov 2) · Charging port cleaning $40 · Screen protector $20"
+     ],
+     [
+      "To book",
+      "Nothing taken, or a deposit for a part ordered in · no cancel or no-show fee"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Tech Help",
+      "On-site repair · within 25 miles of 600 Pine St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A repair is rated, like any job."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B5-34"
+  ]
+ },
+ "notes": "From auto-repair (from: auto-repair): a device repair shop runs like a car repair shop. The device is dropped off, a diagnosis fee is OK'd, a written estimate is OK'd before any work, a part is ordered, and READY comes before the pick-up.\nChecked the old flowchart first: a phone, tablet and computer repair shop (Wasatch Device Repair), dropped off or mailed in. That fits this profession.\nTwo companies: Lee Tech Help (the master's Lee Home Services, flow B: on-site repair at homes and offices, plus network setup) and Lee's Device Repair (the master's barbershop, flow A: the shop). Kinds of work: plumbing became on-site repair, electrical became network setup, the barbershop became the device repair shop.\nPeople: Riley and Avery became Tyler and Nina (the shop); Jordan and Casey became Ethan and Priya (on-site), so the master's pronouns still fit (Jordan he, Casey she). Sofia's drop-off example became Alex's. Addresses: 240 Market St (the shop), 18 Cedar Ave (Alex), 600 Pine St (the office).\nLicenses: a repair dealer registration where the state or city registers repair dealers (the company and the shop), and a low-voltage license for network installers where the state requires one. Repair technicians need none. S1-60, S1-63 and S2-28 keep both branches (state by state; installers vs technicians). Named states and cities in the old sheet became generic switches.\nFlow A money: main visit|none|counter, a laptop that won't hold a charge. The $49 diagnosis counts toward the repair; the estimate is a $110 battery and a $15 fan cleaning, $125 with the diagnosis (OK some lines: $110). The battery is ordered with the yes and comes Tue Oct 27; READY Tue 3:15pm, pick-up 5:30pm, paid at the counter.\nFlow A also: list|none|counter and list|none|bill ($35 computer tune-up; the bill goes with READY), visit|none|bill (the laptop repair, bill with READY), list|deposit|counter ($140 Chromebook screen, a $40 deposit orders the part, $100 at the counter). The shop saves no card, holds nothing and takes no full price: it charges no cancel or no-show fee.\nFlow B money: main list|hold|bill, a $179 phone screen at Alex's home with the $89 on-site fee held. visit|hold|bill: a computer priced at the visit ($245: a $165 SSD with the files copied and an $80 memory upgrade; some lines $165). list|hold|card: the saved card charged at DONE. photos|deposit|bill: a $640 laptop screen priced from photos, Sam OKs it, a $160 deposit (25%) orders the part, $480 on the bill. No full price anywhere.\nSign-up words follow how this work is paid (S1-13, S1-16, S1-17, S1-42, S1-45, S1-46, S1-47, S11-56, S11-57): no service is paid in full; virus removal holds the on-site fee; the shop takes nothing, a deposit only for a part ordered in, no fees. The shop's tune-up at home is $124 ($35 plus the $89 on-site fee), with the fee held, so the master's $75 became $124.\nClocks on the visit path move past Saturday: A8-29 Sat 12:20pm (the yes orders the battery), A8-43 Tue 2:30pm, A8-50 3:15pm, A8-54 5:30pm, A10-02 7pm, A9-04 Tue, A9-10 Sat Oct 31, A10-32 Thu Oct 29. The WAITING ON A PART news rides on the estimate's yes, so A8-11 has no message that would run the clock back.\nOwn steps: the mail-in branch on A4-01 (A4-x01 to A4-x03), the data consent and passcode on the counter tablet (A8-x01, A8-x02), the diagnosis hour (A8-x03 to A8-x05), the new part failing its test (A8-x06) and the passcode deleted at pick-up (A8-x07).\nFlow B is on-site repair at a home or office. The old flowchart's other side is a mail-in, which is a drop-off and so a branch of flow A. A laptop that needs board repair goes to Lee Tech Help's workbench and comes back on a booked return (B8-38, B8-72 kept).\nNever sent now: S2-30, B4-81, B7-55, B8-58 and B6-03's sent-now branch are off; a swollen battery gets the safety steps and the soonest time. Nobody needs to be home is off (someone hands over and unlocks the device). The place's owner (B4-78) and the landlord branches are off: nothing is built into a home.\nOff as work this shop never has: plans and insurance in flow A (A4-28, A4-54, A5-01, A7-02's plan branches, A9-15), rented items (A10-06, B10-07), the next visit at checkout (A10-06), a day-before hold (A7-02), an expert's read (A6-01, B6-03), the live line (B3-01) and weather (A7-02, B7-05). Flow B keeps a business IT check-up plan (Morgan's two offices).\nsplitsKept A: S1-60, S1-63, S2-28, A8-02 (a missing charger stops a charging repair), A8-53 (a quick fix while Alex waits, or left). splitsKept B: S1-60, S1-63, S2-28, B4-57 (a written estimate over an amount), B8-72 (a device to the workbench).\nThe rule that updates go by email while the customer's only phone is in the shop lives in the plug-in (pf.messages) and in more lines (A6-14, A8-11, A8-50, A10-23). Only device repair needs it, so it isn't a gap.\nKeep: 'repair shop' is this work's own name (the pilot had turned the master's barbershop into it, so check-prof lists it as a pilot word).\nNot sure: whether a reviewer wants the main flow A story to be a phone (the old flowchart's) rather than a laptop. A laptop keeps every text going to Alex's phone; the phone case is covered by the email rule.\nReview, Oct 23: the shop prices from its board or after a diagnosis, never from photos (S1-41, S1-42, S1-47, S11-08 to S11-10 reworded); photos stay only for Lee Tech Help's laptop screen at home, which the plug-in now names. The bill goes with READY, so the master's Saturday-morning wording is gone from the bill paths. Tip lines, a crew, a set date, a smallest group, contracts at the shop, a delivery and 'nobody home' branches are off. Virus removal is held like every on-site job (S1-17), never paid in full.\ntouch-up 4 (Oct 23): B10-08's photos path said the new laptop screen 'drips at a fitting' (the master's water heater); three rename pairs, placed before the drain valve and 'water heater' pairs, make it a new laptop screen that flickers, which matches B10-22's 'If you see lines or flicker'.\nRefit on the REDESIGN 2 master (Tue Oct 27, agent R01): facts dropoff (a device left at the shop), photos (a laptop screen priced from photos), extrawork (a part found at the bench, OK'd first), documents (a written estimate or agreement where the plug-in asks); no switches; settings: A a set start (drop-off slots), B a 2-hour arrival window, free cancel until 24 hours before. Money paths unchanged: A visit|none|counter (main: the $49 diagnosis, then the estimate), list|none|counter, visit|none|bill, list|none|bill, list|deposit|counter; B list|card|bill (main), visit|card|bill, list|card|card, photos|deposit|bill. Amounts: A Computer tune-up $35; Chromebook screen $140, $40 deposit, $100 rest; Laptop repair (visit); B Phone screen repair $179, fee $89 (the on-site fee, as the late-cancel / no-show fee: no card authorization any more, D65), Computer repair (visit), Laptop screen replacement $640, $160 deposit, $480 rest. Own steps kept: the data consent at drop-off (A8-x01) and the passcode deleted at pick-up (A8-x07), the diagnosis inside the OK'd hour (A8-x03). Gone: the mail-in branch (cut by the master: a drop-off only), the failed-part branch (S13-56's one path for a late part).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "once Riley sees the hair.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Could Riley use a toner instead of the gloss?",
+    "asks for a toner instead of the gloss. What's the new price?",
+    "two skin fades on",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex picked a kids cut for a son",
+    "Today · 3:00pm · Avery",
+    "a beard trim today at 2:00pm with Avery",
+    "the beard trim today at 2:00pm with Avery",
+    "first tomorrow: 10:00am, Riley",
+    "A card saved for the $20 fee",
+    "haircut with Riley",
+    "Sat 11am Riley",
+    "at 11:20am on Riley's phone",
+    "Gloss to finish · $15",
+    "Riley quotes the rest at the chair, before any work.",
+    "Wants Saturday morning, with Riley",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "How was your visit with Riley?",
+    "Sun Oct 25 · 11:00am · Riley",
+    "Can my son wait in the shop during my cut?",
+    "Walk-in for a haircut",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Your item is still waiting for pick-up.",
+    "A drop-off item isn't picked up.",
+    "Promises the $25 consult; priced at the chair",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "like Lee Plumbing and Lee Electric.",
+    "Quiero un corte el sábado.",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Drain clearing",
+    "home warranty plan",
+    "a package of cuts",
+    "many barbers, salons and groomers are licensed to their shop",
+    "patch test",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop's services need none.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "Riley looks, then prices it",
+    "Texts Alex the price",
+    "Only the consult; the price stays open",
+    "Follows up on an item left behind",
+    "a skin-test result",
+    "color and house calls",
+    "color, house calls",
+    "Consult only",
+    "photos of your hair",
+    "a cut on Saturday",
+    "Books a cut every 4 weeks",
+    "a cut every 4 weeks",
+    "for a staff cut",
+    "in the chair",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "Barber license",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "4471",
+    "Sofia",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "fade",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "$25 consult",
+    "Only the consult",
+    "the consult",
+    "What happens at the chair?",
+    "Priced at the chair",
+    "priced at the chair",
+    "Paid at the chair",
+    "At the chair",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "a house call",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "like a burst pipe",
+    "$75"
+   ],
+   "B": [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "Drain clearings",
+    "drain clearings",
+    "Shutoff valve and wall pipe · $540",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "heating and cooling",
+    "Heating and cooling",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sam adds Reese K. to Lee Home Services.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "You can look for a roofer near you.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "water heater contract",
+    "replaces water heaters",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Can I run the dishwasher before you come?",
+    "like Lee Plumbing and Lee Electric.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "a $2,400 repipe",
+    "of your repipe",
+    "repipe",
+    "Both rentals' visits go on one bill on the 1st.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "Just the kitchen sink.",
+    "a leak under the sink",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals",
+    "next week's drain cleaning",
+    "clear a yard drain",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "your new pipes are in",
+    "a roof leak",
+    "Video and Jordan's notes",
+    "Jordan finds corroded shutoff valves.",
+    "replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "shutoff valves",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "supply house",
+    "Rental 1",
+    "Rental 2",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also run a camera down my sewer line?",
+    "$160 valve quote",
+    "$160 valve work",
+    "a bathroom drain",
+    "kitchen drain",
+    "The faucet is a leak repair, quoted at the visit.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A haircut could mean a salon or a barbershop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Texts Alex the price",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Is the sink still full of water?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "DONE 179 drain",
+    "245 valve 165 supply line 80",
+    "Shutoff valve",
+    "Supply line",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "1-year labor warranty",
+    "a dripping faucet",
+    "color and house calls",
+    "color, house calls",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "plumbing license",
+    "Plumbing license",
+    "electrical license",
+    "Electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "a haircut",
+    "Haircut",
+    "fade",
+    "beard trim",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "camera inspection",
+    "camera report",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Panel upgrade",
+    "under my sink",
+    "under the sink",
+    "like a burst pipe",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "shutoff valve",
+    "$75",
+    "Leak repair",
+    "leak repair"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S13-22": "5324c9a041",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A3-20": "b8251d2535",
+   "A4-03": "c24298dc38",
+   "A6-14": "b17b52115e",
+   "A8-23": "e3a35f7f9e",
+   "A8-25": "a79292eae2",
+   "A8-54": "bc2f9467fd",
+   "A8-44": "4410a4860c",
+   "A10-01": "77ff9c7550",
+   "A10-45": "855be6050a",
+   "A5-19": "5d5db6f3c1",
+   "A10-05": "63c3536c7a",
+   "S1-60": "235c90a3c3",
+   "S1-23": "39941a5377",
+   "S1-50": "3167049ceb",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-28": "549fd7ae22",
+   "S2-11": "07b9eace96",
+   "S2-12": "bf07703251",
+   "S2-13": "1f8ca715f5",
+   "S2-14": "30b76ad6d0",
+   "A3-23": "4a8b7c72a2",
+   "A3-26": "9e3630dc0b",
+   "A4-41": "15813954ee",
+   "A8-02": "15f418fec4",
+   "A8-51": "71142aa1fa",
+   "A8-26": "1e164bc165",
+   "A8-29": "6b776f2a37",
+   "A8-30": "c0f4d7c935",
+   "A8-48": "4797cd5902",
+   "A8-35": "a67e890a5b",
+   "A8-43": "7b0f73c701",
+   "A8-11": "d5522790d9",
+   "A8-50": "0f26abfc87",
+   "A8-45": "6589a6b4d4",
+   "A10-08": "b60e30f285",
+   "A10-22": "c891ad7af1",
+   "A10-23": "105d7f426a",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-56": "bd841a4732",
+   "S11-57": "a3996ae84e",
+   "S1-78": "240d450c92"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S13-22": "9c91065dc1",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B9-06": "f091432f2d",
+   "B9-19": "b97bfbf0d2",
+   "B3-17": "3eb7d7f259",
+   "B4-34": "74ff52d83d",
+   "B6-03": "dcc1eb310c",
+   "B8-04": "6c9782920d",
+   "B8-18": "530038d2b8",
+   "B4-16": "37cd99137d",
+   "B8-03": "ac9d404766",
+   "S1-60": "235c90a3c3",
+   "S1-23": "5b2324d920",
+   "S1-50": "daa9091585",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-28": "549fd7ae22",
+   "S2-11": "07b9eace96",
+   "S2-12": "d1ab5fba45",
+   "S2-13": "71995453c3",
+   "S2-14": "0f7ed95d1d",
+   "B3-19": "2f53161fb2",
+   "B4-04": "df3ea4b2f5",
+   "B8-48": "3b55a46f7c",
+   "B8-30": "a1ef4983e4",
+   "B8-54": "0f180048ca",
+   "S11-41": "b9894f01ce",
+   "S11-54": "f2d479cd60",
+   "S11-57": "2f34f23d8a",
+   "B10-32": "7713bff255"
+  }
+ }
+}

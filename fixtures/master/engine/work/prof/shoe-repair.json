@@ -1,0 +1,3343 @@
+{
+ "id": "shoe-repair",
+ "name": "Shoe repair",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "tailor",
+ "plugin": {
+  "pf.license": {
+   "need": "none for shoe or leather repair in most places; the business registration, where the state asks for one",
+   "ask": [
+    "The business registration number, where the state gave one",
+    "Proof of business auto insurance, for the van and home visits"
+   ],
+   "who": "the business; no license for a person",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "a registration the state requires that the owner says the business lacks keeps the business offline",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance and cover for customers' shoes while the shop has them, as the business says; shown only once proof is sent",
+   "otherwise": "identity checked, and 'license: what the business says'; customers see no license claim"
+  },
+  "pf.services": {
+   "pattern": "drop-off: a pair left at the counter, then READY and a pick-up; at a home visit the cobbler looks at the shoes, takes them to the shop and brings them back",
+   "examples": "the example shop's own prices, not a standard",
+   "list": [
+    {
+     "name": "Heel replacement (pair)",
+     "price": "one price, $35",
+     "length": "ready in 3 days",
+     "place": "at the shop; or by a home visit, taken to the shop and brought back",
+     "before": "nothing taken at the shop",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Zipper replaced (boot)",
+     "price": "one price, $40",
+     "length": "ready in 5 days",
+     "place": "at the shop"
+    },
+    {
+     "name": "Shoe stretch (pair)",
+     "price": "one price, $20",
+     "length": "ready in 2 days",
+     "place": "at the shop"
+    },
+    {
+     "name": "Strap or buckle repair",
+     "price": "one price, $25",
+     "length": "ready in 3 days",
+     "place": "at the shop"
+    },
+    {
+     "name": "Half sole (pair)",
+     "price": "one price, $55",
+     "length": "ready in 5 days",
+     "place": "at the shop"
+    },
+    {
+     "name": "Boot resole, stitched",
+     "price": "one price, $140",
+     "length": "ready in 2 weeks; only with the master cobbler",
+     "place": "at the shop",
+     "before": "a $40 deposit orders the soles",
+     "after": "the $100 rest at pick-up"
+    },
+    {
+     "name": "Leather and bag repair",
+     "price": "priced from the customer's photos first, or at the counter",
+     "place": "at the shop"
+    },
+    {
+     "name": "Shoe restoration",
+     "price": "priced at the counter after a look: scuffs, dye, refinishing; written, item by item",
+     "place": "at the shop, or by a home visit",
+     "before": "nothing taken at the shop",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Fit check",
+     "price": "free, ten minutes at the counter",
+     "place": "at the shop"
+    },
+    {
+     "name": "Home visit (Lee Mobile Cobbler)",
+     "price": "a $15 pickup fee, credited to the work",
+     "place": "at the customer's home or office",
+     "before": "a card saved for the $15 fee",
+     "after": "Rosie texts the bill after the shoes come back"
+    }
+   ],
+   "turnaround": "days until ready, per service: heels 3 days, half soles 5, a stitched resole 2 weeks; a home visit's shoes come back in about 5 days",
+   "included": "a free fix within 30 days if a sole or a stitch comes loose (not wear and not new damage)",
+   "capacity": "one cobbler at the bench; the stitching machine is used by the master cobbler only",
+   "nobody_home": "no: a home visit needs the customer there to look at the shoes and OK the price; the returned pair is handed to an adult the customer named",
+   "online": "no"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What needs fixing: heels, soles, a zipper, a strap, stretching, or other",
+    "The kind of shoe or boot and what it is made of",
+    "How many pairs",
+    "The date they are needed by",
+    "For a home visit: the town and the kind of place"
+   ],
+   "after_time": [
+    "Anything the cobbler should know, like a favorite pair or a repair done elsewhere",
+    "Someone else who may OK the price or pay, like a parent"
+   ],
+   "secure_page_only": [
+    "A photo of the shoes, if the customer wants to send one",
+    "For a home visit: the street address and how to get in"
+   ],
+   "who_may_book": "an adult; a parent or guardian books for a child's shoes"
+  },
+  "pf.safety": {
+   "stop_words": [],
+   "stop_action": "no danger words of its own: the generic screen (danger to life, fire, gas, a medical emergency, crisis words) is always on",
+   "rated_boots": "safety-rated boots (steel toe, electrical hazard): re-soled only with the maker's parts, and the customer is told plainly in writing that the rating can't be promised after any repair; the customer says yes first",
+   "medical_shoes": "orthopedic or medical shoes: only the outer repair, never the insole, lift or brace; the reason stays on the secure page",
+   "during_work": "a finding that stops the work, like a sole cracked through or an upper torn through: the work stops, a written note and photo go to the customer, and nothing is charged for what wasn't done",
+   "house_calls": "a cobbler who feels unsafe at a home leaves, and the owner is told",
+   "can_continue": "yes, after the generic steps"
+  },
+  "pf.first_steps": {
+   "required": "none",
+   "prep_for_reminder": [
+    "Bring both shoes of each pair, and any insoles you want kept",
+    "For a home visit: have the shoes out, and room to sit and try them on"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "the check-in code at the counter; a walk-in drop-off is checked in at the counter at once; at a home visit, the code at the door",
+   "intake": "a ticket per pair: both shoes photographed, wear and damage noted, the repair asked for, and the date it's needed by; the customer keeps the claim ticket",
+   "estimate": "written, item by item, before any work; the customer says yes to all, to some items, or not today; good for 7 days",
+   "added_work": "a new problem found while the shoes are in is texted with its price first; nothing extra without a yes; no answer in 2 days: left as it is",
+   "ready": "READY texts the pick-up hours, anything due and the held-until date",
+   "pick_up": "with the claim ticket or the code; a try-on at the counter; handed over once anything due is paid",
+   "done_proof": "the code at pick-up checks the visit in; at a home visit, DONE after the try-on at the return",
+   "claims": "a damaged or lost pair is reported within 7 days; the owner decides with the shop's claims policy, never more than the pair's value",
+   "unclaimed": "pairs not picked up: reminders at 30 and 60 days after READY, then a final written notice with the date before anything is donated at 90 days, as the state's unclaimed-property rules allow; the owner decides",
+   "house_call": "the cobbler looks at the shoes at the home, prices each item, and takes the pair to the shop; they come back on a booked return, with a try-on"
+  },
+  "pf.money": {
+   "before": "nothing taken at the shop; a stitched resole takes a $40 deposit that orders the soles; a home visit saves a card for the $15 pickup fee",
+   "deposit": "the $40 resole deposit comes off the price; the rest is paid at pick-up; deposit cap: from the state form",
+   "after": "the rest at the counter at pick-up; for a home visit, the bill Rosie texts after the shoes come back",
+   "fees": "no late-cancel or no-show fee at the shop; at a home visit, the $15 pickup fee for a late cancel or a no-show, only if Sam confirms; it is credited to the work when the work is done",
+   "materials": "special soles, dye or hardware bought for a job are added at cost, with a yes first",
+   "tips": "no tip line",
+   "tax": "where the state taxes the work (the owner's setting)",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "A card number",
+    "A gate or door code",
+    "The reason for orthopedic or medical shoes"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a child's shoes go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "heels and soles",
+    "stitched resoles",
+    "zippers and straps",
+    "stretching",
+    "leather and bag repair",
+    "home visits"
+   ],
+   "licenses": "none for a person",
+   "supervision": "none",
+   "who_oks": "the owner OKs restoration prices over $200, stitched resoles and any fee",
+   "stand_in": "heels, soles and zippers: any cobbler; stitched resoles and restoration: only the master cobbler"
+  },
+  "pf.rules": {
+   "written_price": "switch: a written price before work, above an amount: from the state form; the shop writes every item anyway",
+   "fees_in_first_price": "switch: every required fee, like the pickup fee, inside the first price: from the state form",
+   "unclaimed_items": "switch: how long finished pairs are held, the written notice, and the waiting time before they're donated or sold: from the state form; the owner decides, and Rosie sends only the notices the owner OKs",
+   "right_to_cancel_at_home": "switch: a right to cancel work sold at the customer's home: from the state form",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A no-show or a late cancel: no fee at the shop; at a home visit, up to the $15 pickup fee, only if Sam confirms",
+    "More than 15 minutes late: the pair is taken when the customer arrives, or the visit moves",
+    "A need-by date, like a wedding: only turnarounds that make it are offered",
+    "Yes to some items only",
+    "More work found while the shoes are in, with no answer",
+    "Safety-rated boots: told plainly the rating can't be promised",
+    "The pair isn't picked up: reminders at 30 and 60 days, a final notice, donation at 90",
+    "A pair damaged at the shop",
+    "A fix asked within 30 days"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Gianni and Mei (cobblers)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Hector and Dani (cobblers who make home visits)",
+   "other": "Others (a bank, an office manager)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Gianni"
+  },
+  "B": {
+   "staff": "Hector"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken; a $40 deposit for a stitched resole"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved for the $15 pickup fee"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like shoe repair?"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Hector: shoes and leather repair at homes"
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card taken"
+   ],
+   [
+    "EC22871",
+    "Registration only"
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: no fee, except a stitched resole's $40 deposit, and only if you say yes"
+   ],
+   [
+    "To save cards for the $20 fee, connect Stripe in Lee's Barbershop's own name. Bank and tax details go to Stripe, never to us.",
+    "To take resole deposits and send bills, connect Stripe in Lee's Barbershop's own name. Bank and tax details go to Stripe, never to us."
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches boot resole from a $40 deposit to nothing taken. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "Nothing taken · paid at the counter after"
+   ],
+   [
+    "We couldn't find barbershop license BS20981 for Lee's Barbershop on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, the shop stays offline, saved, until our team checks it within 1 business day.",
+    "We couldn't find registration EX-4012 for Lee's Shoe Repair on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, the shop stays offline, saved, until our team checks it within 1 business day."
+   ],
+   [
+    "Once a barber is confirmed and you say yes",
+    "Once your team is added and you say yes"
+   ],
+   [
+    "Customers can book it once a barber is confirmed",
+    "Customers can book it once your team is added"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some shops are registered for one address only."
+   ],
+   [
+    "Barber license number",
+    "Phone for work texts"
+   ],
+   [
+    "Plumbing MP045210",
+    "Registration EX-4011"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "None needed"
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration EX-4012"
+   ],
+   [
+    "MP045210",
+    "EX-4011"
+   ],
+   [
+    "BS20981",
+    "EX-4012"
+   ],
+   [
+    "BS20918",
+    "EX-4021"
+   ],
+   [
+    "JP031552",
+    "EX-3015"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "EC22871",
+    "none"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Shoe Repair's"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A repair could mean shoes or a watch."
+   ],
+   [
+    "Card saved for the $20 fee",
+    "Nothing taken"
+   ],
+   [
+    "The chairs",
+    "The workbench"
+   ],
+   [
+    "The $25 consult included",
+    "The price check is free"
+   ],
+   [
+    "Only the $25 consult is promised.",
+    "Nothing else is promised."
+   ],
+   [
+    "Yes, make it a fade",
+    "Yes, make it two pairs"
+   ],
+   [
+    "Toner · $20",
+    "Leather dye · $20"
+   ],
+   [
+    "quote 110 color correction + 20 toner",
+    "quote 110 boot restoration + 20 leather dye"
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair. {{pay.asks}}. The rest is quoted at the chair, before any work.",
+    "Lee's Shoe Repair prices a restoration at the counter, once Gianni sees the shoes. {{pay.asks}}. The price is set at the counter, before any work."
+   ],
+   [
+    "a house call, $75, paid in full when booking",
+    "a home visit, with a card saved for the $15 pickup fee"
+   ],
+   [
+    "Haircuts already booked keep only their saved card.",
+    "Boot resoles already booked keep their $40 deposit."
+   ],
+   [
+    "How would you like it on top?",
+    "Which heel do you want?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a strap repair is $25. Want a time?"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you fix straps? My daughter's school shoe needs one."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Gianni: heels, soles, stitched resoles"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Hector and Dani fix shoes at customers' homes and offices. Gianni and Mei work the bench; Gianni also does stitched resoles. Pat is my office manager, for prices over $500. Jules repairs bags at the counter, with their own customers."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "Lee's Shoe Repair: you now have two drop-offs on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go."
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's employer for the staff's dress shoes. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Riley at the chair. That shows Riley really came.",
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Gianni at the counter. That shows Gianni really came."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Gianni will take the shoes when Alex arrives, or you can move to a later time. No reply by 11:00am means the drop-off stays."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex asks for a watch battery change, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "At a drop-off, READY and the pick-up come once the work is done. At the chair, the customer is already there, so the shop takes the first branch.",
+    "At a drop-off, READY and the pick-up come once the work is done. Every pair is left with the shop, so the shop takes the drop-off branch."
+   ],
+   [
+    "From Riley's phone, or the portal's Today page at the desk. This confirms the visit. No text goes to the customer: they're at the chair.",
+    "From Gianni's phone, or the portal's Today page at the desk. This confirms the drop-off. No text goes to the customer: they're at the counter."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Gianni shows the work, like a new heel on the bench. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "Alex M.'s price: $110 boot restoration and $15 sole guard, $125 in all. It goes to Sam first."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the counter, at a drop-off, or at the start of a video call."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A restoration's example: 'Restoring boots is priced at the counter first. Have they been resoled before?'"
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My heel fell off' or 'new heels' fits a heel replacement."
+   ],
+   [
+    "Here they OK the $110 color correction and skip the $15 gloss. The $25 consult is part of the $110.",
+    "Here they OK the $110 boot restoration and skip the $15 sole guard. The price check was free."
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the boot's sole splits all the way before the drop-off, and the customer asks if they can still bring it in."
+   ],
+   [
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Done. Today: the boot restoration, $110. The $15 sole guard price is good until Sat Oct 31."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Shoe repair at home in Springfield. Heels, soles and boot care, within 25 miles."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee's Shoe Repair about your Sat 11:00am drop-off: please bring both shoes of each pair."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood shoe repair shop on Bridge St. Heels, soles, zippers and boot care."
+   ],
+   [
+    "Alex M. asks for a toner instead of the gloss. What's the new price?",
+    "Alex M. asks for leather dye instead of the sole guard. What's the new price?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: wide fit, no dye, keep the old laces."
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the boot restoration only, $110. No sole guard today."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Restoration prices come to you first. Board prices never need one"
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like to drop off my boots on Saturday."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The sole split all the way. Can I still bring the boot in?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring both shoes of each pair on Saturday."
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 boot restoration + 15 sole guard Alex M."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Gianni use leather dye instead of the sole guard?"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Boot restoration $110 · sole guard $15"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for these shoes."
+   ],
+   [
+    "Gloss to finish · $15",
+    "Sole guard · $15"
+   ],
+   [
+    "A water heater job",
+    "A shoe repair at a customer's home"
+   ],
+   [
+    "A chair, ready",
+    "The bench, ready"
+   ],
+   [
+    "Color and cut",
+    "Leather and bag repair"
+   ],
+   [
+    "Style consult",
+    "Fit check"
+   ],
+   [
+    "Panel upgrade",
+    "Bag repair"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, and home visits"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Hector: shoes and leather repair at homes"
+   ],
+   [
+    "Casey: plumbing",
+    "Dani: shoes at homes"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Gianni: the bench and stitched resoles"
+   ],
+   [
+    "Avery: barber",
+    "Mei: the bench"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Shoe repair takes none, at the shop or at home."
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Color correction can work this way, with only the $25 consult promised.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. New heels work this way."
+   ],
+   [
+    "a skin fade",
+    "a zipper replacement"
+   ],
+   [
+    "1 color quote",
+    "1 restoration price"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken to book"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Priced at the counter, after a look"
+   ],
+   [
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Gianni's price for your restoration is with the owner. You can wait for it, or take the shoes back today."
+   ],
+   [
+    "Consult only",
+    "Shoes back"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Shoes go back; the price stays open"
+   ],
+   [
+    "Copy: you said yes to a color correction, $125, at 11:20am on Riley's phone.",
+    "Copy: you said yes to Gianni's $125 price for your boot restoration and sole guard, at 11:20am on the shop's phone."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero dejar mis botas para arreglar el sábado."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley, so Riley's next times show. Stitched resoles always stay with Riley."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A repair could mean shoes or a watch."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A shoe shop books a drop-off time at the counter."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Shoe Repair doesn't do watch batteries."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the shop show photos of the finished shoes?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop while I drop off the shoes?"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Gianni will take the shoes when Alex arrives, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A shoe shop takes drop-offs: a pair left at the counter, checked in at once."
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped Alex M.'s repair: the upper is cracked through. Note and photo on the page."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Gianni stopped part of Alex M.'s repair."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The buffer scuffed the toe of my shoe."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the buffer scuffed the toe of a shoe today."
+   ],
+   [
+    "Riley finishes the work",
+    "Gianni finishes the repair"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The new heel came loose on one side."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the new heel from Saturday's drop-off came loose on one side."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 bag repair price."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds watch repair to Lee's Shoe Repair."
+   ],
+   [
+    "NEW massage",
+    "NEW watch repair"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Watch repair for Lee's Shoe Repair: is it the same company?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the counter"
+   ],
+   [
+    "priced at the chair",
+    "priced at the counter"
+   ],
+   [
+    "quote at the chair",
+    "quote at the counter"
+   ],
+   [
+    "added at the chair",
+    "added at the counter"
+   ],
+   [
+    "code at the chair",
+    "code at the counter"
+   ],
+   [
+    "paid at the chair",
+    "paid at the counter"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "pays at the chair",
+    "pays at the counter"
+   ],
+   [
+    "rest at the chair",
+    "rest at the counter"
+   ],
+   [
+    "tip at the chair",
+    "tip at the counter"
+   ],
+   [
+    "is at the chair",
+    "is at the counter"
+   ],
+   [
+    "already in the chair",
+    "already at the counter"
+   ],
+   [
+    "as at the chair",
+    "as at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "Signature cut and shave",
+    "Half sole"
+   ],
+   [
+    "Groom's package",
+    "Boot resole"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Strap or buckle repair"
+   ],
+   [
+    "kids cuts",
+    "strap repairs"
+   ],
+   [
+    "a kids cut",
+    "a strap repair"
+   ],
+   [
+    "Kids cut",
+    "Strap repair"
+   ],
+   [
+    "kids cut",
+    "strap repair"
+   ],
+   [
+    "Skin fade",
+    "Zipper replaced"
+   ],
+   [
+    "skin fade",
+    "zipper replaced"
+   ],
+   [
+    "Beard trim",
+    "Shoe stretch"
+   ],
+   [
+    "a beard trim",
+    "a shoe stretch"
+   ],
+   [
+    "beard trim",
+    "shoe stretch"
+   ],
+   [
+    "Color correction",
+    "Shoe restoration"
+   ],
+   [
+    "A color correction",
+    "A shoe restoration"
+   ],
+   [
+    "a color correction",
+    "a shoe restoration"
+   ],
+   [
+    "color correction",
+    "shoe restoration"
+   ],
+   [
+    "Haircut plans",
+    "Repair plans"
+   ],
+   [
+    "Haircut plan",
+    "Repair plan"
+   ],
+   [
+    "Haircuts",
+    "Heel replacements"
+   ],
+   [
+    "haircuts",
+    "heel replacements"
+   ],
+   [
+    "A haircut",
+    "A heel replacement"
+   ],
+   [
+    "a haircut",
+    "a heel replacement"
+   ],
+   [
+    "Haircut",
+    "Heel replacement"
+   ],
+   [
+    "haircut",
+    "heel replacement"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Shoe Repair LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Shoe Fix and Lee Leather Fix"
+   ],
+   [
+    "Lee Electric",
+    "Lee Leather Fix"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Shoe Fix"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Cobbler's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Cobbler"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Shoe Repair"
+   ],
+   [
+    "plumbing and electrical",
+    "shoe and leather repair"
+   ],
+   [
+    "Plumbing and electrical",
+    "Shoe and leather repair"
+   ],
+   [
+    "electrical license",
+    "leather repair license"
+   ],
+   [
+    "Electrical",
+    "Leather repair"
+   ],
+   [
+    "electrical",
+    "leather repair"
+   ],
+   [
+    "plumber",
+    "cobbler"
+   ],
+   [
+    "Plumbing",
+    "Shoe repair"
+   ],
+   [
+    "plumbing",
+    "shoe repair"
+   ],
+   [
+    "Barbershop",
+    "Shoe shop"
+   ],
+   [
+    "barbershops",
+    "shoe shops"
+   ],
+   [
+    "a barbershop",
+    "a shoe shop"
+   ],
+   [
+    "A barbershop",
+    "A shoe shop"
+   ],
+   [
+    "barbershop",
+    "shoe shop"
+   ],
+   [
+    "a barber",
+    "a cobbler"
+   ],
+   [
+    "A barber",
+    "A cobbler"
+   ],
+   [
+    "barbers",
+    "cobblers"
+   ],
+   [
+    "Barbers",
+    "Cobblers"
+   ],
+   [
+    "barber",
+    "cobbler"
+   ],
+   [
+    "Barber",
+    "Cobbler"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "Riley Chen",
+    "Gianni Rossi"
+   ],
+   [
+    "Avery Diaz",
+    "Mei Park"
+   ],
+   [
+    "Jordan Price",
+    "Hector Vega"
+   ],
+   [
+    "Casey Moore",
+    "Dani Okafor"
+   ],
+   [
+    "Riley",
+    "Gianni"
+   ],
+   [
+    "Avery",
+    "Mei"
+   ],
+   [
+    "Jordan",
+    "Hector"
+   ],
+   [
+    "Casey",
+    "Dani"
+   ],
+   [
+    "88 Elm St",
+    "22 Bridge St"
+   ],
+   [
+    "Elm St",
+    "Bridge St"
+   ],
+   [
+    "Oak St",
+    "Linden Ln"
+   ],
+   [
+    "1200 Main St",
+    "810 Harbor Ave"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Only the consult",
+    "Only the price check"
+   ],
+   [
+    "only the consult",
+    "only the price check"
+   ],
+   [
+    "the consult only",
+    "the price check only"
+   ],
+   [
+    "the consult",
+    "the price check"
+   ]
+  ],
+  "B": [
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken; a $40 deposit for a stitched resole"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "When they book: a card saved for the $15 pickup fee you OK"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved for the $15 pickup fee"
+   ],
+   [
+    "Does it work like plumbing?",
+    "Does it work like shoe repair?"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Hector: shoes and leather repair at homes"
+   ],
+   [
+    "EC22871",
+    "Registration only"
+   ],
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 6pm the day before. After that, or nobody home: up to the $15 pickup fee, only if a card was saved and you say yes"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Mon–Fri 8am–5pm · 2-hour windows · 1 day's notice · up to 30 days ahead"
+   ],
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every visit is booked in a window"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line · no bank transfer"
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, plumbing stays offline, saved, until our team checks it within 1 business day.",
+    "We couldn't find registration EX-4011 for Sam Lee on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, shoe repair stays offline, saved, until our team checks it within 1 business day."
+   ],
+   [
+    "Once a barber is confirmed and you say yes",
+    "Once your team is added and you say yes"
+   ],
+   [
+    "AI assistants can book you now, on your own license",
+    "AI assistants can book you now, on your own registration"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some shops are registered for one address only."
+   ],
+   [
+    "I check licenses right away.",
+    "It takes a minute."
+   ],
+   [
+    "License numbers: here, or by text",
+    "Your phone: here, or by text"
+   ],
+   [
+    "Plumbing MP045210",
+    "Registration EX-4011"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "None needed"
+   ],
+   [
+    "Plumbing, checked",
+    "None needed"
+   ],
+   [
+    "Barber, checked",
+    "None needed"
+   ],
+   [
+    "Everyone's licenses are confirmed on the official lookup. Each person is who their license names: you confirm it. Let them take bookings now?",
+    "Everyone is added. Let them take bookings now?"
+   ],
+   [
+    "The licenses check out; asks Sam",
+    "Everyone is added; asks Sam"
+   ],
+   [
+    "Nobody is offered to customers until their license is confirmed and Sam says yes. Rosie asks about everyone at once.",
+    "Nobody is offered to customers until Sam says yes. Rosie asks about everyone at once."
+   ],
+   [
+    "Each person is who their license names: Sam confirms it with this yes.",
+    "Sam confirms each person with this yes."
+   ],
+   [
+    "Reese can be booked once the license checks out on the state's lookup, and Sam says yes.",
+    "Reese can be booked once Sam says yes."
+   ],
+   [
+    "Welcome! Please add your license number.",
+    "Welcome! Please fill in your secure page."
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration EX-4011"
+   ],
+   [
+    "MP045210",
+    "EX-4011"
+   ],
+   [
+    "MP045201",
+    "EX-4101"
+   ],
+   [
+    "BS20981",
+    "EX-4012"
+   ],
+   [
+    "JP031552",
+    "EX-3015"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "EC22871",
+    "none"
+   ],
+   [
+    "service-call fee",
+    "pickup fee"
+   ],
+   [
+    "service call fee",
+    "pickup fee"
+   ],
+   [
+    "Service call fee",
+    "Pickup fee"
+   ],
+   [
+    "$640 quote",
+    "$245 price"
+   ],
+   [
+    "Sam will answer by Mon Oct 26, 5pm",
+    "Sam will answer by Fri Oct 30, 5pm"
+   ],
+   [
+    "Claim · Thu Oct 22 visit",
+    "Claim · Tue Oct 27 return"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $35"
+   ],
+   [
+    "$20 payment",
+    "$35 payment"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Boots: full rebuild · $540"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa heels Thu 12-2 Casey"
+   ],
+   [
+    "Lee Home Services can clear the drain: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}.",
+    "Lee Mobile Cobbler can fix your shoes at home: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Please leave them as they are."
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan needs a sole from the van."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A shoe repair at home is priced at the visit: only the $15 pickup fee was promised."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A repair could mean shoes or a watch."
+   ],
+   [
+    "Licenses: checked",
+    "Registrations: checked"
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For shoe repair, a fire or a gas smell stops the booking."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Gianni: heels, soles, stitched resoles"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Mobile Cobbler. Sam named you their emergency contact. May we call or text you if they miss a safety check? We'd share only where they're working, only after a missed check."
+   ],
+   [
+    "No live waiting line. Work like towing or a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time.",
+    "No live waiting line. Work like a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Hector and Dani fix shoes at customers' homes and offices. Gianni and Mei work the bench; Gianni also does stitched resoles. Pat is my office manager, for prices over $500. Jules repairs bags at the counter, with their own customers."
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like stitching a fake designer label onto a bag. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note."
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that the boot's sole has split all the way. Rosie runs the plug-in's danger check again, then asks the pro. Dani can come sooner, so that's offered."
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Mobile Cobbler asks: is the visit at a home, an office or somewhere else? And how many pairs, and what needs fixing?"
+   ],
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, arriving 3–5pm, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Mobile Cobbler. It's a shoe repair visit, today, arriving 3–5pm, with Hector. The pickup fee is $15. Accept it?"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Hector's buffer scuffs the toe of a customer's shoe and texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The new heel comes loose 2 weeks later. It's inside the shop's 30-day free fix, so Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "Reminder: your visit is tomorrow, arriving 8–10am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Reminder: your visit is tomorrow, arriving 8–10am, with Hector. {{pay.cancel}}. Please have both shoes of each pair out, and a seat to try them on."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My heel fell off' fits a heel replacement."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds watch repair to Lee Mobile Cobbler. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $35 heel replacement needs none."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Shoe repair at home in Springfield. Heels, soles and boot care, within 25 miles."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 order of boots is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a shoe stretch? Say so.'"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood shoe repair shop on Bridge St. Heels, soles, zippers and boot care."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Watch repair for Lee Mobile Cobbler: is it the same company?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about getting my boots resoled. A text back is fine."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "The zipper on my boot broke this morning."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. They're my boots."
+   ],
+   [
+    "Water heater replacement",
+    "Leather and bag repair"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW watch repair"
+   ],
+   [
+    "Water pressure check",
+    "Fit check"
+   ],
+   [
+    "Yes, it won't drain",
+    "Two pairs, a boot and a dress shoe"
+   ],
+   [
+    "A water heater job",
+    "A shoe repair at a customer's home"
+   ],
+   [
+    "A chair, ready",
+    "The bench, ready"
+   ],
+   [
+    "Sam adds a plumber",
+    "Sam adds a cobbler"
+   ],
+   [
+    "Checked by Rosie on the state's lookup, Oct 19",
+    "None needed. Registration checked Oct 19"
+   ],
+   [
+    "Panel upgrade",
+    "Bag repair"
+   ],
+   [
+    "Every plumbing job, and electrical",
+    "Every shoe repair, and leather repair"
+   ],
+   [
+    "Every plumbing job",
+    "Every shoe repair"
+   ],
+   [
+    "Labor",
+    "Custom leatherwork"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Hector: shoes and leather repair at homes"
+   ],
+   [
+    "Casey: plumbing",
+    "Dani: shoes at homes"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Gianni: the bench and stitched resoles"
+   ],
+   [
+    "Avery: barber",
+    "Mei: the bench"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Shoe repair takes none, at the shop or at home."
+   ],
+   [
+    "Alex M. asked for money back for the Thu Oct 22 visit.",
+    "Alex M. asked for money back for the Tue Oct 27 return."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Shoe Repair can fix heels at the shop for $35, or at your home with a $15 pickup fee."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A shop visit is in the other flow."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Mobile Cobbler does shoe and leather repair, not watch repair. Nothing was saved. You can look for a watch repairer near you."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a gas smell or a fire, gets the safety steps first."
+   ],
+   [
+    "like a move-out day",
+    "like a wedding day"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask a boot maker about a rebuild first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting a sole from the van, back 9:15"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is getting a sole from the van and will be back about 9:15am. The visit should be done by 10am."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE buffer scuffed a toe"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed toe"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan's buffer scuffed the toe of Alex M.'s dress shoe. The before photo shows none."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My boots need new soles. Can a cobbler come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito arreglar el tacón de mis zapatos."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need the heel of my shoes fixed."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a cobbler come to pick up two pairs of boots this Thursday? What does it cost?"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can my wet leather boots be dried in the oven before you fix them?"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A home visit happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Mobile Cobbler doesn't do, like a watch repair."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what needs fixing, the kind of shoe and what it is made of, and the date it's needed by."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: none of its own. The general danger check is always on."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Two pairs: boots and dress shoes."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about a bag strap. Both jobs go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also look at my bag strap?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The bag strap is priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Is the sink still full of water?",
+    "How many pairs is it?"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: Jordan is the one who does bag repair."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I clean the boots before you come?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The sole came off my boot on the way to work."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Please don't walk far in them. Casey can come sooner, at the same price."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also look at my daughter's school shoes?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Zipper replaced · $40"
+   ],
+   [
+    "Yard drain",
+    "Dress shoes"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the left toe of the dress shoes"
+   ],
+   [
+    "Under the sink, before",
+    "Dress shoes, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Boots, before"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan looks at the boots and the dress shoes, and texts each item's price."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 boots 165 dress shoes 80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan looked at your shoes. Here's the price for each item."
+   ],
+   [
+    "Leak repair · $245",
+    "Shoe repair · $245"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Boots: new soles · $165"
+   ],
+   [
+    "Supply line · $80",
+    "Dress shoes: new heels · $80"
+   ],
+   [
+    "No problem. Today's visit is the $89 service call. The repair price is good for 7 days.",
+    "No problem. Today's visit is the $15 pickup fee. The price is good for 7 days."
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the boots only, $165. Leave the dress shoes."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Jordan takes the boots to the shop today, $165. The $80 price for the dress shoes stays good until Thu Oct 29."
+   ],
+   [
+    "Reminder: Jordan is waiting on your OK for the leak repair, $245.",
+    "Reminder: Jordan is waiting on your OK for the shoe repair, $245."
+   ],
+   [
+    "Alex M. hasn't answered Jordan's $245 leak repair quote in 30 minutes.",
+    "Alex M. hasn't answered Jordan's $245 price in 30 minutes."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds the left boot's zipper broken."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 40 replace the left boot zipper"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: replace the left boot zipper, $40. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the left boot zipper"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $40 zipper price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to replacing the left boot zipper for $40."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds the boot's upper cracked through. The plug-in says a cobbler stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD upper cracked through, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Upper cracked through"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found the upper of your boot cracked through and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the upper is cracked through"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the new sole"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE wide fit, keep the old laces."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 price for the dress shoes stays good until Thu Oct 29."
+   ],
+   [
+    "the shutoff valve",
+    "the boots"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE all OK'd items"
+   ],
+   [
+    "the kitchen drain",
+    "the heel replacement"
+   ],
+   [
+    "the leak repair",
+    "the shoe repair"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The new heel came loose again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s shoes, back Tue Oct 27, have a loose heel. It's inside the 30-day free fix."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It's inside the free fix, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free fix lasts."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left shoe polish on the carpet."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan fix another pair of shoes next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a shoe repair visit."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the boot restoration price before booking."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise heel replacement to 40"
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the heel replacement to $40 for visits from Mon Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Heel replacements already booked keep $35, even after Nov 2."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a heel replacement at $30, an old price."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A heel replacement with Lee Mobile Cobbler is $35, not $30."
+   ],
+   [
+    "Drain clearing · $179",
+    "Heel replacement · $35"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Heel replacement"
+   ],
+   [
+    "Kitchen drain",
+    "Heel replacement"
+   ],
+   [
+    "Drain clearings",
+    "Heel replacements"
+   ],
+   [
+    "drain clearings",
+    "heel replacements"
+   ],
+   [
+    "Drain clearing",
+    "Heel replacement"
+   ],
+   [
+    "drain clearing",
+    "heel replacement"
+   ],
+   [
+    "Water heater flush",
+    "Half sole"
+   ],
+   [
+    "A leak repair",
+    "A shoe repair at home"
+   ],
+   [
+    "a leak repair",
+    "a shoe repair at home"
+   ],
+   [
+    "Leak repair",
+    "Shoe repair at home"
+   ],
+   [
+    "leak repair",
+    "shoe repair at home"
+   ],
+   [
+    "$89 service call",
+    "$15 pickup fee"
+   ],
+   [
+    "the service call",
+    "the pickup fee"
+   ],
+   [
+    "service call",
+    "pickup fee"
+   ],
+   [
+    "Service call",
+    "Pickup and return"
+   ],
+   [
+    "Sewer camera inspection",
+    "Zipper replaced"
+   ],
+   [
+    "paid at the chair",
+    "paid at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "A haircut",
+    "A heel replacement"
+   ],
+   [
+    "a haircut",
+    "a heel replacement"
+   ],
+   [
+    "Haircut",
+    "Heel replacement"
+   ],
+   [
+    "haircut",
+    "heel replacement"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Cobbler LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Shoe Fix and Lee Leather Fix"
+   ],
+   [
+    "Lee Electric",
+    "Lee Leather Fix"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Shoe Fix"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Cobbler's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Cobbler"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Shoe Repair"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilecobbler.com"
+   ],
+   [
+    "plumbing and electrical",
+    "shoe and leather repair"
+   ],
+   [
+    "Plumbing and electrical",
+    "Shoe and leather repair"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "electrical license",
+    "leather repair license"
+   ],
+   [
+    "Electrical license",
+    "Leather repair license"
+   ],
+   [
+    "Electrical",
+    "Leather repair"
+   ],
+   [
+    "electrical",
+    "leather repair"
+   ],
+   [
+    "a plumber",
+    "a cobbler"
+   ],
+   [
+    "plumber",
+    "cobbler"
+   ],
+   [
+    "Plumbing",
+    "Shoe repair"
+   ],
+   [
+    "plumbing",
+    "shoe repair"
+   ],
+   [
+    "Barbershop",
+    "Shoe shop"
+   ],
+   [
+    "barbershops",
+    "shoe shops"
+   ],
+   [
+    "a barbershop",
+    "a shoe shop"
+   ],
+   [
+    "barbershop",
+    "shoe shop"
+   ],
+   [
+    "a barber",
+    "a cobbler"
+   ],
+   [
+    "barbers",
+    "cobblers"
+   ],
+   [
+    "Barbers",
+    "Cobblers"
+   ],
+   [
+    "barber",
+    "cobbler"
+   ],
+   [
+    "Barber",
+    "Cobbler"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "Riley Chen",
+    "Gianni Rossi"
+   ],
+   [
+    "Avery Diaz",
+    "Mei Park"
+   ],
+   [
+    "Jordan Price",
+    "Hector Vega"
+   ],
+   [
+    "Casey Moore",
+    "Dani Okafor"
+   ],
+   [
+    "Riley",
+    "Gianni"
+   ],
+   [
+    "Avery",
+    "Mei"
+   ],
+   [
+    "Jordan",
+    "Hector"
+   ],
+   [
+    "Casey",
+    "Dani"
+   ],
+   [
+    "88 Elm St",
+    "22 Bridge St"
+   ],
+   [
+    "Elm St",
+    "Bridge St"
+   ],
+   [
+    "42 Oak St",
+    "5 Linden Ln"
+   ],
+   [
+    "Oak St",
+    "Linden Ln"
+   ],
+   [
+    "1200 Main St",
+    "810 Harbor Ave"
+   ],
+   [
+    "1-year labor warranty",
+    "30-day free fix"
+   ],
+   [
+    "$179",
+    "$35"
+   ],
+   [
+    "$150",
+    "$55"
+   ],
+   [
+    "$199",
+    "$40"
+   ],
+   [
+    "$160",
+    "$40"
+   ],
+   [
+    "$120 an hour",
+    "$60 an hour"
+   ],
+   [
+    "$89",
+    "$15"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex drops off a pair of dress shoes for new heels at Lee's Shoe Repair, Sat Oct 24 at 11:00am. Gianni writes the ticket and texts READY for Tue Oct 27. Alex pays at the counter at pick-up. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Cobbler for a home visit at 5 Linden Ln, and Hector comes Thu Oct 22 between 8 and 10am. Hector looks at a pair of boots and a pair of dress shoes, prices each item, and takes them to the shop. The shoes come back Tue Oct 27, and Rosie texts the bill. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "visit|none|counter",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: new heels for a pair of dress shoes, $35 from the shop's board. Nothing is taken: a YES books the drop-off. Gianni texts READY, and Alex pays at the counter at pick-up.",
+    "visit|none|counter": "A pair of boots that need restoring, priced at the counter after a look. Nothing is taken. Gianni's written price is OK'd before any work, and Alex pays at the counter at pick-up.",
+    "list|deposit|counter": "A stitched boot resole, $140. A $40 deposit orders the soles, and the $100 rest is paid at the counter at pick-up."
+   },
+   "amounts": {
+    "*": {
+     "name": "Heel replacement"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Heel replacement",
+     "fee": "$0"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Boot resole"
+    },
+    "visit|*|*": {
+     "name": "Shoe restoration",
+     "fee": "$0"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|card|bill",
+   "combos": [
+    "visit|card|bill",
+    "list|card|bill"
+   ],
+   "examples": {
+    "visit|card|bill": "The main story: a home visit for a pair of boots and a pair of dress shoes. Only the $15 pickup fee is promised, with a card saved for it. Hector prices each item at the visit. The shoes come back Tue Oct 27, and Rosie texts the bill.",
+    "list|card|bill": "New heels, $35 from the list, by a home visit. A card is saved for the $15 pickup fee. The shoes come back Tue Oct 27, and Rosie texts the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$15",
+     "name": "Heel replacement"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Heel replacement"
+    },
+    "visit|*|*": {
+     "name": "Shoe repair at home"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "dye"
+ ],
+ "splitsKept": {
+  "A": [],
+  "B": []
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Shoe repair pays the $2.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The shoe repair plug-in adds no agreement, so there is nothing to leave unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "A shoe shop books a cobbler's time, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "A shoe shop runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Shoe repair needs no license: the company gives its registration.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "No person at a shoe shop needs a license.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Shoe repair is never sent now.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "why": "No person at a shoe shop needs a license.",
+    "label": "A license problem"
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "why": "No person at a shoe shop holds a license for the work.",
+    "label": "The license holder leaves"
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "why": "Shoe repair has no safety steps of its own: the general check stops a booking, or it goes on.",
+    "label": "Safety steps, then go on"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "A shoe shop has no form to sign first.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A repair is never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "why": "Nothing is required at the counter: the pair is left with the shop.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A child is never left at the shop: a parent stays.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Every pair is left with the shop, so the shop takes the drop-off branch.",
+    "label": "No: the customer stays"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Repairs are rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "why": "Work booked at the shop has no right to cancel to send.",
+    "label": "Yes: a contract signed today"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "A new repair is booked when there is a pair to fix, not at checkout.",
+    "label": "Next visit booked at checkout"
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "A walk-in drop-off is checked in at once at the counter, with a ticket for the pair.",
+     "A pair priced at the counter waits for the customer's yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "The confirmation says what to bring: both shoes of each pair, and any insoles to keep.",
+     "It asks for the date the pair is needed by, like a wedding. Only turnarounds that make it are offered."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.3",
+       "8.21"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "title": "Gianni looks the pair over and writes the ticket",
+      "does": "Gianni photographs both shoes, notes the wear and any damage, and writes what was asked. A ticket lists the pair and the date it is READY.",
+      "more": [
+       "The photos are the before record. A damage claim or complaint is checked against them.",
+       "Wear, loose stitching and a worn welt are noted, so only new damage counts later.",
+       "Safety-rated boots: Gianni says plainly the rating can't be promised after any repair, and Alex says yes first.",
+       "Orthopedic or medical shoes: only the outer repair. The reason stays on the secure page.",
+       "A stitched resole is Gianni's work only. Anything priced at the counter waits for Alex's yes (A8-24)."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "TICKET Alex M.: dress shoes, new heels. Photos added."
+       ],
+       [
+        "san",
+        "cust",
+        "Your ticket for Sat Oct 24: dress shoes, new heels. READY Tue Oct 27. Keep this ticket or your code for pick-up.",
+        {
+         "card": {
+          "title": "Ticket · Lee's Shoe Repair",
+          "lines": [
+           "Dress shoes · new heels",
+           "READY Tue Oct 27",
+           "{{pay.after}}"
+          ]
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Gianni finds something that stops the work, like a sole cracked through or an upper torn through. Nothing more is done on that part, and nothing is charged for it.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Stopped Alex M.'s repair: the upper is cracked through. Note and photo on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Gianni stopped part of your repair today. Please read the note.",
+      {
+       "card": {
+        "title": "A note from Lee's Shoe Repair",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Gianni stopped part of Alex M.'s repair. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "A try-on at the counter comes first, and the pair is handed over once anything due is paid.",
+     "A damaged or lost pair is reported within 7 days. Sam decides, with the shop's claims policy."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-23",
+    "does": "A pair isn't picked up. After READY, the customer gets a reminder at 30 days and another at 60 days. A final written notice with the date goes out before anything is donated at 90 days.",
+    "more": [
+     "The owner sets the days and what happens after, as the state's unclaimed-property rules allow.",
+     "Rosie never donates, sells or charges on its own. Only the notices the owner OKs go out.",
+     "Notices go inside text hours. No nudges after the final notice."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your shoes have been ready since Tue Oct 27. Please pick them up at Lee's Shoe Repair, Tue to Sat, 9am to 6pm.",
+      {
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "Pick-up: Tue to Sat, 9am to 6pm",
+         "Ready since Tue Oct 27",
+         "Bring the code you used to drop them off"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Reply STOP to opt out. Msg & data rates may apply. Reply HELP for help."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-70",
+    "does": "On the drop-off day, Alex says they're running late. The shop takes the pair when Alex arrives, or moves it to a later time.",
+    "more": [
+     "There is no fee for a late drop-off. Gianni is told.",
+     "Not there by closing: the drop-off counts as missed, and the no-show steps follow.",
+     "Means 1: that's fine. Means 2: a later time.",
+     "Clock: by the drop-off time. Silence: the drop-off stays, and Gianni takes the pair when Alex comes.",
+     "Safe default: nothing moves."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Running 15 minutes late, sorry!"
+     ],
+     [
+      "san",
+      "cust",
+      "No problem. Gianni will take your shoes when you arrive, or you can move to a later time. No reply by 11:00am means the drop-off stays.",
+      {
+       "buttons": [
+        "That's fine",
+        "A later time"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff:Alex M.}} (11:00am) is about 15 minutes late."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say the boot's sole splits all the way before the drop-off, and the customer asks if they can still bring it in.",
+    "more": [
+     "The plug-in's rules are checked first: safety-rated boots are told plainly the rating can't be promised.",
+     "Gianni can look at it at the booked time, or the customer can move the visit with no fee.",
+     "A question only a pro should answer gets the shop's line, and the visit stays booked.",
+     "Means 1: bring it, at the booked time. Means 2: better to move it, with no fee. Means 3: Gianni calls them.",
+     "Safe default: the visit stays; Sam is told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The sole split all the way. Can I still bring the boot in?"
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff:Alex M.}} (Sat 11:00am) sent an update before the visit. Can the visit go ahead?",
+      {
+       "card": {
+        "title": "{{alex.staff:Alex M.}}'s update",
+        "lines": [
+         "On the secure page"
+        ]
+       },
+       "buttons": [
+        "Yes, bring it in",
+        "Better to move it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Yes, please bring it in at your Sat 11:00am drop-off. Gianni will look at it then."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Shoe Repair. Sam Lee added you to the team. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Your phone and languages"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/s/qs"
+       },
+       "as": "Quinn S.",
+       "stop": "first"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "more": [
+     "Heel replacements already booked keep $35, even after Nov 2.",
+     "A time being saved right now keeps the price on the customer's screen.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: heel replacement $40 for visits from Mon Nov 2. Heel replacements already booked keep $35."
+     ]
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Shoe repair pays the $2.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The shoe repair plug-in adds no agreement, so there is nothing to leave unsigned.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "A shoe shop books a cobbler's time, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "A shoe shop runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Shoe repair needs no license: the company gives its registration.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "No person at a shoe shop needs a license.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Shoe repair is never sent now.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "why": "No person at a shoe shop needs a license.",
+    "label": "A license problem"
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "why": "No person at a shoe shop holds a license for the work.",
+    "label": "The license holder leaves"
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "why": "Shoe repair has no safety steps of its own: the general check stops a booking, or it goes on.",
+    "label": "Safety steps, then go on"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "A shoe shop has no form to sign first.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Home visits are booked in a 2-hour window.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A repair is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A shoe shop sells no seats.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Shoe repair is never sent now.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "A shoe repair needs no contract: the written price, OK'd at the visit, is the record.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "Shoe repair is never sent now.",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Shoe repair is never sent now, so every home visit is a set time with a reminder.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Shoe repair is never sent now, so the day list and OMW always come first.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never left in the cobbler's care: an adult on the booking is there.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "A home visit needs the customer there to look at the shoes and OK the price.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "why": "Nothing is required at the door: the shoes are out, or the visit moves.",
+    "label": "Something required is missing"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "A new home visit is booked when there are shoes to fix.",
+    "label": "Next visit booked at checkout"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Shoe repair is rated like any visit.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "more",
+    "at": "B6-13",
+    "more": [
+     "The confirmation says what to have ready: both shoes of each pair, and a seat to try them on."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-22",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.16",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 22, 9:30am",
+      "title": "Hector takes the shoes to the shop",
+      "does": "Hector signs out the shoes, with photos, and books their return. Alex checks the list and signs for it on the secure page.",
+      "more": [
+       "The return is part of the same job: one booking, one $2.",
+       "It gets its own check-in code and a reminder the day before, like any visit.",
+       "If Alex said not today, nothing goes to the shop: Hector texts DONE for the $15 pickup fee.",
+       "Pairs are held 90 days after they're ready. Written notice comes before anything else is done."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "TAKEN boots and dress shoes to the shop, back Tue Oct 27",
+        {
+         "photos": [
+          "Boots, as taken",
+          "Dress shoes, as taken"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Hector took your boots and dress shoes to the shop to fix. Please check the photos and sign for them.",
+        {
+         "card": {
+          "title": "Taken to the shop · 2 pairs",
+          "lines": [
+           "Boots and dress shoes",
+           "Back Tue Oct 27 · arriving 8–10am · Hector"
+          ],
+          "button": "Check and sign",
+          "link": "rosfield.com/t/r4"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "vary": {
+       "price:list": {
+        "say": [
+         [
+          "staff",
+          "san",
+          "TAKEN dress shoes to the shop, back Tue Oct 27",
+          {
+           "photos": [
+            "Dress shoes, as taken"
+           ]
+          }
+         ],
+         [
+          "san",
+          "cust",
+          "Hector took your dress shoes to the shop to fix. Please check the photo and sign for them.",
+          {
+           "card": {
+            "title": "Taken to the shop · Dress shoes",
+            "lines": [
+             "New heels",
+             "Back Tue Oct 27 · arriving 8–10am · Hector"
+            ],
+            "button": "Check and sign",
+            "link": "rosfield.com/t/r4"
+           }
+          }
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "id": "B8-x02",
+      "line": [
+       "8.2",
+       "8.3"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Tue Oct 27, 8:15am",
+      "title": "Hector brings the shoes back",
+      "does": "Five days later the shoes are fixed and polished. Hector texts OMW, and Alex gives the return visit's code at the door.",
+      "more": [
+       "The code checks the return in. It's the same job, so there's no new $2.",
+       "Alex tries the shoes on before DONE. A heel or a sole that isn't right is fixed first.",
+       "Alex isn't home: it's handled like any missed visit, and the shoes go back to the shop."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "OMW"
+       ],
+       [
+        "san",
+        "cust",
+        "Hector from Lee Mobile Cobbler is on the way with your shoes, about 15 minutes. Give your return code at the door.",
+        {
+         "code": "6624"
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "6624"
+       ],
+       [
+        "san",
+        "cust",
+        "Hector from Lee Mobile Cobbler is checked in with your shoes."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Tue Oct 27, 9:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-47",
+    "t": "the next morning after B8-x02, 8am"
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Cobbler. Sam Lee added you to the team. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Your phone and languages"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/s/rk"
+       },
+       "as": "Reese K.",
+       "stop": "first"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "more": [
+     "Heel replacements already booked keep $35, even after Nov 2.",
+     "A time being saved right now keeps the price on the customer's screen.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: heel replacement $40 for visits from Mon Nov 2. Heel replacements already booked keep $35."
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "BUILT Oct 27 2026 (P3 new profession D3, REDESIGN 2 master, frozen). No old flowchart or sample plug-in existed (a new profession), so the plug-in is built from the trade's norm. Start: the refitted tailor (from: tailor). Style Drop-off, pattern dropoff.\nWhy tailor: a cobbler works like a tailor. The pair is looked at, priced item by item in writing, left at the shop, READY, and picked up with a try-on. Flow B is the tailor's shape too: a home visit where the cobbler looks at the shoes and prices them, takes them to the shop, and brings them back on a booked return (own steps B8-x01 and B8-x02).\nFacts: dropoff, extrawork. No switches ($2 applies). Settings: arrive A set start, B 2-hour window; cutoff A 24 hours before, B 6pm the day before.\nMoney A (3 paths): list|none|counter (main: new heels for dress shoes, $35, nothing taken, paid at pick-up), visit|none|counter (boot restoration priced at the counter: boot restoration $110 + sole guard $15 in the example, the customer says yes first), list|deposit|counter (stitched boot resole $140: a $40 deposit orders the soles, the $100 rest at pick-up; the late-cancel fee is the $40 deposit).\nMoney B (2 paths): visit|card|bill (main: a home visit for boots and dress shoes; only the $15 pickup fee is promised, with a card saved for it; each item priced at the visit: boots $165 + dress shoes $80 = $245; the bill after the shoes come back, the fee credited to the work), list|card|bill (heel replacement $35 by a home visit). The $15 pickup fee is the late-cancel and no-show fee, charged only on Sam's yes. No deposit or full price in flow B.\nThe master's B numbers become shoe numbers by rename pairs ($89 to $15, $179 to $35, $150 to $55, $199 to $40, $160 to $40, $120 an hour to $60 an hour), so every master line that names a price shows the shop's own.\nLicenses: none for shoe or leather repair or for any person; the company gives its business registration only (S1-60 '1 A license' and S2-28 '1 Yes, each one' off, S11-42 license branches off). The second kind of work (leather repair) is registration only too (S1-38 asks 'license or registration only?'). Fake license numbers use EX-1042 style. No state, law or number from one state.\nSafety and who must not be booked: no danger words of its own (the generic screen is on); 'Safety steps, then go on' is off. Safety-rated boots: the shop says plainly in writing that the rating can't be promised after any repair, and the customer says yes first. Orthopedic or medical shoes: only the outer repair; the reason stays on the secure page. A sole or upper cracked through stops that part of the work (A8-35, B8-30): a written note and photo, nothing charged for what was not done. Adults book; a parent books a child's shoes; no child is left at the shop.\nBy name: a stitched resole is the master cobbler's work only, so the 'by name' branch stays on (A4-15, B4-16); other work goes to any cobbler.\nOwn steps: A8-x01 (the ticket: both shoes photographed, wear noted, READY date), B8-x01 (the shoes taken to the shop, signed for), B8-x02 (the return with a code, a try-on, then DONE). Words ops: A8-35, A10-23 (reminders at 30 and 60 days, a final written notice before the 90-day donation, the owner decides), A7-13, A7-70, B8-41 (DONE moved to the return day, shows the total), B8-47, S11-48.\nDates run forward: visit Thu Oct 22, shoes taken 9:30am (B8-x01), return Tue Oct 27 8:15am (B8-x02), DONE 9:00am (B8-41, time words op). The tailor's own-step dates were not copied.\nNot built: mail-in repairs, orthotics, shoe shine on the spot, bag-only jobs as their own kind of work.\nKnown master limits (see the log): hard-coded 'haircut' words in A4-14, A4-42, A5-05, A6-14 on the visit and deposit paths; the S1-13 owner replies and read-backs; S12-09 / S12-10 price the second service at the first one's price; S12-19 and S11-99 license steps are not gated by the plug-in.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: a card saved for the $89 service-call fee",
+    "Does it work like haircuts?",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "No card, so no $20 fee",
+    "EC22871",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "To save cards for the $20 fee, connect Stripe in Lee's Barbershop's own name. Bank and tax details go to Stripe, never to us.",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "A card saved for the $20 fee · paid after the visit",
+    "We couldn't find barbershop license BS20981 for Lee's Barbershop on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, the shop stays offline, saved, until our team checks it within 1 business day.",
+    "Once a barber is confirmed and you say yes",
+    "Customers can book it once a barber is confirmed",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Barber license number",
+    "Plumbing MP045210",
+    "Plumbing JP031552 · electrical JE30417",
+    "Registration 2020-1187",
+    "MP045210",
+    "BS20981",
+    "BS20918",
+    "JP031552",
+    "JE30417",
+    "EC22871",
+    "Lee's Barbershop's",
+    "A haircut could mean a salon or a barbershop.",
+    "Card saved for the $20 fee",
+    "The chairs",
+    "The $25 consult included",
+    "Only the $25 consult is promised.",
+    "Yes, make it a fade",
+    "Toner · $20",
+    "quote 110 color correction + 20 toner",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair. {{pay.asks}}. The rest is quoted at the chair, before any work.",
+    "a house call, $75, paid in full when booking",
+    "Haircuts already booked keep only their saved card.",
+    "How would you like it on top?",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Do you do kids cuts? My son is 8.",
+    "Riley: barber, color, house calls",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Riley at the chair. That shows Riley really came.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "At a drop-off, READY and the pick-up come once the work is done. At the chair, the customer is already there, so the shop takes the first branch.",
+    "From Riley's phone, or the portal's Today page at the desk. This confirms the visit. No text goes to the customer: they're at the chair.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Here they OK the $110 color correction and skip the $15 gloss. The $25 consult is part of the $110.",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex M. asks for a toner instead of the gloss. What's the new price?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Color quotes come to you first. Board prices never need one",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Could Riley use a toner instead of the gloss?",
+    "Color correction $110 · gloss $15",
+    "My employer pays for this cut.",
+    "Gloss to finish · $15",
+    "A water heater job",
+    "A chair, ready",
+    "Color and cut",
+    "Style consult",
+    "Panel upgrade",
+    "Every shop service, color and house calls",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. Color correction can work this way, with only the $25 consult promised.",
+    "a skin fade",
+    "1 color quote",
+    "A card saved for the $20 fee",
+    "Promises the $25 consult; priced at the chair",
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Consult only",
+    "Only the consult; the price stays open",
+    "Copy: you said yes to a color correction, $125, at 11:20am on Riley's phone.",
+    "Quiero un corte el sábado.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop doesn't do perms.",
+    "May the shop show photos of your hair?",
+    "Can my son wait in the shop during my cut?",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Riley stopped Alex M.'s cut.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Riley finishes the work",
+    "A cut is rated, so the shop takes the first branch.",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Priced at the chair",
+    "priced at the chair",
+    "quote at the chair",
+    "added at the chair",
+    "code at the chair",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "rest at the chair",
+    "tip at the chair",
+    "is at the chair",
+    "already in the chair",
+    "as at the chair",
+    "rents a chair",
+    "Signature cut and shave",
+    "Groom's package",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "a beard trim",
+    "beard trim",
+    "Color correction",
+    "A color correction",
+    "a color correction",
+    "color correction",
+    "Haircut plans",
+    "Haircut plan",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "Lee's Barbershop LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee Electric",
+    "Lee Plumbing",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "a barbershop",
+    "A barbershop",
+    "barbershop",
+    "a barber",
+    "A barber",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "House calls",
+    "house calls",
+    "a house call",
+    "House call",
+    "house call",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "Only the consult",
+    "only the consult",
+    "the consult only",
+    "the consult"
+   ],
+   "B": [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "When they book: a card saved for the $89 service-call fee",
+    "Does it work like plumbing?",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "EC22871",
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup. Check the number and the name as printed, and send the right one. If it still isn't found, plumbing stays offline, saved, until our team checks it within 1 business day.",
+    "Once a barber is confirmed and you say yes",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Plumbing MP045210",
+    "Plumbing JP031552 · electrical JE30417",
+    "Registration 2019-0451",
+    "MP045210",
+    "MP045201",
+    "BS20981",
+    "JP031552",
+    "JE30417",
+    "EC22871",
+    "service-call fee",
+    "service call fee",
+    "Service call fee",
+    "$640 quote",
+    "Sam will answer by Mon Oct 26, 5pm",
+    "Claim · Thu Oct 22 visit",
+    "Refund · $20",
+    "$20 payment",
+    "Shutoff valve and wall pipe · $540",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Lee Home Services can clear the drain: {{pay.price}}. {{pay.asks}}. {{pay.cancel}}.",
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan needs a part from the supply house.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A haircut could mean a salon or a barbershop.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Riley: barber, color, house calls",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "No live waiting line. Work like towing or a lockout is sent now (B4-16), with an arrival estimate, or offered the next free time.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "One request waits for Lee Home Services. It's a leak under the sink, today, arriving 3–5pm, with Jordan. The service call is $89. Accept it?",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Reminder: your visit is tomorrow, arriving 8–10am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "I found water damage under the sink this morning.",
+    "Me, and yes. It's my kitchen.",
+    "Water heater replacement",
+    "NEW heating and cooling",
+    "Water pressure check",
+    "Yes, it won't drain",
+    "A water heater job",
+    "A chair, ready",
+    "Sam adds a plumber",
+    "Panel upgrade",
+    "Every plumbing job, and electrical",
+    "Every plumbing job",
+    "Labor",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex M. asked for money back for the Thu Oct 22 visit.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a move-out day",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Is the sink still full of water?",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Can I run the dishwasher before you come?",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Yard drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Leak repair · $245",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "No problem. Today's visit is the $89 service call. The repair price is good for 7 days.",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Reminder: Jordan is waiting on your OK for the leak repair, $245.",
+    "Alex M. hasn't answered Jordan's $245 leak repair quote in 30 minutes.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "the shutoff valve",
+    "DONE 179 drain",
+    "the kitchen drain",
+    "the leak repair",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "raise drain clearing to 199",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Drain clearing · $179",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "A leak repair",
+    "a leak repair",
+    "Leak repair",
+    "leak repair",
+    "$89 service call",
+    "the service call",
+    "service call",
+    "Service call",
+    "Sewer camera inspection",
+    "paid at the chair",
+    "rents a chair",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "Lee Home Services LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee Electric",
+    "Lee Plumbing",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "leehomeservices.com",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing license",
+    "Plumbing license",
+    "electrical license",
+    "Electrical license",
+    "Electrical",
+    "electrical",
+    "a plumber",
+    "plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "a barbershop",
+    "barbershop",
+    "a barber",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "House calls",
+    "house calls",
+    "House call",
+    "house call",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "Oak St",
+    "1200 Main St",
+    "1-year labor warranty",
+    "$179",
+    "$150",
+    "$199",
+    "$160",
+    "$120 an hour",
+    "$89"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S11-42": "fde535c99e",
+   "A3-22": "0057d8fc9f",
+   "A4-43": "c17d56f766",
+   "A4-66": "f622d7fe12",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A3-20": "b8251d2535",
+   "A6-14": "b17b52115e",
+   "A8-23": "e3a35f7f9e",
+   "A8-35": "a67e890a5b",
+   "A8-54": "bc2f9467fd",
+   "A10-23": "105d7f426a",
+   "A7-70": "da4cede3e2",
+   "A7-13": "e41528a397",
+   "S11-48": "03f824b27b",
+   "S11-54": "ce20fc799b"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S11-42": "8f63c529f7",
+   "B3-17": "3eb7d7f259",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B8-45": "09e62897a6",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255",
+   "B6-13": "ed1f412f7d",
+   "B8-22": "50d78f1af0",
+   "B8-41": "6e8e9825b2",
+   "B8-47": "8b91635433",
+   "S11-48": "6fd1c7b7b9",
+   "S11-54": "f2d479cd60"
+  }
+ }
+}

@@ -1,0 +1,5616 @@
+{
+ "id": "chef",
+ "name": "Private chef",
+ "style": "Event",
+ "pattern": "event",
+ "from": "caterer",
+ "plugin": {
+  "pf.license": {
+   "need": "A switch from the state's form. Cooking only in the customer's own kitchen usually needs no food permit, so the business gives its registration, or a business license where the state or city asks for one.",
+   "a kitchen of its own": "Any dish made away from the customer's kitchen is made in a permitted kitchen, where the state's rules require one. A business that runs its own kitchen, like a cooking studio, gives that kitchen's food service permit.",
+   "each person": "A food handler card for each cook and server, or a food protection manager certificate for the lead, where the state's rules require one. From the state form.",
+   "who holds it": "The business holds its registration or business license, and the permit for any kitchen it cooks in. Each person holds their own card.",
+   "what to ask": [
+    "The business registration or business license number, if the state or city gave one",
+    "A food service permit, only for a kitchen the business cooks in itself",
+    "Each cook's and server's food handler card, in their invite reply, where the state's rules require one",
+    "The food protection manager certificate, and who holds it, where the state's rules require one"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "A kitchen permit the state's rules require that isn't on file: menus with dishes made there stay off, and only menus cooked in the customer's kitchen show. A cook or server without a required card is never offered.",
+   "renewals": "A reminder 30 days before a card, certificate or permit runs out. Once one lapses, the work it covers pauses.",
+   "insurance or bond": "Liability insurance on file, with its end date. Some homes and buildings ask for a certificate.",
+   "background checks": "Only where the state's form asks."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Lee Private Chef's own list)": [
+    {
+     "service": "Private dinner, cooked and served in the customer's kitchen (the example: an anniversary dinner for 10)",
+     "price kind": "quoted from the menu plan: a price per guest set once the chef plans the menu with the customer, plus the server's hours",
+     "price": "the quote (the example: 4 courses at $55 a guest for 10 is $550, plus a server for 3 hours at $30 an hour, $90: $640)",
+     "groceries": "at cost, with every receipt, on the bill after the dinner (the example's estimate: $300 to $350). Or, where the owner sets it, groceries are in the price per guest.",
+     "length": "a set start time for the meal. The chef arrives about 3½ hours before, the server 1½ hours before, and cleanup ends about 1 hour after the meal.",
+     "place": "the customer's own kitchen",
+     "before": "a signed contract, then a 25% deposit that holds the date",
+     "after": "Rosie texts the bill: the rest, the groceries at cost and any extra time. With groceries in the price: the rest is paid on the bill after the dinner, never on a set day."
+    },
+    {
+     "service": "Cooking class at home for 2",
+     "price kind": "one price",
+     "price": "$150, groceries included",
+     "length": "2½ hours, at a set start time",
+     "place": "the customer's kitchen",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Meal prep visit (meal prep)",
+     "price kind": "one price",
+     "price": "$149 for 1 week of meals (3 hours) or $189 for 2 weeks (4 hours), groceries included",
+     "length": "3 or 4 hours, at a set start time",
+     "place": "the customer's kitchen; the meals are labeled and left in the fridge",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Date-night dinner for 2 (a set menu)",
+     "price kind": "one price",
+     "price": "$179, groceries included",
+     "length": "a set start time",
+     "place": "the customer's kitchen",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Brunch for 6",
+     "price kind": "one price, by person",
+     "price": "$199 with Luis or Marco, $249 when Sam cooks it; groceries included",
+     "length": "a set start time",
+     "place": "the customer's kitchen",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "A server",
+     "price kind": "per hour",
+     "price": "$30 an hour, 3-hour minimum (the example's own price)",
+     "length": "from 1½ hours before the meal to the end of cleanup",
+     "place": "with a private dinner",
+     "before": "in the dinner's quote",
+     "after": "in the dinner's bill",
+     "note": "Required for 9 guests or more (the example's own rule)."
+    },
+    {
+     "service": "Extra time on the day",
+     "price kind": "per hour",
+     "price": "the example: $80 an hour for the team that stays; extra chef time is $140 an hour with Marco, $120 with anyone else",
+     "length": "1 hour",
+     "place": "at the dinner",
+     "before": "nothing: asked at the dinner",
+     "after": "on the bill, or one pay link when the dinner was paid before",
+     "note": "Only with the customer's written yes, at the rate shown before booking."
+    },
+    {
+     "service": "Late-cancel or nobody-home fee",
+     "price kind": "a fee",
+     "price": "the example's $89, kept from a set-price service paid in full",
+     "length": "",
+     "place": "the customer's home",
+     "before": "agreed when booking",
+     "after": "kept only with the owner's OK; the rest is refunded"
+    }
+   ],
+   "at the business (the example: Lee Cooking Studio's own list)": [
+    {
+     "service": "Cooking lesson (60 min)",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "the studio's kitchen",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Menu tasting for up to 4 (2½ hours)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours",
+     "place": "the studio's chef's table",
+     "before": "a $40 deposit",
+     "after": "the $100 rest at the studio",
+     "note": "A custom tasting menu has a 15-minute planning call first, at least 2 days before."
+    },
+    {
+     "service": "Knife skills lesson (30 min)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "the studio, or the customer's home for $75 (flow B)",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Sauce lesson",
+     "price kind": "one price",
+     "price": "$40",
+     "length": "45 min",
+     "place": "the studio",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Bread lesson",
+     "price kind": "one price",
+     "price": "$20",
+     "length": "20 min, alone or added to another lesson",
+     "place": "the studio",
+     "before": "the full price",
+     "after": "nothing more; added at the studio, it's paid there"
+    },
+    {
+     "service": "Kids' cooking lesson (12 and under)",
+     "price kind": "one price",
+     "price": "$25",
+     "length": "30 min",
+     "place": "the studio",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "A parent books it and stays for the whole lesson."
+    },
+    {
+     "service": "Lesson pack",
+     "price kind": "a pack",
+     "price": "5 lessons, the studio's own price",
+     "length": "",
+     "place": "the studio",
+     "before": "paid when bought; each booking uses one lesson",
+     "after": "nothing more"
+    }
+   ],
+   "late fees at the studio": "A late cancel (within 24 hours) or a no-show: the studio's $20 fee may be kept, only with the owner's OK; the rest is refunded.",
+   "capacity": "One dinner a day for each lead chef (the example's own rule). A server for 9 guests or more. The studio's one chef's table, for one tasting at a time.",
+   "nobody needs to be there": "Never: an adult on the booking is home while the chef cooks.",
+   "online": "None in the example: lessons and tastings are at the studio, and dinners and classes in the customer's kitchen."
+  },
+  "pf.questions": {
+   "before times (they set the price, the length or who can go)": [
+    "What it's for: an anniversary, a birthday, a dinner party, a class or meal prep",
+    "The date, the meal time, and the town (for the travel area)",
+    "How many guests, and how many are children",
+    "The style: plated courses or family style",
+    "The kitchen: a working oven, how many burners, fridge space and room to work",
+    "Food the guests love, and anything they never eat (likes and dislikes only: allergies go on the secure page)"
+   ],
+   "after a time is picked": [
+    "Plates, glasses and serving pieces: the home's, or the chef's",
+    "Who buys any wine (the customer: the chef never sells alcohol), and whether any guest is under 21",
+    "Parking and the way in, and any pets kept away from the kitchen"
+   ],
+   "only on the secure page": [
+    "Allergies and diets, by guest, with no names needed, and their own yes",
+    "How severe each allergy is",
+    "A door or gate code",
+    "Access needs of a guest",
+    "The card"
+   ],
+   "who may book": "An adult, the host. A kids' lesson at the studio is booked by a parent, who stays."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A fire, a gas smell, or someone hurt in the home right now",
+     "says": "If there's a fire or a gas smell, get everyone out. If anyone is hurt or in danger, call 911 now.",
+     "booking": "No booking until it's safe; the customer can come back."
+    },
+    {
+     "words": "Someone has a bad allergic reaction now (trouble breathing, swelling)",
+     "says": "Call 911 now. Use an epinephrine pen if the person has one.",
+     "booking": "No booking now."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "A food allergy question",
+     "says": "Rosie never says a dish is safe. The chef answers allergy questions from the secure page.",
+     "booking": "Goes on."
+    }
+   ],
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The menu plan: the customer's wishes, the guest count, photos of the kitchen, and allergies with their own yes, on the secure page. The chef plans the menu and the price per guest.",
+     "for": "Every private dinner",
+     "timing": "Before any date is booked. The owner OKs a quote over his limit."
+    },
+    {
+     "step": "The signed contract",
+     "for": "Every dinner priced from a plan",
+     "timing": "Before any money is taken, on the secure page"
+    },
+    {
+     "step": "A menu tasting, booked as its own visit",
+     "for": "Dinners of 20 or more (the example's own rule)",
+     "timing": "At least 7 days before the dinner"
+    },
+    {
+     "step": "A 15-minute planning call",
+     "for": "A custom tasting menu at the studio",
+     "timing": "At least 2 days before the tasting"
+    },
+    {
+     "step": "The final count and any allergy changes",
+     "for": "Every private dinner",
+     "timing": "Due by 7pm the day before (the example's setting). Booked closer: at booking."
+    }
+   ],
+   "prep for the reminder": [
+    "Clear some counter space and leave the oven empty",
+    "Chill any wine you bought",
+    "Keep pets out of the kitchen",
+    "At the studio: closed-toe shoes for the kitchen"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code, given to the lead chef on arrival, about 3½ hours before the meal.",
+   "check-in at the studio": "The code at the studio; the chef types it.",
+   "the kitchen check": "The chef checks the oven, burners and fridge space first. Something that doesn't work changes how the chef cooks, never the menu or the price, and the customer is told in person.",
+   "groceries": "The chef shops the morning of the dinner, keeps every receipt and texts the photos. Groceries are billed at cost, never marked up. Going over the estimate needs the customer's yes first.",
+   "allergies": "An allergy plate is made apart, with its own board, pan and tools, and checked against the secure page before it goes out.",
+   "food safety": "Hot food stays hot and cold food stays cold. Leftovers are labeled with the date and put in the fridge before the team leaves.",
+   "alcohol": "The chef never sells alcohol. The customer buys any wine, and it's poured only for guests 21 or older, where the state's rules allow.",
+   "work changes at the dinner": "More guests, an added course or extra time only with the customer's written yes by text, at the rate shown before booking. No yes in 10 minutes: nothing extra.",
+   "proof it's done": "The lead chef texts DONE once the kitchen is clean, the leftovers are put away and the customer has looked it over. On the bill path, DONE carries the groceries total."
+  },
+  "pf.money": {
+   "starting answers": [
+    "Private dinners: a signed contract, then a 25% deposit that holds the date. The rest, the groceries at cost and any extra time come on the bill Rosie texts after the dinner.",
+    "Where groceries are in the price per guest (the owner's setting): the rest is paid on the bill after the dinner, never on a set day.",
+    "Set-price dinners, cooking classes and meal prep visits at home: paid in full when booking.",
+    "At the studio: lessons paid in full, or from a lesson pack; menu tastings with a $40 deposit and the rest at the studio."
+   ],
+   "limits": [
+    "Deposit cap: from the state form",
+    "Groceries at cost, with every receipt, never marked up. Over the estimate only with the customer's yes",
+    "The final count is billed even if fewer come, when the contract says so",
+    "A cancel after free cancel ends keeps only what the contract says: the deposit, plus groceries already bought, and only with the owner's OK. No answer: nothing kept",
+    "A set-price service paid in full: a late cancel or nobody home keeps only the $89 fee (the studio's $20), with the owner's OK",
+    "The business cancels, or the customer says no to a stand-in: a full refund"
+   ],
+   "gratuity": "A tip line on the bill only if the owner turns it on. It's the customer's choice, never added, and every tip goes to the team who cooked and served.",
+   "service charge": "Any service charge is inside the first price shown, and it's never called a tip.",
+   "tax": "A tax line where the state taxes the service, at the rate from the state form.",
+   "Rosfield's $2": "Applies: a private chef pays Rosfield's $2 for each confirmed booking."
+  },
+  "pf.messages": {
+   "never in a text": "Allergies, diets and any health detail stay on the secure page, with their own yes. No text to the customer, the owner, the chef or the server carries them: a text says only how many special plates there are, and links to the secure page. They're deleted the day after the dinner.",
+   "languages": "English and Spanish.",
+   "minors": "Never booked by a minor. A kids' lesson is booked by a parent, who stays. Wine is never poured for anyone under 21."
+  },
+  "pf.staff": {
+   "roles": [
+    "Lead chef",
+    "Cook",
+    "Server",
+    "Food protection manager, where the state's rules require one"
+   ],
+   "skills": [
+    "Private dinners priced from a plan (leads only)",
+    "Set-price dinners and brunches",
+    "Meal prep",
+    "Cooking classes and lessons",
+    "Menu tastings",
+    "Kids' lessons",
+    "Serving"
+   ],
+   "supervision": "A certified food protection manager is in charge in the kitchen, where the state's rules require one.",
+   "who OKs what": "The owner OKs every quote over his limit, any booking with a severe allergy note (or the lead chef reads it, where the owner sets that), any guest count over the chef's limit, and any stand-in lead chef.",
+   "stand-ins": "A lead chef with the skill, or one the owner trusts from outside the team, only if the customer agrees. The owner can replace a server without asking the customer, when nothing changes for them.",
+   "who does what (the example)": "Marco leads private dinners, teaches classes at home and does meal prep. Luis cooks date-night dinners and brunches and teaches classes, but doesn't lead dinners priced from a plan. Jade serves. At the studio, Robin holds menu tastings and teaches lessons, there and at home; Sage teaches every studio lesson but menu tastings."
+  },
+  "pf.rules": {
+   "written contract": "The business's own contract, filled in from the booking, signed by the customer and the business before money is taken, for every dinner priced from a plan. Any parts the state's rules add come from the state form.",
+   "date hold": "A dinner's date stays saved while the contract is signed: up to 24 hours (the owner's setting).",
+   "dinners a day": "One dinner a day for each lead chef (the owner's setting).",
+   "final count": "Counted at the dinner, once served. It sets the bill texted after the dinner. More guests than the chef's limit (the example: 12) need the owner's OK.",
+   "cancel schedule": "Free to cancel until the final count is due. After that, what the contract says: the deposit may be kept, plus groceries already bought, only with the owner's OK. One free date move if a chef is free.",
+   "cancel right": "Food already cooked and served at the customer's home has no cancel period. Only a contract signed at the customer's home gets one, where the state's rules give one: a switch from the state form.",
+   "alcohol": "No alcohol is sold. The customer's own wine is poured only for guests 21 or older.",
+   "records": "Contracts, receipts and payments kept 7 years, as for every kind of work. Allergy notes deleted the day after the dinner."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for a private chef:",
+   "private chef": [
+    "The guest count changes before the final count: a new total to OK; over the chef's limit needs the owner's OK",
+    "The final count isn't in by its day: the contract's count is billed, and the owner calls about allergies",
+    "A severe allergy note: the booking waits for the chef's OK, and the allergy plate is made apart",
+    "The oven or a burner doesn't work: the chef cooks another way, never changing the menu or the price",
+    "Groceries cost more than the estimate: the customer's yes first, or the chef swaps an item at the same price",
+    "The lead chef can't come on a date that can't move: a chef with the skill or one the owner trusts, only with the customer's yes; a new date; or a full refund",
+    "The server can't come: the owner books another; the customer isn't asked when nothing changes",
+    "The customer moves the date: a new date if a chef is free",
+    "The customer cancels: only what the contract says is kept, plus groceries already bought, with the owner's OK",
+    "A guest under 21 at a dinner with wine: no wine for them",
+    "A dish made ahead away from the home: only in a permitted kitchen; a lapsed permit means a menu cooked in the customer's kitchen",
+    "The party runs late: extra time only with the customer's written yes; service given has no cancel period"
+   ]
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "classes",
+   "tips",
+   "extrawork",
+   "children"
+  ],
+  "pf.switches": {
+   "sensitive": false
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Robin and Sage (chefs at the studio)"
+  },
+  "B": {
+   "staff": "Marco and Luis (chefs who cook in customers' kitchens), with Jade (a server)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Robin"
+  },
+  "B": {
+   "staff": "Marco"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "The lookup shows the license as expired.",
+    "The lookup shows the card as expired."
+   ],
+   [
+    "Plumbing MP045210",
+    "Food handler card FH011210"
+   ],
+   [
+    "like a color correction done in two steps",
+    "like a knife course done in three lessons"
+   ],
+   [
+    "A barbershop runs no classes.",
+    "The studio books private lessons, not classes."
+   ],
+   [
+    "$140 Groom's package",
+    "$140 menu tasting for up to 4"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds meal prep to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Meal prep for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW meal prep"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A tailor, a groomer or a phone repair counter does."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A hot pan left a burn mark on my bag."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The studio's plug-in adds a bad allergic reaction to the danger words."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "The studio books a chef's time for each lesson or tasting."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Lee Cooking Studio prices a party class at a consult, once Robin hears the plan."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Robin hears the plan"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A lesson is rated, so the studio takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Robin's 3-lesson knife course"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Cooking Studio sent you a proposal: Robin's knife course."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Knife course"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the studio show photos of your dishes? Yes / No"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Robin can do a shorter lesson in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Cooking Studio can book you from now on, for tastings and for lessons at home."
+   ],
+   [
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet.",
+    "The state's lookup is down, so Quinn S.'s card isn't checked yet."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A food service permit for the company's kitchen, and a card for each cook where the state asks."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A private chef's example: a grease fire that's out still gets 'wait for the fire department'."
+   ],
+   [
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "The plug-in sets the status words, like in, being made, ready."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: a kitchen's food permit covers that kitchen, and some chefs' cards are tied to it too."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the dishes Alex liked."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A host books cooking lessons for five friends on one morning."
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds lessons side by side across Robin and Sage."
+   ],
+   [
+    "Avery's license is checked again when the lookup answers.",
+    "Sage's card is checked again when the lookup answers."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Deliveries only where the studio's permit covers them."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 custom class quote."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A cooking lesson could mean a studio or a chef at home."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A food service permit for the studio, and a card for each cook."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a 5-lesson pack at the studio."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son watch from the counter during my lesson?"
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Knife skills lessons, salad trays and bread lessons at the studio."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio lesson, menu tastings and lessons at home"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kids' cooking lesson is $25."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Food handler card FH031552"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Robin also holds the menu tastings and lessons at home"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Robin: menu tastings and lessons at home"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a knife skills lesson every 4 weeks."
+   ],
+   [
+    "A barbershop takes no drop-offs.",
+    "The studio takes no drop-offs."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Menu tastings always stay with Robin."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The last dish of my lesson was rushed."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Large parties are priced at the event."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "A fire or gas smell at the venue stops the booking."
+   ],
+   [
+    "plumbing and electrical jobs",
+    "private dining and meal prep jobs"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a tasting on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una degustación el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a knife skills lesson every 4 weeks"
+   ],
+   [
+    "Avery · license not found",
+    "Sage · card not found"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A cooking lesson needs nothing."
+   ],
+   [
+    "Drains have a set price.",
+    "Date-night dinners have a set price."
+   ],
+   [
+    "Avery · license expired",
+    "Sage · card expired"
+   ],
+   [
+    "License renewal",
+    "Card renewal"
+   ],
+   [
+    "1 color quote",
+    "1 custom class quote"
+   ],
+   [
+    "Panel upgrade",
+    "Family meal plan"
+   ],
+   [
+    "Avery: barber",
+    "Sage: studio lessons"
+   ],
+   [
+    "At the chair",
+    "At the studio"
+   ],
+   [
+    "EC22871",
+    "LQ22871"
+   ],
+   [
+    "BS20981",
+    "FP020981"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Private Chef's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Private Chef"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Dinners"
+   ],
+   [
+    "Lee Electric",
+    "Lee Meal Prep"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Cooking Studio LLC"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Cooking Studio's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Cooking Studio"
+   ],
+   [
+    "Jordan Price",
+    "Marco Price"
+   ],
+   [
+    "Casey Moore",
+    "Luis Moore"
+   ],
+   [
+    "Riley Chen",
+    "Robin Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Sage Diaz"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Riley",
+    "Robin"
+   ],
+   [
+    "Avery",
+    "Sage"
+   ],
+   [
+    "1200 Main St",
+    "410 Grove St"
+   ],
+   [
+    "88 Elm St",
+    "26 Cedar St"
+   ],
+   [
+    "Elm St",
+    "Cedar St"
+   ],
+   [
+    "plumbing and electrical",
+    "private dining and meal prep"
+   ],
+   [
+    "Electrical",
+    "Meal prep"
+   ],
+   [
+    "electrical",
+    "meal prep"
+   ],
+   [
+    "Plumbing",
+    "Private dining"
+   ],
+   [
+    "plumbing",
+    "private dining"
+   ],
+   [
+    "plumber",
+    "chef"
+   ],
+   [
+    "Plumber",
+    "Chef"
+   ],
+   [
+    "Barbershop",
+    "Cooking studio"
+   ],
+   [
+    "barbershop",
+    "studio"
+   ],
+   [
+    "barbers",
+    "chefs"
+   ],
+   [
+    "a barber",
+    "a chef"
+   ],
+   [
+    "barber",
+    "chef"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Cooking lesson"
+   ],
+   [
+    "Signature cut and shave",
+    "Cooking lesson"
+   ],
+   [
+    "signature cut and shave",
+    "cooking lesson"
+   ],
+   [
+    "Signature cut",
+    "Cooking lesson"
+   ],
+   [
+    "signature cut",
+    "cooking lesson"
+   ],
+   [
+    "the Groom's package",
+    "the menu tasting for up to 4"
+   ],
+   [
+    "The Groom's package",
+    "The menu tasting for up to 4"
+   ],
+   [
+    "Groom's package",
+    "Menu tasting for up to 4"
+   ],
+   [
+    "groom's party",
+    "two families"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' cooking lesson (12 and under)"
+   ],
+   [
+    "kids cuts",
+    "kids' cooking lessons"
+   ],
+   [
+    "kids cut",
+    "kids' cooking lesson"
+   ],
+   [
+    "a skin fade",
+    "a sauce lesson"
+   ],
+   [
+    "A skin fade",
+    "A sauce lesson"
+   ],
+   [
+    "Skin fade",
+    "Sauce lesson"
+   ],
+   [
+    "skin fade",
+    "sauce lesson"
+   ],
+   [
+    "A beard trim is",
+    "A bread lesson is"
+   ],
+   [
+    "a beard trim",
+    "a bread lesson"
+   ],
+   [
+    "Beard trim",
+    "Bread lesson"
+   ],
+   [
+    "beard trim",
+    "bread lesson"
+   ],
+   [
+    "Haircuts",
+    "Knife skills lessons"
+   ],
+   [
+    "haircuts",
+    "knife skills lessons"
+   ],
+   [
+    "Haircut",
+    "Knife skills lesson"
+   ],
+   [
+    "haircut",
+    "knife skills lesson"
+   ],
+   [
+    "Color and cut",
+    "Custom menu tasting"
+   ],
+   [
+    "color and cut",
+    "custom menu tasting"
+   ],
+   [
+    "a color correction",
+    "a party class"
+   ],
+   [
+    "A color correction",
+    "A party class"
+   ],
+   [
+    "Color correction",
+    "Party class"
+   ],
+   [
+    "color correction",
+    "party class"
+   ],
+   [
+    "house calls",
+    "lessons at home"
+   ],
+   [
+    "House calls",
+    "Lessons at home"
+   ],
+   [
+    "house call",
+    "lesson at home"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "the shop's board",
+    "the studio's price list"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Water heater flush",
+    "Cooking class for 2"
+   ],
+   [
+    "patch test",
+    "planning call"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a flooded basement or a lockout"
+   ],
+   [
+    "travel fee",
+    "trip fee"
+   ],
+   [
+    "Gloss to finish",
+    "Dessert to finish"
+   ],
+   [
+    "gloss",
+    "dessert"
+   ],
+   [
+    "You told us the kids' cooking lesson is for your son, and that you're his parent.",
+    "You told us the lesson is for your son, and that you're his parent."
+   ],
+   [
+    "an automated assistant for Lee Cooking Studio.",
+    "an automated assistant for Lee Studio."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most private chefs set it."
+   ],
+   [
+    "Here's how Lee Cooking Studio will look to customers and AI assistants.",
+    "Here's how Lee Cooking Studio will look to customers and AI assistants."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Dinners for 10, cooking classes and tastings."
+   ],
+   [
+    "Lee Cooking Studio doesn't do perms.",
+    "Lee Cooking Studio doesn't do that."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the studio's list.",
+    "Alex asks for a service the studio doesn't list."
+   ],
+   [
+    "the cape clip ripped a shirt collar today",
+    "the apron strap tore today"
+   ],
+   [
+    "low beard line",
+    "a tidy finish"
+   ],
+   [
+    "two skin fades",
+    "two lessons"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules most studios set."
+   ],
+   [
+    "Here's how I've started each service",
+    "Here's how I've started each service"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most studios start."
+   ],
+   [
+    "Alex picked a kids' cooking lesson for a son before the times, so the times fit it.",
+    "Alex picked a kids' lesson for a son, so the times fit it."
+   ],
+   [
+    "Nothing is taken: a YES",
+    "Nothing is taken: a YES"
+   ],
+   [
+    "Barber license",
+    "Chef license"
+   ],
+   [
+    "hot towel shaves",
+    "dessert tastings"
+   ],
+   [
+    "Yard drain",
+    "Studio fee"
+   ],
+   [
+    "and water heaters, within 25 miles.",
+    "and cooking classes, within 25 miles."
+   ],
+   [
+    "the way most barbershops start",
+    "the way most studios start"
+   ],
+   [
+    "barbershops often set",
+    "studios often set"
+   ],
+   [
+    "Kids cut",
+    "Kids lesson"
+   ],
+   [
+    "Drain clearing and cooking classes",
+    "Private dinners and cooking classes"
+   ],
+   [
+    "A water heater job",
+    "A private dinner"
+   ],
+   [
+    "Barber",
+    "Chef"
+   ],
+   [
+    "barber",
+    "chef"
+   ]
+  ],
+  "B": [
+   [
+    "Both fit in the same arrival window.",
+    "Both fit in the same visit."
+   ],
+   [
+    "with one arrival window and one code",
+    "with one start time and one code"
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This dinner needs a menu tasting first, at least 7 days before, so the first open dates are next week."
+   ],
+   [
+    "Wed morning is full.",
+    "Wed evening is full."
+   ],
+   [
+    "in the next 60 days",
+    "in the next 6 months"
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The lookup shows the card as expired."
+   ],
+   [
+    "Plumbing MP045210",
+    "Food handler card FH011210"
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Nora can ask to be next for that time."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START the gas is off, nothing can cook"
+   ],
+   [
+    "MOVE Alex to Thu 12pm",
+    "MOVE Alex to Thu 6pm"
+   ],
+   [
+    "BLOCK Thu 12-5",
+    "BLOCK Thu 4-10"
+   ],
+   [
+    "Fri 8am",
+    "Fri 7pm"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds meal delivery to Lee Private Chef."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Meal delivery for Lee Private Chef: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW meal delivery"
+   ],
+   [
+    "Rental 1",
+    "Office 1"
+   ],
+   [
+    "Rental 2",
+    "Office 2"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a cooking class for 2 every week."
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every week?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every week"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Weekly office lunch plan"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Every day, 9am–10pm"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can we put the food in our own bowls?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Marco says no. The food stays in its own warmers, so it stays hot."
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Marco's walk-through at Harper J.'s office is for $2,400 of conference lunches."
+   ],
+   [
+    "Today's estimate visit",
+    "Today's walk-through"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 conference lunches, 3 days"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your conference lunches"
+   ],
+   [
+    "Repipe · $2,400",
+    "Conference lunches · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 after day 2, $800 after day 3"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Our party is tonight. Can a chef come?"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "A private chef books a set start time."
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 conference lunch order"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your conference lunch order"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a holiday party menu Marco suggested"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for your holiday party, from Marco's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Holiday party"
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "Robin, a chef at the studio, teaches lessons at home."
+   ],
+   [
+    "Is the report ready on time?",
+    "Are the photos ready on time?"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE event photos Mon Oct 26"
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Marco serves the tacos today, $165. The $80 dessert table stays good until Thu Oct 29."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If there's a fire or a gas smell, get everyone out now. Then call 911."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says an anniversary dinner is quoted from the plan, so Rosie's first text asks for it."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone out of the studio, and to call 911 if there's smoke or a gas smell."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the date, the meal time, how many guests, and the kitchen."
+   ],
+   [
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Before setting up, Marco photographs the room and notes anything already damaged."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Saque a todos de la cocina. Si hay humo u olor a gas, llame al 911."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Cooking Studio can book you from now on, for tastings and for lessons at home."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 9:20pm on Marco's phone, you said yes to 2 more hours of service for $160."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the quote path, only Marco's times show: he leads quoted dinners here."
+   ],
+   [
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Marco can set up 30 minutes later if the next job allows, or you can pick another time."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Get everyone out of the studio. If there's smoke or a gas smell, call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Private Chef doesn't do, like a wedding cake."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Marco found the fryer's cord sparking and stopped using it."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a chef stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For a private chef, a fire, a gas smell or someone hurt at the home stops the booking."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Cooking Studio can teach your knife skills lesson at the studio for $35, or at your home for $75."
+   ],
+   [
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "Marco tries the door again and checks in with the code, so it's a normal visit."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A dinner is always priced before the visit."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "We couldn't find registration 2019-0451 for Sam Lee on the state's lookup."
+   ],
+   [
+    "The state's license lookup is down, so Reese K.'s license isn't checked yet.",
+    "The state's lookup is down, so Reese K.'s card isn't checked yet."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A food service permit for the company's kitchen, and a card for each cook where the state asks."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A private dinner happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a lunch at two offices every week."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A private chef's example: a grease fire that's out still gets 'wait for the fire department'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? There was a small fire in the studio where my party is tonight."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a fire, a gas smell, someone hurt, or a bad allergic reaction right now."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add your plan and a few photos of the room, and a private chef will price it."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: a kitchen's food permit covers that kitchen, and some chefs' cards are tied to it too."
+   ],
+   [
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "A gate or door code shows to Marco only on the day of the visit."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Private Chef does private dining and meal prep work, not cakes."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Date-night dinners already booked keep $179, even after Nov 2."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Marco counts the plates served and texts the price with its lines."
+   ],
+   [
+    "Casey's license is checked again when the lookup answers.",
+    "Luis's card is checked again when the lookup answers."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Private Chef has a weekly office lunch plan, $150 a visit."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Marco went to the store for cream and will be back about 4:45pm."
+   ],
+   [
+    "Sam bills the warranty company the business's own way.",
+    "Sam bills the company the business's own way."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "The missing plates were in your order, so this delivery is free."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Deliveries only where the studio's permit covers them."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Each start is a set time, as Sam set at sign-up."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your anniversary dinner price is with Lee Private Chef."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Marco's next times for a team lunch."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "A short class for 2 is $150."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Marco also run a brunch for 6?"
+   ],
+   [
+    "Lee Home Services: your share of today's repair.",
+    "Lee Private Chef: your share of today's event."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hubo un pequeño incendio en la cocina donde es mi fiesta esta noche."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a private chef bring a drop-off lunch this Thursday?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 2 more hours of service, until 11:30pm"
+   ],
+   [
+    "Alex's home warranty covers part of the repair.",
+    "Alex's company account covers part of the bill."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you bring us lunch every week, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marco bring lunch for my team next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what a make-good covers."
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "Marco only, until others are cleared there"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿El fuego está apagado?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also wants a short cooking class before the dinner."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stain on the carpet by the window"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A food service permit for the studio, and a card for each cook."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Marco also teach us a short class before dinner?"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · Anniversary dinner for 10 · $640"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Marco needs cream from the store."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD fryer cord sparking, unplugged"
+   ],
+   [
+    "Drain clearings already booked keep $179.",
+    "Date-night dinners already booked keep $179."
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Knife skills lessons, salad trays and bread lessons at the studio."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the fire out?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a table for the buffet."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Is this food safe if someone has a nut allergy?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "The countertop fryer's cord sparks when Marco plugs it in."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The studio's lesson is in the other flow."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's lunch?"
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "The room is small: bring the narrow table next time."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Food handler card FH031552"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Bayside Design, our company account."
+   ],
+   [
+    "Nobody home needed: DONE with a photo",
+    "Nobody needs to meet it: DONE with a photo"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "The party runs late, and Alex asks for more time."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It was in the order."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Robin also holds the menu tastings and lessons at home"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which company account should pay?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "We'll be 30 minutes late, sorry!"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Two days later, Alex says the lunch was short two plates."
+   ],
+   [
+    "Give this code to Casey at the door.",
+    "Give this code to Luis at the door."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Robin: menu tastings and lessons at home"
+   ],
+   [
+    "Say Alex books for a parent's home.",
+    "Say Alex books the dinner at a parent's home."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a bakery near you."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "Your company account covers the rest."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Our lunch was short two plates."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 tacos 165 desserts 80"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "2 more hours of service · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Changed: the fried course is roasted instead"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Marco cuts a hand and texts HURT."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Marco left the stovetop greasy."
+   ],
+   [
+    "Here's the price to fix it today.",
+    "Here's the price for today's large party."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Your price doesn't change"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is breakfast in a meeting room?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a sparking fryer cord"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE out of cream, back 4:45"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE hot pan scorched the counter"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no mark."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa date-night dinner Thu 6pm Luis"
+   ],
+   [
+    "The job should be done by 10am.",
+    "Dinner stays at 7:00pm."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It's out."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Large parties are priced at the event."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "A fire or gas smell at the venue stops the booking."
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no counter at an office."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "Our team has a breakfast meeting."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the event photos link"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "private dining and meal prep jobs"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is the food still safe to eat?"
+   ],
+   [
+    "Replace both shutoff valves",
+    "2 more hours of service"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, credited to the order"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE two guests asked for decaf."
+   ],
+   [
+    "Mold behind the sink wall",
+    "Fryer cord"
+   ],
+   [
+    "Casey · license not found",
+    "Luis · card not found"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos of the setup"
+   ],
+   [
+    "The service call is $89.",
+    "It's $179, paid in full."
+   ],
+   [
+    "Drains have a set price.",
+    "Date-night dinners have a set price."
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or account pays"
+   ],
+   [
+    "Priced from your photos",
+    "Quoted from your plan"
+   ],
+   [
+    "Jordan found more work.",
+    "Alex asked for more time."
+   ],
+   [
+    "Casey · license expired",
+    "Luis · card expired"
+   ],
+   [
+    "Just the kitchen sink.",
+    "A breakfast meeting for 20."
+   ],
+   [
+    "Under the sink, before",
+    "Meeting room, before"
+   ],
+   [
+    "Jordan found the leak.",
+    "Marco counted the plates."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Date-night dinner for 2"
+   ],
+   [
+    "Cabinet floor, before",
+    "Carpet by the window, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scorched counter"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Tacos · $165"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Ya está apagado."
+   ],
+   [
+    "Sewer camera report",
+    "Event photos"
+   ],
+   [
+    "the shutoff valves",
+    "the 2 more hours"
+   ],
+   [
+    "Supply line · $80",
+    "Dessert table · $80"
+   ],
+   [
+    "Book the repair",
+    "Book the large party"
+   ],
+   [
+    "Book a free fix",
+    "Book a free make-good"
+   ],
+   [
+    "License renewal",
+    "Card renewal"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 date-night dinner"
+   ],
+   [
+    "Kitchen drain",
+    "Date-night dinner"
+   ],
+   [
+    "Panel upgrade",
+    "Family meal plan"
+   ],
+   [
+    "Avery: barber",
+    "Sage: studio lessons"
+   ],
+   [
+    "Add photos",
+    "Add your plan"
+   ],
+   [
+    "Yard drain",
+    "Drop-off lunch"
+   ],
+   [
+    "EC22871",
+    "LQ22871"
+   ],
+   [
+    "BS20981",
+    "FP020981"
+   ],
+   [
+    "leehomeservices.com",
+    "leeprivatechef.com"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Private Chef LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Private Chef's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Private Chef"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Dinners"
+   ],
+   [
+    "Lee Electric",
+    "Lee Meal Prep"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Cooking Studio"
+   ],
+   [
+    "Jordan Price",
+    "Marco Price"
+   ],
+   [
+    "Casey Moore",
+    "Luis Moore"
+   ],
+   [
+    "Riley Chen",
+    "Robin Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Sage Diaz"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Riley",
+    "Robin"
+   ],
+   [
+    "Avery",
+    "Sage"
+   ],
+   [
+    "1200 Main St",
+    "410 Grove St"
+   ],
+   [
+    "88 Elm St",
+    "26 Cedar St"
+   ],
+   [
+    "42 Oak St",
+    "17 Willow Ln"
+   ],
+   [
+    "plumbing and electrical",
+    "private dining and meal prep"
+   ],
+   [
+    "electrical prices",
+    "meal prep prices"
+   ],
+   [
+    "electrical jobs",
+    "meal prep jobs"
+   ],
+   [
+    "Electrical",
+    "Meal prep"
+   ],
+   [
+    "electrical",
+    "meal prep"
+   ],
+   [
+    "Plumbing license",
+    "Food service permit"
+   ],
+   [
+    "Plumbing",
+    "Private dining"
+   ],
+   [
+    "plumbing",
+    "private dining"
+   ],
+   [
+    "plumbers",
+    "chefs"
+   ],
+   [
+    "a plumber",
+    "a private chef"
+   ],
+   [
+    "plumber",
+    "chef"
+   ],
+   [
+    "Plumber",
+    "Chef"
+   ],
+   [
+    "Barbershop",
+    "Cooking studio"
+   ],
+   [
+    "barbershop",
+    "studio"
+   ],
+   [
+    "barbers",
+    "chefs"
+   ],
+   [
+    "a barber",
+    "a chef"
+   ],
+   [
+    "barber",
+    "chef"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Cooking lesson"
+   ],
+   [
+    "Beard trim",
+    "Bread lesson"
+   ],
+   [
+    "beard trim",
+    "bread lesson"
+   ],
+   [
+    "Haircut",
+    "Knife skills lesson"
+   ],
+   [
+    "haircut",
+    "knife skills lesson"
+   ],
+   [
+    "house calls",
+    "lessons at home"
+   ],
+   [
+    "House calls",
+    "Lessons at home"
+   ],
+   [
+    "house call",
+    "lesson at home"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "A drain clearing with",
+    "A date-night dinner for 2 with"
+   ],
+   [
+    "a drain clearing",
+    "a date-night dinner"
+   ],
+   [
+    "Drain clearing",
+    "Date-night dinner"
+   ],
+   [
+    "drain clearing",
+    "date-night dinner"
+   ],
+   [
+    "a water heater replacement",
+    "an anniversary dinner for 10"
+   ],
+   [
+    "Water heater replacement",
+    "Anniversary dinner for 10"
+   ],
+   [
+    "water heater replacement",
+    "anniversary dinner for 10"
+   ],
+   [
+    "Water heater flush",
+    "Cooking class for 2"
+   ],
+   [
+    "water heater flush",
+    "cooking class for 2"
+   ],
+   [
+    "Leak repair",
+    "Large party"
+   ],
+   [
+    "leak repair",
+    "large party"
+   ],
+   [
+    "Sewer camera inspection",
+    "Brunch for 6"
+   ],
+   [
+    "sewer camera inspection",
+    "brunch for 6"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "Labor",
+    "Extra chef time"
+   ],
+   [
+    "· arriving 8–10am ·",
+    "· 7:00pm ·"
+   ],
+   [
+    "· arriving 12–2pm ·",
+    "· 6:00pm ·"
+   ],
+   [
+    "arriving 8–10am",
+    "at 7:00pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "at 6:00pm"
+   ],
+   [
+    "new arrival time",
+    "new start time"
+   ],
+   [
+    "water heater",
+    "anniversary dinner"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Alex is home",
+    "Alex is there"
+   ],
+   [
+    "they're home",
+    "they're there"
+   ],
+   [
+    "you're home",
+    "you're there"
+   ],
+   [
+    "late-cancel or nobody-home fee",
+    "late-cancel or no-show fee"
+   ],
+   [
+    "Nobody home",
+    "Nobody there"
+   ],
+   [
+    "nobody home",
+    "nobody there"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "was home",
+    "was there"
+   ],
+   [
+    "landlord",
+    "company"
+   ],
+   [
+    "replaces water heaters",
+    "leads quoted dinners"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a flooded basement or a lockout"
+   ],
+   [
+    "travel fee",
+    "trip fee"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 quote"
+   ],
+   [
+    "shutoff valve",
+    "tacos"
+   ],
+   [
+    "supply line",
+    "dessert table"
+   ],
+   [
+    "The repair price",
+    "The large party price"
+   ],
+   [
+    "Electric.",
+    "About 10, and no bar."
+   ],
+   [
+    "8–10am",
+    "7:00pm"
+   ],
+   [
+    "12–2pm",
+    "6:00pm"
+   ],
+   [
+    "10am–12pm",
+    "10:30am"
+   ],
+   [
+    "1–3pm",
+    "5:30pm"
+   ],
+   [
+    "Thu Oct 22, 7:00am",
+    "Wed Oct 21, 7:00pm"
+   ],
+   [
+    "7am Thu",
+    "7pm Wed"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a stain on my dining room floor."
+   ],
+   [
+    "'My sink won't drain' fits a date-night dinner.",
+    "'My kitchen is flooded' fits a date-night dinner."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found water damage in the kitchen this morning."
+   ],
+   [
+    "It's a leak under the sink, today, starts at 3:00pm, with Marco.",
+    "It's a private dinner, today, starts at 3:00pm, with Marco."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "which part of the kitchen is affected, and is water anywhere else?"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a kitchen check? Say so."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like cooking in a neighbor's kitchen without asking."
+   ],
+   [
+    "cracks the cabinet floor",
+    "cracks the tile floor"
+   ],
+   [
+    "cracked the cabinet floor",
+    "cracked the tile floor"
+   ],
+   [
+    "Is breakfast in a meeting room?: Yes, it won't drain",
+    "Is breakfast in a meeting room?: Yes, it's set up"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 dinner needs none."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s dinner, cooked Thu Oct 22, has a problem again."
+   ],
+   [
+    "the drain",
+    "the kitchen"
+   ],
+   [
+    "Lee Private Chef asks: is the job at a home, an office or somewhere else?",
+    "Lee Private Chef asks: is the dinner at a home, an office or somewhere else?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it's set up"
+   ],
+   [
+    "two drain clearings",
+    "two dinners"
+   ],
+   [
+    "Like a catering job's",
+    "Like a dinner's"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Dinners for 10, cooking classes and tastings."
+   ],
+   [
+    "hot towel shaves",
+    "dessert tastings"
+   ],
+   [
+    "Shave",
+    "Tasting"
+   ],
+   [
+    "drain",
+    "kitchen"
+   ],
+   [
+    "Catering",
+    "Dinner"
+   ],
+   [
+    "catering",
+    "dinner"
+   ],
+   [
+    "and water heaters, within 25 miles.",
+    "and cooking classes, within 25 miles."
+   ],
+   [
+    "the way most barbershops start",
+    "the way most studios start"
+   ],
+   [
+    "barbershops often set",
+    "studios often set"
+   ],
+   [
+    "Date-night dinner and water heaters",
+    "Date-night dinner and cooking classes"
+   ],
+   [
+    "Barber",
+    "Chef"
+   ],
+   [
+    "barber",
+    "chef"
+   ]
+  ]
+ },
+ "keep": [
+  "chef",
+  "kitchen",
+  "dessert",
+  "leak",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a cooking lesson at Lee Cooking Studio, Sam's own teaching kitchen, with Chef Robin on Sat Oct 24 at 11:00am, paid in full when booking. A menu tasting there runs the same way, with a deposit and the rest paid at the studio. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Private Chef for a parents' 40th anniversary dinner for 10 at home, 17 Willow Ln, on Thu Oct 22 at 7pm. Chef Marco plans the menu with Alex and prices it per guest, both sign, and a deposit holds the date. Marco shops that morning and cooks in Alex's kitchen, Jade serves, they clean up, and the bill brings the rest and the groceries at cost."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a $55 cooking lesson at the studio, paid in full when booked. A late cancel may keep the $20 fee, only with Sam's OK.",
+    "list|deposit|counter": "A menu tasting for up to 4 at the studio: a $40 deposit when booked, and the $100 rest paid at the studio."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Cooking lesson"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Cooking lesson (60 min)"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "name": "Menu tasting for up to 4"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Knife skills lesson",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$35",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Cooking lesson (60 min)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Lesson pack (5 lessons)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "photos|deposit|bill",
+   "combos": [
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "photos|deposit|bill": "The main story: a private dinner for 10, quoted from the menu plan at $640. A 25% deposit ($160) holds the date; the $480 rest and the groceries at cost come on the bill after the dinner.",
+    "list|full|none": "A cooking class at home for 2, $150 with groceries, paid in full when booked. A late cancel keeps only the $89 fee, with the owner's OK."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Private dinner"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "name": "Cooking class at home for 2"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Cooking class at home for 2"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Private dinner for 10"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "A server for 3 hours",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$90",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Meal prep visit",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$149",
+      "paid": "$149",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Meal prep visit (plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A4-80",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28",
+   "B5-34",
+   "B10-32"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "A private chef pays Rosfield's $2 for each confirmed booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "A private chef's plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "A private chef books people, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Lessons and tastings book a chef's time; nothing runs on a class timetable.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Food is planned and shopped for ahead, so nothing is sent now and nobody is on call (S2-31).",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "A what-if: where a state's form licenses this work, Sam gives that license here, and Rosie checks it. Each kind of work has its own form.",
+    "more": [
+     "Where Sam works, cooking in a customer's own kitchen needs no license, so his company takes the next branch.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state asks for insurance or a bond, the form asks for it here too.",
+     "Each person's own card comes later, with their invite reply.",
+     "Where only a city or county licenses this work, Sam gives that license the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state's form asks for a license to cook for customers in their homes. What's the license number? It can be yours, or your license holder's."
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, PC045210"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-09",
+    "does": "Sam set every dinner quote over his $500 limit to come to him first. Say another customer, Nia K., asks Lee Private Chef for a birthday dinner for 8. Marco prices it from her plan at $560.",
+    "more": [
+     "Prices straight from a price list never need an OK.",
+     "Pat can OK Lee Private Chef prices too. At the studio, only Sam OKs prices.",
+     "Before it reaches Sam, the price is checked against any job limit on the license."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Marco's dinner quote needs your OK.",
+      {
+       "card": {
+        "title": "Birthday dinner for 8 · $560",
+        "lines": [
+         "For Nia K. · priced from her plan",
+         "Lee Private Chef"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-12",
+    "does": "With dates to pick, all with Marco, since only Marco leads quoted dinners.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Private Chef can cook your birthday dinner for $560.",
+      {
+       "card": {
+        "title": "Birthday dinner for 8 · $560",
+        "lines": [
+         "Priced from your plan",
+         "With Marco · 25% deposit when you book"
+        ],
+        "button": "Pick a date",
+        "link": "rosfield.com/q/nk"
+       },
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-10",
+    "say": [
+     [
+      "owner",
+      "san",
+      "520"
+     ],
+     [
+      "san",
+      "owner",
+      "Send Nia K. $520 for the birthday dinner?",
+      {
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-11",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your birthday dinner quote is with the owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-19",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Yesterday, nobody answered for Lee Cooking Studio.",
+      {
+       "list": {
+        "plain": true,
+        "rows": [
+         [
+          "2 requests",
+          "Declined at 4 hours"
+         ],
+         [
+          "1 dinner quote",
+          "Still waiting on you"
+         ]
+        ]
+       },
+       "buttons": [
+        "See them",
+        "Set up AWAY"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-40",
+    "does": "Nia K. asked to talk about the $560 dinner quote. Sam taps Call, and the call goes out from the business's number.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nia K. would like to talk about the dinner quote before booking.",
+      {
+       "buttons": [
+        "Call Nia"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "more": [
+     "Knife skills lessons already booked keep $35, even after Nov 2.",
+     "A time being saved right now keeps the price on the customer's screen.",
+     "A lesson pack bought before then keeps its price.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: knife skills lesson $40 for visits from Mon Nov 2. Knife skills lessons already booked keep $35."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches the menu tasting for up to 4 from a $40 deposit to paid in full, for new bookings only. Each change is read back first.",
+    "more": [
+     "Menu tastings already booked keep their $40 deposit.",
+     "Paid in full is taken when the customer books. A late cancel keeps only the studio's fee.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "does": "Sam adds a supper club to Lee Cooking Studio. It brings its own plug-in, and only what's new is asked.",
+    "more": [
+     "What's new: the prices, the license, and who does the work.",
+     "People already on the team get one text to confirm, never a second invite.",
+     "It goes live on its own once it's set up. Lessons never pause.",
+     "Left unanswered, it's saved. Sam texts MORE to finish it."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW supper club"
+     ],
+     [
+      "san",
+      "owner",
+      "Supper club for Lee Cooking Studio: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like your lessons?",
+      {
+       "card": {
+        "title": "Lessons work like this",
+        "lines": [
+         "Customers come to you",
+         "Paid in full when they book",
+         "A $20 fee for a late cancel"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-70",
+    "does": "Nia K. cancelled a 5-lesson pack inside its cancel period. Where the state's rules require it, the refund has a date. Sam was reminded each day, and the date passed.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nia K.'s refund for the cancelled lesson pack was due yesterday. A person from Rosie's team will call you today.",
+      {
+       "buttons": [
+        "It's done",
+        "Call me now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "The studio has no repeat plans: each lesson is booked and paid on its own, or from a pack.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The studio has no repeat plans: each lesson is booked and paid on its own, or from a pack.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "The studio has no repeat plans: each lesson is booked and paid on its own, or from a pack.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The studio has no repeat plans: each lesson is booked and paid on its own, or from a pack.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The studio has no repeat plans: each lesson is booked and paid on its own, or from a pack.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: a bread lesson too, or just the lesson? Some dishes take longer.",
+     "Questions that only add detail come later, once a time is saved.",
+     "If it's for a child, the kids' cooking lesson is picked here, so the times fit it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here: a lesson needs no first step. A custom tasting menu has a 15-minute planning call first, at least 2 days before."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-15",
+    "more": [
+     "An allergy note on the page shows as 'note on the secure page', never what it says."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-33",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. wants a menu tasting for four. Own visit."
+     ],
+     [
+      "san",
+      "cust",
+      "You asked Robin about a menu tasting for up to 4. It's its own visit, with a $40 deposit.",
+      {
+       "card": {
+        "title": "Menu tasting for up to 4 · $140",
+        "lines": [
+         "Its own visit, 2½ hours",
+         "$40 deposit, the rest at the studio"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/b/a9"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "Lessons and tastings happen in the studio's kitchen.",
+    "label": "By video or phone"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The studio books a chef's time for each lesson or tasting.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The studio books a chef's time for each lesson or tasting.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "The studio books a chef's time for each lesson or tasting.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "No form to sign: allergies go on the secure page as answers, with their own yes.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A parent stays for a kids' lesson; no child is left at the studio.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left at the studio.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Lessons and tastings are rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "why": "A lesson has no problem that gets worse; a change goes through 'Alex changes what's booked'.",
+    "label": "The problem gets worse"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No plan or insurance pays for a lesson.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "No plan or insurance pays for a lesson.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "Everything is done at the lesson or the tasting; nothing comes later.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "why": "Nothing is left at the studio.",
+    "label": "An item isn't picked up"
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Here, allergy and diet notes are sensitive answers. Only the chef on the booking and Sam see them, for that booking.",
+     "They're deleted the day after the lesson or the dinner. Next time, they're added again."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-65",
+    "more": [
+     "Allergies and diets are never asked through the AI. They go only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-42",
+    "more": [
+     "A reaction to a dish goes to Sam at once. Trouble breathing gets 'call 911' first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Alex M. needs help at the studio. Record on the secure page."
+     ],
+     [
+      "san",
+      "owner",
+      "Robin says Alex M. needed help at the studio. Robin is with Alex. The record is on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-21",
+    "does": "Alex didn't answer by 2 hours before. Alex booked Robin's time, so nobody else teaches it without Alex's yes. Sam is asked to call Alex, and the time stays saved.",
+    "more": [
+     "Sage stays ready to come in early, only once Alex says yes.",
+     "If they can't reach each other by the start, the studio cancels with no fee, and anything paid comes back.",
+     "Where the plug-in keeps service names private, the text says only the business, date, time and place. The rest is on the secure page."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered about the Sat 11:00am visit. It was booked with Robin, so it isn't moved to Sage without a yes. Please call Alex. The number is on the booking."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "does": "Robin's day is blocked, and each customer picks. A cancel is free, and anything paid is refunded. A lesson booked with Robin moves to Sage only on a yes. No reply in 24 hours: Sam calls."
+   },
+   {
+    "op": "words",
+    "at": "S11-49",
+    "does": "Sam sets Sage's last day. Each later lesson booked with Sage is offered to someone with the skill. It moves only on the customer's yes. No reply in 24 hours: Sam calls.",
+    "more": [
+     "If nobody can, the customer picks a new time or a free cancel.",
+     "Customers are never told why someone left.",
+     "Sage's sign-in ends after the last day, and the calendar is unlinked.",
+     "Past visits stay in the records, 7 years by default.",
+     "Where the plug-in keeps service names private, the text gives only the business, the date, the time and the place."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can a friend watch from the counter during my lesson?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can a friend watch from the counter during my lesson?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Robin says yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee Cooking Studio",
+      "26 Cedar St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Knife skills lesson $35 ($40 from Nov 2) · Sauce lesson $40 · Bread lesson $20"
+     ],
+     [
+      "To book",
+      "Paid in full when booked · a $20 fee kept for a no-show or a late cancel, only with Sam's OK"
+     ],
+     [
+      "Licenses",
+      "Food service permit, as given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Private Chef",
+      "Private dining · within 25 miles of 410 Grove St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "No plan, pack or group count in this work: nothing comes due before a dinner or a class."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "A private chef pays Rosfield's $2 for each confirmed booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "A private chef's plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "A private chef books people, never a space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Lessons and tastings book a chef's time; nothing runs on a class timetable.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Food is planned and shopped for ahead, so nothing is sent now and nobody is on call (S2-31).",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "A what-if: where a state's form licenses this work, Sam gives that license here, and Rosie checks it. Each kind of work has its own form.",
+    "more": [
+     "Where Sam works, cooking in a customer's own kitchen needs no license, so his company takes the next branch.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state asks for insurance or a bond, the form asks for it here too.",
+     "Each person's own card comes later, with their invite reply.",
+     "Where only a city or county licenses this work, Sam gives that license the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state's form asks for a license to cook for customers in their homes. What's the license number? It can be yours, or your license holder's."
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, PC045210"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "7:30pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Nora S. today, at 7:30pm?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Private Chef. It can't come at 5:30pm today, but it offered another time:",
+      {
+       "card": {
+        "title": "Date-night dinner · $179",
+        "lines": [
+         "Today · 7:30pm · Luis",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ],
+       "stop": true,
+       "as": "Nora S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "more": [
+     "Date-night dinners already booked keep $179, even after Nov 2.",
+     "A time being saved right now keeps the price on the customer's screen.",
+     "A dinner already quoted keeps its quote until it runs out.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: date-night dinner $199 for visits from Mon Nov 2. Date-night dinners already booked keep $179."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches private dinners from groceries on the bill to groceries in the price per guest, for new bookings only. Each change is read back first.",
+    "more": [
+     "Dinners already booked keep their terms.",
+     "With groceries in the price, the rest is charged the day before, after the final count.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-70",
+    "does": "Morgan P. cancelled a dinner contract she signed at her home, inside the cancel window the state's rules give. The refund has a date. Sam was reminded each day, and the date passed.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Morgan P.'s refund for the cancelled dinner contract was due yesterday. A person from Rosie's team will call you today.",
+      {
+       "buttons": [
+        "It's done",
+        "Call me now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-14",
+    "does": "Or a cancel with no fee. Lin paid her $179 date-night dinner in full, so a cancel refunds all of it. If texts are off, Sam calls.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Private Chef had to block Thu Oct 29, 4 to 10pm. So your 6:00pm date-night dinner can't go ahead then. Pick a new time:",
+      {
+       "times": [
+        "Mon Nov 2 · 7:00pm",
+        "Tue Nov 3 · 6:00pm"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Cancel, no fee"
+        ]
+       ],
+       "as": "Lin W."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-03",
+    "does": "Another customer, Rosa, calls at 7:12am Tue. Before 9am, the business line rings Rosie, as Sam set. Rosie says first that it's automated and that the call is recorded."
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero una cena privada, y una invitada tiene alergia al maní.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I want a private dinner, and one guest has a peanut allergy.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Private Chef. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Private Chef. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-15",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I talk to a real person?",
+      {
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Of course. The office opens at 9am. Sam or Pat can call you back then. Is that OK?",
+      {
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Call back: a caller asked for a person at 7:12am. Please call them at 9am.",
+      {
+       "card": {
+        "title": "Call back · Tue Oct 20 · 9:00am",
+        "lines": [
+         "Asked for a person",
+         "Summary and recording on the portal"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/l/m21"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Private Chef. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Private Chef · Private dinner",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa, in Spanish, about a private dinner. She asked an allergy question, and got the safety steps.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "Allergy question · details only on the secure page",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿alguien tiene una reacción ahora mismo?",
+      {
+       "lang": "es",
+       "en": "First: is anyone having a reaction right now?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No, nadie.",
+      {
+       "lang": "es",
+       "en": "No, nobody.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Rosie nunca dice si un plato es seguro. Ponga la alergia solo en la página segura: el chef la revisa allí.",
+      {
+       "lang": "es",
+       "en": "Rosie never says a dish is safe. Put the allergy only on the secure page: the chef checks it there.",
+       "as": "Rosa"
+      }
+     ]
+    ],
+    "more": [
+     "A private chef's example: an allergy mention gets 'is anyone having a reaction now?' first.",
+     "Rosa says nobody is, so Rosa is told to put the allergy only on the secure page, where the chef reads it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Private Chef. We got your voicemail about a birthday dinner. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Private Chef · Private dinner",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about a birthday dinner. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants a birthday dinner for 8 this month"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-05",
+    "say": [
+     [
+      "agent",
+      "san",
+      "Hi, I'm an automated assistant from Google, calling for a customer, Kim. Can a private chef cook a date-night dinner for 2 this Thursday? What does it cost?"
+     ],
+     [
+      "san",
+      "agent",
+      "Lee Private Chef has open times this Thursday, Oct 22. A date-night dinner for 2 is $179. I can't book on this call. I'll text Kim a secure link to pick a time and book. Which mobile should I text?"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Private Chef. Google's assistant asked about a booking for you. Nothing is booked until you pick a time and confirm.",
+      {
+       "card": {
+        "title": "Lee Private Chef · Date-night dinner for 2",
+        "lines": [
+         "Open times this Thursday, Oct 22",
+         "$179, paid in full when you book"
+        ],
+        "button": "Pick a time and book",
+        "link": "rosfield.com/c/g7"
+       },
+       "stop": true,
+       "as": "Kim L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Is your food safe if someone has a nut allergy? Can the chef make it nut-free?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't answer safety questions about food or allergies. The chef answers them, from the allergy notes on the secure page. To talk to a chef, call Lee Private Chef at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "Dinners and classes are cooked in the customer's own kitchen; nothing is taught by video.",
+    "label": "A video or phone session"
+   },
+   {
+    "op": "more",
+    "at": "B4-04",
+    "more": [
+     "Its private answers: allergies and diets, only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-07",
+    "does": "A date-night dinner for 2 is $179, straight from Sam's list. List prices never need Sam's OK."
+   },
+   {
+    "op": "words",
+    "at": "B4-08",
+    "does": "The plug-in says a private dinner is priced from the menu plan, so Rosie's first text asks for it. No time is saved while it's priced.",
+    "more": [
+     "The AI passes on Alex's name and mobile first, so Rosie can text Alex.",
+     "The plan goes on a secure page, never through the AI: the occasion, the guests, favorite foods and kitchen photos.",
+     "Allergies and diets go on the same page, with their own yes. They never go in a text.",
+     "Some work is quoted from answers, not photos. A menu plan runs the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Private Chef. Add your menu plan and a few photos of your kitchen, and a chef will plan the menu and price it. Texts are about this request only.",
+      {
+       "card": {
+        "title": "Anniversary dinner for 10",
+        "lines": [
+         "Priced from your menu plan"
+        ],
+        "button": "Add your plan",
+        "link": "rosfield.com/q/r3"
+       },
+       "stop": true
+      }
+     ]
+    ],
+    "form": [
+     [
+      "Occasion",
+      "My parents' 40th anniversary"
+     ],
+     [
+      "Guests",
+      "10 adults"
+     ],
+     [
+      "Food they love",
+      "Seafood and Southern cooking, nothing very spicy"
+     ],
+     [
+      "The kitchen",
+      "Gas range, 4 burners, one oven, room on the island"
+     ],
+     [
+      "Photos",
+      "Kitchen, dining room"
+     ],
+     [
+      "Allergies and diets (only for your chef, for this dinner)",
+      "1 guest: shellfish, severe. 1 guest: vegetarian"
+     ],
+     [
+      "Share them with the chef?",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-09",
+    "does": "Marco plans the menu on a secure page, from Alex's plan, photos and answers. He prices it per guest, with the server: $640.",
+    "more": [
+     "4 courses at $55 a guest for 10 is $550. A server for 3 hours at $30 an hour is $90.",
+     "Groceries are at cost, on the bill after, with every receipt. Marco's estimate: $300 to $350.",
+     "Marco reads the allergy notes on the page: the menu leaves out shellfish everywhere, with a vegetarian main for one guest.",
+     "If nobody prices it in 4 hours, Sam is asked to. Alex hears it's with the business."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "Alex M. sent the menu plan for an anniversary dinner for 10. Plan the menu and price it on the secure page.",
+      {
+       "photos": [
+        "Kitchen",
+        "Dining room"
+       ],
+       "card": {
+        "title": "Anniversary dinner · Alex M.",
+        "lines": [
+         "Plan, photos and allergy notes on the page",
+         "Price it before anyone says yes"
+        ],
+        "button": "Open and price it",
+        "link": "rosfield.com/q/r3j"
+       },
+       "as": "Marco"
+      }
+     ]
+    ],
+    "form": [
+     [
+      "Anniversary dinner for 10 · Alex M.",
+      "From the plan, the photos and the answers"
+     ],
+     [
+      "Menu",
+      "4 courses, no shellfish, one vegetarian main"
+     ],
+     [
+      "Marco's price",
+      "$55 a guest × 10, plus a server for 3 hours: $640"
+     ],
+     [
+      "Groceries",
+      "At cost after, about $300 to $350"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-13",
+    "does": "Back to Sam's 1 Send it, at 7:40pm: Alex gets the menu and the price, with a link to pick a date. Marco is told."
+   },
+   {
+    "op": "words",
+    "at": "B4-84",
+    "does": "A dinner, a class or a meal prep visit starts at a set time. The times read as the start, like 'Thu Oct 22 · 7:00pm', not a window.",
+    "more": [
+     "For a dinner, the chef arrives about 3½ hours before the meal to cook, and the server 1½ hours before.",
+     "The confirmation, the reminder and the on-my-way text say the same start.",
+     "Only people free, skilled and cleared for the place are shown, soonest first.",
+     "A dinner for 9 or more shows only times when a server is free too."
+    ],
+    "t": "Mon Oct 19, 6:41pm",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Private Chef can teach your cooking class for 2 for $150, paid in full when you book. Start times:",
+      {
+       "times": [
+        "Thu Oct 22 · 7:00pm · Marco",
+        "Fri Oct 23 · 7:00pm · Luis",
+        "Sat Oct 24 · 5:00pm · Marco"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "more": [
+     "Private answers, like a gate code, go only on the secure page.",
+     "Allergies and diets are never asked here. They go only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-35",
+    "more": [
+     "Any cancel window comes from the state's form, and the work starts after it.",
+     "A co-host can sign on a link Alex forwards. Rosie never texts them itself.",
+     "Extra time or food at the dinner is agreed the same way, in writing."
+    ],
+    "form": [
+     [
+      "Anniversary dinner for 10 · $640",
+      "The menu, the price and the terms"
+     ],
+     [
+      "Menu",
+      "4 courses, no shellfish, one vegetarian main"
+     ],
+     [
+      "Price",
+      "$55 a guest × 10, plus a server for 3 hours: $640"
+     ],
+     [
+      "Groceries",
+      "At cost after, with every receipt. Over $350 only with my yes"
+     ],
+     [
+      "Final count",
+      "Due Wed Oct 21, 7pm. The bill is for that count"
+     ],
+     [
+      "Cancel",
+      "By Wed Oct 21, 7pm: all back. Later: the $160 and groceries bought may be kept"
+     ],
+     [
+      "Wine",
+      "I buy it. It's poured only for guests 21 or older"
+     ],
+     [
+      "Alex M.",
+      "Signed"
+     ],
+     [
+      "Lee Private Chef",
+      "Sam signs next"
+     ]
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "Any cancel window comes from the state's form, and the work starts after it.",
+       "A co-host can sign on a link Alex forwards. Rosie never texts them itself.",
+       "Extra time or food at the dinner is agreed the same way, in writing.",
+       "Its page not finished: it stays booked, with nothing taken."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B5-11",
+    "form": [
+     [
+      "Your visit",
+      "The service, time and price you picked"
+     ],
+     [
+      "Deposit now",
+      "Shown here before you pay"
+     ],
+     [
+      "Card",
+      "•••• 4242"
+     ],
+     [
+      "I agree",
+      "Free to cancel until Wed Oct 21, 7pm, for a full refund. After that, the deposit and groceries bought may be kept"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-03",
+    "more": [
+     "Sam's rule: a booking with a severe allergy note waits for his chef's OK. Marco planned this menu with the notes in view, so it books now."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-04",
+    "does": "A what-if: the plug-in says a severe allergy note waits for the chef's OK. On a list-priced dinner or class, the chef reads the note on the secure page and decides.",
+    "more": [
+     "It runs in the chef's text hours. Alex gets a wait text.",
+     "Any money stays held, not taken, until the chef says OK.",
+     "A private dinner priced from the plan skips this: the chef read the notes while planning its menu."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "A new booking has a severe allergy note. Read it on the secure page before it books.",
+      {
+       "card": {
+        "title": "Read before booking",
+        "lines": [
+         "Date-night dinner for 2 · Fri Oct 30 · 7:00pm"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/r/x2"
+       },
+       "buttons": [
+        "OK to book",
+        "No",
+        "Need more first"
+       ],
+       "as": "Marco"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Private Chef's chef is reading your allergy note before it books. We'll text you by 12:00pm tomorrow either way."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-14",
+    "more": [
+     "A gate or door code shows in the job only on the day.",
+     "The customer's language shows too, so Sam can send someone who speaks it.",
+     "Jade, the server, gets a job text too, with no money line and no allergy details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-01",
+    "more": [
+     "Here free cancel ends at 7pm today, with the final count, and the reminder says so."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Marco use our plates and glasses?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can Marco use our plates and glasses?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Marco says yes. He brings his own knives, pans and serving pieces."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "t": "Thu Oct 22, 3:10pm",
+    "does": "Rosie tells Alex the new arrival time. Dinner stays on time, and Alex can still move the visit for free.",
+    "more": [
+     "Marco arrives 3½ hours before dinner, so 20 minutes late doesn't move the meal.",
+     "If a late start would push the meal back, the text says so plainly.",
+     "That works, or no reply, keeps the visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 20"
+     ],
+     [
+      "san",
+      "cust",
+      "Marco is running about 20 minutes late. He'll arrive about 3:50pm, and dinner stays at 7:00pm.",
+      {
+       "buttons": [
+        "That works",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-27",
+    "t": "Thu Oct 22, 3:00pm",
+    "does": "Alex texts on Thursday afternoon, before Marco arrives. The price stays the same: the time was saved for Alex.",
+    "more": [
+     "Marco is told.",
+     "With no reply, nothing moves, and Marco does what fits in the time left.",
+     "A later start can push the meal back. Marco tells Alex in person."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "We'll be home 30 minutes late, sorry!"
+     ],
+     [
+      "san",
+      "cust",
+      "Marco can start cooking 30 minutes later, at 4:00pm, and dinner may run a little late. Or you can pick another time.",
+      {
+       "buttons": [
+        "Come later",
+        "Another time"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-31",
+    "does": "Alex asks to add a cheese course. It's on Sam's list at $6 a guest, so Alex sees the price and says yes first.",
+    "more": [
+     "Marco's day is checked for the extra time. If it doesn't fit, Alex gets new times.",
+     "A price made just for Alex goes through Sam's price OKs first.",
+     "A swap at the same price, like a pecan pie for the cake, needs no new price. Marco just says yes."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Marco add a cheese course after dinner?"
+     ],
+     [
+      "san",
+      "cust",
+      "Yes, Marco can add it.",
+      {
+       "card": {
+        "title": "Cheese course · $6 a guest",
+        "lines": [
+         "Thu Oct 22 · 7:00pm · Marco",
+         "On the bill after, with the rest"
+        ]
+       },
+       "buttons": [
+        "Add it",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "A what-if: the plug-in's first step isn't done by the day before. Say Alex's dinner needed a menu tasting first, and it hasn't happened. Sam decides.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M.'s menu tasting before the dinner (Thu 7:00pm) hasn't happened yet.",
+      {
+       "buttons": [
+        "Move the visit",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Your menu tasting hasn't happened yet, so Lee Private Chef needs to move your dinner. There's no fee.",
+      {
+       "times": [
+        "Mon Oct 26 · 7:00pm · Marco",
+        "Tue Oct 27 · 7:00pm · Marco"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "does": "A what-if: the plug-in or Sam marked this date as one that can't move, like an anniversary. Only a chef with the skill is offered. Alex gets that, a new date, or a full refund.",
+    "more": [
+     "Sam adds Ines to the team for the day on the portal. Rosie first checks that Ines is free and has a food handler card.",
+     "Ines gets the menu, the timeline and the allergy notes on the secure page. The contract and the money stay the same.",
+     "Luis doesn't lead quoted dinners, so Luis isn't offered.",
+     "A refund gives back everything paid. No visit, so no $2 for Rosie. Any $2 taken from a payment goes back to the business.",
+     "No reply by 8pm Wed: Sam calls Alex. Ines cooks only with Alex's yes, and a full refund stays open until the dinner."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Marco can't work Thu. Alex M.'s anniversary dinner for 10 is on a date that can't move. Ines Ruiz is offered, as you set. Alex may pick a new date with Marco or a full refund instead."
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Marco can't cook your dinner tomorrow. Ines Ruiz, a chef Sam trusts, can cook the same menu at the same price. Or pick a new date with Marco, or cancel for a full refund.",
+      {
+       "photos": [
+        "Ines Ruiz, chef"
+       ],
+       "buttons": [
+        "Ines instead",
+        "New date with Marco",
+        "Full refund"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-22",
+    "more": [
+     "Cancelled on the day, after Marco shopped: the groceries he bought may be kept too, at cost, with the receipts. Sam confirms."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "The final count is due",
+     "when": {
+      "price": [
+       "photos"
+      ]
+     },
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.14",
+        "7.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Wed Oct 21, 10:05am",
+       "type": "split",
+       "q": "Is the final count in by 7pm?",
+       "title": "Asks for the final count by its day",
+       "does": "Alex's final count for Thursday's dinner is due today by 7pm, the day before, as the contract says. Free cancel ends then too.",
+       "more": [
+        "The count Alex sends is what's billed, even if fewer come, as the contract says.",
+        "Allergy or diet changes go on the same secure page, with their own yes. They never go in a text.",
+        "Up to 12 guests books at $55 a guest. More than that goes to Sam first: one chef cooks for up to 12 here."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Your final count for Thursday's anniversary dinner is due today by 7pm. That's also when free cancel ends.",
+         {
+          "card": {
+           "title": "Final count · due Wed Oct 21, 7pm",
+           "lines": [
+            "How many guests, and how many are children",
+            "Any new allergy or diet, with your own yes",
+            "After 7pm, the bill is for this count"
+           ],
+           "button": "Send the count",
+           "link": "rosfield.com/f/r3"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.rules",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust"
+       ],
+       "branches": [
+        {
+         "label": "In by 7pm",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x02",
+           "line": [
+            "7.14",
+            "7.10"
+           ],
+           "who": "san",
+           "to": "cust",
+           "via": "msg",
+           "t": "Wed Oct 21, 4:10pm",
+           "title": "Reads back the count",
+           "does": "Alex confirms 10 guests, with no allergy changes. The total stays $640, and Marco is told the count.",
+           "more": [
+            "Sam and Marco get the count and how many special plates, never what they are.",
+            "More guests would add $55 each. Fewer than the contract's count are billed at that count, as it says."
+           ],
+           "say": [
+            [
+             "san",
+             "cust",
+             "Thanks, Alex. Your count is in.",
+             {
+              "card": {
+               "title": "Anniversary dinner · 10 guests",
+               "lines": [
+                "$640, as quoted",
+                "Free cancel ends at 7pm today"
+               ]
+              }
+             }
+            ]
+           ],
+           "vary": {
+            "price:photos+before:deposit+after:card": {
+             "say": [
+              [
+               "san",
+               "cust",
+               "Thanks, Alex. Your count is in.",
+               {
+                "card": {
+                 "title": "Anniversary dinner · 10 guests",
+                 "lines": [
+                  "$640, as quoted",
+                  "The $480 rest is charged at 7pm today, when free cancel ends"
+                 ]
+                }
+               }
+              ]
+             ]
+            }
+           },
+           "needs": [
+            "pf.rules"
+           ],
+           "tells": [
+            "cust"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "Not in by 7pm",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x03",
+           "line": [
+            "7.14",
+            "7.16"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "t": "Wed Oct 21, 7:05pm",
+           "title": "No count: the contract's count is billed",
+           "does": "The count isn't in by 7pm. The contract's 10 guests stay billed, and Sam is asked to call Alex to check the allergy notes.",
+           "more": [
+            "Alex is told the same by text, inside text hours.",
+            "Nothing is cancelled for a late count. A count sent later is Sam's call."
+           ],
+           "say": [
+            [
+             "san",
+             "owner",
+             "Alex M. didn't send the final count for Thursday's dinner. The contract's 10 guests stay billed. Please call Alex about the allergy notes."
+            ],
+            [
+             "san",
+             "cust",
+             "We didn't get your final count, so your contract's 10 guests are billed. Sam will call you about allergies and diets."
+            ]
+           ],
+           "needs": [
+            "pf.rules",
+            "pf.messages"
+           ],
+           "tells": [
+            "owner",
+            "cust"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "The server can't come",
+     "when": {
+      "price": [
+       "photos"
+      ]
+     },
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x04",
+       "line": [
+        "7.8"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "as": "Jade",
+       "t": "Wed Oct 21, 4:00pm",
+       "title": "Jade can't come: Sam books another server",
+       "does": "Jade texts that Thursday is off. Sam books another server. Alex isn't asked: the dinner, the price and the time stay the same.",
+       "more": [
+        "Jade was named in Alex's confirmation, so Alex gets one short text with the new server's name.",
+        "No answer from Sam in 2 hours: Rosie asks the other servers on the team who are free.",
+        "Nobody found by Thursday morning: Sam calls Alex, and the server's $90 comes off the bill."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "OUT Thu",
+         {
+          "as": "Jade"
+         }
+        ],
+        [
+         "san",
+         "owner",
+         "Jade can't work Thu. Alex M.'s anniversary dinner for 10 needs a server from 5:30pm. Book another, or call Alex.",
+         {
+          "buttons": [
+           "Booked one",
+           "I'll call Alex"
+          ]
+         }
+        ],
+        [
+         "owner",
+         "san",
+         "1"
+        ],
+        [
+         "san",
+         "owner",
+         "Got it. The new server gets the job text when you add them to the booking on the Team page. Alex gets one text with their name."
+        ],
+        [
+         "san",
+         "cust",
+         "A change to Thursday's dinner: Kai will serve, in place of Jade, from 5:30pm. The menu, the time and the price stay the same."
+        ]
+       ],
+       "needs": [
+        "pf.staff"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "t": "Thu Oct 22, 7:00am",
+    "more": [
+     "Each job shows what to bring, from the plug-in, like knives, pans and the allergy labels.",
+     "Alex's access notes from booking show too, like where to park.",
+     "No OMW by 30 minutes before the start time: Marco is nudged, then Sam.",
+     "The day list shows the timeline, the guest count and how many special plates. The allergies stay on the secure page.",
+     "Jade gets a day list too, with only the dinner."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-01",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.15"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 22, 12:15pm",
+      "title": "Marco shops and texts every receipt",
+      "does": "Marco shops for the dinner that morning and texts photos of every receipt. Rosie adds them up: $312.40, inside the $300 to $350 estimate.",
+      "more": [
+       "Groceries are billed at cost, never marked up. Going over the estimate needs Alex's yes first.",
+       "Fish and produce are bought the same day. Anything made ahead is made in a permitted kitchen, where the state's rules require one.",
+       "The receipts stay with the job, for the bill after the dinner."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "RECEIPTS groceries 312.40",
+        {
+         "photos": [
+          "Market receipt",
+          "Grocery receipt"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved: groceries $312.40 for Alex M.'s dinner, inside the estimate.",
+        {
+         "as": "Marco"
+        }
+       ]
+      ],
+      "vary": {
+       "price:photos+after:none": {
+        "does": "Marco shops for the dinner that morning and texts photos of every receipt. Groceries are in the price here, so the receipts are only kept with the job.",
+        "more": [
+         "Fish and produce are bought the same day. Anything made ahead is made in a permitted kitchen, where the state's rules require one.",
+         "Nothing is billed for groceries: they were in the $640."
+        ],
+        "say": [
+         [
+          "staff",
+          "san",
+          "RECEIPTS groceries 312.40",
+          {
+           "photos": [
+            "Market receipt",
+            "Grocery receipt"
+           ]
+          }
+         ],
+         [
+          "san",
+          "staff",
+          "Saved with Alex M.'s dinner. Groceries are in the price, so nothing is billed.",
+          {
+           "as": "Marco"
+          }
+         ]
+        ]
+       },
+       "before:full": {
+        "t": "Thu Oct 22, 3:00pm",
+        "does": "Marco shops for the class that afternoon and texts photos of the receipts. Groceries are in the $150, so they're only kept with the job.",
+        "more": [
+         "Nothing is billed for groceries: they were in the class price."
+        ],
+        "say": [
+         [
+          "staff",
+          "san",
+          "RECEIPTS groceries 46.80",
+          {
+           "photos": [
+            "Grocery receipt"
+           ]
+          }
+         ],
+         [
+          "san",
+          "staff",
+          "Saved with Alex M.'s class. Groceries are in the price, so nothing is billed.",
+          {
+           "as": "Marco"
+          }
+         ]
+        ]
+       }
+      },
+      "needs": [
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 3:15pm",
+    "does": "Back to Alex: it's Thursday afternoon, and Marco heads over with the groceries. Alex sees Marco's photo and the code. Until check-in, 2 means only 'that isn't Marco'.",
+    "more": [
+     "The photo link is where a plain text finds the photo.",
+     "If Alex texted STOP, Marco calls instead.",
+     "Marco arrives about 3½ hours before dinner, to cook."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 3:30pm"
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "t": "Thu Oct 22, 3:30pm",
+    "more": [
+     "Examples: an ID for an 18+ service, a working stove, a parking pass, a signed form.",
+     "An oven that won't heat: Marco cooks another way and tells Alex in person. The menu and the price stay the same.",
+     "If the plug-in says it stops the visit, it goes as 'Can't go ahead'."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before cooking, Marco photographs the counters and the stove, and notes anything already damaged. The photos stay with the job.",
+    "more": [
+     "The plug-in names the checks, like the counters, the stove and the floor.",
+     "Alex can see them on the secure page.",
+     "A damage claim later is checked against them.",
+     "Marco checks the allergy plates against the secure page first. No text ever says what they are."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE chip on the island's edge, before cooking",
+      {
+       "photos": [
+        "Island, before",
+        "Stove, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s job.",
+      {
+       "as": "Marco"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-19",
+    "steps": [
+     {
+      "id": "B8-x02",
+      "line": [
+       "8.8"
+      ],
+      "who": "staff",
+      "via": "visit",
+      "t": "Thu Oct 22, 4:00pm",
+      "title": "Marco cooks; the allergy plate is made apart",
+      "does": "Marco cooks the 4 courses in Alex's kitchen. The allergy plate is made apart, with its own board, pan and tools, and checked against the secure page.",
+      "more": [
+       "Jade arrives at 5:30pm and sets the table. The guests arrive at 6:30pm.",
+       "Hot food stays hot and cold food stays cold.",
+       "Nothing about the allergies goes in a text."
+      ],
+      "vary": {
+       "before:full": {
+        "t": "Thu Oct 22, 7:00pm",
+        "does": "Marco teaches Alex and a partner to cook a 3-course dinner in their own kitchen. They eat what they made at the end.",
+        "more": [
+         "Any allergy on the secure page is checked before they start.",
+         "Hot food stays hot and cold food stays cold."
+        ]
+       }
+      },
+      "needs": [
+       "pf.visit"
+      ]
+     },
+     {
+      "id": "B8-x03",
+      "line": [
+       "8.8"
+      ],
+      "who": "staff",
+      "via": "visit",
+      "as": "Jade",
+      "t": "Thu Oct 22, 7:00pm",
+      "title": "The meal is served; the kitchen is cleaned",
+      "does": "Jade serves the 4 courses from 7:00 to 9:30pm, with Marco plating. Alex pours the wine Alex bought, only for guests 21 or older.",
+      "more": [
+       "The chef and the server never sell alcohol.",
+       "Cleanup starts with the last course. The leftovers are labeled with the date and put in the fridge.",
+       "Extra time Alex asks for needs Alex's written yes first, at the rate shown before booking."
+      ],
+      "vary": {
+       "before:full": {
+        "t": "Thu Oct 22, 9:00pm",
+        "does": "Alex and the partner eat the dinner they cooked. Marco cleans up and labels the leftovers for the fridge.",
+        "more": [
+         "Extra time Alex asks for needs Alex's written yes first, at the rate shown before booking."
+        ]
+       }
+      },
+      "needs": [
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "does": "The party runs late, and Alex asks the team to stay 2 more hours. Alex didn't book that time, so Rosie reads it back, then asks Alex first.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "EXTRA 160 2 more hours of service, until 11:30pm"
+     ],
+     [
+      "san",
+      "staff",
+      "Extra for Alex M.: 2 more hours of service, $160. Sent to Alex.",
+      {
+       "as": "Marco"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your guests are still at the table. Marco's team can stay 2 more hours.",
+      {
+       "card": {
+        "title": "2 more hours of service · $160",
+        "lines": [
+         "$80 an hour, as shown before booking",
+         "Done today, if you say yes",
+         "Added to the bill after the dinner"
+        ]
+       },
+       "buttons": [
+        "Yes, do it",
+        "No, just the booked work"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-24",
+    "does": "The team stays until 11:30pm. Service given at the dinner has no cancel period. Only a contract signed at the customer's home gets one, where the state's rules give one.",
+    "more": [
+     "It's paid with the bill, or by one pay link if the dinner was paid before.",
+     "Marco tells Alex out loud too."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Added to your booking.",
+      {
+       "card": {
+        "title": "2 more hours of service · $160",
+        "lines": [
+         "The team stays until 11:30pm",
+         "$80 an hour",
+         "Paid with your bill, or by one pay link"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-25",
+    "does": "Nothing more is done or charged. The team finishes at the booked time.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. The team finishes at the booked time, and nothing extra is charged."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "t": "Thu Oct 22, 10:15pm",
+    "does": "Before DONE, Marco and Alex check the kitchen together. Anything wrong is fixed before Marco texts DONE.",
+    "more": [
+     "The plug-in names what's checked. Here: the counters are clean, the dishes are washed, and the leftovers are labeled in the fridge.",
+     "Food left out is put away or thrown out by the safe time limit in the plug-in.",
+     "After photos are taken from the same angles as the before photos."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:30pm"
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE the family loved the short rib. The gas range runs hot."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private record.",
+      {
+       "as": "Marco"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-19",
+    "does": "Before the bill goes out: each branch is one more thing a bill can carry. Here, only the tip line can, and only on a bill."
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "does": "Sam turned on the tip line at sign-up, so the bill's pay page shows it. Alex chooses to add $80, and it's paid with the bill.",
+    "more": [
+     "Rosie never asks for a tip. The line just shows on the bill, and it's Alex's choice.",
+     "Tips show only where the plug-in allows them and Sam turned them on.",
+     "Rosfield's $2 doesn't change with a tip.",
+     "Every tip goes to the team who cooked and served: here, Marco and Jade."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks! Your $80 tip was added.",
+      {
+       "card": {
+        "title": "Tip · $80",
+        "lines": [
+         "For Marco and Jade, with the dinner's bill"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-05",
+    "t": "Thu Oct 22, 10:31pm",
+    "more": [
+     "A bill that matches an OK'd quote, with groceries inside the estimate, never needs an OK.",
+     "Extra time Alex said yes to is added as its own line, like the $160 for 2 more hours of service.",
+     "A different total over Sam's $500 goes to Sam first. Marco can leave while it waits.",
+     "No answer from Sam in 30 minutes: Alex is told it's with the owner."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Fri Oct 23, 9:00am",
+    "more": [
+     "Rosie sends no reminders of its own.",
+     "Alex can tap any receipt on the page. A question about one goes to Sam.",
+     "A tip line shows only if Sam turned it on at sign-up. It's Alex's choice.",
+     "Where the plug-in keeps service names private, the text names only the business, date, time and place."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-11",
+    "t": "Tue Oct 27, 9:00am"
+   },
+   {
+    "op": "words",
+    "at": "B9-04",
+    "does": "Alex said yes to extra time, so Marco's DONE sends Alex one pay link. There's no counter at a home.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE extra 160"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Private Chef: $160 for the extra time at your dinner.",
+      {
+       "pay": {
+        "amount": "$160",
+        "what": "2 more hours of service",
+        "link": "rosfield.com/p/r4x"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "Any service charge is its own line on the receipt, and it's never called a tip."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Fri Oct 23, 9:00am",
+    "does": "Back to Alex the next morning: the money is in. The receipt goes out by text and email, with the plug-in's promise: a make-good if anything was wrong with the food."
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Fri Oct 23, 11:00am"
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "why": "Service given at the dinner has no cancel period (B8-24).",
+    "label": "Cancels inside the period"
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "Service given at the dinner has no cancel period. Only a contract signed at the customer's home gets one, where the state's rules give one.",
+    "more": [
+     "Where a state's rules do give one, the plug-in's switch turns it on, and the refund follows those rules.",
+     "Here, nothing waits."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Marco cook a birthday dinner for 6 next month?"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. Here are Marco's next dates for a birthday dinner.",
+      {
+       "times": [
+        "Fri Nov 20 · 7:00pm · Marco",
+        "Sat Nov 21 · 7:00pm · Marco"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Marco to cook next year's anniversary dinner too. Marco texts NEXT. It's past the 6 months Sam books ahead, so Rosie saves it as a reminder.",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the customer asks.",
+     "In late Apr 2027, once it's inside the 6 months, Alex gets dates to pick, or skips.",
+     "It's booked with the same money rules as any visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: anniversary dinner, 12 months"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Private Chef books up to 6 months ahead. We'll text you dates for next year's anniversary dinner in late Apr 2027.",
+      {
+       "buttons": [
+        "Sounds good",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-35",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Tips for your leftovers: they're labeled in your fridge. Eat them within 3 days, and reheat until hot all the way through. If anything was wrong with the food, reply here."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "A private chef is never sent now (B4-81), so 'Send someone now' is never offered.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "A private chef is never sent now, and nobody is on call.",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "A private chef is never sent now, so every booking gets its reminder.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "A private chef is never sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Every dinner, class and meal prep visit starts at a set time (the next branch).",
+    "label": "1 Arrival windows"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Every dinner, class and meal prep visit starts at a set time.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Every dinner, class and meal prep visit starts at a set time.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "why": "No group sign-ups: one host books the dinner.",
+    "label": "Too few booked to run"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A private chef never looks after a child; an adult on the booking is home.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "An adult on the booking is home while the chef cooks.",
+    "label": "1 Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "Everything is done at the dinner; nothing comes later.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "why": "A dinner has no problem that gets worse; a changed menu goes through 'Alex changes what's booked'.",
+    "label": "The problem gets worse"
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "why": "No repeat plans: every dinner, class and meal prep visit is booked on its own.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "No repeat plans: every dinner, class and meal prep visit is booked on its own.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "No repeat plans: every dinner, class and meal prep visit is booked on its own.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No repeat plans: every dinner, class and meal prep visit is booked on its own.",
+    "label": "Repeat visits: a plan"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "One host books the whole dinner.",
+    "label": "A group at one address"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No plan or warranty pays for a dinner.",
+    "label": "A plan or account pays"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "why": "No repeat plans: every booking is on its own.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "No form to sign: the menu plan, the final count and the allergy notes are answers on the secure page.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "No plan or insurance pays for a dinner.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "A dinner is paid with a deposit and one bill after, never in stages.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "Each dinner gets its own bill.",
+    "label": "One bill for many visits"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "The host pays for the dinner.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Here, allergy and diet notes are sensitive answers. Only the chef on the booking and Sam see them, for that booking.",
+     "They're deleted the day after the lesson or the dinner. Next time, they're added again."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "does": "Luis's day is blocked, and each customer picks. A cancel is free, and anything paid is refunded. A booking with Luis moves to Marco only on a yes. No reply in 24 hours: Sam calls."
+   },
+   {
+    "op": "words",
+    "at": "S11-49",
+    "does": "Sam sets Luis's last day. Each later booking with Luis is offered to someone with the skill and any card the state's rules require. It moves only on the customer's yes. No reply in 24 hours: Sam calls.",
+    "more": [
+     "If nobody can, the customer picks a new time or a free cancel.",
+     "Customers are never told why someone left.",
+     "Luis's sign-in ends after the last day, and the calendar is unlinked.",
+     "Past jobs stay in the records, 7 years by default.",
+     "Where the plug-in keeps service names private, the text gives only the business, the date, the time and the place."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "more": [
+     "The offer comes first when the plug-in or Sam says a new person needs an OK.",
+     "It also comes first when Alex asked for Marco by name.",
+     "No reply by 8pm Wed: nobody new comes to the home. Sam calls Alex, and the time stays saved.",
+     "A booking with a named chef never moves to another chef without Alex's yes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-22",
+    "does": "No reply by 8pm Wed. Alex's booking is with Marco by name, so Luis isn't sent without Alex's yes. Sam is asked to call Alex, and the time stays saved until they talk.",
+    "more": [
+     "No call by the morning of the visit: the business cancels with no fee, and everything paid comes back.",
+     "Anything else, like a higher price, needs Alex's yes."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered about Thursday's 7:00pm booking. It's with Marco by name, so Luis isn't sent without a yes. Please call Alex. The number is on the booking."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-13",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Private Chef can cook your anniversary dinner for $640.",
+      {
+       "card": {
+        "title": "Anniversary dinner for 10 · $640",
+        "lines": [
+         "25% deposit when you book: $160",
+         "The rest after the job"
+        ],
+        "button": "Pick a time, pay $160",
+        "link": "rosfield.com/q/mp"
+       },
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW meal delivery"
+     ],
+     [
+      "san",
+      "owner",
+      "Meal delivery for Lee Private Chef: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like private dining?",
+      {
+       "card": {
+        "title": "Private dining works like this",
+        "lines": [
+         "You go to customers",
+         "A 25% deposit after the quote",
+         "The rest and groceries on the bill"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-26",
+    "more": [
+     "Alex taps yes, no or cancel there, not Marco.",
+     "The choice is saved with the time and Marco's name.",
+     "A yes there works like a yes by text.",
+     "No work starts without a yes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee Private Chef",
+      "410 Grove St, Springfield · (555) 010-0142"
+     ],
+     [
+      "Prices",
+      "Date-night dinner for 2 $179 ($199 from Nov 2) · Cooking class for 2 $150 · Private dinners priced from your menu plan"
+     ],
+     [
+      "To book",
+      "Set prices: paid in full. Private dinners: a 25% deposit after the quote"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Cooking Studio",
+      "Lessons at 26 Cedar St, Springfield"
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "Pilot: started from the caterer (pattern event), reviewed, not the photographer the table names. A private dinner runs like a quoted catering event: a menu planned with the customer and priced from that plan, allergies kept on the secure page, a contract both sign, a deposit that holds the date, a final count at the dinner (B7-x01 to B7-x03, kept from the caterer and re-timed), and a date that can't move, with a trusted stand-in only on the customer's yes or a full refund. Nothing was taken from the baker or the photographer beyond what the caterer already shares with them.\nWhat the caterer lacked and this overlay adds: cooking in the customer's own kitchen (the chef shops the morning of, texts every receipt, arrives 3½ hours before the meal, checks the kitchen, makes the allergy plate apart, serves with a server, cleans up and puts leftovers away: B8-x01 to B8-x03, B8-45, B8-39), groceries at cost on the bill after the dinner, a server who can be replaced without asking the customer when nothing changes for them (B7-x04), an optional tip for the team (B9-20), and no alcohol sold (the customer's own wine, 21+ only).\nNames: Sam Lee's main company is Lee Private Chef LLC (410 Grove St), with private dining and meal prep as its two kinds of work. His second company is Lee Cooking Studio LLC (26 Cedar St), a teaching kitchen with a chef's table: the master's barbershop. Alex's home, where flow B's dinner is cooked, is 17 Willow Ln.\nPeople: Robin and Sage are the studio's chefs (the master's Riley and Avery); Marco (the lead chef) and Luis (a cook) go to homes (Jordan and Casey). Jade is the server (new, they/name only). Ines Ruiz is a lead chef Sam trusts from outside the team (B7-54; name only, no pronoun). Theo B. keeps the master's name (the caterer's Wren swap was only to avoid a photographer word). Marco and Luis keep the master's pronouns for Jordan and Casey (he); Nia, Lin, Nora, Dee and Morgan keep the master's. Robin, Sage, Jade and Ines get no pronoun. Alex is never 'he' in this overlay's words (B4-73's 'his partner' is renamed).\nFlow A: the main story is a $55 cooking lesson with Chef Robin at the studio, Sat Oct 24 at 11:00am, paid in full when booking (list|full|none). The second path is a $140 menu tasting for up to 4 at the chef's table: a $40 deposit, the $100 rest at the studio (list|deposit|counter); a custom tasting menu has a 15-minute planning call first (A4-43 more, A4-50).\nFlow B: the main story is a parents' 40th anniversary dinner for 10 at Alex's home, Thu Oct 22 at 7pm. Marco plans the menu with Alex on the secure page (B4-08: guests, kitchen photos, allergies with their own yes) and prices it per guest: 4 courses at $55 for 10, plus Jade for 3 hours at $30 = $640 (B4-09). Over Sam's $500, so Sam OKs it (B4-10). Both sign (B4-61 to B4-59), a $160 deposit holds the date (B5-11).\nFlow B timeline: booked Mon Oct 19 7:58pm; reminder Wed Oct 21 10:00am; final count asked 10:05am, due 7pm (read back 4:10pm); Jade's what-if Wed 4:00pm; day list Thu 7:00am; Marco shops 12:15pm ($312.40, receipts texted); OMW 3:15pm; check-in and kitchen check 3:30pm; cooking from 4:00pm; Jade arrives 5:30pm; dinner 7:00pm; check 10:15pm; DONE 10:30pm; bill Fri 9:00am ($640 − $160 + $312.40 = $792.40); receipt 9:25am ($952.40 in all); stars 11:00am. Every clock runs forward on each listed path; the paid-in-full class path runs its own times (7:00pm class, DONE 9:50pm).\nMoney paths: A list|full|none (main), list|deposit|counter. B photos|deposit|bill (main: the rest, groceries at cost and any extra time on the bill after), photos|deposit|none (the owner's other setting: groceries in the price per guest, the $480 rest charged Wed Oct 21 7pm right after the final count), list|full|none (a $150 cooking class at home for 2, groceries included; date-night dinners $179, brunch $199 and meal prep $149/$189 run the same way). Left out: every hold (nothing is held on a card), a card saved then charged after, prices set at the visit, the business's own billing, and a bill after at the studio (it has a counter). The 'photos' price kind reads 'Quoted from the menu plan first' (money.B.labels).\nSign-up (S1-12 to S1-21, S1-38 to S1-47) is reworded to how the work is really paid, not to the master's example: private dinners take a 25% deposit after the quote, with the rest and groceries after (or groceries in the price and the rest the day before); date-night dinners, brunches, classes and meal prep are paid in full; nothing is held. The studio: lessons paid in full, menu tasting $40 deposit, knife skills also at home ($75, paid in full). Rules (S1-21): open 9am–10pm, set start times, 2 days' notice, up to 6 months ahead, free cancel until 7pm the day before, Saturday evenings kept for private dinners.\nLicenses: no single state's rule. S1-60 and S2-28 stay switches (splitsKept): where Sam works, cooking in a customer's own kitchen needs no license (S1-60 more), and S1-23 is kept as a what-if for a state that licenses it (PC045210). The studio gives its own food service permit (S1-48, FP020981); each cook and server gives a food handler card where the state's rules require one (S2-11). A dish made away from the home needs a permitted kitchen (plug-in pf.license and pf.edges). The old flow's single-state rules became these switches.\nFood safety and privacy: allergies and diets are asked plainly, only on the secure page with their own yes (B4-08, B4-24, B3-18), never in a text: the owner's, Marco's and Jade's texts carry only how many special plates there are (B6-14, B8-01). A severe allergy note waits for the chef's OK (B6-03 more, B6-15); here Marco planned the menu with the notes in view, so it books at once. The allergy plate is made apart (B8-x02). Notes are deleted the day after (S13-05 more).\nPatterns kept: no cancel period for food or extra time already given at the home (B8-24 'Gives the extra time; no cancel period', B10-05's 'Cancels by Mon Oct 26' branch off); only a contract signed at the customer's home gets the state's cancel right (S11-72). Nobody is swapped onto a named booking on silence: Ines cooks only with Alex's yes, and no reply means Sam calls (B7-54). The server is the one exception, since nothing changes for Alex (B7-x04).\nOff in both flows: no-$2 and no-license branches for the studio, the agreement before going live, home visits not allowed, spaces and classes on a timetable, sent now (S2-30), and the no-name branches at S11-87/S11-90.\nOff in flow A: walk-in lines, seats, tables and drop-offs (A3-32, A4-66); video lessons (A4-01); a paper the studio must get and a form to sign (A4-43); a damage hold (A5-24); no-name, crew, a date that can't move, a minimum and other late rules (A7-59 to A7-70); a child left (A8-67); drop-offs (A8-53); named-only (A10-34); plans and insurance (A4-28, A4-54, A5-01, A7-02, A9-15); a problem that gets worse, a form late, and a day-before hold failing (A7-02); results later, items left, rentals (A10-06).\nOff in flow B: the live line (B3-01); video (B4-01); sent now everywhere (B4-16, B4-81, B6-03, B7-55, B8-58); arrival windows, stays, seats and no person (B4-83); the venue owner (B4-78); a damage hold (B5-26); a crew and no person (B7-56); group minimums (B7-64, B7-05); plans, series, groups, host days and stock (B4-43, B4-63, B5-20); a first step the business gets or a form (B4-38); a problem that gets worse, a notice, a form, a part, weather, a tool, plans (B7-05); a child in the pro's care, nobody home (B8-67, B8-69, B8-70); a delivery to set up, several days, a part to the studio, the top amount, running late for Kim (B8-22); an inspection, results later, items not taken back, rentals (B10-07); insurance, stages, one bill, extras after, paying over time (B9-19); the company pays (B9-06).\nsplitsKept: S1-60 and S2-28 (state switches, both flows); A4-70 (a kids' cooking lesson is booked with a parent, adults only otherwise); A7-61 (Sage has the skill for most lessons; only Robin holds menu tastings); A8-02 (closed-toe shoes for the kitchen); B4-57 (dinners priced from a plan need a contract; set-price services don't).\nOwn steps: B7-x01 to B7-x03 (the final count, lit on the quoted path only), B7-x04 (the server can't come), B8-x01 (shopping, receipts texted), B8-x02 (cooking; the allergy plate made apart), B8-x03 (serving and cleanup). Changed words carry the rest: the menu plan and quote (B4-05 to B4-13), set start times (B4-84), contract screen (B4-61: menu, price, groceries over $350 only with a yes, final count, cancel schedule, wine 21+), the stand-in (B7-54), groceries kept on a day-of cancel (B7-14), the rest due (B7-24 to B7-47), extra service time (B8-23 to B8-25), the bill with receipts (B9-05 to B9-11), a make-good dinner (B10-08), leftovers tips (B10-22).\nkeep: 'chef', 'kitchen' and 'dessert' are this work's own words (a private chef cooks in the customer's kitchen and makes dessert), though the caterer pilot also uses them.\nUnsure: the $640 total keeps the master's number, so on the groceries-in-the-price path it reads as $64 a guest all-in for the same dinner. The own B7-05 branches append after the master's, so the final count (Wed) reads after later what-ifs in the list. Flow A's section 11 quote (Nia's birthday dinner) names Lee Private Chef, since the studio has no quoted work. The menu tasting for 20+ guests (B4-40) is held at 'Sam's studio kitchen'. Prices are the example's own, not a standard.\nReview (Oct 23): nobody who booked a chef by name is moved to another on silence: Sam calls (A7-21, B7-20, B7-22, S11-46, S11-49). The server's change is told to Alex in one text, since Jade is named in the confirmation (B7-x04). Texts to Sam and staff carry no health detail (A8-38). The cooking-class path has its own extra hour (B8-23, B8-24, B9-04). S11-57's preview shows each business's own way to book.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The lookup shows the license as expired.",
+    "Plumbing MP045210",
+    "like a color correction done in two steps",
+    "A barbershop runs no classes.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "A repair shop, a tailor or a groomer does.",
+    "The cape clip ripped my shirt collar.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "once Riley sees the hair",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "May the shop show photos of your hair? Yes / No",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Avery's license is checked again when the lookup answers.",
+    "House calls only where the state's rules allow them.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "A haircut could mean a salon or a barbershop.",
+    "A license for the shop and for each barber.",
+    "Alex bought a package of cuts at the shop.",
+    "Can my son wait in the shop during my cut?",
+    "Haircut, fade and beard trim at the shop.",
+    "Every shop service, color and house calls",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a cut every 4 weeks.",
+    "A barbershop takes no drop-offs.",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "plumbing and electrical jobs",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "Avery · license not found",
+    "A haircut needs nothing.",
+    "Drains have a set price.",
+    "Avery · license expired",
+    "License renewal",
+    "1 color quote",
+    "Panel upgrade",
+    "Avery: barber",
+    "At the chair",
+    "EC22871",
+    "BS20981",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop's",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "groom's party",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "skin fade",
+    "A beard trim is",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Color and cut",
+    "color and cut",
+    "a color correction",
+    "A color correction",
+    "Color correction",
+    "color correction",
+    "house calls",
+    "House calls",
+    "house call",
+    "price board",
+    "Price board",
+    "the shop's board",
+    "at the chair",
+    "shops",
+    "shop",
+    "Shop",
+    "patch test",
+    "like a burst pipe or a lockout",
+    "travel fee",
+    "Gloss to finish",
+    "gloss",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "the cape clip ripped a shirt collar today",
+    "low beard line",
+    "two skin fades",
+    "Barber license",
+    "hot towel shaves",
+    "and water heaters, within 25 miles.",
+    "Kids cut",
+    "A water heater job",
+    "Barber",
+    "barber"
+   ],
+   "B": [
+    "Both fit in the same arrival window.",
+    "with one arrival window and one code",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Wed morning is full.",
+    "in the next 60 days",
+    "The lookup shows the license as expired.",
+    "Plumbing MP045210",
+    "Nora can ask to be next for that window.",
+    "CANT START no proof Alex may have this work done",
+    "MOVE Alex to Thu 12pm",
+    "BLOCK Thu 12-5",
+    "Fri 8am",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Rental 1",
+    "Rental 2",
+    "Say Alex asks for a water heater flush every year.",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Yearly water heater flush plan",
+    "Mon–Fri 7:30am–5:30pm",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Today's estimate visit",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing books a 2-hour window.",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "One of the shop's barbers does house calls.",
+    "Is the report ready on time?",
+    "LATE camera report Mon Oct 26",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "The state's license lookup is down, so Reese K.'s license isn't checked yet.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Casey's license is checked again when the lookup answers.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Sam bills the warranty company the business's own way.",
+    "Your drain is under warranty, so this visit is free.",
+    "House calls only where the state's rules allow them.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Your water heater price is with Lee Home Services.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Lee Home Services: your share of today's repair.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Alex's home warranty covers part of the repair.",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan only, until others are licensed there",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "BEFORE old water stain on the cabinet floor",
+    "A license for the shop and for each barber.",
+    "Can Jordan also look at a dripping faucet?",
+    "Contract · Water heater replacement · $640",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Drain clearings already booked keep $179.",
+    "Haircut, fade and beard trim at the shop.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "My gas water heater got wet in a flood.",
+    "Jordan finds mold behind the sink wall.",
+    "The shop's chair is in the other flow.",
+    "Can I skip next week's drain cleaning?",
+    "Old pipes: bring the camera next time.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Willow Home Warranty, the basic plan.",
+    "Nobody home needed: DONE with a photo",
+    "Jordan finds corroded shutoff valves.",
+    "It's under the 1-year labor warranty.",
+    "Riley also does color and house calls",
+    "Which home warranty plan should pay?",
+    "I'll be home 30 minutes late, sorry!",
+    "The repair price is good for 7 days.",
+    "The drain clogs again 2 weeks later.",
+    "Give this code to Casey at the door.",
+    "Riley: barber, color and house calls",
+    "Say Alex books for a parent's home.",
+    "You can look for a roofer near you.",
+    "Your home warranty covers the rest.",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan left a mess under the sink.",
+    "Here's the price to fix it today.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The job should be done by 10am.",
+    "No. It doesn't smell like gas.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "There's no counter at a home.",
+    "My kitchen drain is clogged.",
+    "Texts the camera report link",
+    "plumbing and electrical jobs",
+    "Is it safe to turn back on?",
+    "Replace both shutoff valves",
+    "$89, credited to the repair",
+    "NOTE grease clog 12 ft in.",
+    "Mold behind the sink wall",
+    "Casey · license not found",
+    "Video and Jordan's notes",
+    "The service call is $89.",
+    "Drains have a set price.",
+    "A plan or warranty pays",
+    "Priced from your photos",
+    "Jordan found more work.",
+    "Casey · license expired",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Jordan found the leak.",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "Shutoff valve · $165",
+    "No. No huele a gas.",
+    "Sewer camera report",
+    "the shutoff valves",
+    "Supply line · $80",
+    "Book the repair",
+    "Book a free fix",
+    "License renewal",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "Panel upgrade",
+    "Avery: barber",
+    "Add photos",
+    "Yard drain",
+    "EC22871",
+    "BS20981",
+    "leehomeservices.com",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "plumbing and electrical",
+    "electrical prices",
+    "electrical jobs",
+    "Electrical",
+    "electrical",
+    "Plumbing license",
+    "Plumbing",
+    "plumbing",
+    "a plumber",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "Price board",
+    "at the chair",
+    "shop",
+    "Shop",
+    "A drain clearing with",
+    "a drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "a water heater replacement",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "service call",
+    "Service call",
+    "Labor",
+    "· arriving 8–10am ·",
+    "· arriving 12–2pm ·",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "new arrival time",
+    "water heater",
+    "I'm home",
+    "Alex is home",
+    "they're home",
+    "you're home",
+    "late-cancel or nobody-home fee",
+    "Nobody home",
+    "nobody home",
+    "wasn't home",
+    "was home",
+    "replaces water heaters",
+    "like a burst pipe or a lockout",
+    "travel fee",
+    "The $160 valve quote",
+    "shutoff valve",
+    "supply line",
+    "The repair price",
+    "Electric.",
+    "8–10am",
+    "12–2pm",
+    "Thu Oct 22, 7:00am",
+    "Hi, it's about a leaking pipe under my sink.",
+    "I found water damage under the sink this morning.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Adding a faucet check? Say so.",
+    "Like tapping a neighbor's water line without asking.",
+    "cracks the cabinet floor",
+    "cracked the cabinet floor",
+    "The $179 drain needs none.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "the drain",
+    "Yes, it won't drain",
+    "two drain clearings",
+    "Classic cuts, fades and hot towel shaves.",
+    "hot towel shaves",
+    "drain",
+    "catering",
+    "and water heaters, within 25 miles.",
+    "the way most barbershops start",
+    "barbershops often set",
+    "Barber",
+    "barber"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-23": "39941a5377",
+   "A4-09": "b215034fb7",
+   "A4-12": "fa876afeec",
+   "A4-10": "d3655b97dd",
+   "A4-11": "2983f72b69",
+   "S11-19": "65910a6777",
+   "S11-40": "0f0f0a5c8f",
+   "S11-54": "ce20fc799b",
+   "S11-56": "bd841a4732",
+   "S11-58": "87f7492a91",
+   "S11-70": "d2b2cf0360",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A4-50": "6f43775326",
+   "A4-43": "c17d56f766",
+   "A6-15": "1e6395c2f5",
+   "A8-33": "561bc291a5",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-96": "d540b91653",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "S13-05": "ffcae1a1b0",
+   "A4-65": "fa7ec0389d",
+   "A10-42": "4f28189298",
+   "A8-38": "5e48b74f3a",
+   "A7-21": "996ff87f58",
+   "S11-46": "ed1e14ee9c",
+   "S11-49": "7ecff02163",
+   "A7-12": "05f64179a4",
+   "S11-57": "a3996ae84e"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-23": "5b2324d920",
+   "B6-06": "1d676278da",
+   "S11-54": "f2d479cd60",
+   "S11-56": "8b6c6c101f",
+   "S11-70": "e3cd4d5dcd",
+   "S11-14": "5a5607d715",
+   "B3-03": "1426673df8",
+   "B3-11": "e459daf83c",
+   "B3-15": "bbb89eebad",
+   "B3-25": "4413e58bcb",
+   "B3-22": "19f64ba1ba",
+   "B3-18": "a4b81ea9b3",
+   "B3-04": "31447caa31",
+   "B3-05": "c2996f5c4f",
+   "B3-21": "ad48326ac5",
+   "B4-01": "15f683e6cb",
+   "B4-04": "df3ea4b2f5",
+   "B4-07": "9d0dbc90ad",
+   "B4-08": "0c0f0e8d03",
+   "B4-09": "d50a5d4d5e",
+   "B4-13": "ecedd7f044",
+   "B4-84": "549b5c1a9d",
+   "B4-34": "74ff52d83d",
+   "B5-35": "1de0d2312d",
+   "B5-11": "bda80de20e",
+   "B6-03": "dcc1eb310c",
+   "B6-04": "6d888abcaa",
+   "B6-14": "dfd03ee673",
+   "B7-01": "f7a5523875",
+   "B7-16": "3177c3701b",
+   "B7-18": "d53cef58f7",
+   "B7-27": "0f5f9883ff",
+   "B7-31": "1b4da1dea9",
+   "B7-61": "342b55fd9b",
+   "B7-20": "364245afef",
+   "S11-22": "d83ca09a76",
+   "B7-05": "e28a131872",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B8-19": "11e79a26d8",
+   "B8-23": "dd780a2ec8",
+   "B8-24": "bd5fb0ef0b",
+   "B8-25": "3f7d0c2f58",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B9-05": "6cbce323ed",
+   "B9-11": "9525d5f9c9",
+   "B9-04": "6017d4c54a",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B10-05": "a326ea3c0b",
+   "B10-16": "c7a47a391c",
+   "B10-18": "3d7ba16539",
+   "B10-35": "5ed99b23b3",
+   "B4-16": "37cd99137d",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B7-90": "a5b8b2fe42",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B10-38": "867fe1ab7c",
+   "B7-93": "4d6f89e473",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B4-43": "fc9855955a",
+   "B5-01": "841c417586",
+   "B4-38": "9539521dc7",
+   "S13-05": "164ce06368",
+   "S11-46": "ed17f66a63",
+   "S11-49": "5d42a1a5ca",
+   "B7-22": "c8a4abe80b",
+   "S11-58": "3461928783",
+   "B8-26": "056ea7b435",
+   "S11-57": "2f34f23d8a"
+  }
+ }
+}

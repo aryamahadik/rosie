@@ -1,0 +1,2361 @@
+{
+ "id": "tv-repair",
+ "name": "TV Repair",
+ "style": "Fix",
+ "pattern": "fix",
+ "from": "appliance",
+ "plugin": {
+  "pf.license": {
+   "need": "A business registration; where the state's rules require an electronic repair dealer registration, the business says its number (its own word) before it goes live.",
+   "who": "the business",
+   "ask": [
+    "the business registration (the business's own word)",
+    "the electronic repair dealer registration number, where the state's rules require one (the business's own word)",
+    "a manufacturer's service authorization, only for warranty work the business says it does",
+    "liability insurance for in-home work, as the business says"
+   ],
+   "check": "None: Rosie doesn't look up or check any registration, authorization or insurance (D96). The business says what it holds.",
+   "blocks": "A required registration the business says it doesn't hold keeps the work off; warranty work stays off until the business says it holds the manufacturer's authorization.",
+   "renewals": "The business's own record of renewal dates. A lapse the owner reports stops the work it covers.",
+   "limits": "low-voltage work only: a new power outlet behind a TV, or any in-wall power wiring, is an electrician's job and is never booked; mounting on brick, stone or above a fireplace only where the owner turns it on",
+   "otherwise": "identity: the code the customer gets on their own phone (D66); customers see no license claim"
+  },
+  "pf.services": {
+   "shape": "repairs of TVs, sound systems, receivers, game consoles and projectors: carried in to the shop (dropped off, checked, priced, fixed, picked up) or, for big TVs, fixed in the home; TV wall mounting in the home",
+   "examples": "the example shop's own prices, not a standard",
+   "list": [
+    {
+     "name": "TV, receiver or projector repair at the shop (carry-in)",
+     "price": "a $65 bench check (example), counted toward the repair; the repair priced after the check",
+     "kind": "quoted at the visit",
+     "length": "3 to 7 days; a part on order can add 1 to 2 weeks",
+     "where": "dropped off at the shop",
+     "before": "the $65 bench check paid when booking, as a deposit",
+     "after": "the rest paid at the counter at pick-up"
+    },
+    {
+     "name": "Game console HDMI port replacement",
+     "price": "$129 (example)",
+     "kind": "one price from the list",
+     "length": "2 to 3 days",
+     "where": "dropped off at the shop",
+     "before": "nothing taken",
+     "after": "paid at the counter at pick-up"
+    },
+    {
+     "name": "In-home TV repair (TVs 55 inches and bigger)",
+     "price": "a $99 trip and check (example), counted toward the repair; the repair priced in the home",
+     "kind": "quoted at the visit",
+     "length": "1 to 2 hours; a part on order means a second visit",
+     "where": "at the customer's home",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "TV wall mounting",
+     "price": "$149 up to 65 inches, $199 bigger (example); hiding the cables in a low-voltage wall kit +$99",
+     "kind": "one price from the list",
+     "length": "1 to 2 hours",
+     "where": "at the customer's home",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE",
+     "note": "two techs for TVs over 65 inches"
+    },
+    {
+     "name": "Warranty repair (the manufacturer or a protection plan pays)",
+     "price": "nothing for Alex when the plan covers it; anything it doesn't cover is quoted first",
+     "kind": "quoted at the visit",
+     "where": "at the customer's home (big TVs) or the shop",
+     "before": "nothing taken",
+     "after": "the plan is billed; Alex gets a bill only for what it doesn't cover"
+    }
+   ],
+   "capacity": "bench check-ins a day at the shop (8 at the example shop); one tech per home visit, two for TVs over 65 inches",
+   "nobody_home": "no: an adult is home for every home visit",
+   "online": "no"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "at the shop or at your home",
+    "what it is (a TV, a sound bar, a receiver, a game console, a projector)",
+    "the brand and screen size",
+    "what's wrong (no power, no picture, lines, no sound, a broken screen)",
+    "under a warranty or a protection plan?",
+    "for mounting: the screen size, the wall (drywall, brick, plaster), your mount or ours",
+    "the town"
+   ],
+   "afterTime": [
+    "the model number (a photo of the label on the back helps)",
+    "where the TV is and any stairs",
+    "pets at home"
+   ],
+   "securePage": [
+    "the street address",
+    "a gate or building code",
+    "the warranty or plan's claim number",
+    "a device passcode, only if the repair needs it to test, and never in a text",
+    "the card"
+   ],
+   "whoMayBook": "an adult: the owner of the device or someone they authorize"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "smoke, sparks, flames or a burning smell from a TV or device",
+    "a battery that is swollen, hot, hissing or leaking (a remote, a controller, a sound bar)",
+    "a TV that fell, or someone hurt under a TV or stand",
+    "water or a drink spilled into a plugged-in device",
+    "a shock from a device",
+    "an old tube TV opened at the back"
+   ],
+   "stop_action": "flames, smoke that won't stop, someone hurt or a shock: call 911 (Rosie never places the call); otherwise unplug at the wall only with dry hands and if it's safe, don't switch it back on, keep away from a swollen battery and never charge or puncture it, never open the back of an old tube TV (it can hold a deadly charge even unplugged)",
+   "continue": "yes, after the safety steps, when nobody is hurt and nothing is burning: a repair visit or a drop-off"
+  },
+  "pf.first_steps": [
+   {
+    "name": "Repair authorization",
+    "when": "signed on the secure page before the drop-off or the home visit",
+    "what": "the bench or trip check fee, that no repair starts without the customer's yes to the price, that the customer backs up their data, and the shop's rule for devices not picked up"
+   },
+   {
+    "name": "Prep",
+    "when": "in the reminder",
+    "what": "bring the remote and the power cord (carry-in); back up and sign out of accounts; for mounting, the wall clear and the TV out of its box"
+   }
+  ],
+  "pf.visit": {
+   "checkin": "carry-in: the code at the counter and a claim tag; home: the code at the door",
+   "changes": "the price is set after the check and the work waits for the customer's yes; a part found needed is priced first; a part on order means a second visit (home) or a later READY (shop); not worth fixing: only the check fee is paid and the device goes back or is recycled on the customer's yes",
+   "done": "home: tested and working in front of the customer, DONE with a photo; shop: tested on the bench, READY, then picked up with the code"
+  },
+  "pf.money": {
+   "main": "carry-in: the bench check paid when booking and counted toward the repair, the rest at pick-up; home: a card saved, the trip check and the repair charged at DONE",
+   "fees": "A no-show or late-cancel fee inside 24 hours: none for carry-in (the bench check is the deposit); for a home visit, the trip and check ($99) is the visit's fee, the same as its late fee (one fee per booking); wall mounting $50. The owner's own numbers: the example shop's.",
+   "extras": "parts and extra work priced and OK'd by the customer before they're done",
+   "warranty": "a plan that pays is billed by the business; the customer pays only what it doesn't cover",
+   "tips": "no tip line",
+   "tax": "sales tax on parts where the state's rules tax them (a generic switch)",
+   "two": "$2 per confirmed booking applies (D97): a flat fee for each booking Rosie makes."
+  },
+  "pf.messages": {
+   "never": [
+    "device passcodes or account passwords",
+    "what's on the customer's device",
+    "gate or building codes",
+    "the card"
+   ],
+   "languages": "English and Spanish"
+  },
+  "pf.staff": {
+   "skills": [
+    "bench repair",
+    "in-home TV repair",
+    "wall mounting",
+    "warranty work for the brands the business is authorized for"
+   ],
+   "supervision": "a new tech mounts with a senior tech until the owner OKs them",
+   "okWhat": "the owner OKs any repair quote over $400",
+   "twoPeople": "mounting a TV over 65 inches needs two techs: offered only when two are free",
+   "standin": "another tech with the same skill may stand in; a customer who named a tech is never moved on silence"
+  },
+  "pf.rules": {
+   "switches": [
+    "a written estimate before the repair and the customer's OK before going over it, where the state's rules require it",
+    "replaced parts given back on request, where the state's rules require it",
+    "the notice before a device left unclaimed may be sold or recycled, by the state's rules",
+    "an electronic repair dealer registration number shown, where required"
+   ],
+   "records": "the work order, the estimate and the customer's yes kept with the booking"
+  },
+  "pf.edges": {
+   "apply": [
+    "not worth fixing",
+    "a part on back order",
+    "a device not picked up",
+    "a TV damaged at the visit",
+    "data on the device",
+    "a warranty that doesn't cover the problem"
+   ],
+   "handling": "the generic way; the not-picked-up rule is the shop's own, by the state's rules"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork",
+   "planbill",
+   "forms",
+   "photos"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "B": "24 hours before"
+   }
+  },
+  "pf.switches": {}
+ },
+ "rename": {
+  "A": [
+   [
+    "takes jobs sent now.",
+    "takes no jobs sent now."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell,",
+    "Real danger, like smoke or a swollen battery,"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to unplug the TV at the wall if it's safe, and to call 911 if there's smoke or fire."
+   ],
+   [
+    "Shut the cold-water valve, above the orthotic. If you smell gas, get out and call 911.",
+    "Unplug at the wall with dry hands, if it's safe. If there's smoke or fire, get out and call 911."
+   ],
+   [
+    "A podiatrist's example: water near outlets gets 'shut off the main valve'.",
+    "A TV tech's example: water near outlets gets 'unplug at the wall'."
+   ],
+   [
+    "$20 fee ($40 for the Groom's package)",
+    "@@NOFEE@@"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee TV Repair"
+   ],
+   [
+    "Lee Electric",
+    "Lee Mounts"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee TV Shop LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee TV Shop"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home TV LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home TV"
+   ],
+   [
+    "Groom's Package",
+    "TV wall mounting"
+   ],
+   [
+    "Groom's package",
+    "TV wall mounting"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "TV check"
+   ],
+   [
+    "Signature cut and shave",
+    "TV check"
+   ],
+   [
+    "signature cut and shave",
+    "TV check"
+   ],
+   [
+    "Skin fades",
+    "HDMI port repair"
+   ],
+   [
+    "Skin fade",
+    "HDMI port repair"
+   ],
+   [
+    "skin fades",
+    "HDMI port repairs"
+   ],
+   [
+    "skin fade",
+    "HDMI port repair"
+   ],
+   [
+    "Beard trims",
+    "Speaker checks"
+   ],
+   [
+    "Beard trim",
+    "Speaker check"
+   ],
+   [
+    "beard trims",
+    "speaker checks"
+   ],
+   [
+    "beard trim",
+    "speaker check"
+   ],
+   [
+    "Kids cuts",
+    "Remote fixes"
+   ],
+   [
+    "Kids cut",
+    "Remote fix"
+   ],
+   [
+    "kids cuts",
+    "remote fixes"
+   ],
+   [
+    "kids cut",
+    "remote fix"
+   ],
+   [
+    "Color and cut",
+    "TV wall mounting"
+   ],
+   [
+    "color and cut",
+    "TV wall mounting"
+   ],
+   [
+    "Color correction",
+    "TV check"
+   ],
+   [
+    "color correction",
+    "TV check"
+   ],
+   [
+    "hot towel",
+    "TV check"
+   ],
+   [
+    "Hot towel",
+    "TV check"
+   ],
+   [
+    "Haircuts",
+    "TV checks"
+   ],
+   [
+    "haircuts",
+    "TV checks"
+   ],
+   [
+    "Haircut",
+    "TV check"
+   ],
+   [
+    "haircut",
+    "TV check"
+   ],
+   [
+    "barbershops",
+    "TV shops"
+   ],
+   [
+    "barbershop",
+    "TV shop"
+   ],
+   [
+    "Barbershop",
+    "TV shop"
+   ],
+   [
+    "barbers",
+    "techs"
+   ],
+   [
+    "barber",
+    "tech"
+   ],
+   [
+    "Barber",
+    "Tech"
+   ],
+   [
+    "clinicians",
+    "techs"
+   ],
+   [
+    "clinician",
+    "tech"
+   ],
+   [
+    "Clinician",
+    "Tech"
+   ],
+   [
+    "Riley",
+    "Ken"
+   ],
+   [
+    "Avery",
+    "Bea"
+   ],
+   [
+    "Jordan",
+    "Sol"
+   ],
+   [
+    "Casey",
+    "Dena"
+   ],
+   [
+    "Jules",
+    "Noor"
+   ],
+   [
+    "Tessa",
+    "Ellen"
+   ],
+   [
+    "Kim",
+    "Ana"
+   ],
+   [
+    "Nia",
+    "Rosa"
+   ],
+   [
+    "Hugo",
+    "Felix"
+   ],
+   [
+    "Lena",
+    "Greta"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "plumbing and electrical",
+    "TV repair and mounting"
+   ],
+   [
+    "Plumbing and electrical",
+    "TV repair and mounting"
+   ],
+   [
+    "plumbing",
+    "TV repair"
+   ],
+   [
+    "Plumbing",
+    "TV repair"
+   ],
+   [
+    "plumber",
+    "TV tech"
+   ],
+   [
+    "Plumber",
+    "TV tech"
+   ],
+   [
+    "electrical",
+    "mounting"
+   ],
+   [
+    "Electrical",
+    "Mounting"
+   ],
+   [
+    "water heater flush",
+    "TV cleaning"
+   ],
+   [
+    "Water heater flush",
+    "TV cleaning"
+   ],
+   [
+    "water heater replacement",
+    "TV replacement"
+   ],
+   [
+    "Water heater replacement",
+    "TV replacement"
+   ],
+   [
+    "water heater fix",
+    "TV fix"
+   ],
+   [
+    "Water heater fix",
+    "TV fix"
+   ],
+   [
+    "water heaters",
+    "TVs"
+   ],
+   [
+    "Water heaters",
+    "TVs"
+   ],
+   [
+    "water heater",
+    "TV"
+   ],
+   [
+    "Water heater",
+    "TV"
+   ],
+   [
+    "heater",
+    "TV"
+   ],
+   [
+    "Heater",
+    "TV"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip and check"
+   ],
+   [
+    "Service call",
+    "Trip and check"
+   ],
+   [
+    "Drain clearings",
+    "TV checks"
+   ],
+   [
+    "drain clearings",
+    "TV checks"
+   ],
+   [
+    "drain clearing",
+    "TV check"
+   ],
+   [
+    "Drain clearing",
+    "TV check"
+   ],
+   [
+    "drain",
+    "stand"
+   ],
+   [
+    "Drain",
+    "Stand"
+   ],
+   [
+    "perms",
+    "fixes"
+   ],
+   [
+    "Perms",
+    "Fixes"
+   ],
+   [
+    "perm",
+    "fix"
+   ],
+   [
+    "Perm",
+    "Fix"
+   ],
+   [
+    "massage",
+    "soundbar check"
+   ],
+   [
+    "Massage",
+    "Soundbar check"
+   ],
+   [
+    "heating and cooling",
+    "sound system"
+   ],
+   [
+    "Heating and cooling",
+    "Sound system"
+   ],
+   [
+    "sink",
+    "stand"
+   ],
+   [
+    "Sink",
+    "Stand"
+   ],
+   [
+    "faucet",
+    "HDMI port"
+   ],
+   [
+    "Faucet",
+    "HDMI port"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "toilet",
+    "speaker"
+   ],
+   [
+    "Toilet",
+    "Speaker"
+   ],
+   [
+    "sewer",
+    "cable"
+   ],
+   [
+    "Sewer",
+    "Cable"
+   ],
+   [
+    "cabinet",
+    "TV stand"
+   ],
+   [
+    "Cabinet",
+    "TV stand"
+   ],
+   [
+    "dishwasher",
+    "soundbar"
+   ],
+   [
+    "Dishwasher",
+    "Soundbar"
+   ],
+   [
+    "overflowing",
+    "overheating"
+   ],
+   [
+    "shutoff",
+    "power switch"
+   ],
+   [
+    "Shutoff",
+    "Power switch"
+   ],
+   [
+    "supply line",
+    "HDMI cable"
+   ],
+   [
+    "Supply line",
+    "HDMI cable"
+   ],
+   [
+    "garbage disposal",
+    "soundbar"
+   ],
+   [
+    "clog",
+    "fault"
+   ],
+   [
+    "Clog",
+    "Fault"
+   ],
+   [
+    "valve",
+    "power supply"
+   ],
+   [
+    "Valve",
+    "Power supply"
+   ],
+   [
+    "water line",
+    "power cord"
+   ],
+   [
+    "Water line",
+    "Power cord"
+   ],
+   [
+    "leak repair",
+    "TV repair"
+   ],
+   [
+    "Leak repair",
+    "TV repair"
+   ],
+   [
+    "power switch valves",
+    "power supplies"
+   ],
+   [
+    "Power switch valves",
+    "Power supplies"
+   ],
+   [
+    "power switch power supply",
+    "power supply"
+   ],
+   [
+    "Power switch power supply",
+    "Power supply"
+   ],
+   [
+    "Repair shop",
+    "TV shop"
+   ],
+   [
+    "repair shop",
+    "TV shop"
+   ],
+   [
+    "gloss",
+    "screen clean"
+   ],
+   [
+    "Gloss",
+    "Screen clean"
+   ],
+   [
+    "cape",
+    "net"
+   ],
+   [
+    "beard",
+    "grip"
+   ],
+   [
+    "Beard",
+    "Grip"
+   ],
+   [
+    "shaves",
+    "repairs"
+   ],
+   [
+    "shave",
+    "repair"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "clogs",
+    "fails"
+   ],
+   [
+    "clog",
+    "fault"
+   ],
+   [
+    "Shut the cold-water power supply, above the TV. If you smell gas, get out and call 911.",
+    "Unplug at the wall with dry hands, if it's safe. If there's smoke or fire, get out and call 911."
+   ],
+   [
+    "My gas",
+    "My"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay humo o fuego?"
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Desenchufe la TV en la pared solo con las manos secas, si es seguro. Si hay humo o fuego, salga y llame al 911."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay humo ni fuego."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If there's smoke or fire, leave the house now. Then call 911."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said the TV is smoking."
+   ],
+   [
+    "A gas smell at the home",
+    "A TV that is smoking"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to leave, then call 911"
+   ],
+   [
+    "A neighborhood TV shop on Elm St. Classic cuts, fades and TV check shaves.",
+    "A neighborhood TV shop on Elm St. TV repairs, mounts and HDMI ports."
+   ],
+   [
+    "A TV shop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A TV shop takes drop-offs. A bike shop or a shoe repair does too."
+   ],
+   [
+    "My kitchen stand is clogged.",
+    "My TV won't turn on."
+   ],
+   [
+    "which stand is clogged, and is water backing up anywhere else?",
+    "which TV is it, and is the picture or sound gone?"
+   ],
+   [
+    "NOTE grease fault 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE dust in the vents. Bring the cleaning kit next time."
+   ],
+   [
+    "The stand clogs again 2 weeks later.",
+    "The TV fails again 2 weeks later."
+   ],
+   [
+    "the $99 consult included.",
+    "the $65 bench check included."
+   ],
+   [
+    "The $99 consult is part of the $110.",
+    "The $65 bench check is part of the $180."
+   ],
+   [
+    "Lee TV Repair can clear the drain",
+    "Lee TV Repair can come to you"
+   ],
+   [
+    "Ken lets himself in",
+    "Ken goes in"
+   ],
+   [
+    "Lee Home TV can clear the drain",
+    "Lee Home TV can come to you"
+   ],
+   [
+    "Lee Home TV can clear the stand",
+    "Lee Home TV can come to you"
+   ],
+   [
+    "Lee Home TV can clear the drain:",
+    "Lee Home TV can come to you:"
+   ],
+   [
+    "once Ken sees the hair",
+    "once Ken sees the TV"
+   ],
+   [
+    "a no fee, only if",
+    "no fee, only if"
+   ],
+   [
+    "$120 an hour",
+    "$120"
+   ],
+   [
+    "Labor",
+    "Speaker check"
+   ],
+   [
+    "$20 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$40 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 service-call fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 fee",
+    "@@FEE@@"
+   ],
+   [
+    "the $99 consult",
+    "the $65 bench check"
+   ],
+   [
+    "$99 consult",
+    "$65 bench check"
+   ],
+   [
+    "$99 deposit",
+    "$65 deposit"
+   ],
+   [
+    "$99 taken when they book",
+    "$65 taken when they book"
+   ],
+   [
+    "the $99 pays for the consult",
+    "the $65 pays for the bench check"
+   ],
+   [
+    "Late cancel or no-show: the $99, if you confirm",
+    "Late cancel or no-show: the $65, if you confirm"
+   ],
+   [
+    "$125 in all",
+    "$195 in all"
+   ],
+   [
+    "Today's price · $125",
+    "Today's price · $195"
+   ],
+   [
+    "Ken's price · $125",
+    "Ken's price · $195"
+   ],
+   [
+    "Ken's $125 price",
+    "Ken's $195 price"
+   ],
+   [
+    "TV check · $125",
+    "TV check · $180"
+   ],
+   [
+    "you said yes to a TV check, $125,",
+    "you said yes to a TV check, $180,"
+   ],
+   [
+    "Ken's new price for today: $130.",
+    "Ken's new price for today: $195."
+   ],
+   [
+    "Today's price · $130",
+    "Today's price · $195"
+   ],
+   [
+    "$99",
+    "$65"
+   ],
+   [
+    "$110",
+    "$180"
+   ],
+   [
+    "$125",
+    "$195"
+   ],
+   [
+    "$130",
+    "$195"
+   ],
+   [
+    "$25",
+    "$65"
+   ],
+   [
+    "$55",
+    "$149"
+   ],
+   [
+    "$35",
+    "$65"
+   ],
+   [
+    "$40",
+    "$129"
+   ],
+   [
+    "$20",
+    "$50"
+   ],
+   [
+    "$75",
+    "$99"
+   ],
+   [
+    "$89",
+    "$99"
+   ],
+   [
+    "@@NOFEE@@",
+    "no fee"
+   ],
+   [
+    "@@FEE@@",
+    "$50 fee"
+   ]
+  ],
+  "B": [
+   [
+    "takes jobs sent now.",
+    "takes no jobs sent now."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell,",
+    "Real danger, like smoke or a swollen battery,"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to unplug the TV at the wall if it's safe, and to call 911 if there's smoke or fire."
+   ],
+   [
+    "Shut the cold-water valve, above the orthotic. If you smell gas, get out and call 911.",
+    "Unplug at the wall with dry hands, if it's safe. If there's smoke or fire, get out and call 911."
+   ],
+   [
+    "A podiatrist's example: water near outlets gets 'shut off the main valve'.",
+    "A TV tech's example: water near outlets gets 'unplug at the wall'."
+   ],
+   [
+    "$20 fee ($40 for the Groom's package)",
+    "@@NOFEE@@"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee TV Repair"
+   ],
+   [
+    "Lee Electric",
+    "Lee Mounts"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee TV Shop LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee TV Shop"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home TV LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home TV"
+   ],
+   [
+    "Groom's Package",
+    "TV wall mounting"
+   ],
+   [
+    "Groom's package",
+    "TV wall mounting"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "TV check"
+   ],
+   [
+    "Signature cut and shave",
+    "TV check"
+   ],
+   [
+    "signature cut and shave",
+    "TV check"
+   ],
+   [
+    "Skin fades",
+    "HDMI port repair"
+   ],
+   [
+    "Skin fade",
+    "HDMI port repair"
+   ],
+   [
+    "skin fades",
+    "HDMI port repairs"
+   ],
+   [
+    "skin fade",
+    "HDMI port repair"
+   ],
+   [
+    "Beard trims",
+    "Speaker checks"
+   ],
+   [
+    "Beard trim",
+    "Speaker check"
+   ],
+   [
+    "beard trims",
+    "speaker checks"
+   ],
+   [
+    "beard trim",
+    "speaker check"
+   ],
+   [
+    "Kids cuts",
+    "Remote fixes"
+   ],
+   [
+    "Kids cut",
+    "Remote fix"
+   ],
+   [
+    "kids cuts",
+    "remote fixes"
+   ],
+   [
+    "kids cut",
+    "remote fix"
+   ],
+   [
+    "Color and cut",
+    "TV wall mounting"
+   ],
+   [
+    "color and cut",
+    "TV wall mounting"
+   ],
+   [
+    "Color correction",
+    "TV check"
+   ],
+   [
+    "color correction",
+    "TV check"
+   ],
+   [
+    "hot towel",
+    "TV check"
+   ],
+   [
+    "Hot towel",
+    "TV check"
+   ],
+   [
+    "Haircuts",
+    "TV checks"
+   ],
+   [
+    "haircuts",
+    "TV checks"
+   ],
+   [
+    "Haircut",
+    "TV check"
+   ],
+   [
+    "haircut",
+    "TV check"
+   ],
+   [
+    "barbershops",
+    "TV shops"
+   ],
+   [
+    "barbershop",
+    "TV shop"
+   ],
+   [
+    "Barbershop",
+    "TV shop"
+   ],
+   [
+    "barbers",
+    "techs"
+   ],
+   [
+    "barber",
+    "tech"
+   ],
+   [
+    "Barber",
+    "Tech"
+   ],
+   [
+    "clinicians",
+    "techs"
+   ],
+   [
+    "clinician",
+    "tech"
+   ],
+   [
+    "Clinician",
+    "Tech"
+   ],
+   [
+    "Riley",
+    "Ken"
+   ],
+   [
+    "Avery",
+    "Bea"
+   ],
+   [
+    "Jordan",
+    "Sol"
+   ],
+   [
+    "Casey",
+    "Dena"
+   ],
+   [
+    "Jules",
+    "Noor"
+   ],
+   [
+    "Tessa",
+    "Ellen"
+   ],
+   [
+    "Kim",
+    "Ana"
+   ],
+   [
+    "Nia",
+    "Rosa"
+   ],
+   [
+    "Hugo",
+    "Felix"
+   ],
+   [
+    "Lena",
+    "Greta"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "plumbing and electrical",
+    "TV repair and mounting"
+   ],
+   [
+    "Plumbing and electrical",
+    "TV repair and mounting"
+   ],
+   [
+    "plumbing",
+    "TV repair"
+   ],
+   [
+    "Plumbing",
+    "TV repair"
+   ],
+   [
+    "plumber",
+    "TV tech"
+   ],
+   [
+    "Plumber",
+    "TV tech"
+   ],
+   [
+    "electrical",
+    "mounting"
+   ],
+   [
+    "Electrical",
+    "Mounting"
+   ],
+   [
+    "water heater flush",
+    "TV cleaning"
+   ],
+   [
+    "Water heater flush",
+    "TV cleaning"
+   ],
+   [
+    "water heater replacement",
+    "TV replacement"
+   ],
+   [
+    "Water heater replacement",
+    "TV replacement"
+   ],
+   [
+    "water heater fix",
+    "TV fix"
+   ],
+   [
+    "Water heater fix",
+    "TV fix"
+   ],
+   [
+    "water heaters",
+    "TVs"
+   ],
+   [
+    "Water heaters",
+    "TVs"
+   ],
+   [
+    "water heater",
+    "TV"
+   ],
+   [
+    "Water heater",
+    "TV"
+   ],
+   [
+    "heater",
+    "TV"
+   ],
+   [
+    "Heater",
+    "TV"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip and check"
+   ],
+   [
+    "Service call",
+    "Trip and check"
+   ],
+   [
+    "Drain clearings",
+    "TV checks"
+   ],
+   [
+    "drain clearings",
+    "TV checks"
+   ],
+   [
+    "drain clearing",
+    "TV check"
+   ],
+   [
+    "Drain clearing",
+    "TV check"
+   ],
+   [
+    "drain",
+    "stand"
+   ],
+   [
+    "Drain",
+    "Stand"
+   ],
+   [
+    "perms",
+    "fixes"
+   ],
+   [
+    "Perms",
+    "Fixes"
+   ],
+   [
+    "perm",
+    "fix"
+   ],
+   [
+    "Perm",
+    "Fix"
+   ],
+   [
+    "massage",
+    "soundbar check"
+   ],
+   [
+    "Massage",
+    "Soundbar check"
+   ],
+   [
+    "heating and cooling",
+    "sound system"
+   ],
+   [
+    "Heating and cooling",
+    "Sound system"
+   ],
+   [
+    "sink",
+    "stand"
+   ],
+   [
+    "Sink",
+    "Stand"
+   ],
+   [
+    "faucet",
+    "HDMI port"
+   ],
+   [
+    "Faucet",
+    "HDMI port"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "toilet",
+    "speaker"
+   ],
+   [
+    "Toilet",
+    "Speaker"
+   ],
+   [
+    "sewer",
+    "cable"
+   ],
+   [
+    "Sewer",
+    "Cable"
+   ],
+   [
+    "cabinet",
+    "TV stand"
+   ],
+   [
+    "Cabinet",
+    "TV stand"
+   ],
+   [
+    "dishwasher",
+    "soundbar"
+   ],
+   [
+    "Dishwasher",
+    "Soundbar"
+   ],
+   [
+    "overflowing",
+    "overheating"
+   ],
+   [
+    "shutoff",
+    "power switch"
+   ],
+   [
+    "Shutoff",
+    "Power switch"
+   ],
+   [
+    "supply line",
+    "HDMI cable"
+   ],
+   [
+    "Supply line",
+    "HDMI cable"
+   ],
+   [
+    "garbage disposal",
+    "soundbar"
+   ],
+   [
+    "clog",
+    "fault"
+   ],
+   [
+    "Clog",
+    "Fault"
+   ],
+   [
+    "valve",
+    "power supply"
+   ],
+   [
+    "Valve",
+    "Power supply"
+   ],
+   [
+    "water line",
+    "power cord"
+   ],
+   [
+    "Water line",
+    "Power cord"
+   ],
+   [
+    "leak repair",
+    "TV repair"
+   ],
+   [
+    "Leak repair",
+    "TV repair"
+   ],
+   [
+    "power switch valves",
+    "power supplies"
+   ],
+   [
+    "Power switch valves",
+    "Power supplies"
+   ],
+   [
+    "power switch power supply",
+    "power supply"
+   ],
+   [
+    "Power switch power supply",
+    "Power supply"
+   ],
+   [
+    "Repair shop",
+    "TV shop"
+   ],
+   [
+    "repair shop",
+    "TV shop"
+   ],
+   [
+    "gloss",
+    "screen clean"
+   ],
+   [
+    "Gloss",
+    "Screen clean"
+   ],
+   [
+    "cape",
+    "net"
+   ],
+   [
+    "beard",
+    "grip"
+   ],
+   [
+    "Beard",
+    "Grip"
+   ],
+   [
+    "shaves",
+    "repairs"
+   ],
+   [
+    "shave",
+    "repair"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "clogs",
+    "fails"
+   ],
+   [
+    "clog",
+    "fault"
+   ],
+   [
+    "Shut the cold-water power supply, above the TV. If you smell gas, get out and call 911.",
+    "Unplug at the wall with dry hands, if it's safe. If there's smoke or fire, get out and call 911."
+   ],
+   [
+    "My gas",
+    "My"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay humo o fuego?"
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Desenchufe la TV en la pared solo con las manos secas, si es seguro. Si hay humo o fuego, salga y llame al 911."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay humo ni fuego."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If there's smoke or fire, leave the house now. Then call 911."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said the TV is smoking."
+   ],
+   [
+    "A gas smell at the home",
+    "A TV that is smoking"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to leave, then call 911"
+   ],
+   [
+    "A neighborhood TV shop on Elm St. Classic cuts, fades and TV check shaves.",
+    "A neighborhood TV shop on Elm St. TV repairs, mounts and HDMI ports."
+   ],
+   [
+    "A TV shop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A TV shop takes drop-offs. A bike shop or a shoe repair does too."
+   ],
+   [
+    "My kitchen stand is clogged.",
+    "My TV won't turn on."
+   ],
+   [
+    "which stand is clogged, and is water backing up anywhere else?",
+    "which TV is it, and is the picture or sound gone?"
+   ],
+   [
+    "NOTE grease fault 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE dust in the vents. Bring the cleaning kit next time."
+   ],
+   [
+    "The stand clogs again 2 weeks later.",
+    "The TV fails again 2 weeks later."
+   ],
+   [
+    "the $99 consult included.",
+    "the $65 bench check included."
+   ],
+   [
+    "The $99 consult is part of the $110.",
+    "The $65 bench check is part of the $180."
+   ],
+   [
+    "Lee TV Repair can clear the drain",
+    "Lee TV Repair can come to you"
+   ],
+   [
+    "Ken lets himself in",
+    "Ken goes in"
+   ],
+   [
+    "Lee Home TV can clear the drain",
+    "Lee Home TV can come to you"
+   ],
+   [
+    "Lee Home TV can clear the stand",
+    "Lee Home TV can come to you"
+   ],
+   [
+    "Lee Home TV can clear the drain:",
+    "Lee Home TV can come to you:"
+   ],
+   [
+    "It's a leak under the stand, today,",
+    "It's a TV repair today,"
+   ],
+   [
+    "Sol does mounting too, at $199 an hour.",
+    "Sol does mounting too."
+   ],
+   [
+    "TV repair and mounting, $199 an hour",
+    "TV repair and mounting"
+   ],
+   [
+    "The stand fails again 2 weeks later.",
+    "The TV fails again 2 weeks later."
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75.",
+    "can check your TV at the shop for $65, or at your home for $99."
+   ],
+   [
+    "The $149 stand needs none.",
+    "The $149 mount needs none."
+   ],
+   [
+    "Please clear the TV stand under the stand.",
+    "Please clear the space under the TV."
+   ],
+   [
+    "Cable camera inspection · $199",
+    "HDMI cable check · $65"
+   ],
+   [
+    "Sump camera inspection · $199",
+    "HDMI cable check · $65"
+   ],
+   [
+    "$120 an hour",
+    "$120"
+   ],
+   [
+    "Labor",
+    "Speaker check"
+   ],
+   [
+    "$20 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$40 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 service-call fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$35",
+    "$149"
+   ],
+   [
+    "$40",
+    "$129"
+   ],
+   [
+    "$20",
+    "$50"
+   ],
+   [
+    "$25",
+    "$99"
+   ],
+   [
+    "$55",
+    "$149"
+   ],
+   [
+    "$140",
+    "$199"
+   ],
+   [
+    "$75",
+    "$99"
+   ],
+   [
+    "$89",
+    "$99"
+   ],
+   [
+    "$110",
+    "$180"
+   ],
+   [
+    "$179",
+    "$149"
+   ],
+   [
+    "$640",
+    "$450"
+   ],
+   [
+    "@@FEE@@",
+    "$50 fee"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "electrician",
+  "outlet",
+  "valve",
+  "power supply",
+  "cable"
+ ],
+ "story": {
+  "A": "Alex drops a 50-inch TV with no picture at the shop; the $65 bench check is paid when booking and counts toward the repair, which is priced after the check and paid at pick-up.",
+  "B": "A tech comes to fix Alex's 75-inch TV at home: the $99 trip and check is promised, the repair is priced in the home, and the saved card is charged at DONE."
+ },
+ "money": {
+  "A": {
+   "main": "visit|deposit|counter",
+   "combos": [
+    "visit|deposit|counter",
+    "list|none|counter"
+   ],
+   "examples": {
+    "visit|deposit|counter": "The main story: a TV with no picture dropped off; the $65 bench check is paid as a deposit when booking and counts toward the repair; the rest is paid at pick-up.",
+    "list|none|counter": "A game console HDMI port replaced for $129, nothing taken when booking, paid at pick-up."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$0",
+     "name": "TV repair at the shop"
+    },
+    "visit|*|*": {
+     "name": "TV repair at the shop"
+    },
+    "visit|deposit|*": {
+     "deposit": "$65",
+     "price": "$245",
+     "rest": "$180",
+     "fee": "$0",
+     "name": "TV repair at the shop"
+    },
+    "list|*|*": {
+     "price": "$129",
+     "name": "Game console HDMI port replacement"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|card|card",
+   "combos": [
+    "visit|card|card",
+    "list|card|card",
+    "visit|none|bill"
+   ],
+   "examples": {
+    "visit|card|card": "The main story: a 75-inch TV fixed at home; the $99 trip and check is promised; the repair is priced in the home; the saved card is charged at DONE.",
+    "list|card|card": "A 65-inch TV mounted on the wall for $149; a card is saved; it's charged at DONE.",
+    "visit|none|bill": "A warranty repair at home: nothing taken; the plan is billed; Alex gets a bill only for anything it doesn't cover."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50",
+     "name": "TV repair at home"
+    },
+    "visit|*|*": {
+     "fee": "$99",
+     "name": "TV repair at home"
+    },
+    "visit|none|*": {
+     "name": "Warranty TV repair"
+    },
+    "list|*|*": {
+     "price": "$149",
+     "name": "TV wall mounting"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The work books a tech's time, never a space or a thing."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies to every profession (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Where a registration is required it's the business's, not each tech's."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Repairs are booked for a set time; nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "No spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "Every repair at the shop is left with the shop."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Children are never left at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ],
+    "why": "The sent-now branch is off here, so the sign-up card's sent-now lines go (addendum self-check 1)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The work books a tech's time, never a space or a thing."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies to every profession (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Where a registration is required it's the business's, not each tech's."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Repairs are booked for a set time; nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Home visits use arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "An adult is home for every home visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ],
+    "why": "The sent-now branch is off here, so the sign-up card's sent-now lines go (addendum self-check 1)."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60"
+  ]
+ },
+ "notes": "H1 build, Tue Oct 27 2026 (professions pass P3). From appliance (refitted); the test-drive plug-in (work/testdrive/tv-repair.md) is the base: services, prices, the repair authorization, safety words, splits and off ops kept.\nMoney: carry-in at the shop: a $65 bench check paid as the deposit when booking and counted toward the repair; the rest at pick-up; no fee (A fee $0). Console HDMI port $129 paid at the counter. Home: the $99 trip and check promised (the visit's fee, read by B4-14: one fee per booking, so it's also the visit's late/no-show fee; the example shop's $50 no-show fee for home visits becomes $99 for a trip). Wall mounting $149, card at DONE, $50 fee. Warranty: the plan pays; Alex gets only the part it doesn't cover. $2 applies (D97).\nTest-drive finding 4 (phase 4 plug-in fix) applied: the trip fee moved from the visit's price to the visit path's fee.\nD96: no registration lookup, no authorization lookup, no 'checked' claim; each is the business's own word. The master's lookup wording is a MASTER line (log).\nMASTER lines (log only): the second deposit at the drop-off (A8-29, test-drive #3), the 'needs another day' second visit at a drop-off (A8-41/A8-85, #5), 'Sam decides' on a $0 no-show (A8-14, #6).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "takes jobs sent now.",
+    "$20 fee ($40 for the Groom's package)",
+    "Lee Plumbing",
+    "Lee Electric",
+    "at the chair",
+    "At the chair",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Skin fade",
+    "skin fades",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cuts",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "hot towel",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "clinician",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Jules",
+    "Nia",
+    "Hugo",
+    "Lena",
+    "88 Elm St",
+    "1200 Main St",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "water heaters",
+    "water heater",
+    "heater",
+    "Drain clearing",
+    "Drain",
+    "perms",
+    "perm",
+    "massage",
+    "Massage",
+    "pipe",
+    "valve",
+    "repair shop",
+    "gloss",
+    "Gloss",
+    "cape",
+    "beard",
+    "Beard",
+    "shaves",
+    "shave",
+    "pipe",
+    "$20 fee",
+    "$89 service-call fee",
+    "$125 in all",
+    "Today's price · $125",
+    "Today's price · $130",
+    "$110",
+    "$125",
+    "$130",
+    "$25",
+    "$55",
+    "$35",
+    "$40",
+    "$20",
+    "$75",
+    "$89"
+   ],
+   "B": [
+    "takes jobs sent now.",
+    "Real danger, like water near outlets or a gas smell,",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Lee Plumbing",
+    "Lee Electric",
+    "at the chair",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "beard trim",
+    "hot towel",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "clinician",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Jules",
+    "Tessa",
+    "Kim",
+    "42 Oak St",
+    "88 Elm St",
+    "1200 Main St",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "Water heater fix",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "heater",
+    "service call fee",
+    "service call",
+    "Service call",
+    "Drain clearings",
+    "drain clearings",
+    "drain clearing",
+    "Drain clearing",
+    "drain",
+    "Drain",
+    "perm",
+    "heating and cooling",
+    "Heating and cooling",
+    "sink",
+    "faucet",
+    "pipe",
+    "sewer",
+    "Sewer",
+    "cabinet",
+    "Cabinet",
+    "dishwasher",
+    "overflowing",
+    "shutoff",
+    "Shutoff",
+    "supply line",
+    "Supply line",
+    "clog",
+    "valve",
+    "water line",
+    "leak repair",
+    "Leak repair",
+    "beard",
+    "shaves",
+    "shave",
+    "pipe",
+    "clogs",
+    "clog",
+    "My gas",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No. No huele a gas.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "can cut your hair at the shop for $35, or at your home for $75.",
+    "$120 an hour",
+    "Labor",
+    "$20 fee",
+    "$89 service-call fee",
+    "$89 fee",
+    "$35",
+    "$40",
+    "$20",
+    "$140",
+    "$75",
+    "$89",
+    "$110",
+    "$179",
+    "$640"
+   ]
+  },
+  "A": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "b5b0310865",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "S1-21": "5fc9029611"
+  },
+  "B": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "b5b0310865",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "S1-21": "5bb4d61148"
+  }
+ }
+}

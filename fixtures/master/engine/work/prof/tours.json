@@ -1,0 +1,3454 @@
+{
+ "id": "tours",
+ "name": "Tour guide and tour operator",
+ "style": "Class",
+ "pattern": "class",
+ "from": "gym",
+ "cast": {
+  "A": {
+   "staff": "Mara and Tomas (guides) and the meeting-point desk",
+   "cust": "Alex M. (a visitor) · other guests · a school's teacher"
+  },
+  "B": {
+   "staff": "Mara and Hugo (guides who meet at hotels and piers) and Lena (licensed driver)",
+   "cust": "Alex M. (books for the group) · guests",
+   "other": "Others (a hotel, a cruise line, a school)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Mara"
+  },
+  "B": {
+   "staff": "Hugo"
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "if: no state licenses tour guiding itself; where the local rules license sightseeing guides, each guide holds that license; driven tours need the vehicle rules (a commercial driver's license with a passenger endorsement for larger vans, and the company's passenger-carrier authority, federal for trips that cross state lines); tours inside a park or on protected land need the land manager's permit",
+   "who": "the business, for any tour operator permit, the passenger-carrier authority and park permits; each guide, for a local guide license where one is required; each driver, for their commercial license and medical card",
+   "ask": "the business registration; any tour operator permit; for driven tours, the carrier number; each park permit with the places and dates it covers; each guide's local license number where required; each driver's license class",
+   "check": "Rosie checks no license, permit or carrier number: each one is the business's own word, shown as that, never as a state license or as checked",
+   "scope": "a guide is offered only for the places the business says their license covers; a park tour only on the dates the permit covers; a driven tour only with a driver the business says is licensed for that vehicle",
+   "blocks": "walking tours go live on identity and the business's registration; a driven tour or a park tour is booked only once the owner says its paper is on file",
+   "renewals": "licenses, permits, carrier insurance and drivers' medical cards: reminded 30 and 7 days before; a lapse the owner reports takes that guide, driver, vehicle or park off new bookings",
+   "vehicles": "each van has its own registration and safety inspection kept current, and its seat count sets the most guests",
+   "insurance": "liability insurance: the business's own word, shown once it's sent; for driven tours, the vehicle insurance the carrier rules require"
+  },
+  "pf.services": {
+   "shape": "class: seats on a tour departure at a set time from a meeting point, with a set number of seats and a smallest group to run; a private tour books a guide's time for one group, at a meeting point or picked up at the group's hotel, home or cruise pier (flow B)",
+   "examples": "the example operator's own prices (Lee City Tours and Lee Van Tours), not a standard",
+   "list": [
+    {
+     "name": "Old Town walking tour",
+     "price": "$35 adult, $15 child 6 to 12, under 6 free",
+     "kind": "one price per person",
+     "length": "2 hours",
+     "where": "meets at the fountain on Market Square; ends at the old church",
+     "before": "paid in full when booking",
+     "after": "nothing more; any tip is the guest's choice, in cash",
+     "capacity": "20 seats; runs with 4"
+    },
+    {
+     "name": "Food tasting walking tour",
+     "price": "$79 a person, tastings included",
+     "kind": "one price per person",
+     "length": "3 hours",
+     "where": "meets at the market hall",
+     "before": "paid in full",
+     "after": "nothing more",
+     "capacity": "12 seats; runs with 4",
+     "note": "food allergies asked on the secure page; the stops are the operator's partner restaurants"
+    },
+    {
+     "name": "Evening brewery walk (21 and over)",
+     "price": "$65",
+     "kind": "one price per person",
+     "length": "2½ hours",
+     "where": "meets at the fountain on Market Square",
+     "before": "paid in full",
+     "after": "nothing more",
+     "capacity": "14 seats; runs with 4",
+     "note": "every guest shows a photo ID at the meeting point"
+    },
+    {
+     "name": "Free walking tour (pay what you wish)",
+     "price": "free; guests tip the guide what they wish",
+     "kind": "free",
+     "length": "90 minutes",
+     "where": "meets at the fountain on Market Square",
+     "before": "nothing taken; a yes by text",
+     "after": "tips in cash, the guide's own way",
+     "capacity": "25 seats"
+    },
+    {
+     "name": "City highlights van tour",
+     "price": "$89 adult, $59 child",
+     "kind": "one price per person",
+     "length": "4 hours",
+     "where": "meets at the visitor center",
+     "before": "paid in full",
+     "after": "nothing more",
+     "capacity": "14 seats (the van's seat count); runs with 6",
+     "note": "a guide and a licensed driver, or one guide licensed to drive the van"
+    },
+    {
+     "name": "Private walking tour",
+     "price": "$240 for up to 6 people, $30 each after that, up to 12",
+     "kind": "one price per group",
+     "length": "3 hours",
+     "where": "at a meeting point the group picks from the operator's list",
+     "before": "a 25% deposit; the rest charged to the saved card when the guide texts DONE",
+     "after": "nothing more"
+    },
+    {
+     "name": "School group walking tour",
+     "price": "$12 a student; teachers and chaperones free",
+     "kind": "one price per person",
+     "length": "90 minutes",
+     "where": "meets at the fountain on Market Square",
+     "before": "nothing taken",
+     "after": "one bill to the school after the tour",
+     "note": "one adult chaperone for every 10 students, staying with the group"
+    },
+    {
+     "name": "Private van tour with hotel pick-up",
+     "price": "$560 for up to 6 people",
+     "kind": "one price per group",
+     "length": "4 hours",
+     "where": "picked up at the group's hotel or home in the city (flow B)",
+     "before": "a 25% deposit; the rest charged to the saved card when the guide texts DONE",
+     "after": "nothing more"
+    },
+    {
+     "name": "Private shore excursion",
+     "price": "$620 for up to 6 people",
+     "kind": "one price per group",
+     "length": "5 hours, back at the pier 1 hour before the ship's all-aboard time",
+     "where": "picked up at the cruise pier (flow B)",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "the date can't move: it's the ship's day in port"
+    },
+    {
+     "name": "Custom multi-day itinerary",
+     "price": "quoted first from the group's answers (dates, size, interests)",
+     "kind": "quoted first, from answers",
+     "length": "set by the itinerary",
+     "where": "picked up where the group stays (flow B)",
+     "before": "a 30% deposit once the signed itinerary is back; the rest charged to the saved card at the end",
+     "after": "nothing more",
+     "note": "Sam OKs each quote; hotels and flights are the group's own, outside Rosie"
+    }
+   ],
+   "capacity": "seats per departure, set by the guide's group limit or the van's seat count; one guide per departure",
+   "minimum": "a public departure runs with its minimum (like 4 guests), counted 24 hours before; too few: Sam runs it or cancels, and each guest gets a full refund or another departure",
+   "waitlist": "a full departure keeps a waitlist; a freed seat goes by text to one person at a time",
+   "skills": "tour languages; the city areas and parks each guide may lead; who may drive which van; food tours, brewery walks, school groups",
+   "online": "no",
+   "nobodyHome": "never: the guests must be there",
+   "walkIns": "a walk-up guest takes a seat left on the next departure, at the meeting point, until it leaves",
+   "notBookings": "souvenirs, photos and drinks sold on a tour stay outside Rosie"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which tour, and the date",
+    "how many adults and children, and the children's ages (sets the price and the seats)",
+    "for a private tour: the group's size, and for a pick-up the kind of place (a hotel, a home or the cruise pier) and the area",
+    "for a shore excursion: the ship's name, the day in port and the all-aboard time",
+    "for the brewery walk: that everyone is 21 or older",
+    "for a school group: the number of students, their grade, and the number of chaperones"
+   ],
+   "afterTime": [
+    "anything the guide should know: walking pace, a stroller, a wheelchair or a cane, a service animal",
+    "the language the group prefers, where the departure offers more than one"
+   ],
+   "securePage": [
+    "each guest's name for the tour list (private tours and van tours)",
+    "food allergies, for a food tour",
+    "health or mobility details a guest wants the guide to know",
+    "an emergency contact for a full-day or multi-day tour",
+    "for a pick-up: the hotel or street address"
+   ],
+   "whoMayBook": "an adult; children come with an adult from the booking; a teacher or the school office books a school group; the brewery walk is for adults 21 and over only",
+   "told": "the meeting point, the start time, the end point, the walking distance and any stairs, what to wear and bring, and that the tour leaves 10 minutes after the start"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone unwell right now: chest pain, fainting, trouble breathing, signs of heat stroke",
+     "say": "Call 911 now. Move them to shade and give water if they can drink.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a guest uses a wheelchair, walks slowly, or is pregnant",
+     "what": "the booking goes on; Rosie shares the tour's walking distance, stairs and rest stops from the operator's notes; no health advice"
+    },
+    {
+     "words": "a severe food allergy on a food tour",
+     "what": "noted on the secure page for the guide; the operator decides if its partner stops can serve the guest; Rosie never promises a safe meal"
+    }
+   ],
+   "weather": "lightning, a heat warning or high winds stop the outdoor part; light rain doesn't (rain or shine); the guide or Sam makes the call, before the day or at the meeting point",
+   "onTour": "a guest hurt or sick on the tour: the guide helps, calls 911 if needed, and Sam is told; a child lost from the group: the guide calls 911 at once and keeps the rest of the group together",
+   "always": "the generic screen: danger to life, fire, a medical emergency → 911 and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Park tour: the park permit",
+     "when": "on file before the date is offered",
+     "who": "the owner",
+     "result": "no permit, no park tour on that date"
+    },
+    {
+     "name": "Entry tickets to sites on the route",
+     "when": "bought by the operator for each guest before the day",
+     "who": "Sam, a to-do with its due date",
+     "result": "a site's tickets not in hand: the stop is swapped and guests are told"
+    },
+    {
+     "name": "School group: the chaperone list",
+     "when": "on the secure page 3 days before",
+     "who": "the school",
+     "result": "a missing chaperone: the school's own adult is asked before the day"
+    },
+    {
+     "name": "Custom itinerary: the signed itinerary",
+     "when": "on the secure page before the deposit",
+     "who": "the group's booker",
+     "result": "unsigned: no deposit is taken"
+    }
+   ],
+   "prep": "comfortable shoes, water, sun protection and a rain jacket; a photo ID for the brewery walk; be at the meeting point 10 minutes early"
+  },
+  "pf.visit": {
+   "checkIn": "at the meeting point the guide ticks names on the tour list, or takes the booker's code for the whole group; for a pick-up, the code in the hotel lobby",
+   "lateEntry": "the tour leaves the meeting point 10 minutes after the start time; later than that, the guest missed it and the cancel terms apply; a private tour waits for its group but still ends at its set time",
+   "id": "on the brewery walk every guest shows a photo ID; a guest under 21 or without an ID can't join, and only that guest is affected",
+   "changes": "an extra stop or an extra hour on a private tour is priced first, and the group says yes; nothing is added on a public tour",
+   "leaveEarly": "a guest who leaves a tour early pays the full price: the seat or the guide's time was theirs",
+   "done": "the guide texts DONE at the end point"
+  },
+  "pf.money": {
+   "before": "public tours paid in full when booking; private tours a 25% deposit, with the rest charged to the saved card when the guide texts DONE; a shore excursion paid in full; the free tour takes nothing; a school group nothing before",
+   "after": "a school group gets one bill after the tour; everything else is settled before, or at DONE on the saved card",
+   "cancel": "public tours free to cancel up to 24 hours before; private tours 48 hours; later, or a no-show, the payment may be kept, only with Sam's yes",
+   "operatorCancels": "a tour called off for weather or too few guests: a full refund or another departure, the guest picks",
+   "caps": "deposits within the state's limits where they apply",
+   "tips": "tips are the guest's choice, in cash or the guide's own way; Rosie never asks for one",
+   "tax": "any sales or admissions tax the place requires, in the price before the yes",
+   "fee2": "Rosfield's $2 per confirmed booking applies: one $2 per booking, however many seats",
+   "noSale": "souvenirs, photos and drinks are sold outside Rosie"
+  },
+  "pf.messages": {
+   "never": "guests' health, mobility or allergy details, children's names and ages, ID or passport numbers: only on the secure page",
+   "staffTexts": "the guide's day list shows each booker's name and the number of guests; the tour list with names opens only on the guide's signed-in phone",
+   "languages": "English and Spanish; each departure's tour language shown with it",
+   "minors": "texts go to the parent or teacher who booked"
+  },
+  "pf.staff": {
+   "licenses": "a guide's local license where the area requires one; a driver's commercial license with a passenger endorsement and a current medical card for larger vans: the business's own word, never checked by Rosie",
+   "skills": "tour languages, the areas and parks each guide may lead, who may drive which van, food tours, brewery walks, school groups",
+   "crews": "a van tour needs a guide and a licensed driver (or one guide licensed to drive it); it can't run without a licensed driver",
+   "standIn": "another guide with the same tour, language and area license; for a private tour where the group named a guide, the group is asked first, and nobody moves on silence",
+   "oks": "Sam OKs custom itineraries, private tour changes and refunds",
+   "ratio": "one guide per public departure, up to its seat limit"
+  },
+  "pf.rules": {
+   "showFacts": "the meeting point, the end point, the length, the walking distance and the cancel terms before the yes; any license or permit number the area requires",
+   "cancelRight": "no cancel period for a tour already given; a signed multi-day itinerary follows its signed terms",
+   "park": "park tours only inside the permit's dates, places and group sizes",
+   "vehicles": "every guest in a seat with a seatbelt; children in car seats where the rules require them, brought by the parent (the reminder says so)",
+   "travel": "where the state's seller-of-travel rules apply (a multi-day itinerary sold ahead), money paid before goes to the account kept apart, or a bond",
+   "alcohol": "brewery and tasting tours are for 21 and over; the partner serves; the guide stops service to a guest who seems drunk",
+   "records": "the tour list for each departure kept with the booking for 7 years",
+   "reviews": "a rating once after the tour"
+  },
+  "pf.edges": {
+   "tooFew": "too few guests 24 hours before: Sam runs it or cancels; each guest gets a full refund or another departure",
+   "weather": "lightning, a heat warning or high winds: the outdoor part is called off by the guide or Sam, the day before or at the meeting point; a full refund or another departure",
+   "late": "a late guest can join until the tour leaves the meeting point, 10 minutes after the start; later counts as a no-show",
+   "lostGuest": "a guest who doesn't come back at a stop: the guide calls their mobile and waits up to 15 minutes, then the tour goes on and Sam is told",
+   "cruise": "a shore excursion's date can't move: if the guide can't come, a stand-in guide or a full refund",
+   "guideOut": "a public departure: Sam names the cover and guests aren't asked; a private tour where the group named a guide: the group is asked, and nobody moves on silence",
+   "driverOut": "a van tour's driver can't come: another licensed driver, or the tour can't run",
+   "closedSite": "a site on the route closed that day: the guide swaps a stop and the guests are told; if it's the tour's main site, a full refund or another day",
+   "minors": "children with an adult from the booking; a school group with its chaperones",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "classes",
+   "groups",
+   "children",
+   "multiday",
+   "firststeps"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "With Sam's yes, electrical and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Casey for plumbing, Avery at the shop.",
+    "With Sam's yes, the walking tour and the meeting point now show to AI assistants too. Each guide hears what they can lead: Lena for van tours, Tomas for walks."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "Lee City Tours can book you from now on, at the tour company and for tours at a customer's hotel.",
+    "Lee City Tours can book you from now on, at the meeting point and for hotel tours."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a group leader: 'We'd like a walking tour for 6 guests before Saturday.'"
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the tour company, the customer is already there, so there's no door check."
+   ],
+   [
+    "Gemini hears right away that 2:00pm was just taken, and gets the next times.",
+    "Gemini hears right away that the last spot was just taken, and gets the next tours."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A pool service's example: a broken pool gate gets 'keep children away from the water'."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's walking tour for a son, so the times fit it."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "J: a form check in the first 2 weeks, checked from a video, free."
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free make-up tour."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some tour companies and tour hotels are registered as a place."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery guide tours; Riley also does walking and hotel tours."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the next tour."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the seat set-up."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "Five friends book seats in one food tour for a birthday."
+   ],
+   [
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "A meeting point runs no tours. A tour company or a school does."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A tour company's example: 'A first tour needs the waiver first."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: wants a seat near the front, and a slow pace"
+   ],
+   [
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Oct 24 · 11:00am · Day tour with a tour · Mara · 4 seats left"
+   ],
+   [
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "Sat Nov 21 · 11:00am · Day tour with a tour · Mara · 8 seats left"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the tour van's door pinched a bag today."
+   ],
+   [
+    "can book you for on-site tour and tasting from now on.",
+    "can book you for private tours from now on."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a swim lesson, which isn't on the tour company's list."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Private tour for Lee City Tours: is it the same company?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A tour is rated, so the tour company takes the first branch."
+   ],
+   [
+    "Your day list comes at 7:00am, the time you picked.",
+    "Your day list comes at the time you picked."
+   ],
+   [
+    "Your day list comes at 8:00am, the time you picked.",
+    "Your day list comes at the time you picked."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Hotel tours and park tours, within 25 miles."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's tour work takes no jobs sent now, at the tour company or away."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring water and a towel on Saturday."
+   ],
+   [
+    "A barbershop sells its packages only at the shop.",
+    "Some businesses sell packages only at their own desk."
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents space, with their own clients."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'tour' could mean a tour company or a school."
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, make it a walking tour' goes back to the times."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "The $25 assessment; priced at the session"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a weekly food tour plan with Mara."
+   ],
+   [
+    "a color touch-up checked from photos is free",
+    "a form check checked from a video is free"
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter tour in the time left"
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a 10-tour pass at the tour company."
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter tour."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the lobby during my tour?"
+   ],
+   [
+    "The note and photo are on the secure page.",
+    "The note is on the secure page."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Food tour, brewery walk and walking toures."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every tour company tour, walking and hotel tours"
+   ],
+   [
+    "sent you a proposal: Riley's color plan.",
+    "sent you a proposal: Riley's private tour plan."
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The lookup shows Hugo's tasting license as expired."
+   ],
+   [
+    "so Quinn S.'s license isn't checked yet",
+    "so Quinn S.'s tasting license isn't checked yet"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the tour company show photos of you in tour?"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Tasting JE30417"
+   ],
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's employer for a staff tour."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds private tour to Lee City Tours."
+   ],
+   [
+    "I put a note and a photo on the page.",
+    "I put a note on the page."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A dumbbell rolled off the rack and cracked my phone screen."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: guide, walking and hotel tours"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'Walk' or 'a seat tour' fits food tour."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A tour company books a seat in a tour, and a day tour is a seat in the day's open hours."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee City Tours doesn't do swim lessons."
+   ],
+   [
+    "A barbershop's services need none.",
+    "Tours need none. A pass needs one where the state's rules ask."
+   ],
+   [
+    "Dee can ask to be next for 2:00pm.",
+    "Dee can ask to be next for that spot."
+   ],
+   [
+    "Riley's color plan after a consult",
+    "Riley's private tour plan after an assessment"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a seat in the same Saturday tour every week."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: guide, walking, hotel tours"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Day tour with a tour"
+   ],
+   [
+    "A chair renter asked for by name",
+    "A space renter asked for by name"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group of friends together"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up tour, if Sam says so"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Private tour quotes come to you first."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free entrance:"
+   ],
+   [
+    "The rash on my scalp got worse.",
+    "My knee got worse since I booked. Can I still come?"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Walking always stays with Riley."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this tour."
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: 9:00am, Mara"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Each person who joins signs their own waiver."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone unwell right now stops the booking."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "My seat's pedal kept slipping, so I couldn't finish."
+   ],
+   [
+    "How would you like it on top?",
+    "Any injury the guide should know about?"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Food tour plan · every week"
+   ],
+   [
+    "Sat Oct 24 · 2:00pm · Riley",
+    "Sat Oct 24 · 1:00pm · Mara"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a day tour and a walk tour on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring water and a towel."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero un pase de día para el sábado, con una clase."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books the same tour every week"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Riley sees how you move"
+   ],
+   [
+    "Drains have a set price.",
+    "Hotel tours have a set price."
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video intro"
+   ],
+   [
+    "plumbing and electrical",
+    "on-site tour and tasting"
+   ],
+   [
+    "Plumbing and electrical",
+    "On-site tour and tasting"
+   ],
+   [
+    "Signature cut and shave",
+    "Day tour with a tour"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Teen tour (ages 13 to 17)"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "The $89 late-cancel fee",
+    "The late-cancel fee"
+   ],
+   [
+    "the $89 late-cancel fee",
+    "the late-cancel fee"
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration GF20981"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Private tour plan"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Tour notes · $15"
+   ],
+   [
+    "like a chair renter,",
+    "like a guide who rents space,"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee City Tours LLC"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for an intake"
+   ],
+   [
+    "$89 service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "priced at the chair",
+    "priced at the session"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the session"
+   ],
+   [
+    "chairs side by side",
+    "mats side by side"
+   ],
+   [
+    "$89 late-cancel fee",
+    "late-cancel fee"
+   ],
+   [
+    "never more than $89",
+    "never more than the tour price"
+   ],
+   [
+    "Barbering workshop",
+    "Day tour with a tour"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Van Tours's"
+   ],
+   [
+    "A color correction",
+    "A tour assessment"
+   ],
+   [
+    "a color correction",
+    "a tour assessment"
+   ],
+   [
+    "Water heater flush",
+    "Hotel strength tour"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Van Tours"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee City Tours"
+   ],
+   [
+    "Color correction",
+    "Tour assessment"
+   ],
+   [
+    "color correction",
+    "tour assessment"
+   ],
+   [
+    "set at the chair",
+    "set at the session"
+   ],
+   [
+    "Groom's package",
+    "Private walking tour"
+   ],
+   [
+    "a color and cut",
+    "a private tour"
+   ],
+   [
+    "License renewal",
+    "Certificate renewal"
+   ],
+   [
+    "A chair, ready",
+    "A seat, ready"
+   ],
+   [
+    "Color touch-up",
+    "Form check"
+   ],
+   [
+    "color touch-up",
+    "form check"
+   ],
+   [
+    "Drain clearing",
+    "Hotel tour"
+   ],
+   [
+    "two skin fades",
+    "two food tours"
+   ],
+   [
+    "Signature cut",
+    "Day tour with a tour"
+   ],
+   [
+    "signature cut",
+    "day tour with a tour"
+   ],
+   [
+    "Color and cut",
+    "Private tour"
+   ],
+   [
+    "color and cut",
+    "private tour"
+   ],
+   [
+    "Panel upgrade",
+    "Chair tasting day at an hotel"
+   ],
+   [
+    "After the job",
+    "After the session"
+   ],
+   [
+    "2 At my home",
+    "2 At my hotel"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Bootcamps"
+   ],
+   [
+    "Lee Electric",
+    "Lee Chair Tasting"
+   ],
+   [
+    "Jordan Price",
+    "Hugo Price"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "A beard trim",
+    "A body scan"
+   ],
+   [
+    "a beard trim",
+    "a body scan"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "water heater",
+    "company tour day"
+   ],
+   [
+    "NEW massage",
+    "NEW private tour"
+   ],
+   [
+    "Casey Moore",
+    "Lena Moore"
+   ],
+   [
+    "color quote",
+    "private tour quote"
+   ],
+   [
+    "house calls",
+    "hotel tours"
+   ],
+   [
+    "House calls",
+    "Hotel tours"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "barbershops",
+    "tour companies"
+   ],
+   [
+    "the $89 fee",
+    "the late-cancel fee"
+   ],
+   [
+    "The chairs",
+    "The seats"
+   ],
+   [
+    "Electrical",
+    "Tasting"
+   ],
+   [
+    "electrical",
+    "tasting"
+   ],
+   [
+    "Riley Chen",
+    "Mara Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Tomas Diaz"
+   ],
+   [
+    "Beard trim",
+    "Body scan"
+   ],
+   [
+    "beard trim",
+    "body scan"
+   ],
+   [
+    "house call",
+    "hotel tour"
+   ],
+   [
+    "House call",
+    "Hotel tour"
+   ],
+   [
+    "Barbershop",
+    "Tour company"
+   ],
+   [
+    "barbershop",
+    "tour company"
+   ],
+   [
+    "Add photos",
+    "Tell us about the group"
+   ],
+   [
+    "Skin fades",
+    "Food tours"
+   ],
+   [
+    "skin fades",
+    "food tours"
+   ],
+   [
+    "88 Elm St",
+    "12 Market Sq"
+   ],
+   [
+    "Skin fade",
+    "Walking tour"
+   ],
+   [
+    "skin fade",
+    "walking tour"
+   ],
+   [
+    "kids cuts",
+    "teen tours"
+   ],
+   [
+    "a consult",
+    "an assessment"
+   ],
+   [
+    "Plumbing",
+    "On-site tour"
+   ],
+   [
+    "plumbing",
+    "on-site tour"
+   ],
+   [
+    "Kids cut",
+    "Teen tour"
+   ],
+   [
+    "kids cut",
+    "teen tour"
+   ],
+   [
+    "Haircuts",
+    "Drop-in tours"
+   ],
+   [
+    "haircuts",
+    "drop-in tours"
+   ],
+   [
+    "landlord",
+    "employer"
+   ],
+   [
+    "MP045210",
+    "GF045210"
+   ],
+   [
+    "plumber",
+    "guide"
+   ],
+   [
+    "Plumber",
+    "On-site tour"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "consult",
+    "assessment"
+   ],
+   [
+    "Consult",
+    "Assessment"
+   ],
+   [
+    "Haircut",
+    "Drop-in tour"
+   ],
+   [
+    "haircut",
+    "drop-in tour"
+   ],
+   [
+    "Barbers",
+    "Guides"
+   ],
+   [
+    "barbers",
+    "guides"
+   ],
+   [
+    "BS20981",
+    "GF20981"
+   ],
+   [
+    "teacher",
+    "guide"
+   ],
+   [
+    "$89 fee",
+    "late-cancel fee"
+   ],
+   [
+    "Jordan",
+    "Hugo"
+   ],
+   [
+    "Elm St",
+    "Spruce St"
+   ],
+   [
+    "Oak St",
+    "Willow Rd"
+   ],
+   [
+    "Barber",
+    "Guide"
+   ],
+   [
+    "barber",
+    "guide"
+   ],
+   [
+    "$2,400",
+    "$3,000"
+   ],
+   [
+    "gloss",
+    "tour notes"
+   ],
+   [
+    "Riley",
+    "Mara"
+   ],
+   [
+    "Avery",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Lena"
+   ],
+   [
+    "shops",
+    "tour companies"
+   ],
+   [
+    "Shop",
+    "Tour company"
+   ],
+   [
+    "shop",
+    "tour company"
+   ],
+   [
+    "$140",
+    "$240"
+   ],
+   [
+    "$150",
+    "$240"
+   ],
+   [
+    "$179",
+    "$560"
+   ],
+   [
+    "$199",
+    "$620"
+   ],
+   [
+    "$245",
+    "$420"
+   ],
+   [
+    "$640",
+    "$1,500"
+   ],
+   [
+    "$358",
+    "$280"
+   ],
+   [
+    "$540",
+    "$560"
+   ],
+   [
+    "$600",
+    "$1,500"
+   ],
+   [
+    "$700",
+    "$1,500"
+   ],
+   [
+    "$800",
+    "$1,500"
+   ],
+   [
+    "$160",
+    "$140"
+   ],
+   [
+    "$165",
+    "$140"
+   ],
+   [
+    "$169",
+    "$165"
+   ],
+   [
+    "$130",
+    "$120"
+   ],
+   [
+    "$125",
+    "$120"
+   ],
+   [
+    "$100",
+    "$120"
+   ],
+   [
+    "$110",
+    "$120"
+   ],
+   [
+    "$89",
+    "$560"
+   ],
+   [
+    "$90",
+    "$89"
+   ],
+   [
+    "$55",
+    "$65"
+   ],
+   [
+    "$40",
+    "$79"
+   ],
+   [
+    "$15",
+    "$12"
+   ],
+   [
+    "$25",
+    "$15"
+   ],
+   [
+    "$20",
+    "$35"
+   ],
+   [
+    "$75",
+    "$89"
+   ],
+   [
+    "$70",
+    "$65"
+   ],
+   [
+    "$80",
+    "$79"
+   ]
+  ],
+  "B": [
+   [
+    "With Sam's yes, electrical and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Casey for plumbing, Avery at the shop.",
+    "With Sam's yes, the walking tour and the meeting point now show to AI assistants too. Each guide hears what they can lead: Lena for van tours, Tomas for walks."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI described an emergency. They got the 911 message, and nothing was booked."
+   ],
+   [
+    "Lee City Tours can book you from now on, at the tour company and for tours at a customer's hotel.",
+    "Lee City Tours can book you from now on, at the meeting point and for hotel tours."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a tour day is priced from photos of the room, so Rosie's first text asks for them."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told her health answers go on the secure page, and to call 911 if anyone feels unwell."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: an hotel, a park or a building, how many people, and the space."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M. says the tour ended early. It's under the 1-year tour promise."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Sus respuestas de salud van en la página segura, solo para el entrenador. Si alguien se siente mal, llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Thanks for telling us."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some groups want more than one tour, like a 6-week tour."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "does the therapy session today, $165. The $80 written home plan stays good until Thu Oct 29."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a slippery floor and stopped the floor exercises for safety."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 tour day gets an agreement to sign."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a guide stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone unwell right now, gets the safety steps first."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee City Tours: a walking tour for $35, or Lee Van Tours: a private van tour for a family, $560."
+   ],
+   [
+    "Tonight 6-9pm: 12 booked. How many more tables can you take? Reply a number.",
+    "Tonight's 6pm tour: 12 booked. How many more seats can you take? Reply a number."
+   ],
+   [
+    "With Sam's yes, tasting and the tour company now show to AI assistants too.",
+    "With Sam's yes, the tour options now show to AI assistants too."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: an hotel tour at two hotels every month."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A guide's example: someone who feels faint gets 'stop, sit down, and call 911 if it's serious'."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say an hotel manager books one tour for 4 teams at one address."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some tour companies and tour hotels are registered as a place."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many people, and is there room to move?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Swim lessons for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone unwell right now, like chest pain or fainting."
+   ],
+   [
+    "Both jobs go in one booking, with one arrival window and one code.",
+    "Both go in one booking, with one start time and one code."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery guide tours; Riley also does walking and hotel tours."
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 at the halfway point, $800 at the finish"
+   ],
+   [
+    "Drive time from the jobs before and after is checked again.",
+    "Drive time from the sessions before and after is checked again."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to one more guest for $35."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the tour van's door pinched a bag today."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Hugo's van scrapes the curb, and Hugo texts a photo."
+   ],
+   [
+    "Sam bills the warranty company the business's own way.",
+    "Sam bills the benefit plan the business's own way."
+   ],
+   [
+    "can book you for on-site tour and tasting from now on.",
+    "can book you for private tours from now on."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a park tour with no permit."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Sam OK'd a free make-up tour for your team."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Each tour has a set start time. The guide comes 15 minutes early to set up."
+   ],
+   [
+    "Your day list comes at 7:00am, the time you picked.",
+    "Your day list comes at the time you picked."
+   ],
+   [
+    "Your day list comes at 8:00am, the time you picked.",
+    "Your day list comes at the time you picked."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Hotel tours and park tours, within 25 miles."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for an hotel tour every month."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for an hotel tour."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds swim lessons to Lee Home Services."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's tour work takes no jobs sent now, at the tour company or away."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "Chair tasting is priced at the visit."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the conference room wall."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Hugo also add one more guest?"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $79 food tour stays good until Thu Oct 29."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no clear space for the tour"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a guide run a tour at our hotel this Thursday?"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both hotels' visits go on one bill on the 1st."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Estoy embarazada. Quiero un tour en el parque para mi grupo de mamás."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 35 one more guest"
+   ],
+   [
+    "Alex's home warranty covers part of the repair.",
+    "Alex's wellness benefit covers part of the tour."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "OK: Hugo adds one more guest today, $35."
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents space, with their own clients."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come back next week?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Hugo's van scraped the curb at Alex M.'s hotel."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'tour' could mean a tour company or a school."
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a 12-week hotel program, from Hugo's notes"
+   ],
+   [
+    "Each rejoins: the job stays on Alex's record.",
+    "Each rejoins: the session stays on Alex's record."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what the business promises."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a tour at our hotel."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'A workout for our team' fits an hotel tour."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Your health answers go on the secure page, only for the guide."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the conference room was given to another team."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for chair tasting after the tour."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Can a guide come tonight for a team tour?"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien se siente mal ahora mismo?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Our conference room is booked Thursday morning now. Can you come sooner?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the conference room floor"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also do chair tasting after the tour?"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Food tour, brewery walk and walking toures."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should people eat before an 8am tour?"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a 12-week hotel program Hugo suggested"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wet floor in the lobby, jumping moves stopped"
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Alex's hotel in Springfield is inside it."
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The lookup shows Hugo's tasting license as expired."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "I'm pregnant. I'd like a park tour for my moms' group."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a space for the group at the pick-up point."
+   ],
+   [
+    "Most jobs have a price before the visit.",
+    "Most sessions have a price before the visit."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $60 quote is good for 7 days."
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Nora can ask to be next for that time."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a wet, slippery floor in the room."
+   ],
+   [
+    "so Reese K.'s license isn't checked yet",
+    "so Reese K.'s tasting license isn't checked yet"
+   ],
+   [
+    "If you smell gas, get out and call 911.",
+    "If anyone feels unwell, call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "I'm 30 weeks pregnant."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The tour company's own tours are in the other flow."
+   ],
+   [
+    "has a yearly flush plan, $150 a visit.",
+    "has a monthly hotel tour plan, $150 a tour."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Tasting JE30417"
+   ],
+   [
+    "If you smell gas, leave the house now.",
+    "If someone has chest pain or fainted, call 911 now."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's tour?"
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Next time: bring 4 more mats."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Hugo's group asks for one more guest."
+   ],
+   [
+    "no proof Alex may have this work done",
+    "no signed waiver"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Harbor Health Wellness, through my employer."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: guide, walking and hotel tours"
+   ],
+   [
+    "Both fit in the same arrival window.",
+    "Both fit in the same morning."
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which wellness benefit should pay?"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Alex says the tour ended 20 minutes early."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a personal trainer near you."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "Your wellness benefit covers the rest."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Our tour ended 20 minutes early."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left mats and cones in the room."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an hotel tour, today,"
+   ],
+   [
+    "Then call 911 and the gas company.",
+    "Stay with them until help comes."
+   ],
+   [
+    "Please wait until the job is done.",
+    "A big meal is best after the tour."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 therapy 165 home plan 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the jumping moves"
+   ],
+   [
+    "replace both shutoff valves, $160.",
+    "one more guest, $35."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more guest · $35"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: guide, walking, hotel tours"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Day tour with a tour"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the building to dry the floor first"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a clear space for the tour?"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · 12-week hotel program"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wet patch on the lobby floor"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE setting up, start 8:05"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratch on the conference room floor"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa tour Thu 12pm Casey"
+   ],
+   [
+    "nobody was home for any of them",
+    "they missed them all"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "On-site tour books a set start time."
+   ],
+   [
+    "The job should be done by 10am.",
+    "The tour still ends by 8:50am."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Monthly hotel strength tour plan"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Each person who joins signs their own waiver."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone unwell right now stops the booking."
+   ],
+   [
+    "Answers, photos and gate codes",
+    "Answers, notes and gate codes"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT twisted my ankle, need to stop"
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no counter at an hotel."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE tour notes Mon Oct 26"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "Our hotel wants a workout tour."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the home plan link"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 hotel program, 3 stages"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is it safe for me to do a tour?"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more guest"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 tour needs none."
+   ],
+   [
+    "Your water heater contract",
+    "Your tour day agreement"
+   ],
+   [
+    "a water heater replacement",
+    "a company tour day"
+   ],
+   [
+    "It doesn't smell like gas.",
+    "Nobody."
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE 11 joined, mixed levels."
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $2,400 hotel program"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wet lobby floor"
+   ],
+   [
+    "Books one job for a group",
+    "Books one session for a group"
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every month?"
+   ],
+   [
+    "Water heater replacement",
+    "Company tour day"
+   ],
+   [
+    "water heater replacement",
+    "company tour day"
+   ],
+   [
+    "Drains have a set price.",
+    "Hotel tours have a set price."
+   ],
+   [
+    "'Adding a faucet check?",
+    "'Adding one more guest?"
+   ],
+   [
+    "A gas smell at the home",
+    "An emergency described in the chat"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW swim lessons"
+   ],
+   [
+    "plumbing and electrical",
+    "on-site tour and tasting"
+   ],
+   [
+    "Plumbing and electrical",
+    "On-site tour and tasting"
+   ],
+   [
+    "Sewer camera inspection",
+    "Park tour"
+   ],
+   [
+    "sewer camera inspection",
+    "park tour"
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or benefit pays"
+   ],
+   [
+    "The $89 late-cancel fee",
+    "The late-cancel fee"
+   ],
+   [
+    "the $89 late-cancel fee",
+    "the late-cancel fee"
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 10 of us, mixed levels."
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration GF045210"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Hotel tour"
+   ],
+   [
+    "replaces water heaters",
+    "guides tour days"
+   ],
+   [
+    "credited to the repair",
+    "counted toward the session"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your hotel program"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your hotel program"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Van Tours LLC"
+   ],
+   [
+    "Cabinet floor, before",
+    "Conference room floor, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratch on the floor"
+   ],
+   [
+    "like a chair renter,",
+    "like a guide who rents space,"
+   ],
+   [
+    "can clear the drain:",
+    "can run a tour at your hotel:"
+   ],
+   [
+    "a water heater flush",
+    "an hotel strength tour"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Therapy session · $165"
+   ],
+   [
+    "$89 service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a big conference room"
+   ],
+   [
+    "Nobody was home for",
+    "Nobody showed up for"
+   ],
+   [
+    "someone in the home",
+    "someone in the tour"
+   ],
+   [
+    "Only a teen is home",
+    "Only a teen is at the door"
+   ],
+   [
+    "a home-repair class",
+    "a park tour"
+   ],
+   [
+    "like a move-out day",
+    "like a company field day"
+   ],
+   [
+    "leehomeservices.com",
+    "leefitnesscrew.com"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the session"
+   ],
+   [
+    "Sewer camera report",
+    "Tour notes"
+   ],
+   [
+    "sewer camera report",
+    "tour notes"
+   ],
+   [
+    "$89 late-cancel fee",
+    "late-cancel fee"
+   ],
+   [
+    "never more than $89",
+    "never more than the tour price"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 8:50am"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 7:50am"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 7:35am"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Van Tours's"
+   ],
+   [
+    "water heater quote",
+    "tour day quote"
+   ],
+   [
+    "Water heater flush",
+    "Hotel strength tour"
+   ],
+   [
+    "water heater flush",
+    "hotel strength tour"
+   ],
+   [
+    "the shutoff valves",
+    "the second person"
+   ],
+   [
+    "like a roof leak.",
+    "like a swim lesson."
+   ],
+   [
+    "home-repair class",
+    "park tour"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Van Tours"
+   ],
+   [
+    "Do you smell gas?",
+    "Does anyone feel unwell right now?"
+   ],
+   [
+    "Supply line · $80",
+    "Written home plan · $80"
+   ],
+   [
+    "the shutoff valve",
+    "the therapy session"
+   ],
+   [
+    "like nobody home",
+    "like a no-show"
+   ],
+   [
+    "for today's work",
+    "for today's tour"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee City Tours"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Every 12 months",
+    "Every month"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Repipe · $2,400",
+    "Hotel program · $2,400"
+   ],
+   [
+    "Drain clearings",
+    "Hotel tours"
+   ],
+   [
+    "drain clearings",
+    "hotel tours"
+   ],
+   [
+    "Arrival windows",
+    "Time held per visit"
+   ],
+   [
+    "arriving 8–10am",
+    "8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "12:00pm"
+   ],
+   [
+    "No huele a gas.",
+    "Nadie."
+   ],
+   [
+    "Book the repair",
+    "Book the session"
+   ],
+   [
+    "Book a free fix",
+    "Book a free redo"
+   ],
+   [
+    "A chair, ready",
+    "A seat, ready"
+   ],
+   [
+    "Drain clearing",
+    "Hotel tour"
+   ],
+   [
+    "drain clearing",
+    "hotel tour"
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 hotel tour"
+   ],
+   [
+    "Signature cut",
+    "Day tour with a tour"
+   ],
+   [
+    "A leak repair",
+    "A tour assessment"
+   ],
+   [
+    "a leak repair",
+    "a tour assessment"
+   ],
+   [
+    "Panel upgrade",
+    "Chair tasting day at an hotel"
+   ],
+   [
+    "after the job",
+    "after the session"
+   ],
+   [
+    "After the job",
+    "After the session"
+   ],
+   [
+    "Kitchen drain",
+    "Hotel pickup"
+   ],
+   [
+    "kitchen drain",
+    "hotel pickup"
+   ],
+   [
+    "Alex is home",
+    "Alex is here"
+   ],
+   [
+    "they're home",
+    "they're here"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Bootcamps"
+   ],
+   [
+    "Lee Electric",
+    "Lee Chair Tasting"
+   ],
+   [
+    "Jordan Price",
+    "Hugo Price"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "water heater",
+    "company tour day"
+   ],
+   [
+    "you're home",
+    "you're here"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "Casey Moore",
+    "Lena Moore"
+   ],
+   [
+    "house calls",
+    "hotel tours"
+   ],
+   [
+    "House calls",
+    "Hotel tours"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "barbershops",
+    "tour companies"
+   ],
+   [
+    "Leak repair",
+    "Tour assessment"
+   ],
+   [
+    "leak repair",
+    "tour assessment"
+   ],
+   [
+    "the $89 fee",
+    "the late-cancel fee"
+   ],
+   [
+    "The chairs",
+    "The seats"
+   ],
+   [
+    "At my home",
+    "At my hotel"
+   ],
+   [
+    "Electrical",
+    "Tasting"
+   ],
+   [
+    "electrical",
+    "tasting"
+   ],
+   [
+    "Riley Chen",
+    "Mara Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Tomas Diaz"
+   ],
+   [
+    "Beard trim",
+    "Body scan"
+   ],
+   [
+    "beard trim",
+    "body scan"
+   ],
+   [
+    "house call",
+    "hotel tour"
+   ],
+   [
+    "House call",
+    "Hotel tour"
+   ],
+   [
+    "Barbershop",
+    "Tour company"
+   ],
+   [
+    "barbershop",
+    "tour company"
+   ],
+   [
+    "Yard drain",
+    "Park tour"
+   ],
+   [
+    "88 Elm St",
+    "12 Market Sq"
+   ],
+   [
+    "42 Oak St",
+    "14 Birch Ct"
+   ],
+   [
+    "Electric.",
+    "About 10, mostly new to it."
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Plumbing",
+    "On-site tour"
+   ],
+   [
+    "plumbing",
+    "on-site tour"
+   ],
+   [
+    "landlord",
+    "employer"
+   ],
+   [
+    "MP045210",
+    "GF045210"
+   ],
+   [
+    "Rental 1",
+    "Hotel 1"
+   ],
+   [
+    "Rental 2",
+    "Hotel 2"
+   ],
+   [
+    "plumber",
+    "guide"
+   ],
+   [
+    "Plumber",
+    "On-site tour"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "consult",
+    "assessment"
+   ],
+   [
+    "Haircut",
+    "Drop-in tour"
+   ],
+   [
+    "haircut",
+    "drop-in tour"
+   ],
+   [
+    "Barbers",
+    "Guides"
+   ],
+   [
+    "barbers",
+    "guides"
+   ],
+   [
+    "BS20981",
+    "GF20981"
+   ],
+   [
+    "teacher",
+    "guide"
+   ],
+   [
+    "$89 fee",
+    "late-cancel fee"
+   ],
+   [
+    "Jordan",
+    "Hugo"
+   ],
+   [
+    "Elm St",
+    "Spruce St"
+   ],
+   [
+    "Oak St",
+    "Willow Rd"
+   ],
+   [
+    "Barber",
+    "Guide"
+   ],
+   [
+    "barber",
+    "guide"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "$2,400",
+    "$3,000"
+   ],
+   [
+    "Riley",
+    "Mara"
+   ],
+   [
+    "Avery",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Lena"
+   ],
+   [
+    "shops",
+    "tour companies"
+   ],
+   [
+    "2–4pm",
+    "2:00pm"
+   ],
+   [
+    "Shop",
+    "Tour company"
+   ],
+   [
+    "shop",
+    "tour company"
+   ],
+   [
+    "$140",
+    "$240"
+   ],
+   [
+    "$150",
+    "$240"
+   ],
+   [
+    "$179",
+    "$560"
+   ],
+   [
+    "$199",
+    "$620"
+   ],
+   [
+    "$245",
+    "$420"
+   ],
+   [
+    "$640",
+    "$1,500"
+   ],
+   [
+    "$358",
+    "$280"
+   ],
+   [
+    "$540",
+    "$560"
+   ],
+   [
+    "$600",
+    "$1,500"
+   ],
+   [
+    "$700",
+    "$1,500"
+   ],
+   [
+    "$800",
+    "$1,500"
+   ],
+   [
+    "$160",
+    "$140"
+   ],
+   [
+    "$165",
+    "$140"
+   ],
+   [
+    "$169",
+    "$165"
+   ],
+   [
+    "$130",
+    "$120"
+   ],
+   [
+    "$125",
+    "$120"
+   ],
+   [
+    "$100",
+    "$120"
+   ],
+   [
+    "$110",
+    "$120"
+   ],
+   [
+    "$89",
+    "$560"
+   ],
+   [
+    "$90",
+    "$89"
+   ],
+   [
+    "$55",
+    "$65"
+   ],
+   [
+    "$40",
+    "$79"
+   ],
+   [
+    "$15",
+    "$12"
+   ],
+   [
+    "$25",
+    "$15"
+   ],
+   [
+    "$20",
+    "$35"
+   ],
+   [
+    "$75",
+    "$89"
+   ],
+   [
+    "$70",
+    "$65"
+   ],
+   [
+    "$80",
+    "$79"
+   ]
+  ]
+ },
+ "keep": [
+  "Private class",
+  "private class",
+  "Late-cancel fee",
+  "late-cancel fee",
+  "9 Harbor Plaza",
+  "leak",
+  "color",
+  "photo ID",
+  "patch test"
+ ],
+ "story": {
+  "A": "Alex books two adult seats on Saturday's 10am Old Town walking tour, paid in full. The group meets at the fountain on Market Square, and Mara ticks the names and leaves at 10:10. The tour ends at the old church at noon. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a private van tour for a family of 5 with hotel pick-up: a 25% deposit when booking, and the rest charged to the saved card when the guide texts DONE. Hugo and Lena pick them up in the hotel lobby at 9am. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|deposit|card",
+    "list|none|counter",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|full|none": "The main story: two adult seats on Saturday's 10am Old Town walking tour, $35 each, paid in full when booking. A tour the guest cancels in time gets a full refund; the price may be kept only with Sam's yes.",
+    "list|deposit|card": "A private walking tour for a group: a 25% deposit when booking, and the rest is charged to the saved card when the guide texts DONE at the end.",
+    "list|none|counter": "The free walking tour: nothing taken, and guests tip the guide in cash if they wish.",
+    "list|none|bill": "A school group: nothing before, and one bill to the school after the tour."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$35",
+     "name": "Old Town walking tour"
+    },
+    "list|full|none": {
+     "price": "$35",
+     "paid": "$35",
+     "fee": "$35",
+     "name": "Old Town walking tour"
+    },
+    "list|deposit|card": {
+     "price": "$240",
+     "deposit": "$60",
+     "rest": "$180",
+     "fee": "$60",
+     "name": "Private walking tour"
+    },
+    "list|none|counter": {
+     "price": "free",
+     "deposit": "$0",
+     "rest": "$0",
+     "fee": "$0",
+     "name": "Free walking tour"
+    },
+    "list|none|bill": {
+     "price": "$240",
+     "fee": "$0",
+     "name": "School group walking tour (20 students)"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|full|none",
+    "photos|deposit|card"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|deposit|card": "The main story: a private van tour for a family of 5 with hotel pick-up, $560 for up to 6 people, a 25% deposit when booking, and the rest charged to the saved card when the guide texts DONE.",
+    "list|full|none": "A private shore excursion from the cruise pier, $620 for up to 6 people, paid in full when booking.",
+    "photos|deposit|card": "A custom multi-day itinerary quoted first from the group's answers, signed, then a 30% deposit, and the rest charged to the saved card at the end."
+   },
+   "amounts": {
+    "*": {
+     "price": "$560",
+     "fee": "$140",
+     "name": "Private van tour with hotel pick-up"
+    },
+    "list|deposit|card": {
+     "price": "$560",
+     "deposit": "$140",
+     "rest": "$420",
+     "fee": "$140",
+     "name": "Private van tour with hotel pick-up"
+    },
+    "list|full|none": {
+     "price": "$620",
+     "paid": "$620",
+     "fee": "$620",
+     "name": "Private shore excursion"
+    },
+    "photos|deposit|card": {
+     "price": "$1,500",
+     "deposit": "$450",
+     "rest": "$1,050",
+     "fee": "$450",
+     "name": "Custom multi-day itinerary"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "Lee's Gym sells day passes and class seats. It books no one by name."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The gym books class seats and day passes, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A class or a day pass is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A gym bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the gym."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A gym bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Classes and passes are rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The gym sells passes, seats, packs and memberships from its list: it sends no proposals."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the gym."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "The gym runs no childcare. Teens 13 to 17 come with a guardian's OK on file."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Coaching group fitness needs no state license here, so the company gives only its registration (S1-61). Massage therapists' own licenses come with their invite (S2-11)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "On-site fitness and massage pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The gym books seats in classes and day passes, never rooms on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The gym runs classes on a timetable (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Massage licenses each therapist, so Kofi is checked. Coaches are skipped there (S2-11)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No fitness work is sent now, and nobody is on call."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A class always needs the group there, so there's no visit with nobody there."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "On-site fitness takes no jobs sent now (S2-31), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for on-site classes (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A class always needs the group there, so there's no visit with nobody there."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the coach's care: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A class is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No class is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No class is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Coaching group fitness needs no state license here, so the company gives only its registration (S1-61). Massage therapists' own licenses come with their invite (S2-11)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "On-site fitness and massage pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The gym books seats in classes and day passes, never rooms on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The gym runs classes on a timetable (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Massage licenses each therapist, so Kofi is checked. Coaches are skipped there (S2-11)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No fitness work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or benefit pays part of a class."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "No class or fitness day is billed in stages."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A gym asks for a rating after a class."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A4-66",
+   "A4-80",
+   "A4-43",
+   "A7-59",
+   "A7-15",
+   "A7-62",
+   "A7-63",
+   "A7-68",
+   "A7-70",
+   "A8-02",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B4-83",
+   "B5-34",
+   "B7-56",
+   "B7-62",
+   "S11-87",
+   "S11-90"
+  ]
+ },
+ "notes": "Base: the Oct 25 test-drive plug-in (work/testdrive/tours.md), kept where verified; re-verified on the REDESIGN 2 master (Oct 27). Sibling: gym (refit R07), class pattern.\nD96: Rosie checks no guide license, driver license, permit or carrier number (pf.license says so; the test-drive's 'checked on the lookup' is removed).\nMoney: the rest of every deposit is charged to the saved card when the guide texts DONE (or the multi-day trip's end), never on a set day by itself (the test-drive's '7 days before' and '30 days before' are removed). Paths: A list|full|none (public seats, $35), A list|deposit|card (private walking tour, $240 with a $60 deposit), A list|none|counter (free walking tour), A list|none|bill (school group, one bill), B list|deposit|card (private van tour, $560, deposit $140), B list|full|none (shore excursion, $620, paid in full), B photos|deposit|card (custom itinerary quoted first, deposit $450). Fees are never more than the money paid now.\nNames: Lee City Tours (flow A) and Lee Van Tours (flow B), both of Sam Lee; guides Mara and Tomas (A), Hugo and Lena (B, Lena the licensed driver); the example guest Alex M.\nFacts: classes, groups, children, weather, permits, crews, multiday, proposals, contracts, firststeps. No switches. Settings: set start times; cancel free until 24 hours before (private tours 48 hours, the plug-in's own rule).\nNot used: plans, packs, memberships, intro offers, online, drop-off, insurance, holds, sent-now work, on-call, stays.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Gemini hears right away that 2:00pm was just taken, and gets the next times.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Your day list comes at 7:00am, the time you picked.",
+    "Your day list comes at 8:00am, the time you picked.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "A barbershop sells its packages only at the shop.",
+    "Jules rents a chair, with their own customers.",
+    "A haircut could mean a salon or a barbershop.",
+    "'Yes, make it a fade' goes back to the times.",
+    "Promises the $25 consult; priced at the chair",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "a color touch-up checked from photos is free",
+    "Riley can do a shorter cut in the time left",
+    "Alex bought a package of cuts at the shop.",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "The note and photo are on the secure page.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Every shop service, color and house calls",
+    "sent you a proposal: Riley's color plan.",
+    "The lookup shows the license as expired.",
+    "so Quinn S.'s license isn't checked yet",
+    "May the shop show photos of your hair?",
+    "Plumbing JP031552 · electrical JE30417",
+    "like Alex's employer for a staff cut.",
+    "Sam adds massage to Lee's Barbershop.",
+    "I put a note and a photo on the page.",
+    "The cape clip ripped my shirt collar.",
+    "Riley: barber, color and house calls",
+    "'A trim' or 'a fade' fits a haircut.",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop doesn't do perms.",
+    "A barbershop's services need none.",
+    "Dee can ask to be next for 2:00pm.",
+    "Riley's color plan after a consult",
+    "Alex asks for a cut every 4 weeks.",
+    "Riley: barber, color, house calls",
+    "Signature cut and hot towel shave",
+    "A chair renter asked for by name",
+    "Books the groom's party together",
+    "Books a free fix, if Sam says so",
+    "Color quotes come to you first.",
+    "Access, like a step-free chair:",
+    "The rash on my scalp got worse.",
+    "Color always stays with Riley.",
+    "My employer pays for this cut.",
+    "first tomorrow: 10:00am, Riley",
+    "like a burst pipe or a lockout",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "The cut is uneven on one side.",
+    "How would you like it on top?",
+    "Haircut plan · every 4 weeks",
+    "Sat Oct 24 · 2:00pm · Riley",
+    "I'd like a cut on Saturday.",
+    "please come with dry hair.",
+    "Next: Sat Nov 28 · 10:00am",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "once Riley sees the hair",
+    "Drains have a set price.",
+    "15-minute style consult",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "Priced from your photos",
+    "Registration 2020-1187",
+    "Proposal · Color plan",
+    "Gloss to finish · $15",
+    "like a chair renter,",
+    "Lee's Barbershop LLC",
+    "Asks Alex for photos",
+    "$89 service-call fee",
+    "priced at the chair",
+    "Priced at the chair",
+    "chairs side by side",
+    "Barbering workshop",
+    "Lee Home Services'",
+    "A color correction",
+    "a color correction",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "set at the chair",
+    "Groom's package",
+    "a color and cut",
+    "License renewal",
+    "A chair, ready",
+    "Color touch-up",
+    "color touch-up",
+    "Drain clearing",
+    "two skin fades",
+    "Signature cut",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Panel upgrade",
+    "After the job",
+    "2 At my home",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "A beard trim",
+    "a beard trim",
+    "at the chair",
+    "At the chair",
+    "water heater",
+    "NEW massage",
+    "Casey Moore",
+    "color quote",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "barbershops",
+    "The chairs",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "House call",
+    "Barbershop",
+    "barbershop",
+    "Add photos",
+    "skin fades",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "a consult",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "MP045210",
+    "plumber",
+    "Plumber",
+    "Main St",
+    "consult",
+    "Consult",
+    "Haircut",
+    "haircut",
+    "Barbers",
+    "barbers",
+    "BS20981",
+    "teacher",
+    "Jordan",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "gloss",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "Shop",
+    "shop",
+    "$140",
+    "$160",
+    "$130",
+    "$125",
+    "$100",
+    "$110",
+    "$89",
+    "$90",
+    "$55",
+    "$40",
+    "$15",
+    "$25",
+    "$20",
+    "$75",
+    "$70",
+    "$80"
+   ],
+   "B": [
+    "With Sam's yes, electrical and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Casey for plumbing, Avery at the shop.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Tonight 6-9pm: 12 booked. How many more tables can you take? Reply a number.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Both jobs go in one booking, with one arrival window and one code.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Drive time from the jobs before and after is checked again.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Sam bills the warranty company the business's own way.",
+    "Like tapping a neighbor's water line without asking.",
+    "Your drain is under warranty, so this visit is free.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Your day list comes at 7:00am, the time you picked.",
+    "Your day list comes at 8:00am, the time you picked.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Say Alex asks for a water heater flush every year.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Told to leave, then call 911 and the gas company",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "CANT START no proof Alex may have this work done",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Both rentals' visits go on one bill on the 1st.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Alex's home warranty covers part of the repair.",
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "Jules rents a chair, with their own customers.",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "A haircut could mean a salon or a barbershop.",
+    "a proposal for new pipes, from Jordan's notes",
+    "Each rejoins: the job stays on Alex's record.",
+    "The plug-in says how long the warranty lasts.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Shut the cold-water valve, above the heater.",
+    "Alex texts that the sink is now overflowing.",
+    "Say Alex also asks about a dripping faucet.",
+    "It's overflowing. Can someone come tonight?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Classic cuts, fades and hot towel shaves.",
+    "Can I run the dishwasher before you come?",
+    "like replacing the old pipes Jordan noted",
+    "HAZARD mold behind the sink wall, stopped",
+    "Alex's home in Springfield is inside it.",
+    "The lookup shows the license as expired.",
+    "Water is coming out of the water heater.",
+    "Please clear the cabinet under the sink.",
+    "Most jobs have a price before the visit.",
+    "The $160 valve quote is good for 7 days.",
+    "Nora can ask to be next for that window.",
+    "Jordan finds mold behind the sink wall.",
+    "so Reese K.'s license isn't checked yet",
+    "If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood.",
+    "The shop's chair is in the other flow.",
+    "has a yearly flush plan, $150 a visit.",
+    "Plumbing JP031552 · electrical JE30417",
+    "If you smell gas, leave the house now.",
+    "Can I skip next week's drain cleaning?",
+    "Old pipes: bring the camera next time.",
+    "Jordan finds corroded shutoff valves.",
+    "no proof Alex may have this work done",
+    "Willow Home Warranty, the basic plan.",
+    "Riley: barber, color and house calls",
+    "Both fit in the same arrival window.",
+    "Which home warranty plan should pay?",
+    "The repair price is good for 7 days.",
+    "The drain clogs again 2 weeks later.",
+    "You can look for a roofer near you.",
+    "Your home warranty covers the rest.",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "It's a leak under the sink, today,",
+    "Then call 911 and the gas company.",
+    "Please wait until the job is done.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "Riley: barber, color, house calls",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Proposal · Replace the old pipes",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "The before photo shows no crack.",
+    "DAMAGE cracked the cabinet floor",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "nobody was home for any of them",
+    "Plumbing books a 2-hour window.",
+    "The job should be done by 10am.",
+    "Yearly water heater flush plan",
+    "like a burst pipe or a lockout",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Answers, photos and gate codes",
+    "HURT cut my hand, need to stop",
+    "There's no counter at a home.",
+    "LATE camera report Mon Oct 26",
+    "My kitchen drain is clogged.",
+    "Texts the camera report link",
+    "QUOTE 2400 repipe, 3 stages",
+    "Is it safe to turn back on?",
+    "Replace both shutoff valves",
+    "The $179 drain needs none.",
+    "Your water heater contract",
+    "a water heater replacement",
+    "It doesn't smell like gas.",
+    "NOTE grease clog 12 ft in.",
+    "Harper J.'s $2,400 repipe",
+    "Mold behind the sink wall",
+    "Books one job for a group",
+    "Want it every 12 months?",
+    "Water heater replacement",
+    "water heater replacement",
+    "Drains have a set price.",
+    "'Adding a faucet check?",
+    "A gas smell at the home",
+    "NEW heating and cooling",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "A plan or warranty pays",
+    "Just the kitchen sink.",
+    "Registration 2019-0451",
+    "Kitchen drain clearing",
+    "replaces water heaters",
+    "credited to the repair",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "quote for your repipe",
+    "Lee Home Services LLC",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "like a chair renter,",
+    "can clear the drain:",
+    "a water heater flush",
+    "Shutoff valve · $165",
+    "$89 service-call fee",
+    "Yes, it won't drain",
+    "Nobody was home for",
+    "someone in the home",
+    "Only a teen is home",
+    "a home-repair class",
+    "like a move-out day",
+    "leehomeservices.com",
+    "Sewer camera report",
+    "sewer camera report",
+    "never more than $89",
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:05am",
+    "Lee Home Services'",
+    "water heater quote",
+    "Water heater flush",
+    "water heater flush",
+    "the shutoff valves",
+    "like a roof leak.",
+    "home-repair class",
+    "Lee Home Services",
+    "Do you smell gas?",
+    "Supply line · $80",
+    "the shutoff valve",
+    "like nobody home",
+    "for today's work",
+    "Lee's Barbershop",
+    "Service call fee",
+    "service call fee",
+    "Every 12 months",
+    "Yes, every year",
+    "Repipe · $2,400",
+    "Drain clearings",
+    "drain clearings",
+    "Arrival windows",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "No huele a gas.",
+    "Book the repair",
+    "Book a free fix",
+    "A chair, ready",
+    "Drain clearing",
+    "drain clearing",
+    "Arrival times:",
+    "DONE 179 drain",
+    "A leak repair",
+    "a leak repair",
+    "Panel upgrade",
+    "after the job",
+    "After the job",
+    "Kitchen drain",
+    "kitchen drain",
+    "Alex is home",
+    "they're home",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "at the chair",
+    "Service call",
+    "service call",
+    "water heater",
+    "you're home",
+    "wasn't home",
+    "Casey Moore",
+    "house calls",
+    "House calls",
+    "Price board",
+    "barbershops",
+    "Leak repair",
+    "leak repair",
+    "the $89 fee",
+    "The chairs",
+    "At my home",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "house call",
+    "House call",
+    "Barbershop",
+    "barbershop",
+    "Yard drain",
+    "88 Elm St",
+    "42 Oak St",
+    "Electric.",
+    "I'm home",
+    "Plumbing",
+    "plumbing",
+    "MP045210",
+    "Rental 1",
+    "Rental 2",
+    "plumber",
+    "Plumber",
+    "Main St",
+    "consult",
+    "Haircut",
+    "haircut",
+    "Barbers",
+    "barbers",
+    "BS20981",
+    "teacher",
+    "$89 fee",
+    "Jordan",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "8–10am",
+    "12–2pm",
+    "$2,400",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "2–4pm",
+    "Shop",
+    "shop",
+    "$140",
+    "$150",
+    "$179",
+    "$199",
+    "$245",
+    "$640",
+    "$358",
+    "$540",
+    "$600",
+    "$700",
+    "$800",
+    "$160",
+    "$165",
+    "$169",
+    "$100",
+    "$110",
+    "$89",
+    "$90",
+    "$40",
+    "$15",
+    "$20",
+    "$75",
+    "$70",
+    "$80"
+   ]
+  },
+  "A": {
+   "A4-66": "f622d7fe12",
+   "A4-28": "c8e677520c",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A8-67": "e9fd748fc5",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3"
+  },
+  "B": {
+   "B8-03": "ac9d404766",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255"
+  }
+ }
+}

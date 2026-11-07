@@ -1,0 +1,3674 @@
+{
+ "id": "makeup",
+ "name": "Makeup artist",
+ "style": "Event",
+ "pattern": "event",
+ "from": "photographer",
+ "plugin": {
+  "pf.license": {
+   "need": "A switch from the state form. Where the state's rules license makeup work, it falls under a cosmetology or esthetics license (or a makeup license where the state issues one); some states exempt makeup-only work, sometimes after a short course. Hair styling is licensed nearly everywhere.",
+   "who holds it": "Each artist holds their own license where the state licenses people. The studio holds an establishment license where the state issues one. Work at a home, hotel or venue may need a permit or a link to a licensed studio: the state form says.",
+   "what to ask": [
+    "The business's establishment license or registration, where the state issues one",
+    "Each artist's license number, in their invite reply (or the owner sends it)",
+    "Any permit the state's form asks for work away from a licensed studio"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "away from the studio": "Homes, hotels and venues only where the state's rules allow makeup work away from a licensed place, only for the services allowed there (often makeup and strip lashes, never lash extensions, tints or waxing), and only for artists cleared for it (some states ask for more years licensed, a background check or insurance). A switch from the state form.",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance or bond": "Liability insurance on file, with its end date, where the state form or a venue asks. Many hotels and venues ask for a certificate naming them.",
+   "background checks": "Only where the state's form asks, like for permits to work away from a studio.",
+   "bridal hair": "Its own kind of work, with its own license, optional and shown as given the same way."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Lee Bridal Beauty's own list)": [
+    {
+     "service": "Wedding party makeup",
+     "price kind": "planned and quoted first: a price per face from the list, plus travel and any early start, checked by the lead artist and OK'd by the owner",
+     "price": "the quote (the example: $640 for four faces: the bride $200, three party faces at $120, travel $80)",
+     "length": "about 45 to 60 minutes a face, the bride about 70 minutes and last, all done by the ready-by time",
+     "place": "at a home, hotel or venue where the party gets ready",
+     "before": "a signed contract, then a 25% retainer that holds the date",
+     "after": "the rest charged to the saved card when the faces are done, or on the bill after the faces"
+    },
+    {
+     "service": "Bridal makeup (with strip lashes)",
+     "price kind": "one price, in the wedding quote",
+     "price": "$200",
+     "length": "70 min",
+     "place": "where the party gets ready",
+     "before": "with the wedding",
+     "after": "with the wedding"
+    },
+    {
+     "service": "Party makeup (bridesmaids, mothers, guests; strip lashes included)",
+     "price kind": "per face, in the wedding quote",
+     "price": "$120 a face",
+     "length": "45 to 60 min a face",
+     "place": "where the party gets ready",
+     "before": "with the wedding",
+     "after": "with the wedding"
+    },
+    {
+     "service": "Junior makeup (under 18: a parent says yes and stays)",
+     "price kind": "per face",
+     "price": "$45",
+     "length": "20 min",
+     "place": "where the party gets ready",
+     "before": "with the wedding",
+     "after": "with the wedding",
+     "note": "Light makeup only. A parent's yes on a page the booker forwards"
+    },
+    {
+     "service": "Event makeup for two (prom, a gala or photos)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "90 min",
+     "place": "at the customer's home",
+     "before": "a $40 deposit, or the full price (the owner picks)",
+     "after": "the rest charged to the saved card when the faces are done, or nothing more"
+    },
+    {
+     "service": "Event makeup for one at your place",
+     "price kind": "one price",
+     "price": "$179, travel within 10 miles included",
+     "length": "60 min",
+     "place": "at the customer's home",
+     "before": "a $40 deposit",
+     "after": "the rest charged to the saved card when the faces are done"
+    },
+    {
+     "service": "Touch-ups on site after the faces (photo shoot or reception)",
+     "price kind": "per hour",
+     "price": "$120 an hour for one artist, $160 an hour for two (the example)",
+     "length": "by the hour",
+     "place": "at the venue",
+     "before": "with the main booking",
+     "after": "with the main booking, or one pay link if added on the day",
+     "note": "Added on the day only with the payer's written yes"
+    },
+    {
+     "service": "Travel",
+     "price kind": "travel fee, per artist",
+     "price": "free within 10 miles; $40 an artist from 10 to 25 miles; farther, quoted first",
+     "place": "at the customer's place",
+     "before": "in the quote or the list price",
+     "after": "with the rest"
+    },
+    {
+     "service": "Early start (artists arrive before 7:00am)",
+     "price kind": "a set fee, per artist",
+     "price": "$40 an artist (the example)",
+     "place": "at the customer's place",
+     "before": "in the quote",
+     "after": "with the rest"
+    },
+    {
+     "service": "Bridal hair (Lee Bridal Hair, the second kind of work)",
+     "price kind": "one price, or per person in a wedding quote",
+     "price": "bridal hairstyle $189, party hairstyle $149 (the example)",
+     "length": "45 to 75 min",
+     "place": "where the party gets ready",
+     "before": "with the wedding",
+     "after": "with the wedding",
+     "note": "Only stylists whose cosmetology license is on file as given"
+    }
+   ],
+   "at the business (the example: Lee Makeup Studio's own list)": [
+    {
+     "service": "Makeup lesson (one to one, with a face chart to keep)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2 hours",
+     "place": "at the studio",
+     "before": "a $40 deposit",
+     "after": "the $100 rest at the studio"
+    },
+    {
+     "service": "Express makeup (lips, lashes, a fresh base)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "at the studio",
+     "before": "a card saved for the studio's $20 no-show fee, or nothing for a returning customer",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Event makeup with strip lashes",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the studio",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Natural makeup",
+     "price kind": "one price",
+     "price": "$40",
+     "length": "45 min",
+     "place": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Strip lashes (add-on)",
+     "price kind": "one price",
+     "price": "$20",
+     "length": "10 min",
+     "place": "at the studio",
+     "before": "with the main booking",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Kids' recital makeup (12 and under)",
+     "price kind": "one price",
+     "price": "$25",
+     "length": "20 min",
+     "place": "at the studio",
+     "before": "a card saved",
+     "after": "paid at the studio",
+     "note": "A parent books and stays"
+    },
+    {
+     "service": "Bridal trial",
+     "price kind": "one price",
+     "price": "$125 (the example)",
+     "length": "90 min",
+     "place": "at the studio",
+     "before": "nothing: no fee for a missed trial",
+     "after": "paid at the trial",
+     "note": "The first step before a wedding, booked as its own visit"
+    },
+    {
+     "service": "Stage or costume look",
+     "price kind": "quoted from photos first",
+     "price": "the quote (the example: $90)",
+     "length": "about 60 min",
+     "place": "at the studio",
+     "before": "a card saved",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Cover-up makeup (a tattoo or birthmark)",
+     "price kind": "quoted at the studio",
+     "price": "from $110; only the $25 consult is promised",
+     "length": "30 to 60 min",
+     "place": "at the studio",
+     "before": "a card saved",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Express makeup at home",
+     "price kind": "one price",
+     "price": "$75",
+     "length": "45 min",
+     "place": "at the customer's home",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "The same studio work, booked in flow B"
+    }
+   ],
+   "planning a party": "Start times are worked back from the ready-by time: about 45 to 60 minutes a face, the bride last (about 70 minutes), after 30 minutes of setup, with touch-ups until the ready-by time. One artist for up to 3 faces in 2 hours; a second artist when the party is bigger or the morning is short (the owner's setting).",
+   "capacity": "One booking per artist at a time. A wedding books every artist it needs together.",
+   "nobody needs to be home": "Never: someone always sits in the chair.",
+   "online": "A video lesson or a planning call can be online; makeup itself is in person."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What it's for: a wedding, an event, photos, a lesson or a trial",
+    "The date and the ready-by time (when everyone must be done)",
+    "Where everyone gets ready: a home, a hotel or a venue, and the town only (for the travel fee)",
+    "How many faces, and each person's role (the bride, bridesmaids, mothers, anyone under 18)",
+    "Who wants strip lashes, and any bridal hair",
+    "Whether they want a trial before the day"
+   ],
+   "after a time is picked": [
+    "Each person's name, for the schedule",
+    "A day-of contact and their mobile, if Alex won't be there first",
+    "The look: soft, glam, photo-ready; any inspiration photos (on the secure page)",
+    "A table near a window and a plug, and a chair for each artist",
+    "At the studio: what the lesson or look is for"
+   ],
+   "only on the secure page": [
+    "Known allergies (to a product, lash glue, latex or a fragrance) and skin conditions, each person answering for themselves on a link the booker forwards",
+    "A past reaction to makeup or lash glue",
+    "The getting-ready street address and any door or suite code",
+    "Anyone under 18: their parent's yes, and that the parent stays",
+    "May the business show photos of the makeup? Each person's own yes; a parent for anyone under 18",
+    "The card"
+   ],
+   "flags": "A known allergy or a past reaction is flagged: the artist calls (never a text) and offers a patch test before the day, uses the person's own products, or leaves that product out.",
+   "who may book": "An adult. For a wedding, the couple or someone they name; the booker answers only for themselves, and each person in the party answers their own skin and photo questions. A parent books a child and stays."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A reaction now: the face, lips or throat swelling, or trouble breathing",
+     "says": "Call 911 now.",
+     "booking": "No booking, and the artist and the owner are told. Never makeup on a reacting face."
+    },
+    {
+     "words": "Makeup or lash glue in the eye with pain or a change in sight",
+     "says": "Rinse the eye with clean running water for 15 minutes. If you can't see or it's badly hurt, call 911 now. Otherwise see a doctor today.",
+     "booking": "No booking until a doctor says it's fine."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "A rash, redness, itching or puffiness after makeup, with no danger signs",
+     "says": "Take the makeup off gently with water and a mild cleanser. Don't add more. Your artist will call you.",
+     "booking": "The artist calls within the hour (the owner if the artist is silent 15 minutes) and decides: a different product, a patch test, or a doctor."
+    },
+    {
+     "words": "A skin infection, cold sore, pink eye or open skin where the makeup goes, on the day",
+     "says": "No makeup on that area, so it can't spread or worsen.",
+     "booking": "The artist works around it or leaves that area bare; a whole face that can't be done moves with no fee."
+    }
+   ],
+   "clean tools": "Single-use wands, sponges and lip applicators; brushes cleaned between faces; products taken out with a clean spatula, never from the pot to the face. A double-dipped mascara is never used.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first. Rosie never judges a reaction: the artist or a doctor decides."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The signed contract",
+     "for": "Every wedding and quoted event",
+     "timing": "Before any money is taken, on the secure page"
+    },
+    {
+     "step": "A bridal trial at the studio (90 minutes)",
+     "for": "Weddings, if the bride wants one",
+     "timing": "1 to 3 months before (booked closer: any day before the wedding). Its own visit, paid at the trial; no fee for a missed trial. The look, products and shades are saved for the day."
+    },
+    {
+     "step": "The skin and allergy form",
+     "for": "Each person getting makeup",
+     "timing": "On the secure page before the day; each person answers on a link the booker forwards"
+    },
+    {
+     "step": "A patch test",
+     "for": "Anyone with a known allergy, sensitive skin or a past reaction",
+     "timing": "At least 48 hours before, at the studio or at the trial: the products and the lash glue on a small spot of skin. A reaction means that product is left out."
+    },
+    {
+     "step": "A parent's yes for anyone under 18",
+     "for": "A junior bridesmaid or flower girl",
+     "timing": "On a page the booker forwards, before the final count; the parent stays during the makeup"
+    },
+    {
+     "step": "The final count",
+     "for": "Weddings",
+     "timing": "7 days before (the owner's setting); booked closer, the count at booking is final"
+    }
+   ],
+   "prep for the reminder": [
+    "Come with clean, moisturized skin and no makeup",
+    "Wear a button-front top, so nothing goes over the face",
+    "A table by a window, a plug and a chair for each artist",
+    "Contact lenses in before your turn, not after"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code, given to the lead artist at the door of the home or suite. A day-of contact can get the code instead, when a mobile is given for them.",
+   "check-in at the studio": "The code at the desk, or the artist types it.",
+   "setup": "Lights, a chair for each artist and a clean kit, set up in about 30 minutes before the first face.",
+   "before each face": "The artist reads that person's secure notes, asks if anything changed, and uses only products that person has used safely, with single-use applicators.",
+   "the schedule": "Each person's start time from the ready-by time. Artists running late shorten setup and the first looks, never the bride's; the ready-by time doesn't move.",
+   "work changes at the visit": "A face added on the day only if an artist is free before the ready-by time, priced from the list, with the payer's written yes. Touch-up hours the same way.",
+   "proof it's done": "The lead artist texts DONE when the last face is done; the trial's look and any new products go in the artist's notes for next time."
+  },
+  "pf.money": {
+   "starting answers": [
+    "Weddings: a signed contract, a 25% retainer when booking, and the rest charged to the saved card when the faces are done, or on the bill after the faces (Rosie never charges the rest on a set day by itself)",
+    "Small events at home: a deposit and the rest when the faces are done, or the full price",
+    "Studio: lessons with a deposit and the rest at the studio; express makeup with a card saved for a $20 no-show fee, or nothing for a returning customer; event makeup paid in full",
+    "The bridal trial: nothing taken, paid at the trial"
+   ],
+   "limits": [
+    "Deposit cap: from the state form",
+    "A late cancel keeps only what the contract says, and the owner confirms it. No answer: nothing kept",
+    "The business cancels, or the customer says no to a stand-in: a full refund",
+    "Faces dropped after the final count are still charged, as the contract says (the owner's setting)"
+   ],
+   "travel": "Free within 10 miles; $40 an artist from 10 to 25 miles; farther, quoted first (the example's own fees).",
+   "early start": "$40 an artist when the artists arrive before 7:00am (the example's fee), shown in the first total.",
+   "tips": "On: optional, on the receipt page or the bill, split between the artists as the owner sets; how tips are paid out follows the state's rules.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the service or products sold.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Allergies, skin conditions, past reactions, patch-test results and medical notes stay on the secure page and the artist's job link, never in a text to the customer, the owner or the staff, and never through the AI. A text says only 'a note is on the page'.",
+   "photos": "Photos of a face go only by the secure page, never in a text, and in the portfolio only with that person's own yes.",
+   "languages": "English and Spanish.",
+   "minors": "Anyone under 18 in a party needs a parent's yes on a page the booker forwards; Rosie never texts the minor or the parent first."
+  },
+  "pf.staff": {
+   "roles": [
+    "Lead makeup artist",
+    "Makeup artist",
+    "Hair stylist (bridal hair)",
+    "Studio makeup artist"
+   ],
+   "licenses": "Each artist's license per state, where the state licenses makeup work; a stylist's cosmetology license for hair.",
+   "skills": [
+    "Bridal (leads only)",
+    "Party and event makeup",
+    "Lessons",
+    "Stage and costume looks",
+    "Cover-up makeup",
+    "Bridal hair"
+   ],
+   "away from the studio": "Only artists cleared for work away from a licensed studio are offered for homes, hotels and venues (the state form says what clears them).",
+   "supervision": "Students and apprentices work only under a licensed artist, where the state's rules allow.",
+   "who OKs what": "The owner OKs every wedding quote, any stand-in lead and any face added on the day. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "At the studio: another studio artist with the skill, at the same time and price; with no reply 2 hours before, that stand-in comes, and Sam can turn this off. On location: a lead artist the owner trusts, even from outside the team, cleared for that place, offered by name; the wedding contract names the stand-in, so with no reply by 8pm the evening before, the stand-in comes and Sam calls. A full refund is always the other choice. The stand-in gets the trial's look and each person's secure notes."
+  },
+  "pf.rules": {
+   "license shown": "A license number on the confirmation, the reminder or the receipt where the state's rules ask for it, with the state board's contact (a switch from the state form).",
+   "away from the studio": "Makeup at a home, hotel or venue only where the state allows it, only for the services it allows there, and only by artists cleared for it (a switch from the state form).",
+   "written contract": "The business's own contract for every wedding and quoted event, signed by the customer and the business before money is taken; any parts the state adds come from the state form.",
+   "date hold": "A wedding date stays saved while the contract is signed: up to 48 hours (the owner's setting).",
+   "cancel and date change": "Free to cancel for a set time after signing; after that, what the contract says, with the owner's OK. One free date change to an open date (the owner's setting).",
+   "final count": "Due 7 days before (the owner's setting); faces dropped after that are still charged.",
+   "minors": "A parent's yes for anyone under 18, and the parent stays; a parent's written OK where the state's rules require one.",
+   "photo use": "Portfolio or ad photos only with each person's own yes; a parent's for anyone under 18. No answer means no.",
+   "hygiene": "Single-use applicators and cleaned tools, as the state's sanitation rules require (a switch from the state form).",
+   "records": "Contracts, skin forms, patch tests and payments kept 7 years, or longer where the state asks."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for makeup:",
+   "makeup": [
+    "The ready-by time can't move: artists running late shorten setup and the first looks, and the bride starts on time",
+    "A reaction or a rash during or after makeup: makeup off, the artist calls, a doctor if needed",
+    "A known allergy: a patch test before the day, or that product is left out",
+    "Someone added late: only if an artist is free before the ready-by time, with the owner's OK",
+    "Someone under 18 in the party: a parent's yes, and the parent stays",
+    "The lead artist can't come: a trusted stand-in the contract names, or a full refund",
+    "The customer moves the date: one free move, if the artists are free that day",
+    "The customer cancels: only what the contract says is kept, with the owner's OK",
+    "The party moves to another place on the day: the travel fee is checked again before anyone agrees",
+    "Storms on the wedding morning: the artists leave early at no charge"
+   ]
+  },
+  "pf.facts": [
+   "firststeps",
+   "forms",
+   "photos",
+   "groups",
+   "documents",
+   "tips",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Talia and Priya (studio makeup artists)"
+  },
+  "B": {
+   "staff": "Marco and Amara (makeup artists)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Talia"
+  },
+  "B": {
+   "staff": "Marco"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Lessons, express makeup and event looks."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Wedding and event makeup on location, within 25 miles."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Talia and Priya do studio makeup; Talia also does stage looks and makeup at home."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Talia: studio artist, stage looks, makeup at home"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Talia: studio artist, stage looks and makeup at home"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, stage looks and makeup at home"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most makeup studios set it."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "J: a lash touch-up in the first 2 weeks, checked from photos, free."
+   ],
+   [
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "On this path, a lash touch-up checked from photos is free: nothing before, nothing after."
+   ],
+   [
+    "Color touch-up",
+    "Lash touch-up"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Stage look quotes come to you first."
+   ],
+   [
+    "A water heater job",
+    "A wedding party"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a spray tan, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Makeup Studio doesn't do spray tans."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A studio's example: 'Lash glue here needs a quick patch test first."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books an express makeup for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Lee Makeup Studio: you now have two express makeups on Sat Nov 7."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked recital makeup for a child before the times."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "You told us the recital makeup is for your child, and that you're their parent. Their details go on the secure page."
+   ],
+   [
+    "A haircut at Lee's Barbershop:",
+    "{{name}} at Lee Makeup Studio:"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book me a makeup session at Lee Makeup Studio on Saturday."
+   ],
+   [
+    "Alex M. · Haircut",
+    "Alex M. · Makeup visit"
+   ],
+   [
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "Lee Makeup Studio · Express makeup: your 3:00pm"
+   ],
+   [
+    "Lee's Barbershop · Haircut",
+    "Lee Makeup Studio · {{name}}"
+   ],
+   [
+    "Books the groom's party together",
+    "Books the group together"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds spray tans to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Spray tans for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW spray tans"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Makeup Studio doesn't do lash extensions."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Foundation got on my silk blouse."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says foundation got on a silk blouse today."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a tow or a lockout"
+   ],
+   [
+    "Gloss to finish",
+    "Setting spray"
+   ],
+   [
+    "gloss",
+    "setting spray"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A session is rated, so the studio takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Talia's cover-up plan after a consult"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Makeup Studio sent you a proposal: Talia's cover-up plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Cover-up plan"
+   ],
+   [
+    "your first color plan visit",
+    "your first cover-up plan visit"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the studio show your photos in its portfolio? Yes / No"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Talia can do a shorter session in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Makeup Studio can book you from now on, at the studio and for express makeups at home."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Lee Makeup Studio prices an cover-up makeup at the studio, once Talia sees the photos."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company, and one for each artist where the state asks."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A makeup example: a rash after makeup elsewhere, with no swelling, gets 'take it off gently' first."
+   ],
+   [
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "The plug-in sets the status words, like in, scanning, ready."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Add photos of your old print, and a makeup artist will price the restoration."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only for their own place."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the shades Alex liked."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A prom group of five books makeup for one afternoon."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: warm shades, soft wing, brown liner works best"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds back-to-back times across Talia and Priya."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your baby milestone session is part of a plan with Talia, every 4 weeks."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Express makeups at home wherever the studio travels."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says one of Saturday's photos has a shadow on the face."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 stage look quote."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Makeup could mean a makeup artist or a cosmetics store."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A business license for the studio, where the city asks."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a package of sessions at the studio."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my friend wait in the studio during my lesson?"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "Alex leaves the old print, and picks it up when it's ready."
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Headshots, pet portraits and strip lashes at the studio."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, stage looks and express makeups at home"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kids' recital makeup (12 and under) is $25."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Talia also does stage looks and express makeups at home"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Talia: studio, stage looks and express makeups at home"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a baby milestone session every 4 weeks."
+   ],
+   [
+    "A barbershop takes no drop-offs.",
+    "The studio takes stage looks as drop-offs."
+   ],
+   [
+    "The rash on my scalp got worse.",
+    "The rash on my face got worse."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Stage looks always stay with Talia."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "One photo has a shadow on my face."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "A wedding party is quoted from the plan."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone hurt at the venue stops the booking."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Talia stopped Alex M.'s makeup."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a makeup lesson on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una clase de maquillaje el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a baby milestone every 4 weeks"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A makeup lesson needs Alex's own makeup bag, to learn with."
+   ],
+   [
+    "Drains have a set price.",
+    "Event makeup for one has a set price."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s makeup."
+   ],
+   [
+    "License renewal",
+    "Renewal due"
+   ],
+   [
+    "1 color quote",
+    "1 stage look quote"
+   ],
+   [
+    "Panel upgrade",
+    "Hair extensions, styled"
+   ],
+   [
+    "Avery: barber",
+    "Priya: studio"
+   ],
+   [
+    "$140 an hour",
+    "$160 an hour"
+   ],
+   [
+    "At the chair",
+    "At the studio"
+   ],
+   [
+    "EC22871",
+    "EL22871"
+   ],
+   [
+    "BS20981",
+    "EL20981"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Bridal Beauty's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Bridal Beauty"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Bridal Makeup"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bridal Hair"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Makeup Studio LLC"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Makeup Studio's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Makeup Studio"
+   ],
+   [
+    "Jordan Price",
+    "Marco Park"
+   ],
+   [
+    "Casey Moore",
+    "Amara Ellis"
+   ],
+   [
+    "Riley Chen",
+    "Talia Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Priya Diaz"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Amara"
+   ],
+   [
+    "Riley",
+    "Talia"
+   ],
+   [
+    "Avery",
+    "Priya"
+   ],
+   [
+    "1200 Main St",
+    "75 Park Ave"
+   ],
+   [
+    "88 Elm St",
+    "18 Rose St"
+   ],
+   [
+    "Elm St",
+    "Rose St"
+   ],
+   [
+    "plumbing and electrical",
+    "makeup and bridal hair"
+   ],
+   [
+    "Electrical",
+    "Bridal hair"
+   ],
+   [
+    "electrical",
+    "bridal hair"
+   ],
+   [
+    "Plumbing",
+    "Makeup"
+   ],
+   [
+    "plumbing",
+    "makeup"
+   ],
+   [
+    "plumber",
+    "artist"
+   ],
+   [
+    "Plumber",
+    "Artist"
+   ],
+   [
+    "Barbershop",
+    "Makeup studio"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A makeup studio's plug-in adds its own: a reaction with swelling, or makeup in an eye with pain."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's words had none of them, so nothing is sent here."
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "Makeup's is each person's skin and allergy form."
+   ],
+   [
+    "barbershop",
+    "makeup studio"
+   ],
+   [
+    "barbers",
+    "studio artists"
+   ],
+   [
+    "a barber",
+    "a studio artist"
+   ],
+   [
+    "barber",
+    "studio artist"
+   ],
+   [
+    "Barber",
+    "Studio artist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Event makeup with lashes"
+   ],
+   [
+    "Signature cut and shave",
+    "Event makeup with lashes"
+   ],
+   [
+    "Signature cut",
+    "Event makeup with lashes"
+   ],
+   [
+    "signature cut",
+    "event makeup with lashes"
+   ],
+   [
+    "the Groom's package",
+    "the makeup lesson"
+   ],
+   [
+    "The Groom's package",
+    "The makeup lesson"
+   ],
+   [
+    "Groom's package",
+    "Makeup lesson"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' recital makeup (12 and under)"
+   ],
+   [
+    "kids cuts",
+    "kids' recital makeups"
+   ],
+   [
+    "kids cut",
+    "kids' recital makeup"
+   ],
+   [
+    "a skin fade",
+    "a natural makeup"
+   ],
+   [
+    "A skin fade",
+    "A natural makeup"
+   ],
+   [
+    "Skin fade",
+    "Natural makeup"
+   ],
+   [
+    "skin fade",
+    "natural makeup"
+   ],
+   [
+    "A beard trim is",
+    "Strip lashes are"
+   ],
+   [
+    "a beard trim",
+    "strip lashes"
+   ],
+   [
+    "Beard trim",
+    "Strip lashes"
+   ],
+   [
+    "beard trim",
+    "strip lashes"
+   ],
+   [
+    "Haircuts",
+    "Express makeups"
+   ],
+   [
+    "haircuts",
+    "express makeups"
+   ],
+   [
+    "Haircut",
+    "Express makeup"
+   ],
+   [
+    "a haircut",
+    "an express makeup"
+   ],
+   [
+    "A haircut",
+    "An express makeup"
+   ],
+   [
+    "haircut",
+    "express makeup"
+   ],
+   [
+    "Color and cut",
+    "Stage look"
+   ],
+   [
+    "color and cut",
+    "stage look"
+   ],
+   [
+    "a color correction",
+    "a cover-up session"
+   ],
+   [
+    "A color correction",
+    "A cover-up session"
+   ],
+   [
+    "Color correction",
+    "Cover-up makeup"
+   ],
+   [
+    "color correction",
+    "cover-up makeup"
+   ],
+   [
+    "house calls",
+    "express makeups at home"
+   ],
+   [
+    "House calls",
+    "Express makeups at home"
+   ],
+   [
+    "a house call",
+    "an express makeup at home"
+   ],
+   [
+    "house call",
+    "express makeup at home"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "the shop's board",
+    "the studio's price list"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Water heater flush",
+    "Event makeup for two"
+   ],
+   [
+    "photos of your hair",
+    "photos of your old print"
+   ],
+   [
+    "sees the hair",
+    "sees the photos"
+   ],
+   [
+    "MP045210",
+    "ES045210"
+   ],
+   [
+    "JP031552",
+    "ES031552"
+   ],
+   [
+    "JE30417",
+    "CO30417"
+   ],
+   [
+    "Your day list comes at 7:00am, the time you picked.",
+    "Your day list comes at 6:00am, the time you picked."
+   ],
+   [
+    "$89",
+    "$40"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the party's details"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 30-minute video makeup lesson"
+   ],
+   [
+    "Kids cut",
+    "Kids' recital makeup"
+   ]
+  ],
+  "B": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Lessons, express makeup and event looks."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Wedding and event makeup on location, within 25 miles."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Talia and Priya do studio makeup; Talia also does stage looks and makeup at home."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Talia: studio artist, stage looks, makeup at home"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Talia: studio artist, stage looks and makeup at home"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, stage looks and makeup at home"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most makeup studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules makeup studios often set."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Makeup for my wedding party' fits wedding party makeup."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like makeup on someone who hasn't agreed to it."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding bridal hair? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many faces, and what time must everyone be ready?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Bridal Beauty can do the makeup:"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, by the big window"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $150 event makeup for two needs none."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 extra-hour quote is good for 7 days."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Marco's kit stand scratches the hotel desk, and Marco texts a photo."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a makeup stain on the hotel chair this morning."
+   ],
+   [
+    "Drain clearings already booked keep $179.",
+    "Event makeups already booked keep $150."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Event makeups already booked keep only their saved card."
+   ],
+   [
+    "Lee Home Services: you have two drain clearings on Mon Nov 9.",
+    "Lee Bridal Beauty: you have two event makeups on Mon Nov 9."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Reply here, and it goes to Sam. How was the makeup with Jordan?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about makeup for my wedding party. A text back is fine."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's event makeup for two, today,"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A bridal hairstyle is $189 with Marco. Both fit in the same morning if Marco starts at 7:45am."
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Bridal Beauty · {{name}}"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · {{name}}"
+   ],
+   [
+    "Prices it: the list, photos or the visit",
+    "Prices it: the list, a quote or the visit"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds live streaming to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Live streaming for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW live streaming"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can you start the makeup at 7am instead?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Marco says no. The faces start at 8am, as planned."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a tow or a lockout"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Our party is tonight. Can a makeup artist come?"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Makeup books a time slot, like 8 to 10am."
+   ],
+   [
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "Your makeup runs two days: today, and Fri Oct 23, 8–10am, for day 2."
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 wedding weekend"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your wedding weekend"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like makeup for the couple's anniversary photo shoot"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for makeup at your anniversary shoot, from Marco's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Anniversary shoot makeup"
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "Talia, a studio makeup artist, does express makeups at home."
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Harbor Inn in Springfield is inside it."
+   ],
+   [
+    "At my home.",
+    "At a hotel: Harbor Inn."
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the sneak peek ready on time?"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE sneak peek Mon Oct 26"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the interior photos only, $165. Skip the twilight photos."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Marco takes the interior photos today, $165. The $80 twilight photos stay good until Thu Oct 29."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurt or in danger, call 911 now."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a wedding party is planned and quoted first, so Rosie's first text asks for the party's details."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told how to take the makeup off gently, and to call 911 if her daughter's lips or throat swell."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the date, the ready-by time, where everyone gets ready, and how many faces."
+   ],
+   [
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Before setting up, Marco lays a drop cloth and photographs the carpet and the vanity, noting any stains."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Quítele el maquillaje con agua y un limpiador suave. Si se le hinchan los labios o la garganta, llame al 911."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Makeup Studio can book you from now on, at the studio and for express makeups at home."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Marco's phone, you said yes to one more hour for $160."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the quote path, only Marco's times show: he leads weddings here."
+   ],
+   [
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Marco can start 30 minutes later if the next booking allows, or you can pick another time."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Take the makeup off with water and a mild cleanser. If her lips or throat swell, call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Bridal Beauty doesn't do, like lash extensions."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Amara stopped using the outlet by the vanity: it sparked. Please tell the front desk."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says to stop using it, so Alex gets a written note and the photo."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For makeup, a reaction with swelling or trouble breathing, or makeup in an eye with pain, stops the booking."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Makeup Studio can do an express makeup at the studio for $35, or at your home for $75."
+   ],
+   [
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "Marco finds Alex and checks in with the code, so it's a normal visit."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Every makeup job is priced before the visit: from the list, or quoted and OK'd first."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company, and one for each artist where the state asks."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "An event happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: listing photos for two rentals every 3 months."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A makeup example: a rash after makeup elsewhere, with no swelling, gets 'take it off gently' first."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need makeup for my daughter's quinceañera on Saturday."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a reaction with swelling, or makeup in an eye with pain."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add each person's name and role, and any look photos. Our lead artist will plan your morning and price it."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only for their own place."
+   ],
+   [
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "A gate or door code for the venue shows to Marco only on the day."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Bridal Beauty does makeup and bridal hair on location, not lash extensions."
+   ],
+   [
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Marco is at the venue for your 8–10am booking and can't reach you."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Event makeup for one already booked keeps $179, even after Nov 2."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Marco counts the rooms and texts the price with its lines."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Bridal Beauty has a yearly event makeup for two plan, $150 a visit."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Your makeup is ahead of schedule: everyone should be ready by 9:45am."
+   ],
+   [
+    "Sam bills the warranty company the business's own way.",
+    "Sam bills the company the business's own way."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M. says the makeup from Thu Oct 22 creased before the photos."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: one more hour, $160."
+   ],
+   [
+    "Jordan priced a water heater replacement for Alex M.",
+    "Marco planned a wedding party for Alex M.: four faces, two artists, ready by 10am Thu."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Touch-ups are part of your booking, so this visit is free."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Express makeups at home wherever the studio travels."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "A wedding's time block is worked back from its ready-by time."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your wedding party quote is with Lee Bridal Beauty."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Marco's next times for event makeup."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can you add my aunt? She'd like makeup too."
+   ],
+   [
+    "Lee Home Services: your share of today's repair.",
+    "Lee Bridal Beauty: your share of today's photos."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito maquillaje para la quinceañera de mi hija el sábado."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a makeup artist do touch-ups at an outdoor photo shoot this Thursday?"
+   ],
+   [
+    "Try the door again, and check in with the code.",
+    "Look for Alex again, and check in with the code."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 one more hour of touch-ups"
+   ],
+   [
+    "Alex's home warranty covers part of the repair.",
+    "Alex's company account covers part of the bill."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you do event makeup for two for us every year, too?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Foundation spilled on the carpet at Alex M.'s suite."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marco do my makeup for an anniversary dinner next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what a free fix covers."
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "The whole team, since no license is needed"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene hinchados los labios o la garganta? ¿Le cuesta respirar?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for bridal hair. Both go in one booking, with one time and one code."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the hall floor, before setup"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A business license for the studio, where the city asks."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Marco also do my hair?"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · Wedding party makeup · $640"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "The faces are ahead of schedule."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD outlet by the vanity sparks, unplugged"
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Headshots, pet portraits and strip lashes at the studio."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: are her lips or throat swelling? Is she having trouble breathing?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Your timeline is on your page."
+   ],
+   [
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "Cancel your makeup (Thu 8–10am)?"
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Can I wear lash glue if I'm allergic to latex?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "The outlet by the vanity sparks when Amara plugs in a light."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A session at the studio is in the other flow."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's listing photos?"
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Bring the long lens next time."
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Events, our office account."
+   ],
+   [
+    "Nobody home needed: DONE with a photo",
+    "Nobody needs to be home: DONE with a photo"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks Marco to stay one more hour, for touch-ups before the photos."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It was on the shot list."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Talia also does stage looks and express makeups at home"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which company account should pay?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "We'll be 30 minutes late, sorry!"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The makeup creases before the photos."
+   ],
+   [
+    "Give this code to Casey at the door.",
+    "Give this code to Amara on arrival."
+   ],
+   [
+    "Give your check-in code at the door.",
+    "Give your check-in code when the makeup artist arrives."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Talia: studio, stage looks and express makeups at home"
+   ],
+   [
+    "Say Alex books for a parent's home.",
+    "Say Alex books makeup for a parent's anniversary party."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a lash studio near you."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "Your company account covers the rest."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My makeup creased before the photos."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 rooms 165 twilight 80"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more hour of touch-ups · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: nothing, the lights moved"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Marco slips on a wet floor and texts HURT."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Marco was 20 minutes late."
+   ],
+   [
+    "Here's the price to fix it today.",
+    "Here's the price for today's photos."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Nothing comes off your price"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a table by a window?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a sparking outlet by the vanity"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE ahead of schedule, all ready by 9:45"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE foundation spilled on the carpet"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no stain."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa event Thu 12-2 Amara"
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code at the venue"
+   ],
+   [
+    "The job should be done by 10am.",
+    "Marco and Amara stay for touch-ups until 10am."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It's just red."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped and hurt my wrist, need to stop"
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "A wedding party is quoted from the plan."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone hurt at the venue stops the booking."
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no counter at a venue."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I need makeup for my wedding party of four."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the sneak peek link"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is that safe?"
+   ],
+   [
+    "The quote stays open 7 days",
+    "Nothing extra is done today"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more hour of touch-ups"
+   ],
+   [
+    "$89, credited to the repair",
+    "$40 an artist, past 10 miles"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE the CEO prefers her left side."
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the vanity"
+   ],
+   [
+    "Video and Jordan's notes",
+    "25 edited photos"
+   ],
+   [
+    "Drains have a set price.",
+    "Event makeup for one has a set price."
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or account pays"
+   ],
+   [
+    "Priced from your photos",
+    "Planned from your answers"
+   ],
+   [
+    "Jordan found more work.",
+    "You asked Marco for one more hour."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Four faces, all ready by 10am."
+   ],
+   [
+    "Under the sink, before",
+    "Hall floor, before"
+   ],
+   [
+    "Jordan found the leak.",
+    "Marco counted the rooms."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Event makeup for one"
+   ],
+   [
+    "Cabinet floor, before",
+    "Carpet by the vanity, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Foundation on the carpet"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Interior photos · $165"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo está roja."
+   ],
+   [
+    "Insurance pays part",
+    "An account pays part"
+   ],
+   [
+    "Sewer camera report",
+    "Sneak peek"
+   ],
+   [
+    "the shutoff valves",
+    "the extra hour"
+   ],
+   [
+    "Supply line · $80",
+    "Twilight photos · $80"
+   ],
+   [
+    "the kitchen drain",
+    "the wedding party"
+   ],
+   [
+    "Book the repair",
+    "Book the makeup"
+   ],
+   [
+    "Book a free fix",
+    "Book a free reshoot"
+   ],
+   [
+    "Arrival windows",
+    "Time slots"
+   ],
+   [
+    "License renewal",
+    "Renewal due"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 event"
+   ],
+   [
+    "Kitchen drain",
+    "Wedding party"
+   ],
+   [
+    "Panel upgrade",
+    "Hair extensions, styled"
+   ],
+   [
+    "Avery: barber",
+    "Priya: studio"
+   ],
+   [
+    "$140 an hour",
+    "$160 an hour"
+   ],
+   [
+    "Add photos",
+    "Add the details"
+   ],
+   [
+    "Yard drain",
+    "Outdoor shoot touch-ups"
+   ],
+   [
+    "EC22871",
+    "EL22871"
+   ],
+   [
+    "BS20981",
+    "EL20981"
+   ],
+   [
+    "leehomeservices.com",
+    "leebridalbeauty.com"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Bridal Beauty LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Bridal Beauty's"
+   ],
+   [
+    "Lee Home Services has no open times for this job in the next 60 days. Nothing was saved.",
+    "Lee Bridal Beauty has no artist free that morning, so nothing was saved."
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Bridal Beauty books up to 18 months ahead. We'll text you times for your sister's wedding in Apr 2027."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Event makeup for one with Lee Bridal Beauty is $179, not $150. Here are the open times at $179."
+   ],
+   [
+    "Lee Home Services",
+    "Lee Bridal Beauty"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Bridal Makeup"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bridal Hair"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Makeup Studio"
+   ],
+   [
+    "Jordan Price",
+    "Marco Park"
+   ],
+   [
+    "Casey Moore",
+    "Amara Ellis"
+   ],
+   [
+    "Riley Chen",
+    "Talia Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Priya Diaz"
+   ],
+   [
+    "Yes, Jordan has time for it.",
+    "Yes, Amara can fit her in if both artists arrive at 7am."
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Amara"
+   ],
+   [
+    "Riley",
+    "Talia"
+   ],
+   [
+    "Avery",
+    "Priya"
+   ],
+   [
+    "1200 Main St",
+    "75 Park Ave"
+   ],
+   [
+    "88 Elm St",
+    "18 Rose St"
+   ],
+   [
+    "42 Oak St",
+    "Harbor Inn, 9 Lake Rd"
+   ],
+   [
+    "plumbing and electrical",
+    "makeup and bridal hair"
+   ],
+   [
+    "electrical prices",
+    "hair prices"
+   ],
+   [
+    "electrical jobs",
+    "hair jobs"
+   ],
+   [
+    "Electrical",
+    "Bridal hair"
+   ],
+   [
+    "electrical",
+    "bridal hair"
+   ],
+   [
+    "plumbing license",
+    "esthetics license"
+   ],
+   [
+    "Plumbing license",
+    "Esthetics license"
+   ],
+   [
+    "Plumbing",
+    "Makeup"
+   ],
+   [
+    "plumbing",
+    "makeup"
+   ],
+   [
+    "a plumber",
+    "an artist"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say a maid of honor books makeup for the whole party at one hotel suite. It's one booking with one code, given by whoever meets the artists."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's start time and look go to the artists, one line each. Skin notes stay on each person's own page."
+   ],
+   [
+    "plumber",
+    "artist"
+   ],
+   [
+    "Plumber",
+    "Artist"
+   ],
+   [
+    "Barbershop",
+    "Makeup studio"
+   ],
+   [
+    "barbershop",
+    "makeup studio"
+   ],
+   [
+    "a barber",
+    "a studio artist"
+   ],
+   [
+    "barber",
+    "studio artist"
+   ],
+   [
+    "Barber",
+    "Studio artist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Event makeup with lashes"
+   ],
+   [
+    "Beard trim",
+    "Strip lashes"
+   ],
+   [
+    "beard trim",
+    "strip lashes"
+   ],
+   [
+    "Haircut",
+    "Express makeup"
+   ],
+   [
+    "a haircut",
+    "an express makeup"
+   ],
+   [
+    "A haircut",
+    "An express makeup"
+   ],
+   [
+    "haircut",
+    "express makeup"
+   ],
+   [
+    "house calls",
+    "express makeups at home"
+   ],
+   [
+    "House calls",
+    "Express makeups at home"
+   ],
+   [
+    "house call",
+    "express makeup at home"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "a drain clearing",
+    "event makeup for one"
+   ],
+   [
+    "A drain clearing",
+    "Event makeup for one"
+   ],
+   [
+    "Drain clearing",
+    "Event makeup for one"
+   ],
+   [
+    "drain clearing",
+    "event makeup for one"
+   ],
+   [
+    "Water heater replacement",
+    "Wedding party makeup"
+   ],
+   [
+    "water heater replacement",
+    "wedding party makeup"
+   ],
+   [
+    "Water heater flush",
+    "Event makeup for two"
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: sister's wedding, Oct 2028"
+   ],
+   [
+    "water heater flush",
+    "event makeup for two"
+   ],
+   [
+    "Leak repair",
+    "On-set touch-ups"
+   ],
+   [
+    "leak repair",
+    "on-set touch-ups"
+   ],
+   [
+    "Sewer camera inspection",
+    "Airbrush makeup"
+   ],
+   [
+    "sewer camera inspection",
+    "airbrush makeup"
+   ],
+   [
+    "service call fee",
+    "travel fee"
+   ],
+   [
+    "Service call fee",
+    "Travel fee"
+   ],
+   [
+    "service call",
+    "travel fee"
+   ],
+   [
+    "Service call",
+    "Travel fee"
+   ],
+   [
+    "Labor",
+    "Touch-ups on site"
+   ],
+   [
+    "arriving 8–10am",
+    "8–10am"
+   ],
+   [
+    "arriving 10am–12pm",
+    "10am–12pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "12–2pm"
+   ],
+   [
+    "arriving 2–4pm",
+    "2–4pm"
+   ],
+   [
+    "new arrival time",
+    "new start time"
+   ],
+   [
+    "water heater",
+    "wedding party"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Alex is home",
+    "Alex is here"
+   ],
+   [
+    "they're home",
+    "they're here"
+   ],
+   [
+    "you're home",
+    "you're here"
+   ],
+   [
+    "late-cancel or nobody-home fee",
+    "late-cancel or no-show fee"
+   ],
+   [
+    "Nobody home",
+    "Nobody there"
+   ],
+   [
+    "nobody home",
+    "nobody there"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "was home",
+    "was there"
+   ],
+   [
+    "landlord",
+    "parent"
+   ],
+   [
+    "replaces water heaters",
+    "leads weddings"
+   ],
+   [
+    "Electric.",
+    "At a hotel suite. Two of us, for a gala."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 wedding weekend, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your wedding weekend"
+   ],
+   [
+    "Repipe · $2,400",
+    "Wedding weekend · $2,400"
+   ],
+   [
+    "$800 when the pipes are in",
+    "$800 after day one"
+   ],
+   [
+    "The $80 supply line stays",
+    "The $80 twilight photos stay"
+   ],
+   [
+    "shutoff valve",
+    "interior photos"
+   ],
+   [
+    "The report is ready on the date Alex was told.",
+    "The sneak peek is ready on the date Alex was told."
+   ],
+   [
+    "The report is ready on the new date.",
+    "The sneak peek is ready on the new date."
+   ],
+   [
+    "Texts the report link on the new date",
+    "Texts the photos link on the new date"
+   ],
+   [
+    "The repair price",
+    "The quote"
+   ],
+   [
+    "MP045210",
+    "ES045210"
+   ],
+   [
+    "JP031552",
+    "ES031552"
+   ],
+   [
+    "JE30417",
+    "CO30417"
+   ],
+   [
+    "From the photos and answers",
+    "From the party's answers: 4 faces, ready by 10am"
+   ],
+   [
+    "The plug-in sets the group's size limits and its price.",
+    "The plug-in sets the price per face and how many artists the time needs. Anyone under 18 needs a parent's yes, and the parent stays."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This booking needs a first step at least a day before, so the first open times start Thursday."
+   ],
+   [
+    "Entry statement: I live here, or may let the pro in",
+    "Skin and allergy form: allergies, skin conditions and past reactions, each person's own"
+   ],
+   [
+    "In the driveway",
+    "The hotel garage"
+   ],
+   [
+    "A dog, kept inside",
+    "None"
+   ],
+   [
+    "Written estimate and terms",
+    "Contract and terms"
+   ],
+   [
+    "7am on the visit day",
+    "6pm the day before"
+   ],
+   [
+    "Day list at 7am",
+    "Day list at 6am"
+   ],
+   [
+    "Your day list comes at 7:00am, the time you picked.",
+    "Your day list comes at 6:00am, the time you picked."
+   ],
+   [
+    "Thu Oct 22, 7:00am",
+    "Wed Oct 21, 6:00pm"
+   ],
+   [
+    "7am Thu",
+    "6pm Wed"
+   ],
+   [
+    "an $89",
+    "a $40"
+   ],
+   [
+    "$89",
+    "$40"
+   ],
+   [
+    "Fri 8am",
+    "Thu 7am"
+   ],
+   [
+    "Only a teen is home at Alex M.'s",
+    "Only a teen is at Alex M.'s suite"
+   ],
+   [
+    "Photos and answers added",
+    "Answers and look photos added"
+   ],
+   [
+    "Price it before anyone says yes",
+    "Plan and price it before anyone says yes"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no vendor pass from the venue"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI raised an emergency. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "An emergency: the details are on the portal"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Arrival times:",
+    "Open times:"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the party's details"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Every day, 6am–7pm"
+   ],
+   [
+    "On the photos path",
+    "On the quote path"
+   ],
+   [
+    "Quoted from photos first",
+    "Planned and quoted first"
+   ],
+   [
+    "long lens",
+    "kit"
+   ]
+  ]
+ },
+ "keep": [
+  "travel fee",
+  "visit fee",
+  "leak",
+  "patch test",
+  "studio",
+  "session",
+  "wedding",
+  "running late",
+  "backup",
+  "shoot"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a makeup lesson at Lee Makeup Studio, Sam's own studio, with Talia on Sat Oct 24 at 11:00am. The visit depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Bridal Beauty for a small wedding party: four faces at Harbor Inn, all ready by 10am Thu Oct 22. Marco plans the morning with a second artist, Sam OKs the $640 quote, both sign the contract, a deposit holds the date, and the rest is charged to the saved card when the faces are done."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: a $140 makeup lesson (2 hours, one to one). A $40 deposit now, and the $100 rest at the studio.",
+    "list|card|counter": "A $35 express makeup. A card is saved for the studio's $20 no-show fee. Alex pays at the studio.",
+    "list|none|counter": "A $35 express makeup for a returning customer. Nothing is taken: a YES books it, and Alex pays at the studio.",
+    "list|full|none": "A $55 event makeup with lashes, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Express makeup"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Express makeup"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Makeup lesson (2 hours)"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$20",
+     "name": "Event makeup with lashes"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Strip lashes",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$15",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Event makeup with lashes",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Express makeup (pack)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "photos|deposit|card",
+   "combos": [
+    "photos|deposit|card",
+    "photos|deposit|bill",
+    "list|deposit|card",
+    "list|full|none"
+   ],
+   "booking": {
+    "times": [
+     "window"
+    ]
+   },
+   "labels": {
+    "price": {
+     "photos": "Planned and quoted first"
+    }
+   },
+   "examples": {
+    "photos|deposit|card": "The main story: a wedding party of four, all ready by 10am. Planned and quoted at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit holds the date, and the $480 rest is charged to the saved card when the faces are done.",
+    "photos|deposit|bill": "The same wedding party, with the $160 deposit now and the $480 rest on the bill after the faces, with a tip line.",
+    "list|deposit|card": "Event makeup for two at home, $150 from the list. A $40 deposit now, and the $110 rest charged to the saved card when the faces are done.",
+    "list|full|none": "The $150 event makeup for two, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Event makeup for two"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Wedding party makeup (4 faces)"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Wedding party makeup (4 faces)"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "name": "Event makeup for two"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Event makeup for two"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$40",
+     "name": "Event makeup for two"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Bridal hair",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$120",
+      "fee": "$40"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Event makeup for two",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$40"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Event makeup (a credit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-15",
+   "A7-63",
+   "A8-02",
+   "A4-43"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B5-34"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Some states exempt makeup-only work, sometimes after a short course. There, this runs instead of the license step."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The makeup plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Artists are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable: lessons are one to one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Makeup is booked ahead for a set time and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "Studio makeup is booked visit by visit; no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for makeup."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "Makeup has no problem that gets worse before the visit."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "No group class with a smallest size (A7-67)."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Makeup is done in the chair: nothing is dropped off."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Makeup is done in the chair: nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays for kids' recital makeup."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for makeup."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Makeup is done in the chair: a problem is fixed before Alex leaves, or goes as a refund request."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing comes later: the makeup is the work."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing of the customer's is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A studio visit is rated."
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here: the skin and allergy form on the secure page. A patch test comes first for a known allergy, or for a stage look's glue."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The studio sells its packages only at the studio, never on the booking page."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "The studio takes new customers."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Some states exempt makeup-only work, sometimes after a short course. There, this runs instead of the license step."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The makeup plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Artists are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable: lessons are one to one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Makeup is booked ahead for a set time and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Makeup is booked for a set time and never sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "A booking is a time block for the faces, shown like 8 to 10am (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Makeup is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "An artist's time is booked, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "Makeup for an event is booked one event at a time; no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Makeup is booked for a set time and never sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Makeup is booked for a set time and never sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "Makeup has no problem that gets worse before the day. A changed party goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "No group class with a smallest size."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Makeup is booked for a set time and never sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "An artist never looks after a child: a parent stays for anyone under 18."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone always sits in the chair, so someone is always there."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans (B4-43)."
+   },
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "A wedding's date is the customer's own, so its times are that morning only, worked back from the ready-by time."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-23",
+    "more": [
+     "A wedding booked months ahead stays saved up to 48 hours while both sign: Sam's setting."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Here: a bridal trial at the studio room, which Alex wants, and each person's skin and allergy form.",
+     "Booked this close, the trial is this week. Booked months ahead, it's 1 to 3 months before."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "The trial is its own visit at the studio room, with its own code, paid there. A missed trial has no fee.",
+     "The look, products and shades from the trial are saved for the wedding morning."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Alex answers only their own form. The others answer on a link Alex forwards; Rosie never texts them first.",
+     "A known allergy or past reaction is flagged. The artist calls, never texts, and offers a patch test or leaves that product out."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B5-35",
+    "more": [
+     "The contract shows each start time, the ready-by time, the final count date and what can't be done away from a studio."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-69",
+    "more": [
+     "Here: Lee Bridal Beauty's portfolio and social posts. No answer means no.",
+     "Each person in the party answers for their own face on a link Alex forwards. A parent answers for anyone under 18."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-03",
+    "more": [
+     "Sam's rule: every wedding waits for Sam's OK. This wedding's quote was OK'd already, so it books now."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "Amara gets the same job text, with Amara's two faces and start times."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-07",
+    "more": [
+     "Sam's rule for weddings: one free date move, if the artists are free that day."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-10",
+    "more": [
+     "For a wedding, what may be kept follows the signed contract. Sam confirms first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-01",
+    "more": [
+     "For a wedding, the day list carries each person's start time and the trial's look. Skin notes open only on the job link."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "An extra hour needs Alex's written yes, at the rate shown before booking. No yes in 10 minutes: the artists leave at 10am, as booked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-24",
+    "more": [
+     "At a hotel or venue, a right to cancel comes only where the state's rules say so."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Makeup is done on the day; nothing can be redone later. A complaint or a refund request goes its own way."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing comes later: the makeup is the work."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No repeat plans, so nothing is billed for many visits at once."
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Both artists stay for the hour: $160, at the touch-up rate for two shown before booking."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Touch-ups done at the visit have no cancel period (B8-24)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A makeup artist asks for a rating after the faces."
+   }
+  ]
+ },
+ "notes": "Refit Tue Oct 27 2026 (R14) to the REDESIGN 2 master: plug-in facts (firststeps: a patch test for a known allergy, forms: the skin and allergy form, photos: a wedding planned and quoted first, groups: a wedding party, documents: the wedding contract, tips, extrawork: an extra hour), no switches, settings (A set start, free cancel until 24 hours before; B arrival windows, free cancel until 6pm the day before), money facts per path with names, rename pairs, few ops. The rest after a deposit is charged to the saved card when the faces are done, or on the bill: the master never charges it on a set day or when free cancel ends (D66 #7), so that is gone from the plug-in and the examples. Every old say/vary words op is gone (the record words deposits, fees and refunds now). Kept: valid off ops and the more lines (B7-24's set-day line dropped; 'his OK' -> 'Sam's OK').\nFrom: photographer. A wedding makeup artist runs like event photography: a date held while a contract is signed, a deposit (retainer) that holds the date, the rest before the day, travel to a home, hotel or venue, a party of several people, a stand-in for a date that can't move. Hair, esthetician and lash-brow were read for beauty wording: skin forms, patch tests, allergies on the secure page only, a parent for anyone under 18.\nNames: Sam Lee's main company is Lee Bridal Beauty LLC (75 Park Ave): makeup on location, with bridal hair as its second kind of work (trade names Lee Bridal Makeup and Lee Bridal Hair). His second company is Lee Makeup Studio LLC (18 Rose St), the master's barbershop. Flow A's story is at the studio, flow B's at the main company.\nPeople: Marco Park (lead artist; bridal hair too; the master's Jordan) and Amara Ellis (artist; Casey) go out; Talia Chen and Priya Diaz work at the studio (Riley and Avery). Jo Park is a lead artist Sam trusts from outside the team (the stand-in). The master's Theo B. stays Wren B. (Theo is a pilot word). Customer Alex M. and owner Sam are kept. Marco is male because the master uses 'he' for Jordan.\nFlow B's main story: Alex's wedding party of four (Alex, Linda, Jess, Rosa) at Harbor Inn, 9 Lake Rd, Thu Oct 22, faces 8 to 10am, ready by 10am. Marco plans it from the party's answers: two artists, 45 to 70 minutes a face, bride last (Marco: Linda 8:00, Alex 8:50; Amara: Jess 8:00, Rosa 8:50), set up from 7:30am. Quote $640 = bride $200 + three party faces at $120 + travel $80 (two artists at $40); no early-start fee, since they arrive after 7am. Over Sam's $500, so Sam OKs it (the old flow's 'every wedding needs Hannah's OK'). Both sign the contract; a 25% deposit ($160) holds the date; the $480 rest is charged at 6pm Wed when free cancel ends (Sam's set day for weddings is 7 days before; booked closer, at free cancel).\nTimes on flow B (words ops set t): booked Mon Oct 19 6:40 to 7:58pm; trial offered Tue 6pm or Wed noon at the studio room; reminder Wed 10am; rest charged Wed 6:00pm, receipt 6:05pm (a declined rest: pay link 6pm, Sam asked 7:30pm, decided by 8pm); day list Thu 6:00am, OMW 7:00am, check-in 7:30am, setup checks 7:35am, faces 8 to 10am, DONE 10:05am, receipt 10:10am, rating Fri 11am. LATE is 7:05am, Jess late at 7:15am. Free cancel moved from the master's 7am on the day to 6pm the day before (rename pairs '7am Thu', 'Thu 7am', 'Thu Oct 22, 7:00am').\nFlow A's main story: a $140 makeup lesson (2 hours, one to one) with Talia, Sat Oct 24 at 11:00am, a $40 deposit and the $100 rest at the studio. The master's A times are kept.\nMoney paths, flow B: photos|deposit|none (the wedding, main), photos|deposit|bill (the rest and any extra hour on the bill after the faces, with a tip line), list|deposit|none and list|full|none (event makeup for two at home, $150). The price kind 'quoted from photos first' reads as 'Planned and quoted first' (label): a price per face from the list, plus travel and any early start, checked by the lead artist and OK'd by Sam. Left out: holds and the saved card charged at DONE (makeup takes deposits), the visit price kind (nothing is priced at the visit).\nMoney paths, flow A: list|deposit|counter (the lesson, main), list|card|counter (a $35 express makeup, a card saved for the $20 no-show fee), list|none|counter (a returning customer's express makeup; also how the old flow's trial is paid: nothing taken, paid at the trial), list|full|none (the $55 event makeup with lashes). The studio has a card reader, so nothing is texted as a bill.\nThe trial: the old flow's studio trial is B4-38's first step (B4-40's words: at the studio room, 90 minutes, $125, paid at the trial, no fee for a miss); the look is saved for the day (B4-40 more, B8-44). A trial result that changes the job is B7-37/B7-38 (an airbrush finish adds $60); one that can't go ahead safely is B7-59, with the details only on the secure page.\nSafety and privacy: pf.safety stops a booking for a reaction with swelling or trouble breathing, or makeup in an eye with pain; a rash with no danger signs gets safety steps (B3-18, Rosa's call in Spanish). Allergies, skin conditions, reactions and patch tests stay on the secure page and the job link; no text to the customer, owner or staff names them (B6-14, B7-33, B7-59, B8-34, B10-01, B10-22, A8-35, A8-38 reworded). Each person in a party answers their own skin form and photo question on a link Alex forwards (B4-86, B4-69 more). Clean, single-use tools are in pf.safety and B8-39. A known allergy gets a patch test before the day, or the product is left out (pf.first_steps, B4-87, B7-33).\nA minor in the party (a junior bridesmaid): a parent's yes on a forwarded link, and the parent stays (pf.questions, pf.rules, B4-46 words; gap 'Each person in a group answers their own form').\nLicenses: makeup licensing is a switch from the state form (cosmetology or esthetics, sometimes exempt after a short course). The example's state licenses it, so S1-60, S1-63 and S2-28 take the license branch (Sam's ES045210; the studio's EL20981; Marco's ES031552 and cosmetology CO30417), and keep the registration-only branch too (splitsKept), for states that exempt makeup-only work (S1-61 more). Working away from a licensed studio is S1-43's master split, kept whole (never turned off). Nothing names a state or a city; the old flow's California, Texas, Minnesota and New York rules are dropped.\nOff, flow B: sent now (never), a stay, a seat, no person named, a plan or warranty, repeat plans, seats or visit days at a host's place, stock held, the damage hold, a crew short-handed, 'One person, by name' at B7-56 (every makeup booking is for an event whose date can't move, so B7-54 runs: Jo Park or a full refund), Sam moving an event, a tool out, a part late, the problem getting worse, too few for a group, nobody home, a delivery, an item to the studio, an outside check, running late for the next job, the after-visit branches makeup never has (a free fix, a report later, an item not taken back, a rented item, a permit inspection), and the B9-19 extras (one bill for many visits, extras at cost, an account paying part).\nOff, flow A: walk-in seats, tables and check-in at once (a walk-in waits in line for express makeup), plans and insurance, items held, a seat or space or drop-off or stay, adults only, a paper the studio must get, the damage hold, a crew, a minimum, being held late at a table or class door, a class roster, a drop-off, several days, a child left, repeat plans and pack sales on the page, the day-before hold (the studio holds nothing), weather, something ordered late, the plan check, the problem getting worse, a free fix, results later, items not picked up, rentals, named-only work. Kept: video lessons (A4-01), the patch test as a first step, a past reaction (A4-49), the skin form (A4-72), a skin problem that stops the makeup (A8-35), aftercare and reactions (A10-25).\nPlug-in splits kept whole: S1-60, S1-63, S2-28 (license by state), A7-61 (Priya stands in except for stage looks and cover-ups), A7-63 (a lesson can move; event makeup before a wedding can't), A8-02 (a lesson needs Alex's own makeup bag, express makeup nothing), B4-57 (quoted weddings sign a contract; list event makeup doesn't).\nSign-up: words ops on S1-12, S1-13, S1-14, S1-16, S1-21, S1-38, S1-41, S1-42 show the real setup (wedding quotes with a 25% retainer, the trial at the studio room, event makeup for two by deposit or in full, travel and early start $40 an artist, the studio's lesson deposit and $20 no-show card). Free cancel is 6pm the day before; books ahead 18 months; Saturdays kept for weddings; staff hours every day 6am to 7pm.\nWhat-ifs: Nora's event makeup for one takes a $40 deposit (S11-04 to S11-86 renamed, never the master's hold); S11-56 switches event makeup for two from a deposit to paid in full; S11-58 adds bridal henna (B) and spray tans (A); Kim's outdoor photo shoot carries the weather what-if (B7-35); the declared-emergency price uses a supply invoice (S12-20 to S12-22).\nkeep: travel fee. Makeup artists really charge one per artist (the photographer's word for the master's service call).\nSam's wedding rules (more lines): every wedding waits for his OK (B6-03), a wedding stays saved up to 48 hours while both sign (B4-23), one free date move if the artists are free (B7-07), what may be kept on a cancel follows the contract (B7-10), an extra hour needs Alex's written yes (B8-23), storms never move a wedding morning (B7-35).\nGaps (work/gaps/makeup.json): Done-by time sets the plan; A first step at the business, priced on its own; Final count by a set date; Refund if the date is rebooked; Each person in a group answers their own form. The overlay says the first, third and fifth in words for now.\nMaster issues seen (not fixed here): the S1/S2 and S11/S12 clocks restart (S2-01 goes back to Monday after S1-51; S11-01 after the visit); sibling what-ifs after the money branch 'Rest due on a set day' read earlier times than it (B7-33, B7-61, B7-35 after B7-24; A7-15 after A7-06); B7-01's rule wants free cancel heard before it ends, so a set day of 6pm the day before is used here; B8-24 and B10-05 still offer a right to cancel extra work at a venue (a more line says only where the state's rules say so); check-prof scores hidden variants of changed steps (B4-15's visit-path messages had to be shortened).\nReview Oct 23 (fresh reviewer): touch-ups done at the visit have no cancel period (B8-24, B10-05; its cancel branch off). Touch-ups: $120 an hour for one artist, $160 for two (pf.services, B8-23).\nReview: patch test at least 48 hours before (pf.first_steps; matches A4-45, A7-04, A7-33, B4-87). Stand-ins described per place in pf.staff: the studio's default stand-in (A7-61), the wedding contract's named stand-in on location (B7-54).\nReview: B3-02 now says the couple's artist cancelled, so a Monday booking for a Thursday wedding with a trial that week reads as a real last-minute booking.\nReview: S11-56 (A) now switches express makeup between two ways the studio really uses (no hold); B's switch (deposit or paid in full for event makeup for two) was already real.\nReview: removed 299 never-firing rename pairs (193 A, 106 B); the read files were identical before and after. \nMoney fix Oct 27 2026 (D65/D66): the rest of a deposit is paid at the visit, on the bill after, or on the saved card at DONE, never charged on a date of its own; the rest is charged to the saved card when the faces are done, or on the bill after the faces. Any older wording above about a date or free-cancel moment for the rest is from the earlier pass and no longer applies.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "Each service starts the way most barbershops set it.",
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "Color touch-up",
+    "Color quotes come to you first.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "A haircut at Lee's Barbershop:",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Alex M. · Haircut",
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "Lee's Barbershop · Haircut",
+    "Books the groom's party together",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "like a burst pipe or a lockout",
+    "Gloss to finish",
+    "gloss",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "May the shop show photos of your hair? Yes / No",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "House calls only where the state's rules allow them.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "A haircut could mean a salon or a barbershop.",
+    "A license for the shop and for each barber.",
+    "Alex bought a package of cuts at the shop.",
+    "Can my son wait in the shop during my cut?",
+    "A repair shop, a tailor or a groomer does.",
+    "Haircut, fade and beard trim at the shop.",
+    "Every shop service, color and house calls",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a cut every 4 weeks.",
+    "A barbershop takes no drop-offs.",
+    "The rash on my scalp got worse.",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Riley stopped Alex M.'s cut.",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "Drains have a set price.",
+    "Stopped Alex M.'s cut.",
+    "License renewal",
+    "1 color quote",
+    "Panel upgrade",
+    "Avery: barber",
+    "$140 an hour",
+    "At the chair",
+    "EC22871",
+    "BS20981",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop's",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop has none, so nothing is sent here.",
+    "A barbershop's plug-in has none.",
+    "barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "skin fade",
+    "A beard trim is",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "a haircut",
+    "A haircut",
+    "haircut",
+    "Color and cut",
+    "color and cut",
+    "a color correction",
+    "A color correction",
+    "Color correction",
+    "color correction",
+    "house calls",
+    "House calls",
+    "a house call",
+    "house call",
+    "price board",
+    "Price board",
+    "the shop's board",
+    "at the chair",
+    "shops",
+    "shop",
+    "Shop",
+    "photos of your hair",
+    "sees the hair",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "Your day list comes at 7:00am, the time you picked.",
+    "$89",
+    "Asks Alex for photos",
+    "like a 15-minute style consult",
+    "Kids cut"
+   ],
+   "B": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "The $160 valve quote is good for 7 days.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "I found water damage under the sink this morning.",
+    "Drain clearings already booked keep $179.",
+    "Drain clearings already booked keep only their saved card.",
+    "Lee Home Services: you have two drain clearings on Mon Nov 9.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "It's a leak under the sink, today,",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Prices it: the list, photos or the visit",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing books a 2-hour window.",
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "One of the shop's barbers does house calls.",
+    "Alex's home in Springfield is inside it.",
+    "At my home.",
+    "Is the report ready on time?",
+    "LATE camera report Mon Oct 26",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Sam bills the warranty company the business's own way.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Jordan priced a water heater replacement for Alex M.",
+    "Your drain is under warranty, so this visit is free.",
+    "House calls only where the state's rules allow them.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Your water heater price is with Lee Home Services.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Lee Home Services: your share of today's repair.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Try the door again, and check in with the code.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Alex's home warranty covers part of the repair.",
+    "Can you flush my water heater every year, too?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan only, until others are licensed there",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "BEFORE old water stain on the cabinet floor",
+    "A license for the shop and for each barber.",
+    "Can Jordan also look at a dripping faucet?",
+    "Contract · Water heater replacement · $640",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Haircut, fade and beard trim at the shop.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "My gas water heater got wet in a flood.",
+    "Jordan finds mold behind the sink wall.",
+    "The shop's chair is in the other flow.",
+    "Can I skip next week's drain cleaning?",
+    "Old pipes: bring the camera next time.",
+    "Willow Home Warranty, the basic plan.",
+    "Nobody home needed: DONE with a photo",
+    "Jordan finds corroded shutoff valves.",
+    "It's under the 1-year labor warranty.",
+    "Riley also does color and house calls",
+    "Which home warranty plan should pay?",
+    "I'll be home 30 minutes late, sorry!",
+    "The repair price is good for 7 days.",
+    "The drain clogs again 2 weeks later.",
+    "Give this code to Casey at the door.",
+    "Give your check-in code at the door.",
+    "Riley: barber, color and house calls",
+    "Say Alex books for a parent's home.",
+    "You can look for a roofer near you.",
+    "Your home warranty covers the rest.",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan left a mess under the sink.",
+    "Here's the price to fix it today.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Alex gives the code at the door",
+    "The job should be done by 10am.",
+    "No. It doesn't smell like gas.",
+    "HURT cut my hand, need to stop",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "There's no counter at a home.",
+    "My kitchen drain is clogged.",
+    "Texts the camera report link",
+    "Is it safe to turn back on?",
+    "The quote stays open 7 days",
+    "Replace both shutoff valves",
+    "$89, credited to the repair",
+    "NOTE grease clog 12 ft in.",
+    "Mold behind the sink wall",
+    "Video and Jordan's notes",
+    "Drains have a set price.",
+    "A plan or warranty pays",
+    "Priced from your photos",
+    "Jordan found more work.",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Jordan found the leak.",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "Shutoff valve · $165",
+    "No. No huele a gas.",
+    "Insurance pays part",
+    "Sewer camera report",
+    "the shutoff valves",
+    "Supply line · $80",
+    "the kitchen drain",
+    "Book the repair",
+    "Book a free fix",
+    "Arrival windows",
+    "License renewal",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "Panel upgrade",
+    "Avery: barber",
+    "$140 an hour",
+    "Add photos",
+    "Yard drain",
+    "EC22871",
+    "BS20981",
+    "leehomeservices.com",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services has no open times for this job in the next 60 days. Nothing was saved.",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Yes, Jordan has time for it.",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "plumbing and electrical",
+    "electrical prices",
+    "electrical jobs",
+    "Electrical",
+    "electrical",
+    "plumbing license",
+    "Plumbing license",
+    "Plumbing",
+    "plumbing",
+    "a plumber",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Each unit's notes go to the plumber, one line each.",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "barbershop",
+    "a barber",
+    "barber",
+    "Barber",
+    "beard trim",
+    "Haircut",
+    "a haircut",
+    "A haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "Price board",
+    "at the chair",
+    "shop",
+    "Shop",
+    "a drain clearing",
+    "A drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "service call",
+    "Service call",
+    "Labor",
+    "arriving 8–10am",
+    "arriving 10am–12pm",
+    "arriving 12–2pm",
+    "arriving 2–4pm",
+    "new arrival time",
+    "water heater",
+    "I'm home",
+    "Alex is home",
+    "they're home",
+    "you're home",
+    "late-cancel or nobody-home fee",
+    "Nobody home",
+    "nobody home",
+    "wasn't home",
+    "was home",
+    "replaces water heaters",
+    "Electric.",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 when the pipes are in",
+    "The $80 supply line stays",
+    "shutoff valve",
+    "The report is ready on the date Alex was told.",
+    "The report is ready on the new date.",
+    "Texts the report link on the new date",
+    "The repair price",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "From the photos and answers",
+    "The plug-in sets the group's size limits and its price.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Entry statement: I live here, or may let the pro in",
+    "In the driveway",
+    "A dog, kept inside",
+    "Written estimate and terms",
+    "7am on the visit day",
+    "Day list at 7am",
+    "Your day list comes at 7:00am, the time you picked.",
+    "Thu Oct 22, 7:00am",
+    "an $89",
+    "$89",
+    "Fri 8am",
+    "Only a teen is home at Alex M.'s",
+    "Photos and answers added",
+    "Price it before anyone says yes",
+    "CANT START no proof Alex may have this work done",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Arrival times:",
+    "Asks Alex for photos",
+    "Mon–Fri 7:30am–5:30pm",
+    "On the photos path",
+    "Quoted from photos first"
+   ]
+  },
+  "A": {
+   "S1-61": "7421d186d5",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A7-96": "d540b91653",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-03": "7accda6f86",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-44": "50aad85ac2",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87"
+  },
+  "B": {
+   "S1-61": "e30e71f65d",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B4-83": "a7473a80ea",
+   "B4-43": "fc9855955a",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-93": "4d6f89e473",
+   "B7-90": "a5b8b2fe42",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B5-01": "841c417586",
+   "B4-15": "f13240b9c6",
+   "B4-23": "3bbc0f30df",
+   "B4-38": "9539521dc7",
+   "B5-35": "1de0d2312d",
+   "B4-69": "350fbaf90a",
+   "B6-14": "dfd03ee673",
+   "B7-07": "954270db4b",
+   "B7-10": "b5b9295e82",
+   "B8-01": "df9177b059",
+   "B8-23": "dd780a2ec8",
+   "B8-24": "bd5fb0ef0b",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B9-19": "b97bfbf0d2",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255"
+  }
+ }
+}
