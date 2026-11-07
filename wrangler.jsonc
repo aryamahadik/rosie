@@ -72,5 +72,54 @@
         { "pattern": "rosfield.com/test/*", "zone_name": "rosfield.com" },
       ],
     },
+    // The production environment (T-1003). Written, never deployed: no production deploy script, workflow or secret
+    // exists, and nothing below is created on Cloudflare until the user says yes (Q-51: one account for now, so every
+    // resource carries "production" in its name and none is shared with staging). Wrangler does not inherit bindings,
+    // vars, migrations or secrets into an environment, so each is repeated here. account_id, main and the
+    // compatibility settings are inherited from the top level (the Rosfield account stays pinned there).
+    "production": {
+      "name": "rosie-production",
+      // Not reachable on a workers.dev address or a preview URL; production answers only on its route once approved.
+      "workers_dev": false,
+      "preview_urls": false,
+      "vars": {
+        "ENVIRONMENT": "production",
+        "BASE_PATH": "",
+        "DB_SCHEMA": "",
+      },
+      // Names only, no values. Live keys are set by the CTO from his own login at M8 (none exists before then).
+      "secrets": {
+        "required": [],
+      },
+      "durable_objects": {
+        "bindings": [{ "name": "HANDLE_ACTOR", "class_name": "HandleActor" }],
+      },
+      "migrations": [{ "tag": "v1-handle-actor", "new_sqlite_classes": ["HandleActor"] }],
+      // Placeholder id (not a real namespace): the CTO creates rosie-production-bundles and puts its id here.
+      "kv_namespaces": [{ "binding": "BUNDLES", "id": "00000000000000000000000000000001" }],
+      "triggers": {
+        "crons": ["* * * * *"],
+      },
+      "queues": {
+        "producers": [{ "queue": "rosie-production-retry", "binding": "RETRY_QUEUE" }],
+        "consumers": [
+          {
+            "queue": "rosie-production-retry",
+            "max_retries": 5,
+            "dead_letter_queue": "rosie-production-retry-dlq",
+          },
+        ],
+      },
+      "r2_buckets": [{ "binding": "FILES", "bucket_name": "rosie-production-files" }],
+      // Placeholder id (not a real Hyperdrive configuration): the CTO creates rosie-production-hyperdrive (caching
+      // off for decision reads, ADR-007) and puts its id here. The database password lives in that configuration,
+      // never in this file.
+      "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "00000000000000000000000000000002" }],
+      // Production's route stays commented out until the user says yes. Do not uncomment it in a task; the lead
+      // does that with the user's OK, together with the DNS check.
+      // "routes": [
+      //   { "pattern": "rosfield.com/<production path, set when approved>", "zone_name": "rosfield.com" },
+      // ],
+    },
   },
 }
