@@ -1,0 +1,60 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-customer-mobile-email.json",
+      "version": "v1",
+      "table": "customers",
+      "expect": "accept",
+      "shows": "Alex M. on two businesses' lists, as two records never joined: at Lee's Barbershop as Alex's own AI booked it, with Alex's mobile and email on file (both K-04 handles), texts as the way and 18 or older; at the yoga studio with the same contacts, texts only, the times Alex named, first name only, no voicemail, and marked fee-free by Sam",
+      "source": "FS line 727 (customer); A4-82 ('Text me at ...'); A4-23 ('The AI sends Alex's name'; 'A new customer is added to the business's customer list once booked'); A4-80 ('It's for me, and yes, I'm over 18'); MC C2 (a mobile required, an email optional); RULES 4.8, 4.10; S13-19 and A3-50 (contact preferences; 'Weekdays after 6pm'); S11-57 (fee-free); Q-07 (texts only); SPEC-master 6 (Alex M., Lee's Barbershop, Wed Oct 21, 7:15pm); K-04 v1 seed-person-roles (Alex's mobile and email handles)"
+    },
+    {
+      "file": "seed-customer-business-added.json",
+      "version": "v1",
+      "table": "customers",
+      "expect": "accept",
+      "shows": "Tessa, added by the business: Sam's BOOK text for a drain clearing with Casey on Thu Oct 22 is read back with how to reach Tessa, and Sam's reply 1 says Tessa agreed to messages; Tessa's customer row at Lee Home Services (mobile on file, texts, 18 or older), K-04 handle, phone row (added as a Linq contact once saved) and customer role, the booking head, and Tessa's yes to texts for that booking as a K-29 consent row bound to the read-back's words and Sam's turn",
+      "source": "B3-08 ('BOOK Tessa drain Thu 12-2 Casey'; the read-back; 'owner → san: 1'; 'Means 1 Yes, send the link: the customer agreed to messages from Rosie for this booking'); A3-30; RULES 2.5 ('Rosie texts those customers only after the business adds their yes to texts'); S13-32 ('The business's word counts only for someone who gave the business their number for this booking'); S13-19; master-B.json slot two.count (the shop row); K-29 v1 consents; Q-03; SPEC-master 6 (Lee Home Services, Casey)"
+    },
+    {
+      "file": "seed-customer-blocked.json",
+      "version": "v1",
+      "table": "customer_blocks",
+      "expect": "accept",
+      "shows": "Kim, a customer of Lee Home Services (mobile and email on file, email as the way): Sam blocked Kim's number in the portal on Tue Oct 20 and lifted the block the next day; on Mon Oct 26 Sam told the AI to block Kim's number and Kim's address for home visits, which is sealed under Kim's key; both blocks hold, and the lifted one keeps its row",
+      "source": "S11-62 ('Sam blocks a number, or an address for home visits, by telling the AI or in the portal'; 'Sam can lift the block at any time'; 'Rosie's team sees each block, in case it's a mistake'); FS line 727 (blocked); FS section 6.2 (Customers: 'block a number or an address'); arch 01 line 93; K-04 v1 rule 6 (sealed as pauses.address); SPEC-master 6 (Kim, Lee Home Services)"
+    },
+    {
+      "file": "invalid/refuse-calls-only-way.json",
+      "version": "v1",
+      "table": "customers",
+      "expect": "refuse",
+      "shows": "Setting Tessa's way to calls only is refused (CHECK customers_way_known, SQLSTATE 23514): calls only is not offered; the same update to texts only passes",
+      "source": "Q-07 ('calls only is not offered'; 'Texts only works like Texts while there is no voice'); MC C2; A4-82, B4-93"
+    },
+    {
+      "file": "invalid/refuse-email-way-without-email.json",
+      "version": "v1",
+      "table": "customers",
+      "expect": "refuse",
+      "shows": "A record for Kim at Lee's Barbershop with email as the way and no email on file is refused (CHECK customers_way_fits_contact, SQLSTATE 23514); the same row with Kim's email on file passes",
+      "source": "A4-82, B4-93 ('so the branch always fits the line'; 'Means Email: every message and link by email'); S13-19 ('Email: everything goes by email')"
+    },
+    {
+      "file": "invalid/refuse-cross-business-read.json",
+      "version": "v1",
+      "table": "customers",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio does not see Lee's Barbershop's record of Alex M., though Alex is the yoga studio's customer too (row-level security per business: no row); the barbershop's own scope sees it",
+      "source": "RULES 4.10 ('A business's customer data is used only for that business ... never joined across businesses'); arch 10 line 546; K-04 v1 rule 4"
+    },
+    {
+      "file": "invalid/refuse-second-open-block.json",
+      "version": "v1",
+      "table": "customer_blocks",
+      "expect": "refuse",
+      "shows": "A second block of Kim's number at Lee Home Services while one holds is refused (unique customer_blocks_one_open_number, SQLSTATE 23505); the same block once the first is lifted passes",
+      "source": "S11-62 ('Sam blocks a number'; 'Sam can lift the block at any time')"
+    }
+  ]
+}

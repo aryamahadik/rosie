@@ -1,0 +1,23 @@
+{
+  "after": ["seed-customer-business-added.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "update",
+    "table": "customers",
+    "set": {
+      "way": "callsonly",
+      "version": 2
+    },
+    "where": {
+      "id": "customer-tessa-home-services"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["customers_way_known"]
+    }
+  }
+}

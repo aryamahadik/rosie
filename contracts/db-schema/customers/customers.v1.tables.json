@@ -1,0 +1,450 @@
+{
+  "part": "customers",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "customers",
+      "description": "A business's record of one customer (FS line 727, the customer row), per business and person: the name the business has on file, the contact on file (a mobile and an optional email, as K-04 handles), the way they are reached, their contact preferences, their age band and the owner's fee-free mark. A business's customer data is used only for that business and never joined across businesses (RULES 4.10), so a person who is a customer of two businesses has two rows. The person, their handles, their phone row with the stopped flag, and the paused flag are K-04's; a yes to texts is a K-29 consent row; a block is a customer_blocks row.",
+      "source": "FS line 727 (customer); RULES 4.8, 4.10; S13-19; S13-45; A4-23, B4-25 ('A new customer is added to the business's customer list once booked'); A3-30, B3-08; 02-contracts section 7 row K-28 and section 8 (customer, reach_by)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The customer row's id: an opaque string code makes and never parses (CQ-09). Later parts name a customer by it (FS lines 737, 738: a membership's and a pack's customer_id).",
+          "source": "FS line 727 (id); CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose customer list it is on (businesses.id). Row-level security scopes by it, so no other business reads it (RULES 4.10).",
+          "source": "FS line 727 (business_id); RULES 4.10; arch 10 line 546"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person (persons.id), as K-04's booking head names a booker, person served or payer. Their role at this business is K-04's person_roles row with role customer, which the guard lists (arch 02 line 115); this row is that customer's record at the business, not a second role.",
+          "source": "FS line 743 ('A person is one row'); K-04 v1 persons, person_roles; arch 02 line 115"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The name this business has on file for them: as their own AI sent it (A4-23, B4-25) or as the business booked them (A3-19: 'BOOK Alex M. haircut Sat 11am Riley'; B3-08: 'BOOK Tessa drain Thu 12-2 Casey'). A record on file is linked to a new conversation only when a proven contact and the name they type match (S13-45). Kept per business and never copied from or to another business's record (RULES 4.10); K-04's persons.name is the person's own name across Rosie. Plain, as persons.name (K-04 v1 rule 6). Texts about a child, or for sensitive work, show it only as RULES 4.6 and 4.7 allow (the claim check, limit 7).",
+          "source": "FS line 727 (name); A4-23, B4-25; A3-19, B3-08; S13-45; RULES 4.6, 4.7, 4.10; K-04 v1 README rule 6"
+        },
+        {
+          "name": "mobile_handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Their mobile on file: the handle (handles.id) of a K-04 phones row, and one of their own handles (person_handles). Texts go to it when their way is texts or textsonly. The number, its chat, its Linq contact (Q-03: added when it is saved) and its stopped flag across every business (MC C1) are that K-04 handle's and phone row's, never repeated here. Required when the customer or their own AI books (MC C2; D103), which the reach card checks (A4-82, B4-93); null for a customer the business booked with no mobile (A3-19: 'A customer with no mobile can be booked too'), or once staff took the number off in person (S13-19). A switch of where updates go moves it to the new contact (RULES 9.1).",
+          "source": "FS line 727 (mobile, required when the customer or their own AI books); MC C1, C2; D103; Q-03; A4-82, B4-93; A3-19; S13-19; RULES 9.1"
+        },
+        {
+          "name": "email_handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Their email on file: a K-04 handle (handles.id) of kind email, and one of their own handles (person_handles). Optional (MC C2: 'an email stays optional and gets every message'); it gets every message in step with the chat (RULES 4.1, 4.8), and everything when their way is email. The address itself is the K-04 handle's. A lost phone's code goes only to it (RULES 9.2b). Null: none given.",
+          "source": "FS line 727 (email, optional); MC C2; D103; RULES 4.1, 4.8, 9.2b; A4-82, B4-93"
+        },
+        {
+          "name": "way",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "How Rosie reaches them, from the reach card (A4-82, B4-93) or the owner's read-back (A3-30, B3-08): texts, textsonly or email, spelt as K-01 v1's bookingValues.reach. Calls only is not offered (Q-07; MC C2), and textsonly works like texts while there is no voice (Q-07). Every message goes this way, fallbacks too (S13-19), and an email on file also gets every message (RULES 4.8). A change on the same contact is set at once on their word in their own chat (A7-98: 'Calls instead of texts, or quiet times, on the same number: set at once'). Null only when no contact is on file: Rosie then sends them nothing, and the business reaches them its own way (S13-19).",
+          "source": "FS line 727 (reach way); RULES 4.8; S13-19; A4-82, B4-93; A3-30, B3-08; A7-98; Q-07; MC C2; K-01 v1 bookingValues.reach; 02-contracts section 8 (reach_by)"
+        },
+        {
+          "name": "contact_times",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The times they named for being reached, in their own words as read back (S13-19: 'Contact preferences: the person served sets how and when they're reached. That's the way, the times, first name only and no voicemail'; A3-50: 'Weekdays after 6pm'). The owner and staff line of a private booking says to reach them only at these times (S13-19). Kept as their words: no source gives a form code can read (README, open gaps). Null: none named.",
+          "source": "FS line 727 (contact preferences: times); S13-19; A3-50, B3-32"
+        },
+        {
+          "name": "first_name_only",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": ["staff", "owner"],
+          "description": "They asked to be named by first name only (S13-19; A3-50, B3-32): messages about them and the business's own calls use their first name only.",
+          "source": "FS line 727 (contact preferences: first name only); S13-19; A3-50, B3-32"
+        },
+        {
+          "name": "no_voicemail",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": ["staff", "owner"],
+          "description": "They asked for no voicemail (S13-19; A3-50, B3-32): nobody leaves one. Rosie places no calls (Q-05), so it binds the business's own person.",
+          "source": "FS line 727 (contact preferences: no voicemail); S13-19; A3-50, B3-32; Q-05"
+        },
+        {
+          "name": "age_band",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "Their answer to 'are you 18 or older?' (A4-80, B4-92), or the age the owner's read-back gave (A3-30, B3-08: 'For Tessa, 18 or older'): 18_or_older or under_18, never an exact age (A4-80: 'Never ask a child's exact age'). The question is skipped only for a record that says 18_or_older, for that record's own person, once a proven contact links it (A4-80); under_18 is asked again. Nothing is kept about a child under 13 or a teen booking alone (A4-80; RULES 4.7). Null: not asked.",
+          "source": "FS line 727 (age band); A4-80, B4-92; A3-30, B3-08; RULES 4.7"
+        },
+        {
+          "name": "fee_free",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": ["owner"],
+          "description": "The owner marked them fee-free on the Customers page (S11-57; FS section 6.2): they are never asked a late-cancel or no-show fee (S11-22). Never used or hinted at before the one rule proves the contact (S13-45: 'no fee-free label'). The reasons stay K-26's notes (K-26 v1 README).",
+          "source": "FS line 727 (fee_free); S11-57; S11-22; S13-45; FS section 6.2 (Customers)"
+        },
+        {
+          "name": "added_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": ["owner"],
+          "description": "When the business's list gained them: once booked (A4-23, B4-25), or when the business booked them (A3-30, B3-08).",
+          "source": "A4-23, B4-25 ('A new customer is added to the business's customer list once booked'); A3-30, B3-08"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "customers_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customers_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customers_mobile_phone_fk",
+          "columns": ["mobile_handle_id"],
+          "references": {
+            "table": "phones",
+            "columns": ["handle_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customers_mobile_own_fk",
+          "columns": ["person_id", "mobile_handle_id"],
+          "references": {
+            "table": "person_handles",
+            "columns": ["person_id", "handle_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customers_email_own_fk",
+          "columns": ["person_id", "email_handle_id"],
+          "references": {
+            "table": "person_handles",
+            "columns": ["person_id", "handle_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "customers_business_person_key",
+          "columns": ["business_id", "person_id"],
+          "source": "FS line 727 (business_id); RULES 4.10 (one record per person at each business)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "customers_way_known",
+          "expression": "way is null or way in ('texts', 'textsonly', 'email')",
+          "source": "Q-07 (calls only is not offered); MC C2; K-01 v1 bookingValues.reach"
+        },
+        {
+          "name": "customers_way_fits_contact",
+          "expression": "((way is null) = (mobile_handle_id is null and email_handle_id is null)) and (way <> 'email' or email_handle_id is not null) and (way not in ('texts', 'textsonly') or mobile_handle_id is not null)",
+          "source": "A4-82, B4-93 ('so the branch always fits the line'); S13-19"
+        },
+        {
+          "name": "customers_age_band_known",
+          "expression": "age_band is null or age_band in ('under_18', '18_or_older')",
+          "source": "A4-80, B4-92 ('are you 18 or older?'; 'Never ask a child's exact age')"
+        },
+        {
+          "name": "customers_name_given",
+          "expression": "length(btrim(name)) > 0",
+          "source": "FS line 727 (name); A4-23, B4-25"
+        },
+        {
+          "name": "customers_contact_times_given",
+          "expression": "contact_times is null or length(btrim(contact_times)) > 0",
+          "source": "S13-19 (the times they named)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "customers_mobile_idx",
+          "columns": ["business_id", "mobile_handle_id"],
+          "where": "mobile_handle_id is not null",
+          "why": "The business's record on file for a proven mobile (S13-45; 02-contracts K-09 v1.1, journey 3: 'find or add the customer by mobile'), and K-26's own-customers rule (FS K10)."
+        },
+        {
+          "name": "customers_email_idx",
+          "columns": ["business_id", "email_handle_id"],
+          "where": "email_handle_id is not null",
+          "why": "The business's record on file for a proven email (S13-45; RULES 9.2b)."
+        },
+        {
+          "name": "customers_person_idx",
+          "columns": ["person_id"],
+          "why": "A person's records, for the runtime side's jobs that work by person, such as the 45-day copy or delete (RULES 4.10); no business scope reads another business's row."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "customer_blocks",
+      "description": "A business's block of one customer, by their number or by their address for home visits (S11-62: 'Sam blocks a number, or an address for home visits, by telling the AI or in the portal'; FS section 6.2, Customers). While it holds, AI assistants and the booking page hear only that the business can't take their booking, with no reason given. One row per block; lifting keeps the row (S11-62: 'Sam can lift the block at any time'; 'Rosie's team sees each block, in case it's a mistake'). FS line 727's blocked is whether an open row exists. Not K-04's pauses: a pause holds visits for the owner's decision (A3-48), a block refuses new bookings.",
+      "source": "S11-62; FS line 727 (blocked); FS section 6.2 (Customers: 'block a number or an address'); 02-contracts section 7 row K-28 ('blocked number or address (S11-62)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The block's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business that blocked (businesses.id): a block holds only at that business. Row-level security scopes by it.",
+          "source": "S11-62; arch 10 line 546"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The customer blocked (persons.id), held with business_id to their customer row (S11-62: 'Blocks a customer'). Also the person whose key seals the address (arch 01 line 93).",
+          "source": "S11-62 ('Blocks a customer'); arch 01 line 93"
+        },
+        {
+          "name": "target",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "number or address: 'Sam blocks a number, or an address for home visits' (S11-62).",
+          "source": "S11-62; FS section 6.2 (Customers)"
+        },
+        {
+          "name": "phone_handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a number: the blocked mobile, the handle (handles.id) of a K-04 phones row and one of the customer's own handles (person_handles). A new booking that gives it, through their own AI, the booking page or a text, hears only that the business can't take it (S11-62).",
+          "source": "S11-62 ('Sam blocks a number'; 'AI assistants hear that the business can't take their booking, with no reason given')"
+        },
+        {
+          "name": "address",
+          "type": "bytea",
+          "null": true,
+          "audience": "secure-page-only",
+          "sealedBy": "person_id",
+          "description": "For an address: the street address for home visits, sealed under the key of the person in person_id, as K-04's pauses.address (K-04 v1 rule 6; arch 01 line 93), so deleting their key erases it. Never in a text, an email or to an AI (RULES 4.5): shown only on a secure, signed-in page, the owner's Customers page. A flow B booking's address is checked against the business's open address blocks in code, after unsealing them.",
+          "source": "S11-62 ('an address for home visits'); arch 01 line 93; RULES 4.5, 4.10; K-04 v1 pauses.address"
+        },
+        {
+          "name": "set_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the block was set.",
+          "source": "S11-62"
+        },
+        {
+          "name": "set_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who set it (persons.id): the account owner, or an admin the owner lets (RULES 6.8; S13-45 row 8). Whether that person may is K-22's.",
+          "source": "S11-62; RULES 6.8; S13-45 row 8"
+        },
+        {
+          "name": "set_by_turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that set it (turns.id), when the owner told the AI; null when it was set in the portal (S11-62: 'by telling the AI or in the portal').",
+          "source": "S11-62; K-04 v1 turns"
+        },
+        {
+          "name": "lifted_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was lifted; null while it holds (S11-62: 'Sam can lift the block at any time').",
+          "source": "S11-62"
+        },
+        {
+          "name": "lifted_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who lifted it (persons.id).",
+          "source": "S11-62"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "customer_blocks_customer_fk",
+          "columns": ["business_id", "person_id"],
+          "references": {
+            "table": "customers",
+            "columns": ["business_id", "person_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customer_blocks_phone_fk",
+          "columns": ["phone_handle_id"],
+          "references": {
+            "table": "phones",
+            "columns": ["handle_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customer_blocks_phone_own_fk",
+          "columns": ["person_id", "phone_handle_id"],
+          "references": {
+            "table": "person_handles",
+            "columns": ["person_id", "handle_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customer_blocks_set_by_fk",
+          "columns": ["set_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customer_blocks_turn_fk",
+          "columns": ["set_by_turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customer_blocks_lifted_by_fk",
+          "columns": ["lifted_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "customer_blocks_one_open_number",
+          "columns": ["business_id", "phone_handle_id"],
+          "where": "lifted_at is null",
+          "source": "S11-62 (a number is blocked at a business, or it is not)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "customer_blocks_target_known",
+          "expression": "target in ('number', 'address')",
+          "source": "S11-62 ('a number, or an address for home visits')"
+        },
+        {
+          "name": "customer_blocks_one_target",
+          "expression": "(target <> 'number' or (phone_handle_id is not null and address is null)) and (target <> 'address' or (address is not null and phone_handle_id is null))",
+          "source": "S11-62"
+        },
+        {
+          "name": "customer_blocks_lifted_together",
+          "expression": "(lifted_at is null) = (lifted_by_person_id is null)",
+          "source": "S11-62 ('Sam can lift the block at any time')"
+        },
+        {
+          "name": "customer_blocks_lifted_after_set",
+          "expression": "lifted_at is null or lifted_at >= set_at",
+          "source": "S11-62"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "customer_blocks_customer_idx",
+          "columns": ["business_id", "person_id"],
+          "why": "A customer's blocks, for the Customers page and the read-back that names any plan, membership or credits a block ends (S11-62)."
+        },
+        {
+          "name": "customer_blocks_open_address_idx",
+          "columns": ["business_id"],
+          "where": "target = 'address' and lifted_at is null",
+          "why": "A flow B booking's address is checked against the business's open address blocks (S11-62)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}
