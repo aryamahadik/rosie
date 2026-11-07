@@ -25,6 +25,14 @@
       "source": "S11-62 ('Sam blocks a number, or an address for home visits, by telling the AI or in the portal'; 'Sam can lift the block at any time'; 'Rosie's team sees each block, in case it's a mistake'); FS line 727 (blocked); FS section 6.2 (Customers: 'block a number or an address'); arch 01 line 93; K-04 v1 rule 6 (sealed as pauses.address); SPEC-master 6 (Kim, Lee Home Services)"
     },
     {
+      "file": "seed-customer-blocked-first-sender.json",
+      "version": "v1",
+      "table": "customer_blocks",
+      "expect": "accept",
+      "shows": "A first-time sender to Lee's Barbershop whose text threatened someone on the team: nothing was booked, so they have no customer row or customer role there and no name on file (K-04's persons.name, null until known); told 'keep them paused, or block them', Sam tells the AI to block their number, and the block names the business and the person, with no customer row",
+      "source": "A3-48 ('New requests from that phone or place wait for Sam. Sam may block them'; 'Nothing booked / Paused until you decide: keep them paused, or block them'); B3-30; S11-62 ('Sam blocks a number, or an address for home visits, by telling the AI or in the portal'); A4-23 ('A new customer is added to the business's customer list once booked'); RULES 4.1b (chat open, set by the first text); K-04 v1 persons.name ('null until known'); SPEC-master 6 (Lee's Barbershop, Sam)"
+    },
+    {
       "file": "invalid/refuse-calls-only-way.json",
       "version": "v1",
       "table": "customers",

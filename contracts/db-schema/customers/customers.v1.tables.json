@@ -94,8 +94,8 @@
           "type": "text",
           "null": true,
           "audience": ["customer", "staff", "owner"],
-          "description": "Their answer to 'are you 18 or older?' (A4-80, B4-92), or the age the owner's read-back gave (A3-30, B3-08: 'For Tessa, 18 or older'): 18_or_older or under_18, never an exact age (A4-80: 'Never ask a child's exact age'). The question is skipped only for a record that says 18_or_older, for that record's own person, once a proven contact links it (A4-80); under_18 is asked again. Nothing is kept about a child under 13 or a teen booking alone (A4-80; RULES 4.7). Null: not asked.",
-          "source": "FS line 727 (age band); A4-80, B4-92; A3-30, B3-08; RULES 4.7"
+          "description": "Their answer to 'are you 18 or older?' (A4-80, B4-92), or the age the read-back of a booking the business adds gave (A3-30, B3-08: 'For Tessa, 18 or older'): 18_or_older or under_18, never an exact age (A4-80: 'Never ask a child's exact age'). The question is skipped only for a record whose phone was proven in an earlier booking and that says 18_or_older, and only for that record's own person (A4-80: 'Someone new on the same phone is asked their age'); under_18 is asked again. Nothing is kept about a child under 13 or a teen booking alone (A4-80; RULES 4.7). Staff see it because Sam, a barber or the desk books for a customer, and the read-back they answer carries the age their reply sets (A3-19, A3-30). under_18 is a child's detail, which no staff or owner text carries (RULES 4.5; RULES 4.7: 'Staff and owner texts name only the parent and the time or class'), so for them the claim check (limit 7) treats it as secure-page-only. Null: not asked.",
+          "source": "FS line 727 (age band); A4-80, B4-92; A3-19, A3-30, B3-08; RULES 4.5, 4.7; S13-46"
         },
         {
           "name": "fee_free",
@@ -260,8 +260,8 @@
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "The customer blocked (persons.id), held with business_id to their customer row (S11-62: 'Blocks a customer'). Also the person whose key seals the address (arch 01 line 93).",
-          "source": "S11-62 ('Blocks a customer'); arch 01 line 93"
+          "description": "The person blocked (persons.id). They need no customer row at the business: Sam may block a first-time sender whose threat booked nothing (A3-48, B3-30: 'Paused until you decide: keep them paused, or block them'), and a customer row comes only once booked (A4-23), so a block adds none. A number block's handle is one of their own (customer_blocks_phone_own_fk), and their key seals an address block's address (arch 01 line 93).",
+          "source": "S11-62 ('Blocks a customer'); A3-48, B3-30; A4-23; arch 01 line 93"
         },
         {
           "name": "target",
@@ -341,11 +341,20 @@
       "primaryKey": ["id"],
       "foreignKeys": [
         {
-          "name": "customer_blocks_customer_fk",
-          "columns": ["business_id", "person_id"],
+          "name": "customer_blocks_business_fk",
+          "columns": ["business_id"],
           "references": {
-            "table": "customers",
-            "columns": ["business_id", "person_id"]
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "customer_blocks_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
           },
           "onDelete": "restrict"
         },
