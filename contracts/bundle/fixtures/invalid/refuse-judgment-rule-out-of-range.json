@@ -1,0 +1,84 @@
+{
+  "id": "A7-12",
+  "section": 7,
+  "lines": [
+    "7.5"
+  ],
+  "who": "san",
+  "to": "staff",
+  "via": "msg",
+  "tells": [
+    "staff",
+    "cust"
+  ],
+  "text": "A7-12",
+  "title": "Checks it, then asks Riley",
+  "does": "A question the booking answers, like the time or the address, is answered at once. Otherwise Riley gets the words, with quick answers to tap.",
+  "more": [
+    "No answer in 10 minutes: it goes to Sam, and the customer hears the shop was asked.",
+    "A question that can wait, sent at night, waits for the morning. The customer is told, and Sam is texted at 8am.",
+    "A question only a pro may answer gets the shop's line: 'Riley will go over it at your visit.'",
+    "A question nobody here may answer, like a legal one, gets: 'We can't advise on legal questions; a lawyer can help.'",
+    "Never promise it for the visit.",
+    "The plug-in's urgent words, like labor or water breaking, ring the on-call person at once, any hour.",
+    "Never: answer urgent words with 'it waits for the morning'. Staff never quote prices by text.",
+    "Words that hold something private reach Riley as 'Read it on the secure page'.",
+    "A report that someone at the business harmed a person goes to Rosie's team that day.",
+    "It never goes to the one named (judgment rule 58).",
+    "Abuse aimed at Riley is never passed on. Sam hears what kind came, and decides about the booking.",
+    "Safe default: it goes to Sam; nothing changes."
+  ],
+  "say": [
+    {
+      "from": "cust",
+      "to": "san",
+      "text": "Can my son wait in the shop during my cut?",
+      "plainText": "Can my son wait in the shop during my cut?"
+    },
+    {
+      "from": "san",
+      "to": "staff",
+      "text": "{{alex.staff:Alex M.}} asks: Can my son wait in the shop during my cut?",
+      "elements": {
+        "buttons": [
+          "Yes",
+          "No",
+          "Call Alex"
+        ]
+      },
+      "plainText": "{{alex.staff:Alex M.}} asks: Can my son wait in the shop during my cut?\nReply 1 Yes, 2 No, 3 Call Alex."
+    },
+    {
+      "from": "staff",
+      "to": "san",
+      "text": "1",
+      "plainText": "1"
+    },
+    {
+      "from": "san",
+      "to": "cust",
+      "text": "Riley says yes.",
+      "plainText": "Riley says yes."
+    }
+  ],
+  "rule": "Rosie's rule: a booking never changes just because nobody answered. Why: silence isn't a yes.",
+  "took": "A",
+  "layerLines": [
+    "private",
+    "privatecall",
+    "textsonly",
+    "emailonly"
+  ],
+  "ev": "A",
+  "reads": [
+    "money",
+    "contact"
+  ],
+  "fallbackText": "Alex M. asks: Can my son wait in the shop during my cut?",
+  "pageTypes": [],
+  "next": null,
+  "judgmentRules": [
+    68
+  ],
+  "lint": []
+}

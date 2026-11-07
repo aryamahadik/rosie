@@ -1,0 +1,604 @@
+{
+  "contract": "bundle.v1",
+  "bundleId": {
+    "hash": "7dc5819dc3831d2adcf24561ec1eb23e453dbda1f87c449038d69045c3b2d346",
+    "build": 1
+  },
+  "builtAt": "2026-11-07T08:00:00Z",
+  "compiler": {
+    "version": "0.0.0-sample"
+  },
+  "inputs": [
+    {
+      "kind": "masterFlow",
+      "path": "engine/work/master/master-A.json",
+      "sha256": "a5e7b4bb1af5c7c0431f3af83c4c3f57e252272143cf978c1a9d39f5ab222a7e"
+    },
+    {
+      "kind": "masterFlow",
+      "path": "engine/work/master/master-B.json",
+      "sha256": "89d2c8117b32c7a511cf8f96c57b989c4840687804fc0febd250cfc549757940"
+    },
+    {
+      "kind": "trade",
+      "path": "engine/work/prof/barber.json",
+      "sha256": "b1572006b845046eb7951066e65f73f34066a064c61aa4ee5a903fa86c63f372",
+      "trade": "barber"
+    },
+    {
+      "kind": "masterCorrections",
+      "path": "2 Technical Architecture/3 Master Corrections.md",
+      "sha256": "11e692ec7af29de388815a2327b588508d936a2725702d49f83be25b64615c4b",
+      "version": "as of Nov 5 2026"
+    },
+    {
+      "kind": "lines",
+      "path": "engine/design/LINES.md",
+      "sha256": "55ab0383ac6190c4b94b763bc834a7566469f9d98a31312f8d03f62541f9aaed"
+    },
+    {
+      "kind": "fixtureSetManifest",
+      "path": "fixtures/v1/MANIFEST.sha256",
+      "sha256": "8ef84685629eb3d0489d9f9f1f70bdf7c6fd15de16e0deddffaea05824cc1bf7"
+    },
+    {
+      "kind": "referenceCode",
+      "path": "engine/work/build/overlay-core.js",
+      "sha256": "a01c993c84ce7ed3b20cbfe470bffa1d300b8e7e4cd35d45a2c5ba1e13bfa18c"
+    },
+    {
+      "kind": "referenceCode",
+      "path": "engine/work/build/lib.js",
+      "sha256": "8b11317cecbda085d4ef414d3454a57d4a788f08935994736caab496ccafc48d"
+    },
+    {
+      "kind": "referenceCode",
+      "path": "engine/work/build/msgtext.js",
+      "sha256": "7928feb90897c5ae2e053e45313f631f20827959c1dc9207b1885ae4f1119bc4"
+    }
+  ],
+  "prompts": {
+    "safetyRead": {
+      "version": "sample-1",
+      "sha256": "575db3b26f4a9441d6c02fe34cf0d2c8d8baf6bfa4e62bb8a5173a53f776f6a4",
+      "text": "Sample safety read prompt for the K-01 v1 fixtures. The real prompt is the AI engineer's (C-119) and ships inside the bundle."
+    },
+    "decide": {
+      "version": "sample-1",
+      "sha256": "6c3837ef3ff47b52ce8d0ae77075c707282890bbede23886d71d3bc4c77c4177",
+      "text": "Sample decide prompt for the K-01 v1 fixtures. The real prompt is the AI engineer's (C-119) and ships inside the bundle."
+    },
+    "planner": {
+      "version": "sample-1",
+      "sha256": "728e5a6c863e361ec29ee957a62fc2c9190522c7f5b0f22a15fadc7ee3240a96",
+      "text": "Sample planner prompt for the K-01 v1 fixtures. The real prompt is the AI engineer's (C-119) and ships inside the bundle."
+    },
+    "composer": {
+      "version": "sample-1",
+      "sha256": "e42b4896df6056755979aba2d162827c2193a26eabcc06589d56f18555f616e3",
+      "text": "Sample composer prompt for the K-01 v1 fixtures. The real prompt is the AI engineer's (C-119) and ships inside the bundle."
+    }
+  },
+  "models": {
+    "haiku": "claude-haiku-5-5",
+    "sonnet": "claude-sonnet-5-5"
+  },
+  "policy": {
+    "low": {
+      "first": "haiku",
+      "second": "haiku"
+    },
+    "high": {
+      "first": "sonnet",
+      "second": "haiku"
+    },
+    "reread": "sonnet"
+  },
+  "lint": {
+    "rules": [
+      {
+        "rule": "no-safe-default-or-clock",
+        "failures": 0
+      },
+      {
+        "rule": "choice-without-definition",
+        "failures": 0
+      },
+      {
+        "rule": "lookup-without-field",
+        "failures": 0
+      },
+      {
+        "rule": "loop",
+        "failures": 0
+      },
+      {
+        "rule": "guard-keyword-button",
+        "failures": 1
+      },
+      {
+        "rule": "unknown-slot",
+        "failures": 0
+      },
+      {
+        "rule": "judgment-rule-out-of-range",
+        "failures": 0
+      },
+      {
+        "rule": "record-lint",
+        "failures": 0
+      }
+    ],
+    "failures": [
+      {
+        "rule": "guard-keyword-button",
+        "flow": "A",
+        "step": "S1-37",
+        "trade": null,
+        "message": "S1-37 fails guard-keyword-button"
+      }
+    ]
+  },
+  "journeys": [
+    {
+      "journey": 1,
+      "steps": [
+        "S1-01",
+        "S1-02",
+        "S1-03",
+        "S1-04",
+        "S1-08",
+        "S1-09",
+        "S1-10",
+        "S1-11",
+        "S1-12",
+        "S1-13",
+        "S1-14",
+        "S1-21",
+        "S1-23",
+        "S1-24",
+        "S1-25",
+        "S1-26",
+        "S1-27",
+        "S1-29",
+        "S1-31",
+        "S1-32",
+        "S1-33",
+        "S1-35",
+        "S1-36",
+        "S1-37",
+        "S1-38",
+        "S1-43",
+        "S1-50",
+        "S1-52",
+        "S1-60",
+        "S1-61",
+        "S1-62",
+        "S1-70",
+        "S1-71",
+        "S1-72",
+        "S1-74",
+        "S1-75",
+        "S1-76",
+        "S1-77",
+        "S1-78",
+        "S1-79",
+        "S1-80",
+        "S1-81",
+        "S1-82",
+        "S1-83",
+        "S1-84"
+      ],
+      "ships": false,
+      "failingSteps": [
+        "S1-37"
+      ]
+    }
+  ],
+  "storage": {
+    "manifestKey": "bundle/7dc5819dc3831d2adcf24561ec1eb23e453dbda1f87c449038d69045c3b2d346/1/manifest",
+    "values": [
+      {
+        "key": "bundle/7dc5819dc3831d2adcf24561ec1eb23e453dbda1f87c449038d69045c3b2d346/1/flow/A",
+        "kind": "flow",
+        "flow": "A",
+        "bytes": 195703,
+        "sha256": "08f400b23b3150be3aebfdfd4e4006e103890b6f151b63876c353ac9493ef6a1"
+      },
+      {
+        "key": "bundle/7dc5819dc3831d2adcf24561ec1eb23e453dbda1f87c449038d69045c3b2d346/1/flow/B",
+        "kind": "flow",
+        "flow": "B",
+        "bytes": 184383,
+        "sha256": "5420ed9d082f8139e750179a7c017a9e6a04feafd60efc25dbdfa8496425e861"
+      },
+      {
+        "key": "bundle/7dc5819dc3831d2adcf24561ec1eb23e453dbda1f87c449038d69045c3b2d346/1/trade/barber",
+        "kind": "trade",
+        "trade": "barber",
+        "bytes": 42315,
+        "sha256": "4ead707968978e725920921c5c0a0b64d93e9a73ea56de537c5222a25230788d"
+      }
+    ]
+  },
+  "lists": {
+    "keywords": {
+      "start": "START",
+      "help": "HELP",
+      "optOut": [
+        "STOP",
+        "STOPALL",
+        "CANCEL",
+        "END",
+        "QUIT",
+        "UNSUBSCRIBE",
+        "REVOKE",
+        "OPTOUT",
+        "OPT OUT",
+        "CANCELAR",
+        "PARA",
+        "PARAR",
+        "ALTO",
+        "BASTA",
+        "DETENER",
+        "FIN"
+      ],
+      "flagsVisit": [
+        "CANCEL",
+        "CANCELAR"
+      ]
+    },
+    "fixedLines": {
+      "lines": [
+        {
+          "id": "opener",
+          "text": "This is Rosie, the automated booking assistant for <business>.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "On Rosie's first text to a handle about one business, with the privacy-notice link.",
+          "source": "arch 07 line 361; S13-01; RULES 1.11, 4.3"
+        },
+        {
+          "id": "optOutLine",
+          "text": "Reply STOP to opt out. Msg & data rates may apply. Reply HELP for help.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "On Rosie's first reply in a chat the person opened, which is the first text that number gets (Q-30).",
+          "source": "S13-32; S13-02; RULES 4.3; msgtext.js line 31; Q-30"
+        },
+        {
+          "id": "stopReply",
+          "text": null,
+          "lang": "en",
+          "status": "pendingJay",
+          "use": "The one reply to a stop word: Rosie's texts to this number are off for every business; the visit is still booked, and how to cancel it.",
+          "source": "Q-01 (drafted words go to Jay on a tier 3 card); MC C1; RULES 7.2, 7.3; S13-32; A7-11, B7-15"
+        },
+        {
+          "id": "stopLaterReply",
+          "text": "Texts are off. Reply START, or call the business.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "Each later text from a stopped number gets this one reply and nothing else (Q-01).",
+          "source": "RULES 7.3; S13-32; Q-01"
+        },
+        {
+          "id": "stopOtherNumber",
+          "text": "To stop texts to a number, reply STOP from it.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "A stop asked for another number changes nothing.",
+          "source": "RULES 7.2; S13-32"
+        },
+        {
+          "id": "stopToBusiness",
+          "text": "Texts to this customer are off. Reach them their way.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "What each business with an open booking for the stopped phone hears.",
+          "source": "RULES 7.5; S13-32"
+        },
+        {
+          "id": "startReply",
+          "text": null,
+          "lang": "en",
+          "status": "pendingJay",
+          "use": "The reply to START: texts to this number are back on.",
+          "source": "Q-01; RULES 7.5; S13-32"
+        },
+        {
+          "id": "helpReply",
+          "text": null,
+          "lang": "en",
+          "status": "pendingJay",
+          "use": "The reply to HELP: the business's name and number, and how to stop.",
+          "source": "Q-01; RULES 7.6; S13-32 ('HELP gets the business's name and number, and how to stop')"
+        },
+        {
+          "id": "safetyEmergency",
+          "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "An emergency: the safety message, at any hour, past any opt-out.",
+          "source": "A3-24; arch 02 line 111; arch 06"
+        },
+        {
+          "id": "safetyCrisis",
+          "text": "If you're thinking about harming yourself, call or text 988 now. If you're in danger right now, call 911.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "Crisis words: 988 and 911 at once.",
+          "source": "A3-25; arch 02 line 111; arch 06"
+        },
+        {
+          "id": "safetyAsk",
+          "text": "Is anyone in danger right now?",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "Added when a safety label's tense is unknown.",
+          "source": "arch 06 line 329; S13-24 rule 10"
+        },
+        {
+          "id": "passedOn",
+          "text": "I’ve passed this on. Rosie’s team will reply within 1 business day.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "When no reply passes the checks: the question is withdrawn and the team is paged.",
+          "source": "arch 02 line 123; S13-29"
+        },
+        {
+          "id": "outage",
+          "text": "Rosie is down for a few minutes. If anyone is in danger, call 911.",
+          "lang": "en",
+          "status": "asWritten",
+          "use": "Once to each text whose turn has not committed while the AI provider or PostgreSQL is down, never to a stopped number.",
+          "source": "arch 11 lines 564 and 566; S12-12"
+        }
+      ]
+    },
+    "keyMap": {
+      "keys": [
+        {
+          "key": "id",
+          "as": "typed",
+          "to": "trade/id",
+          "why": "SPEC-prof 3; MC R3 (top keys read by name)"
+        },
+        {
+          "key": "name",
+          "as": "typed",
+          "to": "trade/name",
+          "why": "SPEC-prof 3"
+        },
+        {
+          "key": "style",
+          "as": "typed",
+          "to": "trade/style",
+          "why": "SPEC-prof 3"
+        },
+        {
+          "key": "pattern",
+          "as": "typed",
+          "to": "trade/pattern",
+          "why": "SPEC-prof 2 items 5 and 8"
+        },
+        {
+          "key": "pf.facts",
+          "as": "typed",
+          "to": "facts",
+          "why": "MC R3: code reads pf.facts by name; MC C5's fills"
+        },
+        {
+          "key": "pf.switches",
+          "as": "typed",
+          "to": "flows/<flow>/switches",
+          "why": "MC R3; SPEC-master 5b (a per-flow value split per flow); no2 from S1-62 (SPEC-master 5j)"
+        },
+        {
+          "key": "pf.settings",
+          "as": "typed",
+          "to": "flows/<flow>/settings",
+          "why": "MC R3; MC C5 (none: arrive window and an empty cutoff)"
+        },
+        {
+          "key": "money",
+          "as": "typed",
+          "to": "flows/<flow>/money",
+          "why": "MC R3: money.<flow> read by name; SPEC-prof 3"
+        },
+        {
+          "key": "pf.license",
+          "as": "textBlock",
+          "to": "pluginText/pf.license",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.services",
+          "as": "textBlock",
+          "to": "pluginText/pf.services",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.questions",
+          "as": "textBlock",
+          "to": "pluginText/pf.questions",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.safety",
+          "as": "textBlock",
+          "to": "pluginText/pf.safety",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.first_steps",
+          "as": "textBlock",
+          "to": "pluginText/pf.first_steps",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.visit",
+          "as": "textBlock",
+          "to": "pluginText/pf.visit",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.money",
+          "as": "textBlock",
+          "to": "pluginText/pf.money",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.messages",
+          "as": "textBlock",
+          "to": "pluginText/pf.messages",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.staff",
+          "as": "textBlock",
+          "to": "pluginText/pf.staff",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.rules",
+          "as": "textBlock",
+          "to": "pluginText/pf.rules",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "pf.edges",
+          "as": "textBlock",
+          "to": "pluginText/pf.edges",
+          "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+        },
+        {
+          "key": "rename",
+          "as": "ops",
+          "to": "flows/<flow>/rename",
+          "why": "SPEC-prof 3 'rename'; overlay-core.js line 1800"
+        },
+        {
+          "key": "slots",
+          "as": "ops",
+          "to": "flows/<flow>/slotRows",
+          "why": "overlay-core.js profRecord line 1867"
+        },
+        {
+          "key": "A",
+          "as": "ops",
+          "to": "flows/A/ops",
+          "why": "SPEC-prof 3 'ops'; MC C8 (void offs dropped)"
+        },
+        {
+          "key": "B",
+          "as": "ops",
+          "to": "flows/B/ops",
+          "why": "SPEC-prof 3 'ops'; MC C8 (void offs dropped)"
+        },
+        {
+          "key": "notes",
+          "as": "leftOut",
+          "why": "MC R2: authoring fields"
+        },
+        {
+          "key": "basis",
+          "as": "leftOut",
+          "why": "MC R2: authoring fields"
+        },
+        {
+          "key": "keep",
+          "as": "leftOut",
+          "why": "MC R2: authoring fields"
+        },
+        {
+          "key": "from",
+          "as": "leftOut",
+          "why": "MC R2: authoring fields"
+        },
+        {
+          "key": "splitsKept",
+          "as": "leftOut",
+          "why": "MC R2: authoring fields"
+        },
+        {
+          "key": "keep_why",
+          "as": "leftOut",
+          "why": "MC R2: authoring fields"
+        },
+        {
+          "key": "cast",
+          "as": "leftOut",
+          "why": "MC C6: the sample cast, names and story are illustrations"
+        },
+        {
+          "key": "names",
+          "as": "leftOut",
+          "why": "MC C6: the sample cast, names and story are illustrations"
+        },
+        {
+          "key": "story",
+          "as": "leftOut",
+          "why": "MC C6: the sample cast, names and story are illustrations"
+        }
+      ],
+      "subKeys": "guidance"
+    },
+    "outOfScope": {
+      "markers": [
+        {
+          "component": "C-252",
+          "title": "C9 and no voice: S1-75's code by call or text to the listing's phone",
+          "targets": [
+            {
+              "at": "S1-75",
+              "unreachable": "line",
+              "line": "To prove Lee's Barbershop is yours, I'm calling the number on your listing with a code: (555) 010-0177. Type the code here."
+            },
+            {
+              "at": "S1-75",
+              "unreachable": "line",
+              "line": "A code by call, text or email to the public listing's own phone or email, typed back here."
+            }
+          ],
+          "why": "MC C9; Q-02 (the code goes only to the listing's email); arch 12 line 634 (Phone calls, D5); C-237"
+        },
+        {
+          "component": "C-253",
+          "title": "C9 and no voice: S1-35's texted and called notice to the listing's phone",
+          "targets": [
+            {
+              "at": "S1-35",
+              "unreachable": "line",
+              "line": "The notice goes to the phone and email on the public listing. The registration's contact gets it only with no listing."
+            },
+            {
+              "at": "S1-35",
+              "unreachable": "line",
+              "line": "A landline gets it by a call: 'This is Rosie, an automated assistant. <Business> is now on Rosie. Not you? Call Rosie's team.'"
+            }
+          ],
+          "why": "MC C9; Q-02 (the go-live notice goes by email only); arch 12 line 634"
+        },
+        {
+          "component": "C-254",
+          "title": "C9: A3-30's and B3-08's \"1 Yes, send the link\"",
+          "targets": [
+            {
+              "at": "A3-30",
+              "unreachable": "firstText",
+              "branch": "1 Yes, send the link"
+            },
+            {
+              "at": "B3-08",
+              "unreachable": "firstText",
+              "branch": "1 Yes, send the link"
+            }
+          ],
+          "why": "MC C9 ('the owner, for staff (S2-05) and for a booking the business adds'); the booking and the customer's yes to messages for it stay in scope"
+        }
+      ]
+    }
+  },
+  "partial": true
+}

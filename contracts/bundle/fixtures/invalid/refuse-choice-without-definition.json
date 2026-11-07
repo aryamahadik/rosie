@@ -1,0 +1,196 @@
+{
+  "type": "split",
+  "id": "A6-02",
+  "section": 6,
+  "text": "A6-02",
+  "lines": [
+    "6.1"
+  ],
+  "who": "san",
+  "to": "owner",
+  "via": "msg",
+  "tells": [
+    "owner",
+    "cust"
+  ],
+  "title": "Texts Sam the request",
+  "does": "This booking needs Sam's OK, so Rosie texts Sam the request. The clock runs only in Sam's text hours. Nothing is charged for this visit until the OK.",
+  "more": [
+    "The owner names who answers: Sam, the office manager, or an expert. The first answer counts.",
+    "No answer in 30 minutes: the customer is told to wait, and Sam gets one reminder.",
+    "No answer in 4 of Sam's text hours: not booked.",
+    "The plug-in can shorten the time to answer, like when someone is at risk. It always ends before the visit.",
+    "Sam can set OK rules by date range, like busy holidays.",
+    "An answer after the deadline: check the time is still free, then ask the customer again.",
+    "A yes after free cancel ended, on a request made before it, shows today's terms. It needs a fresh yes, where the booking can keep a fee.",
+    "Means '2 Another time': Sam offers another time, read back first.",
+    "Never: take money or confirm before Sam's yes.",
+    "Safe default: not booked; nothing is charged for this visit."
+  ],
+  "say": [
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "New request from {{alex.staff}} Please answer within 4 of your text hours, or it isn't booked.",
+      "elements": {
+        "card": {
+          "title": "{{svc.intext:Haircut}}",
+          "lines": [
+            "Sat Oct 24 · 11:00am · Riley",
+            "Nothing is charged for this visit until you accept"
+          ]
+        },
+        "buttons": [
+          "Accept",
+          "Another time",
+          "Decline"
+        ]
+      },
+      "plainText": "New request from {{alex.staff}} Please answer within 4 of your text hours, or it isn't booked.\n{{svc.intext:Haircut}}\nSat Oct 24 · 11:00am · Riley\nNothing is charged for this visit until you accept\nReply 1 Accept, 2 Another time, 3 Decline."
+    },
+    {
+      "from": "san",
+      "to": "cust",
+      "text": "Lee's Barbershop hasn't answered yet. You'll hear by Thu 11:20am. Nothing is charged for this visit until then.",
+      "plainText": "Lee's Barbershop hasn't answered yet. You'll hear by Thu 11:20am. Nothing is charged for this visit until then."
+    },
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Reminder: {{alex.staff}}'s request needs your answer. No answer in time: it isn't booked.",
+      "elements": {
+        "buttons": [
+          "Accept",
+          "Another time",
+          "Decline"
+        ]
+      },
+      "plainText": "Reminder: {{alex.staff}}'s request needs your answer. No answer in time: it isn't booked.\nReply 1 Accept, 2 Another time, 3 Decline."
+    }
+  ],
+  "rule": "Rosie's decision: nothing is charged until the owner accepts. Why: a decline then costs the customer nothing.",
+  "q": "Sam replies?",
+  "took": "A",
+  "layerLines": [
+    "private",
+    "privatecall",
+    "textsonly",
+    "emailonly"
+  ],
+  "wr": false,
+  "reads": [
+    "money",
+    "contact"
+  ],
+  "branches": [
+    {
+      "label": "1 Accept",
+      "tag": "message",
+      "steps": [
+        "A6-03"
+      ],
+      "end": "merge",
+      "rejoinAt": null,
+      "answerFields": [],
+      "effects": []
+    },
+    {
+      "label": "2 Another time",
+      "tag": "message",
+      "steps": [
+        "A6-04",
+        "A6-17"
+      ],
+      "end": "merge",
+      "rejoinAt": null,
+      "answerFields": [],
+      "effects": [
+        {
+          "kind": "message",
+          "ref": "A6-04",
+          "to": [
+            "owner"
+          ]
+        },
+        {
+          "kind": "message",
+          "ref": "A6-17",
+          "to": [
+            "cust"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "3 Decline",
+      "tag": "message",
+      "steps": [
+        "A6-05"
+      ],
+      "end": "end",
+      "endText": "Declined, and the customer is told.",
+      "rejoinAt": null,
+      "answerFields": [],
+      "effects": [
+        {
+          "kind": "message",
+          "ref": "A6-05",
+          "to": [
+            "cust"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "No answer in time",
+      "tag": "clock",
+      "steps": [
+        "A6-07"
+      ],
+      "end": "end",
+      "endText": "No answer in time: not booked, nothing taken. The customer and Sam are told.",
+      "rejoinAt": null,
+      "answerFields": [],
+      "effects": [
+        {
+          "kind": "message",
+          "ref": "A6-07",
+          "to": [
+            "cust",
+            "owner"
+          ]
+        }
+      ]
+    }
+  ],
+  "card": {
+    "question": "Sam replies?",
+    "means": [
+      {
+        "branch": "1 Accept",
+        "text": "Sam accepts.",
+        "from": "firstSentence"
+      },
+      {
+        "branch": "2 Another time",
+        "from": "none"
+      },
+      {
+        "branch": "3 Decline",
+        "text": "Sam declined.",
+        "from": "firstSentence"
+      }
+    ],
+    "never": [
+      "Never: take money or confirm before Sam's yes."
+    ],
+    "safeDefault": "not booked; nothing is charged for this visit.",
+    "clock": {
+      "from": "step9Default"
+    }
+  },
+  "fallbackText": "New request from Alex M. Please answer within 4 of your text hours, or it isn't booked.",
+  "pageTypes": [],
+  "next": null,
+  "lint": []
+}

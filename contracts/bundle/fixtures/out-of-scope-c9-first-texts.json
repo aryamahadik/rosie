@@ -1,0 +1,55 @@
+{
+  "markers": [
+    {
+      "component": "C-252",
+      "title": "C9 and no voice: S1-75's code by call or text to the listing's phone",
+      "targets": [
+        {
+          "at": "S1-75",
+          "unreachable": "line",
+          "line": "To prove Lee's Barbershop is yours, I'm calling the number on your listing with a code: (555) 010-0177. Type the code here."
+        },
+        {
+          "at": "S1-75",
+          "unreachable": "line",
+          "line": "A code by call, text or email to the public listing's own phone or email, typed back here."
+        }
+      ],
+      "why": "MC C9; Q-02 (the code goes only to the listing's email); arch 12 line 634 (Phone calls, D5); C-237"
+    },
+    {
+      "component": "C-253",
+      "title": "C9 and no voice: S1-35's texted and called notice to the listing's phone",
+      "targets": [
+        {
+          "at": "S1-35",
+          "unreachable": "line",
+          "line": "The notice goes to the phone and email on the public listing. The registration's contact gets it only with no listing."
+        },
+        {
+          "at": "S1-35",
+          "unreachable": "line",
+          "line": "A landline gets it by a call: 'This is Rosie, an automated assistant. <Business> is now on Rosie. Not you? Call Rosie's team.'"
+        }
+      ],
+      "why": "MC C9; Q-02 (the go-live notice goes by email only); arch 12 line 634"
+    },
+    {
+      "component": "C-254",
+      "title": "C9: A3-30's and B3-08's \"1 Yes, send the link\"",
+      "targets": [
+        {
+          "at": "A3-30",
+          "unreachable": "firstText",
+          "branch": "1 Yes, send the link"
+        },
+        {
+          "at": "B3-08",
+          "unreachable": "firstText",
+          "branch": "1 Yes, send the link"
+        }
+      ],
+      "why": "MC C9 ('the owner, for staff (S2-05) and for a booking the business adds'); the booking and the customer's yes to messages for it stay in scope"
+    }
+  ]
+}

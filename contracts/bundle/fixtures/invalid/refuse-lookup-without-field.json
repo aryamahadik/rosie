@@ -1,0 +1,161 @@
+{
+  "type": "split",
+  "id": "A5-04",
+  "text": "A5-04",
+  "lines": [
+    "5.1"
+  ],
+  "who": "san",
+  "via": "auto",
+  "t": "3 minutes later",
+  "needs": [
+    "contact"
+  ],
+  "title": "What's taken now?",
+  "does": "Each service was set at sign-up with what's taken before the visit. Exactly one of these happens, on the page, only with the price and the yes shown first.",
+  "more": [
+    "This is the one place that sets what this booking took. Every later message speaks of that, never of the service's setting.",
+    "With several services, part paid now and part left is 'A deposit'. All of it paid now is 'The full price'.",
+    "Nothing due now: 'A card saved' if any service needs a card, else 'Nothing taken'.",
+    "A credit for the only service: 'Nothing taken', or 'A card saved' for extras where it asks a card.",
+    "On a call, a card is typed on the keypad. Until that's set up, Sam is asked first (A5-08).",
+    "Where the plug-in says money before the work can't go through Rosie, the deposit and full price are off for that work.",
+    "Terms can differ for new and returning customers, as Sam set.",
+    "Never: take money before the price and the yes to it, or more than the terms say.",
+    "Plug-in silent: the money before Sam set for the service."
+  ],
+  "q": "What's taken now?",
+  "section": 5,
+  "took": "A",
+  "reads": [
+    "money"
+  ],
+  "branches": [
+    {
+      "label": "Nothing taken",
+      "tag": "lookup",
+      "when": {
+        "before": [
+          "none"
+        ],
+        "took": "A"
+      },
+      "steps": [
+        "A5-05"
+      ],
+      "end": "merge",
+      "rejoinAt": "A5-31",
+      "reads": {
+        "from": "path",
+        "key": "before"
+      },
+      "answerFields": [],
+      "effects": [
+        {
+          "kind": "message",
+          "ref": "A5-05",
+          "to": [
+            "cust"
+          ]
+        },
+        {
+          "kind": "recordWrite",
+          "ref": "money_before"
+        }
+      ]
+    },
+    {
+      "label": "A card saved",
+      "tag": "lookup",
+      "when": {
+        "before": [
+          "card"
+        ],
+        "took": "A"
+      },
+      "steps": [
+        "A5-07"
+      ],
+      "end": "merge",
+      "rejoinAt": "A5-31",
+      "answerFields": [],
+      "effects": [
+        {
+          "kind": "recordWrite",
+          "ref": "money_before"
+        },
+        {
+          "kind": "recordWrite",
+          "ref": "card_saved"
+        }
+      ]
+    },
+    {
+      "label": "A deposit",
+      "tag": "lookup",
+      "when": {
+        "before": [
+          "deposit"
+        ],
+        "took": "A"
+      },
+      "steps": [
+        "A5-13"
+      ],
+      "end": "merge",
+      "rejoinAt": "A5-31",
+      "reads": {
+        "from": "path",
+        "key": "before"
+      },
+      "answerFields": [],
+      "effects": [
+        {
+          "kind": "recordWrite",
+          "ref": "money_before"
+        },
+        {
+          "kind": "recordWrite",
+          "ref": "card_saved"
+        },
+        {
+          "kind": "recordWrite",
+          "ref": "deposit_paid"
+        }
+      ]
+    },
+    {
+      "label": "The full price",
+      "tag": "lookup",
+      "when": {
+        "before": [
+          "full"
+        ],
+        "took": "A"
+      },
+      "steps": [
+        "A5-16"
+      ],
+      "end": "merge",
+      "rejoinAt": "A5-31",
+      "reads": {
+        "from": "path",
+        "key": "before"
+      },
+      "answerFields": [],
+      "effects": [
+        {
+          "kind": "recordWrite",
+          "ref": "money_before"
+        },
+        {
+          "kind": "recordWrite",
+          "ref": "paid_full"
+        }
+      ]
+    }
+  ],
+  "pageTypes": [],
+  "next": "A5-31",
+  "lint": []
+}

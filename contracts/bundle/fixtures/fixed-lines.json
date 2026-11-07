@@ -1,0 +1,108 @@
+{
+  "lines": [
+    {
+      "id": "opener",
+      "text": "This is Rosie, the automated booking assistant for <business>.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "On Rosie's first text to a handle about one business, with the privacy-notice link.",
+      "source": "arch 07 line 361; S13-01; RULES 1.11, 4.3"
+    },
+    {
+      "id": "optOutLine",
+      "text": "Reply STOP to opt out. Msg & data rates may apply. Reply HELP for help.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "On Rosie's first reply in a chat the person opened, which is the first text that number gets (Q-30).",
+      "source": "S13-32; S13-02; RULES 4.3; msgtext.js line 31; Q-30"
+    },
+    {
+      "id": "stopReply",
+      "text": null,
+      "lang": "en",
+      "status": "pendingJay",
+      "use": "The one reply to a stop word: Rosie's texts to this number are off for every business; the visit is still booked, and how to cancel it.",
+      "source": "Q-01 (drafted words go to Jay on a tier 3 card); MC C1; RULES 7.2, 7.3; S13-32; A7-11, B7-15"
+    },
+    {
+      "id": "stopLaterReply",
+      "text": "Texts are off. Reply START, or call the business.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "Each later text from a stopped number gets this one reply and nothing else (Q-01).",
+      "source": "RULES 7.3; S13-32; Q-01"
+    },
+    {
+      "id": "stopOtherNumber",
+      "text": "To stop texts to a number, reply STOP from it.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "A stop asked for another number changes nothing.",
+      "source": "RULES 7.2; S13-32"
+    },
+    {
+      "id": "stopToBusiness",
+      "text": "Texts to this customer are off. Reach them their way.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "What each business with an open booking for the stopped phone hears.",
+      "source": "RULES 7.5; S13-32"
+    },
+    {
+      "id": "startReply",
+      "text": null,
+      "lang": "en",
+      "status": "pendingJay",
+      "use": "The reply to START: texts to this number are back on.",
+      "source": "Q-01; RULES 7.5; S13-32"
+    },
+    {
+      "id": "helpReply",
+      "text": null,
+      "lang": "en",
+      "status": "pendingJay",
+      "use": "The reply to HELP: the business's name and number, and how to stop.",
+      "source": "Q-01; RULES 7.6; S13-32 ('HELP gets the business's name and number, and how to stop')"
+    },
+    {
+      "id": "safetyEmergency",
+      "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "An emergency: the safety message, at any hour, past any opt-out.",
+      "source": "A3-24; arch 02 line 111; arch 06"
+    },
+    {
+      "id": "safetyCrisis",
+      "text": "If you're thinking about harming yourself, call or text 988 now. If you're in danger right now, call 911.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "Crisis words: 988 and 911 at once.",
+      "source": "A3-25; arch 02 line 111; arch 06"
+    },
+    {
+      "id": "safetyAsk",
+      "text": "Is anyone in danger right now?",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "Added when a safety label's tense is unknown.",
+      "source": "arch 06 line 329; S13-24 rule 10"
+    },
+    {
+      "id": "passedOn",
+      "text": "I’ve passed this on. Rosie’s team will reply within 1 business day.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "When no reply passes the checks: the question is withdrawn and the team is paged.",
+      "source": "arch 02 line 123; S13-29"
+    },
+    {
+      "id": "outage",
+      "text": "Rosie is down for a few minutes. If anyone is in danger, call 911.",
+      "lang": "en",
+      "status": "asWritten",
+      "use": "Once to each text whose turn has not committed while the AI provider or PostgreSQL is down, never to a stopped number.",
+      "source": "arch 11 lines 564 and 566; S12-12"
+    }
+  ]
+}

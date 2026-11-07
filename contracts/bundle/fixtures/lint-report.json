@@ -1,0 +1,31 @@
+{
+  "rules": [
+    {
+      "rule": "guard-keyword-button",
+      "failures": 3
+    }
+  ],
+  "failures": [
+    {
+      "rule": "guard-keyword-button",
+      "flow": "A",
+      "step": "S1-37",
+      "trade": null,
+      "message": "S1-37's button 'Start' is the guard keyword START (Q-14)."
+    },
+    {
+      "rule": "guard-keyword-button",
+      "flow": "B",
+      "step": "S1-37",
+      "trade": null,
+      "message": "S1-37's button 'Start' is the guard keyword START (Q-14)."
+    },
+    {
+      "rule": "guard-keyword-button",
+      "flow": "A",
+      "step": "S1-38",
+      "trade": "advisor",
+      "message": "The advisor trade's words for S1-38 carry the button 'Start', the guard keyword START."
+    }
+  ]
+}

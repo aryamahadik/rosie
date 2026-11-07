@@ -1,0 +1,161 @@
+{
+  "fixtures": [
+    {
+      "file": "bundle-v0-skeleton.json",
+      "version": "v1",
+      "expect": "accept",
+      "shows": "Bundle v0 for the walking skeleton: flow A holding S1-01 and S1-02 (S1-02's first reply carries stop \"first\", Q-30), with the whole routing tables (hubs, doors, the 21 any-time rows, the 50 always-on rules as the cached prefix, the homes, the 67 judgment rules), the record, the shared lists and a manifest marked partial",
+      "source": "02-contracts K-01 Fixtures; D-007; S1-01, S1-02 in master-A.json; arch 03 lines 163 to 181; MC R6; Q-30"
+    },
+    {
+      "file": "bundle-mini-a.json",
+      "version": "v1",
+      "expect": "accept",
+      "shows": "Flow A and the barber trade: the money split A5-04 whose branches are lookups that name what they read (the before choice), A5-31's clock branch 'Not done in time' and its booking:shop vary, A6-02's card and clock branch, the hub A7-02, the door A3-51, the danger check A3-22 with A3-24, the STOP path A7-96 to A7-11 (flag stopped), A7-12's judgment rule 58, A6-14's record slots ({{pay.price}}, {{pay.took}}, {{pay.cancel}}), the rule nodes S13-23 to S13-29, S13-53, S13-54 and S13-32, and S1-37 marked as failing guard-keyword-button, so the manifest's journey 1, listing its steps (the 45 section 1 steps of both flows), does not ship",
+      "source": "02-contracts K-01 Fixtures; master-A.json; engine/work/prof/barber.json; arch 03 lines 161 to 177; arch 12 line 592; Q-14; Q-17; MC R6; journey 1's steps: 02-contracts K-09 v1 'Journey 1', master-A.json and master-B.json section 1"
+    },
+    {
+      "file": "bundle-mini-b.json",
+      "version": "v1",
+      "expect": "accept",
+      "shows": "Flow B and the barber trade: the travel area B4-77, the on-call pro B6-16 with its pf:sensitive words, the hub B7-05 with its fact gates, B7-89's record gate (rec keep), the door B3-40, the danger check B3-17 and the STOP step B7-15",
+      "source": "02-contracts K-01 Fixtures; master-B.json; engine/work/prof/barber.json; SPEC-master 5b, 5d; arch 03 line 161"
+    },
+    {
+      "file": "manifest.json",
+      "version": "v1",
+      "def": "manifest",
+      "expect": "accept",
+      "shows": "A manifest of a bundle holding the two sample flow graphs and the barber overlay: the bundle id (sha256 of the sorted value lines, build 1), every input with its sha256 (both flows, the trade file, Master Corrections, LINES.md, fixture set v1's MANIFEST.sha256, overlay-core.js, lib.js, msgtext.js), sample prompts, claude-haiku-5-5 and claude-sonnet-5-5, routing by stakes (Sonnet first on high stakes), the lint summary with S1-37's failure, journey 1 with its steps (the 45 section 1 steps of both flows) not shipping, the KV keys with each value's size and hash, and the shared lists",
+      "source": "02-contracts K-01 'The manifest' and 'Storage'; arch 01 line 87; arch 10 line 536; arch 11 line 564; arch 12 line 592; Q-26; Q-36; CQ-09; journey 1's steps: 02-contracts K-09 v1 'Journey 1', master-A.json and master-B.json section 1"
+    },
+    {
+      "file": "trade-overlay.json",
+      "version": "v1",
+      "def": "tradeOverlay",
+      "expect": "accept",
+      "shows": "The barber trade's compiled overlay: its facts, the 11 free-text pf blocks stored whole as JSON text, both flows' settings (setstart, 24 hours before), money, renames and slot rows, and a sample of its ops in order (off, words, more, and the new branch 'Asks to add beard color' on A7-02 with its compiled step A7-x01)",
+      "source": "SPEC-prof 3 and 8; MC R3, C5, C8; engine/work/prof/barber.json; overlay-core.js apply() lines 1794 to 1866; Q-39"
+    },
+    {
+      "file": "anytime-table.json",
+      "version": "v1",
+      "def": "anytimeTable",
+      "expect": "accept",
+      "shows": "Flow A's any-time table: the 21 rows in their turn order, the first three set by the safety read alone, handlers from the steps BP's M3b row names (A3-22, A3-48, A7-81, A7-11, A7-98, S11-12, S12-11) with their flags, and null for each row with no clear step, which goes to Jay",
+      "source": "arch 01 line 75; arch 03 lines 169 to 177; Q-40"
+    },
+    {
+      "file": "fixed-lines.json",
+      "version": "v1",
+      "def": "fixedLines",
+      "expect": "accept",
+      "shows": "The fixed lines word for word: the opener, the opt-out line, the later-stop reply, the other-number and business stop lines, the 911 and 988 safety lines, the danger question, step 7's last line and the outage line; the stop, START and HELP replies wait for Jay with no words (Q-01)",
+      "source": "arch 07 line 361; arch 02 lines 111 and 123; arch 06 line 329; arch 11 lines 564 and 566; RULES 7.2, 7.3, 7.5, 7.6; S13-32; A3-24; A3-25; Q-01; Q-30"
+    },
+    {
+      "file": "keywords.json",
+      "version": "v1",
+      "def": "keywords",
+      "expect": "accept",
+      "shows": "The guard's keywords: START, HELP and msgtext.js's 16 opt-out words, with CANCEL and CANCELAR also flagging the visit",
+      "source": "arch 02 line 115; msgtext.js line 29; RULES 7.4; S13-28 rule 46"
+    },
+    {
+      "file": "key-map.json",
+      "version": "v1",
+      "def": "keyMap",
+      "expect": "accept",
+      "shows": "The plug-in key map: each trade-file top key and where it lands; pf.facts, pf.switches, pf.settings and money typed, the 11 free-text pf keys as whole text blocks with sub-keys as guidance only, the ops, and the authoring and sample-story keys left out",
+      "source": "arch 12 line 592; MC R2, R3, C6; Q-39; SPEC-prof 3"
+    },
+    {
+      "file": "lint-report.json",
+      "version": "v1",
+      "def": "lintReport",
+      "expect": "accept",
+      "shows": "A lint report with one rule run, guard-keyword-button, and 3 failing steps: S1-37's 'Start' in both flows and the advisor trade's own words for S1-38",
+      "source": "arch 12 line 592; Q-14; master-A.json and master-B.json S1-37; engine/work/prof/advisor.json (flow A ops, S1-38)"
+    },
+    {
+      "file": "out-of-scope-c9-first-texts.json",
+      "version": "v1",
+      "def": "outOfScope",
+      "expect": "accept",
+      "shows": "The out-of-scope markers for C-252 (S1-75's code by call or text to the listing's phone), C-253 (S1-35's texted and called notice) and C-254 (A3-30's and B3-08's first text on '1 Yes, send the link')",
+      "source": "01-inventory.md group 11, C-252 to C-254; MC C9; Q-02; DL-012"
+    },
+    {
+      "file": "judgment-rules.json",
+      "version": "v1",
+      "def": "judgmentRules",
+      "expect": "accept",
+      "shows": "The 67 numbered judgment rules by number, word for word, each with its step: 1 to 59 from S13-23 to S13-29, 60 to 65 from S13-53, 66 and 67 from S13-54",
+      "source": "MC R6; DECISIONS.md D2 (checked Nov 5 2026); master-A.json S13-23 to S13-29, S13-53, S13-54"
+    },
+    {
+      "file": "invalid/refuse-loop.json",
+      "version": "v1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "A step whose loop-rule walk comes back to itself (A6-14, A6-26, A6-14) while its lint does not list loop is refused",
+      "source": "arch 12 line 592 ('when a walk can loop'); Q-39; SPEC-master 5g; arch 03 line 191"
+    },
+    {
+      "file": "invalid/refuse-no-safe-default-or-clock.json",
+      "version": "v1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "A6-02's card with neither a safe default nor a clock, while its lint does not list no-safe-default-or-clock, is refused",
+      "source": "arch 12 line 592 ('when a question lacks a safe default or a clock'); arch 03 line 181"
+    },
+    {
+      "file": "invalid/refuse-choice-without-definition.json",
+      "version": "v1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "A6-02's card with a branch that has no Means line and no first sentence, while its lint does not list choice-without-definition, is refused",
+      "source": "arch 12 line 592 ('when a choice lacks a definition')"
+    },
+    {
+      "file": "invalid/refuse-guard-keyword-button.json",
+      "version": "v1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "S1-37 as the master writes it, with the button 'Start', while its lint does not list guard-keyword-button, is refused",
+      "source": "arch 12 line 592; Q-14; S1-37 in master-A.json; msgtext.js line 95"
+    },
+    {
+      "file": "invalid/refuse-lookup-without-field.json",
+      "version": "v1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "A5-04 with one lookup branch that does not name the field it reads, while its lint does not list lookup-without-field, is refused",
+      "source": "arch 12 line 592 ('when a lookup lacks the field it reads'); Q-39; arch 03 line 161"
+    },
+    {
+      "file": "invalid/refuse-unknown-slot.json",
+      "version": "v1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "A6-14 with a message naming the slot {{visit.place}}, which is not in the slot list, while its lint does not list unknown-slot, is refused",
+      "source": "02-contracts K-01 Fixtures; overlay-core.js SLOTS line 1285 and slotProblems line 1508; master-A.json record.slots"
+    },
+    {
+      "file": "invalid/refuse-judgment-rule-out-of-range.json",
+      "version": "v1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "A7-12 pointing to judgment rule 68, outside 1 to 67, is refused whatever its lint says",
+      "source": "MC R6; DECISIONS.md D2; 02-contracts K-01 ('a number that does not resolve, or lies outside 1 to 67, is refused')"
+    },
+    {
+      "file": "invalid/refuse-journey-ships-with-failing-step.json",
+      "version": "v1",
+      "def": "journeyGate",
+      "expect": "refuse",
+      "shows": "Journey 1, its 45 section 1 steps listed, marked to ship while it lists the failing step S1-37, is refused",
+      "source": "arch 12 line 592 ('A journey with a failing step does not ship'); Q-17; Q-14; S1-37 in master-A.json and master-B.json; 02-contracts K-09 v1 'Journey 1'"
+    }
+  ]
+}

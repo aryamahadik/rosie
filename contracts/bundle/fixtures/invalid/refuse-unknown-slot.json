@@ -1,0 +1,127 @@
+{
+  "id": "A6-14",
+  "text": "A6-14",
+  "lines": [
+    "6.3",
+    "4.27"
+  ],
+  "who": "san",
+  "to": "cust",
+  "via": "msg",
+  "t": "right after",
+  "needs": [
+    "booked",
+    "customer",
+    "contact",
+    "pf.messages"
+  ],
+  "gives": [
+    "code"
+  ],
+  "tells": [
+    "cust"
+  ],
+  "title": "Confirms, with the check-in code",
+  "does": "The customer is booked, with a check-in code that's new for this visit. Only they get the code, and give it to Riley at the chair. That shows Riley really came.",
+  "more": [
+    "The AI gets a booking number, but not the code.",
+    "No street address, card or private detail ever passes through the AI.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The card shows the way in, from Sam's access details, or a video session's link or who calls whom.",
+    "Any notice said at booking is on it too, and any prep that starts before the next reminder would reach them.",
+    "Booked after the free-cancel time: it says 'No free cancel'. Booked after the reminder hour: it carries the reminder.",
+    "A customer in another time zone sees each deadline in their time too.",
+    "On a call, the read-back on the call was the confirmation, with the code said twice.",
+    "Where the service meets away: the meeting point and where it ends, in place of the address.",
+    "Where Sam set a plain display name, texts, pay pages and the card statement show it.",
+    "Must carry: the business, the service, the date and time, the person, and the address and way in.",
+    "Must carry too: the price and how it's paid, anything saved or paid, and the free-cancel time and fee.",
+    "And the code and where to give it, and how to change or cancel."
+  ],
+  "say": [
+    {
+      "from": "san",
+      "to": "cust",
+      "text": "You're booked! Give this code at {{visit.place:the chair}} when you arrive.",
+      "elements": {
+        "card": {
+          "title": "Lee's Barbershop · {{svc.intext:Haircut}}",
+          "lines": [
+            "Sat Oct 24 · 11:00am · Riley",
+            "{{pay.price}}",
+            "{{pay.took}}",
+            "{{pay.cancel}}",
+            "Step-free door on Elm St · parking in the back"
+          ]
+        },
+        "code": "5160",
+        "buttons": [
+          "Change the time",
+          "Call off the visit"
+        ]
+      },
+      "plainText": "You're booked! Give this code at the chair when you arrive.\nLee's Barbershop · {{svc.intext:Haircut}}\nSat Oct 24 · 11:00am · Riley\n{{pay.price}}\n{{pay.took}}\n{{pay.cancel}}\nStep-free door on Elm St · parking in the back\nYour check-in code: 5160\nReply 1 Change the time, 2 Call off the visit."
+    }
+  ],
+  "rule": "Rosie's rule: if someone has two or more open bookings, a reply never acts at once. Rosie first asks which booking.",
+  "section": 6,
+  "took": "A",
+  "rec": "A",
+  "amounts": {
+    "*": {
+      "fee": "$20",
+      "name": "Haircut"
+    },
+    "list|*|*": {
+      "price": "$35",
+      "name": "Haircut"
+    },
+    "list|deposit|*": {
+      "price": "$140",
+      "deposit": "$40",
+      "rest": "$100",
+      "name": "Groom's package",
+      "fee": "$40"
+    },
+    "list|full|*": {
+      "price": "$55",
+      "paid": "$55",
+      "name": "Signature cut and hot towel shave"
+    },
+    "list|none|none": {
+      "price": "free",
+      "name": "Style consult"
+    },
+    "photos|*|*": {
+      "price": "$90",
+      "name": "Color and cut"
+    },
+    "photos|none|none": {
+      "price": "free",
+      "name": "Color touch-up"
+    },
+    "visit|deposit|*": {
+      "deposit": "$25",
+      "name": "Color correction"
+    },
+    "photos|deposit|*": {
+      "deposit": "$20",
+      "rest": "$70",
+      "name": "Color and cut"
+    },
+    "photos|full|*": {
+      "paid": "$90",
+      "name": "Color and cut"
+    },
+    "visit|*|*": {
+      "name": "Color correction"
+    }
+  },
+  "reads": [
+    "money"
+  ],
+  "fallbackText": "You're booked! Give this code at the chair when you arrive.",
+  "pageTypes": [],
+  "next": "A6-15",
+  "lint": []
+}
