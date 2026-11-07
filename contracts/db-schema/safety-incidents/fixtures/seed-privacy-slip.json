@@ -1,0 +1,101 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json", "../../core/fixtures/seed-phone-stopped.json"],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-dee",
+        "name": "Dee W.",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-dee",
+        "kind": "phone",
+        "address": "+15555550109"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-dee",
+        "handle_id": "handle-dee"
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-dee-barber",
+        "person_id": "person-dee",
+        "business_id": "biz-lees-barbershop",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "privacy_incidents",
+      "values": {
+        "id": "privacy-dee-card-photo",
+        "business_id": "biz-lees-barbershop",
+        "kind": "detail_never_kept",
+        "person_id": "person-dee",
+        "booking_id": null,
+        "detail_kind": "card_number",
+        "event_id": "evt-dee-0001",
+        "fields_shown": [],
+        "found_at": "2026-10-29T15:00:01Z",
+        "deleted_at": "2026-10-29T15:00:01Z",
+        "person_told_at": "2026-10-29T15:00:03Z",
+        "business_told_at": "2026-10-29T15:00:03Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-ben-old-number",
+        "kind": "phone",
+        "address": "+15555550110"
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-ben-saturday",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-ben",
+        "served_person_id": "person-ben",
+        "payer_person_id": "person-ben",
+        "private": false,
+        "deceased": false,
+        "version": 3
+      }
+    },
+    {
+      "table": "privacy_incidents",
+      "values": {
+        "id": "privacy-ben-old-number",
+        "business_id": "biz-lees-barbershop",
+        "kind": "wrong_person",
+        "person_id": "person-ben",
+        "booking_id": "booking-ben-saturday",
+        "detail_kind": null,
+        "event_id": null,
+        "outbox_row_id": null,
+        "sent_to_handle_id": "handle-ben-old-number",
+        "fields_shown": ["name", "visit_time"],
+        "found_at": "2026-10-16T14:00:00Z",
+        "stopped_at": "2026-10-16T14:00:01Z",
+        "person_told_at": "2026-10-16T14:05:00Z",
+        "business_told_at": "2026-10-16T14:05:00Z",
+        "team_reviewed_at": "2026-10-16T19:30:00Z",
+        "version": 5
+      }
+    }
+  ]
+}

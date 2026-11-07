@@ -1,0 +1,103 @@
+{
+  "after": ["../../core/fixtures/seed-turn.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-0202",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0202"],
+        "state": "committed",
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0202",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-24T15:00:03Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "safety_outcomes",
+      "values": {
+        "id": "safety-alex-0202",
+        "event_id": "evt-alex-0202",
+        "source": "text",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "turn_id": "turn-alex-0202",
+        "read_at": "2026-10-24T15:00:01Z",
+        "tries": [{ "model": "haiku", "result": "verdict" }],
+        "timed_out": false,
+        "labels": ["An emergency"],
+        "tenses": ["now"],
+        "danger_word_lists": ["plugin"],
+        "danger_word_kinds": ["other"],
+        "sealed_words": "\\x6b33342d736565642d7365616c65642d776f7264732d6e6f742d7265616c",
+        "outcomes": ["An emergency"],
+        "lifted_to_unsure": false
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-0220",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0220"],
+        "state": "committed",
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0220",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-24T16:30:03Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "safety_outcomes",
+      "values": {
+        "id": "safety-alex-0220",
+        "event_id": "evt-alex-0220",
+        "source": "text",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "turn_id": "turn-alex-0220",
+        "read_at": "2026-10-24T16:30:01Z",
+        "tries": [{ "model": "haiku", "result": "verdict" }],
+        "timed_out": false,
+        "labels": ["No"],
+        "tenses": ["over"],
+        "danger_word_lists": [],
+        "danger_word_kinds": [],
+        "sealed_words": "\\x6b33342d736565642d7365616c65642d776f7264732d6e6f742d7265616c",
+        "outcomes": ["No"],
+        "lifted_to_unsure": false
+      }
+    },
+    {
+      "table": "safety_holds",
+      "values": {
+        "id": "hold-alex-0202",
+        "safety_outcome_id": "safety-alex-0202",
+        "business_id": "biz-lees-barbershop",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "booking_id": null,
+        "turn_id": "turn-alex-0202",
+        "release_rule": "after_safe",
+        "blocks_booking": false,
+        "held_at": "2026-10-24T15:00:03Z",
+        "released_at": "2026-10-24T16:30:03Z",
+        "released_why": "safe_readback",
+        "released_by_turn_id": "turn-alex-0220",
+        "released_by_outcome_id": "safety-alex-0220",
+        "version": 2
+      }
+    }
+  ]
+}

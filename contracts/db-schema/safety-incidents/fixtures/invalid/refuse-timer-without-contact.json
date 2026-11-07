@@ -1,0 +1,52 @@
+{
+  "after": ["seed-safety-timer.json"],
+  "rows": [
+    {
+      "table": "clock_rows",
+      "values": {
+        "id": "clock-timer-sam-survey-2",
+        "kind": "step",
+        "handle_id": "handle-sam",
+        "business_id": "biz-movers",
+        "booking_id": "booking-alex-move-survey",
+        "due_at": "2026-10-28T15:20:00Z",
+        "due_zone": "America/New_York",
+        "state": "armed",
+        "armed_at": "2026-10-28T13:20:02Z",
+        "fires": {
+          "step": "B8-86",
+          "safetyTimer": "timer-sam-survey-2"
+        },
+        "version": 1
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-movers"
+    },
+    "action": "insert",
+    "table": "safety_timers",
+    "values": {
+      "id": "timer-sam-survey-2",
+      "business_id": "biz-movers",
+      "booking_id": "booking-alex-move-survey",
+      "worker_person_id": "person-sam",
+      "worker_handle_id": "handle-sam",
+      "emergency_contact_person_id": null,
+      "emergency_contact_handle_id": null,
+      "contact_yes_at": null,
+      "started_at": "2026-10-28T13:20:02Z",
+      "due_at": "2026-10-28T15:20:00Z",
+      "due_zone": "America/New_York",
+      "address": "\\x6b33342d736565642d7365616c65642d616464726573732d6e6f742d7265616c",
+      "address_for_person_id": "person-alex",
+      "clock_row_id": "clock-timer-sam-survey-2",
+      "state": "running"
+    },
+    "expect": {
+      "sqlstate": "23502"
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "after": ["../../core/fixtures/seed-turn.json", "../../core/fixtures/seed-phone-chat-open.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-0204",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0204"],
+        "state": "committed",
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0204",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-26T21:40:03Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "safety_outcomes",
+      "values": {
+        "id": "safety-alex-0204",
+        "event_id": "evt-alex-0204",
+        "source": "text",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "turn_id": "turn-alex-0204",
+        "read_at": "2026-10-26T21:40:01Z",
+        "tries": [{ "model": "haiku", "result": "verdict" }],
+        "timed_out": false,
+        "labels": ["A threat to staff or others"],
+        "tenses": ["now"],
+        "danger_word_lists": [],
+        "danger_word_kinds": [],
+        "sealed_words": "\\x6b33342d736565642d7365616c65642d776f7264732d6e6f742d7265616c",
+        "outcomes": ["A threat to staff or others"],
+        "lifted_to_unsure": false
+      }
+    },
+    {
+      "table": "safety_holds",
+      "values": {
+        "id": "hold-alex-0204",
+        "safety_outcome_id": "safety-alex-0204",
+        "business_id": "biz-lees-barbershop",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "booking_id": null,
+        "turn_id": "turn-alex-0204",
+        "release_rule": "never",
+        "blocks_booking": false,
+        "held_at": "2026-10-26T21:40:03Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "pauses",
+      "values": {
+        "id": "pause-alex-threat-person",
+        "business_id": "biz-lees-barbershop",
+        "target": "person",
+        "person_id": "person-alex",
+        "set_by_turn_id": "turn-alex-0204",
+        "set_at": "2026-10-26T21:40:03Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "pauses",
+      "values": {
+        "id": "pause-alex-threat-phone",
+        "business_id": "biz-lees-barbershop",
+        "target": "phone",
+        "phone_number": "+15555550101",
+        "set_by_turn_id": "turn-alex-0204",
+        "set_at": "2026-10-26T21:40:03Z",
+        "version": 1
+      }
+    }
+  ]
+}
