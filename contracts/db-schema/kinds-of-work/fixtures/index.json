@@ -1,0 +1,68 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-kinds-sample.json",
+      "version": "v1",
+      "table": "kinds",
+      "expect": "accept",
+      "shows": "Eight of the 243 kinds with both flows, as the compiled bundle has them: S1-02's sample (barber, plumber, electrician) and the demo shops of the other seeds (yoga, movers, boarding), plus dog-walker (a 2-hour window in flow B, a per-flow cutoff) and insurance (MC C5: its facts filled from cpa.json's list, no pf.settings so arrive window and an empty cutoff in both flows); the plumber's cancelright on in flow B only, and no cutoff in its file",
+      "source": "02-contracts row K-24; S1-02 ('Barbershop, plumbing, electrical'); fixtures/master/engine/work/prof/barber.json, plumber.json, electrician.json, yoga.json, movers.json, boarding.json, dog-walker.json, insurance.json (read through compiler/src/load/trade.ts); MC R3, C5; K-01 v1 tradeOverlay, tradeFlow"
+    },
+    {
+      "file": "seed-business-kinds.json",
+      "version": "v1",
+      "table": "picked_kinds",
+      "expect": "accept",
+      "shows": "Sam's S1-02 answer 'Barbershop, plumbing, electrical' as three listed picks in the order named, each placed in its company at S1-04 (the barbershop in Lee's Barbershop LLC; plumbing and electrical in Lee Home Services LLC); the barbershop's 11 plug-in text blocks loaded whole at S1-11, each the trade file's value as JSON text, while plumbing's and electrical's wait until Sam gets to them",
+      "source": "S1-02 (gives kinds; 'Barbershop, plumbing, electrical'; 'The first kind named is set up first'); S1-11 ('Rosie loads the barbershop's now, and plumbing's and electrical's when Sam gets to them'; slot gives pf.license to pf.edges); S1-04; FS line 746; MC R3; K-01 v1 pluginText; K-23 v1 seed-company-two-kinds"
+    },
+    {
+      "file": "seed-new-work-draft.json",
+      "version": "v1",
+      "table": "new_work_drafts",
+      "expect": "accept",
+      "shows": "Sam texts NEW pack hikes for the pet boarding business; it is not on Rosie's list, so it becomes the drafted kind new-pack-hikes (closest pattern: service), and its draft, sent for review, holds the checklist blocks Sam answered: no to health care, a vaccine record and a free group check first, the prices and a weekly plan, dogs only, up to 4 dogs a leader, drop-off at the base; the other blocks stay at their safe defaults",
+      "source": "S11-58 ('A kind with no plug-in yet: S1-03's checklist, offline until Rosie's team reviews it'); S1-02 branch 'One isn't on the list yet'; S1-03 (the 15 blocks); fixtures/master/engine/work/prof/dog-walker.json notes (Lee Pack Hikes: group walks from the base, up to 4 dogs a leader, a free group check, a vaccine record, $35 group walk, $55 trail hike, a weekly Saturday plan)"
+    },
+    {
+      "file": "invalid/refuse-typed-key-as-text-block.json",
+      "version": "v1",
+      "table": "picked_kind_texts",
+      "expect": "refuse",
+      "shows": "Storing the plumber's pf.facts as a text block is refused (CHECK picked_kind_texts_key_known, SQLSTATE 23514): facts, switches and settings are typed, read by name, never text; the same insert as pf.license passes",
+      "source": "MC R3 ('Code reads pf.facts, pf.switches, pf.settings and money.<flow> by name ... Every other pf.* value is free text ... stored whole as a text block'); S1-11 (slot gives the 11); Q-39 default"
+    },
+    {
+      "file": "invalid/refuse-main-path-not-listed.json",
+      "version": "v1",
+      "table": "kind_flows",
+      "expect": "refuse",
+      "shows": "Setting the barber's flow A main path to one its file does not list (visit|card|counter) is refused (CHECK kind_flows_main_listed, SQLSTATE 23514); the same update to list|none|counter, a listed path, passes",
+      "source": "SPEC-prof 3 ('money': 'the main path per flow and the combinations this profession really uses (at least the main one)'); fixtures/master/engine/work/prof/barber.json money.A"
+    },
+    {
+      "file": "invalid/refuse-pick-without-company-kind.json",
+      "version": "v1",
+      "table": "picked_kinds",
+      "expect": "refuse",
+      "shows": "Placing a barbershop pick in Lee Home Services LLC, which has no barber kind in K-23's company_kinds, is refused (foreign key picked_kinds_company_kind_fk, SQLSTATE 23503); the same pick not yet placed (company_id null) passes",
+      "source": "S1-04 ('Plumbing and electrical share Lee Home Services'; the barbershop is its own company); K-23 v1 company_kinds"
+    },
+    {
+      "file": "invalid/refuse-cross-business-text-read.json",
+      "version": "v1",
+      "table": "picked_kind_texts",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio reads none of the barbershop's plug-in text blocks (row-level security, 0 rows); scoped to the barbershop it reads all 11",
+      "source": "arch 10 line 546 (row-level security per business on every Tool API call); K-04 v1 rule 4"
+    },
+    {
+      "file": "invalid/refuse-no-block-with-facts.json",
+      "version": "v1",
+      "table": "new_work_draft_blocks",
+      "expect": "refuse",
+      "shows": "A no to checklist block 5 that still sets a fact is refused (CHECK new_work_draft_blocks_no_sets_nothing, SQLSTATE 23514): a no skips the block; the same no setting nothing passes",
+      "source": "S1-03 ('Each starts from its safe default, and a no skips that block')"
+    }
+  ]
+}

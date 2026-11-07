@@ -1,0 +1,127 @@
+{
+  "after": ["../../business-setup/fixtures/seed-place-or-thing.json"],
+  "rows": [
+    {
+      "table": "kinds",
+      "values": {
+        "id": "new-pack-hikes",
+        "name": "Pack hikes",
+        "style": null,
+        "pattern": "service",
+        "facts": null,
+        "source": "new_work",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kinds",
+      "values": {
+        "id": "pick-sam-pack-hikes",
+        "owner_person_id": "person-sam",
+        "position": 1,
+        "words": "pack hikes",
+        "outcome": "new_work",
+        "kind_id": "new-pack-hikes",
+        "company_id": null,
+        "business_id": "biz-pet-boarding",
+        "picked_at": "2026-10-26T14:00:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "new_work_drafts",
+      "values": {
+        "id": "draft-pack-hikes",
+        "picked_kind_id": "pick-sam-pack-hikes",
+        "business_id": "biz-pet-boarding",
+        "state": "in_review",
+        "drafted_at": "2026-10-26T14:01:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "new_work_draft_blocks",
+      "values": {
+        "draft_id": "draft-pack-hikes",
+        "block": 3,
+        "business_id": "biz-pet-boarding",
+        "outcome": "no",
+        "answer": "No",
+        "facts_on": [],
+        "switches_on": [],
+        "answered_at": "2026-10-26T14:02:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "new_work_draft_blocks",
+      "values": {
+        "draft_id": "draft-pack-hikes",
+        "block": 4,
+        "business_id": "biz-pet-boarding",
+        "outcome": "answered",
+        "answer": "A vaccine record on file, and a free group check before the first hike",
+        "facts_on": ["forms", "firststeps"],
+        "switches_on": [],
+        "answered_at": "2026-10-26T14:03:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "new_work_draft_blocks",
+      "values": {
+        "draft_id": "draft-pack-hikes",
+        "block": 6,
+        "business_id": "biz-pet-boarding",
+        "outcome": "answered",
+        "answer": "$35 group walk, $55 trail hike, and a weekly Saturday plan",
+        "facts_on": ["plans"],
+        "switches_on": [],
+        "answered_at": "2026-10-26T14:04:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "new_work_draft_blocks",
+      "values": {
+        "draft_id": "draft-pack-hikes",
+        "block": 8,
+        "business_id": "biz-pet-boarding",
+        "outcome": "answered",
+        "answer": "Dogs only",
+        "facts_on": ["animals"],
+        "switches_on": [],
+        "answered_at": "2026-10-26T14:05:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "new_work_draft_blocks",
+      "values": {
+        "draft_id": "draft-pack-hikes",
+        "block": 12,
+        "business_id": "biz-pet-boarding",
+        "outcome": "answered",
+        "answer": "Up to 4 dogs a leader",
+        "facts_on": ["groups"],
+        "switches_on": [],
+        "answered_at": "2026-10-26T14:06:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "new_work_draft_blocks",
+      "values": {
+        "draft_id": "draft-pack-hikes",
+        "block": 14,
+        "business_id": "biz-pet-boarding",
+        "outcome": "answered",
+        "answer": "Drop the dog at the base for a 1-hour group walk; pick-up after",
+        "facts_on": ["dropoff"],
+        "switches_on": [],
+        "answered_at": "2026-10-26T14:07:00Z",
+        "version": 1
+      }
+    }
+  ]
+}

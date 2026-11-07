@@ -1,0 +1,23 @@
+{
+  "after": ["seed-business-kinds.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "insert",
+    "table": "picked_kind_texts",
+    "values": {
+      "picked_kind_id": "pick-sam-plumbing",
+      "pf_key": "pf.facts",
+      "business_id": "biz-lee-home-services",
+      "block": "[\"firststeps\",\"documents\",\"forms\",\"sentnow\",\"planbill\",\"dropoff\",\"extrawork\",\"photos\",\"video\"]",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["picked_kind_texts_key_known"]
+    }
+  }
+}

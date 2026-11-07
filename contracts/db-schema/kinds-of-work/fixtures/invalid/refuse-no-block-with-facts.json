@@ -1,0 +1,27 @@
+{
+  "after": ["seed-new-work-draft.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-pet-boarding"
+    },
+    "action": "insert",
+    "table": "new_work_draft_blocks",
+    "values": {
+      "draft_id": "draft-pack-hikes",
+      "block": 5,
+      "business_id": "biz-pet-boarding",
+      "outcome": "no",
+      "answer": "No",
+      "facts_on": ["documents"],
+      "switches_on": [],
+      "answered_at": "2026-10-26T14:08:00Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["new_work_draft_blocks_no_sets_nothing"]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "after": ["seed-kinds-sample.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "kind_flows",
+    "set": {
+      "main_combo": "visit|card|counter",
+      "version": 2
+    },
+    "where": {
+      "kind_id": "barber",
+      "flow": "A"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["kind_flows_main_listed"]
+    }
+  }
+}

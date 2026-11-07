@@ -1,0 +1,470 @@
+{
+  "after": [],
+  "rows": [
+    {
+      "table": "kinds",
+      "values": {
+        "id": "barber",
+        "name": "Barber",
+        "style": "Chair",
+        "pattern": "chair",
+        "facts": [
+          "children",
+          "documents",
+          "extrawork",
+          "groups",
+          "photos"
+        ],
+        "source": "trade_file",
+        "version": 1
+      }
+    },
+    {
+      "table": "kinds",
+      "values": {
+        "id": "plumber",
+        "name": "Plumber",
+        "style": "Home visit",
+        "pattern": "fix",
+        "facts": [
+          "firststeps",
+          "documents",
+          "forms",
+          "sentnow",
+          "planbill",
+          "dropoff",
+          "extrawork",
+          "photos",
+          "video"
+        ],
+        "source": "trade_file",
+        "version": 1
+      }
+    },
+    {
+      "table": "kinds",
+      "values": {
+        "id": "electrician",
+        "name": "Electrician",
+        "style": "Home visit",
+        "pattern": "fix",
+        "facts": [
+          "photos",
+          "firststeps",
+          "dropoff",
+          "extrawork",
+          "stages",
+          "documents",
+          "video"
+        ],
+        "source": "trade_file",
+        "version": 1
+      }
+    },
+    {
+      "table": "kinds",
+      "values": {
+        "id": "yoga",
+        "name": "Yoga studio",
+        "style": "Class",
+        "pattern": "class",
+        "facts": [
+          "classes",
+          "children",
+          "groups",
+          "waitlist",
+          "video",
+          "firststeps",
+          "forms",
+          "extrawork",
+          "documents",
+          "photos",
+          "capacitycheck"
+        ],
+        "source": "trade_file",
+        "version": 1
+      }
+    },
+    {
+      "table": "kinds",
+      "values": {
+        "id": "movers",
+        "name": "Movers",
+        "style": "Project",
+        "pattern": "project",
+        "facts": [
+          "firststeps",
+          "documents",
+          "extrawork",
+          "photos",
+          "video"
+        ],
+        "source": "trade_file",
+        "version": 1
+      }
+    },
+    {
+      "table": "kinds",
+      "values": {
+        "id": "boarding",
+        "name": "Pet boarding and doggy daycare",
+        "style": "Drop-off",
+        "pattern": "dropoff",
+        "facts": [
+          "animals",
+          "dropoff",
+          "extrawork",
+          "forms",
+          "multiday",
+          "spaces"
+        ],
+        "source": "trade_file",
+        "version": 1
+      }
+    },
+    {
+      "table": "kinds",
+      "values": {
+        "id": "dog-walker",
+        "name": "Dog walking",
+        "style": "Set service",
+        "pattern": "service",
+        "facts": [
+          "animals",
+          "plans",
+          "firststeps",
+          "groups",
+          "forms",
+          "dropoff"
+        ],
+        "source": "trade_file",
+        "version": 1
+      }
+    },
+    {
+      "table": "kinds",
+      "values": {
+        "id": "insurance",
+        "name": "Insurance agent",
+        "style": "Consult",
+        "pattern": "consult",
+        "facts": [
+          "video",
+          "forms",
+          "firststeps",
+          "documents"
+        ],
+        "source": "trade_file",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "barber",
+        "flow": "A",
+        "main_combo": "list|card|counter",
+        "combos": [
+          "list|card|counter",
+          "list|none|counter",
+          "list|deposit|counter"
+        ],
+        "switches_on": [],
+        "arrive": "setstart",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "barber",
+        "flow": "B",
+        "main_combo": "list|card|bill",
+        "combos": [
+          "list|card|bill",
+          "list|full|none",
+          "photos|deposit|bill"
+        ],
+        "switches_on": [],
+        "arrive": "setstart",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "plumber",
+        "flow": "A",
+        "main_combo": "list|card|counter",
+        "combos": [
+          "list|card|counter",
+          "list|none|counter",
+          "list|deposit|counter",
+          "list|full|none",
+          "photos|card|counter",
+          "visit|card|counter"
+        ],
+        "switches_on": [],
+        "arrive": "setstart",
+        "arrive_window_hours": null,
+        "cutoff": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "plumber",
+        "flow": "B",
+        "main_combo": "list|card|bill",
+        "combos": [
+          "list|card|bill",
+          "list|none|bill",
+          "list|card|card",
+          "visit|card|bill",
+          "photos|deposit|bill",
+          "list|full|none"
+        ],
+        "switches_on": [
+          "cancelright"
+        ],
+        "arrive": "window",
+        "arrive_window_hours": null,
+        "cutoff": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "electrician",
+        "flow": "A",
+        "main_combo": "list|card|counter",
+        "combos": [
+          "list|card|counter",
+          "list|none|counter",
+          "list|full|none",
+          "photos|card|counter",
+          "visit|card|counter"
+        ],
+        "switches_on": [],
+        "arrive": "setstart",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "electrician",
+        "flow": "B",
+        "main_combo": "list|card|bill",
+        "combos": [
+          "list|card|bill",
+          "list|none|bill",
+          "list|card|card",
+          "visit|card|bill",
+          "visit|none|bill",
+          "photos|deposit|bill",
+          "list|full|none"
+        ],
+        "switches_on": [],
+        "arrive": "window",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "yoga",
+        "flow": "A",
+        "main_combo": "list|full|none",
+        "combos": [
+          "list|full|none",
+          "list|card|counter",
+          "list|none|counter",
+          "list|card|card",
+          "list|deposit|counter",
+          "photos|card|counter",
+          "visit|card|counter"
+        ],
+        "switches_on": [],
+        "arrive": "setstart",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "yoga",
+        "flow": "B",
+        "main_combo": "list|card|card",
+        "combos": [
+          "list|card|card",
+          "list|card|bill",
+          "list|full|none",
+          "list|deposit|bill",
+          "photos|deposit|bill",
+          "visit|card|bill"
+        ],
+        "switches_on": [],
+        "arrive": "setstart",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "movers",
+        "flow": "A",
+        "main_combo": "list|card|counter",
+        "combos": [
+          "list|card|counter",
+          "list|none|counter",
+          "list|full|none",
+          "list|deposit|counter",
+          "photos|card|counter"
+        ],
+        "switches_on": [],
+        "arrive": "setstart",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "movers",
+        "flow": "B",
+        "main_combo": "visit|none|bill",
+        "combos": [
+          "visit|none|bill",
+          "visit|none|own",
+          "photos|deposit|bill",
+          "list|card|card",
+          "list|full|none"
+        ],
+        "switches_on": [
+          "cancelright"
+        ],
+        "arrive": "window",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "boarding",
+        "flow": "A",
+        "main_combo": "list|card|counter",
+        "combos": [
+          "list|card|counter",
+          "list|deposit|counter"
+        ],
+        "switches_on": [],
+        "arrive": "window",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "boarding",
+        "flow": "B",
+        "main_combo": "list|card|card",
+        "combos": [
+          "list|card|card",
+          "list|deposit|card"
+        ],
+        "switches_on": [],
+        "arrive": "window",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "dog-walker",
+        "flow": "A",
+        "main_combo": "list|card|card",
+        "combos": [
+          "list|card|card",
+          "list|full|none"
+        ],
+        "switches_on": [],
+        "arrive": "setstart",
+        "arrive_window_hours": null,
+        "cutoff": "24 hours before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "dog-walker",
+        "flow": "B",
+        "main_combo": "list|card|card",
+        "combos": [
+          "list|card|card",
+          "list|none|bill",
+          "list|full|none"
+        ],
+        "switches_on": [],
+        "arrive": "window",
+        "arrive_window_hours": 2,
+        "cutoff": "8pm the day before",
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "insurance",
+        "flow": "A",
+        "main_combo": "list|none|none",
+        "combos": [
+          "list|none|none"
+        ],
+        "switches_on": [],
+        "arrive": "window",
+        "arrive_window_hours": null,
+        "cutoff": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "kind_flows",
+      "values": {
+        "kind_id": "insurance",
+        "flow": "B",
+        "main_combo": "list|none|none",
+        "combos": [
+          "list|none|none"
+        ],
+        "switches_on": [],
+        "arrive": "window",
+        "arrive_window_hours": null,
+        "cutoff": null,
+        "version": 1
+      }
+    }
+  ]
+}
