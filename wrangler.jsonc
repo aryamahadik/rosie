@@ -21,7 +21,11 @@
     "bindings": [{ "name": "HANDLE_ACTOR", "class_name": "HandleActor" }],
   },
   "migrations": [{ "tag": "v1-handle-actor", "new_sqlite_classes": ["HandleActor"] }],
-  // No KV, R2, Queues or Hyperdrive bindings yet: they come with the tasks that need them.
+  // The bundle KV namespace (T-249 reads the step graph from it). The id is a local placeholder, enough for local
+  // runs, the Vitest Workers pool and dry runs; no real namespace exists yet (a later staging task creates it and
+  // env.staging's copy, T-566).
+  "kv_namespaces": [{ "binding": "BUNDLES", "id": "00000000000000000000000000000000" }],
+  // No R2, Queues or Hyperdrive bindings yet: they come with the tasks that need them.
   // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
   "vars": {
     "ENVIRONMENT": "production",

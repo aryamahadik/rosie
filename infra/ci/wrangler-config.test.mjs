@@ -37,6 +37,30 @@ function parseJsonc(text) {
 const raw = readFileSync(path.join(REPO, "wrangler.jsonc"), "utf8");
 const config = parseJsonc(raw);
 
+describe("wrangler.jsonc BUNDLES KV binding (T-277)", () => {
+  it("declares exactly one KV namespace, bound as BUNDLES, with a placeholder id", () => {
+    assert.equal(config.kv_namespaces.length, 1);
+    const [kv] = config.kv_namespaces;
+    assert.deepEqual(Object.keys(kv).sort(), ["binding", "id"]);
+    assert.equal(kv.binding, "BUNDLES");
+    assert.match(kv.id, /^0{32}$/);
+  });
+
+  it("leaves env.staging without its own copy and adds no other storage binding", () => {
+    assert.equal(config.env.staging.kv_namespaces, undefined);
+    for (const k of ["r2_buckets", "queues", "hyperdrive", "d1_databases"]) {
+      assert.equal(config[k], undefined);
+    }
+  });
+
+  it("adds no production route or key", () => {
+    assert.equal(config.routes, undefined);
+    assert.equal(config.route, undefined);
+    assert.deepEqual(config.secrets, { required: [] });
+    assert.ok(!/(sk_|token)/i.test(JSON.stringify(config.kv_namespaces)));
+  });
+});
+
 describe("wrangler.jsonc HandleActor binding", () => {
   it("declares exactly the HANDLE_ACTOR binding on class HandleActor", () => {
     assert.deepEqual(config.durable_objects, {
