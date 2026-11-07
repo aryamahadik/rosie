@@ -90,3 +90,80 @@ export async function verifyWebhookSignature(input: WebhookSignatureInput): Prom
   );
   return ok ? { valid: true } : { valid: false, reason: "badSignature" };
 }
+
+// Linq's real scheme (K-11 v1 README spike rows 2 and 3; T-020; T-1075). The hex form above stays for any port that
+// signs that way; Linq does not: it signs "v1,<base64>" over {id}.{timestamp}.{raw} (the same signed string) under the
+// key bytes that follow the secret's "whsec_" prefix, base64-decoded. The header may hold several space-separated
+// entries (key rotation); one match passes.
+
+const WHSEC_PREFIX = "whsec_";
+const BASE64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+
+function fromBase64(text: string): Uint8Array<ArrayBuffer> | undefined {
+  if (text === "" || !BASE64.test(text)) return undefined;
+  const binary = atob(text);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+function toBase64(bytes: Uint8Array): string {
+  return btoa(String.fromCharCode(...bytes));
+}
+
+async function importLinqKey(secret: string, usage: "sign" | "verify"): Promise<CryptoKey | undefined> {
+  if (!secret.startsWith(WHSEC_PREFIX)) return undefined;
+  const keyBytes = fromBase64(secret.slice(WHSEC_PREFIX.length));
+  if (keyBytes === undefined) return undefined;
+  return crypto.subtle.importKey("raw", keyBytes, { name: "HMAC", hash: "SHA-256" }, false, [usage]);
+}
+
+/**
+ * The `webhook-signature` header value Linq's scheme gives for this webhook: "v1," and the base64 HMAC-SHA256 of
+ * id.timestamp.raw under the decoded key. For the double (C-211) and tests. Throws only when `secret` is not
+ * "whsec_" plus base64, which is a setup fault, never webhook input.
+ */
+export async function signLinqWebhook(
+  secret: string,
+  id: string,
+  timestamp: string,
+  raw: string,
+): Promise<string> {
+  const key = await importLinqKey(secret, "sign");
+  if (key === undefined) throw new Error("The Linq webhook secret must be whsec_ followed by base64.");
+  const mac = await crypto.subtle.sign("HMAC", key, encoder.encode(signedWebhookString(id, timestamp, raw)));
+  return `v1,${toBase64(new Uint8Array(mac))}`;
+}
+
+/**
+ * Checks a Linq webhook: the timestamp is whole seconds and within the window, then any one "v1,<base64>" entry of
+ * the space-separated header matches the HMAC over id.timestamp.raw (constant-time verify). A bare hex signature,
+ * an entry without "v1,", a secret that is not whsec_ plus base64, or any changed byte is badSignature. Never throws
+ * on webhook input and never returns or logs the secret.
+ */
+export async function verifyLinqWebhookSignature(
+  input: WebhookSignatureInput,
+): Promise<WebhookSignatureResult> {
+  if (!/^\d{1,15}$/.test(input.timestamp)) return { valid: false, reason: "badTimestamp" };
+  const tolerance = input.toleranceSeconds ?? DEFAULT_TOLERANCE_SECONDS;
+  if (Math.abs(input.nowMs / 1000 - Number(input.timestamp)) > tolerance)
+    return { valid: false, reason: "staleTimestamp" };
+  const bad = { valid: false, reason: "badSignature" } as const;
+  let key: CryptoKey | undefined;
+  try {
+    key = await importLinqKey(input.secret, "verify");
+  } catch {
+    return bad;
+  }
+  if (key === undefined) return bad;
+  const message = encoder.encode(signedWebhookString(input.id, input.timestamp, input.raw));
+  let matched = false;
+  for (const entry of input.signature.split(/\s+/)) {
+    if (!entry.startsWith("v1,")) continue;
+    const signature = fromBase64(entry.slice(3));
+    if (signature === undefined) continue;
+    // Every entry is checked, so the time does not show which one matched.
+    if (await crypto.subtle.verify("HMAC", key, signature, message)) matched = true;
+  }
+  return matched ? { valid: true } : bad;
+}

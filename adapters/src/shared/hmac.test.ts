@@ -1,12 +1,16 @@
 // T-410: the HMAC helper verifies a published vector and refuses a changed byte. The vectors are RFC 4231 test cases 1
 // and 2 (HMAC-SHA-256), not a real key; the webhook secret below is a made-up test string.
+import { createHmac } from "node:crypto";
+
 import { describe, expect, it } from "vitest";
 
 import {
   DEFAULT_TOLERANCE_SECONDS,
   signHmacSha256,
   signedWebhookString,
+  signLinqWebhook,
   verifyHmacSha256,
+  verifyLinqWebhookSignature,
   verifyWebhookSignature,
 } from "./hmac";
 
@@ -130,5 +134,120 @@ describe("webhook signature (id.timestamp.raw, 300 s window)", () => {
     expect(
       (await verifyWebhookSignature({ ...base, nowMs: nowMs + 30_000, toleranceSeconds: 30 })).valid,
     ).toBe(true);
+  });
+});
+
+describe("Linq webhook signature (whsec_ key, v1,<base64>, T-1075)", () => {
+  // Fictional keys built here: 32 and 24 bytes of a counting pattern, never a real key.
+  const b64 = (bytes: Uint8Array): string => btoa(String.fromCharCode(...bytes));
+  const keyBytes = Uint8Array.from({ length: 32 }, (_, i) => (i * 7 + 3) % 256);
+  const secret = `whsec_${b64(keyBytes)}`;
+  const otherSecret = `whsec_${b64(Uint8Array.from({ length: 24 }, (_, i) => (i * 5 + 1) % 256))}`;
+  const id = "msg_test_0001";
+  const timestamp = "1790000000";
+  const raw = '{"event_type":"example","n":1}';
+  const nowMs = 1_790_000_000_000;
+  const base = { secret, id, timestamp, raw, nowMs };
+
+  /** The expected header, computed with node:crypto, apart from the code under test. */
+  function reference(key: Uint8Array, body = raw): string {
+    const mac = createHmac("sha256", key).update(`${id}.${timestamp}.${body}`).digest("base64");
+    return `v1,${mac}`;
+  }
+
+  it("verifies a signature computed in Linq's form", async () => {
+    const signature = reference(keyBytes);
+    expect(await verifyLinqWebhookSignature({ ...base, signature })).toEqual({ valid: true });
+    expect(await signLinqWebhook(secret, id, timestamp, raw)).toBe(signature);
+  });
+
+  it("fails the old hex form of the same body, the raw secret as key, and a bare base64 signature", async () => {
+    const hex = await signHmacSha256(secret, `${id}.${timestamp}.${raw}`);
+    expect(await verifyLinqWebhookSignature({ ...base, signature: hex })).toEqual({
+      valid: false,
+      reason: "badSignature",
+    });
+    expect(await verifyLinqWebhookSignature({ ...base, signature: `v1,${hex}` })).toEqual({
+      valid: false,
+      reason: "badSignature",
+    });
+    const bare = reference(keyBytes).slice(3);
+    expect(await verifyLinqWebhookSignature({ ...base, signature: bare })).toEqual({
+      valid: false,
+      reason: "badSignature",
+    });
+    // The hex form still refuses Linq's signature, so the two schemes stay apart.
+    expect(await verifyWebhookSignature({ ...base, signature: reference(keyBytes) })).toEqual({
+      valid: false,
+      reason: "badSignature",
+    });
+  });
+
+  it("passes a header of two entries where only the second matches, in either order", async () => {
+    const good = reference(keyBytes);
+    const wrong = reference(Uint8Array.from({ length: 32 }, (_, i) => i));
+    expect(await verifyLinqWebhookSignature({ ...base, signature: `${wrong} ${good}` })).toEqual({
+      valid: true,
+    });
+    expect(await verifyLinqWebhookSignature({ ...base, signature: `${good} ${wrong}` })).toEqual({
+      valid: true,
+    });
+    expect(await verifyLinqWebhookSignature({ ...base, signature: `${wrong} ${wrong}` })).toEqual({
+      valid: false,
+      reason: "badSignature",
+    });
+  });
+
+  it("fails a changed byte of the body, the id, the signature, a wrong key and a stale timestamp", async () => {
+    const signature = reference(keyBytes);
+    const bad = { valid: false, reason: "badSignature" };
+    expect(await verifyLinqWebhookSignature({ ...base, signature, raw: raw.replace("1", "2") })).toEqual(bad);
+    expect(await verifyLinqWebhookSignature({ ...base, signature, id: "msg_test_0002" })).toEqual(bad);
+    const mac = Uint8Array.from(atob(signature.slice(3)), (c) => c.charCodeAt(0));
+    mac[5] = (mac[5] ?? 0) ^ 1;
+    expect(await verifyLinqWebhookSignature({ ...base, signature: `v1,${b64(mac)}` })).toEqual(bad);
+    expect(await verifyLinqWebhookSignature({ ...base, signature, secret: otherSecret })).toEqual(bad);
+    for (const at of [nowMs + 301_000, nowMs - 301_000]) {
+      expect(await verifyLinqWebhookSignature({ ...base, signature, nowMs: at })).toEqual({
+        valid: false,
+        reason: "staleTimestamp",
+      });
+    }
+    for (const at of [nowMs + 300_000, nowMs - 300_000]) {
+      expect(await verifyLinqWebhookSignature({ ...base, signature, nowMs: at })).toEqual({ valid: true });
+    }
+    expect(await verifyLinqWebhookSignature({ ...base, signature, timestamp: "abc" })).toEqual({
+      valid: false,
+      reason: "badTimestamp",
+    });
+  });
+
+  it("never throws on a missing v1, prefix, junk, an empty header or a secret that is not whsec_ plus base64", async () => {
+    const good = reference(keyBytes);
+    const bad = { valid: false, reason: "badSignature" };
+    for (const signature of [
+      "",
+      " ",
+      "v1",
+      "v1,",
+      "v2,abc",
+      `v2${good.slice(2)}`,
+      "v1,!!!!",
+      "v1,abc",
+      good.slice(3),
+    ]) {
+      expect(await verifyLinqWebhookSignature({ ...base, signature })).toEqual(bad);
+    }
+    for (const badSecret of ["", "whsec_", "whsec_!!!", "not-a-whsec-key", b64(keyBytes)]) {
+      expect(await verifyLinqWebhookSignature({ ...base, signature: good, secret: badSecret })).toEqual(bad);
+    }
+    await expect(signLinqWebhook("not-a-whsec-key", id, timestamp, raw)).rejects.toThrow();
+  });
+
+  it("does not put the secret in a result or an error", async () => {
+    const result = await verifyLinqWebhookSignature({ ...base, signature: "v1,abc" });
+    expect(JSON.stringify(result)).not.toContain(secret);
+    const error = await signLinqWebhook("whsec_!!!", id, timestamp, raw).catch((e: unknown) => String(e));
+    expect(error).not.toContain("!!!");
   });
 });
