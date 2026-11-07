@@ -1,0 +1,18 @@
+{
+  "after": ["seed-page-open.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-yoga-studio"
+    },
+    "action": "select",
+    "table": "hand_offs",
+    "where": {
+      "id": "handoff-alex-0204"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

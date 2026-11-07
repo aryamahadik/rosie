@@ -1,0 +1,52 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-page-open.json",
+      "version": "v1",
+      "table": "team_pages",
+      "expect": "accept",
+      "shows": "Alex's threat to Riley at Lee's Barbershop (K-34's seed-threat-pause): Sam is told at once (a threat hand-off with A3-48's owner line); no reply or console tap in 5 minutes, so the hand-off's clock row fires and Pat, the person Sam named, and Rosie's team are paged; paged again 5 minutes later, still open, with the next page's clock row armed for 5 minutes after that",
+      "source": "arch 06 line 329 ('An emergency or a threat: the owner; after 5 minutes with no reply or console tap, whoever they named and Rosie's team, paged every 5 minutes until acknowledged'); A3-48; S13-29 rule 57; K-34 v1 fixtures/seed-threat-pause.json; SPEC-master 6 (Sam, Alex M., Riley, Pat the office manager, Lee's Barbershop)"
+    },
+    {
+      "file": "seed-page-acknowledged.json",
+      "version": "v1",
+      "table": "team_pages",
+      "expect": "accept",
+      "shows": "Alex's emergency at Lee's Barbershop (K-34's seed-hold-released): Sam is told at once; no answer in 5 minutes, so Pat and Rosie's team are paged twice, 5 minutes apart; Pat acknowledges by reply at 11:12am, so the page is acknowledged and its next clock row cancelled. Sam's own answer is still to come (the hand-off stays unanswered)",
+      "source": "arch 06 line 329 ('paged every 5 minutes until acknowledged'); A3-24 ('A person is told at once: Sam, or Rosie's team if Sam can't be reached'); S13-29 rule 57; K-34 v1 fixtures/seed-hold-released.json; SPEC-master 6 (Pat)"
+    },
+    {
+      "file": "invalid/refuse-owner-reads-team-page.json",
+      "version": "v1",
+      "table": "team_pages",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop cannot read the page about its own hand-off: the Tool API role may add pages and never read, change or delete them (SQLSTATE 42501); the same read on Rosie's team's side returns it",
+      "source": "S13-10 ('Never to the one it names'); arch 06 line 329; K-37 v1 README rule 2; README rule 2"
+    },
+    {
+      "file": "invalid/refuse-other-business-reads-hand-off.json",
+      "version": "v1",
+      "table": "hand_offs",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio sees none of Lee's Barbershop's hand-offs (row-level security, no row); the barbershop's own scope sees it",
+      "source": "arch 10 line 546 (row-level security per business on every Tool API call); K-04 v1 rule 4"
+    },
+    {
+      "file": "invalid/refuse-threat-escalates-after-ten-minutes.json",
+      "version": "v1",
+      "table": "hand_offs",
+      "expect": "refuse",
+      "shows": "A threat hand-off whose escalation waits 10 minutes is refused (CHECK hand_offs_emergency_threat_five_minutes, SQLSTATE 23514); the same row escalating 5 minutes after it was handed off passes",
+      "source": "arch 06 line 329 ('after 5 minutes with no reply or console tap')"
+    },
+    {
+      "file": "invalid/refuse-page-acknowledged-by-nobody.json",
+      "version": "v1",
+      "table": "team_pages",
+      "expect": "refuse",
+      "shows": "Marking the open page acknowledged with no one who acknowledged it and no way (reply or console tap) is refused (CHECK team_pages_acknowledged_together, SQLSTATE 23514); the same update naming Pat and reply passes",
+      "source": "arch 06 line 329 ('paged every 5 minutes until acknowledged'; 'reply or console tap')"
+    }
+  ]
+}

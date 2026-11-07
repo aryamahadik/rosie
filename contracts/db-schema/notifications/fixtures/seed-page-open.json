@@ -1,0 +1,126 @@
+{
+  "after": ["../../safety-incidents/fixtures/seed-threat-pause.json"],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-pat",
+        "name": "Pat",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-pat",
+        "kind": "phone",
+        "address": "+15555550111"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-pat",
+        "handle_id": "handle-pat"
+      }
+    },
+    {
+      "table": "clock_rows",
+      "values": {
+        "id": "clock-handoff-alex-0204",
+        "kind": "job",
+        "handle_id": null,
+        "business_id": "biz-lees-barbershop",
+        "due_at": "2026-10-26T21:45:03Z",
+        "due_zone": "America/New_York",
+        "state": "fired",
+        "armed_at": "2026-10-26T21:40:03Z",
+        "fires": {
+          "job": "hand-off-escalation",
+          "handOff": "handoff-alex-0204"
+        },
+        "fired_at": "2026-10-26T21:45:03Z",
+        "created_by_turn_id": "turn-alex-0204",
+        "version": 2
+      }
+    },
+    {
+      "table": "hand_offs",
+      "values": {
+        "id": "handoff-alex-0204",
+        "business_id": "biz-lees-barbershop",
+        "kind": "threat",
+        "safety_outcome_id": "safety-alex-0204",
+        "turn_id": "turn-alex-0204",
+        "booking_id": null,
+        "about_person_id": "person-alex",
+        "told_person_id": "person-sam",
+        "told_as": "owner",
+        "alert_outbox_row_id": null,
+        "summary": "Urgent: a message to Lee's Barbershop threatened harm to someone on your team. Nothing was booked. Visits with this person are paused until you decide. Details on the secure page.",
+        "handed_at": "2026-10-26T21:40:03Z",
+        "escalate_at": "2026-10-26T21:45:03Z",
+        "escalation_clock_row_id": "clock-handoff-alex-0204",
+        "escalated_at": "2026-10-26T21:45:03Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "clock_rows",
+      "values": {
+        "id": "clock-page-alex-0204-2",
+        "kind": "job",
+        "handle_id": null,
+        "business_id": "biz-lees-barbershop",
+        "due_at": "2026-10-26T21:50:03Z",
+        "due_zone": "America/New_York",
+        "state": "fired",
+        "armed_at": "2026-10-26T21:45:03Z",
+        "fires": {
+          "job": "team-page",
+          "page": "page-alex-0204"
+        },
+        "fired_at": "2026-10-26T21:50:03Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "clock_rows",
+      "values": {
+        "id": "clock-page-alex-0204-3",
+        "kind": "job",
+        "handle_id": null,
+        "business_id": "biz-lees-barbershop",
+        "due_at": "2026-10-26T21:55:03Z",
+        "due_zone": "America/New_York",
+        "state": "armed",
+        "armed_at": "2026-10-26T21:50:03Z",
+        "fires": {
+          "job": "team-page",
+          "page": "page-alex-0204"
+        },
+        "version": 1
+      }
+    },
+    {
+      "table": "team_pages",
+      "values": {
+        "id": "page-alex-0204",
+        "reason": "hand_off",
+        "business_id": "biz-lees-barbershop",
+        "hand_off_id": "handoff-alex-0204",
+        "turn_id": null,
+        "named_person_id": "person-pat",
+        "summary": "Hand-off handoff-alex-0204 at Lee's Barbershop (biz-lees-barbershop): a threat to staff or others, read from safety-alex-0204; no reply or console tap from the owner in 5 minutes.",
+        "opened_at": "2026-10-26T21:45:03Z",
+        "last_paged_at": "2026-10-26T21:50:03Z",
+        "times_paged": 2,
+        "repeat_minutes": 5,
+        "next_page_clock_row_id": "clock-page-alex-0204-3",
+        "state": "open",
+        "version": 2
+      }
+    }
+  ]
+}
