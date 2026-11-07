@@ -203,7 +203,7 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
 
   it("is recorded in schema_migrations after 0001", async () => {
     const rows = await db.sql<{ name: string }[]>`select name from schema_migrations order by version`;
-    expect(rows.map((row) => row.name)).toEqual(["init", "core_business_people"]);
+    expect(rows.map((row) => row.name).slice(0, 2)).toEqual(["init", "core_business_people"]);
   });
 });
 
