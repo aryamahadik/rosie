@@ -29,6 +29,7 @@
     "test:unit": "vitest run --project unit",
     "test:workers": "vitest run --project workers",
     "test:contract": "vitest run --project contract",
+    "test:parity": "vitest run --project parity",
     "test:integration": "vitest run --project integration",
     "test:scenario": "vitest run --project scenario",
     "test:e2e": "vitest run --project e2e",

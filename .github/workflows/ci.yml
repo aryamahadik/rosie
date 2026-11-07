@@ -59,6 +59,32 @@ jobs:
       - name: Tests (unit, workers, contract)
         run: npm test
 
+      # T-1067: the 8 parity shards (243 trades through both flows) are the "parity" Vitest project, outside
+      # `npm test`. They run only when a parity input changed: compared with origin/main on a pull request, with
+      # the previous commit on a push to main. merge-check.yml holds the same list.
+      - name: Parity inputs changed (overlay, load, graph, master fixtures, Vitest config, manifest, lockfile)
+        id: parity
+        run: |
+          set -euo pipefail
+          inputs=(compiler/src/overlay compiler/src/load compiler/src/graph fixtures/master vitest.config.ts package.json package-lock.json)
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            changed="$(git diff --name-only HEAD^ HEAD -- "${inputs[@]}")"
+          else
+            changed="$(git diff --name-only origin/main...HEAD -- "${inputs[@]}")"
+          fi
+          if [ -n "$changed" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Parity inputs changed, so the parity shards run:"
+            echo "$changed"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No parity input changed: the parity shards are skipped."
+          fi
+
+      - name: Overlay parity (only when its inputs changed)
+        if: steps.parity.outputs.run == 'true'
+        run: npm run test:parity
+
       - name: CI script tests (the guards and the PreToolUse hook)
         run: node --test "infra/ci/*.test.mjs"
 
