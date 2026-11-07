@@ -106,8 +106,10 @@ async function loadFixture(
   return { loaded, skipped: [...skipped].sort() };
 }
 
+// Later migrations add tables that reference these, so the truncate cascades to them. Each test file runs in its
+// own schema (createTestDatabase), so nothing else is touched.
 async function emptyTables(sql: Sql): Promise<void> {
-  await sql`truncate messages, openers_sent, threads, pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses`;
+  await sql`truncate messages, openers_sent, threads, pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses cascade`;
 }
 
 /** What the database says about a failed statement: its SQLSTATE and the constraint it names. */

@@ -99,8 +99,10 @@ function toHex(bytes: Uint8Array): string {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+// Later migrations add tables that reference these (0005's threads, openers_sent and messages first), so the
+// truncate cascades to them. Each test file runs in its own schema (createTestDatabase), so nothing else is touched.
 async function emptyTables(sql: Sql): Promise<void> {
-  await sql`truncate pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses`;
+  await sql`truncate pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses cascade`;
 }
 
 /** What the database says about a failed statement: its SQLSTATE and the constraint it names. */
