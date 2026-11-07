@@ -4,6 +4,9 @@
 //
 // A contract folder contracts/<name>/ may hold a frozen.json that marks versions frozen. Accepted shapes:
 //   { "frozen": ["v1", "v1.1"] }     { "frozen": { "v1": { ...freeze record... } } }     ["v1"]
+// A file takes its frozen versions from the NEAREST frozen.json between its own folder and contracts/<name>/.
+// So contracts/db-schema/<part>/frozen.json governs that part alone (a part freezes on its own turn), while
+// every other contract reads contracts/<name>/frozen.json as before.
 // A branch fails when, compared with the merge-base of HEAD and origin/main, it edits or removes
 //   - a schema or tables file whose name carries a frozen version (<name>.v1.schema.json, <part>.v1.tables.json),
 //   - a fixture that fixtures/index.json lists for a frozen version (or, if unlisted, whose name carries one),
@@ -87,13 +90,29 @@ export function parseFixtureIndex(text) {
 export function checkFreeze(changes, readBase, readBranch = () => undefined) {
   const errors = [];
   const folderCache = new Map();
-  // contracts/<name>/... -> its frozen versions at the base (empty set when there is no frozen.json)
-  const frozenOf = (folder) => {
+  // A folder's own frozen.json at the base: { path, versions }, or undefined when it has none.
+  const frozenIn = (folder) => {
     if (!folderCache.has(folder)) {
       const text = readBase(`${folder}/frozen.json`);
-      folderCache.set(folder, text === undefined ? new Set() : parseFrozen(text, `${folder}/frozen.json`));
+      folderCache.set(
+        folder,
+        text === undefined
+          ? undefined
+          : { path: `${folder}/frozen.json`, versions: parseFrozen(text, `${folder}/frozen.json`) },
+      );
     }
     return folderCache.get(folder);
+  };
+  // The frozen.json that governs a file: the nearest one at the base, looking from the file's own folder up to
+  // contracts/<name>/. So contracts/db-schema/<part>/frozen.json governs that part alone, and a contract
+  // without parts reads contracts/<name>/frozen.json as always.
+  const governing = (file) => {
+    const parts = file.split("/");
+    for (let depth = parts.length - 1; depth >= 2; depth -= 1) {
+      const found = frozenIn(parts.slice(0, depth).join("/"));
+      if (found !== undefined) return found;
+    }
+    return undefined;
   };
   const indexCache = new Map();
   const indexOf = (dir) => {
@@ -109,12 +128,13 @@ export function checkFreeze(changes, readBase, readBranch = () => undefined) {
     const parts = file.split("/");
     if (parts[0] !== "contracts" || parts.length < 3) continue;
     const folder = `contracts/${parts[1]}`;
-    const frozen = frozenOf(folder);
-    if (frozen.size === 0) continue;
+    const governs = governing(file);
+    if (governs === undefined || governs.versions.size === 0) continue;
+    const frozen = governs.versions;
     const verb = status.startsWith("D") ? "removes" : "edits";
     const rest = parts.slice(2);
 
-    if (rest.length === 1 && rest[0] === "frozen.json") {
+    if (parts[parts.length - 1] === "frozen.json" && governs.path === file) {
       const now = readBranch(file);
       let after = new Set();
       try {
@@ -159,7 +179,7 @@ export function checkFreeze(changes, readBase, readBranch = () => undefined) {
       if (version !== undefined && frozen.has(version)) {
         errors.push({
           file,
-          message: `${file}: ${verb} a fixture of v${version}, which ${folder}/frozen.json marks frozen. Add a new minor version instead.`,
+          message: `${file}: ${verb} a fixture of v${version}, which ${governs.path} marks frozen. Add a new minor version instead.`,
         });
       }
       continue;
@@ -169,7 +189,7 @@ export function checkFreeze(changes, readBase, readBranch = () => undefined) {
     if (version !== undefined && frozen.has(version) && /\.json$/i.test(file)) {
       errors.push({
         file,
-        message: `${file}: ${verb} a file of v${version}, which ${folder}/frozen.json marks frozen. Add a new minor version file instead.`,
+        message: `${file}: ${verb} a file of v${version}, which ${governs.path} marks frozen. Add a new minor version file instead.`,
       });
     }
   }
