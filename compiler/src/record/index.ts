@@ -1,0 +1,22 @@
+// The record engine (T-137): the compiled record per flow and per trade, and the row of a slot that fits a path.
+export {
+  HOME_NAMES,
+  HoldSlotError,
+  OneFeeError,
+  RecordError,
+  SLOT_NAMES,
+  TradeSlotError,
+  compileRecord,
+  compileRecords,
+  compileTradeRecord,
+  slotRowIndex,
+  type CompiledRecord,
+  type CompiledRecordView,
+  type CompiledService,
+  type CompiledSlot,
+  type CompiledSlotRow,
+  type HomeName,
+  type RecordWay,
+  type RowStamps,
+  type SlotName,
+} from "./compile";
