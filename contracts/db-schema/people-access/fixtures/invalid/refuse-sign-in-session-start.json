@@ -1,0 +1,44 @@
+{
+  "after": ["seed-session.json"],
+  "rows": [
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-sam-sign-in-oct28",
+        "purpose": "sign_in",
+        "person_id": "person-sam",
+        "business_id": null,
+        "sent_to_handle_id": "handle-sam",
+        "channel": "text",
+        "code_hash": "fa709a2eebc0e8c805d55ca6e6e022be4e17ab6e5df45d90ca80ea4617c77718",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-28T08:20:00Z",
+        "expires_at": "2026-10-28T08:30:00Z",
+        "wrong_tries": 0,
+        "used_at": "2026-10-28T08:21:00Z",
+        "version": 2
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {},
+    "action": "insert",
+    "table": "sessions",
+    "values": {
+      "id": "session-sam-oct28",
+      "person_id": "person-sam",
+      "token_sha256": "283035aef11af0d61f5c6dda64a427a4b21e33762074cd8b97189691ed0be698",
+      "device_sha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+      "proven_via": "code",
+      "proof_code_id": "code-sam-sign-in-oct28",
+      "started_at": "2026-10-28T08:21:00Z",
+      "last_seen_at": "2026-10-28T08:21:00Z",
+      "expires_at": "2026-11-27T08:21:00Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "after": ["seed-staff-joined.json"],
+  "rows": [
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-jordan-email",
+        "kind": "email",
+        "address": "jordan@example.com"
+      }
+    },
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-jordan-own-change",
+        "purpose": "contact_change",
+        "person_id": "person-jordan",
+        "business_id": null,
+        "sent_to_handle_id": "handle-jordan",
+        "channel": "text",
+        "code_hash": "a9a37d367b88bebc0a390f6da845144ed069fefcb5f564324515daa3f589047f",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-27T18:00:00Z",
+        "expires_at": "2026-10-27T18:10:00Z",
+        "wrong_tries": 0,
+        "used_at": "2026-10-27T18:01:00Z",
+        "version": 2
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {},
+    "action": "insert",
+    "table": "contact_changes",
+    "values": {
+      "id": "cc-jordan-mobile-to-email",
+      "person_id": "person-jordan",
+      "business_id": null,
+      "old_handle_id": "handle-jordan",
+      "new_handle_id": "handle-jordan-email",
+      "way": "own_code",
+      "proof_code_id": "code-jordan-own-change",
+      "id_upload_id": null,
+      "changed_by_person_id": "person-jordan",
+      "changed_at": "2026-10-27T18:01:00Z"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

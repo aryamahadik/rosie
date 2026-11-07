@@ -191,6 +191,62 @@
       "expect": "refuse",
       "shows": "A call scoped to Lee's Barbershop acting for Sam writing an own-chat change for Alex with no business (Alex's updates moved from his email to Sam's mobile, with a code Sam's mobile got and typed back) is refused by the insert policy (SQLSTATE 42501): a change with no business is admitted only for the call's own person (rosie.person_id), since D75 counts it only from Alex's own chat and its code proves only the new contact; the same row in Alex's own call passes, and so does the runtime side",
       "source": "README rule 4; D75 (RULES 9.1; S13-45 row 3: 'the request counts only from the customer's own chat'); D102; FS line 756"
+    },
+    {
+      "file": "invalid/refuse-sign-in-session-read.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A sign-in call for Sam before his code is right acts for no person (no rosie.person_id, and no business scope: README rule 4), so its read of Sam's live session with every column but the two hashes gets no row: typing Sam's mobile gives no call his sessions; the same read in Sam's own call (rosie.person_id Sam, set once his code is right) returns it, and so does the runtime side",
+      "source": "README rules 4 and 5; S11-52 ('Sam types his mobile, and a code comes by text'); RULES 6.1 ('Or a code is sent to the contact on file and typed back in the same conversation'); BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-sign-in-session-end.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "The same sign-in call (no person until Sam's code is right) ending Sam's live session changes no row (row-level security by rosie.person_id): a typed mobile or email alone ends no one's session; the same update in Sam's own call signs him out (version 2 to 3), and so does the runtime side",
+      "source": "README rules 4 and 5; S11-52; RULES 6.1; RULES 8.7, 9.1"
+    },
+    {
+      "file": "invalid/refuse-sign-in-session-start.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A call that acts for no person (a sign-in call before its code is right) starting a session for Sam is refused by the insert policy (SQLSTATE 42501), even naming a used sign-in code of Sam's: the person is set only once the code is right, in the same transaction; the same insert in Sam's own call (rosie.person_id Sam) passes, and so does the runtime side",
+      "source": "README rules 4 and 5; S11-52 ('Sam types his mobile, and a code comes by text'); RULES 6.1, 6.2; S13-45 row 8"
+    },
+    {
+      "file": "invalid/refuse-session-unused-code.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "Sam's own call (rosie.person_id Sam) starting a session that names his sign-in code of Oct 29, sent and not yet typed back, is refused by the insert policy (SQLSTATE 42501): a session needs a code of its own person that check_proof_code answered right (used_at set); the same insert once check_proof_code says right for that code passes, and so does the runtime side",
+      "source": "README rule 5; S11-52; RULES 6.1, 6.2 ('A code works 10 minutes'); BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-proof-code-inserted-used.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A sign-in call (no person yet) inserting Sam's sign-in code already marked used is refused (no INSERT on used_at, SQLSTATE 42501): a send writes only its own columns, so a code starts unused, untried and unpaused at version 1 and only check_proof_code moves used_at, wrong_tries, last_wrong_at and paused_until; the same insert without used_at passes, and so does the insert with it on the runtime side",
+      "source": "README rule 5; RULES 6.2 ('A code works 10 minutes. Five wrong codes pause it 15 minutes'); S11-52; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-sign-in-own-change.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "refuse",
+      "shows": "A call that acts for no person (a sign-in call before its code is right) writing Jordan's own_code change with no business (his updates moved from his mobile to his email, with a used code to his phone on file) is refused by the insert policy (SQLSTATE 42501): a change with no business is the call's own person's; the same row in Jordan's own call passes, and so does the runtime side",
+      "source": "README rule 4; FS section 8 (a staff member's own change by a code to the phone or email on file); RULES 6.1, 9.3; D102; FS line 756"
+    },
+    {
+      "file": "invalid/refuse-ended-session-reopened.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "Sam's own call setting ended_at and ended_why back to null on his session of Oct 20, which he signed out of, changes no row (the update policy admits only a session not yet ended): an ended session stays ended, so no call reopens one its person or the runtime ended (left, handed_over); the same update on the runtime side passes",
+      "source": "README rule 5; RULES 8.7 ('Sign-in ... end'), 9.1; S11-100; S11-52"
     }
   ]
 }
