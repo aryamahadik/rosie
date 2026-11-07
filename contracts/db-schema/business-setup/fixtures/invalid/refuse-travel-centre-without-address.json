@@ -1,0 +1,31 @@
+{
+  "after": ["seed-business-demo-shop.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "locations",
+    "values": {
+      "id": "loc-lees-barbershop-second-shop",
+      "business_id": "biz-lees-barbershop",
+      "kind": "shop",
+      "name": null,
+      "address": "123 Demo St, Anytown",
+      "map_point": "SRID=4326;POINT(-90.2 40.1)",
+      "end_address": null,
+      "travel_miles": 25,
+      "travel_centre": "SRID=4326;POINT(-90.01 40.01)",
+      "travel_centre_address": null,
+      "travel_fee_cents": null,
+      "travel_fee_currency": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["locations_travel_centre_with_address"]
+    }
+  }
+}

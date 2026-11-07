@@ -774,9 +774,9 @@
           "name": "map_point",
           "type": "geography(Point,4326)",
           "null": true,
-          "audience": "never",
-          "description": "The address's map point, from the geo port (K-17; its double until Q-25 is answered). Null until it is found.",
-          "source": "FS line 722 (map point); FS row B03 ('address + map pin'); Q-25 ('PostGIS distance on stored points'); 02-contracts K-17"
+          "audience": ["owner"],
+          "description": "The address's map point, from the geo port (K-17; its double until Q-25 is answered): the map pin the owner confirms with the address at setup (B03) and sees in Settings, where every change is read back first. Owner only: customers get the address and the inside-or-outside answer, never the point. Null until it is found.",
+          "source": "FS line 722 (map point); FS row B03 ('address + map pin'; [G], the owner confirms); FS line 627 (Settings: a second shop, S11-59); FS line 630 (every change read back); Q-25 ('PostGIS distance on stored points'); 02-contracts K-17"
         },
         {
           "name": "end_address",
@@ -798,9 +798,17 @@
           "name": "travel_centre",
           "type": "geography(Point,4326)",
           "null": true,
-          "audience": "never",
-          "description": "The travel area's centre when it is not this location's own map point; null: map_point is the centre (L02: the centre is the confirmed B03).",
-          "source": "FS line 722 (travel centre); FS rows L02, B03"
+          "audience": ["owner"],
+          "description": "The travel area's centre when it is not this location's own map point: the map pin of travel_centre_address, set with it. Null: map_point is the centre (L02: the centre is the confirmed B03). Owner only, as a centre can be the owner's home (README, open gaps): the owner's setup and Settings pages show it and read a change back first.",
+          "source": "FS line 722 (travel centre); FS rows L02 ('a centre and a distance'; 'address + miles'), B03 ('address + map pin'); FS line 627 (Settings: S11-53, a second shop S11-59); FS line 630 (every change read back)"
+        },
+        {
+          "name": "travel_centre_address",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The address of travel_centre, as the owner confirmed it, which the owner's setup and Settings pages show and edit and read back, as S11-57's 'within 25 miles of 1200 Main St, Springfield'. Set exactly when travel_centre is; null: the centre is this location's own address.",
+          "source": "FS row L02 (flow B travel area: 'a centre and a distance', type 'address + miles'); FS row B03 ('address + map pin'); FS line 722 (travel centre); FS line 627 (Settings, S11-53, S11-59); FS line 630 (read back first); S11-57 ('within 25 miles of 1200 Main St, Springfield')"
         },
         {
           "name": "travel_fee_cents",
@@ -870,6 +878,11 @@
           "name": "locations_travel_parts_need_miles",
           "expression": "travel_miles is not null or (travel_centre is null and travel_fee_cents is null)",
           "source": "FS rows L02, L03 (a travel fee for farther towns of the travel area)"
+        },
+        {
+          "name": "locations_travel_centre_with_address",
+          "expression": "(travel_centre is null) = (travel_centre_address is null)",
+          "source": "FS row L02 ('a centre and a distance', type 'address + miles'); FS row B03 ('address + map pin')"
         },
         {
           "name": "locations_travel_fee_money",
