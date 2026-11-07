@@ -1,0 +1,109 @@
+# db-schema/business-setup (K-23): the database schema, business setup part
+
+**Status: v1, frozen** (`frozen.json`: `{"frozen": ["v1"]}`). Written and frozen by T-032. The freeze takes effect when T-032 merges, and the merge waits for every review below (build prompt 6.2, 6.5).
+
+## Freeze record
+
+Frozen v1, 2026-11-07, reviews required: database engineer, action-layer engineer, frontend engineer, QA and eval engineer.
+
+Each reviewer checks its own side (02-contracts section 1): the database engineer that the migrations can produce exactly this table list, with the rules below, beside K-04's `businesses` (migration 0002) without redefining any core column (C-159 business setup tables, with C-154 migrations queue and C-155 seeds); the action-layer engineer the rows journey 1's Tool API calls and the owner commands write: the companies and their kinds (S1-04), the listing fields (S1-09, S1-84), Stripe (S1-27), the terms and control (S1-29, S1-75), places and things (S1-81), the flow defaults (S1-21) and PAUSE and RESUME (S11-15, S11-16) (C-074, C-096, C-087); the frontend engineer the fields the registration screens, the Stripe connect page, the owner console and the public listing page show or save (C-187, C-190, C-192, C-196, through K-21); QA and eval the seeds and refused rows (C-147; the contract test `tests/contract/db-schema.business-setup.v1.test.ts`, a QA task the lead creates). The lead records the freeze in `ops/DECISIONS.md` and on the board (build prompt 5.7).
+
+**Owner:** the architect. **Table list:** `business-setup.v1.tables.json`, checked against `../tables.meta.schema.json` (02-contracts section 2 item 3). **Checked by:** `npm run contracts:check` (the list's shape, that every column a key, constraint, index, scope, version or seal names exists, and the fixtures index). **Contract test:** `tests/contract/db-schema.business-setup.v1.test.ts` (QA, its own task, not T-032): migrate a fresh schema with the core part, compare the catalog with the table list, load the seeds, refuse the refused rows. A change after the freeze is a new file, `business-setup.v1.1.tables.json` (additive) or `business-setup.v2.tables.json` (breaking, with the CTO's OK), with new fixtures (build prompt 6.4); the frozen-contract guard fails any edit to v1's table list, its fixtures or their index entries.
+
+## What it defines
+
+The nine tables of arch 09's "Business setup" domain (arch 09 line 460: 9 tables; "Business: brand · company · places", line 457), under Q-33's default (arch 09's shape, FS section 9 as the checklist), following 02-contracts section 7 row K-23. K-04 core v1's `businesses` row (id, name B01, display_name B02, status, time_zone, text hours H04, version) stays core's; this part adds the rest of FS line 721 beside it and never repeats a core column. Arch 09 gives only the count; every table and column names its source in `business-setup.v1.tables.json`.
+
+| Table                | What it holds                                                                                                                                                                                                 | Source                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `business_setup`     | One row per business beside core's: listing phone (B04) and email (Q-02), website (B05), About us (B06) and when the profile was confirmed, Stripe account (M01), no money (M02), terms (M05), control (B15). | FS line 721; FS rows B04 to B06, B15, M01, M02, M05; S1-09, S1-27, S1-29, S1-75, S1-84 |
+| `flow_defaults`      | Per business and flow: the default free-cancel time (H06), as a span before the visit or a clock time the day before, and the arrival setting (H07), setstart or window.                                      | FS rows H06, H07; FS line 746 (pf.settings); S1-21                                     |
+| `companies`          | A company: one tax number, one Stripe, one bill; one company is one business, a second company a second business on the same login. May exist before its business row.                                        | FS row B10; FS line 721 (company_id); S1-04                                            |
+| `company_kinds`      | Each kind of work and its company, its own trade name, and the plug-in's facts and the switches on in each flow, as typed columns.                                                                            | S1-04; FS rows B01, B09, B10; FS line 746; SPEC-master 5b, 5d                          |
+| `business_photos`    | The profile's photos (B07): place, work, team or logo; where each came from; never a person not on the team without the owner confirming their written yes.                                                   | FS row B07; S1-84; S13-22                                                              |
+| `business_faqs`      | Optional FAQs (B08): question and answer, in order.                                                                                                                                                           | FS row B08; S1-84                                                                      |
+| `locations`          | Shop, office or meeting spot: address, map point, a meeting spot's name and end, and for flow B the travel area's miles, centre and travel fee for farther towns.                                             | FS line 722; FS rows B03, L02, L03, L04; B4-77; Q-25                                   |
+| `places_or_things`   | Spaces and things booked by themselves: name, kind, how many each fits, how many Rosie can book per slot or day, turnaround.                                                                                  | FS line 741; S1-81; A4-62                                                              |
+| `new_booking_pauses` | The owner's PAUSE of new bookings until RESUME, with the one reminder at 8am the next day.                                                                                                                    | S11-15 (gives paused); S11-16                                                          |
+
+### Where each field of FS line 721 lives
+
+- In K-04 core: `id`, `name` (B01), `display_name` (B02), `status` (offline, saved, live; S1-35 gives live), `time_zone`, `text_hours` (H04).
+- Here: `company_id` (B10) as `companies.business_id` (one company is one business, so the link is held from the company's side, which exists first); `listing_phone` (B04), `website` (B05), `about` (B06), `stripe_account_id` (M01), `no_money` (M02), `terms_accepted_at` (M05) in `business_setup`; default cutoff (H06) and arrive (H07) in `flow_defaults`; `pf_facts` and `pf_switches` per kind in `company_kinds`.
+- Elsewhere: `fee_consent_at and by` (M03) is K-29's consent row of kind `fee_ok` (frozen, #59); `extras` (the plug-in text blocks per kind) is K-24's (02-contracts row K-24; MC R3); the bill card (M04) is K-33's.
+
+### Companies and kinds (S1-04)
+
+- S1-04 gives `companies` before S1-09 gives `business`, so a company row may be written before its business: `companies.business_id` is null until then, and `companies_business_key` keeps one company per business. A company with no business is seen by no business scope (rule 4 below); sign-up's turns read it on the runtime side.
+- `company_kinds` carries `business_id`, copied from its company and held to it by the composite foreign key `company_kinds_company_business_fk`, so row-level security can scope the row. Code sets the company's and its kinds' `business_id` in the same commit; `company_kinds_company_fk` holds the company itself while both are null.
+- `kind_id` is the profession file's id (such as `plumber`); K-24 names the 243 kinds and adds the foreign key to them. That each kind belongs to one company of an owner spans rows, so code checks it at S1-04.
+- `pf_facts`, `pf_switches_a`, `pf_switches_b`: the plug-in's facts, and the switches turned on in each flow (SPEC-master 5b: every switch is off unless turned on, and a switch can differ by flow). `company_kinds_nomoney_fact_and_switch` holds SPEC-master 5d's "a profession sets both or neither" for `nomoney`. Which names are known facts and switches is K-26's closed registry (arch 09 line 480); here they are only checked for form.
+
+### The flow defaults (H06, H07)
+
+- Exactly one form of free-cancel time per flow (`flow_defaults_one_cutoff`): `cutoff_before`, a span such as `24 hours` or `2 days`, or `cutoff_day_before_at`, a clock time the day before in the business's zone, such as `18:00` ("6pm the day before"). Both forms appear in fixture set v1's shops.
+- A booking copies its free-cancel time in when it is made (K-30's `cutoff_at`, written once: FS line 752); a change here applies to new bookings only (S1-21: "A booking keeps the rules it was made with").
+
+### Locations and places
+
+- A location's opening hours (H01) and a place's hours and closed days are K-27's schedule rows owned by the location or the place (FS line 726: schedule owner location, place_or_thing; 02-contracts row K-27 lists hours H01). A place's services are K-25's `services.places` (FS line 724); its papers are K-35 documents it owns (FS line 736). None is repeated here.
+- The travel check (B4-77) is distance on stored points (Q-25): a customer's point is inside when `ST_DWithin(coalesce(travel_centre, map_point), point, travel_miles * 1609.344)`. Null `travel_centre` means the location's own point is the centre (L02: the centre is the confirmed B03). Map points come from the geo port's double until Q-25 is answered.
+
+### The owner's PAUSE (S11-15, S11-16)
+
+- One row per pause and business ("Both" is a row each); RESUME sets `resumed_at` and who. `new_booking_pauses_one_open` allows one open pause per business. While open, AI assistants and the booking page hear only "not taking new bookings"; times already saved can still be confirmed (S11-15). The count S11-16 reports ("1 AI assistant asked") is read from the event log (K-08), not kept here.
+- Not core's `pauses` (a person, phone or address held for the owner, A3-48), and not K-33's pause for an unpaid monthly bill (S11-66 to S11-69).
+
+## Database rules beyond the table list
+
+The table list's meta-schema has no place for these; the migrations must produce them too, and the contract test checks them.
+
+1. **Same schema as core:** the nine tables live beside K-04's tables, and their foreign keys name core tables by K-04's keys (`businesses.id`, `persons.id`), so the references carry no schema prefix. No table here refers to K-29 or K-37.
+2. **Extensions:** `postgis`, for `locations.map_point` and `travel_centre` (`geography(Point,4326)`), with a GiST index on `map_point`; core needs `btree_gist` (K-04 v1 rule 1). A value is given as EWKT, such as `SRID=4326;POINT(-90 40)`.
+3. **Versions:** every table here is updated, so each has `version integer not null default 1`, raised by every update and compared and set by a commit (arch 01 line 85; K-04 v1 rule 2).
+4. **Ids** are `text`, opaque strings code makes (CQ-09). `kind_id` is the profession file's id, not an id code makes.
+5. **Row-level security per business** (arch 10 line 546; K-04 v1 rule 4): every table is scoped by `business_id`. A company, or a company's kind, whose business is null is seen by no business scope; sign-up's turns read and write it on the runtime side.
+6. **Arrays:** `pf_facts`, `pf_switches_a` and `pf_switches_b` are `text[]`, not null, default `'{}'`; a fixture gives them as a JSON array (K-04's fixture format).
+7. **Money** is whole cents with a currency code (CQ-09): `travel_fee_cents` with `travel_fee_currency`, both or neither.
+
+## Seed and refused-row fixtures (`fixtures/`, listed in `fixtures/index.json`)
+
+The fixture file format is K-04's (`../core/README.md`, "Seed and refused-row fixtures"): `after`, `rows`, and for a refused fixture `refused` with `role`, `scope`, `action` and `expect`. Each `after` path is relative to this part's `fixtures/` folder, so its seeds name K-04's as `../../core/fixtures/<file>`; a loader loads each file once, its own `after` first. This part needs no other part's seed. `npm run contracts:check` counts each entry as a seed row and leaves it to the contract test (02-contracts section 2 item 12).
+
+Accepted (5): the four of 02-contracts row K-23, `seed-business-demo-shop` (Lee's Barbershop set up and live: listing phone, website, About us and three photos confirmed, Stripe, terms ticked by Sam, control by a code to the listing, both flows' defaults, one FAQ, the shop at 88 Elm St), `seed-company-two-kinds` (Sam's S1-04 answer: plumbing and electrical share Lee Home Services LLC as Lee Plumbing and Lee Electric, and the barbershop is its own company; it adds the Lee Home Services business head and Sam's owner role), `seed-location-flow-b` (Lee Home Services' office at 1200 Main St, the centre of its 25-mile travel area, with an arrival window in flow B), `seed-place-or-thing` (the pet boarding demo shop's run, suite and cat condo, counted by the day; it adds that business head and Sam's owner role); and one beyond its list, so every table has a seed row, as K-04 added `seed-pause`: `seed-new-booking-pause` (S11-15's PAUSE of Lee's Barbershop at 1:15pm Mon Oct 26 and S11-16's RESUME at 2:40pm). Refused (3, in `fixtures/invalid/`, beyond the row's list, which names none): `refuse-photo-customer-without-yes` (CHECK `business_photos_person_needs_yes`, 23514), `refuse-second-open-pause` (unique `new_booking_pauses_one_open`, 23505), `refuse-nomoney-fact-without-switch` (CHECK `company_kinds_nomoney_fact_and_switch`, 23514). Each is refused for its one reason: the same photo with the written yes confirmed, the same pause with RESUME's time, and the same update with the switch on each pass.
+
+Names and values come from fixture set v1's demo shops (`fixtures/v1/test-kit/shops/barber.json`, `plumber.json`, `electrician.json`, `boarding.json`: facts, switches, settings, the demo website) and the master's sample cast (SPEC-master 6: Sam Lee, Lee Home Services LLC at 1200 Main St, Lee's Barbershop LLC at 88 Elm St, the 25-mile travel area, the price board; S1-04's trade names; S1-84's About us line and photo labels; S11-15's and S11-16's times), never a real person (rule 9). Phone numbers are in the 555-01xx range: the cast's listing numbers (555) 010-0142 and 010-0177 are kept by their last four digits as +15555550142 and +15555550177. These are examples, not from the sources: the listing email (`shop@example.com`; the cast gives none, and Q-02 sends the code by email), the Stripe account id, the photo object keys, the FAQ's wording (built from the price board's kids cut), the map points (stand-ins a geo double could return, not geocodes), and the boarding spaces' `fits` (from "Second pet in the same run or condo") and `bookable_count`. Lee Home Services' free-cancel time is the electrician file's 24 hours (the plumber file gives none).
+
+**Checked on 2026-11-07** by a throwaway script against PostgreSQL 17 with PostGIS 3.5 in a private Docker container (the local image `postgis/postgis:17-3.5`, stopped and removed after): DDL built from the core and this part's table lists (33 tables), with `postgis` and `btree_gist`, K-04's Tool API role and row-level security by `rosie.business_id`; every listed column with its nullability found in the catalog; all 18 core seeds and these 5 loaded together (every table here gets rows), and each of these 5 alone with its `after` chain; each refused fixture refused as its `expect` says and passed once its fault was removed; every other CHECK, unique and foreign key of the nine tables refused a row that broke it (39 probes), and the valid forms passed (a cutoff as 6pm the day before, a company before its business, a named meeting spot with its end, a travel fee with its miles and currency, a thing with a turnaround); a Tool API call scoped to the yoga studio saw none of the barbershop's setup, companies or kinds, the barbershop's scope saw its own, and an insert into another business was refused (42501); a point 20 miles from the office was inside the 25-mile area and one 40 miles out was not. The contract test is QA's task.
+
+## Producers and consumers (02-contracts K-23 and section 7)
+
+- **Producers:** database engineer: C-159 business setup tables, with C-154 migrations queue and C-155 seeds from fixture set v1 (its setup seeds after F14: 02-contracts section 7 notes; CQ-14).
+- **Consumers:** action-layer engineer: C-074 Tool API journey 1 calls (S1-04, S1-09, S1-21, S1-27, S1-29, S1-35, S1-75, S1-81, S1-84), C-096 catalog and pricing (businesses and kinds of work), C-087 one commit per turn, the owner commands of journey 11 (PAUSE and RESUME, settings read back); AI engineer: C-114 context bundle (facts, switches and FAQs the planner answers from); frontend engineer (through K-21): C-187 registration screens, C-190 Stripe connect and bill card, C-192 owner console, C-196 public listing page; integrations engineer: C-218 Google Places (the listing fields it prefills, K-15) and the geo adapter (map points, K-17); database engineer: C-202 staging seeded state ("signed up, with Stripe test accounts": K-23 after F14); QA: C-147 scenario tests and the contract test.
+- **Frozen before it:** K-04 (frozen, #55). **Frozen with it (F14):** K-22, K-24, K-25, K-26, K-27, K-33, K-35 and K-02 v1.1, each of which may refer to these tables (K-24's kinds to `company_kinds`, K-25's services to `locations` and `places_or_things`, K-27's schedules to `locations` and `places_or_things`, K-35's documents to `places_or_things`); nothing here refers to them.
+
+## Defaults used (T-032)
+
+1. **Q-33** (arch 09's shape, FS section 9 as the checklist): nine tables named from 02-contracts row K-23 and FS lines 721, 722 and 741.
+2. **Q-02** (no calls or texts to the listing): `listing_email` holds the listing's email for the control code and the go-live notice; with none, control is `team_check`.
+3. **Q-24** (Places double) and **Q-25** (geo double; PostGIS distance on stored points): the listing fields and map points arrive through K-15 and K-17's doubles; `map_point` is nullable until found.
+4. **Q-51** (the link host a config value): no link host or booking-page address is stored here.
+5. **Hours live in K-27** (FS line 726 against 02-contracts row K-23's "hours H01"): one home for every weekly hour, owned by the location or place.
+6. **Facts and switches per kind** (FS line 721 puts `pf_facts` and `pf_switches` on the business; FS line 746 keeps the plug-in keys per kind of work): typed columns on `company_kinds`, so a company with two kinds keeps each kind's own.
+7. **"Photos B07 and B08"** in 02-contracts row K-23 read as FS's rows: B07 photos and B08 FAQs (S1-84 asks both).
+
+## Open gaps
+
+- **The owner's terms tick as a consent row** (02-contracts section 8: "K-29: the consent row of the ticked terms"): K-29 v1's `consents_ticked_terms_has_booking` makes every `ticked_terms` row name a booking (A5-07), so S1-29's tick has no consent row in K-29 v1. Here it is `terms_accepted_at` and who; which words and version the owner ticked (S13-30) is not stored. A K-29 minor version (a kind that only widens) or a K-23 v1.1 column; proposed for QUESTIONS.md.
+- **Which towns are "farther"** for the travel fee (L03: "Travel fee for farther towns", an amount): the sources give no distance or town list; v1 stores the amount only. Proposed for QUESTIONS.md.
+- **A business with no public place** (a solo pro working from home in flow B): its travel centre needs a point, but FS's location kinds are shop, office and meeting spot; whether a home address may be a private centre is not in the sources.
+- **`fits` and `bookable_count`** (S1-81: "how many it fits"; "How many can Rosie book per time slot or day?"): whether one row is one space or a set of like spaces, and so whether `bookable_count` may exceed `fits`, is not in the sources; v1 checks neither against the other. A connected reservation system replacing the count (D88) has no column.
+- **The company's own details** (B10: "one tax number, one Stripe, one bill"): the tax number is Stripe's (S1-27: "Bank and tax details go to Stripe, never to Rosie"), so none is stored; the company's name is as the owner gives it or the listing reads.
+- **The Stripe account's state** (onboarding finished, charges on): K-14's (Stripe port), not a column here; `stripe_account_id`'s form is K-14's.
+- **K-13's file reference form** for `business_photos.object_key`, and **K-15's place id** for the matched listing: text with no form until those contracts freeze (F8, F10); a place id, if K-15 needs one stored, is a v1.1 column.
+- **A drafted plug-in's** facts and switches (S1-03, new work drafted for review): K-24's; until the draft is approved its kind has no profession id here.
+- **CQ-09's id forms:** ids are opaque text until the CTO rules.
+
+## Change log
+
+- v1, 2026-11-07 (T-032): first version, frozen.

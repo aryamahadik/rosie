@@ -1,0 +1,118 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "business_setup",
+      "values": {
+        "business_id": "biz-lees-barbershop",
+        "listing_phone": "+15555550177",
+        "listing_email": "shop@example.com",
+        "website": "https://example.com",
+        "about": "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+        "profile_confirmed_at": "2026-10-19T18:14:00Z",
+        "stripe_account_id": "acct_1DemoLeesBarbershop",
+        "no_money": false,
+        "terms_accepted_at": "2026-10-19T18:18:00Z",
+        "terms_accepted_by_person_id": "person-sam",
+        "control_proven_at": "2026-10-19T18:10:00Z",
+        "control_proven_via": "listing_code",
+        "version": 4
+      }
+    },
+    {
+      "table": "flow_defaults",
+      "values": {
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "cutoff_before": "24 hours",
+        "cutoff_day_before_at": null,
+        "arrive": "setstart",
+        "version": 1
+      }
+    },
+    {
+      "table": "flow_defaults",
+      "values": {
+        "business_id": "biz-lees-barbershop",
+        "flow": "B",
+        "cutoff_before": "24 hours",
+        "cutoff_day_before_at": null,
+        "arrive": "setstart",
+        "version": 1
+      }
+    },
+    {
+      "table": "business_photos",
+      "values": {
+        "id": "photo-lees-barbershop-front",
+        "business_id": "biz-lees-barbershop",
+        "object_key": "photos/biz-lees-barbershop/shop-front.jpg",
+        "label": "The shop front",
+        "shows": "place",
+        "came_from": "listing",
+        "position": 1,
+        "shows_person_not_on_team": false,
+        "written_yes_confirmed_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "business_photos",
+      "values": {
+        "id": "photo-lees-barbershop-chairs",
+        "business_id": "biz-lees-barbershop",
+        "object_key": "photos/biz-lees-barbershop/chairs.jpg",
+        "label": "The chairs",
+        "shows": "place",
+        "came_from": "listing",
+        "position": 2,
+        "shows_person_not_on_team": false,
+        "written_yes_confirmed_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "business_photos",
+      "values": {
+        "id": "photo-lees-barbershop-chair-ready",
+        "business_id": "biz-lees-barbershop",
+        "object_key": "photos/biz-lees-barbershop/chair-ready.jpg",
+        "label": "A chair, ready",
+        "shows": "place",
+        "came_from": "listing",
+        "position": 3,
+        "shows_person_not_on_team": false,
+        "written_yes_confirmed_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "business_faqs",
+      "values": {
+        "id": "faq-lees-barbershop-kids-cut",
+        "business_id": "biz-lees-barbershop",
+        "question": "Do you cut kids' hair?",
+        "answer": "Yes: a kids cut (12 and under) is $25.",
+        "position": 1,
+        "version": 1
+      }
+    },
+    {
+      "table": "locations",
+      "values": {
+        "id": "loc-lees-barbershop-shop",
+        "business_id": "biz-lees-barbershop",
+        "kind": "shop",
+        "name": null,
+        "address": "88 Elm St, Springfield",
+        "map_point": "SRID=4326;POINT(-90.01 40.01)",
+        "end_address": null,
+        "travel_miles": null,
+        "travel_centre": null,
+        "travel_fee_cents": null,
+        "travel_fee_currency": null,
+        "version": 1
+      }
+    }
+  ]
+}

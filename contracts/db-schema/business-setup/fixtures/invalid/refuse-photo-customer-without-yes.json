@@ -1,0 +1,28 @@
+{
+  "after": ["seed-business-demo-shop.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "business_photos",
+    "values": {
+      "id": "photo-lees-barbershop-customer-fade",
+      "business_id": "biz-lees-barbershop",
+      "object_key": "photos/biz-lees-barbershop/customer-fade.jpg",
+      "label": "A skin fade",
+      "shows": "work",
+      "came_from": "owner",
+      "position": 4,
+      "shows_person_not_on_team": true,
+      "written_yes_confirmed_at": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["business_photos_person_needs_yes"]
+    }
+  }
+}

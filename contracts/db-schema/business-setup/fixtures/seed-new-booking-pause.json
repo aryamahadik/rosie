@@ -1,0 +1,18 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "new_booking_pauses",
+      "values": {
+        "id": "nbpause-lees-barbershop-oct26",
+        "business_id": "biz-lees-barbershop",
+        "paused_at": "2026-10-26T17:15:00Z",
+        "paused_by_person_id": "person-sam",
+        "reminded_at": null,
+        "resumed_at": "2026-10-26T18:40:00Z",
+        "resumed_by_person_id": "person-sam",
+        "version": 2
+      }
+    }
+  ]
+}

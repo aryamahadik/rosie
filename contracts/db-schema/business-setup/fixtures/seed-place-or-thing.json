@@ -1,0 +1,70 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "businesses",
+      "values": {
+        "id": "biz-pet-boarding",
+        "name": "Pet boarding and doggy daycare",
+        "display_name": "Pet boarding and doggy daycare",
+        "status": "saved",
+        "time_zone": "America/New_York",
+        "text_hours_start": "08:00",
+        "text_hours_end": "20:00",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-sam-pet-boarding",
+        "person_id": "person-sam",
+        "business_id": "biz-pet-boarding",
+        "role": "owner",
+        "version": 1
+      }
+    },
+    {
+      "table": "places_or_things",
+      "values": {
+        "id": "place-pet-boarding-standard-run",
+        "business_id": "biz-pet-boarding",
+        "name": "Standard run",
+        "kind": "space",
+        "fits": 2,
+        "bookable_count": 1,
+        "bookable_per": "day",
+        "turnaround": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "places_or_things",
+      "values": {
+        "id": "place-pet-boarding-suite",
+        "business_id": "biz-pet-boarding",
+        "name": "Suite",
+        "kind": "space",
+        "fits": 2,
+        "bookable_count": 1,
+        "bookable_per": "day",
+        "turnaround": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "places_or_things",
+      "values": {
+        "id": "place-pet-boarding-cat-condo",
+        "business_id": "biz-pet-boarding",
+        "name": "Cat condo",
+        "kind": "space",
+        "fits": 2,
+        "bookable_count": 1,
+        "bookable_per": "day",
+        "turnaround": null,
+        "version": 1
+      }
+    }
+  ]
+}

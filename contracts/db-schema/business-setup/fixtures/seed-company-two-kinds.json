@@ -1,0 +1,97 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "businesses",
+      "values": {
+        "id": "biz-lee-home-services",
+        "name": "Lee Home Services",
+        "display_name": "Lee Home Services",
+        "status": "saved",
+        "time_zone": "America/New_York",
+        "text_hours_start": "08:00",
+        "text_hours_end": "20:00",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-sam-home-services",
+        "person_id": "person-sam",
+        "business_id": "biz-lee-home-services",
+        "role": "owner",
+        "version": 1
+      }
+    },
+    {
+      "table": "companies",
+      "values": {
+        "id": "company-lee-home-services",
+        "owner_person_id": "person-sam",
+        "name": "Lee Home Services LLC",
+        "business_id": "biz-lee-home-services",
+        "version": 2
+      }
+    },
+    {
+      "table": "companies",
+      "values": {
+        "id": "company-lees-barbershop",
+        "owner_person_id": "person-sam",
+        "name": "Lee's Barbershop LLC",
+        "business_id": "biz-lees-barbershop",
+        "version": 2
+      }
+    },
+    {
+      "table": "company_kinds",
+      "values": {
+        "company_id": "company-lee-home-services",
+        "kind_id": "plumber",
+        "business_id": "biz-lee-home-services",
+        "trade_name": "Lee Plumbing",
+        "pf_facts": [
+          "firststeps",
+          "documents",
+          "forms",
+          "sentnow",
+          "planbill",
+          "dropoff",
+          "extrawork",
+          "photos",
+          "video"
+        ],
+        "pf_switches_a": [],
+        "pf_switches_b": ["cancelright"],
+        "version": 1
+      }
+    },
+    {
+      "table": "company_kinds",
+      "values": {
+        "company_id": "company-lee-home-services",
+        "kind_id": "electrician",
+        "business_id": "biz-lee-home-services",
+        "trade_name": "Lee Electric",
+        "pf_facts": ["photos", "firststeps", "dropoff", "extrawork", "stages", "documents", "video"],
+        "pf_switches_a": [],
+        "pf_switches_b": [],
+        "version": 1
+      }
+    },
+    {
+      "table": "company_kinds",
+      "values": {
+        "company_id": "company-lees-barbershop",
+        "kind_id": "barber",
+        "business_id": "biz-lees-barbershop",
+        "trade_name": null,
+        "pf_facts": ["children", "documents", "extrawork", "groups", "photos"],
+        "pf_switches_a": [],
+        "pf_switches_b": [],
+        "version": 1
+      }
+    }
+  ]
+}

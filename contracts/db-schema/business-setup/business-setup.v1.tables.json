@@ -1,0 +1,1164 @@
+{
+  "part": "business-setup",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "business_setup",
+      "description": "The fields of FS line 721 that K-04 core's businesses row does not hold, one row per business beside it: the listing's phone and email, website, About us, the profile's confirmation, the Stripe account, no money through Rosie, the terms accepted and by whom, and how control of the business was proven. Core keeps id, name (B01), display_name (B02), status, time_zone, text hours (H04) and version; this row never repeats them.",
+      "source": "FS line 721; 02-contracts section 7 row K-23; K-04 v1 businesses (CQ-03)",
+      "columns": [
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id); one setup row per business.",
+          "source": "FS line 721 (business.id); arch 10 line 546"
+        },
+        {
+          "name": "listing_phone",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The business's own phone from its public listing, in E.164 form (B04). It stays the business's: customers book through Rosie's one number, and Rosie uses it only for the control code and the go-live notice. Null: no listed phone.",
+          "source": "FS row B04; FS line 721 (listing_phone); S1-09; S1-75; S1-35; D102"
+        },
+        {
+          "name": "listing_email",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The email on the public listing, in lower case: where the control code and the go-live notice go while there are no calls or texts to the listing (Q-02's default). Null: the listing has no email, so Rosie's team checks control.",
+          "source": "Q-02 default; S1-75 ('the listing's own phone or email'); S1-35 ('the phone and email on the public listing'); FS row B15"
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The website or listing link (B05), read to draft About us and the photos; not shown.",
+          "source": "FS row B05; FS line 721 (website); S1-09; S1-84"
+        },
+        {
+          "name": "about",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The About us line (B06), drafted from the listing or website or written by the owner; go-live waits for it. Null until drafted.",
+          "source": "FS row B06; FS line 721 (about); S1-84; FS section 10"
+        },
+        {
+          "name": "profile_confirmed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner confirmed About us and the photos in one answer (S1-84 gives profile). Null: nothing shows yet (S1-84's safe default).",
+          "source": "S1-84 (gives profile; 'nothing shows until Sam confirms'); FS rows B06, B07"
+        },
+        {
+          "name": "stripe_account_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business's own Stripe account (M01), connected at S1-27; money lands there, never with Rosie. Null: not connected, or no money through Rosie. Its form is K-14's.",
+          "source": "FS row M01; FS line 721 (stripe_account_id); S1-27 (gives stripe); K-14"
+        },
+        {
+          "name": "no_money",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": ["owner"],
+          "description": "No money through Rosie (M02): every service takes nothing up front and is paid the business's own way, and Stripe is not asked.",
+          "source": "FS row M02; FS line 721 (no_money); S1-13; S1-27; SPEC-master 5b and 5d (nomoney)"
+        },
+        {
+          "name": "terms_accepted_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner ticked the terms (M05) on S1-29's preview page; null until then.",
+          "source": "FS row M05; FS line 721 (terms_accepted_at); S1-29 (gives terms); S13-30"
+        },
+        {
+          "name": "terms_accepted_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The owner who ticked them (persons.id); never a helper, whose yes is not the owner's.",
+          "source": "S1-29; S1-77 ('Never: count the helper's yes as the owner's')"
+        },
+        {
+          "name": "control_proven_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When control of the business was proven (B15), the go-live gate of S1-75; null: not yet, so the business stays offline.",
+          "source": "FS row B15; S1-75; S1-76; S1-32"
+        },
+        {
+          "name": "control_proven_via",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "listing_code: a code sent to the listing's own contact came back right; team_check: Rosie's team checked it (S1-75's two branches).",
+          "source": "S1-75 ('Code to the listed phone or email'; 'Rosie's team checks'); S1-76; Q-02"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["business_id"],
+      "foreignKeys": [
+        {
+          "name": "business_setup_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "business_setup_terms_by_fk",
+          "columns": ["terms_accepted_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "business_setup_listing_phone_form",
+          "expression": "listing_phone is null or listing_phone ~ '^\\+[1-9][0-9]{6,14}$'",
+          "source": "FS row B04; CQ-09 (E.164, as K-04's phones)"
+        },
+        {
+          "name": "business_setup_listing_email_form",
+          "expression": "listing_email is null or (listing_email ~ '^[^@[:space:]]+@[^@[:space:]]+$' and listing_email = lower(listing_email))",
+          "source": "Q-02; K-04 v1 handles_address_form"
+        },
+        {
+          "name": "business_setup_website_form",
+          "expression": "website is null or website ~ '^https?://[^[:space:]]+$'",
+          "source": "FS row B05 (a link)"
+        },
+        {
+          "name": "business_setup_terms_with_who",
+          "expression": "(terms_accepted_at is null) = (terms_accepted_by_person_id is null)",
+          "source": "S1-29; S1-77"
+        },
+        {
+          "name": "business_setup_control_with_way",
+          "expression": "(control_proven_at is null) = (control_proven_via is null)",
+          "source": "S1-75"
+        },
+        {
+          "name": "business_setup_control_way_known",
+          "expression": "control_proven_via is null or control_proven_via in ('listing_code', 'team_check')",
+          "source": "S1-75 (its two branches); S1-76"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "flow_defaults",
+      "description": "The business's default free-cancel time (H06) and arrival setting (H07), one row per flow it offers: A, the customer comes to the business; B, the business goes to the customer. Each starts from the plug-in's pf.settings (cutoff, arrive), which may differ by flow, and the owner keeps or changes it at S1-21. A booking copies its free-cancel time in when it is made (K-30's cutoff_at), so a change applies to new bookings only.",
+      "source": "FS rows H06, H07; FS line 721 (default cutoff, default arrive); FS line 746 (pf.settings in typed columns); S1-21; fixtures/v1/test-kit/shops (settings per flow)",
+      "columns": [
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "FS line 721"
+        },
+        {
+          "name": "flow",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "A or B, as K-04's bookings.flow.",
+          "source": "FS line 729 (flow); FS row H07 ('choice per flow'); master-A.json, master-B.json"
+        },
+        {
+          "name": "cutoff_before",
+          "type": "interval",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "A free-cancel time counted back from the visit's start, such as 24 hours or 2 days before (H06). Null when cutoff_day_before_at gives it.",
+          "source": "FS row H06; pf.settings.cutoff ('24 hours before', '2 days before', '72 hours before' in fixture set v1's shops); A7-01"
+        },
+        {
+          "name": "cutoff_day_before_at",
+          "type": "time",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "A free-cancel time at a clock time on the day before the visit, in the business's zone, such as 6pm the day before (H06). Null when cutoff_before gives it.",
+          "source": "FS row H06; pf.settings.cutoff ('6pm the day before', '8pm the day before' in fixture set v1's shops)"
+        },
+        {
+          "name": "arrive",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The arrival setting (H07): setstart, a set start time; window, an arrival window.",
+          "source": "FS row H07; pf.settings.arrive (setstart, window); B4-83"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["business_id", "flow"],
+      "foreignKeys": [
+        {
+          "name": "flow_defaults_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "flow_defaults_flow_known",
+          "expression": "flow in ('A', 'B')",
+          "source": "FS line 729 (flow); K-04 v1 bookings_flow_known"
+        },
+        {
+          "name": "flow_defaults_arrive_known",
+          "expression": "arrive in ('setstart', 'window')",
+          "source": "FS row H07; pf.settings.arrive"
+        },
+        {
+          "name": "flow_defaults_one_cutoff",
+          "expression": "num_nonnulls(cutoff_before, cutoff_day_before_at) = 1",
+          "source": "FS row H06 (R: one free-cancel time)"
+        },
+        {
+          "name": "flow_defaults_cutoff_before_positive",
+          "expression": "cutoff_before is null or cutoff_before > interval '0'",
+          "source": "FS row H06"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "companies",
+      "description": "A company (B10): kinds of work that share one tax number, one Stripe and one bill. One company is one business, listed under each of its kinds of work; a separate company is a second business on the same login (S1-04). S1-04 gives companies before S1-09 gives the business, so a company may exist before its business row; business_id is set when it is written.",
+      "source": "FS row B10; FS line 721 (company_id); S1-04 (gives companies); arch 09 line 457 ('Business: brand · company · places')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The company's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "owner_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The owner whose login it is on (persons.id); the ID, mobile, calendar and bill card carry over between their companies.",
+          "source": "S1-04 ('a second business on the same login'; 'The ID, mobile, calendar and bill card carry over')"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The company's name as the owner gives it or the listing reads, such as Lee Home Services LLC.",
+          "source": "S1-04; S1-09 (the read-back's name); SPEC-master 6 (Lee Home Services LLC, Lee's Barbershop LLC)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Its business (businesses.id): FS line 721's business.company_id, held from this side since one company is one business. Null until the business row is written.",
+          "source": "FS line 721 (company_id, B10); S1-04 ('One company is one business')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "companies_owner_fk",
+          "columns": ["owner_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "companies_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "companies_business_key",
+          "columns": ["business_id"],
+          "source": "S1-04 ('One company is one business')"
+        },
+        {
+          "name": "companies_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "S1-04 (a company's kinds carry its business, for row-level security)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "companies_owner_idx",
+          "columns": ["owner_person_id"],
+          "why": "An owner's companies: S1-04's split, S1-35's 'Next' and S11-15's 'Pause which business?'."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "company_kinds",
+      "description": "Each kind of work and the company it belongs to (S1-04 gives companies: 'the company of each kind'), with the kind's own trade name and the plug-in's facts and switches as typed columns, because logic reads them (FS line 746). The kinds themselves, their plug-in text blocks and the business's extras are K-24's, which refers to these rows.",
+      "source": "S1-04; FS row B10; FS row B01 ('a trade name per kind of work'); FS lines 721, 746 (pf_facts, pf_switches); 02-contracts section 8 (companies; K-23)",
+      "columns": [
+        {
+          "name": "company_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The company (companies.id).",
+          "source": "S1-04"
+        },
+        {
+          "name": "kind_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind of work: its profession file's id, such as plumber or barber (B09). K-24 names the 243 kinds and adds the foreign key.",
+          "source": "FS row B09; S1-02; fixtures/v1/test-kit/shops (ids); 02-contracts row K-24"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The company's business, copied from companies and held to it by a foreign key, so row-level security can scope the row. Null while the company has none.",
+          "source": "arch 10 line 546; S1-04"
+        },
+        {
+          "name": "trade_name",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The kind's own trade name, such as Lee Plumbing or Lee Electric; null: the business's name.",
+          "source": "S1-04 ('Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric'); FS row B01"
+        },
+        {
+          "name": "pf_facts",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "The plug-in's facts for this kind (pf.facts), which gate branches and steps. Empty: no facts list, so every branch shows.",
+          "source": "FS line 746 ('pf.facts (list) ... also sit in typed columns'); SPEC-master 5d; MC R3"
+        },
+        {
+          "name": "pf_switches_a",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "The plug-in switches turned on in flow A (pf.switches); every switch not named is off.",
+          "source": "FS line 746 ('pf.switches (object)'); SPEC-master 5b ('Every switch is off unless turned on'; per flow)"
+        },
+        {
+          "name": "pf_switches_b",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "The plug-in switches turned on in flow B.",
+          "source": "FS line 746; SPEC-master 5b (per flow: { \"A\": true, \"B\": false })"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["company_id", "kind_id"],
+      "foreignKeys": [
+        {
+          "name": "company_kinds_company_fk",
+          "columns": ["company_id"],
+          "references": {
+            "table": "companies",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "company_kinds_company_business_fk",
+          "columns": ["company_id", "business_id"],
+          "references": {
+            "table": "companies",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "company_kinds_kind_id_form",
+          "expression": "kind_id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'",
+          "source": "fixtures/v1/test-kit/shops (profession file ids)"
+        },
+        {
+          "name": "company_kinds_names_form",
+          "expression": "array_to_string(pf_facts || pf_switches_a || pf_switches_b, ',') ~ '^([a-z0-9]+(,[a-z0-9]+)*)?$'",
+          "source": "SPEC-master 5b ('lowercase letters and digits'), 5d"
+        },
+        {
+          "name": "company_kinds_nomoney_fact_and_switch",
+          "expression": "('nomoney' = any(pf_facts)) = ('nomoney' = any(pf_switches_a) or 'nomoney' = any(pf_switches_b))",
+          "source": "SPEC-master 5d ('nomoney is a switch (words) and a fact (branches and steps): a profession sets both or neither')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "company_kinds_business_idx",
+          "columns": ["business_id"],
+          "why": "A business's kinds of work with their facts and switches (the frontier and the gate read them)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "business_photos",
+      "description": "The business's photos (B07): the place, the work, the team or a logo, drafted from the listing or website or sent by the owner, shown once the owner confirms the profile (business_setup.profile_confirmed_at). Never a customer, or anyone not on the team, without the owner confirming that person's written yes.",
+      "source": "FS row B07; S1-84; S13-22; FS section 10",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The photo's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "FS line 721"
+        },
+        {
+          "name": "object_key",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The photo itself: its file reference in R2, the object key of K-13, shown on the listing page.",
+          "source": "FS row B07; MC 8 'Files' (R2); 02-contracts K-13"
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "A few words for what it shows, such as The shop front.",
+          "source": "S1-84 ('[photo: The shop front]')"
+        },
+        {
+          "name": "shows",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "place, work, team or logo. Sensitive work shows only the place, the team or a logo (S13-22), which code checks against the switch.",
+          "source": "FS row B07 ('the place, the work, the team, a logo'); S1-84; S13-22"
+        },
+        {
+          "name": "came_from",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "listing or website (drafted from what S1-09 read), or owner (sent from the owner's phone).",
+          "source": "S1-84 ('picks a few photos from the website or listing'; 'Send a few photos from your phone'); FS section 10"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["owner"],
+          "description": "Its place in the order shown, from 1.",
+          "source": "FS row B07 ('a few'); S1-84"
+        },
+        {
+          "name": "shows_person_not_on_team",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "Whether it shows a customer or anyone else not on the team.",
+          "source": "S1-84 ('Never a customer, unless Sam confirms that customer's written yes'; 'A drafted photo that shows someone not on the team is left out'); FS row B07"
+        },
+        {
+          "name": "written_yes_confirmed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner confirmed that person's written yes to be shown; required when shows_person_not_on_team.",
+          "source": "S1-84; FS row B07 ('never a customer without their written yes')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "business_photos_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "business_photos_shows_known",
+          "expression": "shows in ('place', 'work', 'team', 'logo')",
+          "source": "FS row B07; S1-84"
+        },
+        {
+          "name": "business_photos_came_from_known",
+          "expression": "came_from in ('listing', 'website', 'owner')",
+          "source": "S1-84; FS section 10"
+        },
+        {
+          "name": "business_photos_position_positive",
+          "expression": "position >= 1",
+          "source": "S1-84"
+        },
+        {
+          "name": "business_photos_person_needs_yes",
+          "expression": "not shows_person_not_on_team or written_yes_confirmed_at is not null",
+          "source": "S1-84 ('Never a customer, unless Sam confirms that customer's written yes'); FS row B07"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "business_photos_business_idx",
+          "columns": ["business_id", "position"],
+          "why": "The listing page and the preview show a business's photos in order (S1-29, S1-84)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "business_faqs",
+      "description": "FAQs (B08), optional: a question and its answer, which the listing page shows and Rosie answers from (judgment rules 3 and 36).",
+      "source": "FS row B08; S1-84 ('FAQs are optional ... Rosie lists them and answers from them'); S11-57",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The FAQ's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "FS line 721"
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The question, in the owner's words.",
+          "source": "FS row B08 ('FAQs (question and answer)')"
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The owner's answer, which Rosie answers from.",
+          "source": "FS row B08; S1-84"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["owner"],
+          "description": "Its place in the list, from 1.",
+          "source": "FS row B08 (a list)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "business_faqs_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "business_faqs_words_given",
+          "expression": "length(btrim(question)) > 0 and length(btrim(answer)) > 0",
+          "source": "FS row B08"
+        },
+        {
+          "name": "business_faqs_position_positive",
+          "expression": "position >= 1",
+          "source": "FS row B08"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "business_faqs_business_idx",
+          "columns": ["business_id", "position"],
+          "why": "The listing page and the planner read a business's FAQs in order (S1-84)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "locations",
+      "description": "Where the business is (FS location row): a shop, an office or a meeting spot, with its address and map point. A shop or office can be the centre of the flow B travel area, with its miles and a travel fee for farther towns (L02, L03); distance is PostGIS distance on stored points (Q-25). A location's opening hours (H01) are K-27 schedule rows owned by the location (FS line 726).",
+      "source": "FS line 722 (location); FS rows B03, L02, L03, L04, H01; S1-09; S1-21; B4-77; Q-25",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The location's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "FS line 722 (id); CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "FS line 722 (business_id)"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "shop, office or meeting_spot.",
+          "source": "FS line 722 (kind: shop, office, meeting spot)"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "A meeting spot's name, which the booking page's place pick shows (L04); null for a shop or office, which goes by the business's name.",
+          "source": "FS row L04 ('Meeting spots (name and where the visit ends)'); S1-83; A4-01"
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The address as the owner confirmed it (B03), such as 88 Elm St, Springfield; shown on the listing page and in a flow A confirmation.",
+          "source": "FS row B03; FS line 722 (address); S1-09"
+        },
+        {
+          "name": "map_point",
+          "type": "geography(Point,4326)",
+          "null": true,
+          "audience": "never",
+          "description": "The address's map point, from the geo port (K-17; its double until Q-25 is answered). Null until it is found.",
+          "source": "FS line 722 (map point); FS row B03 ('address + map pin'); Q-25 ('PostGIS distance on stored points'); 02-contracts K-17"
+        },
+        {
+          "name": "end_address",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For a meeting spot, where the visit ends when it ends elsewhere; null: it ends where it meets.",
+          "source": "FS row L04 ('where the visit ends'); S1-83 ('its meeting point and where it ends')"
+        },
+        {
+          "name": "travel_miles",
+          "type": "numeric",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For flow B, how far the business goes from the travel centre, in miles (L02), such as 25; null: no travel area from here.",
+          "source": "FS row L02 ('a centre and a distance'); FS line 722 (miles); B4-77, B4-31; SPEC-master 6 (travel area: 25 miles)"
+        },
+        {
+          "name": "travel_centre",
+          "type": "geography(Point,4326)",
+          "null": true,
+          "audience": "never",
+          "description": "The travel area's centre when it is not this location's own map point; null: map_point is the centre (L02: the centre is the confirmed B03).",
+          "source": "FS line 722 (travel centre); FS rows L02, B03"
+        },
+        {
+          "name": "travel_fee_cents",
+          "type": "integer",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The travel fee for farther towns (L03) in whole cents, shown with the price before the yes; null: none.",
+          "source": "FS row L03; FS line 722 (travel fee); B4-77 ('If Sam set a travel fee for farther towns'); CQ-09 (integer cents)"
+        },
+        {
+          "name": "travel_fee_currency",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The fee's currency code, such as USD; set with travel_fee_cents.",
+          "source": "CQ-09 ('money in integer cents with a currency code'); contracts/common/formats.v1.schema.json (currency)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "locations_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "locations_kind_known",
+          "expression": "kind in ('shop', 'office', 'meeting_spot')",
+          "source": "FS line 722"
+        },
+        {
+          "name": "locations_meeting_spot_named",
+          "expression": "kind <> 'meeting_spot' or name is not null",
+          "source": "FS row L04"
+        },
+        {
+          "name": "locations_end_only_for_meeting_spot",
+          "expression": "end_address is null or kind = 'meeting_spot'",
+          "source": "FS row L04; S1-83"
+        },
+        {
+          "name": "locations_travel_from_shop_or_office",
+          "expression": "travel_miles is null or kind in ('shop', 'office')",
+          "source": "FS rows L02, B03 ('in flow B it is also the centre of the travel area')"
+        },
+        {
+          "name": "locations_travel_miles_positive",
+          "expression": "travel_miles is null or travel_miles > 0",
+          "source": "FS row L02"
+        },
+        {
+          "name": "locations_travel_parts_need_miles",
+          "expression": "travel_miles is not null or (travel_centre is null and travel_fee_cents is null)",
+          "source": "FS rows L02, L03 (a travel fee for farther towns of the travel area)"
+        },
+        {
+          "name": "locations_travel_fee_money",
+          "expression": "(travel_fee_cents is null) = (travel_fee_currency is null) and (travel_fee_cents is null or travel_fee_cents >= 0) and (travel_fee_currency is null or travel_fee_currency ~ '^[A-Z]{3}$')",
+          "source": "CQ-09; FS row L03"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "locations_business_idx",
+          "columns": ["business_id"],
+          "why": "A business's places for the listing page, the place pick and the travel check (B4-01, B4-77)."
+        },
+        {
+          "name": "locations_map_point_idx",
+          "columns": ["map_point"],
+          "using": "gist",
+          "why": "Distance on stored points: the travel check (B4-77) and M5's distance search (Q-25)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "places_or_things",
+      "description": "Spaces and things a kind of work is booked by (FS place_or_thing row; S1-81): customers pick a space and its size, never a person. Each has its name, how many it fits and how many Rosie can book per time slot or per day; the rest are kept for walk-ins and other platforms. Its hours and closed days are K-27 schedule rows owned by it (FS line 726), the services that use it are K-25's services.places, and its papers are K-35 documents owned by it (FS line 736).",
+      "source": "FS line 741 (place_or_thing); S1-81 (gives spaces); A4-62; FS line 743",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The space or thing's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "FS line 741 (id); CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "FS line 741 (business_id)"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "Its name as the owner lists it, such as Suite.",
+          "source": "FS line 741 (name); S1-81 ('Name')"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "space (a room, run, lane or court, booked for a time or a stay) or thing (an item, counted by date).",
+          "source": "FS line 741 (kind); S1-81 ('each space or thing'; 'Items and daily caps are counted by date')"
+        },
+        {
+          "name": "fits",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "How many it fits, such as the pets one run holds.",
+          "source": "FS line 741 (fits); S1-81 ('How many it fits')"
+        },
+        {
+          "name": "bookable_count",
+          "type": "integer",
+          "null": false,
+          "audience": ["owner"],
+          "description": "How many Rosie can book per time slot or per day (bookable_per); a connected reservation or class system replaces it (D88).",
+          "source": "FS line 741 (bookable_count); S1-81 ('How many can Rosie book per time slot or day?'; D88)"
+        },
+        {
+          "name": "bookable_per",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "slot or day: what bookable_count counts.",
+          "source": "S1-81 ('per time slot or day')"
+        },
+        {
+          "name": "turnaround",
+          "type": "interval",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The time to turn it around between bookings; null: none.",
+          "source": "S1-81 ('Items and daily caps are counted by date, with the time to turn them around')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "places_or_things_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "places_or_things_kind_known",
+          "expression": "kind in ('space', 'thing')",
+          "source": "S1-81"
+        },
+        {
+          "name": "places_or_things_fits_positive",
+          "expression": "fits > 0",
+          "source": "S1-81"
+        },
+        {
+          "name": "places_or_things_bookable_not_negative",
+          "expression": "bookable_count >= 0",
+          "source": "S1-81 ('Keep the rest for walk-ins and other platforms')"
+        },
+        {
+          "name": "places_or_things_bookable_per_known",
+          "expression": "bookable_per in ('slot', 'day')",
+          "source": "S1-81"
+        },
+        {
+          "name": "places_or_things_turnaround_positive",
+          "expression": "turnaround is null or turnaround > interval '0'",
+          "source": "S1-81"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "places_or_things_business_idx",
+          "columns": ["business_id"],
+          "why": "A business's spaces and things for the place pick (A4-62) and the setup summary."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "new_booking_pauses",
+      "description": "The owner's PAUSE of new bookings (S11-15 gives paused): AI assistants and the booking page hear only 'not taking new bookings' until the owner texts RESUME (S11-16); times already saved can still be confirmed and booked visits stay. One row per pause; RESUME closes it. Not core's pauses (a person, phone or address held for the owner, A3-48), and not K-33's pause for an unpaid monthly bill (S11-66 to S11-69).",
+      "source": "S11-15 (gives paused); S11-16; 02-contracts section 8 (paused: K-23)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pause's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business paused (businesses.id); 'Both' is one row for each.",
+          "source": "S11-15 ('Sam pauses one business, or both')"
+        },
+        {
+          "name": "paused_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the PAUSE took effect.",
+          "source": "S11-15"
+        },
+        {
+          "name": "paused_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who paused it (persons.id).",
+          "source": "S11-15 ('Sam texts PAUSE')"
+        },
+        {
+          "name": "reminded_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When Rosie asked once, because it was still paused at 8am the next day; null: not yet.",
+          "source": "S11-15 ('Still paused at 8am tomorrow: Rosie asks once')"
+        },
+        {
+          "name": "resumed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When RESUME ended it; null while paused. With no reply it stays paused.",
+          "source": "S11-16 ('RESUME ends a PAUSE'); S11-15 safe default"
+        },
+        {
+          "name": "resumed_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who resumed it (persons.id).",
+          "source": "S11-16"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "new_booking_pauses_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "new_booking_pauses_paused_by_fk",
+          "columns": ["paused_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "new_booking_pauses_resumed_by_fk",
+          "columns": ["resumed_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "new_booking_pauses_one_open",
+          "columns": ["business_id"],
+          "where": "resumed_at is null",
+          "source": "S11-15, S11-16 (paused until RESUME: one PAUSE at a time)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "new_booking_pauses_resumed_with_who",
+          "expression": "(resumed_at is null) = (resumed_by_person_id is null)",
+          "source": "S11-16"
+        },
+        {
+          "name": "new_booking_pauses_times_in_order",
+          "expression": "(resumed_at is null or resumed_at >= paused_at) and (reminded_at is null or reminded_at >= paused_at)",
+          "source": "S11-15; S11-16"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

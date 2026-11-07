@@ -1,0 +1,68 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-business-demo-shop.json",
+      "version": "v1",
+      "table": "business_setup",
+      "expect": "accept",
+      "shows": "Lee's Barbershop set up and live: its listing phone, website, About us line and three photos confirmed, Stripe connected, terms ticked by Sam, control proven by a code to the listing; free cancel until 24 hours before with a set start in both flows; one FAQ; the shop at 88 Elm St with its map point",
+      "source": "FS line 721; FS rows B03 to B08, M01, M02, M05, B15, H06, H07; S1-09 (the read-back: Lee's Barbershop LLC, 88 Elm St, Springfield, (555) 010-0177); S1-75; S1-84 (the About us line and the three photos); S1-27; S1-29; S1-35 (live at 2:20pm Mon Oct 19); SPEC-master 6 (the price board); fixtures/v1/test-kit/shops/barber.json (settings, website)"
+    },
+    {
+      "file": "seed-company-two-kinds.json",
+      "version": "v1",
+      "table": "companies",
+      "expect": "accept",
+      "shows": "Sam's two companies after S1-04: plumbing and electrical share Lee Home Services LLC, each with its own trade name (Lee Plumbing, Lee Electric), and the barbershop is its own company; each kind's plug-in facts and switches as typed columns (the plumber's cancelright on in flow B only)",
+      "source": "S1-04 ('1 Plumbing and electrical share Lee Home Services'; 'like Lee Plumbing and Lee Electric'); FS row B10; FS line 746; SPEC-master 5b, 5d, 6 (Lee Home Services LLC, Lee's Barbershop LLC); fixtures/v1/test-kit/shops/plumber.json, electrician.json, barber.json"
+    },
+    {
+      "file": "seed-location-flow-b.json",
+      "version": "v1",
+      "table": "locations",
+      "expect": "accept",
+      "shows": "Lee Home Services' office at 1200 Main St, Springfield, the centre of its 25-mile flow B travel area (its own map point is the centre), with an arrival window in flow B and a set start in flow A",
+      "source": "FS line 722 (location); FS rows L02, B03, H07; B4-77 ('Lee Home Services goes 25 miles from 1200 Main St'); SPEC-master 6 (travel area: 25 miles); fixtures/v1/test-kit/shops/plumber.json, electrician.json (settings); Q-25"
+    },
+    {
+      "file": "seed-place-or-thing.json",
+      "version": "v1",
+      "table": "places_or_things",
+      "expect": "accept",
+      "shows": "The pet boarding demo shop's spaces, each fitting two pets and counted by the day: a standard run, a suite and a cat condo",
+      "source": "FS line 741 (place_or_thing); S1-81 ('A stay books a kennel or room from a start date to an end date'); fixtures/v1/test-kit/shops/boarding.json ('runs, suites and cat condos are spaces, counted night by night'; 'Second pet in the same run or condo')"
+    },
+    {
+      "file": "seed-new-booking-pause.json",
+      "version": "v1",
+      "table": "new_booking_pauses",
+      "expect": "accept",
+      "shows": "Sam's PAUSE of Lee's Barbershop at 1:15pm Mon Oct 26 and his RESUME at 2:40pm, as one closed row",
+      "source": "S11-15 (gives paused; 'owner → san · msg · Mon Oct 26, 1:15pm'; 'A Lee's Barbershop'); S11-16 ('Mon Oct 26, 2:40pm'; 'RESUME ends a PAUSE')"
+    },
+    {
+      "file": "invalid/refuse-photo-customer-without-yes.json",
+      "version": "v1",
+      "table": "business_photos",
+      "expect": "refuse",
+      "shows": "A photo of a customer's cut added to the barbershop's profile without the owner confirming that customer's written yes is refused (CHECK business_photos_person_needs_yes, SQLSTATE 23514); the same row with written_yes_confirmed_at set passes",
+      "source": "S1-84 ('Never a customer, unless Sam confirms that customer's written yes'); FS row B07"
+    },
+    {
+      "file": "invalid/refuse-second-open-pause.json",
+      "version": "v1",
+      "table": "new_booking_pauses",
+      "expect": "refuse",
+      "shows": "A second PAUSE of Lee's Barbershop while one is still open is refused (unique new_booking_pauses_one_open, SQLSTATE 23505); the same row with resumed_at set passes",
+      "source": "S11-15 ('takes no new bookings until you text RESUME'); S11-16 ('RESUME ends a PAUSE')"
+    },
+    {
+      "file": "invalid/refuse-nomoney-fact-without-switch.json",
+      "version": "v1",
+      "table": "company_kinds",
+      "expect": "refuse",
+      "shows": "Setting the fact nomoney on the barber kind without the nomoney switch is refused (CHECK company_kinds_nomoney_fact_and_switch, SQLSTATE 23514); the same update that also turns the switch on passes",
+      "source": "SPEC-master 5d ('nomoney is a switch (words) and a fact (branches and steps): a profession sets both or neither'); FS row M02 (fact nomoney)"
+    }
+  ]
+}
