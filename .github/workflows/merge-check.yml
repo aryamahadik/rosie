@@ -117,28 +117,7 @@ jobs:
       - name: Tests (unit, workers, contract)
         run: npm test
 
-      # T-1067: the parity shards (T-1076: any compiler/src change runs them) are the "parity" Vitest project, outside `npm test`. They run only when a
-      # parity input changed since origin/main (the branch is already rebased onto it above). ci.yml holds the
-      # same list.
-      - name: Parity inputs changed (compiler, master fixtures, Vitest config, manifest, lockfile)
-        id: parity
-        run: |
-          set -euo pipefail
-          inputs=(compiler/src fixtures/master vitest.config.ts package.json package-lock.json)
-          changed="$(git diff --name-only origin/main...HEAD -- "${inputs[@]}")"
-          if [ -n "$changed" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Parity inputs changed, so the parity shards run:"
-            echo "$changed"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "No parity input changed: the parity shards are skipped."
-          fi
-
-      - name: Parity shards (only when its inputs changed)
-        if: steps.parity.outputs.run == 'true'
-        run: npm run test:parity
-
+      # The parity shards run in the parity-shard jobs below (T-1078), not here.
       - name: CI script tests (the guards and the PreToolUse hook)
         run: node --test "infra/ci/*.test.mjs"
 
@@ -183,3 +162,115 @@ jobs:
               echo "- Eval smoke slice: no gold set yet"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # T-1067, T-1076, T-1078: the parity shards (every compiler/src/**/parity.shard-*.test.ts) are the "parity" Vitest
+  # project, outside `npm test`. They run only here, only when a parity input changed on the branch rebased onto
+  # origin/main, and in parallel jobs with no database service. A failed shard job fails the run; skipped shards
+  # (no parity input changed) do not. ci.yml never runs them.
+  parity-inputs:
+    name: parity inputs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRANCH: ${{ inputs.branch }}
+    outputs:
+      run: ${{ steps.parity.outputs.run }}
+    steps:
+      - name: Check the branch name
+        run: |
+          set -euo pipefail
+          if ! [[ "$BRANCH" =~ ^(task|train)/[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$ ]] || [[ "$BRANCH" == *..* ]]; then
+            echo "::error title=Bad branch::branch must be a task/... or train/... branch, not \"$BRANCH\"."
+            exit 1
+          fi
+
+      - name: Check out the branch (full history)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Rebase onto origin/main (a conflict fails the run)
+        run: |
+          set -euo pipefail
+          git config user.name "rosie merge-check"
+          git config user.email "merge-check@users.noreply.github.com"
+          before="$(git rev-parse HEAD)"
+          main="$(git rev-parse origin/main)"
+          if ! git rebase origin/main; then
+            git rebase --abort || true
+            echo "::error title=Rebase conflict::$BRANCH does not rebase cleanly onto origin/main ($main). It goes back to its owner as a rebase step."
+            exit 1
+          fi
+          echo "Rebased $BRANCH ($before) onto origin/main ($main): now $(git rev-parse HEAD)"
+
+      - name: Parity inputs changed (compiler, master fixtures, Vitest config, manifest, lockfile)
+        id: parity
+        run: |
+          set -euo pipefail
+          inputs=(compiler/src fixtures/master vitest.config.ts package.json package-lock.json)
+          changed="$(git diff --name-only origin/main...HEAD -- "${inputs[@]}")"
+          if [ -n "$changed" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Parity inputs changed, so the parity shards run:"
+            echo "$changed"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No parity input changed: the parity shards are skipped."
+          fi
+
+  parity-shard:
+    name: parity shard ${{ matrix.shard }} of 3
+    needs: parity-inputs
+    if: needs.parity-inputs.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    env:
+      BRANCH: ${{ inputs.branch }}
+      SHARD_COUNT: 3
+    steps:
+      - name: Check the branch name
+        run: |
+          set -euo pipefail
+          if ! [[ "$BRANCH" =~ ^(task|train)/[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$ ]] || [[ "$BRANCH" == *..* ]]; then
+            echo "::error title=Bad branch::branch must be a task/... or train/... branch, not \"$BRANCH\"."
+            exit 1
+          fi
+
+      - name: Check out the branch (full history)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Rebase onto origin/main (a conflict fails the run)
+        run: |
+          set -euo pipefail
+          git config user.name "rosie merge-check"
+          git config user.email "merge-check@users.noreply.github.com"
+          before="$(git rev-parse HEAD)"
+          main="$(git rev-parse origin/main)"
+          if ! git rebase origin/main; then
+            git rebase --abort || true
+            echo "::error title=Rebase conflict::$BRANCH does not rebase cleanly onto origin/main ($main). It goes back to its owner as a rebase step."
+            exit 1
+          fi
+          echo "Rebased $BRANCH ($before) onto origin/main ($main): now $(git rev-parse HEAD)"
+
+      - name: Set up Node (version from .nvmrc)
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install from the lockfile
+        run: npm ci --no-audit --no-fund
+
+      - name: Parity shards (this job's share of the parity files)
+        run: npm run test:parity -- --shard="${{ matrix.shard }}/$SHARD_COUNT"
