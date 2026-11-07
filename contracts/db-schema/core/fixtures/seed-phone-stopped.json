@@ -1,0 +1,56 @@
+{
+  "after": [
+    "seed-business-head.json"
+  ],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-ben",
+        "name": "Ben T.",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-ben",
+        "kind": "phone",
+        "address": "+15555550106"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-ben",
+        "handle_id": "handle-ben"
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-ben-barber",
+        "person_id": "person-ben",
+        "business_id": "biz-lees-barbershop",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550106",
+        "handle_id": "handle-ben",
+        "chat_open": false,
+        "chat_open_at": "2026-10-05T17:00:00Z",
+        "chat_way": "imessage",
+        "stopped": true,
+        "stop_at": "2026-10-20T13:00:00Z",
+        "linq_contact_added_at": "2026-10-05T17:00:00Z",
+        "optout_line_delivered_at": "2026-10-05T17:00:02Z",
+        "version": 3
+      }
+    }
+  ]
+}

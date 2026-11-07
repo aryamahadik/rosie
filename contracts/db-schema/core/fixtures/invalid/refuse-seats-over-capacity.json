@@ -1,0 +1,28 @@
+{
+  "after": [
+    "seed-class-seats.json"
+  ],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-yoga-studio"
+    },
+    "action": "update",
+    "table": "class_seats",
+    "set": {
+      "taken": 11,
+      "version": 4
+    },
+    "where": {
+      "resource_id": "res-handstand-workshop",
+      "version": 3
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": [
+        "class_seats_taken_within_capacity"
+      ]
+    }
+  }
+}

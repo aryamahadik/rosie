@@ -1,0 +1,45 @@
+{
+  "after": [
+    "seed-open-question.json"
+  ],
+  "rows": [
+    {
+      "table": "clock_rows",
+      "values": {
+        "id": "clock-oq-a7-03-alex",
+        "kind": "question",
+        "open_question_id": "oq-a7-03-alex",
+        "handle_id": "handle-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "due_at": "2026-10-24T14:05:04Z",
+        "due_zone": "America/New_York",
+        "state": "armed",
+        "armed_at": "2026-10-23T14:05:04Z",
+        "fires": {
+          "step": "A7-03",
+          "safeDefault": "the time stays as booked"
+        },
+        "created_by_turn_id": "turn-alex-move-1",
+        "version": 2
+      }
+    },
+    {
+      "table": "clock_rows",
+      "values": {
+        "id": "clock-monthly-billing-2026-12",
+        "kind": "job",
+        "handle_id": null,
+        "business_id": null,
+        "due_at": "2026-12-01T13:00:00Z",
+        "due_zone": "America/New_York",
+        "state": "armed",
+        "armed_at": "2026-11-01T13:00:00Z",
+        "fires": {
+          "job": "monthly-billing"
+        },
+        "version": 1
+      }
+    }
+  ]
+}

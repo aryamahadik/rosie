@@ -1,0 +1,92 @@
+{
+  "after": [
+    "seed-person-roles.json"
+  ],
+  "rows": [
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550100",
+        "handle_id": "handle-sam",
+        "chat_open": true,
+        "chat_open_at": "2026-10-19T14:00:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-19T14:00:00Z",
+        "optout_line_delivered_at": "2026-10-19T14:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550101",
+        "handle_id": "handle-alex",
+        "chat_open": true,
+        "chat_open_at": "2026-10-12T16:20:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-12T16:20:00Z",
+        "optout_line_delivered_at": "2026-10-12T16:20:00Z",
+        "version": 3,
+        "poll_voted_at": "2026-10-23T14:06:10Z"
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550102",
+        "handle_id": "handle-riley",
+        "chat_open": true,
+        "chat_open_at": "2026-10-19T15:00:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-19T15:00:00Z",
+        "optout_line_delivered_at": "2026-10-19T15:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550103",
+        "handle_id": "handle-avery",
+        "chat_open": true,
+        "chat_open_at": "2026-10-19T15:02:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-19T15:02:00Z",
+        "optout_line_delivered_at": "2026-10-19T15:02:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550104",
+        "handle_id": "handle-maya",
+        "chat_open": true,
+        "chat_open_at": "2026-10-20T13:00:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-20T13:00:00Z",
+        "optout_line_delivered_at": "2026-10-20T13:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550105",
+        "handle_id": "handle-tomas",
+        "chat_open": true,
+        "chat_open_at": "2026-10-21T12:30:00Z",
+        "chat_way": "rcs",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-21T12:30:00Z",
+        "optout_line_delivered_at": "2026-10-21T12:30:00Z",
+        "version": 2
+      }
+    }
+  ]
+}

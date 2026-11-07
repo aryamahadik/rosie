@@ -1,0 +1,200 @@
+{
+  "after": [
+    "seed-open-question.json",
+    "seed-person-roles.json"
+  ],
+  "rows": [
+    {
+      "table": "outbox_rows",
+      "values": {
+        "id": "out-a7-03-alex",
+        "turn_id": "turn-alex-move-1",
+        "recipient_handle_id": "handle-alex",
+        "recipient_person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "channel": "imessage",
+        "send_class": "quick_reply",
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-alex-haircut",
+            "version": 7
+          }
+        ],
+        "open_question_id": "oq-a7-03-alex",
+        "plan": {
+          "row": "out-a7-03-alex",
+          "channel": "imessage",
+          "copyOf": null,
+          "plan": {
+            "formats": [
+              "text",
+              "poll"
+            ],
+            "lines": [
+              {
+                "role": "first",
+                "text": "Sure. Pick a new time for your haircut at {{biz.name:Lee's Barbershop}} with {{pro.name:Riley}}."
+              }
+            ],
+            "question": {
+              "text": "Which time works?",
+              "optionIds": [
+                "A7-03/1",
+                "A7-03/2",
+                "A7-03/3"
+              ]
+            },
+            "pageType": null,
+            "threadReplyTo": null
+          }
+        },
+        "final_parts": {
+          "row": "out-a7-03-alex",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            },
+            {
+              "kind": "poll",
+              "text": null,
+              "calendarFile": "none",
+              "options": [
+                {
+                  "id": "A7-03/1",
+                  "label": "Sat 12:00pm"
+                },
+                {
+                  "id": "A7-03/2",
+                  "label": "Sat 2:00pm"
+                },
+                {
+                  "id": "A7-03/3",
+                  "label": "Sat 3:30pm"
+                }
+              ],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            {
+              "slot": "biz.name",
+              "value": "Lee's Barbershop"
+            },
+            {
+              "slot": "pro.name",
+              "value": "Riley"
+            }
+          ],
+          "threadReplyTo": null
+        },
+        "copy_of_row_id": null,
+        "state": "delivered",
+        "held_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0007",
+        "version": 6
+      }
+    },
+    {
+      "table": "outbox_parts",
+      "values": {
+        "outbox_row_id": "out-a7-03-alex",
+        "part_no": 1,
+        "try_no": 1,
+        "idempotency_key": "out-a7-03-alex/1/1",
+        "attempts": 1,
+        "kind": "words",
+        "linq_message_id": "linq-msg-demo-0001",
+        "state": "delivered",
+        "sent_at": "2026-10-23T14:05:03Z",
+        "delivered_at": "2026-10-23T14:05:04Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "outbox_parts",
+      "values": {
+        "outbox_row_id": "out-a7-03-alex",
+        "part_no": 2,
+        "try_no": 1,
+        "idempotency_key": "out-a7-03-alex/2/1",
+        "attempts": 1,
+        "kind": "poll",
+        "linq_message_id": "linq-msg-demo-0002",
+        "linq_option_ids": [
+          "linq-opt-demo-1",
+          "linq-opt-demo-2",
+          "linq-opt-demo-3"
+        ],
+        "state": "delivered",
+        "sent_at": "2026-10-23T14:05:05Z",
+        "delivered_at": "2026-10-23T14:05:06Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "outbox_rows",
+      "values": {
+        "id": "out-a7-03-alex-email",
+        "turn_id": "turn-alex-move-1",
+        "recipient_handle_id": "handle-alex-email",
+        "recipient_person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "channel": "email",
+        "send_class": "quick_reply",
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-alex-haircut",
+            "version": 7
+          }
+        ],
+        "open_question_id": "oq-a7-03-alex",
+        "plan": {
+          "row": "out-a7-03-alex-email",
+          "channel": "email",
+          "copyOf": "out-a7-03-alex",
+          "plan": {
+            "formats": [
+              "text",
+              "poll"
+            ],
+            "lines": [
+              {
+                "role": "first",
+                "text": "Sure. Pick a new time for your haircut at {{biz.name:Lee's Barbershop}} with {{pro.name:Riley}}."
+              }
+            ],
+            "question": {
+              "text": "Which time works?",
+              "optionIds": [
+                "A7-03/1",
+                "A7-03/2",
+                "A7-03/3"
+              ]
+            },
+            "pageType": null,
+            "threadReplyTo": null
+          }
+        },
+        "final_parts": null,
+        "copy_of_row_id": "out-a7-03-alex",
+        "state": "planned",
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0007",
+        "version": 2
+      }
+    }
+  ]
+}

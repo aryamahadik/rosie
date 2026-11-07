@@ -1,0 +1,37 @@
+{
+  "after": [
+    "seed-person-roles.json"
+  ],
+  "rows": [
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 7
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-workshop",
+        "business_id": "biz-yoga-studio",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 2
+      }
+    }
+  ]
+}

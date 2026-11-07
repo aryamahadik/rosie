@@ -1,0 +1,48 @@
+{
+  "after": [
+    "seed-turn.json",
+    "seed-booking-head.json"
+  ],
+  "rows": [
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-a7-03-alex",
+        "turn_id": "turn-alex-move-1",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "step": "A7-03",
+        "options": [
+          {
+            "id": "A7-03/1",
+            "label": "Sat 12:00pm"
+          },
+          {
+            "id": "A7-03/2",
+            "label": "Sat 2:00pm"
+          },
+          {
+            "id": "A7-03/3",
+            "label": "Sat 3:30pm"
+          }
+        ],
+        "readback": null,
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-alex-haircut",
+            "version": 7
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "24 h",
+        "ask_count": 1,
+        "status": "open",
+        "version": 2
+      }
+    }
+  ]
+}

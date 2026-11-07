@@ -1,0 +1,93 @@
+{
+  "after": [
+    "seed-resources.json",
+    "seed-booking-head.json",
+    "seed-phone-chat-open.json"
+  ],
+  "rows": [
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "resource_id": "res-riley",
+        "resource_kind": "worker",
+        "worker_person_id": "person-riley",
+        "during": "[2026-10-24T15:00:00Z,2026-10-24T15:30:00Z)",
+        "state": "booked",
+        "seats": 1,
+        "for_phone_number": "+15555550101",
+        "booking_id": "booking-alex-haircut",
+        "version": 2
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-alex-saved-avery",
+        "business_id": "biz-lees-barbershop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "worker_person_id": "person-avery",
+        "during": "[2026-11-14T15:00:00Z,2026-11-14T15:30:00Z)",
+        "state": "held",
+        "queued_at": "2026-11-07T15:00:00Z",
+        "seats": 1,
+        "held_until": "2026-11-07T15:10:00Z",
+        "extended": false,
+        "for_phone_number": "+15555550101",
+        "version": 1
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-agent-waiting-avery-second",
+        "business_id": "biz-lees-barbershop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "worker_person_id": "person-avery",
+        "during": "[2026-11-14T15:00:00Z,2026-11-14T15:30:00Z)",
+        "state": "waiting",
+        "queued_at": "2026-11-07T15:04:00Z",
+        "seats": 1,
+        "for_agent_token": "agent-token-demo-3",
+        "version": 1
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-agent-waiting-avery",
+        "business_id": "biz-lees-barbershop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "worker_person_id": "person-avery",
+        "during": "[2026-11-14T15:00:00Z,2026-11-14T15:30:00Z)",
+        "state": "waiting",
+        "queued_at": "2026-11-07T15:02:00Z",
+        "seats": 1,
+        "for_agent_token": "agent-token-demo-2",
+        "version": 1
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-truck-expired",
+        "business_id": "biz-movers",
+        "resource_id": "res-truck-26",
+        "resource_kind": "vehicle",
+        "worker_person_id": null,
+        "during": "[2026-11-20T13:00:00Z,2026-11-20T21:00:00Z)",
+        "state": "released",
+        "seats": 1,
+        "held_until": "2026-11-06T18:10:00Z",
+        "for_agent_token": "agent-token-demo-1",
+        "released_at": "2026-11-06T18:10:00Z",
+        "released_why": "expired",
+        "version": 2
+      }
+    }
+  ]
+}

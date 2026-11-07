@@ -1,0 +1,27 @@
+{
+  "after": [
+    "seed-bundle-registry.json",
+    "seed-person-roles.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-move-1",
+        "handle_id": "handle-alex",
+        "event_ids": [
+          "evt-alex-0007"
+        ],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0007",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-23T14:05:02Z",
+        "version": 2
+      }
+    }
+  ]
+}

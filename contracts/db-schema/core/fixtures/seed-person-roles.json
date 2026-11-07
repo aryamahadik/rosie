@@ -1,0 +1,256 @@
+{
+  "after": [
+    "seed-business-head.json"
+  ],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-sam",
+        "name": "Sam Lee",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-alex",
+        "name": "Alex M.",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-riley",
+        "name": "Riley",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-avery",
+        "name": "Avery",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-maya",
+        "name": "Maya",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-tomas",
+        "name": "Tomás",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-sam",
+        "kind": "phone",
+        "address": "+15555550100"
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-alex",
+        "kind": "phone",
+        "address": "+15555550101"
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-riley",
+        "kind": "phone",
+        "address": "+15555550102"
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-avery",
+        "kind": "phone",
+        "address": "+15555550103"
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-maya",
+        "kind": "phone",
+        "address": "+15555550104"
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-tomas",
+        "kind": "phone",
+        "address": "+15555550105"
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-alex-email",
+        "kind": "email",
+        "address": "alex@example.com"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-sam",
+        "handle_id": "handle-sam"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-alex",
+        "handle_id": "handle-alex"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-riley",
+        "handle_id": "handle-riley"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-avery",
+        "handle_id": "handle-avery"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-maya",
+        "handle_id": "handle-maya"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-tomas",
+        "handle_id": "handle-tomas"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-alex",
+        "handle_id": "handle-alex-email"
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-sam-barber",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "role": "owner",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-sam-yoga",
+        "person_id": "person-sam",
+        "business_id": "biz-yoga-studio",
+        "role": "owner",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-sam-movers",
+        "person_id": "person-sam",
+        "business_id": "biz-movers",
+        "role": "owner",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-alex-barber",
+        "person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-alex-yoga",
+        "person_id": "person-alex",
+        "business_id": "biz-yoga-studio",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-riley-barber",
+        "person_id": "person-riley",
+        "business_id": "biz-lees-barbershop",
+        "role": "staff",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-avery-barber",
+        "person_id": "person-avery",
+        "business_id": "biz-lees-barbershop",
+        "role": "staff",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-maya-yoga",
+        "person_id": "person-maya",
+        "business_id": "biz-yoga-studio",
+        "role": "staff",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-tomas-movers",
+        "person_id": "person-tomas",
+        "business_id": "biz-movers",
+        "role": "staff",
+        "version": 1
+      }
+    }
+  ]
+}

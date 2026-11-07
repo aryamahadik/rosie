@@ -1,0 +1,29 @@
+{
+  "after": [
+    "seed-person-roles.json",
+    "seed-phone-stopped.json"
+  ],
+  "rows": [
+    {
+      "table": "sealing_keys",
+      "values": {
+        "person_id": "person-alex",
+        "wrapped_key": "\\x6b30342d736565642d777261707065642d6b65792d616c65782d6e6f742d612d7265616c2d6b6579",
+        "wrapping_key_name": "SEALING_WRAP_KEY",
+        "created_at": "2026-10-12T16:20:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "sealing_keys",
+      "values": {
+        "person_id": "person-ben",
+        "wrapped_key": null,
+        "wrapping_key_name": "SEALING_WRAP_KEY",
+        "created_at": "2026-10-05T17:00:00Z",
+        "erased_at": "2026-11-02T15:00:00Z",
+        "version": 2
+      }
+    }
+  ]
+}

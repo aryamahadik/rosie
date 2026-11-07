@@ -1,0 +1,20 @@
+{
+  "after": [
+    "seed-booking-head.json"
+  ],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-yoga-studio"
+    },
+    "action": "select",
+    "table": "bookings",
+    "where": {
+      "id": "booking-alex-haircut"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

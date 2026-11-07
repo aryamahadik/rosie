@@ -1,0 +1,188 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-business-head.json",
+      "version": "v1",
+      "table": "businesses",
+      "expect": "accept",
+      "shows": "Three business head rows from fixture set v1's demo shops: the barber (named Lee's Barbershop, as the master's sample cast names it), the yoga studio and the movers; two live, one saved; owner text hours 8am to 8pm",
+      "source": "FS line 721; CQ-03; fixtures/v1/test-kit/shops barber.json, yoga.json, movers.json; SPEC-master 6 (sample cast)"
+    },
+    {
+      "file": "seed-bundle-registry.json",
+      "version": "v1",
+      "table": "bundles",
+      "expect": "accept",
+      "shows": "The registry holds K-01's bundle v0 (bundleId {hash, build 1}) as the active bundle, with PostgreSQL's copy of its manifest under its KV key, bytes and sha256 (a short stand-in value, not the real manifest's bytes)",
+      "source": "arch 10 line 536; CQ-03; K-01 v1 bundleId, kvKey and storedValue; contracts/bundle/fixtures/bundle-v0-skeleton.json"
+    },
+    {
+      "file": "seed-person-roles.json",
+      "version": "v1",
+      "table": "person_roles",
+      "expect": "accept",
+      "shows": "One person row per human across businesses: Sam owns all three shops; Alex M. is a customer at two; Riley and Avery are barbers, Maya a yoga teacher, Tomás a mover; each person's mobile is a handle, and Alex's email is a second handle",
+      "source": "FS lines 723, 743; arch 01 line 55; arch 09 line 457; SPEC-master 6 (Sam, Alex M., Riley, Avery); yoga.json (Maya); movers.json (Tomás)"
+    },
+    {
+      "file": "seed-phone-chat-open.json",
+      "version": "v1",
+      "table": "phones",
+      "expect": "accept",
+      "shows": "Phone rows with the chat open (set by each mobile's first text), the service Linq reports, the Linq contact added and the opt-out line delivered; Alex's phone has voted in a poll, so options go only in the poll",
+      "source": "FS line 728; RULES 4.1b, 4.3; MC C9; Q-33 (chat_way); Q-03; Q-30; arch 07 line 379"
+    },
+    {
+      "file": "seed-phone-stopped.json",
+      "version": "v1",
+      "table": "phones",
+      "expect": "accept",
+      "shows": "Ben T.'s phone after STOP: stopped with its stop time, the chat closed (STOP clears it), every business at once (one number)",
+      "source": "FS line 728; arch 03 line 175; RULES 4.1b, 7.5; MC C1; SPEC-master 6 (Ben T.)"
+    },
+    {
+      "file": "seed-sealing-key.json",
+      "version": "v1",
+      "table": "sealing_keys",
+      "expect": "accept",
+      "shows": "Alex's sealing key, wrapped under a key named for Workers secrets (the name is an example; the release engineer names the secret); Ben's key erased: the row stays, the wrapped key is gone",
+      "source": "arch 01 line 93; arch 09 line 492; RULES 4.10; BP rule 7"
+    },
+    {
+      "file": "seed-booking-head.json",
+      "version": "v1",
+      "table": "bookings",
+      "expect": "accept",
+      "shows": "Two booking head rows: Alex's haircut at Lee's Barbershop (flow A, booked, version 7, the version the open question read) and Alex's spot in the yoga studio's handstand workshop; booker, person served and payer; private and deceased off",
+      "source": "FS line 729; CQ-03; arch 03 lines 163, 175; tour line 425 (booking v7); barber.json and yoga.json (flow A main stories)"
+    },
+    {
+      "file": "seed-resources.json",
+      "version": "v1",
+      "table": "resources",
+      "expect": "accept",
+      "shows": "Bookable resources of each kind: workers Riley and Avery (barber) and Maya (yoga), each tied to their person; the yoga studio's room; the movers' two trucks; the handstand workshop as a class session",
+      "source": "arch 05 line 255; arch 10 line 510; BP section 10 card T-041; FS line 743; barber.json, yoga.json, movers.json ('a truck (a 26-ft or a 20-ft)')"
+    },
+    {
+      "file": "seed-class-seats.json",
+      "version": "v1",
+      "table": "class_seats",
+      "expect": "accept",
+      "shows": "The handstand workshop's seat counter (10 spots, 2 taken), with two seat reservations in the same time range that EXCLUDE leaves alone: Alex's booked seat and a seat an agent token saved for 10 minutes",
+      "source": "arch 05 line 255; arch 10 line 510 (class seats as a counter with CHECK (taken ≤ capacity)); BP section 10 card T-041; yoga.json ('Sat 11:00am (10 spots)')"
+    },
+    {
+      "file": "seed-reservation.json",
+      "version": "v1",
+      "table": "reservations",
+      "expect": "accept",
+      "shows": "Alex's haircut with Riley, booked; a time Alex saved with Avery for 10 minutes (15:00) and two agent tokens waiting next in line for the same time, queued at 15:02 and 15:04 and inserted in the other order, so queued_at, not insert order, makes agent-token-demo-2 the one release promotes (waiting rows are outside EXCLUDE); a truck hold that expired and was released",
+      "source": "arch 09 line 457; arch 05 lines 247, 255; A4-18; 02-contracts K-05 item 6 (release promotes the next in line); CQ-09; key time_saved (A4-21); barber.json (the $35 haircut with Riley); MASTER-FLOW-A A7-03 (Sat Oct 24, 11:00am)"
+    },
+    {
+      "file": "seed-turn.json",
+      "version": "v1",
+      "table": "turns",
+      "expect": "accept",
+      "shows": "One committed turn: Alex's text \"1\" (change the time) at hub A7-02, under its turn id, on bundle v0, with its trace id; it started once",
+      "source": "arch 01 lines 59, 61; arch 10 lines 508, 548; CQ-06; MASTER-FLOW-A A7-03 ('cust → san: 1')"
+    },
+    {
+      "file": "seed-open-question.json",
+      "version": "v1",
+      "table": "open_questions",
+      "expect": "accept",
+      "shows": "The tour's example: step A7-03, the options as sent (Sat 12:00, 2:00, 3:30), versions read booking v7, a 24-hour clock, asked once, open",
+      "source": "tour lines 423 to 427; arch 01 line 63; arch 09 line 490; MASTER-FLOW-A A7-03 ('Clock: the customer picks within 24 hours')"
+    },
+    {
+      "file": "seed-clock-row.json",
+      "version": "v1",
+      "table": "clock_rows",
+      "expect": "accept",
+      "shows": "The question's clock row, armed at the first delivery receipt and due 24 hours later in New York's zone, owned by Alex's handle; and a monthly billing row no handle owns, which the minute sweep fires",
+      "source": "arch 01 line 83; arch 02 line 127; arch 10 line 540; tour line 425"
+    },
+    {
+      "file": "seed-outbox-row.json",
+      "version": "v1",
+      "table": "outbox_rows",
+      "expect": "accept",
+      "shows": "The tour's outbox row to Alex: one message on iMessage, a quick reply, the versions read, its open question, K-03's plan and final parts stored as one JSON value each, and its two parts (words, then the poll) under keys (row, part, try), delivered; plus the email copy that reuses its plan",
+      "source": "tour line 427 (outbox row → Alex); arch 01 line 65; arch 07 lines 367, 371, 379; RULES 4.1, 4.3; K-03 v1 rowPlan and finalParts"
+    },
+    {
+      "file": "seed-thread-messages.json",
+      "version": "v1",
+      "table": "messages",
+      "expect": "accept",
+      "shows": "Alex's chat with Rosie's number (one per handle) and the haircut's email thread with its own reply address; the opener for Lee's Barbershop recorded as sent to Alex's handle with the first reply; the message log of the A7-03 exchange (\"1\", the times, \"A\") as the context bundle reads it",
+      "source": "S1-01 (gives thread); FS line 734; RULES 4.1; arch 07 line 361; arch 03 line 181; MASTER-FLOW-A A7-03"
+    },
+    {
+      "file": "seed-event-log.json",
+      "version": "v1",
+      "table": "event_log",
+      "expect": "accept",
+      "shows": "Three appended events: the turn's commit opening the question (who, what, old and new, why), a write whose private value is sealed under Alex's key, and a job's write with no turn",
+      "source": "arch 09 lines 457, 492; arch 10 line 548; 02-contracts K-08 (kinds are K-08's; the ones here are examples)"
+    },
+    {
+      "file": "seed-flag.json",
+      "version": "v1",
+      "table": "release_flags",
+      "expect": "accept",
+      "shows": "Release flags: a journey flag shipped off; the skeleton's flag on; a staging-only text-hours override for one test phone (the names are examples; flag names are the release engineer's, C-013)",
+      "source": "BP 5.4 (code with flags off, then flags on); d000-factory-spec ADR-010 draft; QUESTIONS.md M3-M3b.4 (a release-flag row per test phone)"
+    },
+    {
+      "file": "seed-pause.json",
+      "version": "v1",
+      "table": "pauses",
+      "expect": "accept",
+      "shows": "The paused flag: Ben T.'s phone paused at Lee's Barbershop until the owner clears it, and an address pause sealed under Alex's key (an address is secure-page-only); one pause already cleared by Sam",
+      "source": "arch 03 lines 175, 177; A3-48; RULES 4.5; arch 01 line 93"
+    },
+    {
+      "file": "invalid/refuse-overlapping-reservation.json",
+      "version": "v1",
+      "table": "reservations",
+      "expect": "refuse",
+      "shows": "A second reservation for Riley that overlaps Alex's booked haircut is refused by the database (EXCLUDE, SQLSTATE 23P01)",
+      "source": "BP section 10 card T-041 (two overlapping reservations for one worker are refused by the database (EXCLUDE)); arch 10 line 510; arch 05 line 255"
+    },
+    {
+      "file": "invalid/refuse-seats-over-capacity.json",
+      "version": "v1",
+      "table": "class_seats",
+      "expect": "refuse",
+      "shows": "Raising the workshop's taken seats past its 10 spots is refused by the database (CHECK taken <= capacity, SQLSTATE 23514)",
+      "source": "BP section 10 card T-041 (class seats never exceed capacity (CHECK)); arch 10 line 510; arch 05 line 255"
+    },
+    {
+      "file": "invalid/refuse-duplicate-turn-id.json",
+      "version": "v1",
+      "table": "turns",
+      "expect": "refuse",
+      "shows": "A second turns row with a committed turn's id is refused (the primary key, SQLSTATE 23505), so a turn commits once",
+      "source": "arch 01 line 59; arch 10 line 508 ('The commit is unique on the turn id'); tour line 418"
+    },
+    {
+      "file": "invalid/refuse-event-log-update.json",
+      "version": "v1",
+      "table": "event_log",
+      "expect": "refuse",
+      "shows": "Editing an event-log row is refused: the application roles may insert and read event_log, never update or delete it (SQLSTATE 42501)",
+      "source": "arch 09 lines 457, 492 (never edited); arch 10 line 516"
+    },
+    {
+      "file": "invalid/refuse-cross-business-read.json",
+      "version": "v1",
+      "table": "bookings",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio cannot read Lee's Barbershop's booking: row-level security returns no row (the same read scoped to Lee's Barbershop returns it)",
+      "source": "arch 10 line 546 (row-level security per business on every Tool API call); RULES 4.10"
+    }
+  ]
+}

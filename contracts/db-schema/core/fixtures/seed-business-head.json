@@ -1,0 +1,44 @@
+{
+  "after": [],
+  "rows": [
+    {
+      "table": "businesses",
+      "values": {
+        "id": "biz-lees-barbershop",
+        "name": "Lee's Barbershop",
+        "display_name": "Lee's Barbershop",
+        "status": "live",
+        "time_zone": "America/New_York",
+        "text_hours_start": "08:00",
+        "text_hours_end": "20:00",
+        "version": 3
+      }
+    },
+    {
+      "table": "businesses",
+      "values": {
+        "id": "biz-yoga-studio",
+        "name": "Yoga studio",
+        "display_name": "Yoga studio",
+        "status": "live",
+        "time_zone": "America/New_York",
+        "text_hours_start": "08:00",
+        "text_hours_end": "20:00",
+        "version": 2
+      }
+    },
+    {
+      "table": "businesses",
+      "values": {
+        "id": "biz-movers",
+        "name": "Movers",
+        "display_name": "Movers",
+        "status": "saved",
+        "time_zone": "America/New_York",
+        "text_hours_start": "08:00",
+        "text_hours_end": "20:00",
+        "version": 1
+      }
+    }
+  ]
+}

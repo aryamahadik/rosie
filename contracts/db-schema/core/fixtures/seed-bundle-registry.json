@@ -1,0 +1,30 @@
+{
+  "after": [],
+  "rows": [
+    {
+      "table": "bundles",
+      "values": {
+        "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "build": 1,
+        "manifest_key": "bundle/93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037/1/manifest",
+        "built_at": "2026-11-07T08:00:00Z",
+        "published_at": "2026-11-07T08:05:00Z",
+        "active": true,
+        "activated_at": "2026-11-07T08:06:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "bundle_values",
+      "values": {
+        "key": "bundle/93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037/1/manifest",
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "kind": "manifest",
+        "bytes": 121,
+        "sha256": "80faf33c7cf1f52519432d27116699cb4045818f23667dedf3c08df977df2e63",
+        "value": "\\x7b22636f6e7472616374223a2262756e646c652e7631222c226e6f7465223a224b2d30342073656564207374616e642d696e20666f7220746865206d616e6966657374206f66204b2d30312062756e646c652d76302d736b656c65746f6e2e6a736f6e3b206e6f7420697473207265616c206279746573227d"
+      }
+    }
+  ]
+}
