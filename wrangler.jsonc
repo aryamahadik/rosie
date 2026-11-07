@@ -25,7 +25,13 @@
   // runs, the Vitest Workers pool and dry runs; no real namespace exists yet (a later staging task creates it and
   // env.staging's copy, T-566).
   "kv_namespaces": [{ "binding": "BUNDLES", "id": "00000000000000000000000000000000" }],
-  // No R2, Queues or Hyperdrive bindings yet: they come with the tasks that need them.
+  // The retry queue (RETRY_QUEUE) with its dead-letter queue: 5 tries, then the message goes to rosie-retry-dlq.
+  // For local runs and the Vitest Workers pool; no real queue exists, and env.staging's copies come in T-566.
+  "queues": {
+    "producers": [{ "queue": "rosie-retry", "binding": "RETRY_QUEUE" }],
+    "consumers": [{ "queue": "rosie-retry", "max_retries": 5, "dead_letter_queue": "rosie-retry-dlq" }],
+  },
+  // No R2 or Hyperdrive bindings yet: they come with the tasks that need them.
   // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
   "vars": {
     "ENVIRONMENT": "production",

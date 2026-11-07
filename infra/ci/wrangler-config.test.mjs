@@ -48,7 +48,7 @@ describe("wrangler.jsonc BUNDLES KV binding (T-277)", () => {
 
   it("leaves env.staging without its own copy and adds no other storage binding", () => {
     assert.equal(config.env.staging.kv_namespaces, undefined);
-    for (const k of ["r2_buckets", "queues", "hyperdrive", "d1_databases"]) {
+    for (const k of ["r2_buckets", "hyperdrive", "d1_databases"]) {
       assert.equal(config[k], undefined);
     }
   });
@@ -58,6 +58,27 @@ describe("wrangler.jsonc BUNDLES KV binding (T-277)", () => {
     assert.equal(config.route, undefined);
     assert.deepEqual(config.secrets, { required: [] });
     assert.ok(!/(sk_|token)/i.test(JSON.stringify(config.kv_namespaces)));
+  });
+});
+
+describe("wrangler.jsonc retry queue (T-279)", () => {
+  it("declares the RETRY_QUEUE producer binding", () => {
+    assert.deepEqual(config.queues.producers, [{ queue: "rosie-retry", binding: "RETRY_QUEUE" }]);
+  });
+
+  it("declares one consumer with 5 tries and a dead-letter queue", () => {
+    assert.deepEqual(config.queues.consumers, [
+      { queue: "rosie-retry", max_retries: 5, dead_letter_queue: "rosie-retry-dlq" },
+    ]);
+    assert.deepEqual(Object.keys(config.queues).sort(), ["consumers", "producers"]);
+  });
+
+  it("leaves env.staging without its own copy and adds no production route or key", () => {
+    assert.equal(config.env.staging.queues, undefined);
+    assert.equal(config.routes, undefined);
+    assert.equal(config.route, undefined);
+    assert.deepEqual(config.secrets, { required: [] });
+    assert.ok(!/(sk_|key|token)/i.test(JSON.stringify(config.queues)));
   });
 });
 
