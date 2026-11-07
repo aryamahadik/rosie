@@ -1,0 +1,33 @@
+{
+  "eventId": "evt-alex-0203",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "Crisis words",
+        "tense": "now",
+        "evidence": "I don't want to be alive anymore",
+        "atRisk": "the writer",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [
+    {
+      "words": "don't want to be alive",
+      "list": "general",
+      "kind": "selfHarm"
+    }
+  ],
+  "outcomes": [
+    "Crisis words"
+  ],
+  "liftedToUnsure": false
+}

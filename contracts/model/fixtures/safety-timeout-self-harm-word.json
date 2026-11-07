@@ -1,0 +1,27 @@
+{
+  "eventId": "evt-alex-0211",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "timeout"
+    },
+    {
+      "model": "sonnet",
+      "result": "timeout"
+    }
+  ],
+  "read": null,
+  "timedOut": true,
+  "dangerWords": [
+    {
+      "words": "don't want to be alive",
+      "list": "general",
+      "kind": "selfHarm"
+    }
+  ],
+  "outcomes": [
+    "Unsure"
+  ],
+  "liftedToUnsure": true
+}

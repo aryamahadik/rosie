@@ -8,7 +8,9 @@
 //   - every fixtures/index.json against common/fixtures-index.meta.schema.json, then every fixture it lists against
 //     its schema (or one $defs entry of it): "accept" must pass, "refuse" must fail. An accepted fixture must also pass
 //     every later minor version of the same schema (BP 6.4: a minor version only adds). Every .json file in fixtures/
-//     must be listed. A database seed row (an entry with "table") is left to its part's contract test;
+//     must be listed. A database seed row (an entry with "table") is left to its part's contract test. An entry that
+//     names a "rule" (T-011) must pass its schema, and then the named rule, exported by contracts/<name>/<name>.rules.mjs,
+//     decides it: "accept" must pass the rule, "refuse" must fail it, so the fixture is refused for that rule alone;
 //   - every frozen.json against common/frozen.meta.schema.json, only at contracts/<name>/frozen.json or at
 //     contracts/db-schema/<part>/frozen.json (the guard takes a file's nearest frozen.json, so a part's own file
 //     governs that part alone; T-1061), with a file for each frozen version: for a part, its table list of that
@@ -20,6 +22,7 @@
 // Exit code: 0 passed, 1 failed.
 
 import { existsSync, realpathSync } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -44,6 +47,27 @@ const VERSIONED_NAME = /^(.+)\.v(\d+)(?:\.(\d+))?\.(schema|tables)\.json$/;
 
 const posixDir = (file) => path.posix.dirname(file);
 const baseName = (file) => path.posix.basename(file);
+const requireModule = createRequire(import.meta.url);
+
+/**
+ * The named rules of the contract in `contractDir` (contracts-relative): the `rules` object its
+ * <name>.rules.mjs exports, loaded synchronously (require of an ES module, Node 22.12 and later).
+ * @returns {{ rules?: Record<string, (payload: unknown) => string[]>, problem?: string }}
+ */
+export function loadRules(contractsDir, contractDir) {
+  const file = `${contractDir}/${baseName(contractDir)}.rules.mjs`;
+  const absolute = path.join(contractsDir, file);
+  if (!existsSync(absolute)) return { problem: `${file} does not exist` };
+  try {
+    const loaded = requireModule(absolute);
+    if (loaded.rules === null || typeof loaded.rules !== "object") {
+      return { problem: `${file} exports no "rules" object` };
+    }
+    return { rules: loaded.rules };
+  } catch (error) {
+    return { problem: `${file} could not be loaded: ${error.message}` };
+  }
+}
 
 /** Splits "contracts-relative/x.v1.2.schema.json" into its name, major and minor; undefined if unversioned. */
 function versionedName(file) {
@@ -74,7 +98,16 @@ export function frozenFolder(file) {
  */
 export function checkContracts(contractsDir = CONTRACTS_DIR) {
   const errors = [];
-  const counts = { schemas: 0, accepted: 0, refused: 0, seedRows: 0, tableLists: 0, frozen: 0 };
+  const counts = {
+    schemas: 0,
+    accepted: 0,
+    refused: 0,
+    refusedByRule: 0,
+    seedRows: 0,
+    tableLists: 0,
+    frozen: 0,
+  };
+  const rulesByContract = new Map(); // contract folder -> loadRules() result
   const fail = (file, message) => errors.push(`${file}: ${message}`);
   const files = listFiles(contractsDir);
   const fileSet = new Set(files);
@@ -200,6 +233,51 @@ export function checkContracts(contractsDir = CONTRACTS_DIR) {
         continue;
       }
       const valid = validate(payload);
+      if (entry.rule !== undefined) {
+        // A named rule (T-011): the schema must take the fixture, so the rule alone accepts or refuses it.
+        if (!rulesByContract.has(contractDir))
+          rulesByContract.set(contractDir, loadRules(contractsDir, contractDir));
+        const loaded = rulesByContract.get(contractDir);
+        const rule = loaded.rules?.[entry.rule];
+        if (typeof rule !== "function") {
+          fail(
+            fixture,
+            `names the rule ${entry.rule}, which ${loaded.problem ?? `${contractDir}/${contractName}.rules.mjs does not export`}`,
+          );
+          continue;
+        }
+        if (!valid) {
+          fail(
+            fixture,
+            `names the rule ${entry.rule}, so ${schemaName}${entry.def ? ` #/$defs/${entry.def}` : ""} must accept it and the rule alone decide it, but the schema refuses it:`,
+          );
+          for (const line of formatErrors(validate.errors)) errors.push(`  ${line}`);
+          continue;
+        }
+        let problems;
+        try {
+          problems = rule(payload);
+        } catch (error) {
+          fail(fixture, `the rule ${entry.rule} failed to run: ${error.message}`);
+          continue;
+        }
+        if (entry.expect === "refuse") {
+          counts.refused += 1;
+          counts.refusedByRule += 1;
+          if (problems.length === 0) {
+            fail(
+              fixture,
+              `must be refused by the rule ${entry.rule} (it shows: ${entry.shows}), but the rule passes it`,
+            );
+          }
+          continue;
+        }
+        if (problems.length > 0) {
+          fail(fixture, `must pass the rule ${entry.rule}, but:`);
+          for (const line of problems) errors.push(`  ${line}`);
+          continue;
+        }
+      }
       if (entry.expect === "accept") {
         counts.accepted += 1;
         if (!valid) {
@@ -390,7 +468,8 @@ export function main(argv, { write = (line) => console.log(line) } = {}) {
   }
   const { errors, counts } = checkContracts(contractsDir);
   write(
-    `contracts check: ${counts.schemas} schemas, ${counts.accepted} accepted and ${counts.refused} refused fixtures, ` +
+    `contracts check: ${counts.schemas} schemas, ${counts.accepted} accepted and ${counts.refused} refused fixtures ` +
+      `(${counts.refusedByRule} refused by a named rule), ` +
       `${counts.seedRows} seed rows left to their database test, ${counts.tableLists} table lists, ${counts.frozen} frozen.json`,
   );
   for (const line of errors) write(line.startsWith("  ") ? line : `FAIL ${line}`);

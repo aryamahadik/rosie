@@ -1,0 +1,1756 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/model/model.v1.schema.json",
+  "title": "Model v1",
+  "description": "K-02, the model's contract, v1 (02-contracts K-02; arch 03 lines 179 to 191; arch 06 lines 275 to 293 and 315 to 329; arch 02 lines 111 and 119; arch 12 line 590). It has no root payload: each payload is one definition under $defs. What decide is given: context. What one model read returns (model-facing, inside the structured-outputs subset): decideRead, safetyRead, plannerOutput. What the decide and safety stages hand on, assembled by code around those reads: decideResult, safetyResult. A context with a decide result, as the gate reads them together: contextAndDecide. Owner: the architect. Photo reading is v1.1 (F14), not here.",
+  "$defs": {
+    "language": {
+      "title": "Language",
+      "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+      "type": "string",
+      "pattern": "^[a-z]{2}$"
+    },
+    "nonEmptyText": {
+      "title": "NonEmptyText",
+      "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "stakes": {
+      "title": "Stakes",
+      "description": "high or low (arch 01 line 79: 'High when the target question, or the first read's pick, can charge, refund, book, move or cancel. Otherwise low.'). It routes the reads (arch 02 line 119; arch 06 lines 285 to 287; Q-26).",
+      "type": "string",
+      "enum": ["high", "low"]
+    },
+    "choiceKind": {
+      "title": "ChoiceKind",
+      "description": "What a choice is (arch 01 line 67: 'One branch of an open question, one hub case, one any-time row or one door'): option, an open question's branch; hub, a hub case (arch 03 line 163); anytime, an any-time row (arch 03 lines 169 to 177); door, an entry step for something new (arch 03 line 165); searchEntry, one of the 3 closest entry steps meaning search adds when nothing fits (arch 03 line 189; Q-42); whichBooking, the one 'which booking?' choice a booking other than the target collapses to when there would be over 60 choices (arch 03 line 167).",
+      "type": "string",
+      "enum": ["option", "hub", "anytime", "door", "searchEntry", "whichBooking"]
+    },
+    "stakesReason": {
+      "title": "StakesReason",
+      "description": "Why the frontier builder (C-075) marked a choice high (arch 01 line 79; the rule and its default are in contracts/model/README.md, 'Stakes'). charge, refund, calendarWrite: an effect of that kind (contracts/bundle effect.kind) on the choice's branch or on a step its walk reaches before it stops (arch 03 line 191); booked: a recordWrite of the gives key booked (A-keys.md and B-keys.md: given in section 6, the booking); money: a recordWrite of a gives key of section 5, the money taken (money_before, card_saved, deposit_paid, paid_full: A-keys.md, B-keys.md); cancelRow, moveRow: the any-time rows cancel and move (arch 03 line 171); question: another option of the same open question is high ('the target question ... can': arch 01 line 79); unknown: the builder could not walk the choice, so it takes the safer route (default, README 'Stakes').",
+      "type": "object",
+      "properties": {
+        "why": {
+          "description": "The reason, as listed above (arch 01 line 79; README 'Stakes').",
+          "type": "string",
+          "enum": [
+            "charge",
+            "refund",
+            "calendarWrite",
+            "booked",
+            "money",
+            "cancelRow",
+            "moveRow",
+            "question",
+            "unknown"
+          ]
+        },
+        "step": {
+          "description": "The step whose branch or effect gives the reason; null for a row, a question or unknown (contracts/bundle stepId; arch 03 line 191).",
+          "anyOf": [
+            {
+              "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ref": {
+          "description": "The effect's ref (the gives key, record field or amount: contracts/bundle effect.ref), or the other option's choice id for question; null otherwise (arch 01 line 77).",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["why", "step", "ref"],
+      "additionalProperties": false
+    },
+    "target": {
+      "title": "Target",
+      "description": "What a choice acts on, labelled by business, date and time so questions about other bookings are told apart (arch 03 line 159: 'Questions about other bookings add only their options, labeled by business, date and time').",
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "description": "The business (arch 03 line 159; K-04's business head row).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "businessName": {
+          "description": "The business's name as the label shows it (arch 03 line 159).",
+          "type": "string"
+        },
+        "bookingId": {
+          "description": "The booking, or null when the choice is about no booking yet, such as a door to a new booking (arch 03 line 159; arch 03 line 165).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "visitAt": {
+          "description": "The booking's date and time, in its zone, or null with no booking (arch 03 line 159: 'labeled by business, date and time'; S13-03: a visit's time is read in the visit's zone).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["businessId", "businessName", "bookingId", "visitAt"],
+      "additionalProperties": false
+    },
+    "choice": {
+      "title": "Choice",
+      "description": "One entry of the frontier, the closed list of choices code builds for one turn (arch 01 lines 67 and 69; arch 03 lines 157 to 167; 02-contracts K-02 'What decide is given'). Its id is the turn's own and never an enum in a model-facing schema: compiled grammars are cached for 24 hours, so option ids are checked in code (T-360 finding 3; README 'Model-facing schemas').",
+      "type": "object",
+      "properties": {
+        "choiceId": {
+          "description": "The choice's id in this turn, unique in the context (arch 03 line 183: choose names its option; README 'Named rules': optionOffered).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "kind": {
+          "$ref": "#/$defs/choiceKind"
+        },
+        "label": {
+          "description": "Its label: the branch label word for word for an option or a hub case (SPEC-master 5d: 'never rename a branch label'); the row's name for an any-time row (arch 03 line 171); the door's name (arch 03 line 165); the entry step's title for searchEntry; 'Which booking?' with the booking's business, date and time for whichBooking (arch 03 line 167). arch 06 line 279: 'choices: label + definition'.",
+          "type": "string"
+        },
+        "definition": {
+          "description": "What the choice means: the branch's Means line, or the first sentence of the step it leads to standing in (contracts/bundle card.means; arch 12 line 592); for an any-time row, a door or an entry step, the first sentence of its handler or entry step (README default 3). arch 03 line 181: 'each choice's label and definition'.",
+          "type": "string"
+        },
+        "step": {
+          "description": "The step behind it: the open question's step, the hub step, the any-time row's handler in this flow, the door step, the entry step meaning search found, or the target booking's hub for whichBooking (arch 03 lines 159 to 167; contracts/bundle routingTables).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "question": {
+          "description": "What choose names as its question (arch 03 line 183: 'choose(question, option, fields ...)'): an option's open question id, a hub case's hub step id, the booking id a whichBooking choice stands for; null for door, anytime and searchEntry, which enter takes.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch": {
+          "description": "The branch label word for word, for an option or a hub case; null otherwise (SPEC-master 4 and 5d; contracts/bundle branch.label).",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "anytimeRow": {
+          "description": "For an any-time row, which of the 21 (arch 03 line 171; contracts/bundle anytimeRow.row); null otherwise.",
+          "anyOf": [
+            {
+              "$ref": "../bundle/bundle.v1.schema.json#/$defs/anytimeRow/properties/row"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "door": {
+          "description": "For a door, which one (arch 03 line 165; contracts/bundle routingTables.doors): newBooking, existingBooking (after a code check), ownerCommand, teamChange, unclearOwnerOrHelp; null otherwise.",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["newBooking", "existingBooking", "ownerCommand", "teamChange", "unclearOwnerOrHelp"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hub": {
+          "description": "For a hub case, the target booking's stage whose hub it is (arch 03 line 163; contracts/bundle routingTables.hubs): entry, booked, checkedIn, done, owner, settings, team; null otherwise.",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["entry", "booked", "checkedIn", "done", "owner", "settings", "team"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "fields": {
+          "description": "The fields an answer to this choice carries, with their types (contracts/bundle answerField: the branch's fields, from the gives keys and record values; arch 03 line 183: 'fields with their source words').",
+          "type": "array",
+          "items": {
+            "$ref": "../bundle/bundle.v1.schema.json#/$defs/answerField"
+          }
+        },
+        "stakes": {
+          "$ref": "#/$defs/stakes"
+        },
+        "stakesFrom": {
+          "description": "Why it is high: at least one reason when stakes is high, none when low (arch 01 line 79; README 'Stakes').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stakesReason"
+          }
+        }
+      },
+      "required": [
+        "choiceId",
+        "kind",
+        "label",
+        "definition",
+        "step",
+        "question",
+        "branch",
+        "anytimeRow",
+        "door",
+        "hub",
+        "target",
+        "fields",
+        "stakes",
+        "stakesFrom"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "stakes": {
+          "description": "High has its reasons, low has none (arch 01 line 79; README 'Stakes').",
+          "if": {
+            "properties": {
+              "stakes": {
+                "description": "arch 01 line 79.",
+                "const": "high"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "stakesFrom": {
+                "description": "arch 01 line 79.",
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "stakesFrom": {
+                "description": "arch 01 line 79.",
+                "type": "array",
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        "kind": {
+          "description": "Each kind fills the fields it uses and leaves the others null (arch 01 line 67; arch 03 lines 163 to 167, 189).",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 67.",
+                    "const": "option"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "An option belongs to an open question (arch 01 line 63).",
+                    "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                  },
+                  "branch": {
+                    "description": "SPEC-master 5d.",
+                    "type": "string"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 67.",
+                    "const": "hub"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "The hub's step id (arch 03 line 163).",
+                    "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+                  },
+                  "branch": {
+                    "description": "SPEC-master 5d.",
+                    "type": "string"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 03 line 163.",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 67.",
+                    "const": "anytime"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "enter takes an any-time row (arch 03 line 183).",
+                    "type": "null"
+                  },
+                  "branch": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 03 line 171.",
+                    "type": "string"
+                  },
+                  "door": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 67.",
+                    "const": "door"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "enter takes a door (arch 03 line 183).",
+                    "type": "null"
+                  },
+                  "branch": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 03 line 165.",
+                    "type": "string"
+                  },
+                  "hub": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 03 line 189.",
+                    "const": "searchEntry"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "enter takes an entry step (README default 2).",
+                    "type": "null"
+                  },
+                  "branch": {
+                    "description": "arch 03 line 189.",
+                    "type": "null"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 03 line 189.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 03 line 189.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 03 line 189.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 03 line 167.",
+                    "const": "whichBooking"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "The booking it stands for (arch 03 line 167).",
+                    "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                  },
+                  "branch": {
+                    "description": "arch 03 line 167.",
+                    "type": "null"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 03 line 167.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 03 line 167.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 03 line 167.",
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "openQuestion": {
+      "title": "OpenQuestion",
+      "description": "An open question sent to this handle, as the context lists it (arch 03 line 159: 'every one sent to this handle (S13-12)'; arch 01 line 63; K-04's open question row). Its options are choices of kind option that name it.",
+      "type": "object",
+      "properties": {
+        "openQuestionId": {
+          "description": "The open question's row id (arch 01 line 63).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "step": {
+          "description": "The step that asked it (arch 01 line 63).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "sentAt": {
+          "description": "When it was sent (arch 01 line 63; arch 02 line 127).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/time"
+        },
+        "pollId": {
+          "description": "The poll it went out as, so a vote answers its own poll (arch 03 line 187: 'a poll vote answers its own poll (Linq polls)'); null when it went out as text.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "askCount": {
+          "description": "How many times it has been asked (arch 01 line 63: 'ask count').",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["openQuestionId", "step", "target", "sentAt", "pollId", "askCount"],
+      "additionalProperties": false
+    },
+    "stepCard": {
+      "title": "StepCard",
+      "description": "A full step card for an open question or a hub: question, Means, Never, safe default (arch 03 line 181; contracts/bundle card).",
+      "type": "object",
+      "properties": {
+        "step": {
+          "description": "The open question's or hub's step (arch 03 line 181).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "card": {
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/card"
+        }
+      },
+      "required": ["step", "card"],
+      "additionalProperties": false
+    },
+    "factValue": {
+      "title": "FactValue",
+      "description": "A fact's value, typed as contracts/bundle answerField types it: text, integer, boolean, money or time as the shared formats write them (CQ-09); null when the home holds no value (arch 02 line 117).",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/money"
+        },
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fact": {
+      "title": "Fact",
+      "description": "One fact the open questions' and hubs' steps need, given once, from its one home, with the row and version it came from (arch 02 line 117: 'the facts they need, each fact once, from its one home (S13-30)'; arch 01 line 85; 02-contracts K-02).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The fact's key: a needs key, a record value or a named slot (SPEC-master 4 'needs'; master-A.json and master-B.json record; K-03's slot names).",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.]*$"
+        },
+        "value": {
+          "$ref": "#/$defs/factValue"
+        },
+        "home": {
+          "description": "The home the fact comes from (contracts/bundle homes: money S13-55, contact S13-19, proof S13-45, stop S13-32, clock S13-35, who S13-31, safety S13-10, change S13-56, record S13-57, two A9-21; arch 02 line 117).",
+          "type": "string",
+          "enum": ["money", "contact", "proof", "stop", "clock", "who", "safety", "change", "record", "two"]
+        },
+        "table": {
+          "description": "The table of the row it was read from (arch 02 line 117; K-04 and the domain parts name the tables).",
+          "type": "string",
+          "pattern": "^[a-z_][a-z0-9_]*$"
+        },
+        "rowId": {
+          "description": "The row it was read from (arch 02 line 117).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "version": {
+          "description": "The row's version when read, which the commit compares and sets (arch 01 line 85; arch 06 line 305, limit 4).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "forSteps": {
+          "description": "The steps that need it (arch 03 line 181: 'the facts those steps need').",
+          "type": "array",
+          "items": {
+            "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+          }
+        }
+      },
+      "required": ["name", "value", "home", "table", "rowId", "version", "forSteps"],
+      "additionalProperties": false
+    },
+    "attachment": {
+      "title": "Attachment",
+      "description": "Something sent with a text, such as a photo (02-contracts K-02: 'its attachments'). Reading a photo is v1.1 (F14, C-120); v1 passes only its id and media type.",
+      "type": "object",
+      "properties": {
+        "attachmentId": {
+          "description": "The attachment's id; v1.1 turns it into a K-13 file reference (02-contracts K-02, photo reading).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "mediaType": {
+          "description": "Its media type, such as image/jpeg (02-contracts K-02).",
+          "type": "string",
+          "pattern": "^[a-z]+/[A-Za-z0-9.+-]+$"
+        }
+      },
+      "required": ["attachmentId", "mediaType"],
+      "additionalProperties": false
+    },
+    "text": {
+      "title": "Text",
+      "description": "One text of the turn, after the edge scrub (arch 02 line 109: card numbers and Social Security numbers swapped for a tag before any write; 02-contracts K-02: 'each text's words after the edge scrub, its send time and zone, and its attachments, with a poll vote given as its poll and option ids').",
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "The inbound event's id; the turn id hashes these (arch 01 line 59).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "kind": {
+          "description": "text: words typed; pollVote: a vote in one of Rosie's polls (arch 03 line 187: 'a poll vote answers its own poll'); tapback: a reaction, never a yes (arch 03 line 187: 'A tapback is never a yes'; A7-17).",
+          "type": "string",
+          "enum": ["text", "pollVote", "tapback"]
+        },
+        "words": {
+          "description": "The words after the edge scrub, which every quote must be found in (arch 03 line 185; arch 02 line 109). For a poll vote, the voted option's words as sent; for a tapback, the reaction's name as the Linq port reports it (K-11; README open gaps).",
+          "type": "string"
+        },
+        "sentAt": {
+          "description": "Its send time and zone; dates resolve from it in the visit's zone (arch 06 line 309, limit 6; S13-03).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/time"
+        },
+        "attachments": {
+          "description": "What came with it (02-contracts K-02).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachment"
+          }
+        },
+        "poll": {
+          "description": "For a poll vote: its poll and option ids (02-contracts K-02; arch 03 line 187); null otherwise.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "pollId": {
+                  "description": "The poll voted in (Linq polls; arch 03 line 187).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
+                "optionId": {
+                  "description": "The option voted for (Linq polls; arch 03 line 187).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["pollId", "optionId"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tapback": {
+          "description": "For a tapback: the reaction and the message it reacts to (arch 03 line 187; A7-17); null otherwise.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "reaction": {
+                  "description": "The reaction as the Linq port reports it; the list is K-11's (README open gaps).",
+                  "type": "string"
+                },
+                "onMessageId": {
+                  "description": "The message reacted to (arch 03 line 187).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["reaction", "onMessageId"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["eventId", "kind", "words", "sentAt", "attachments", "poll", "tapback"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "A poll vote carries its poll, a tapback its reaction, and a text neither (arch 03 line 187).",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 03 line 187.",
+                    "const": "pollVote"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "poll": {
+                    "description": "arch 03 line 187.",
+                    "type": "object"
+                  },
+                  "tapback": {
+                    "description": "arch 03 line 187.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 03 line 187.",
+                    "const": "tapback"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "poll": {
+                    "description": "arch 03 line 187.",
+                    "type": "null"
+                  },
+                  "tapback": {
+                    "description": "arch 03 line 187.",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 03 line 187.",
+                    "const": "text"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "poll": {
+                    "description": "arch 03 line 187.",
+                    "type": "null"
+                  },
+                  "tapback": {
+                    "description": "arch 03 line 187.",
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "person": {
+      "title": "Person",
+      "description": "One person behind the handle, with their roles (02-contracts K-02: 'who wrote (handle, people, roles)'; arch 01 line 55: one handle can be several people, S13-27 rule 28; FS line 743).",
+      "type": "object",
+      "properties": {
+        "personId": {
+          "description": "The person row (FS line 743).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "name": {
+          "description": "The name the record holds; the model never picks a language from it (arch 06 line 341).",
+          "type": "string"
+        },
+        "roles": {
+          "description": "Their roles per business (FS line 723: owner, admin, staff, own business, customer; arch 09 'Person & role').",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "description": "The role (FS line 723).",
+                "type": "string",
+                "enum": ["owner", "admin", "staff", "ownBusiness", "customer"]
+              },
+              "businessId": {
+                "description": "The business it is held at (FS line 723).",
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              }
+            },
+            "required": ["role", "businessId"],
+            "additionalProperties": false
+          }
+        },
+        "language": {
+          "description": "The person's stored language, set when they name it or write in it twice, or null (arch 06 line 341).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/language"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["personId", "name", "roles", "language"],
+      "additionalProperties": false
+    },
+    "recentMessage": {
+      "title": "RecentMessage",
+      "description": "One of the last 6 messages with this business, up to 30 days old, for tone only (arch 03 line 181 (DD); arch 06 line 279).",
+      "type": "object",
+      "properties": {
+        "from": {
+          "description": "person: the handle's side; rosie: Rosie's side (arch 03 line 181).",
+          "type": "string",
+          "enum": ["person", "rosie"]
+        },
+        "sentAt": {
+          "description": "When it was sent; older than 30 days is left out by code (arch 03 line 181).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/time"
+        },
+        "words": {
+          "description": "Its words as sent or received, after the edge scrub (arch 03 line 181; arch 02 line 109).",
+          "type": "string"
+        }
+      },
+      "required": ["from", "sentAt", "words"],
+      "additionalProperties": false
+    },
+    "context": {
+      "title": "Context",
+      "description": "What decide is given: the context bundle (C-114) for one turn, built from the frontier (C-075) and the bundle (02-contracts K-02 'What decide is given'; arch 03 line 181; arch 06 line 279). Decide's input, not model output, so it may carry limits such as at most 60 choices (T-360 finding 5). The planner reads the same context after meaning search (arch 03 line 189).",
+      "type": "object",
+      "properties": {
+        "turnId": {
+          "description": "The turn (arch 01 line 59).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "bundleId": {
+          "description": "The bundle the turn is pinned to (arch 01 line 87; C-050).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/bundleId"
+        },
+        "flow": {
+          "description": "The flow of the turn's target business, whose always-on prefix the turn reads (contracts/bundle flowLetter). A choice from the other flow, such as a question about the owner's other business, names its own step, whose id carries its flow (contracts/bundle stepId; arch 03 line 159).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/flowLetter"
+        },
+        "texts": {
+          "description": "The turn: one batch of the handle's texts, oldest first (arch 01 line 59; arch 02 line 113).",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "writer": {
+          "description": "Who wrote: the handle, the people behind it and their roles (02-contracts K-02; arch 03 line 181: 'role and language').",
+          "type": "object",
+          "properties": {
+            "handle": {
+              "description": "The phone number or email address that wrote (arch 01 line 55).",
+              "type": "string",
+              "pattern": "."
+            },
+            "people": {
+              "description": "The people behind it (arch 01 line 55; S13-27 rule 28).",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/person"
+              }
+            }
+          },
+          "required": ["handle", "people"],
+          "additionalProperties": false
+        },
+        "businessLanguage": {
+          "description": "The business's language, used when nobody has a stored one (arch 06 line 341). Which stage reports the text's own language: CQ-07 (default: the two decide reads, which must agree).",
+          "$ref": "#/$defs/language"
+        },
+        "openQuestions": {
+          "description": "Every open question sent to this handle (arch 03 line 159; S13-12).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/openQuestion"
+          }
+        },
+        "choices": {
+          "description": "The frontier: about 40 choices and never more than 60 (arch 01 line 69 (DD); arch 03 line 167: over 60, each booking other than the target collapses to one 'which booking?' choice). A choice id appears once (a code check: README 'Named rules').",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 60,
+          "items": {
+            "$ref": "#/$defs/choice"
+          }
+        },
+        "cards": {
+          "description": "Full step cards for the open questions and hubs (arch 03 line 181).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepCard"
+          }
+        },
+        "facts": {
+          "description": "The facts those steps need, each once, from its home (arch 02 line 117; arch 03 line 181).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fact"
+          }
+        },
+        "alwaysOn": {
+          "description": "The always-on rules as the cached prefix, named by the bundle and the prefix's hash rather than repeated (arch 03 line 181: 'the 50 rules as a cached prefix'; contracts/bundle routingTables.alwaysOn).",
+          "type": "object",
+          "properties": {
+            "flow": {
+              "description": "The flow graph whose prefix it is (contracts/bundle routingTables.alwaysOn).",
+              "$ref": "../bundle/bundle.v1.schema.json#/$defs/flowLetter"
+            },
+            "prefixSha256": {
+              "description": "The prefix's sha256, as the bundle holds it (contracts/bundle routingTables.alwaysOn.prefixSha256).",
+              "$ref": "../bundle/bundle.v1.schema.json#/$defs/sha256"
+            }
+          },
+          "required": ["flow", "prefixSha256"],
+          "additionalProperties": false
+        },
+        "recentMessages": {
+          "description": "The last 6 messages with this business, up to 30 days old, for tone only (arch 03 line 181).",
+          "type": "array",
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/recentMessage"
+          }
+        },
+        "meaningSearch": {
+          "description": "Set when nothing fit and meaning search added the 3 closest entry steps as choices of kind searchEntry, for the turn's one re-read (arch 03 line 189 (DD); Q-42); null on a first read.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "added": {
+                  "description": "The choice ids it added, the closest first (arch 03 line 189: 'adds the 3 closest entry steps').",
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 3,
+                  "items": {
+                    "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                  }
+                },
+                "index": {
+                  "description": "The model or index the match ran on, as Q-42's spike names it (Q-42; README open gaps).",
+                  "type": "string"
+                }
+              },
+              "required": ["added", "index"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "turnId",
+        "bundleId",
+        "flow",
+        "texts",
+        "writer",
+        "businessLanguage",
+        "openQuestions",
+        "choices",
+        "cards",
+        "facts",
+        "alwaysOn",
+        "recentMessages",
+        "meaningSearch"
+      ],
+      "additionalProperties": false
+    },
+    "fieldValue": {
+      "title": "FieldValue",
+      "description": "The value the model read for a field, in the type the choice's field names (contracts/bundle answerField.type): a string for text, zone, id or choice; an integer; a boolean; money or a time as the shared formats write them (CQ-09). Code re-parses it from its words (arch 03 line 185; arch 06 line 309, limit 6). Model-facing.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/money"
+        },
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/time"
+        }
+      ]
+    },
+    "field": {
+      "title": "Field",
+      "description": "One field of a choose or enter, with its source words (arch 03 line 183: 'fields with their source words'). A value without words is refused (refuse-value-without-words). Model-facing.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The field's name, one the chosen choice lists in its fields (contracts/bundle answerField.name; arch 03 line 183).",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "words": {
+          "description": "The exact words of the text the value comes from; code re-parses the value from them (arch 03 line 185; arch 06 line 309, limit 6).",
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      },
+      "required": ["name", "value", "words"],
+      "additionalProperties": false
+    },
+    "quote": {
+      "title": "Quote",
+      "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+      "$ref": "#/$defs/nonEmptyText"
+    },
+    "choose": {
+      "title": "Choose",
+      "description": "choose(question, option, fields with their source words): the part answers an offered question or hub case (arch 03 line 183). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 03 line 183.",
+          "const": "choose"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "question": {
+          "description": "The question the option answers, exactly as the chosen choice's question gives it (arch 03 line 183).",
+          "type": "string"
+        },
+        "choice": {
+          "description": "The chosen option's choice id, one of the turn's choices of kind option, hub or whichBooking (arch 03 line 183; arch 06 line 333: 'Code hands it the choices'). Checked in code, never an enum (README 'Named rules').",
+          "type": "string"
+        },
+        "fields": {
+          "description": "The fields its answer carries, each with its words (arch 03 line 183).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        }
+      },
+      "required": ["verb", "quote", "question", "choice", "fields"],
+      "additionalProperties": false
+    },
+    "enter": {
+      "title": "Enter",
+      "description": "enter(door or any-time row, fields): the part starts something new or raises an any-time row (arch 03 line 183); also an entry step meaning search added (arch 03 line 189). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 03 line 183.",
+          "const": "enter"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "choice": {
+          "description": "The door's, any-time row's or entry step's choice id, one of the turn's choices of kind door, anytime or searchEntry (arch 03 lines 183 and 189). Checked in code (README 'Named rules').",
+          "type": "string"
+        },
+        "fields": {
+          "description": "The fields its answer carries, each with its words (arch 03 line 183).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        }
+      },
+      "required": ["verb", "quote", "choice", "fields"],
+      "additionalProperties": false
+    },
+    "ask": {
+      "title": "Ask",
+      "description": "ask(questions, what is unclear): the part could answer more than one question, or a bare reply or reaction is not a choice, so Rosie asks which (arch 03 lines 183 and 187; S13-12; A7-17). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 03 line 183.",
+          "const": "ask"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "questions": {
+          "description": "The questions it could answer, by the choices' question values (arch 03 line 183).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unclear": {
+          "description": "What is unclear, in plain words (arch 03 line 183).",
+          "type": "string"
+        }
+      },
+      "required": ["verb", "quote", "questions", "unclear"],
+      "additionalProperties": false
+    },
+    "noneFits": {
+      "title": "NoneFits",
+      "description": "none_fits(why): no choice fits the part; meaning search runs (arch 03 lines 183 and 189). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 03 line 183.",
+          "const": "none_fits"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "why": {
+          "description": "Why nothing fits (arch 03 line 183).",
+          "type": "string"
+        }
+      },
+      "required": ["verb", "quote", "why"],
+      "additionalProperties": false
+    },
+    "passOn": {
+      "title": "PassOn",
+      "description": "pass_on(words): the part is words for the business, passed on as they are (arch 03 line 183). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 03 line 183.",
+          "const": "pass_on"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "words": {
+          "description": "The words to pass on (arch 03 line 183).",
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      },
+      "required": ["verb", "quote", "words"],
+      "additionalProperties": false
+    },
+    "handOffAbout": {
+      "title": "HandOffAbout",
+      "description": "Whom a hand-off is about, so the hand-off code (C-104) routes it without reading the reason: ownerOrStaff, a report about the owner or staff, which goes to Rosie's team that day, never the person named (arch 06 line 329: 'a report about the owner or staff: Rosie's team that day, never the person named'; S13-29 rule 58: 'A report that the owner or staff harmed someone goes to Rosie's team that day, never only to the one named'; S13-27 rule 36's note: 'If it's about the owner or staff, or is sent to Rosie itself, only Rosie's team gets it'); other, any other hand-off, which goes to the owner in text hours, then Rosie's team after 2 days unanswered (arch 06 line 329; S11-19). A closed enum of scalars, inside the structured-outputs subset (02-contracts section 2 item 7). Model-facing.",
+      "type": "string",
+      "enum": ["ownerOrStaff", "other"]
+    },
+    "handOff": {
+      "title": "HandOff",
+      "description": "hand_off(reason): the part goes to a person (arch 03 line 183), routed by about: a report about the owner or staff to Rosie's team that day, any other hand-off to the owner in text hours, then Rosie's team (arch 06 line 329). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 03 line 183.",
+          "const": "hand_off"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "reason": {
+          "description": "Why it goes to a person (arch 03 line 183).",
+          "type": "string"
+        },
+        "about": {
+          "$ref": "#/$defs/handOffAbout"
+        }
+      },
+      "required": ["verb", "quote", "reason", "about"],
+      "additionalProperties": false
+    },
+    "redact": {
+      "title": "Redact",
+      "description": "redact(words): words that must not stay in the message log or reach a message, such as a field kept to the secure page (arch 03 line 183; RULES 4.5). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 03 line 183.",
+          "const": "redact"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "words": {
+          "description": "The words to redact, found in the text (arch 03 line 183).",
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      },
+      "required": ["verb", "quote", "words"],
+      "additionalProperties": false
+    },
+    "noOp": {
+      "title": "NoOp",
+      "description": "no_op: the part needs nothing done, such as a thank-you (arch 03 line 183). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 03 line 183.",
+          "const": "no_op"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        }
+      },
+      "required": ["verb", "quote"],
+      "additionalProperties": false
+    },
+    "decidePart": {
+      "title": "DecidePart",
+      "description": "One verb for one part of the text: choose, enter, ask, none_fits, pass_on, hand_off, redact or no_op (arch 03 line 183). Any other verb is refused (refuse-unknown-verb). Model-facing.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/choose"
+        },
+        {
+          "$ref": "#/$defs/enter"
+        },
+        {
+          "$ref": "#/$defs/ask"
+        },
+        {
+          "$ref": "#/$defs/noneFits"
+        },
+        {
+          "$ref": "#/$defs/passOn"
+        },
+        {
+          "$ref": "#/$defs/handOff"
+        },
+        {
+          "$ref": "#/$defs/redact"
+        },
+        {
+          "$ref": "#/$defs/noOp"
+        }
+      ]
+    },
+    "decideRead": {
+      "title": "DecideRead",
+      "description": "What one decide read returns: the model's verbs, one per part of the text (arch 03 line 183; arch 02 line 119: 'The output is the model's verbs'). Model-facing: written inside the structured-outputs subset and checked by contracts/scripts/structured-subset-lint.mjs (02-contracts section 2 item 7).",
+      "type": "object",
+      "properties": {
+        "language": {
+          "description": "The text's language, as this read sees it; the two reads must agree (CQ-07 default; arch 06 line 341).",
+          "$ref": "#/$defs/language"
+        },
+        "parts": {
+          "description": "One verb per part of the text, in the text's order (arch 03 line 183).",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/decidePart"
+          }
+        }
+      },
+      "required": ["language", "parts"],
+      "additionalProperties": false
+    },
+    "read": {
+      "title": "Read",
+      "description": "One decide read as the decide stage records it: which model, in which role, and what it returned (02-contracts K-02: 'which models read it'; arch 02 line 119; arch 06 lines 285 to 289).",
+      "type": "object",
+      "properties": {
+        "model": {
+          "description": "The model (contracts/bundle modelRole: haiku or sonnet; arch 11 line 564: claude-haiku-5-5 and claude-sonnet-5-5).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/modelRole"
+        },
+        "role": {
+          "description": "first: the first read; check: the read that must agree with it (Haiku again with the choices shuffled on low stakes, Haiku checking Sonnet on high); reread: the one Sonnet re-read per turn (arch 02 line 119; arch 06 lines 285 to 289).",
+          "type": "string",
+          "enum": ["first", "check", "reread"]
+        },
+        "output": {
+          "$ref": "#/$defs/decideRead"
+        }
+      },
+      "required": ["model", "role", "output"],
+      "additionalProperties": false
+    },
+    "resultPart": {
+      "title": "ResultPart",
+      "description": "One part as decide hands it to the gate: the verb the reads agreed on and what happens to it (arch 02 line 119: 'Still unclear: one question, and nothing changes for that part. Parts about other bookings that both reads agree on go ahead').",
+      "type": "object",
+      "properties": {
+        "part": {
+          "$ref": "#/$defs/decidePart"
+        },
+        "outcome": {
+          "description": "go: the reads agree, and the part goes to the gate; oneQuestion: still unclear after the re-read, so one question is asked and nothing changes for this part (arch 02 line 119; arch 06 lines 287 and 289; Q-41). For oneQuestion, part is the last read's verb, kept for the trace and the question, and the gate commits nothing for it.",
+          "type": "string",
+          "enum": ["go", "oneQuestion"]
+        }
+      },
+      "required": ["part", "outcome"],
+      "additionalProperties": false
+    },
+    "decideResult": {
+      "title": "DecideResult",
+      "description": "What decide returns to the gate for one turn (C-115, C-116 to C-080; 02-contracts K-02 'What decide returns'): the reads, whether they agreed, whether the re-read ran, and each part with its outcome. Assembled by code around the model's reads; not model-facing.",
+      "type": "object",
+      "properties": {
+        "turnId": {
+          "description": "The turn (arch 01 line 59).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "bundleId": {
+          "description": "The bundle the turn ran on (arch 01 line 87).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/bundleId"
+        },
+        "stakes": {
+          "description": "The turn's stakes: high when the target question, or the first read's pick, is high (arch 01 line 79).",
+          "$ref": "#/$defs/stakes"
+        },
+        "routing": {
+          "description": "Which model read first and which checked: Haiku twice on low stakes; on high stakes Sonnet first with Haiku checking, Q-26's default (arch 02 line 119; arch 06 lines 285 and 287; contracts/bundle readPair).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/readPair"
+        },
+        "reads": {
+          "description": "The reads in the order they ran: first and check, then the re-read if it ran (arch 02 line 119; arch 06 line 289: once per turn).",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/read"
+          }
+        },
+        "agreed": {
+          "description": "Whether the first and check reads agreed on every choice and every field value (arch 02 line 119: 'Two reads must agree on every choice and every field value').",
+          "type": "boolean"
+        },
+        "reread": {
+          "description": "Whether the one Sonnet re-read ran: on a disagreement, an unmapped part or a value that fails its words, or after meaning search (arch 02 line 119; arch 03 line 189; Q-41: the re-read runs before the one question).",
+          "type": "boolean"
+        },
+        "language": {
+          "description": "The text's language the reads agreed on, or null when they did not (CQ-07 default: the two decide reads, which must agree).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/language"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parts": {
+          "description": "Each part of the text with its outcome (arch 02 line 119).",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/resultPart"
+          }
+        }
+      },
+      "required": [
+        "turnId",
+        "bundleId",
+        "stakes",
+        "routing",
+        "reads",
+        "agreed",
+        "reread",
+        "language",
+        "parts"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "reread": {
+          "description": "A re-read is the third read; without one there are two (arch 06 line 289: once per turn).",
+          "if": {
+            "properties": {
+              "reread": {
+                "description": "arch 06 line 289.",
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reads": {
+                "description": "arch 06 line 289.",
+                "type": "array",
+                "minItems": 3
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "reads": {
+                "description": "arch 06 line 289.",
+                "type": "array",
+                "maxItems": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "contextAndDecide": {
+      "title": "ContextAndDecide",
+      "description": "A context with the decide result made from it, as the gate reads them together (C-080; arch 03 line 185). Two rules hold across the pair that one JSON Schema cannot state, and contracts/model/model.rules.mjs states them by name: optionOffered (every chosen or entered choice is one the context offers, with the verb its kind takes) and quoteInText (every quote and every field's words are found in the turn's texts). README 'Named rules'.",
+      "type": "object",
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "decide": {
+          "$ref": "#/$defs/decideResult"
+        }
+      },
+      "required": ["context", "decide"],
+      "additionalProperties": false
+    },
+    "safetyOutcome": {
+      "title": "SafetyOutcome",
+      "description": "One of the 8 outcomes of A3-22 and B3-17, as their branch labels give them word for word (SPEC-master 5d), or Unsure (arch 03 line 183; arch 06 lines 283 and 315 to 329): No; Safety steps, then go on; An emergency; Crisis words; A threat to staff or others; Harm to a child or older adult; Unsafe at home; Needs the business's own line. Model-facing.",
+      "type": "string",
+      "enum": [
+        "No",
+        "Safety steps, then go on",
+        "An emergency",
+        "Crisis words",
+        "A threat to staff or others",
+        "Harm to a child or older adult",
+        "Unsafe at home",
+        "Needs the business's own line",
+        "Unsure"
+      ]
+    },
+    "tense": {
+      "title": "Tense",
+      "description": "A label's tense: now, could restart, over, joke or unknown. Over and joke are not danger; unknown reads as danger and adds 'Is anyone in danger right now?' (arch 06 line 329; S13-24 rule 10). Model-facing.",
+      "type": "string",
+      "enum": ["now", "could restart", "over", "joke", "unknown"]
+    },
+    "safetyLabel": {
+      "title": "SafetyLabel",
+      "description": "One label of a safety read, with its tense, evidence words, who is at risk and who wrote it (arch 03 line 183; arch 02 line 111). Model-facing.",
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "$ref": "#/$defs/safetyOutcome"
+        },
+        "tense": {
+          "$ref": "#/$defs/tense"
+        },
+        "evidence": {
+          "description": "The words of the text that show it; empty for No when nothing points to danger (arch 02 line 111: 'evidence words').",
+          "type": "string"
+        },
+        "atRisk": {
+          "description": "Who is at risk, in plain words, such as 'the writer' or 'nobody' (arch 03 line 183; arch 02 line 111). A closed list waits for a source (README open gaps).",
+          "type": "string"
+        },
+        "writer": {
+          "description": "Who wrote it, as the text shows: the person at the handle or someone writing for them, in plain words (arch 03 line 183: 'who wrote it').",
+          "type": "string"
+        }
+      },
+      "required": ["outcome", "tense", "evidence", "atRisk", "writer"],
+      "additionalProperties": false
+    },
+    "safetyRead": {
+      "title": "SafetyRead",
+      "description": "What one safety read returns for one raw text: its labels, several at once allowed (arch 06 line 279: '8 · several per text · tense'; arch 03 line 183). Model-facing: written inside the structured-outputs subset and checked by contracts/scripts/structured-subset-lint.mjs (02-contracts section 2 item 7).",
+      "type": "object",
+      "properties": {
+        "labels": {
+          "description": "At least one label; a text with no danger reads No (A3-22 'Means No').",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/safetyLabel"
+          }
+        }
+      },
+      "required": ["labels"],
+      "additionalProperties": false
+    },
+    "safetyResult": {
+      "title": "SafetyResult",
+      "description": "The safety read's output for one raw text, as the actor (C-047) hands it on: the model's read, or a timeout marker, with the danger words code matched (C-113; arch 02 line 111; arch 06 line 283; 02-contracts K-02 'The safety read's output'). Assembled by code around the model's read; not model-facing. The same output serves free text from pages and outside AIs (arch 02 line 129).",
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "The raw text's event id, or the page or agent call's id (arch 02 lines 111 and 129).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "source": {
+          "description": "text: a text on arrival, before batching (arch 02 line 111); page: free text from a secure page; agent: free text from an outside AI (arch 02 line 129).",
+          "type": "string",
+          "enum": ["text", "page", "agent"]
+        },
+        "tries": {
+          "description": "The model tries in order: Haiku, then Sonnet, 2 s each (arch 06 line 283; arch 02 line 111: 'One 2 s try per model').",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "description": "contracts/bundle modelRole (arch 06 line 283).",
+                "$ref": "../bundle/bundle.v1.schema.json#/$defs/modelRole"
+              },
+              "result": {
+                "description": "verdict, timeout or error (arch 02 line 111).",
+                "type": "string",
+                "enum": ["verdict", "timeout", "error"]
+              }
+            },
+            "required": ["model", "result"],
+            "additionalProperties": false
+          }
+        },
+        "read": {
+          "description": "The read that gave a verdict, or null when none came in 4 s (arch 02 line 111).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safetyRead"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timedOut": {
+          "description": "The timeout marker: no verdict in 4 s (arch 02 line 111).",
+          "type": "boolean"
+        },
+        "dangerWords": {
+          "description": "The danger words code found in the raw text: the general check's (danger to life, fire, gas, a medical emergency or self-harm: A3-22) and the plug-in's own (a shop's safety_stop list in fixture set v1; arch 06 line 283).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "words": {
+                "description": "The words matched in the text (arch 06 line 283).",
+                "type": "string"
+              },
+              "list": {
+                "description": "general: the general danger check (A3-22); plugin: the trade's own danger words (arch 06 line 283; A3-22).",
+                "type": "string",
+                "enum": ["general", "plugin"]
+              },
+              "kind": {
+                "description": "Which safety line the match gets on a timeout, when no read gives a Crisis words label (arch 02 line 111: 'a danger-word match counts as Unsure and gets the safety line (988 and 911 for self-harm words, else 911)'): selfHarm, words about suicide, self-harm or a mental health crisis (A3-25: 'Words about suicide, self-harm or a mental health crisis get the 988 line at once'; A3-22's general check names self-harm, and 'Crisis words' means suicide, self-harm or a mental health crisis), which get 988 and 911; other, every other danger word (danger to life, fire, gas, a medical emergency: A3-22; a trade's own words: arch 06 line 283), which get 911. Code sets it from the list entry the words matched; no source lists the words themselves (README open gaps: 'Self-harm words').",
+                "type": "string",
+                "enum": ["selfHarm", "other"]
+              }
+            },
+            "required": ["words", "list", "kind"],
+            "additionalProperties": false
+          }
+        },
+        "outcomes": {
+          "description": "What holds, after code's rules on the read: a danger word lifts No to Unsure only when the tense is now, could restart or unknown (arch 06 line 283); with no verdict in 4 s, a danger word counts as Unsure, and with none the list is empty and the outage line goes (arch 02 line 111).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/safetyOutcome"
+          }
+        },
+        "liftedToUnsure": {
+          "description": "Whether a danger word lifted No to Unsure, or counted as Unsure on a timeout (arch 06 line 283; arch 02 line 111).",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "eventId",
+        "source",
+        "tries",
+        "read",
+        "timedOut",
+        "dangerWords",
+        "outcomes",
+        "liftedToUnsure"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "timedOut": {
+          "description": "A timeout has no read; a verdict has one (arch 02 line 111).",
+          "if": {
+            "properties": {
+              "timedOut": {
+                "description": "arch 02 line 111.",
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "read": {
+                "description": "arch 02 line 111.",
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "read": {
+                "description": "arch 02 line 111.",
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "plannerAnswer": {
+      "title": "PlannerAnswer",
+      "description": "Answer from stored facts (arch 06 line 291). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 06 line 291.",
+          "const": "answer"
+        },
+        "text": {
+          "description": "The answer, saying only what the facts hold (arch 06 line 291: 'answer from stored facts').",
+          "type": "string"
+        },
+        "facts": {
+          "description": "The names of the context's facts it uses; code checks each is in the context (arch 06 line 291; arch 02 line 117).",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["verb", "text", "facts"],
+      "additionalProperties": false
+    },
+    "plannerAsk": {
+      "title": "PlannerAsk",
+      "description": "Ask one question (arch 06 line 291). A reply to it that fits nothing goes to a person (arch 03 line 189; S13-29 rule 54). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 06 line 291.",
+          "const": "ask"
+        },
+        "question": {
+          "description": "The one question (arch 06 line 291). One question is a code check (C-092), not a schema rule (02-contracts section 2 item 7).",
+          "type": "string"
+        }
+      },
+      "required": ["verb", "question"],
+      "additionalProperties": false
+    },
+    "plannerPassOn": {
+      "title": "PlannerPassOn",
+      "description": "Pass a question on to the business (arch 06 line 291). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 06 line 291.",
+          "const": "pass_on"
+        },
+        "question": {
+          "description": "The question passed on, in the person's words (arch 06 line 291).",
+          "type": "string"
+        }
+      },
+      "required": ["verb", "question"],
+      "additionalProperties": false
+    },
+    "plannerHandOff": {
+      "title": "PlannerHandOff",
+      "description": "Hand to a person: the owner, then the team (arch 06 lines 279 and 291); a report about the owner or staff goes to Rosie's team that day, never the person named, so about says which (arch 06 line 329; S13-29 rule 58). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 06 line 291.",
+          "const": "hand_off"
+        },
+        "reason": {
+          "description": "Why (arch 06 line 291).",
+          "type": "string"
+        },
+        "about": {
+          "$ref": "#/$defs/handOffAbout"
+        }
+      },
+      "required": ["verb", "reason", "about"],
+      "additionalProperties": false
+    },
+    "plannerLogGap": {
+      "title": "PlannerLogGap",
+      "description": "Log a gap case: a turn no choice fit, logged with its state and frontier for the weekly review (arch 06 line 291; arch 01 line 95; arch 03 line 189). Model-facing.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "arch 06 line 291.",
+          "const": "log_gap"
+        },
+        "summary": {
+          "description": "What the person wanted that nothing fit, in plain words; code adds the state and frontier (arch 01 line 95).",
+          "type": "string"
+        }
+      },
+      "required": ["verb", "summary"],
+      "additionalProperties": false
+    },
+    "plannerOutput": {
+      "title": "PlannerOutput",
+      "description": "What the Sonnet planner returns when nothing fits after meaning search: five verbs only, answer from stored facts, ask one question, pass a question on, hand to a person, log a gap case. It never books, charges, refunds, cancels, moves, or changes a setting, contact or consent (arch 06 line 291; arch 03 line 189), so any other verb is refused (refuse-planner-books). Model-facing: written inside the structured-outputs subset and checked by contracts/scripts/structured-subset-lint.mjs (02-contracts section 2 item 7).",
+      "type": "object",
+      "properties": {
+        "language": {
+          "description": "The language it answers in: the text's (arch 06 line 341; CQ-07).",
+          "$ref": "#/$defs/language"
+        },
+        "action": {
+          "description": "One of the five verbs (arch 06 line 291).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/plannerAnswer"
+            },
+            {
+              "$ref": "#/$defs/plannerAsk"
+            },
+            {
+              "$ref": "#/$defs/plannerPassOn"
+            },
+            {
+              "$ref": "#/$defs/plannerHandOff"
+            },
+            {
+              "$ref": "#/$defs/plannerLogGap"
+            }
+          ]
+        }
+      },
+      "required": ["language", "action"],
+      "additionalProperties": false
+    }
+  }
+}

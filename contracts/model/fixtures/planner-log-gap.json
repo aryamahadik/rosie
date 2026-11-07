@@ -1,0 +1,7 @@
+{
+  "language": "en",
+  "action": {
+    "verb": "log_gap",
+    "summary": "Alex asks whether the shop has parking; no stored fact says."
+  }
+}

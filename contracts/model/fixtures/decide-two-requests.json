@@ -1,0 +1,145 @@
+{
+  "turnId": "turn-two-requests-sam",
+  "bundleId": {
+    "hash": "22d734f465f32f953c926384a825e36d37ccb577b3fbe134debfd96a0667e72a",
+    "build": 1
+  },
+  "stakes": "low",
+  "routing": {
+    "first": "haiku",
+    "second": "haiku"
+  },
+  "reads": [
+    {
+      "model": "haiku",
+      "role": "first",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "block thursday afternoon",
+            "question": "S11-12",
+            "choice": "c-01",
+            "fields": [
+              {
+                "name": "block_when",
+                "value": "thursday afternoon",
+                "words": "thursday afternoon"
+              }
+            ]
+          },
+          {
+            "verb": "choose",
+            "quote": "tile is $12 a foot from now on",
+            "question": "S11-12",
+            "choice": "c-04",
+            "fields": [
+              {
+                "name": "service",
+                "value": "tile",
+                "words": "tile"
+              },
+              {
+                "name": "price",
+                "value": {
+                  "cents": 1200,
+                  "currency": "USD"
+                },
+                "words": "$12 a foot"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "model": "haiku",
+      "role": "check",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "block thursday afternoon",
+            "question": "S11-12",
+            "choice": "c-01",
+            "fields": [
+              {
+                "name": "block_when",
+                "value": "thursday afternoon",
+                "words": "thursday afternoon"
+              }
+            ]
+          },
+          {
+            "verb": "choose",
+            "quote": "tile is $12 a foot from now on",
+            "question": "S11-12",
+            "choice": "c-04",
+            "fields": [
+              {
+                "name": "service",
+                "value": "tile",
+                "words": "tile"
+              },
+              {
+                "name": "price",
+                "value": {
+                  "cents": 1200,
+                  "currency": "USD"
+                },
+                "words": "$12 a foot"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "agreed": true,
+  "reread": false,
+  "language": "en",
+  "parts": [
+    {
+      "part": {
+        "verb": "choose",
+        "quote": "block thursday afternoon",
+        "question": "S11-12",
+        "choice": "c-01",
+        "fields": [
+          {
+            "name": "block_when",
+            "value": "thursday afternoon",
+            "words": "thursday afternoon"
+          }
+        ]
+      },
+      "outcome": "go"
+    },
+    {
+      "part": {
+        "verb": "choose",
+        "quote": "tile is $12 a foot from now on",
+        "question": "S11-12",
+        "choice": "c-04",
+        "fields": [
+          {
+            "name": "service",
+            "value": "tile",
+            "words": "tile"
+          },
+          {
+            "name": "price",
+            "value": {
+              "cents": 1200,
+              "currency": "USD"
+            },
+            "words": "$12 a foot"
+          }
+        ]
+      },
+      "outcome": "go"
+    }
+  ]
+}

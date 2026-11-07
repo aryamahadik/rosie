@@ -1,0 +1,27 @@
+{
+  "eventId": "evt-alex-0204",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "A threat to staff or others",
+        "tense": "now",
+        "evidence": "if Riley messes up my hair again I'll hurt him",
+        "atRisk": "Riley, staff",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [],
+  "outcomes": [
+    "A threat to staff or others"
+  ],
+  "liftedToUnsure": false
+}

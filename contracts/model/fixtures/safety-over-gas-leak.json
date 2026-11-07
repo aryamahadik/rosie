@@ -1,0 +1,33 @@
+{
+  "eventId": "evt-alex-0208",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "No",
+        "tense": "over",
+        "evidence": "the gas leak was fixed in March",
+        "atRisk": "nobody",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [
+    {
+      "words": "gas leak",
+      "list": "general",
+      "kind": "other"
+    }
+  ],
+  "outcomes": [
+    "No"
+  ],
+  "liftedToUnsure": false
+}

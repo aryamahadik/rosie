@@ -1,0 +1,27 @@
+{
+  "eventId": "evt-alex-0201",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "No",
+        "tense": "now",
+        "evidence": "",
+        "atRisk": "nobody",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [],
+  "outcomes": [
+    "No"
+  ],
+  "liftedToUnsure": false
+}

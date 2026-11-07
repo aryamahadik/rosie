@@ -1,0 +1,88 @@
+{
+  "turnId": "turn-a7-17-alex-either",
+  "bundleId": {
+    "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82",
+    "build": 1
+  },
+  "stakes": "high",
+  "routing": {
+    "first": "sonnet",
+    "second": "haiku"
+  },
+  "reads": [
+    {
+      "model": "sonnet",
+      "role": "first",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "can Avery do it",
+            "question": "oq-a7-17",
+            "choice": "c-01",
+            "fields": []
+          }
+        ]
+      }
+    },
+    {
+      "model": "haiku",
+      "role": "check",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "or I'll just come Saturday at 2",
+            "question": "oq-a7-17",
+            "choice": "c-02",
+            "fields": [
+              {
+                "name": "time",
+                "value": {
+                  "utc": "2026-10-24T18:00:00Z",
+                  "zone": "America/New_York"
+                },
+                "words": "Saturday at 2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "model": "sonnet",
+      "role": "reread",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "ask",
+            "quote": "can Avery do it, or I'll just come Saturday at 2",
+            "questions": [
+              "oq-a7-17"
+            ],
+            "unclear": "Alex names both the stand-in and another time."
+          }
+        ]
+      }
+    }
+  ],
+  "agreed": false,
+  "reread": true,
+  "language": "en",
+  "parts": [
+    {
+      "part": {
+        "verb": "ask",
+        "quote": "can Avery do it, or I'll just come Saturday at 2",
+        "questions": [
+          "oq-a7-17"
+        ],
+        "unclear": "Alex names both the stand-in and another time."
+      },
+      "outcome": "oneQuestion"
+    }
+  ]
+}

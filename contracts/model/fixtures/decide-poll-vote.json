@@ -1,0 +1,61 @@
+{
+  "turnId": "turn-s11-13-sam-vote",
+  "bundleId": {
+    "hash": "22d734f465f32f953c926384a825e36d37ccb577b3fbe134debfd96a0667e72a",
+    "build": 1
+  },
+  "stakes": "high",
+  "routing": {
+    "first": "sonnet",
+    "second": "haiku"
+  },
+  "reads": [
+    {
+      "model": "sonnet",
+      "role": "first",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "Block around it",
+            "question": "oq-s11-13",
+            "choice": "c-02",
+            "fields": []
+          }
+        ]
+      }
+    },
+    {
+      "model": "haiku",
+      "role": "check",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "Block around it",
+            "question": "oq-s11-13",
+            "choice": "c-02",
+            "fields": []
+          }
+        ]
+      }
+    }
+  ],
+  "agreed": true,
+  "reread": false,
+  "language": "en",
+  "parts": [
+    {
+      "part": {
+        "verb": "choose",
+        "quote": "Block around it",
+        "question": "oq-s11-13",
+        "choice": "c-02",
+        "fields": []
+      },
+      "outcome": "go"
+    }
+  ]
+}
