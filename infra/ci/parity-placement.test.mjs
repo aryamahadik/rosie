@@ -3,7 +3,7 @@
 // changed. No YAML or TypeScript parser: this reads the few lines it needs as text.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,15 +16,24 @@ const pkg = JSON.parse(read("package.json"));
 const PARITY_GLOB = "compiler/src/**/parity.shard-*.test.ts";
 // The inputs of the parity (card T-1067), in the order the workflows list them.
 const PARITY_INPUTS = [
-  "compiler/src/overlay",
-  "compiler/src/load",
-  "compiler/src/graph",
+  "compiler/src",
   "fixtures/master",
   "vitest.config.ts",
   "package.json",
   "package-lock.json",
 ];
-const SHARDS = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => `compiler/src/overlay/parity.shard-${n}.test.ts`);
+
+// Every parity shard in the repository, found from the glob (T-1076), not a fixed list.
+function findShards(dir) {
+  const found = [];
+  for (const entry of readdirSync(path.join(root, dir), { withFileTypes: true })) {
+    const rel = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) found.push(...findShards(rel));
+    else if (path.matchesGlob(rel, PARITY_GLOB)) found.push(rel);
+  }
+  return found.sort();
+}
+const SHARDS = findShards("compiler/src");
 
 // The text of one project of vitest.config.ts: from its name to the next project's name (or the end).
 function project(name) {
@@ -41,7 +50,19 @@ function listOf(text, key) {
   return m[1];
 }
 
-test("the parity glob is one constant, and it matches the 8 shards and nothing else of the overlay", () => {
+test("every parity shard on disk is found: overlay, slots and corrections, 8 each", () => {
+  for (const folder of ["overlay", "slots", "corrections"]) {
+    const own = SHARDS.filter((s) => s.startsWith(`compiler/src/${folder}/`));
+    assert.deepEqual(
+      own,
+      [1, 2, 3, 4, 5, 6, 7, 8].map((n) => `compiler/src/${folder}/parity.shard-${n}.test.ts`).sort(),
+    );
+  }
+  assert.ok(SHARDS.length >= 24, `${SHARDS.length} shards found`);
+  console.log(`parity shards found (${SHARDS.length}):\n${SHARDS.join("\n")}`);
+});
+
+test("the parity glob is one constant, and it matches every shard and nothing else", () => {
   assert.ok(vitestConfig.includes(`const PARITY_GLOB = "${PARITY_GLOB}";`));
   for (const shard of SHARDS) assert.ok(path.matchesGlob(shard, PARITY_GLOB), `${shard} matches`);
   for (const other of [
