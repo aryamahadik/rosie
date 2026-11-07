@@ -1,0 +1,47 @@
+{
+  "after": ["seed-contact-change.json"],
+  "rows": [
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-alex-to-riley-mobile",
+        "purpose": "contact_change",
+        "person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "sent_to_handle_id": "handle-riley",
+        "channel": "text",
+        "code_hash": "3fd18f5df3c5c8464233418be4e91ac483428486f88fbe6a598397584fb603b1",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-31T10:00:00Z",
+        "expires_at": "2026-10-31T10:10:00Z",
+        "wrong_tries": 0,
+        "used_at": "2026-10-31T10:02:00Z",
+        "version": 2
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-riley"
+    },
+    "action": "insert",
+    "table": "contact_changes",
+    "values": {
+      "id": "cc-alex-email-to-riley-mobile",
+      "person_id": "person-alex",
+      "business_id": "biz-lees-barbershop",
+      "old_handle_id": "handle-alex-email",
+      "new_handle_id": "handle-riley",
+      "way": "own_chat",
+      "proof_code_id": "code-alex-to-riley-mobile",
+      "id_upload_id": null,
+      "changed_by_person_id": "person-alex",
+      "changed_at": "2026-10-31T10:02:00Z"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

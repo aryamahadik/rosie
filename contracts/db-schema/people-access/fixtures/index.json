@@ -1,0 +1,268 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-owner-id-upload.json",
+      "version": "v1",
+      "table": "id_uploads",
+      "expect": "accept",
+      "shows": "Sam's ID photo uploaded on the secure page at sign-up, accepted as given and counted as the ID confirmed, its R2 object key sealed under Sam's own key; Sam's account: the one mobile only Sam uses, proven by Sam's own text to Rosie's number, and the owner email, proven by a code typed on the page",
+      "source": "MC C10; MC C9; S1-10 (gives id_checked mobile; 'Done once, for every company'); S1-32; FS rows B11 to B14; Q-31; arch 01 line 93; SPEC-master 6 (Sam Lee; sign-up Mon Oct 19)"
+    },
+    {
+      "file": "seed-staff-invited.json",
+      "version": "v1",
+      "table": "staff",
+      "expect": "accept",
+      "shows": "Pat, Lee Home Services' office manager, added as an admin after Sam's '1 Yes, all agreed' and not joined yet (Pat's ready text has not come); Pat may OK Lee Home Services prices over $500",
+      "source": "S2-02 ('Pat is my office manager, for prices over $500'; 'Did they all agree to get a text from Rosie?'; gives added); S2-05 ('Pat too'); FS rows T01 to T03, T05; S13-45 row 8; SPEC-master 6 (Pat; Sam's price OK limit $500); K-29 v1 seed-chat-link (Pat's person, handle and phone)"
+    },
+    {
+      "file": "seed-staff-joined.json",
+      "version": "v1",
+      "table": "staff",
+      "expect": "accept",
+      "shows": "Jordan and Casey joined Lee Home Services and Riley joined Lee's Barbershop, each by their own ready text from the mobile Sam gave, and each bookable after Sam's yes; Riley's languages (English and Spanish) and 8am day list, Jordan's 7am day list; skills: Jordan plumbing and electrical, Casey plumbing, Riley every barber service plus beard color and house calls",
+      "source": "S2-02 ('Jordan and Casey do plumbing; Jordan does electrical too'; 'Riley also does color and house calls'); S2-05, S2-06 ('Languages: English and Spanish'; 'Day list at 8am'); S2-22; S2-24 ('Your day list comes at 7:00am'; gives staff_live); FS rows T02 to T04, T09, T10; Q-08; MC C9; SPEC-master 6 (Riley, Jordan, Casey); barber.json pf.staff skills"
+    },
+    {
+      "file": "seed-emergency-contact.json",
+      "version": "v1",
+      "table": "emergency_contacts",
+      "expect": "accept",
+      "shows": "Jordan, who goes to homes alone, named Casey on the secure page, and Casey's own yes came by text, so a timer may run; Riley named a contact whose yes has not come, so no contact is on file and no timer runs; each name and mobile sealed under the pro's own key",
+      "source": "S1-78 ('Until that yes, no contact is on file'); S2-06 ('it asks an emergency contact, with that person's own yes'); FS row T11; S13-10; Q-06; arch 01 line 93"
+    },
+    {
+      "file": "seed-session.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "accept",
+      "shows": "Sam's portal session after S11-52's text code on Mon Oct 26, 8:21am, live, holding only the token's sha256 and the device's; an earlier session Sam signed out of",
+      "source": "S11-52 (gives signed_in; 'Mon Oct 26, 8:20am'); S13-45 row 8 (a new device); FS section 8; BP rule 7"
+    },
+    {
+      "file": "seed-proof-code.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "accept",
+      "shows": "Codes kept as keyed hashes, never the code: Sam's owner-email code typed back at sign-up; Sam's sign-in codes of Oct 20 and Oct 26 (one wrong try, then the right one within its 10 minutes); Jordan's sign-in code after five wrong codes, paused 15 minutes from the fifth and never used",
+      "source": "RULES 6.2 ('A code works 10 minutes. Five wrong codes pause it 15 minutes'); S11-52 ('It works for 10 minutes'; 'Five wrong codes pause sign-in for 15 minutes'); S1-10 (the email's code); S13-45; BP rule 7"
+    },
+    {
+      "file": "seed-on-call.json",
+      "version": "v1",
+      "table": "on_call",
+      "expect": "accept",
+      "shows": "Lee Home Services' plumbing jobs sent now: in open hours the nearest free plumber, weeknights 5:30pm to 7:30am Jordan, weekends and holidays Casey",
+      "source": "S2-27 (gives on_call; 'Open hours: whoever's nearest and free. Jordan weeknights. Casey weekends and holidays'; 'Weeknights, 5:30pm to 7:30am'); FS row T12; S2-30"
+    },
+    {
+      "file": "seed-contact-change.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "accept",
+      "shows": "Alex moves updates from his mobile to his email from his own chat: a code sent only to the new email, typed back in the chat, and one contact change row (D75)",
+      "source": "D75 (RULES 9.1; S13-45 row 3: 'they give another phone number or an email in the same chat. Rosie sends a code there; they type the code back in this chat'); FS line 756; RULES 9.3; SPEC-master 6 (Alex M.)"
+    },
+    {
+      "file": "invalid/refuse-staff-joined-from-other-mobile.json",
+      "version": "v1",
+      "table": "staff",
+      "expect": "refuse",
+      "shows": "Pat joined by a ready text from a mobile other than the one Sam gave is refused (CHECK staff_joined_from_own_mobile, SQLSTATE 23514); the same join from Pat's own mobile passes",
+      "source": "Q-08 ('a ready text from another mobile takes S2-09's wrong-number path'); S2-05 ('Never: join someone on another person's word'); S2-09"
+    },
+    {
+      "file": "invalid/refuse-bookable-before-join.json",
+      "version": "v1",
+      "table": "staff",
+      "expect": "refuse",
+      "shows": "Letting Pat take bookings before Pat has joined is refused (CHECK staff_bookable_after_join, SQLSTATE 23514); the same yes with Pat's join passes",
+      "source": "S2-07 ('can't be booked until Avery replies YES'); S2-22 ('Nobody is offered to customers until Sam says yes')"
+    },
+    {
+      "file": "invalid/refuse-admin-export-power.json",
+      "version": "v1",
+      "table": "team_powers",
+      "expect": "refuse",
+      "shows": "Giving the office manager the power to export is refused (CHECK team_powers_power_known, SQLSTATE 23514): exporting stays the account owner's; the same row with power money passes",
+      "source": "S13-45 row 8 ('Admins never close the business, export, hand it over, or remove the account owner'); S2-02; RULES 6.8"
+    },
+    {
+      "file": "invalid/refuse-emergency-contact-is-pro.json",
+      "version": "v1",
+      "table": "emergency_contacts",
+      "expect": "refuse",
+      "shows": "Casey named as Casey's own emergency contact is refused (CHECK emergency_contacts_not_the_pro, SQLSTATE 23514); the same row with Jordan as the contact passes",
+      "source": "S1-78 ('names one person Rosie may call for their safety'); K-34 v1 README ('The contact is not the pro')"
+    },
+    {
+      "file": "invalid/refuse-proof-code-raw.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A sign-in code stored as the code itself (482913) is refused (CHECK proof_codes_hash_form, SQLSTATE 23514); the same row with a 64-hex keyed hash passes",
+      "source": "BP rule 7; S11-52 ('Your Rosie sign-in code is 482913'); RULES 6.2"
+    },
+    {
+      "file": "invalid/refuse-code-after-ten-minutes.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A sign-in code typed back 11 minutes after it was sent is refused (CHECK proof_codes_used_in_time, SQLSTATE 23514); the same code typed back at 9 minutes passes",
+      "source": "RULES 6.2 ('A code works 10 minutes'); S11-52 ('It works for 10 minutes')"
+    },
+    {
+      "file": "invalid/refuse-session-raw-token.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A session holding the raw token instead of its sha256 is refused (CHECK sessions_token_hash_form, SQLSTATE 23514); the same session with the token's sha256 passes",
+      "source": "BP rule 7 (never a key or token); S11-52"
+    },
+    {
+      "file": "invalid/refuse-proof-code-hash-read.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's sign-in code row with every column is refused (no SELECT on code_hash, SQLSTATE 42501): no Tool API call reads a code hash back; the same read on the runtime side passes, and the Tool API's read of every other column passes, returning the row only in Sam's own call (rosie.person_id Sam: rules 4 and 5)",
+      "source": "README rule 5; BP rule 7; RULES 6.2; S11-52"
+    },
+    {
+      "file": "invalid/refuse-proof-code-pause-lifted.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee Home Services lifting the pause on Jordan's code after five wrong codes is refused (no UPDATE on proof_codes, SQLSTATE 42501): a try is counted and a code used only through check_proof_code; the same update on the runtime side passes",
+      "source": "README rule 5; RULES 6.2 ('Five wrong codes pause it 15 minutes'); S11-52"
+    },
+    {
+      "file": "invalid/refuse-session-token-read.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's live session with every column is refused (no SELECT on token_sha256 or device_sha256, SQLSTATE 42501): a token is found only through session_for_token and a device only through device_known, which never return a hash; the same read on the runtime side passes",
+      "source": "README rule 5; BP rule 7; S11-52"
+    },
+    {
+      "file": "invalid/refuse-own-chat-change-business-read.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Alex's change from his own chat, which has no business, gets no row (row-level security): the Tool API may write a person's own change with no business but no business scope reads one; the same read on the runtime side returns it",
+      "source": "README rule 4; K-04 v1 rule 4; D75; D102; FS line 756; RULES 9.3"
+    },
+    {
+      "file": "invalid/refuse-session-device-read.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "Sam's own call (rosie.person_id Sam) reading his live session with every column but token_sha256 is refused (no SELECT on device_sha256, SQLSTATE 42501): the device hash is a session hash no Tool API call reads, and whether a device was seen before comes only from device_known; the same read without device_sha256 returns Sam's row, and the read on the runtime side passes",
+      "source": "README rule 5; BP rule 7; S13-45 row 8 ('A new device needs a code to the owner's email, typed back, or the ID re-check'); S11-52"
+    },
+    {
+      "file": "invalid/refuse-other-person-code-read.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A call scoped to Lee Home Services acting for Sam, its owner, reading Jordan's paused sign-in code with every column but code_hash gets no row (row-level security by rosie.person_id): a code is read only in the call of the person it proves, never across people from a business scope; the same read in Jordan's own call returns it, and so does the runtime side",
+      "source": "README rules 4 and 5; RULES 6.2; S11-52; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-other-person-session-read.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A call scoped to Lee's Barbershop acting for Riley reading Sam's live session with every column but the two hashes gets no row (row-level security by rosie.person_id): a session is read only in its own person's call, even inside a business that person owns; the same read in Sam's own call returns it, and so does the runtime side",
+      "source": "README rules 4 and 5; S11-52 (a session covers every business of the person); BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-other-person-session-end.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "The same call (Lee's Barbershop, acting for Riley) ending Sam's live session changes no row (row-level security by rosie.person_id): the Tool API touches and ends only its own person's sessions, and another person's (left, handed_over) end on the runtime side; the same update in Sam's own call signs him out (version 2 to 3), and so does the runtime side",
+      "source": "README rule 5; S11-52; S13-56 ('Their access ends: sign-in ...'); RULES 8.7, 9.1; S11-100"
+    },
+    {
+      "file": "invalid/refuse-own-chat-change-for-another.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "refuse",
+      "shows": "A call scoped to Lee's Barbershop acting for Sam writing an own-chat change for Alex with no business (Alex's updates moved from his email to Sam's mobile, with a code Sam's mobile got and typed back) is refused by the insert policy (SQLSTATE 42501): a change with no business is admitted only for the call's own person (rosie.person_id), since D75 counts it only from Alex's own chat and its code proves only the new contact; the same row in Alex's own call passes, and so does the runtime side",
+      "source": "README rule 4; D75 (RULES 9.1; S13-45 row 3: 'the request counts only from the customer's own chat'); D102; FS line 756"
+    },
+    {
+      "file": "invalid/refuse-sign-in-session-read.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A sign-in call for Sam before his code is right acts for no person (no rosie.person_id, and no business scope: README rule 4), so its read of Sam's live session with every column but the two hashes gets no row: typing Sam's mobile gives no call his sessions; the same read in Sam's own call (rosie.person_id Sam, set once his code is right) returns it, and so does the runtime side",
+      "source": "README rules 4 and 5; S11-52 ('Sam types his mobile, and a code comes by text'); RULES 6.1 ('Or a code is sent to the contact on file and typed back in the same conversation'); BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-sign-in-session-end.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "The same sign-in call (no person until Sam's code is right) ending Sam's live session changes no row (row-level security by rosie.person_id): a typed mobile or email alone ends no one's session; the same update in Sam's own call signs him out (version 2 to 3), and so does the runtime side",
+      "source": "README rules 4 and 5; S11-52; RULES 6.1; RULES 8.7, 9.1"
+    },
+    {
+      "file": "invalid/refuse-sign-in-session-start.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A call that acts for no person starting a session for Sam is refused by the insert policy (SQLSTATE 42501), even naming a used sign-in code of Sam's: a sign-in call acts for no one before its code is right, nor does the call that takes a new device's ID re-check before it sets its person. The person is set in the transaction where check_proof_code answers right for the code the call made (the sign-in code, or a new device's code to the owner's email) or, for the ID re-check, by the call that takes the upload, to the person K-05 kept on the server with the used sign-in code (never an id the page sends); then the same insert passes in Sam's own call (rosie.person_id Sam), as proven_via code here or code_and_id_re_check after a new device's ID re-check, each session naming its sign-in code once, and so does the runtime side",
+      "source": "README rules 4 and 5 and 'Every path that binds a person'; S11-52 ('Sam types his mobile, and a code comes by text'; 'A new device ... follows the business side of S13-45'); S13-45 row 8 ('A new device needs a code to the owner's email, typed back, or the ID re-check'); RULES 6.1, 6.2; FS line 688; MC C10"
+    },
+    {
+      "file": "invalid/refuse-session-unused-code.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "Sam's own call (rosie.person_id Sam) starting a session that names his sign-in code of Oct 29, sent and not yet typed back, is refused by the insert policy (SQLSTATE 42501): a session needs a code of its own person that check_proof_code answered right (used_at set); the same insert once check_proof_code says right for that code passes, and so does the runtime side",
+      "source": "README rule 5; S11-52; RULES 6.1, 6.2 ('A code works 10 minutes'); BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-proof-code-inserted-used.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A sign-in call (no person yet) inserting Sam's sign-in code already marked used is refused (no INSERT on used_at, SQLSTATE 42501): a send writes only its own columns, so a code starts unused, untried and unpaused at version 1 and only check_proof_code moves used_at, wrong_tries, last_wrong_at and paused_until; the same insert without used_at passes, and so does the insert with it on the runtime side",
+      "source": "README rule 5; RULES 6.2 ('A code works 10 minutes. Five wrong codes pause it 15 minutes'); S11-52; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-sign-in-own-change.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "refuse",
+      "shows": "A call that acts for no person (a sign-in call before its code is right) writing Jordan's own_code change with no business (his updates moved from his mobile to his email, with a used code to his phone on file) is refused by the insert policy (SQLSTATE 42501): a change with no business is the call's own person's; the same row in Jordan's own call passes, and so does the runtime side",
+      "source": "README rule 4; FS section 8 (a staff member's own change by a code to the phone or email on file); RULES 6.1, 9.3; D102; FS line 756"
+    },
+    {
+      "file": "invalid/refuse-ended-session-reopened.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "Sam's own call setting ended_at and ended_why back to null on his session of Oct 20, which he signed out of, changes no row (the update policy admits only a session not yet ended): an ended session stays ended, so no call reopens one its person or the runtime ended (left, handed_over); the same update on the runtime side passes",
+      "source": "README rule 5; RULES 8.7 ('Sign-in ... end'), 9.1; S11-100; S11-52"
+    },
+    {
+      "file": "invalid/refuse-own-chat-change-under-business.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "refuse",
+      "shows": "A call scoped to Lee's Barbershop acting for Riley writing an own-chat change for Alex under the barbershop's business id (Alex's updates moved from his email to Riley's mobile, with a code Riley's mobile got and typed back) is refused by the insert policy (SQLSTATE 42501): a business scope writes only its own desk and team-edit rows (in_person, owner_team_edit), so a person's own change (own_chat, own_code, email_on_file, signed_in_id_re_check) is written only with no business and only for the call's own person; the same row with no business passes in Alex's own call, and the same row passes on the runtime side",
+      "source": "README rule 4; D75 (RULES 9.1; S13-45 row 3: 'the request counts only from the customer's own chat'); D77; S11-20; RULES 9.3; D102; FS line 756"
+    },
+    {
+      "file": "invalid/refuse-session-contact-change-code.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "Jordan's own call (rosie.person_id Jordan) starting a session that names his used contact-change code (a code to his phone on file, typed back to change his email) is refused by the insert policy (SQLSTATE 42501): a session needs a used sign-in code of its own person (purpose sign_in or new_device), never a code that proved something else; the same insert naming a used sign-in code of Jordan's passes in his own call, and the same row passes on the runtime side",
+      "source": "README rule 5; S11-52 ('Sam types his mobile, and a code comes by text'); S13-45 row 8; FS section 8 ('Staff changing their own phone or email'); RULES 6.2"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "after": ["seed-proof-code.json"],
+  "rows": [
+    {
+      "table": "sessions",
+      "values": {
+        "id": "session-sam-oct20",
+        "person_id": "person-sam",
+        "token_sha256": "55c887c6a012afe4a89a3c2a798ec32f65a8e1a76d7acaf6338dd6dbcabc4267",
+        "device_sha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+        "proven_via": "code",
+        "proof_code_id": "code-sam-sign-in-oct20",
+        "started_at": "2026-10-20T07:51:00Z",
+        "last_seen_at": "2026-10-20T08:25:00Z",
+        "expires_at": "2026-11-19T07:51:00Z",
+        "ended_at": "2026-10-20T08:30:00Z",
+        "ended_why": "signed_out",
+        "version": 3
+      }
+    },
+    {
+      "table": "sessions",
+      "values": {
+        "id": "session-sam-oct26",
+        "person_id": "person-sam",
+        "token_sha256": "bcc9e6bc57d87c2e4bce0e6261d51dfa66d346abf24ef81de1bb8a4acd286127",
+        "device_sha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+        "proven_via": "code",
+        "proof_code_id": "code-sam-sign-in-oct26",
+        "started_at": "2026-10-26T08:21:00Z",
+        "last_seen_at": "2026-10-26T09:05:00Z",
+        "expires_at": "2026-11-25T08:21:00Z",
+        "ended_at": null,
+        "ended_why": null,
+        "version": 2
+      }
+    }
+  ]
+}

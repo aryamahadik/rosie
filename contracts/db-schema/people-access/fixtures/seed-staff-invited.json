@@ -1,0 +1,48 @@
+{
+  "after": [
+    "../../business-setup/fixtures/seed-company-two-kinds.json",
+    "../../conversations-consent/fixtures/seed-chat-link.json"
+  ],
+  "rows": [
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-pat-home-services",
+        "person_id": "person-pat",
+        "business_id": "biz-lee-home-services",
+        "role": "admin",
+        "version": 1
+      }
+    },
+    {
+      "table": "staff",
+      "values": {
+        "id": "staff-pat-home-services",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-pat",
+        "mobile": "+15555550107",
+        "agreed_to_text_ticked_at": "2026-10-19T14:36:00Z",
+        "agreed_ticked_by_person_id": "person-sam",
+        "status": "invited",
+        "added_at": "2026-10-19T14:36:00Z",
+        "languages": [],
+        "calls_customer_mobile": false,
+        "version": 1
+      }
+    },
+    {
+      "table": "team_powers",
+      "values": {
+        "id": "power-pat-prices",
+        "staff_id": "staff-pat-home-services",
+        "business_id": "biz-lee-home-services",
+        "power": "prices",
+        "over_cents": 50000,
+        "over_currency": "USD",
+        "granted_at": "2026-10-19T14:36:00Z",
+        "granted_by_person_id": "person-sam",
+        "version": 1
+      }
+    }
+  ]
+}

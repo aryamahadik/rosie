@@ -1,0 +1,23 @@
+{
+  "after": ["seed-session.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "personId": "person-sam"
+    },
+    "action": "update",
+    "table": "sessions",
+    "set": {
+      "ended_at": null,
+      "ended_why": null,
+      "version": 4
+    },
+    "where": {
+      "id": "session-sam-oct20"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

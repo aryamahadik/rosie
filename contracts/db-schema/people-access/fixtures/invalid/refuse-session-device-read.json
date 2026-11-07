@@ -1,0 +1,31 @@
+{
+  "after": ["seed-session.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "personId": "person-sam"
+    },
+    "action": "select",
+    "table": "sessions",
+    "columns": [
+      "id",
+      "person_id",
+      "device_sha256",
+      "proven_via",
+      "proof_code_id",
+      "started_at",
+      "last_seen_at",
+      "expires_at",
+      "ended_at",
+      "ended_why",
+      "version"
+    ],
+    "where": {
+      "id": "session-sam-oct26"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

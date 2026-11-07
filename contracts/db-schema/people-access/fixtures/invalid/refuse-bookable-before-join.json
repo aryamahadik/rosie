@@ -1,0 +1,24 @@
+{
+  "after": ["seed-staff-invited.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "update",
+    "table": "staff",
+    "set": {
+      "bookable_at": "2026-10-19T15:10:00Z",
+      "bookable_by_person_id": "person-sam",
+      "version": 2
+    },
+    "where": {
+      "id": "staff-pat-home-services"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["staff_bookable_after_join"]
+    }
+  }
+}

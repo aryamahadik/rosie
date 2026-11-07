@@ -1,0 +1,25 @@
+{
+  "after": ["seed-staff-invited.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "insert",
+    "table": "team_powers",
+    "values": {
+      "id": "power-pat-export",
+      "staff_id": "staff-pat-home-services",
+      "business_id": "biz-lee-home-services",
+      "power": "export",
+      "granted_at": "2026-10-19T14:37:00Z",
+      "granted_by_person_id": "person-sam",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["team_powers_power_known"]
+    }
+  }
+}

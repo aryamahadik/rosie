@@ -1,0 +1,35 @@
+{
+  "after": ["seed-proof-code.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam"
+    },
+    "action": "select",
+    "table": "proof_codes",
+    "columns": [
+      "id",
+      "purpose",
+      "person_id",
+      "business_id",
+      "sent_to_handle_id",
+      "channel",
+      "hash_key_name",
+      "sent_at",
+      "expires_at",
+      "wrong_tries",
+      "last_wrong_at",
+      "paused_until",
+      "used_at",
+      "version"
+    ],
+    "where": {
+      "id": "code-jordan-sign-in-paused"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

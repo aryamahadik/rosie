@@ -1,0 +1,50 @@
+{
+  "after": ["seed-staff-joined.json"],
+  "rows": [
+    {
+      "table": "on_call",
+      "values": {
+        "id": "oncall-plumbing-open-hours",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "plumber",
+        "staff_id": null,
+        "hours": "open",
+        "days": [1, 2, 3, 4, 5, 6, 7],
+        "holidays": false,
+        "from_time": null,
+        "until_time": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "on_call",
+      "values": {
+        "id": "oncall-plumbing-weeknights",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "plumber",
+        "staff_id": "staff-jordan-home-services",
+        "hours": "closed",
+        "days": [1, 2, 3, 4, 5],
+        "holidays": false,
+        "from_time": "17:30",
+        "until_time": "07:30",
+        "version": 1
+      }
+    },
+    {
+      "table": "on_call",
+      "values": {
+        "id": "oncall-plumbing-weekends",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "plumber",
+        "staff_id": "staff-casey-home-services",
+        "hours": "closed",
+        "days": [6, 7],
+        "holidays": true,
+        "from_time": null,
+        "until_time": null,
+        "version": 1
+      }
+    }
+  ]
+}

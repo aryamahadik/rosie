@@ -1,0 +1,29 @@
+{
+  "after": ["seed-owner-id-upload.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "proof_codes",
+    "values": {
+      "id": "code-sam-sign-in-oct27",
+      "purpose": "sign_in",
+      "person_id": "person-sam",
+      "business_id": null,
+      "sent_to_handle_id": "handle-sam",
+      "channel": "text",
+      "code_hash": "757e7b8b5204ceb2b9063ef8a79d381a9c4821aba9d0f0edf210eb471cf95bdd",
+      "hash_key_name": "PROOF_CODE_HASH_KEY",
+      "sent_at": "2026-10-27T08:20:00Z",
+      "expires_at": "2026-10-27T08:30:00Z",
+      "wrong_tries": 0,
+      "used_at": "2026-10-27T08:31:00Z",
+      "version": 2
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["proof_codes_used_in_time"]
+    }
+  }
+}

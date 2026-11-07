@@ -1,0 +1,18 @@
+{
+  "after": ["seed-proof-code.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "select",
+    "table": "proof_codes",
+    "where": {
+      "id": "code-sam-sign-in-oct26"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}
