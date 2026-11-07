@@ -1,0 +1,30 @@
+{
+  "id": "evlog-pat-0202-1",
+  "at": "2026-10-24T15:12:40Z",
+  "zone": "America/New_York",
+  "turn_id": "turn-pat-0202",
+  "job_id": null,
+  "trace_id": "trace-pat-0202",
+  "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+  "bundle_build": 1,
+  "business_id": null,
+  "actor_kind": "person",
+  "actor_person_id": "person-pat",
+  "actor_role": null,
+  "kind": "team_page.acknowledged",
+  "table_name": "team_pages",
+  "row_id": "page-alex-0202",
+  "old_values": {
+    "state": "open",
+    "acknowledged_at": null,
+    "acknowledged_by_person_id": null,
+    "acknowledged_via": null
+  },
+  "new_values": {
+    "state": "acknowledged",
+    "acknowledged_at": "2026-10-24T15:12:40Z",
+    "acknowledged_by_person_id": "person-pat",
+    "acknowledged_via": "reply"
+  },
+  "why": { "step": "A3-24" }
+}

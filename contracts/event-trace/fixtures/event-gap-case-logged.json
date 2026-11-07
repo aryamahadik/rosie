@@ -1,0 +1,26 @@
+{
+  "id": "evlog-alex-0005-1",
+  "at": "2026-10-22T14:20:04Z",
+  "zone": "America/New_York",
+  "turn_id": "turn-alex-gift-card",
+  "job_id": null,
+  "trace_id": "trace-alex-0005",
+  "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+  "bundle_build": 1,
+  "business_id": null,
+  "actor_kind": "rosie",
+  "kind": "gap_case.logged",
+  "table_name": "gap_cases",
+  "row_id": "turn-alex-gift-card",
+  "old_values": null,
+  "new_values": {
+    "business_id": "biz-lees-barbershop",
+    "outcome": "log_gap",
+    "open_question_ids": [],
+    "versions_read": [{ "table": "businesses", "rowId": "biz-lees-barbershop", "version": 3 }],
+    "logged_at": "2026-10-22T14:20:04Z",
+    "review_state": "open"
+  },
+  "sealed_values": "\\x6b30382d666978747572652d7365616c65642d62797465732d6e6f742d7265616c2d63697068657274657874",
+  "sealed_for_person_id": "person-alex"
+}

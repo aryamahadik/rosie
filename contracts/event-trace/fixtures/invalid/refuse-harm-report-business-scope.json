@@ -1,0 +1,29 @@
+{
+  "id": "evlog-alex-0205-3",
+  "at": "2026-10-28T14:15:03Z",
+  "zone": "America/New_York",
+  "turn_id": "turn-alex-0205",
+  "trace_id": "trace-alex-0205",
+  "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+  "bundle_build": 1,
+  "business_id": "biz-lees-barbershop",
+  "actor_kind": "rosie",
+  "kind": "harm_report.filed",
+  "table_name": "harm_reports",
+  "row_id": "harm-alex-0205",
+  "old_values": null,
+  "new_values": {
+    "business_id": "biz-lees-barbershop",
+    "kind": "harm_to_child_or_elder",
+    "safety_outcome_id": "safety-alex-0205",
+    "reporter_person_id": "person-alex",
+    "booking_id": null,
+    "named_person_id": null,
+    "hotline": "elder_care",
+    "reported_at": "2026-10-28T14:15:03Z",
+    "day_zone": "America/New_York"
+  },
+  "sealed_values": "\\x6b30382d666978747572652d7365616c65642d62797465732d6e6f742d7265616c2d63697068657274657874",
+  "sealed_for_person_id": "person-alex",
+  "why": { "step": "A3-49" }
+}

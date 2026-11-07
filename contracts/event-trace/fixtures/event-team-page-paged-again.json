@@ -1,0 +1,26 @@
+{
+  "id": "evlog-clock-page-alex-0204-2-1",
+  "at": "2026-10-26T21:50:03Z",
+  "zone": "America/New_York",
+  "turn_id": null,
+  "job_id": "job-fire-clock-page-alex-0204-2",
+  "trace_id": "trace-clock-page-alex-0204-2",
+  "bundle_hash": null,
+  "bundle_build": null,
+  "business_id": null,
+  "actor_kind": "job",
+  "kind": "team_page.paged_again",
+  "table_name": "team_pages",
+  "row_id": "page-alex-0204",
+  "old_values": {
+    "last_paged_at": "2026-10-26T21:45:03Z",
+    "times_paged": 1,
+    "next_page_clock_row_id": "clock-page-alex-0204-2"
+  },
+  "new_values": {
+    "last_paged_at": "2026-10-26T21:50:03Z",
+    "times_paged": 2,
+    "next_page_clock_row_id": "clock-page-alex-0204-3"
+  },
+  "why": { "step": "A3-48" }
+}

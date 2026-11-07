@@ -1,0 +1,26 @@
+{
+  "id": "evlog-page-ben-0001-1",
+  "at": "2026-10-05T17:00:00Z",
+  "zone": "America/New_York",
+  "turn_id": null,
+  "job_id": "page-req-ben-0001",
+  "trace_id": "trace-page-ben-0001",
+  "bundle_hash": null,
+  "bundle_build": null,
+  "business_id": "biz-lees-barbershop",
+  "actor_kind": "rosie",
+  "kind": "chat_link.issued",
+  "table_name": "chat_links",
+  "row_id": "chatlink-ben-haircut",
+  "old_values": null,
+  "new_values": {
+    "short_code": "4K7Q",
+    "purpose": "booking",
+    "booking_id": "booking-ben-haircut",
+    "person_id": "person-ben",
+    "given_via": ["booking_page"],
+    "issued_at": "2026-10-05T17:00:00Z"
+  },
+  "sealed_values": "\\x6b30382d666978747572652d7365616c65642d62797465732d6e6f742d7265616c2d63697068657274657874",
+  "sealed_for_person_id": "person-ben"
+}
