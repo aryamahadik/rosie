@@ -1,0 +1,42 @@
+{
+  "row": "outbox-a4-01-sam-text",
+  "attempt": "composed",
+  "checked": {
+    "row": "outbox-a4-01-sam-text",
+    "channel": "imessage",
+    "sends": [
+      {
+        "kind": "words",
+        "text": "Alex M. booked a Skin fade for Sat Oct 24 at 11:00am. It costs $45.",
+        "calendarFile": "none",
+        "options": [],
+        "link": null
+      }
+    ],
+    "fixedLines": [],
+    "slotValues": [
+      { "slot": "alex.staff", "value": "Alex M." },
+      { "slot": "svc.intext", "value": "Skin fade" },
+      { "slot": "day", "value": "Sat Oct 24" },
+      { "slot": "visit.time", "value": "11:00am" },
+      { "slot": "price", "value": "$40" }
+    ],
+    "threadReplyTo": null
+  },
+  "checks": [
+    { "check": "fixedLines", "passed": true, "detail": null },
+    {
+      "check": "values",
+      "passed": false,
+      "detail": "The price $45 is not a code-supplied fact; write the price as the {{price}} slot."
+    },
+    { "check": "oneQuestion", "passed": true, "detail": null },
+    { "check": "neverInMessage", "passed": true, "detail": null },
+    { "check": "shape", "passed": true, "detail": null },
+    { "check": "lengthAndReading", "passed": true, "detail": null },
+    { "check": "format", "passed": true, "detail": null }
+  ],
+  "outcome": "rewrite",
+  "questionWithdrawn": false,
+  "teamPaged": false
+}

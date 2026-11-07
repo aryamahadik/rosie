@@ -1,0 +1,12 @@
+{
+  "formats": ["text", "contactCard"],
+  "lines": [
+    {
+      "role": "first",
+      "text": "Here is {{biz.name}}'s contact card."
+    }
+  ],
+  "question": null,
+  "pageType": null,
+  "threadReplyTo": null
+}

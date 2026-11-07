@@ -1,0 +1,52 @@
+{
+  "row": "outbox-a7-17-alex-text",
+  "attempt": "composed",
+  "checked": {
+    "row": "outbox-a7-17-alex-text",
+    "channel": "imessage",
+    "sends": [
+      {
+        "kind": "words",
+        "text": "Riley can't be in on Sat Oct 24. Avery can do your visit at 11:00am, same price. Please reply by 7pm.",
+        "calendarFile": "none",
+        "options": [],
+        "link": null
+      },
+      {
+        "kind": "poll",
+        "text": null,
+        "calendarFile": "none",
+        "options": [
+          { "id": "A7-17/1", "label": "Avery instead" },
+          { "id": "A7-17/3", "label": "Cancel" }
+        ],
+        "link": null
+      }
+    ],
+    "fixedLines": [],
+    "slotValues": [
+      { "slot": "pro.name", "value": "Riley" },
+      { "slot": "name.staff", "value": "Avery" },
+      { "slot": "day", "value": "Sat Oct 24" },
+      { "slot": "visit.time", "value": "11:00am" },
+      { "slot": "ask.by", "value": "7pm" }
+    ],
+    "threadReplyTo": null
+  },
+  "checks": [
+    { "check": "fixedLines", "passed": true, "detail": null },
+    { "check": "values", "passed": true, "detail": null },
+    { "check": "oneQuestion", "passed": true, "detail": null },
+    {
+      "check": "neverInMessage",
+      "passed": false,
+      "detail": "The option 'Cancel' is only an opt-out word; name what it cancels, such as 'Cancel visit'."
+    },
+    { "check": "shape", "passed": true, "detail": null },
+    { "check": "lengthAndReading", "passed": true, "detail": null },
+    { "check": "format", "passed": true, "detail": null }
+  ],
+  "outcome": "rewrite",
+  "questionWithdrawn": false,
+  "teamPaged": false
+}

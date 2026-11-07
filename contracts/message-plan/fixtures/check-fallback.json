@@ -1,0 +1,41 @@
+{
+  "row": "outbox-a7-17-alex-text",
+  "attempt": "rewrite",
+  "checked": {
+    "row": "outbox-a7-17-alex-text",
+    "channel": "imessage",
+    "sends": [
+      {
+        "kind": "words",
+        "text": "Riley can't be in on Sat Oct 24. Avery can do your visit at 10:30am instead.",
+        "calendarFile": "none",
+        "options": [],
+        "link": null
+      }
+    ],
+    "fixedLines": [],
+    "slotValues": [
+      { "slot": "pro.name", "value": "Riley" },
+      { "slot": "name.staff", "value": "Avery" },
+      { "slot": "day", "value": "Sat Oct 24" },
+      { "slot": "visit.time", "value": "11:00am" }
+    ],
+    "threadReplyTo": null
+  },
+  "checks": [
+    { "check": "fixedLines", "passed": true, "detail": null },
+    {
+      "check": "values",
+      "passed": false,
+      "detail": "The time 10:30am is not a code-supplied fact; the visit is at {{visit.time}}."
+    },
+    { "check": "oneQuestion", "passed": true, "detail": null },
+    { "check": "neverInMessage", "passed": true, "detail": null },
+    { "check": "shape", "passed": true, "detail": null },
+    { "check": "lengthAndReading", "passed": true, "detail": null },
+    { "check": "format", "passed": true, "detail": null }
+  ],
+  "outcome": "fallback",
+  "questionWithdrawn": false,
+  "teamPaged": false
+}

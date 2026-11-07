@@ -1,0 +1,15 @@
+{
+  "formats": ["text", "poll"],
+  "lines": [
+    {
+      "role": "first",
+      "text": "{{name.staff:Ben T.}} is booked at {{visit.time:3:00pm}}, inside the block you asked for."
+    }
+  ],
+  "question": {
+    "text": "Block {{change.when:Thu Oct 29, 2–5pm}} at {{biz.name:Lee's Barbershop}}?",
+    "optionIds": ["S11-13/1", "S11-13/2"]
+  },
+  "pageType": null,
+  "threadReplyTo": null
+}

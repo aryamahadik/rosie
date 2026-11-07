@@ -1,0 +1,19 @@
+{
+  "formats": ["text", "poll"],
+  "lines": [
+    {
+      "role": "first",
+      "text": "{{alex.staff}} asks: {{relay.quote}}"
+    },
+    {
+      "role": "action",
+      "text": "Read it on the secure page: {{link.secure}}"
+    }
+  ],
+  "question": {
+    "text": "Your answer for {{alex.staff}}?",
+    "optionIds": ["A7-12/1", "A7-12/2", "A7-12/3"]
+  },
+  "pageType": null,
+  "threadReplyTo": null
+}

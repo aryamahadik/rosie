@@ -1,0 +1,35 @@
+{
+  "row": "outbox-a6-14-alex-text",
+  "channel": "imessage",
+  "sends": [
+    {
+      "kind": "words",
+      "text": "You're booked at Lee's Barbershop. Give this code at the chair when you arrive: 5160\nHaircut · Sat Oct 24 · 11:00am · Riley\n88 Elm St, Springfield\n$35, paid at the chair · The card is saved for a $20 fee\nFree to cancel until Fri 11am, then a $20 fee may apply\nChange the time or call off the visit: rosfield.com/v/s03",
+      "calendarFile": "new",
+      "options": [],
+      "link": null
+    },
+    {
+      "kind": "linkCard",
+      "text": "Lee's Barbershop",
+      "calendarFile": "none",
+      "options": [],
+      "link": "rosfield.com/v/s03"
+    }
+  ],
+  "fixedLines": [],
+  "slotValues": [
+    { "slot": "biz.name", "value": "Lee's Barbershop" },
+    { "slot": "visit.code", "value": "5160" },
+    { "slot": "svc.intext", "value": "Haircut" },
+    { "slot": "day", "value": "Sat Oct 24" },
+    { "slot": "visit.time", "value": "11:00am" },
+    { "slot": "pro.name", "value": "Riley" },
+    { "slot": "visit.place", "value": "88 Elm St, Springfield" },
+    { "slot": "pay.price", "value": "$35, paid at the chair" },
+    { "slot": "pay.took", "value": "The card is saved for a $20 fee" },
+    { "slot": "pay.cancel", "value": "Free to cancel until Fri 11am, then a $20 fee may apply" },
+    { "slot": "link.secure", "value": "rosfield.com/v/s03" }
+  ],
+  "threadReplyTo": null
+}

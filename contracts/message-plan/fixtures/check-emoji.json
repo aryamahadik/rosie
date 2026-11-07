@@ -1,0 +1,40 @@
+{
+  "row": "outbox-a6-14-alex-text",
+  "attempt": "composed",
+  "checked": {
+    "row": "outbox-a6-14-alex-text",
+    "channel": "imessage",
+    "sends": [
+      {
+        "kind": "words",
+        "text": "You're booked! 🎉 Sat Oct 24 at 11:00am with Riley.",
+        "calendarFile": "none",
+        "options": [],
+        "link": null
+      }
+    ],
+    "fixedLines": [],
+    "slotValues": [
+      { "slot": "day", "value": "Sat Oct 24" },
+      { "slot": "visit.time", "value": "11:00am" },
+      { "slot": "pro.name", "value": "Riley" }
+    ],
+    "threadReplyTo": null
+  },
+  "checks": [
+    { "check": "fixedLines", "passed": true, "detail": null },
+    { "check": "values", "passed": true, "detail": null },
+    { "check": "oneQuestion", "passed": true, "detail": null },
+    {
+      "check": "neverInMessage",
+      "passed": false,
+      "detail": "The text holds an emoji; write it without one."
+    },
+    { "check": "shape", "passed": true, "detail": null },
+    { "check": "lengthAndReading", "passed": true, "detail": null },
+    { "check": "format", "passed": true, "detail": null }
+  ],
+  "outcome": "rewrite",
+  "questionWithdrawn": false,
+  "teamPaged": false
+}

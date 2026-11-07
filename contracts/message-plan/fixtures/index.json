@@ -1,0 +1,172 @@
+{
+  "fixtures": [
+    {
+      "file": "slots.json",
+      "version": "v1",
+      "def": "slotVocabulary",
+      "expect": "accept",
+      "shows": "The whole slot vocabulary, each slot with its kind, value type, what it reads, audience, sensitive form, who fills it, a sample-cast example and its source: the record's 16 named slots; the auto-fill slots; the amount slots and ledger amounts (no hold: D66); today and tomorrow, filled at send; the link slots and the slots for the sample cast's names, dates, times, prices, places, codes, deadlines and quotes, both marked proposedCQ17",
+      "source": "02-contracts K-03 'The slot vocabulary'; master-A.json and master-B.json record.slots; SPEC-master 5h and its D66 amendments; overlay-core.js lines 597, 981, 983, 1285 to 1301; arch 07 line 409; arch 12 line 592; MC C6, C9; RULES 4.5, 4.6; arch 06 line 311; CQ-17"
+    },
+    {
+      "file": "input-s1-02.json",
+      "version": "v1",
+      "def": "composeInput",
+      "expect": "accept",
+      "shows": "The composer's input for S1-02's reply to Sam's first text: S1-02's master line, no facts yet, the owner as audience, English on iMessage, a routine tag, text alone allowed, no links, options or page types, and Sam's text as <inbound>; no frontier",
+      "source": "02-contracts K-03 Fixtures; arch 07 line 397; S1-01 and S1-02 in master-A.json; SPEC-master 6 (Sam, sign-up Mon Oct 19, 2026, 2:05pm)"
+    },
+    {
+      "file": "plan-s1-02.json",
+      "version": "v1",
+      "def": "plan",
+      "expect": "accept",
+      "shows": "The plan for input-s1-02.json: text alone, S1-02's line kept in meaning and order (its 'Hi! I'm Rosie' left to the opener fixed line code adds), a fact line from S1-02's card with Rosie's own $2 fee term kept as words (arch 12 line 592: not a slot), and the open-ended kinds question with no option ids",
+      "source": "02-contracts K-03 Fixtures; S1-02 in master-A.json; arch 07 lines 353, 361, 401; arch 12 line 592; S13-28 rule 50"
+    },
+    {
+      "file": "plan-block-readback-poll.json",
+      "version": "v1",
+      "def": "plan",
+      "expect": "accept",
+      "shows": "An owner's block read-back, then a poll: the booked customer named in the first line, the question carrying the block's date and time and the business as slots (with the master's example words), and the two option ids of S11-13's buttons",
+      "source": "02-contracts K-03 Fixtures; arch 04 ('block thursday afternoon'); S11-13 in master-A.json; arch 07 lines 379, 409; S13-28 rule 50; CQ-17"
+    },
+    {
+      "file": "plan-confirmation-a6-14.json",
+      "version": "v1",
+      "def": "plan",
+      "expect": "accept",
+      "shows": "A6-14's confirmation: the first line with the check-in code slot, four fact lines (service, day, time and pro; the place; the money lines pay.price and pay.took; pay.cancel), the action line with the secure link, a calendar file and a link card",
+      "source": "02-contracts K-03 Fixtures; A6-14 in master-A.json; arch 07 lines 353, 381, 383; record.slots pay.price, pay.took, pay.cancel; CQ-17"
+    },
+    {
+      "file": "plan-relay-private-a7-12.json",
+      "version": "v1",
+      "def": "plan",
+      "expect": "accept",
+      "shows": "A7-12's relay to Riley with a private part: the sender named and quoted in the code-filled relay.quote slot, which limit 7 fills with 'Read it on the secure page' for private words, the secure link, and the question with A7-12's three option ids as a poll",
+      "source": "02-contracts K-03 Fixtures; A7-12 in master-A.json; arch 07 lines 359, 399; arch 06 line 311; S13-28 rules 42, 44; RULES 4.5; CQ-17"
+    },
+    {
+      "file": "plan-email-copy.json",
+      "version": "v1",
+      "def": "rowPlan",
+      "expect": "accept",
+      "shows": "An email row that reuses its text row's plan (A6-14's confirmation, word for word as plan-confirmation-a6-14.json) instead of a composer call: copyOf names the text row",
+      "source": "02-contracts K-03 Fixtures and 'An email copy reuses its text row's plan'; arch 07 lines 371, 397"
+    },
+    {
+      "file": "plan-sensitive.json",
+      "version": "v1",
+      "def": "plan",
+      "expect": "accept",
+      "shows": "A plan for staff on sensitive work (fixture set v1's therapist demo shop, 'First session'): the same slots as any plan; at fill, with the sensitive switch on, alex.staff gives initials and svc.intext empties with one ' · ' next to it, and the details stay on the secure page",
+      "source": "02-contracts K-03 Fixtures; RULES 4.6; S13-22; SPEC-master 5h; D41; arch 06 line 311; fixture set v1 test-kit/shops/therapist.json"
+    },
+    {
+      "file": "plan-tapback-thanks.json",
+      "version": "v1",
+      "def": "plan",
+      "expect": "accept",
+      "shows": "A tapback in place of a reply to 'thanks!': the format tapback alone, no lines and no question",
+      "source": "02-contracts K-03 Fixtures; arch 07 line 391"
+    },
+    {
+      "file": "final-two-sends.json",
+      "version": "v1",
+      "def": "finalParts",
+      "expect": "accept",
+      "shows": "A6-14's confirmation after code, as two sends: the words with every slot filled from the sample cast, carrying a new calendar file, then a link card whose preview shows only the business name; the slot values the Values check reads",
+      "source": "02-contracts K-03 'Final parts'; arch 07 lines 367, 381, 383; A6-14 in master-A.json; record.slots rows for list|card|counter; SPEC-master 6"
+    },
+    {
+      "file": "check-pass.json",
+      "version": "v1",
+      "def": "checkResult",
+      "expect": "accept",
+      "shows": "The relay answer 'Riley says yes.' passes every check, so it sends",
+      "source": "02-contracts K-03 'The check result'; arch 07 lines 405 to 417; A7-12 in master-A.json"
+    },
+    {
+      "file": "check-two-questions.json",
+      "version": "v1",
+      "def": "checkResult",
+      "expect": "accept",
+      "shows": "A text with two questions fails One question, which blocks: one rewrite, told what failed",
+      "source": "arch 07 lines 411, 417; S13-28 rule 50; arch 02 line 123"
+    },
+    {
+      "file": "check-raw-price.json",
+      "version": "v1",
+      "def": "checkResult",
+      "expect": "accept",
+      "shows": "A price typed by the model ($45), not a slot and not the code-supplied $40, fails Values: one rewrite",
+      "source": "arch 07 lines 409, 417; S13-28 rule 51; RULES 3.14, 4.2; SPEC-master 6 (Skin fade $40)"
+    },
+    {
+      "file": "check-emoji.json",
+      "version": "v1",
+      "def": "checkResult",
+      "expect": "accept",
+      "shows": "An emoji fails Never in a message: one rewrite",
+      "source": "arch 07 lines 351, 415, 417; RULES 4.4"
+    },
+    {
+      "file": "check-unfilled-slot.json",
+      "version": "v1",
+      "def": "checkResult",
+      "expect": "accept",
+      "shows": "A slot with no value leaves '{{' in the text and fails Values: one rewrite",
+      "source": "arch 07 lines 409 ('no “{{”, “null” or “undefined”'), 417"
+    },
+    {
+      "file": "check-optout-only-option.json",
+      "version": "v1",
+      "def": "checkResult",
+      "expect": "accept",
+      "shows": "A poll option that is only the opt-out word 'Cancel' fails Never in a message: one rewrite",
+      "source": "arch 07 lines 415, 417 (“Cancel visit”, never “Cancel”); PLAIN-WORDS §3; A7-17 in master-A.json"
+    },
+    {
+      "file": "check-fallback.json",
+      "version": "v1",
+      "def": "checkResult",
+      "expect": "accept",
+      "shows": "The one rewrite still fails Values (a time that is not a fact), so the step's fallback text goes through the same checks next",
+      "source": "arch 02 line 123; arch 07 line 417; A7-17 in master-A.json"
+    },
+    {
+      "file": "check-passed-on.json",
+      "version": "v1",
+      "def": "checkResult",
+      "expect": "accept",
+      "shows": "The step's fallback text fails Values too, so nothing passes: the passed-on line goes, the question is withdrawn (no clock arms) and the team is paged",
+      "source": "arch 02 line 123; S13-29; RULES 5.2; K-01 fixed line passedOn; A7-17 in master-A.json"
+    },
+    {
+      "file": "invalid/refuse-format-not-allowed.json",
+      "version": "v1",
+      "def": "plan",
+      "expect": "refuse",
+      "shows": "A plan with a contact card, which is not a format (formats is a closed list: text, poll, linkCard, calendarFile, tapback; bold and read receipts are not in it either). The rule across two documents, a plan format outside the input's allowedFormats, is the message checks' (C-092, C-128), not the schema's",
+      "source": "arch 07 lines 373 to 393 (Never: contact cards); Q-43; MC 8 'iPhone tests'"
+    },
+    {
+      "file": "invalid/refuse-frontier-in-input.json",
+      "version": "v1",
+      "def": "composeInput",
+      "expect": "refuse",
+      "shows": "A composer input that carries the frontier, which the composer never gets: input-s1-02.json plus a frontier field",
+      "source": "arch 07 line 397 ('never the frontier'); 02-contracts K-03 'The composer's input'"
+    },
+    {
+      "file": "invalid/refuse-hold-slot.json",
+      "version": "v1",
+      "def": "plan",
+      "expect": "refuse",
+      "shows": "A plan whose line names the slot {{hold}}, refused since D66: no hold (the rest of the plan is valid)",
+      "source": "SPEC-master D66 amendments (#3; the 5h amendment: a {{hold}} slot is an error); 02-contracts K-03 'hold is refused since D66'"
+    }
+  ]
+}
