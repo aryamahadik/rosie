@@ -40,6 +40,12 @@ jobs:
       - name: Install from the lockfile
         run: npm ci --no-audit --no-fund
 
+      - name: Contract types (generated into contracts/generated/, git-ignored, never committed)
+        run: npm run contracts:types
+
+      - name: Contract fixtures (each against its schema; no-op until the contracts workspace has the script)
+        run: npm run contracts:check
+
       - name: Format
         run: npm run format:check
 
@@ -60,3 +66,6 @@ jobs:
 
       - name: Migration guard (migrations only expand)
         run: npm run guard:migrations
+
+      - name: Frozen-contract guard (no edit to a schema or fixture of a frozen version)
+        run: npm run guard:contracts
