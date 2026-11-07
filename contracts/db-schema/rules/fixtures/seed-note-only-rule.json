@@ -1,0 +1,21 @@
+{
+  "after": ["seed-rule-registry.json", "../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "rules",
+      "values": {
+        "id": "rule-lees-barbershop-note-kids-cut",
+        "business_id": "biz-lees-barbershop",
+        "rule_kind": "note",
+        "value_type": "note",
+        "flow": null,
+        "kind_id": "barber",
+        "words": "A parent or guardian books for anyone under 18, and a parent stays for a kids cut.",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:12:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    }
+  ]
+}

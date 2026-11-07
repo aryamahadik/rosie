@@ -1,0 +1,453 @@
+{
+  "after": [],
+  "rows": [
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "plans",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "packs",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "groups",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "classes",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "firststeps",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts; MC C5 (insurance)"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "forms",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts; MC C5 (insurance)"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "sentnow",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "results",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "planbill",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "dropoff",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "multiday",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "spaces",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "children",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "incare",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "animals",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "video",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts; MC C5 (insurance)"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "aftercare",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "photos",
+        "means": null,
+        "source": "SPEC-master 5d (FACTS: 'the plug-in shows work photos'); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "documents",
+        "means": "A document to sign or OK on the secure page before the work: a contract, a written estimate, a proposal or a design (the business sending it is its signature; REDESIGN 2).",
+        "source": "master-A.json header facts; live.facts; MC C5 (insurance)"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "waitlist",
+        "means": "The business keeps a waitlist for full times (the owner's booking rules turn it on, S1-21).",
+        "source": "master-A.json header facts; live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "tips",
+        "means": "A tip line on the bills Rosie sends (the owner's tip setting in S1-21's \"Bills I send\" row, or S11-56).",
+        "source": "master-A.json header facts; live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "discounts",
+        "means": "The business takes its own discount codes on the booking page (the owner turns them on in the portal, S11-56). Off: the booking never asks for one. Gift cards are never taken through Rosie.",
+        "source": "master-A.json header facts; live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "stages",
+        "means": "Big jobs paid in stages, each stage billed before the next (the plug-in's or the owner's stage plan).",
+        "source": "master-A.json header facts; live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "monthlybill",
+        "means": "One bill a period for plans or business accounts (the owner turns it on in the portal, S11-56).",
+        "source": "master-A.json header facts; live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "banktransfer",
+        "means": "Big bills may be paid by bank transfer (the owner's setting in S1-21, or S11-56).",
+        "source": "master-A.json header facts; live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "extrawork",
+        "means": "Work can change at the visit: an add-on, a bigger job found, goods or an urgent part (the plug-in's visit rules).",
+        "source": "master-A.json header facts; live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "nomoney",
+        "means": "A whole business with no money through Rosie; a switch and a fact, set both or neither (SPEC-master 5d).",
+        "source": "SPEC-master 5b, 5d (FACTS); master-A.json live.facts"
+      }
+    },
+    {
+      "table": "trade_facts",
+      "values": {
+        "name": "capacitycheck",
+        "means": "The owner turns it on: at the times they pick, the AI asks how many more a window can take; silence turns that window's new bookings into requests (D87).",
+        "source": "master-A.json header facts; live.facts"
+      }
+    },
+    {
+      "table": "plugin_switches",
+      "values": {
+        "name": "sensitive",
+        "means": "On for health care, therapy, addiction, legal and immigration work, children's services, funeral and grief work, investigators; off: normal texts. The switch grief is merged into it.",
+        "source": "SPEC-master 5b; master-A.json live.switches, live.merged.switches"
+      }
+    },
+    {
+      "table": "plugin_switches",
+      "values": {
+        "name": "no2",
+        "means": "On for human health practices and law firms; off: the $2 lines. It follows the owner's choice at the $2 split, never set by hand.",
+        "source": "SPEC-master 5b; SPEC-prof section 3 (no2); master-A.json live.switches"
+      }
+    },
+    {
+      "table": "plugin_switches",
+      "values": {
+        "name": "welfare",
+        "means": "On for work where the person served may be unable to answer; off: normal no-show words.",
+        "source": "SPEC-master 5b; master-A.json live.switches"
+      }
+    },
+    {
+      "table": "plugin_switches",
+      "values": {
+        "name": "cancelright",
+        "means": "On for work sold at the customer's place with a written cancel period; off: no cancel period for work already given.",
+        "source": "SPEC-master 5b; master-A.json live.switches; FS row V20"
+      }
+    },
+    {
+      "table": "plugin_switches",
+      "values": {
+        "name": "verify",
+        "means": "License and document checks: off for now (D96; not launched). Off: licenses and documents are optional, shown as the business gave them and never checked.",
+        "source": "master-A.json header switches; live.switches; D96"
+      }
+    },
+    {
+      "table": "plugin_switches",
+      "values": {
+        "name": "nomoney",
+        "means": "A whole business with no money through Rosie; merged into the fact nomoney, and set with it (SPEC-master 5d; K-23 v1 company_kinds_nomoney_fact_and_switch).",
+        "source": "SPEC-master 5b, 5d; master-A.json live.merged.switches"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "ok_same_day",
+        "value_type": "on",
+        "needs_fact": null,
+        "unset_means": "A same-day booking books on the yes, unless another rule asks.",
+        "means": "A same-day booking waits for the owner's OK: the page says 'This is a request' before the yes, and nothing is charged until the OK (A4-98).",
+        "source": "S1-21 ('Same-day and new customers: Ask you first'); FS row H05; A4-98; B4-115"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "ok_new_customer",
+        "value_type": "on",
+        "needs_fact": null,
+        "unset_means": "A new customer's booking books on the yes, unless another rule asks.",
+        "means": "A new customer's booking waits for the owner's OK (A4-98); where it covers a job sent now, the owner gets 5 minutes, any hour, and silence sends nobody (B4-115).",
+        "source": "S1-21 ('Same-day and new customers: Ask you first'); FS row H05; A4-98; B4-115"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "ok_dates",
+        "value_type": "dates",
+        "needs_fact": null,
+        "unset_means": "No date waits for an OK.",
+        "means": "A booking on these dates waits for the owner's OK; several ranges may be in effect at once.",
+        "source": "A4-98 ('same day, new customers, some services, date ranges'); S1-21 ('some services or dates'); FS row H05"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "notice",
+        "value_type": "span",
+        "needs_fact": null,
+        "unset_means": "No notice beyond the times the times card offers.",
+        "means": "A booking needs at least this much notice before its start; a time with less is not offered.",
+        "source": "FS row H05 ('notice'); S11-57 ('hours, notice')"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "months_offered",
+        "value_type": "dates",
+        "needs_fact": null,
+        "unset_means": "All year.",
+        "means": "Bookings are offered only on these dates; several ranges add up.",
+        "source": "FS row H08 ('Months offered', O: all year); S1-21 ('Also months offered', kept at default); S11-57"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "minimum_job",
+        "value_type": "money",
+        "needs_fact": null,
+        "unset_means": "No minimum.",
+        "means": "The least a booking's total may be, with any extra work; a photo quote is checked when priced, and a price set only at the visit or by the hour passes, with a note on the owner's booking card (limit 2).",
+        "source": "arch 06 line 301 (limit 2: 'The $250 minimum'); arch 05 line 239 ('owner rules · minimum job'); C-082"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "deposit_cap",
+        "value_type": "money",
+        "needs_fact": null,
+        "unset_means": "No cap beyond the price known then (FS row V06).",
+        "means": "The most a deposit may be: a cap the plug-in knows, shown as a suggested row and kept by the owner as the owner's own rule, never Rosie's check.",
+        "source": "S1-21 ('Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks'); S1-03 block 6"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "fee_cap",
+        "value_type": "money",
+        "needs_fact": null,
+        "unset_means": "No cap beyond what was paid now, when money was paid now (S1-21).",
+        "means": "The most a late-cancel or no-show fee may be: a cap the plug-in knows, kept by the owner as the owner's own rule, never Rosie's check.",
+        "source": "S1-21 ('Deposit or fee caps the plug-in knows show as suggested rows'); S1-03 block 6; FS row V08"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "waitlist",
+        "value_type": "on",
+        "needs_fact": "waitlist",
+        "unset_means": "Off.",
+        "means": "The business keeps a waitlist for full times (A4-60).",
+        "source": "S1-21 ('Also the waitlist ... all off'); FS row V14; master-A.json header facts (waitlist)"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "tip_line",
+        "value_type": "on",
+        "needs_fact": "tips",
+        "unset_means": "Off.",
+        "means": "A tip line on the bills Rosie sends, only where bills are sent.",
+        "source": "S1-21 ('Bills Rosie sends: a tip line'); FS row V11; master-A.json header facts (tips)"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "bank_transfer_over",
+        "value_type": "money",
+        "needs_fact": "banktransfer",
+        "unset_means": "Off: no bill is paid by bank transfer.",
+        "means": "A bill Rosie sends over this amount may be paid by bank transfer.",
+        "source": "S1-21 ('bank transfer over an amount'); FS row V12; master-A.json header facts (banktransfer)"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "one_bill",
+        "value_type": "on",
+        "needs_fact": "monthlybill",
+        "unset_means": "Off.",
+        "means": "One bill a period for many visits.",
+        "source": "S1-21 ('one bill for many visits ... all off'); FS row V17; S11-56; master-A.json header facts (monthlybill)"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "no_show_count",
+        "value_type": "count",
+        "needs_fact": null,
+        "unset_means": "Off.",
+        "means": "The no-show count, off unless the owner turns it on: after this many no-shows or late cancels with no card, a card is needed to book.",
+        "source": "S1-21 ('the no-show count, all off'); S11-57 ('The no-show count stays off unless Sam turns it on'); the plug-ins' pf.edges repeatNoShow ('the owner's setting')"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "members_paying_elsewhere",
+        "value_type": "on",
+        "needs_fact": "packs",
+        "unset_means": "On: bookings from members who pay elsewhere are taken, each class $2 at check-in.",
+        "means": "Take bookings from members who pay elsewhere; off: those bookings are declined (A4-80).",
+        "source": "S1-21 ('take bookings from members who pay elsewhere? On unless Sam turns it off'); A4-80; master-A.json live.merged.facts (memberships: packs)"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "own_customers_only",
+        "value_type": "on",
+        "needs_fact": null,
+        "unset_means": "Off: anyone may book.",
+        "means": "Only the business's own customers may book; the booking page says so kindly.",
+        "source": "S1-21 ('Only the business's own customers may book'); FS row K10; A4-43; A4-80"
+      }
+    },
+    {
+      "table": "rule_kinds",
+      "values": {
+        "id": "note",
+        "value_type": "note",
+        "needs_fact": null,
+        "unset_means": "No note.",
+        "means": "The owner's own words, which the AI reads and code never enforces; the read-back tells the owner it was saved only as a note.",
+        "source": "arch 09 line 482; C-157"
+      }
+    }
+  ]
+}

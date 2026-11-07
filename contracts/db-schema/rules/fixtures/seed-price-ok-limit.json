@@ -1,0 +1,39 @@
+{
+  "after": ["../../business-setup/fixtures/seed-company-two-kinds.json"],
+  "rows": [
+    {
+      "table": "price_ok_limits",
+      "values": {
+        "id": "pok-lee-home-services",
+        "business_id": "biz-lee-home-services",
+        "flow": null,
+        "kind_id": null,
+        "quotes": true,
+        "bills": true,
+        "over_cents": 50000,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:12:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_ok_limits",
+      "values": {
+        "id": "pok-lees-barbershop-barber-flow-b",
+        "business_id": "biz-lees-barbershop",
+        "flow": "B",
+        "kind_id": "barber",
+        "quotes": true,
+        "bills": false,
+        "over_cents": 50000,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:12:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    }
+  ]
+}

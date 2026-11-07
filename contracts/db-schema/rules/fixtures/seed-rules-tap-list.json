@@ -1,0 +1,56 @@
+{
+  "after": ["seed-rule-registry.json", "../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "rules",
+      "values": {
+        "id": "rule-lees-barbershop-ok-same-day",
+        "business_id": "biz-lees-barbershop",
+        "rule_kind": "ok_same_day",
+        "value_type": "on",
+        "flow": null,
+        "kind_id": null,
+        "value_on": true,
+        "words": null,
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:12:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "rules",
+      "values": {
+        "id": "rule-lees-barbershop-ok-new-customer",
+        "business_id": "biz-lees-barbershop",
+        "rule_kind": "ok_new_customer",
+        "value_type": "on",
+        "flow": null,
+        "kind_id": null,
+        "value_on": true,
+        "words": null,
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:12:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_ok_limits",
+      "values": {
+        "id": "pok-lees-barbershop-quotes",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "kind_id": null,
+        "quotes": true,
+        "bills": false,
+        "over_cents": 0,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:12:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    }
+  ]
+}
