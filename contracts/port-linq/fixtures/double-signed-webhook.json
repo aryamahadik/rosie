@@ -33,7 +33,8 @@
       "fromRosie": false,
       "email": null,
       "traceId": "trace-double-0104-0001"
-    }
+    },
+    "partKey": null
   },
   "outcome": {
     "result": "signed",

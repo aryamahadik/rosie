@@ -25,6 +25,14 @@
       "source": "02-contracts K-11 Fixtures ('outside 300 s'); arch 02 line 109"
     },
     {
+      "file": "verify-delivered-after-4006.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "Linq's message.delivered for Sam's text 25 s after error-4006.json's 4006: parsed into a K-06 delivered event with the echoed key out-sam-booked-riley/1/1 beside it as partKey, by which the dispatcher finds the failed part that has no message id and moves it to delivered; no new key goes.",
+      "source": "arch 01 line 65; K-07 v1 retry rule 2 and open gap 8; README spike row 7; vendor-samples/webhook-message-delivered.json; K-11 error-4006.json"
+    },
+    {
       "file": "send-text.json",
       "version": "v1",
       "def": "sendPart.exchange",
@@ -183,6 +191,14 @@
       "expect": "refuse",
       "shows": "send-text.json asking Linq to send by SMS (preferredService sms): refused, no SMS channel in v1.",
       "source": "02-contracts K-11 Fixtures and 'Not in v1'; DL-012; DL-031; MC C9"
+    },
+    {
+      "file": "invalid/refuse-key-on-text.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "refuse",
+      "shows": "verify-ok.json with a part key beside Alex's received text: refused, only message.sent and message.delivered echo a key.",
+      "source": "README spike row 7; arch 01 line 65"
     }
   ]
 }

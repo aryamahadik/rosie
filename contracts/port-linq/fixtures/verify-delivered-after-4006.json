@@ -1,0 +1,53 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-11-07T15:07:01Z",
+    "note": "The same send as error-4006.json, where this time Linq's message.delivered comes 25 s after the 4006. The part has no Linq message id, so the receipt carries the part's key, out-sam-booked-riley/1/1, beside the K-06 delivered event; the dispatcher finds the failed part by it and moves it to delivered, and no new key goes (K-07 retry rule 2).",
+    "signing": "valid"
+  },
+  "request": {
+    "webhookId": "evt-linq-delivered-sam-0001",
+    "timestamp": "1794064021",
+    "signature": "v1,signed-at-test-time",
+    "raw": "{\"api_version\":\"v3\",\"webhook_version\":\"2026-02-03\",\"event_type\":\"message.delivered\",\"event_id\":\"evt-linq-delivered-sam-0001\",\"created_at\":\"2026-11-07T15:07:01Z\",\"trace_id\":\"linq-trace-demo-sam-0001\",\"partner_id\":\"partner-demo\",\"data\":{\"chat\":{\"id\":\"linq-chat-demo-sam\",\"is_group\":false},\"id\":\"linq-msg-demo-sam-0001\",\"direction\":\"outbound\",\"sender_handle\":{\"handle\":\"+15555550199\",\"is_me\":true,\"service\":\"iMessage\"},\"parts\":[{\"type\":\"text\",\"value\":\"New booking: Alex M. with Riley.\\nSat Nov 14, 11:00am\"}],\"idempotency_key\":\"out-sam-booked-riley/1/1\",\"preferred_service\":null,\"sent_at\":\"2026-11-07T15:06:59Z\",\"delivered_at\":\"2026-11-07T15:07:00Z\",\"read_at\":null,\"service\":\"iMessage\"}}",
+    "receivedAt": "2026-11-07T15:07:01Z",
+    "traceId": "trace-sam-delivered-0001"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "evt-linq-delivered-sam-0001",
+      "provider": "linq",
+      "handle": {
+        "kind": "phone",
+        "address": "+15555550100"
+      },
+      "service": "imessage",
+      "kind": "delivered",
+      "messageId": null,
+      "chatId": "linq-chat-demo-sam",
+      "sentAt": null,
+      "receivedAt": "2026-11-07T15:07:01Z",
+      "body": null,
+      "scrubbed": {
+        "cards": 0,
+        "ssns": 0
+      },
+      "attachments": [],
+      "threadedReplyTo": null,
+      "poll": null,
+      "reaction": null,
+      "edit": null,
+      "status": {
+        "messageId": "linq-msg-demo-sam-0001",
+        "at": "2026-11-07T15:07:00Z",
+        "failure": null
+      },
+      "fromRosie": false,
+      "email": null,
+      "traceId": "trace-sam-delivered-0001"
+    },
+    "partKey": "out-sam-booked-riley/1/1"
+  }
+}

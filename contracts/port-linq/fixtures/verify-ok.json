@@ -43,6 +43,7 @@
       "fromRosie": false,
       "email": null,
       "traceId": "trace-alex-0001"
-    }
+    },
+    "partKey": null
   }
 }

@@ -38,6 +38,11 @@
       "description": "The part's idempotency key, '<row>/<part>/<try>', K-07 v1's (arch 01 line 65). Linq stores it on the message (its idempotency_key) and reports it back on message.sent and message.delivered, so a receipt after a 4001 or 4006 finds its part by it (README 'Spike findings').",
       "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/idempotencyKey"
     },
+    "echoedKey": {
+      "title": "EchoedKey",
+      "description": "The part key a receipt echoes, beside the K-06 event: Linq's idempotency_key on message.sent and message.delivered (README spike row 7), or null when the event carries none. A part that failed with 4001 or 4006 has no Linq message id (sendPart.errors providerMessageId null), so the dispatcher (C-124) finds the part by this key when it holds no message id for it, and a receipt within 1 minute moves the failed part to delivered (arch 01 line 65; K-07 v1 retry rule 2 and open gap 8). K-06 v1 has no field for it, so it travels beside the event, never in it.",
+      "anyOf": [{ "$ref": "#/$defs/partKey" }, { "type": "null" }]
+    },
     "given": {
       "title": "Given",
       "description": "What a fixture assumes before the call: the moment it runs, a note, and for a webhook how it was signed. Fixtures only; never sent.",
@@ -94,7 +99,7 @@
     },
     "verifyWebhook.response": {
       "title": "VerifyWebhookResponse",
-      "description": "The signature passed. event: the webhook parsed into one K-06 event, which the gateway seals and writes to the handle's actor, then answers 200 in under 1 s; a known event id also gets 200 and is dropped, and a failed write gets 503 so Linq retries for 30 minutes (arch 02 line 109; those three answers are the gateway's, after this call). ignored: a signed event of a type Rosie does not use (README default 2), answered 200 and dropped.",
+      "description": "The signature passed. event: the webhook parsed into one K-06 event, with the part key a receipt echoes beside it (partKey), which the gateway seals and writes to the handle's actor, then answers 200 in under 1 s; a known event id also gets 200 and is dropped, and a failed write gets 503 so Linq retries for 30 minutes (arch 02 line 109; those three answers are the gateway's, after this call). ignored: a signed event of a type Rosie does not use (README default 2), answered 200 and dropped.",
       "oneOf": [
         {
           "type": "object",
@@ -107,10 +112,24 @@
             "event": {
               "description": "One K-06 v1 inbound event, its provider linq (02-contracts K-11: 'gives K-06 events'). K-06 v1.1 has the same shape with a wider scrub rule, which the gateway's scrub (C-045) makes hold before any write.",
               "$ref": "../inbound-event/inbound-event.v1.schema.json"
+            },
+            "partKey": {
+              "description": "For message.sent and message.delivered, the part key Linq echoes (its idempotency_key); else null. The gateway hands it on with the event, for the dispatcher (C-124) to find a part that has no message id (arch 01 line 65; K-07 v1 retry rule 2).",
+              "$ref": "#/$defs/echoedKey"
             }
           },
-          "required": ["result", "httpStatus", "event"],
-          "additionalProperties": false
+          "required": ["result", "httpStatus", "event", "partKey"],
+          "additionalProperties": false,
+          "if": {
+            "description": "Only message.sent and message.delivered echo a key (README spike row 7: message.received, message.failed and the poll and reaction events carry none), so partKey is null for every other K-06 kind.",
+            "properties": {
+              "event": {
+                "type": "object",
+                "properties": { "kind": { "not": { "enum": ["sent", "delivered"] } } }
+              }
+            }
+          },
+          "then": { "properties": { "partKey": { "type": "null" } } }
         },
         {
           "type": "object",
@@ -732,14 +751,28 @@
         "event": {
           "description": "The K-06 v1 event the gateway must get back from verifyWebhook, given the same receivedAt and traceId; its provider is linq.",
           "$ref": "../inbound-event/inbound-event.v1.schema.json"
+        },
+        "partKey": {
+          "description": "For a faked sent or delivered receipt, the part key the webhook echoes, so a test can fake a late receipt after a 4001 or 4006 (K-07 v1 retry rule 2); else null. verifyWebhook gives it back as its partKey.",
+          "$ref": "#/$defs/echoedKey"
         }
       },
-      "required": ["event"],
-      "additionalProperties": false
+      "required": ["event", "partKey"],
+      "additionalProperties": false,
+      "if": {
+        "description": "As verifyWebhook.response: only a sent or delivered receipt echoes a key (README spike row 7).",
+        "properties": {
+          "event": {
+            "type": "object",
+            "properties": { "kind": { "not": { "enum": ["sent", "delivered"] } } }
+          }
+        }
+      },
+      "then": { "properties": { "partKey": { "type": "null" } } }
     },
     "doubleWebhook.response": {
       "title": "DoubleWebhookResponse",
-      "description": "The signed webhook, ready for the gateway: verifyWebhook on it, inside the 300 s window, gives back the request's event (the contract test's round trip). Signed with the test environment's webhook secret, never Linq's (rule 7).",
+      "description": "The signed webhook, ready for the gateway: verifyWebhook on it, inside the 300 s window, gives back the request's event and partKey (the contract test's round trip). Signed with the test environment's webhook secret, never Linq's (rule 7).",
       "type": "object",
       "properties": {
         "result": { "const": "signed" },
