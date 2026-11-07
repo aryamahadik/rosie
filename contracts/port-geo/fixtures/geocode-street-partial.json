@@ -1,0 +1,16 @@
+{
+  "call": "geocode",
+  "request": { "kind": "streetAddress", "text": "42 Oak St, Riverton" },
+  "outcome": {
+    "result": "found",
+    "matches": [
+      {
+        "point": { "lat": 40.58, "lng": -90 },
+        "precision": "town",
+        "normalizedAddress": "Riverton",
+        "state": "MA",
+        "timeZone": "America/New_York"
+      }
+    ]
+  }
+}

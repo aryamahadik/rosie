@@ -1,0 +1,16 @@
+{
+  "call": "geocode",
+  "request": { "kind": "town", "text": "Anytown" },
+  "outcome": {
+    "result": "found",
+    "matches": [
+      {
+        "point": { "lat": 40.1, "lng": -90.2 },
+        "precision": "town",
+        "normalizedAddress": "Anytown",
+        "state": null,
+        "timeZone": "America/New_York"
+      }
+    ]
+  }
+}

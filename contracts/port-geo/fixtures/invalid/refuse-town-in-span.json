@@ -1,0 +1,20 @@
+{
+  "trace_id": "trace-alex-0031",
+  "span_id": "span-alex-0031-07",
+  "seq": 7,
+  "hop": "portCall",
+  "at": "2026-10-19T22:40:02.100Z",
+  "ms": 180,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": "turn-b4-77-alex",
+  "job_id": null,
+  "handle_ref": "handle-alex",
+  "business_id": "biz-lee-home-services",
+  "provider": "geo",
+  "call": "geocode",
+  "attempt": 1,
+  "got": { "step": "B4-77", "kind": "town", "town": "Springfield" },
+  "decided": { "result": "found", "matches": 1, "precision": "town" },
+  "outcome": "ok",
+  "error_code": null
+}

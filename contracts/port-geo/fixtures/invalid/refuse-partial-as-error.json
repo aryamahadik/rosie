@@ -1,0 +1,5 @@
+{
+  "call": "geocode",
+  "request": { "kind": "streetAddress", "text": "42 Oak St, Riverton" },
+  "outcome": { "error": "partialMatch", "retryAfterSeconds": null }
+}

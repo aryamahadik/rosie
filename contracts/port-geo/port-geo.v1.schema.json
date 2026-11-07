@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/port-geo/port-geo.v1.schema.json",
+  "title": "PortGeoV1",
+  "description": "K-17 v1, the geo port: one call, geocode, that turns a town, a ZIP code or a street address into map points, each with its precision, a normalized address, its US state and the point's time zone, or says nothing matched (02-contracts K-17; arch 05 line 237; B4-77, B4-30, B4-31, S12-07; FS rows L02, L03; CQ-08; Q-25). Provider-neutral: only fields every geo provider candidate of T-1122 (adapters/spikes/geo-provider/FINDINGS.md) can fill, in Rosie's own terms; the vendor's wire format stays inside the adapter (02-contracts section 5). The call's request, response and errors are geocode.request, geocode.response and geocode.errors under $defs, and geocode.exchange pairs one request with its outcome, which is what every exchange fixture is (02-contracts section 2 item 2). geocode.span is the K-08 v1 portCall span the call writes, with no address in it. The root is any one of these, so the type generator writes a type for each (ADR-005). The distance itself is never the port's: it is computed in PostGIS on the stored points (Q-25's default). Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [{ "$ref": "#/$defs/geocode.exchange" }, { "$ref": "#/$defs/geocode.span" }],
+  "$defs": {
+    "zone": {
+      "title": "GeoZone",
+      "description": "An IANA time zone name, such as America/New_York (CQ-09; S13-03: a visit at the customer's place uses that place's zone).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/zone"
+    },
+    "kind": {
+      "title": "GeocodeKind",
+      "description": "What the caller asks the port to place: a ZIP code (B4-77 'the town or ZIP in the request'; arch 05 line 237 'near 02139'), a town (B4-77, S12-07), or a street address (B4-30 'the street address on the page'; FS row L02's travel centre, the confirmed B03 address). Every candidate takes all three except the US Census Geocoder, which takes street addresses only and so cannot be the provider (FINDINGS.md section 2).",
+      "type": "string",
+      "enum": ["zip", "town", "streetAddress"]
+    },
+    "precision": {
+      "title": "GeocodePrecision",
+      "description": "How exactly the point places what was asked, finest first, the coarse port list each adapter maps its provider's own field to (FINDINGS.md section 2: 'exact, interpolated, street, ZIP, town'): exact, the address's own point (a rooftop or parcel); interpolated, a point estimated along the street from house-number ranges; street, the street with no house number matched; zip, the ZIP code's area; town, the town's area. A coarser precision than the kind asked is a partial match (a town found for a street address), told apart by this field, never by an error (B4-30: 'This catches a street address that's outside after all'; safe default 'ask for the address again'). A provider's own values (ROOFTOP, rooftop, range_interpolation, houseNumber …) never cross the port.",
+      "type": "string",
+      "enum": ["exact", "interpolated", "street", "zip", "town"]
+    },
+    "point": {
+      "title": "GeoPoint",
+      "description": "A map point in WGS 84 decimal degrees, the coordinates K-23 v1 stores as geography(Point,4326) (locations.map_point, locations.travel_centre; Q-25: distance in PostGIS on stored points). Named lat and lng, so no reader confuses PostGIS's longitude-first order.",
+      "type": "object",
+      "properties": {
+        "lat": {
+          "description": "Latitude in degrees, -90 to 90 (EPSG 4326).",
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lng": {
+          "description": "Longitude in degrees, -180 to 180 (EPSG 4326).",
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      },
+      "required": ["lat", "lng"],
+      "additionalProperties": false
+    },
+    "usState": {
+      "title": "GeoState",
+      "description": "A US state as its two-letter USPS code, such as MA (B4-30 'in a state whose form the business filled in'; 'The address decides which state's rules apply to the job'). Each adapter maps its provider's own field to it: Google's administrative_area_level_1 short_name, Mapbox's context.region.region_code, Geocodio's address_components state_province, HERE's address.stateCode (README, 'Which field of each candidate fills each port field'). Never a full name (Massachusetts) or a country-prefixed code (US-MA).",
+      "type": "string",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "match": {
+      "title": "GeocodeMatch",
+      "description": "One place the text matched: its point, the precision of that point, the provider's normalized one-line address, the US state it lies in and the point's time zone (02-contracts K-17 'a map point, its precision and a normalized address'; B4-30, B4-31 the state; CQ-08 'the geo port returns each point's zone'). No distance: the distance is computed in PostGIS on the stored point (Q-25's default; arch 05 line 237 'within 10 mi · PostGIS').",
+      "type": "object",
+      "properties": {
+        "point": {
+          "description": "Where it is (02-contracts K-17 'a map point'; FS line 722 location 'map point').",
+          "$ref": "#/$defs/point"
+        },
+        "precision": {
+          "description": "How exactly the point places what was asked (FINDINGS.md section 2).",
+          "$ref": "#/$defs/precision"
+        },
+        "normalizedAddress": {
+          "description": "The provider's normalized address, on one line, as the owner confirms it (FS row L02 'centre is the confirmed B03'; FS row B03 'address + map pin'; K-23 v1 locations.address and travel_centre_address). Every candidate gives one: Google and Geocodio formatted_address, Mapbox full_address, HERE address.label (FINDINGS.md section 2). An address: it never enters a span or a log line (K-08 v1 'never the raw number or words').",
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "description": "The US state the match lies in, as its two-letter USPS code, or null when the provider's result gives none the adapter can map to one (B4-30: 'The address decides which state's rules apply to the job'; 'only addresses in states whose form it filled in are offered'; B4-31: 'A town in a state whose form Sam hasn't filled in gets the same answer'). The key is on every match; its value is nullable because no candidate's documents promise a state on every result. A null state never counts as a state whose form the business filled in: the safe default holds (B4-30 'ask for the address again; nothing is booked until it checks'; at the town check, B4-77 'ask for the ZIP; the street address on the page decides').",
+          "anyOf": [{ "$ref": "#/$defs/usState" }, { "type": "null" }]
+        },
+        "timeZone": {
+          "description": "The point's time zone, since a visit at the customer's place uses that place's zone (S13-03; arch 06 line 309; CQ-08's default: 'the geo port returns each point's zone ... the provider pick (Q-25) must supply it').",
+          "$ref": "#/$defs/zone"
+        }
+      },
+      "required": ["point", "precision", "normalizedAddress", "state", "timeZone"],
+      "additionalProperties": false
+    },
+    "geocode.request": {
+      "title": "GeocodeRequest",
+      "description": "Geocode one town, ZIP code or street address (02-contracts K-17 'Geocode'). A read with no side effect: repeating it is safe. The text is the words as typed (B4-77: the town or ZIP in the request; B4-30: the street address the customer types on the secure page, never one an AI put in a message); it is the request's own and never enters a span or log.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "What is asked: a ZIP code, a town or a street address (B4-77, B4-30).",
+          "$ref": "#/$defs/kind"
+        },
+        "text": {
+          "description": "The ZIP code, town or street address, as typed (B4-77, B4-30; FS row L02).",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "required": ["kind", "text"],
+      "additionalProperties": false
+    },
+    "geocode.found": {
+      "title": "GeocodeFound",
+      "description": "The text matched: one or more places, best first. More than one means the text fits several places, such as a town two states share; B4-77's answer is to ask for the ZIP ('a town two states share? Ask for the ZIP').",
+      "type": "object",
+      "properties": {
+        "result": { "const": "found" },
+        "matches": {
+          "description": "The places matched, best first (02-contracts K-17).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/match" },
+          "minItems": 1
+        }
+      },
+      "required": ["result", "matches"],
+      "additionalProperties": false
+    },
+    "geocode.notFound": {
+      "title": "GeocodeNotFound",
+      "description": "Nothing matched: the port's answer to an empty result, so no vendor field is needed (FINDINGS.md section 2 'Not found'). Not an error. B4-77's safe default follows: ask for the ZIP; the street address on the page decides.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "notFound" }
+      },
+      "required": ["result"],
+      "additionalProperties": false
+    },
+    "geocode.response": {
+      "title": "GeocodeResponse",
+      "description": "Found, with its matches, or not found (02-contracts K-17). A partial match is a found answer with a coarser precision, never an error.",
+      "anyOf": [{ "$ref": "#/$defs/geocode.found" }, { "$ref": "#/$defs/geocode.notFound" }]
+    },
+    "geocode.errors": {
+      "title": "GeocodeError",
+      "description": "The call failed, so nothing is known about the place: unavailable (the provider failed, timed out or refused the key), rateLimited (the provider said to slow down, with any Retry-After: arch 10 line 540), or badRequest (the provider refused the request itself). An error never means not found and never a partial match: those are answers (geocode.response). The caller's safe default meanwhile is its step's: B4-77 'ask for the ZIP; the street address on the page decides', B4-30 'nothing is booked until it checks'.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "description": "What failed (arch 10 line 540; K-08 v1 span outcome failed or timedOut).",
+          "type": "string",
+          "enum": ["unavailable", "rateLimited", "badRequest"]
+        },
+        "retryAfterSeconds": {
+          "description": "The provider's Retry-After, in whole seconds, when it gave one; otherwise null (arch 10 line 540: 'a rate limit with any Retry-After').",
+          "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        }
+      },
+      "required": ["error", "retryAfterSeconds"],
+      "additionalProperties": false
+    },
+    "geocode.exchange": {
+      "title": "GeocodeExchange",
+      "description": "One geocode call and its outcome: an answer or an error (02-contracts section 2 item 2). The exchange fixtures are the geo double's fixed answers for the test addresses (02-contracts K-17 'The double: fixed points (and zones) for the test addresses').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "geocode" },
+        "request": { "$ref": "#/$defs/geocode.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/geocode.response" }, { "$ref": "#/$defs/geocode.errors" }]
+        }
+      },
+      "required": ["call", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "geocode.span": {
+      "title": "GeocodeSpan",
+      "description": "The span a geocode call writes: a K-08 v1 span on the portCall hop, provider geo, call geocode, with its attempt (K-08 v1 README 'portCall covers ... a geocode (K-17, C-220)'). What it got and decided is a closed list here, so no address, town or ZIP ever enters it: got names the step and the kind asked; decided names the result, the number of matches and the best match's precision (K-08 v1 'never the raw number or words'; arch 02 diagram line 105: full detail only in sealed traces).",
+      "allOf": [
+        { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/span" },
+        {
+          "type": "object",
+          "properties": {
+            "hop": { "const": "portCall" },
+            "provider": { "const": "geo" },
+            "call": { "const": "geocode" },
+            "got": {
+              "description": "The step that asked and the kind asked, never the text (K-08 v1).",
+              "type": "object",
+              "properties": {
+                "step": {
+                  "description": "The step whose check asked, such as B4-77, B4-30, S12-07 or S1-21 (K-08 v1 label).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label"
+                },
+                "kind": { "$ref": "#/$defs/kind" }
+              },
+              "required": ["kind"],
+              "additionalProperties": false
+            },
+            "decided": {
+              "description": "The answer in counts and labels, never the address (K-08 v1). Left out on an error, whose code is the span's error_code.",
+              "type": "object",
+              "properties": {
+                "result": {
+                  "description": "found or notFound (geocode.response).",
+                  "type": "string",
+                  "enum": ["found", "notFound"]
+                },
+                "matches": {
+                  "description": "How many places matched (geocode.found).",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "precision": {
+                  "description": "The best match's precision, when found.",
+                  "$ref": "#/$defs/precision"
+                }
+              },
+              "required": ["result", "matches"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["hop", "provider", "call", "attempt", "got"]
+        }
+      ]
+    }
+  }
+}

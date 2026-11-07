@@ -1,0 +1,16 @@
+{
+  "call": "geocode",
+  "request": { "kind": "streetAddress", "text": "1200 Main St, Springfield" },
+  "outcome": {
+    "result": "found",
+    "matches": [
+      {
+        "point": { "lat": 40, "lng": -90 },
+        "precision": "exact",
+        "normalizedAddress": "1200 Main St, Springfield",
+        "state": "MA",
+        "timeZone": "America/New_York"
+      }
+    ]
+  }
+}

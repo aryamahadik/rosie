@@ -1,0 +1,5 @@
+{
+  "call": "geocode",
+  "request": { "kind": "town", "text": "Springfield" },
+  "outcome": { "error": "unavailable", "retryAfterSeconds": null }
+}
