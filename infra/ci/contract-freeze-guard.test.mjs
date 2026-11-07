@@ -189,3 +189,154 @@ describe("contract freeze guard, end to end", () => {
     assert.match(run.stdout, /origin\/main was not found/);
   });
 });
+
+const TABLES_V1 = '{"tables":{"a":{}}}\n';
+const CORE_V1 = "contracts/db-schema/core/core.v1.tables.json";
+const BOOKING_V1 = "contracts/db-schema/booking/booking.v1.tables.json";
+
+// Database parts: core freezes v1 first (own frozen.json); booking has none yet; widget has no parts.
+// opts.bookingFrozen puts a frozen.json of its own in the booking part.
+function partsRepo(t, { bookingFrozen = false } = {}) {
+  const repo = tempRepo(t);
+  repo.write("contracts/db-schema/core/frozen.json", '{"frozen":["v1"]}\n');
+  repo.write(CORE_V1, TABLES_V1);
+  repo.write(BOOKING_V1, TABLES_V1);
+  if (bookingFrozen) repo.write("contracts/db-schema/booking/frozen.json", '{"frozen":["v1"]}\n');
+  repo.write("contracts/widget/frozen.json", '{"frozen":["v1"]}\n');
+  repo.write("contracts/widget/widget.v1.schema.json", SCHEMA_V1);
+  repo.write("README.md", "rosie\n");
+  repo.commit("base");
+  repo.markOriginMain();
+  repo.git("switch", "-q", "-c", "task/T-101");
+  return repo;
+}
+
+describe("contract freeze guard, database parts", () => {
+  it("a part's own frozen.json freezes that part only", (t) => {
+    const repo = partsRepo(t);
+    repo.write(BOOKING_V1, '{"tables":{"b":{}}}\n');
+    repo.commit("edit the part that is not frozen");
+    const run = repo.guard();
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+  });
+
+  it("fails an edit of the frozen part's v1 table list", (t) => {
+    const repo = partsRepo(t);
+    repo.write(CORE_V1, '{"tables":{"b":{}}}\n');
+    repo.commit("edit core");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(
+      run.stdout,
+      /FAIL contracts\/db-schema\/core\/core\.v1\.tables\.json: edits a file of v1, which contracts\/db-schema\/core\/frozen\.json marks frozen/,
+    );
+  });
+
+  it("fails an edit of the frozen part but passes the other part in one branch", (t) => {
+    const repo = partsRepo(t);
+    repo.write(CORE_V1, '{"tables":{"b":{}}}\n');
+    repo.write(BOOKING_V1, '{"tables":{"b":{}}}\n');
+    repo.commit("edit both");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(run.stdout, /core\.v1\.tables\.json: edits a file of v1/);
+    assert.doesNotMatch(run.stdout, /booking/);
+  });
+
+  it("fails removing the frozen part's v1 table list", (t) => {
+    const repo = partsRepo(t);
+    repo.git("rm", "-q", CORE_V1);
+    repo.commit("remove core v1");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(run.stdout, /core\.v1\.tables\.json: removes a file of v1/);
+  });
+
+  it("fails an edit of the second part once it has a frozen.json of its own", (t) => {
+    const repo = partsRepo(t, { bookingFrozen: true });
+    repo.write(BOOKING_V1, '{"tables":{"b":{}}}\n');
+    repo.commit("edit booking");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(
+      run.stdout,
+      /booking\.v1\.tables\.json: edits a file of v1, which contracts\/db-schema\/booking\/frozen\.json marks frozen/,
+    );
+  });
+
+  it("passes adding a part's frozen.json, and adding a new minor version file to a frozen part", (t) => {
+    const repo = partsRepo(t);
+    repo.write("contracts/db-schema/booking/frozen.json", '{"frozen":["v1"]}\n');
+    repo.write("contracts/db-schema/core/core.v1.1.tables.json", TABLES_V1);
+    repo.write("contracts/db-schema/core/frozen.json", '{"frozen":["v1","v1.1"]}\n');
+    repo.commit("freeze booking, add core v1.1");
+    const run = repo.guard();
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+  });
+
+  it("fails removing a version from a part's frozen.json", (t) => {
+    const repo = partsRepo(t);
+    repo.write("contracts/db-schema/core/frozen.json", '{"frozen":[]}\n');
+    repo.commit("unfreeze core");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(
+      run.stdout,
+      /contracts\/db-schema\/core\/frozen\.json: v1 is frozen on the base; a freeze is never lifted/,
+    );
+  });
+
+  it("fails deleting a part's frozen.json", (t) => {
+    const repo = partsRepo(t);
+    repo.git("rm", "-q", "contracts/db-schema/core/frozen.json");
+    repo.commit("delete the freeze");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(run.stdout, /a freeze is never lifted/);
+  });
+
+  it("a frozen part's fixtures follow the part's frozen.json", (t) => {
+    const repo = partsRepo(t);
+    repo.write(
+      "contracts/db-schema/core/fixtures/index.json",
+      JSON.stringify({ fixtures: [{ file: "x.v1.json" }] }),
+    );
+    repo.write("contracts/db-schema/core/fixtures/x.v1.json", "{}\n");
+    repo.write("contracts/db-schema/booking/fixtures/y.v1.json", "{}\n");
+    repo.commit("fixtures at base");
+    repo.markOriginMain();
+    repo.write("contracts/db-schema/core/fixtures/x.v1.json", '{"a":1}\n');
+    repo.write("contracts/db-schema/booking/fixtures/y.v1.json", '{"a":1}\n');
+    repo.commit("edit fixtures");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(run.stdout, /core\/fixtures\/x\.v1\.json: edits a fixture of v1/);
+    assert.doesNotMatch(run.stdout, /booking/);
+  });
+
+  it("a contract without parts reads contracts/<name>/frozen.json exactly as before", (t) => {
+    const repo = partsRepo(t);
+    repo.write("contracts/widget/widget.v1.schema.json", '{"$id":"widget.v1","type":"array"}\n');
+    repo.commit("edit widget");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(
+      run.stdout,
+      /widget\.v1\.schema\.json: edits a file of v1, which contracts\/widget\/frozen\.json marks frozen/,
+    );
+  });
+
+  it("a part with no frozen.json of its own still falls back to contracts/db-schema/frozen.json", (t) => {
+    const repo = tempRepo(t);
+    repo.write("contracts/db-schema/frozen.json", '{"frozen":["v1"]}\n');
+    repo.write(BOOKING_V1, TABLES_V1);
+    repo.commit("base");
+    repo.markOriginMain();
+    repo.git("switch", "-q", "-c", "task/T-102");
+    repo.write(BOOKING_V1, '{"tables":{"b":{}}}\n');
+    repo.commit("edit");
+    const run = repo.guard();
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    assert.match(run.stdout, /which contracts\/db-schema\/frozen\.json marks frozen/);
+  });
+});
