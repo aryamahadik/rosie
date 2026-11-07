@@ -1,0 +1,48 @@
+{
+  "call": "recordEffectResult",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-effects.json"],
+    "now": "2026-11-07T15:06:34Z",
+    "note": "Google Calendar wrote the event on Riley's calendar on the first try (K-07 effect-calendar-write)."
+  },
+  "request": {
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "expectVersion": 2,
+    "claimer": "effects-runner-1",
+    "outcome": "ok",
+    "at": "2026-11-07T15:06:34Z",
+    "providerObjectId": "gcal-event-demo-0001",
+    "errorCode": null,
+    "ledgerLineId": null,
+    "nextTryAt": null,
+    "events": [
+      {
+        "id": "log-eff-cal-riley-alex-nov14-write-run-1-try-1-ok",
+        "kind": "effect.result",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "job",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "effects",
+        "rowId": "eff-cal-riley-alex-nov14-write",
+        "oldValues": { "state": "running", "tries": 0, "runs": 1 },
+        "newValues": { "state": "succeeded", "tries": 1, "runs": 1, "providerObjectId": "gcal-event-demo-0001" },
+        "sealed": null,
+        "why": { "try": 1, "outcome": "ok" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "result": "recorded",
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "version": 3,
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 1,
+    "claimLapsesAt": null
+  }
+}

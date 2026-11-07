@@ -359,6 +359,390 @@
       "expect": "refuse",
       "shows": "A row marked held with no time to hold it until",
       "source": "arch 06 line 313 ('held to 9am, or 8am for owner and team'); K-04 outbox_rows.held_until"
+    },
+    {
+      "file": "commit-writes-effect.json",
+      "version": "v1.1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "commit-first's turn in v1.1: Alex's exact yes also writes the calendar write for Riley's calendar as an effect row, pending, with its turn id, in the same transaction, listed in written with its version",
+      "source": "02-contracts K-05 v1.1; K-07 v1 effect-calendar-write and move (new) to pending by commitTurn; arch 10 line 508; arch 05 line 267"
+    },
+    {
+      "file": "claim-effects.json",
+      "version": "v1.1",
+      "def": "claimEffects.exchange",
+      "expect": "accept",
+      "shows": "The effects runner claims the pending calendar write: running, its run's first try now, tries 0, its claim lapsing 60 s later",
+      "source": "02-contracts K-05 v1.1 ('claim effect rows'); K-07 v1 move pending to running by claimEffects, effectRow.firstTryAt, README 'How a claim lapses' (default 2)"
+    },
+    {
+      "file": "effect-result.json",
+      "version": "v1.1",
+      "def": "recordEffectResult.exchange",
+      "expect": "accept",
+      "shows": "Try 1 succeeds: the effect is succeeded with Google's event id, tries 1, and its claim cleared",
+      "source": "02-contracts K-05 v1.1 ('record an effect's result'); K-07 v1 move running to succeeded by recordEffectResult; K-07 effect-calendar-write"
+    },
+    {
+      "file": "effect-result-network-error.json",
+      "version": "v1.1",
+      "def": "recordEffectResult.exchange",
+      "expect": "accept",
+      "shows": "Try 1 gets a 503: the effect stays running on its one key, tries 1, and its claim now lapses 60 s after the planned next try",
+      "source": "arch 10 line 542 ('retry network errors 5 times in 10 minutes on one idempotency key'); K-07 v1 move running to running by recordEffectResult"
+    },
+    {
+      "file": "claim-effects-lapsed.json",
+      "version": "v1.1",
+      "def": "claimEffects.exchange",
+      "expect": "accept",
+      "shows": "A runner that died leaves its claim to lapse; another runner's sweep of the calendar port takes the running row again, keeping its tries, its run and its first try",
+      "source": "K-07 v1 move running to running by claimEffects ('a lapsed claim taken again'), README 'How a claim lapses'; arch 10 line 542"
+    },
+    {
+      "file": "effect-try-2.json",
+      "version": "v1.1",
+      "def": "recordEffectResult.exchange",
+      "expect": "accept",
+      "shows": "The new runner's try, the run's second, gets a 503 again: tries 2, still running",
+      "source": "arch 10 line 542; K-07 v1 retry rule 8"
+    },
+    {
+      "file": "effect-try-3.json",
+      "version": "v1.1",
+      "def": "recordEffectResult.exchange",
+      "expect": "accept",
+      "shows": "Try 3 gets a 503: tries 3, still running",
+      "source": "arch 10 line 542; K-07 v1 retry rule 8"
+    },
+    {
+      "file": "effect-try-4.json",
+      "version": "v1.1",
+      "def": "recordEffectResult.exchange",
+      "expect": "accept",
+      "shows": "Try 4 gets a 503: tries 4, still running",
+      "source": "arch 10 line 542; K-07 v1 retry rule 8"
+    },
+    {
+      "file": "effect-fifth-try-outage.json",
+      "version": "v1.1",
+      "def": "recordEffectResult.exchange",
+      "expect": "accept",
+      "shows": "Try 5, inside the 10 minutes, gets a 503: the call counts the run's tries and moves the effect to the calendar service's outage row, its claim let go",
+      "source": "arch 10 line 542 ('then take that service's outage row'); S12-16; K-07 v1 move running to outage by recordEffectResult, default 3"
+    },
+    {
+      "file": "service-back.json",
+      "version": "v1.1",
+      "def": "serviceBack.exchange",
+      "expect": "accept",
+      "shows": "Google Calendar is back: the effect in outage is claimed for one more run on its same key (runs 2, tries 0, a new first try)",
+      "source": "arch 11 line 582 ('Charges and refunds wait, then run once'); S12-16, S12-18; K-07 v1 move outage to running by serviceBack"
+    },
+    {
+      "file": "commit-lets-go-outage-effect.json",
+      "version": "v1.1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "While the calendar is still down, Alex calls off the haircut: the commit cancels the booking, releases the time with Riley and lets the waiting calendar write go (outage to cancelled), so it never runs",
+      "source": "K-07 v1 move outage to cancelled by letGo; arch 11 line 582; S12-17"
+    },
+    {
+      "file": "provider-event-recorded.json",
+      "version": "v1.1",
+      "def": "recordProviderEvent.exchange",
+      "expect": "accept",
+      "shows": "Google Calendar's push about Riley's own event is stored once by (provider, event id), linked to no effect",
+      "source": "02-contracts K-05 v1.1 ('record a provider event once by its event id'); arch 02 line 109; K-07 v1 provider-event-calendar; S12-33"
+    },
+    {
+      "file": "provider-event-duplicate.json",
+      "version": "v1.1",
+      "def": "recordProviderEvent.exchange",
+      "expect": "accept",
+      "shows": "The same push again under the same event id writes nothing and answers repeated with the first one's received time",
+      "source": "arch 02 line 109 ('Known event id: 200, dropped'); 02-contracts K-05 Fixtures (provider-event-duplicate.json)"
+    },
+    {
+      "file": "reconciliation-refund.json",
+      "version": "v1.1",
+      "def": "reconciliationRefund.exchange",
+      "expect": "accept",
+      "shows": "The daily reconciliation, a job with no turn, writes the refund of a $20 charge with no agreed booking behind it as a pending stripe_refund effect with its job id and event-log entry",
+      "source": "arch 10 line 550; S12-26; K-07 v1 move (new) to pending by reconciliationJob, effect-reconciliation-refund, default 12"
+    },
+    {
+      "file": "renew-claim-first-send.json",
+      "version": "v1.1",
+      "def": "renewClaim.exchange",
+      "expect": "accept",
+      "shows": "The dispatcher about to send the first part renews its claim by 60 s and sets the claim's firstTryAt, which the 15 minutes count from",
+      "source": "K-07 v1 outboxClaim (firstTryAt 'Written by the dispatcher at its first send'), README 'How a claim lapses' (renewed at each part attempt); arch 02 line 125"
+    },
+    {
+      "file": "mark-failed-retry-after.json",
+      "version": "v1.1",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "A 429 with a Retry-After: the failure stores nextTryNotBefore in the claim, the next try gets a new key, and the answer carries the row's state and its raised version",
+      "source": "arch 01 line 65; arch 10 line 540 ('each try after any Retry-After'); K-07 v1 retry rule 6; T-016's database review (markPart raises the row's version)"
+    },
+    {
+      "file": "claim-lapsed-reclaimed.json",
+      "version": "v1.1",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "A sending row whose claim lapsed is claimed again by another dispatcher (claim 2), keeping the first try's time and the pending Retry-After; the pending try goes under its stored key",
+      "source": "K-07 v1 move sending to sending by claimOutbox, outbox-retry-after-reclaimed, README 'How a claim lapses'; K-05 v1 open gap 1; arch 11 line 576"
+    },
+    {
+      "file": "renew-claim-not-yet.json",
+      "version": "v1.1",
+      "def": "renewClaim.exchange",
+      "expect": "accept",
+      "shows": "A try before the provider's Retry-After has passed is refused with notYet and the time it may go",
+      "source": "arch 10 line 540; K-07 v1 retry rule 6"
+    },
+    {
+      "file": "renew-claim-lost.json",
+      "version": "v1.1",
+      "def": "renewClaim.exchange",
+      "expect": "accept",
+      "shows": "A slow dispatcher whose claim was taken again is refused with claimLost and sends nothing, so the try is never sent twice",
+      "source": "02-contracts K-05 item 3 ('with a claim so no row is sent twice'); K-07 v1 README 'How a claim lapses'; arch 11 line 576"
+    },
+    {
+      "file": "dispatcher-gives-up-too-soon.json",
+      "version": "v1.1",
+      "def": "dispatcherGivesUp.exchange",
+      "expect": "accept",
+      "shows": "Ending a row before 15 minutes of tries have passed since the claim's firstTryAt is refused with tooSoon",
+      "source": "arch 02 line 125 ('Sends still failing after 15 minutes of tries'); K-07 v1 retry rule 5"
+    },
+    {
+      "file": "dispatcher-gives-up.json",
+      "version": "v1.1",
+      "def": "dispatcherGivesUp.exchange",
+      "expect": "accept",
+      "shows": "Sends still failing 15 minutes after the first try went: in one transaction the row ends failed and the next way Alex allows, an email row, is written planned under the failed row's turn, with the event-log entries for both (the email row's names the failed row and nextWay)",
+      "source": "arch 02 line 125; S12-09, S12-10; K-07 v1 move sending to failed by dispatcherGivesUp, retry rule 5, followUp nextWay, outbox-fallback-email; arch 09 line 457"
+    },
+    {
+      "file": "write-all-set.json",
+      "version": "v1.1",
+      "def": "writeAllSet.exchange",
+      "expect": "accept",
+      "shows": "Texts to Alex work again: the dispatcher writes the one short 'all set' to his mobile, planned under the failed row's turn, its id fixed by rule, with its event-log entry naming the failed row",
+      "source": "arch 02 line 125 ('once texts work, one short \"all set\"'); S12-10; K-07 v1 open gap 12"
+    },
+    {
+      "file": "write-all-set-not-failed.json",
+      "version": "v1.1",
+      "def": "writeAllSet.exchange",
+      "expect": "accept",
+      "shows": "An 'all set' for a row still sending is refused with wrongState and writes nothing",
+      "source": "arch 02 line 125 (the 'all set' follows a failed row); K-07 v1 rowState failed"
+    },
+    {
+      "file": "write-plan-dee-answer.json",
+      "version": "v1.1",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "The one message giving Dee's booking as it stands gets its plan and final parts",
+      "source": "02-contracts K-05 item 2; K-03 v1 rowPlan, finalParts"
+    },
+    {
+      "file": "claim-dee-answer.json",
+      "version": "v1.1",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "The answer to Dee is claimed (claim 1); her superseded row is finished and skipped",
+      "source": "K-07 v1 README 'How K-05 v1's calls use them' (superseded rows are skipped); arch 02 line 125"
+    },
+    {
+      "file": "renew-claim-dee-answer.json",
+      "version": "v1.1",
+      "def": "renewClaim.exchange",
+      "expect": "accept",
+      "shows": "The first send of the answer to Dee sets the claim's firstTryAt, which the 15 minutes count from",
+      "source": "K-07 v1 outboxClaim.firstTryAt, retry rule 5; arch 02 line 125"
+    },
+    {
+      "file": "dispatcher-gives-up-owner-number.json",
+      "version": "v1.1",
+      "def": "dispatcherGivesUp.exchange",
+      "expect": "accept",
+      "shows": "Sends to Dee still failing after 15 minutes and she gave no email: in one transaction the row ends failed and one row to Sam gives him her number to call, with the event-log entries for both",
+      "source": "arch 02 line 125 ('none left, the owner gets the number to call'); S12-10 ('With no email on file, Sam gets the number to call'); K-07 v1 followUp ownerGetsNumber, retry rule 5"
+    },
+    {
+      "file": "commit-alex-safety.json",
+      "version": "v1.1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "The safety read finds an emergency in Alex's text: the commit writes the safety line as a safety row",
+      "source": "arch 02 line 111; K-07 v1 outbox-safety-retry; 02-contracts K-05 item 1"
+    },
+    {
+      "file": "write-plan-alex-safety.json",
+      "version": "v1.1",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "The safety row's final parts are K-01's fixed line safetyEmergency word for word, with no plan lines of its own",
+      "source": "arch 07 line 361; K-01 v1 fixed-lines safetyEmergency; K-07 v1 outbox-safety-retry"
+    },
+    {
+      "file": "claim-alex-safety.json",
+      "version": "v1.1",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "The dispatcher claims the safety line, which goes at any hour",
+      "source": "RULES 4.3; arch 02 line 125"
+    },
+    {
+      "file": "mark-safety-failed-other-way.json",
+      "version": "v1.1",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "The safety line's first try fails: in the same transaction the next try's key is written and so is the row that takes the line at once to Alex's email, with its event-log entry naming the failed row and safetyOtherWay",
+      "source": "arch 02 line 125 ('A failed safety line ... goes at once every other way the person allows'); RULES 4.12; K-07 v1 retry rule 3, followUp safetyOtherWay, outbox-safety-retry"
+    },
+    {
+      "file": "commit-adds-dee-booking.json",
+      "version": "v1.1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Sam adds Dee W.'s haircut with Riley: Dee's person, mobile handle, phone row with no chat open, customer role and booking are written, with one routine row to tell her",
+      "source": "K-07 v1 outbox-waiting-chat-superseded (the same rows); arch 01 lines 39 to 41; K-04 v1 persons, handles, phones, person_roles, bookings"
+    },
+    {
+      "file": "write-plan-dee.json",
+      "version": "v1.1",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "Dee's booking notice gets its plan and final parts",
+      "source": "02-contracts K-05 item 2; K-03 v1 rowPlan, finalParts"
+    },
+    {
+      "file": "claim-dee.json",
+      "version": "v1.1",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "A first claim in v1.1's form: the claim written to outbox_claims and returned (claim 1, lapsing in 60 s, no first try yet), claimed from checked",
+      "source": "K-07 v1 outboxClaim, outbox-effects.v1.tables.json outbox_claims, README 'How a claim lapses'; K-05 v1 open gap 1"
+    },
+    {
+      "file": "mark-waiting-chat.json",
+      "version": "v1.1",
+      "def": "markRow.exchange",
+      "expect": "accept",
+      "shows": "Limit 8 at send finds Dee's mobile with no open chat: the row waits (waiting_chat) with no held time, its claim let go",
+      "source": "arch 06 line 313; RULES 4.1b; MC C9; K-07 v1 move sending to waiting_chat by markRow (waitingChat), default 11"
+    },
+    {
+      "file": "mark-row-wrong-state.json",
+      "version": "v1.1",
+      "def": "markRow.exchange",
+      "expect": "accept",
+      "shows": "A limit-8 outcome for a row that is no longer sending is refused with wrongState and the state it is in, and changes nothing",
+      "source": "K-07 v1 rowMove (limit 8's moves start from sending); T-016's database review (markRow and markPart need a wrong-state error)"
+    },
+    {
+      "file": "commit-supersedes-waiting.json",
+      "version": "v1.1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Dee texts in: the commit writes the one message giving her booking as it stands, and every waiting row to her mobile moves to superseded, never sent",
+      "source": "arch 06 line 313; RULES 4.1b ('Nothing sent before is sent again'); K-07 v1 move waiting_chat to superseded by commitTurn, followUp chatOpenAnswer, default 9"
+    },
+    {
+      "file": "commit-withdraws-waiting.json",
+      "version": "v1.1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Sam calls off Dee's haircut before she ever texts in: the waiting row about the booking moves to withdrawn, never sent",
+      "source": "arch 06 line 313; K-07 v1 move waiting_chat to withdrawn by commitTurn, outbox-waiting-chat-withdrawn, default 10"
+    },
+    {
+      "file": "invalid/refuse-mark-waiting-chat-with-time.json",
+      "version": "v1.1",
+      "def": "markRow.request",
+      "expect": "refuse",
+      "shows": "A row marked waiting for the chat with a held time: a waiting row has no clock and no held_until",
+      "source": "arch 06 line 313 ('other rows wait, with no clock, until it texts in'); K-07 v1 rowState waiting_chat"
+    },
+    {
+      "file": "invalid/refuse-reconciliation-not-refund.json",
+      "version": "v1.1",
+      "def": "reconciliationRefund.request",
+      "expect": "refuse",
+      "shows": "The reconciliation job writing a charge: it writes only the refund of a charge with no agreed booking behind it",
+      "source": "arch 10 line 550; S12-26; K-07 v1 effectLife (reconciliationJob writes only a stripe_refund), default 12"
+    },
+    {
+      "file": "invalid/refuse-effect-calendar-without-visit.json",
+      "version": "v1.1",
+      "def": "effectNew",
+      "expect": "refuse",
+      "shows": "A calendar write with no visit: a calendar effect is keyed by booking id, visit and person",
+      "source": "arch 05 line 267; K-07 v1 effectRow kind rules, outbox-effects.v1.tables.json effects_calendar_keyed"
+    },
+    {
+      "file": "invalid/refuse-effect-result-ok-with-error.json",
+      "version": "v1.1",
+      "def": "recordEffectResult.request",
+      "expect": "refuse",
+      "shows": "A try recorded ok with an error code: an ok try carries no error",
+      "source": "K-07 v1 effectMove (running to succeeded with tryOutcome ok); arch 10 line 542"
+    },
+    {
+      "file": "invalid/refuse-failed-no-retry-with-not-before.json",
+      "version": "v1.1",
+      "def": "markPart.request",
+      "expect": "refuse",
+      "shows": "A failure with no next try that still carries a Retry-After time: the time holds only a next try",
+      "source": "arch 10 line 540; K-07 v1 outboxClaim.nextTryNotBefore, retry rule 6"
+    },
+    {
+      "file": "invalid/refuse-claim-effects-sms-port.json",
+      "version": "v1.1",
+      "def": "claimEffects.request",
+      "expect": "refuse",
+      "shows": "Claiming effects of an SMS port: effects run only through the stripe, calendar and linq ports, and there is no SMS port",
+      "source": "DL-012; K-07 v1 effectRow.port"
+    },
+    {
+      "file": "invalid/refuse-provider-event-linq.json",
+      "version": "v1.1",
+      "def": "recordProviderEvent.request",
+      "expect": "refuse",
+      "shows": "A Linq event recorded as a provider event: provider events are Stripe's and the calendars'; Linq's events are inbound events to the handle's actor and the dispatcher",
+      "source": "arch 02 line 109 ('Stripe and calendar events go to PostgreSQL'); K-07 v1 providerEvent.provider; K-06 v1"
+    },
+    {
+      "file": "invalid/refuse-effect-result-without-events.json",
+      "version": "v1.1",
+      "def": "recordEffectResult.request",
+      "expect": "refuse",
+      "shows": "An effect's result recorded with no event-log entry: every write appends to the event log",
+      "source": "arch 09 lines 457, 492 ('every write appends: who, what, old to new, when, why'); K-08 v1 kind effect.result"
+    },
+    {
+      "file": "invalid/refuse-safety-other-way-without-events.json",
+      "version": "v1.1",
+      "def": "markPart.request",
+      "expect": "refuse",
+      "shows": "A safety line's other-way row written with no event-log entry: the entry is the row's link to the failed one",
+      "source": "arch 09 line 457; K-07 v1 open gap 3 (the event log holds the follow-up link)"
+    },
+    {
+      "file": "invalid/refuse-all-set-by-email.json",
+      "version": "v1.1",
+      "def": "writeAllSet.request",
+      "expect": "refuse",
+      "shows": "An 'all set' sent by email: it goes once texts work, as a text",
+      "source": "arch 02 line 125 ('once texts work, one short \"all set\"'); S12-10 ('Nothing already emailed is sent again in full')"
     }
   ]
 }

@@ -1,0 +1,62 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["mark-waiting-chat.json"],
+    "now": "2026-11-10T14:00:02Z",
+    "note": "Dee sends the ready text with her booking ref, so the chat opens. The commit of the turn that answers it writes the one message giving her booking as it stands, and the call moves every waiting row to her mobile to superseded, never sent (arch 06 line 313; RULES 4.1b: 'Nothing sent before is sent again'; K-07 outbox-waiting-chat-superseded), with one event-log entry per row moved."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-dee-chat-open-1",
+      "handleId": "handle-dee",
+      "eventIds": ["evt-dee-0001"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-dee-0011",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-dee-riley-nov14", "version": 1 }],
+    "writes": {
+      "state": [],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-dee-chat-open-answer",
+          "recipientHandleId": "handle-dee",
+          "recipientPersonId": "person-dee",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-dee-riley-nov14",
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-dee-riley-nov14", "version": 1 }]
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [],
+      "waitingChat": {
+        "supersede": { "recipientHandleId": "handle-dee", "answerRowId": "out-dee-chat-open-answer" },
+        "withdrawForBookings": [],
+        "withdrawForQuestions": []
+      }
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-dee-chat-open-1",
+    "committedAt": "2026-11-10T14:00:02Z",
+    "repeated": false,
+    "committed": {
+      "written": [],
+      "outboxRows": [{ "id": "out-dee-chat-open-answer", "commitSeq": 2 }],
+      "promoted": [],
+      "waitingChat": {
+        "superseded": [{ "table": "outbox_rows", "rowId": "out-dee-booked-riley", "version": 5 }],
+        "withdrawn": []
+      }
+    }
+  }
+}

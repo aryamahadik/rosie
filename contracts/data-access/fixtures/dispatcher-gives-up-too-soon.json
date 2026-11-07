@@ -1,0 +1,74 @@
+{
+  "call": "dispatcherGivesUp",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-lapsed-reclaimed.json"],
+    "now": "2026-11-07T15:10:00Z",
+    "note": "dispatcher-2 tries to end the row 3 minutes 25 seconds after the first try went; the 15 minutes count from the claim's firstTryAt, which the re-claim kept (arch 02 line 125). Nothing is written: neither the move to failed nor the email row."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "expectVersion": 5,
+    "claimer": "dispatcher-2",
+    "claimNo": 2,
+    "at": "2026-11-07T15:10:00Z",
+    "followUps": [
+      {
+        "why": "nextWay",
+        "row": {
+          "id": "out-alex-booked-riley-by-email",
+          "recipientHandleId": "handle-alex-email",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov14",
+          "channel": "email",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }]
+        }
+      }
+    ],
+    "events": [
+      {
+        "id": "log-out-alex-booked-riley-failed",
+        "kind": "outbox_row.state_changed",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-alex-booked-riley",
+        "oldValues": { "state": "sending" },
+        "newValues": { "state": "failed" },
+        "sealed": null,
+        "why": { "sendsFailingSince": "2026-11-07T15:06:35Z", "minutes": 15 },
+        "approvedBy": null,
+        "proofs": null
+      },
+      {
+        "id": "log-out-alex-booked-riley-by-email",
+        "kind": "outbox_row.created",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-alex-booked-riley-by-email",
+        "oldValues": null,
+        "newValues": { "state": "planned", "channel": "email" },
+        "sealed": null,
+        "why": { "followUpOf": "out-alex-booked-riley", "followUp": "nextWay" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "error": "tooSoon",
+    "outboxRowId": "out-alex-booked-riley",
+    "firstTryAt": "2026-11-07T15:06:35Z"
+  }
+}

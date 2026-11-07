@@ -1,0 +1,28 @@
+{
+  "call": "renewClaim",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-in-order.json"],
+    "now": "2026-11-07T15:06:35Z",
+    "note": "dispatcher-1 claimed Alex's confirmation (claim 1, which a v1.1 claim writes to outbox_claims) and is about to send its words part: the first part to go, so the claim's firstTryAt is set now."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "claimer": "dispatcher-1",
+    "claimNo": 1,
+    "idempotencyKey": "out-alex-booked-riley/1/1",
+    "at": "2026-11-07T15:06:35Z"
+  },
+  "outcome": {
+    "result": "renewed",
+    "outboxRowId": "out-alex-booked-riley",
+    "claim": {
+      "claimer": "dispatcher-1",
+      "claimedAt": "2026-11-07T15:06:35Z",
+      "lapsesAt": "2026-11-07T15:07:35Z",
+      "claimNo": 1,
+      "firstTryAt": "2026-11-07T15:06:35Z",
+      "nextTryNotBefore": null
+    }
+  }
+}

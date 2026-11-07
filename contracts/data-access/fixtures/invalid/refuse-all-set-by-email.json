@@ -1,0 +1,35 @@
+{
+  "failedRowIds": ["out-alex-booked-riley"],
+  "row": {
+    "id": "out-alex-booked-riley/all-set",
+    "recipientHandleId": "handle-alex-email",
+    "recipientPersonId": "person-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-riley-nov14",
+    "channel": "email",
+    "sendClass": "routine",
+    "openQuestionId": null,
+    "copyOfRowId": null,
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }]
+  },
+  "at": "2026-11-07T16:30:00Z",
+  "events": [
+    {
+      "id": "log-out-alex-booked-riley-all-set",
+      "kind": "outbox_row.created",
+      "zone": "America/New_York",
+      "businessId": "biz-lees-barbershop",
+      "actorKind": "rosie",
+      "actorPersonId": null,
+      "actorRole": null,
+      "tableName": "outbox_rows",
+      "rowId": "out-alex-booked-riley/all-set",
+      "oldValues": null,
+      "newValues": { "state": "planned", "channel": "email" },
+      "sealed": null,
+      "why": { "allSetFor": ["out-alex-booked-riley"] },
+      "approvedBy": null,
+      "proofs": null
+    }
+  ]
+}

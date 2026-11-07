@@ -1,0 +1,53 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-07T15:59:58Z",
+    "note": "The safety read finds an emergency in Alex's text: the outcome step's checked message goes first, at any hour, past any opt-out (arch 02 line 111). The commit writes it as a safety row (K-07 outbox-safety-retry)."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-safety-1",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0050"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0050",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [],
+    "writes": {
+      "state": [],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-alex-safety-emergency",
+          "recipientHandleId": "handle-alex",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "safety",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": []
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": []
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-safety-1",
+    "committedAt": "2026-11-07T15:59:58Z",
+    "repeated": false,
+    "committed": {
+      "written": [],
+      "outboxRows": [{ "id": "out-alex-safety-emergency", "commitSeq": 1 }],
+      "promoted": []
+    }
+  }
+}

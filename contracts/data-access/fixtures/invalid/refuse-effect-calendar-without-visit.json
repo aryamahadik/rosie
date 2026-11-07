@@ -1,0 +1,20 @@
+{
+  "effectId": "eff-cal-riley-alex-nov14-write",
+  "businessId": "biz-lees-barbershop",
+  "bookingId": "booking-alex-riley-nov14",
+  "kind": "calendar_write",
+  "port": "calendar",
+  "calendarProvider": "google",
+  "visitId": null,
+  "personId": "person-riley",
+  "handleId": null,
+  "amount": null,
+  "portRequest": {
+    "title": "Lee's Barbershop · Haircut · Alex",
+    "start": "2026-11-14T16:00:00Z",
+    "end": "2026-11-14T16:30:00Z",
+    "zone": "America/New_York"
+  },
+  "idempotencyKey": "eff-cal-riley-alex-nov14-write",
+  "traceId": "trace-alex-0012"
+}

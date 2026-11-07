@@ -1,0 +1,53 @@
+{
+  "call": "reconciliationRefund",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-09T03:00:05Z",
+    "note": "The daily reconciliation at 03:00 UTC, over the last 48 hours, finds Alex M.'s $20 fee at Lee's Barbershop charged twice: the second charge has no ledger line and no agreed booking behind it, so it is refunded at once (arch 10 line 550; S12-26; K-07 effect-reconciliation-refund). Its ledger line and telling Alex and Sam are not this call's."
+  },
+  "request": {
+    "jobId": "job-reconcile-2026-11-09",
+    "at": "2026-11-09T03:00:05Z",
+    "effect": {
+      "effectId": "eff-reconcile-alex-second-fee-refund",
+      "businessId": "biz-lees-barbershop",
+      "bookingId": null,
+      "kind": "stripe_refund",
+      "port": "stripe",
+      "calendarProvider": null,
+      "visitId": null,
+      "personId": "person-alex",
+      "handleId": null,
+      "amount": { "cents": 2000, "currency": "USD" },
+      "portRequest": { "refundOf": "stripe-charge-demo-0031" },
+      "idempotencyKey": "eff-reconcile-alex-second-fee-refund",
+      "traceId": "trace-reconcile-0002"
+    },
+    "events": [
+      {
+        "id": "log-eff-reconcile-alex-second-fee-refund",
+        "kind": "effect.created",
+        "zone": null,
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "job",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "effects",
+        "rowId": "eff-reconcile-alex-second-fee-refund",
+        "oldValues": null,
+        "newValues": { "kind": "stripe_refund", "state": "pending", "amount": { "cents": 2000, "currency": "USD" } },
+        "sealed": null,
+        "why": { "reconciliation": "a charge with no agreed booking behind it", "charge": "stripe-charge-demo-0031" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "result": "written",
+    "effectId": "eff-reconcile-alex-second-fee-refund",
+    "version": 1,
+    "repeated": false
+  }
+}

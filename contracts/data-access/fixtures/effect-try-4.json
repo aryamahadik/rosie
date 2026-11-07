@@ -1,0 +1,48 @@
+{
+  "call": "recordEffectResult",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["effect-try-3.json"],
+    "now": "2026-11-07T15:11:11Z",
+    "note": "Try 4 on the same key: 503 again."
+  },
+  "request": {
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "expectVersion": 6,
+    "claimer": "effects-runner-2",
+    "outcome": "networkError",
+    "at": "2026-11-07T15:11:11Z",
+    "providerObjectId": null,
+    "errorCode": "503",
+    "ledgerLineId": null,
+    "nextTryAt": "2026-11-07T15:14:11Z",
+    "events": [
+      {
+        "id": "log-eff-cal-riley-alex-nov14-write-run-1-try-4",
+        "kind": "effect.result",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "job",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "effects",
+        "rowId": "eff-cal-riley-alex-nov14-write",
+        "oldValues": { "state": "running", "tries": 3, "runs": 1 },
+        "newValues": { "state": "running", "tries": 4, "runs": 1, "errorCode": "503" },
+        "sealed": null,
+        "why": { "try": 4, "outcome": "networkError", "nextTryAt": "2026-11-07T15:14:11Z" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "result": "recorded",
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "version": 7,
+    "state": "running",
+    "tries": 4,
+    "runs": 1,
+    "claimLapsesAt": "2026-11-07T15:15:11Z"
+  }
+}

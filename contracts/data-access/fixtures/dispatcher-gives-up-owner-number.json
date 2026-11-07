@@ -1,0 +1,76 @@
+{
+  "call": "dispatcherGivesUp",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["renew-claim-dee-answer.json"],
+    "now": "2026-11-10T14:15:10Z",
+    "note": "Linq keeps refusing each try to Dee's mobile (the tries between are left out; the call checks only the time since firstTryAt). Dee gave no email, so no other way is left: in the same transaction the row ends failed and one row to Sam, the owner, gives him her number to call (S12-10: 'With no email on file, Sam gets the number to call, and reaches them their way'; K-07 followUp ownerGetsNumber), planned under the failed row's turn and composed as any row is."
+  },
+  "request": {
+    "outboxRowId": "out-dee-chat-open-answer",
+    "expectVersion": 3,
+    "claimer": "dispatcher-1",
+    "claimNo": 1,
+    "at": "2026-11-10T14:15:10Z",
+    "followUps": [
+      {
+        "why": "ownerGetsNumber",
+        "row": {
+          "id": "out-sam-dee-number",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-dee-riley-nov14",
+          "channel": "imessage",
+          "sendClass": "routine",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-dee-riley-nov14", "version": 1 }]
+        }
+      }
+    ],
+    "events": [
+      {
+        "id": "log-out-dee-chat-open-answer-failed",
+        "kind": "outbox_row.state_changed",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-dee-chat-open-answer",
+        "oldValues": { "state": "sending" },
+        "newValues": { "state": "failed" },
+        "sealed": null,
+        "why": { "sendsFailingSince": "2026-11-10T14:00:06Z", "minutes": 15 },
+        "approvedBy": null,
+        "proofs": null
+      },
+      {
+        "id": "log-out-sam-dee-number",
+        "kind": "outbox_row.created",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-sam-dee-number",
+        "oldValues": null,
+        "newValues": { "state": "planned", "channel": "imessage" },
+        "sealed": null,
+        "why": { "followUpOf": "out-dee-chat-open-answer", "followUp": "ownerGetsNumber" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "result": "failed",
+    "outboxRowId": "out-dee-chat-open-answer",
+    "version": 4,
+    "firstTryAt": "2026-11-10T14:00:06Z",
+    "followUpRows": [{ "id": "out-sam-dee-number", "commitSeq": 3 }]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "call": "renewClaim",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["claim-dee-answer.json"],
+    "now": "2026-11-10T14:00:06Z",
+    "note": "dispatcher-1 is about to send the answer's words part, the first part to go: the claim's firstTryAt is set now, and the 15 minutes count from it."
+  },
+  "request": {
+    "outboxRowId": "out-dee-chat-open-answer",
+    "claimer": "dispatcher-1",
+    "claimNo": 1,
+    "idempotencyKey": "out-dee-chat-open-answer/1/1",
+    "at": "2026-11-10T14:00:06Z"
+  },
+  "outcome": {
+    "result": "renewed",
+    "outboxRowId": "out-dee-chat-open-answer",
+    "claim": {
+      "claimer": "dispatcher-1",
+      "claimedAt": "2026-11-10T14:00:05Z",
+      "lapsesAt": "2026-11-10T14:01:06Z",
+      "claimNo": 1,
+      "firstTryAt": "2026-11-10T14:00:06Z",
+      "nextTryNotBefore": null
+    }
+  }
+}

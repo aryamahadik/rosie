@@ -1,0 +1,24 @@
+{
+  "call": "renewClaim",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-lapsed-reclaimed.json"],
+    "now": "2026-11-07T15:07:45Z",
+    "note": "dispatcher-1 was only slow, not dead: it comes back to send try 2 under its old claim, which dispatcher-2 now holds. It sends nothing, so try 2 is never sent twice."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "claimer": "dispatcher-1",
+    "claimNo": 1,
+    "idempotencyKey": "out-alex-booked-riley/1/2",
+    "at": "2026-11-07T15:07:45Z"
+  },
+  "outcome": {
+    "error": "claimLost",
+    "table": "outbox_rows",
+    "rowId": "out-alex-booked-riley",
+    "claimer": "dispatcher-2",
+    "claimNo": 2,
+    "state": "sending"
+  }
+}

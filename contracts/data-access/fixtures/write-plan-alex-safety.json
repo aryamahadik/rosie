@@ -1,0 +1,46 @@
+{
+  "call": "writePlan",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-alex-safety.json"],
+    "now": "2026-11-07T15:59:59Z",
+    "note": "The safety line is K-01's fixed line safetyEmergency word for word, which code adds (arch 07 line 361), so the plan has no lines of its own."
+  },
+  "request": {
+    "outboxRowId": "out-alex-safety-emergency",
+    "expectVersion": 1,
+    "plan": {
+      "row": "out-alex-safety-emergency",
+      "channel": "imessage",
+      "copyOf": null,
+      "plan": {
+        "formats": ["text"],
+        "lines": [],
+        "question": null,
+        "pageType": null,
+        "threadReplyTo": null
+      }
+    },
+    "finalParts": {
+      "row": "out-alex-safety-emergency",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": ["safetyEmergency"],
+      "slotValues": [],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "outboxRowId": "out-alex-safety-emergency",
+    "version": 2
+  }
+}

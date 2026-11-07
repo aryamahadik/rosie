@@ -1,0 +1,11 @@
+{
+  "provider": "linq",
+  "providerEventId": "linq-evt-demo-0001",
+  "eventType": "message.delivered",
+  "occurredAt": null,
+  "receivedAt": "2026-11-07T15:06:37Z",
+  "businessId": "biz-lees-barbershop",
+  "effectId": null,
+  "payload": { "message": "linq-msg-demo-0101" },
+  "traceId": "trace-alex-0012"
+}

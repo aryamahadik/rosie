@@ -1,0 +1,26 @@
+{
+  "outcome": "failed",
+  "idempotencyKey": "out-alex-safety-emergency/1/1",
+  "errorCode": "503",
+  "retry": true,
+  "at": "2026-11-07T16:00:01Z",
+  "providerMessageId": null,
+  "nextTryNotBefore": null,
+  "followUps": [
+    {
+      "why": "safetyOtherWay",
+      "row": {
+        "id": "out-alex-safety-emergency-email",
+        "recipientHandleId": "handle-alex-email",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "channel": "email",
+        "sendClass": "safety",
+        "openQuestionId": null,
+        "copyOfRowId": null,
+        "versionsRead": []
+      }
+    }
+  ]
+}

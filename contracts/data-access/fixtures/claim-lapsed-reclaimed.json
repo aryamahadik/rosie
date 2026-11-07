@@ -1,0 +1,73 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["mark-failed-retry-after.json"],
+    "now": "2026-11-07T15:07:40Z",
+    "note": "dispatcher-1 died while try 2 waited for the Retry-After; its claim lapsed at 15:07:35. dispatcher-2 claims Alex's rows: the sending row is taken again (claim 2), keeping the first try's time and the Retry-After (K-07 outbox-retry-after-reclaimed). Try 2 goes under its stored key; attempts counts the claims that handed it out (K-05 v1 item 3)."
+  },
+  "request": {
+    "claimer": "dispatcher-2",
+    "recipientHandleId": "handle-alex",
+    "now": "2026-11-07T15:07:40Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-alex-booked-riley",
+        "version": 5,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-alex",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-riley-nov14",
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "quick_reply",
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+        "finalParts": {
+          "row": "out-alex-booked-riley",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am",
+              "calendarFile": "new",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            { "slot": "pro.name", "value": "Riley" },
+            { "slot": "biz.name", "value": "Lee's Barbershop" },
+            { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+          ],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 2,
+            "idempotencyKey": "out-alex-booked-riley/1/2",
+            "attempts": 2,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0012",
+        "claim": {
+          "claimer": "dispatcher-2",
+          "claimedAt": "2026-11-07T15:07:40Z",
+          "lapsesAt": "2026-11-07T15:08:40Z",
+          "claimNo": 2,
+          "firstTryAt": "2026-11-07T15:06:35Z",
+          "nextTryNotBefore": "2026-11-07T15:08:36Z"
+        },
+        "claimedFrom": "sending"
+      }
+    ],
+    "passedHeld": []
+  }
+}

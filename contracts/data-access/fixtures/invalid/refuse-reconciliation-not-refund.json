@@ -1,0 +1,38 @@
+{
+  "jobId": "job-reconcile-2026-11-09",
+  "at": "2026-11-09T03:00:05Z",
+  "effect": {
+    "effectId": "eff-reconcile-alex-fee-charge",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": null,
+    "kind": "stripe_charge",
+    "port": "stripe",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-alex",
+    "handleId": null,
+    "amount": { "cents": 2000, "currency": "USD" },
+    "portRequest": { "chargeFor": "ledger-alex-fee-without-charge" },
+    "idempotencyKey": "eff-reconcile-alex-fee-charge",
+    "traceId": "trace-reconcile-0003"
+  },
+  "events": [
+    {
+      "id": "log-eff-reconcile-alex-fee-charge",
+      "kind": "effect.created",
+      "zone": null,
+      "businessId": "biz-lees-barbershop",
+      "actorKind": "job",
+      "actorPersonId": null,
+      "actorRole": null,
+      "tableName": "effects",
+      "rowId": "eff-reconcile-alex-fee-charge",
+      "oldValues": null,
+      "newValues": { "kind": "stripe_charge", "state": "pending" },
+      "sealed": null,
+      "why": { "reconciliation": "a line with no charge" },
+      "approvedBy": null,
+      "proofs": null
+    }
+  ]
+}
