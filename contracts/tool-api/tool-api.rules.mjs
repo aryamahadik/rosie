@@ -55,10 +55,54 @@ export const STEP_GIVES = Object.freeze({
 /** Every key some step of journeys 1 and 2 gives. */
 const ALL_KEYS = new Set(Object.values(STEP_GIVES).flat());
 
+/** The decide result a gate exchange's request carries, or undefined for a clock's or a core-only turn. */
+function decideOf(exchange) {
+  const input = exchange.request?.input;
+  return input?.kind === "decided" ? input.decided?.decide : undefined;
+}
+
+/**
+ * Limit 6 only after decide's one Sonnet re-read (arch 02 line 119; arch 06 lines 289, 309; Q-41): a gate answer of
+ * valueFailsWords needs a decide result with reread false, naming parts that went to the gate and fields those parts
+ * carry; a part stopped by limit 6 needs reread true.
+ */
+function limit6AfterReread(exchange) {
+  const problems = [];
+  const decide = decideOf(exchange);
+  const outcome = exchange.outcome ?? {};
+  if (outcome.error === "valueFailsWords") {
+    if (decide === undefined) return ["valueFailsWords needs a decided input"];
+    if (decide.reread !== false)
+      problems.push("valueFailsWords is answered only while decide.reread is false");
+    for (const named of outcome.parts) {
+      const resultPart = decide.parts[named.part];
+      if (resultPart === undefined || resultPart.outcome !== "go") {
+        problems.push(
+          `valueFailsWords names part ${named.part}, which is not a part decide sent to the gate`,
+        );
+        continue;
+      }
+      const fieldNames = (resultPart.part.fields ?? []).map((field) => field.name);
+      for (const name of named.fields) {
+        if (!fieldNames.includes(name)) problems.push(`part ${named.part} has no field ${name}`);
+      }
+    }
+  }
+  if (Array.isArray(outcome.parts) && outcome.result === "committed") {
+    for (const part of outcome.parts) {
+      if (part.stoppedBy?.limit === 6 && decide?.reread !== true) {
+        problems.push(`parts[${part.part}] is stopped by limit 6 although decide.reread is not true`);
+      }
+    }
+  }
+  return problems;
+}
+
 /**
  * statedOutcome: a gate exchange that states a limit's outcome stops exactly one part, by that limit, with that kind
  * of outcome and that action, and logs that limit as failed with that action on the part's limits (README "Limits 1 to
- * 6 at the gate"; 02-contracts K-09 "Contract test": each limit fixture gives its stated outcome).
+ * 6 at the gate"; 02-contracts K-09 "Contract test": each limit fixture gives its stated outcome). Limit 6 stops a
+ * part only after decide's one re-read (limit6AfterReread).
  */
 export function statedOutcome(exchange) {
   const stated = exchange.given?.stated;
@@ -90,6 +134,59 @@ export function statedOutcome(exchange) {
         `parts[${part.part}].limits does not log limit ${stated.limit} as failed with ${stated.action}`,
       );
     }
+  }
+  return [...problems, ...limit6AfterReread(exchange)];
+}
+
+/**
+ * rereadBeforeQuestion: a gate exchange on decided texts answers a value that fails its words with valueFailsWords,
+ * refused before any write, while decide has not re-read, and with limit 6's outcome only after the re-read (README
+ * "Limits 1 to 6 at the gate"; arch 02 line 119; arch 06 lines 289, 309; Q-41; the AI engineer's review of T-018).
+ */
+export function rereadBeforeQuestion(exchange) {
+  if (exchange.call !== "gateAndCommit" || decideOf(exchange) === undefined) {
+    return ["rereadBeforeQuestion needs a gateAndCommit exchange on decided texts"];
+  }
+  return limit6AfterReread(exchange);
+}
+
+/**
+ * clockTurn: a clock's firing (gateAndCommit, input.kind clock) is a turn on the clock row's handle, or a firing with
+ * no turn (QUESTIONS.md NQ-RT-4; K-05 v1 fireClock). With a turn: caller.kind turn, caller.turnId and caller.requestId
+ * the turn's id, its one event id the clock row's id (K-05 v1 default 9), its trace id the caller's, the firing's own
+ * (CQ-06). With none: caller.kind clockFiring, caller.turnId null, caller.requestId the clock row's id. A clock's turn
+ * carries no text, so no safety outcome; its answer is fired, for that row and that turn, or one of the errors.
+ */
+export function clockTurn(exchange) {
+  const request = exchange.request ?? {};
+  const input = request.input;
+  if (exchange.call !== "gateAndCommit" || input?.kind !== "clock") {
+    return ["clockTurn needs a gateAndCommit exchange on a clock's firing"];
+  }
+  const problems = [];
+  const { caller, turn } = request;
+  if (turn === null) {
+    if (caller.kind !== "clockFiring" || caller.turnId !== null) {
+      problems.push("a firing with no turn is called with caller.kind clockFiring and caller.turnId null");
+    }
+    if (caller.requestId !== input.clockRowId) problems.push("its caller.requestId is the clock row's id");
+  } else {
+    if (caller.kind !== "turn" || caller.turnId !== turn.id || caller.requestId !== turn.id) {
+      problems.push("a clock turn is called with caller.kind turn, and caller.turnId and requestId its id");
+    }
+    if (JSON.stringify(turn.eventIds) !== JSON.stringify([input.clockRowId])) {
+      problems.push("a clock turn's one event id is the clock row's id (K-05 v1 default 9)");
+    }
+    if (turn.traceId !== caller.traceId) problems.push("a clock turn's trace id is the firing's own (CQ-06)");
+  }
+  if (request.core.some((action) => action.call === "recordSafetyOutcome")) {
+    problems.push("a clock's turn has no text, so it carries no safety outcome");
+  }
+  const outcome = exchange.outcome ?? {};
+  if (outcome.result === "committed") problems.push("a clock's firing answers fired, never committed");
+  if (outcome.result === "fired") {
+    if (outcome.clockRowId !== input.clockRowId) problems.push("fired names another clock row");
+    if (outcome.turnId !== (turn === null ? null : turn.id)) problems.push("fired names another turn");
   }
   return problems;
 }
@@ -132,4 +229,4 @@ export function givesStepKeys(exchange) {
   return problems;
 }
 
-export const rules = Object.freeze({ statedOutcome, givesStepKeys });
+export const rules = Object.freeze({ statedOutcome, givesStepKeys, rereadBeforeQuestion, clockTurn });

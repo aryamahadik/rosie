@@ -94,12 +94,12 @@
       "type": "object",
       "properties": {
         "kind": {
-          "description": "Who calls: turn (the handle actor's turn, through gateAndCommit; arch 02 line 121), page (a secure page or the portal, through K-21), agent (an outside AI through the Agent API, K-20), console (the team console, C-194), job (an offline or queue job, such as the dispatcher or a calendar renewal), clockFiring (a clock row's firing with no handle, the minute sweep's: arch 10 line 540) or actorOnReturn (a line the handle actor sent while PostgreSQL was down, written on return: arch 11 line 566). The same calls serve texts, secure pages and outside AIs under the same limits (arch 02 line 129).",
+          "description": "Who calls: turn (the handle actor's turn, through gateAndCommit; arch 02 line 121), a clock turn on the clock row's handle included (QUESTIONS.md NQ-RT-4), page (a secure page or the portal, through K-21), agent (an outside AI through the Agent API, K-20), console (the team console, C-194), job (an offline or queue job, such as the dispatcher or a calendar renewal), clockFiring (a clock row's firing that carries no turn: a row no handle owns, the minute sweep's (arch 10 line 540), or a firing whose writes hold no outbox row (K-05 v1 fireClock.request.turn)) or actorOnReturn (a line the handle actor sent while PostgreSQL was down, written on return: arch 11 line 566). The same calls serve texts, secure pages and outside AIs under the same limits (arch 02 line 129).",
           "type": "string",
           "enum": ["turn", "page", "agent", "console", "job", "clockFiring", "actorOnReturn"]
         },
         "turnId": {
-          "description": "For kind turn, the turn whose one commit carries the call (arch 02 line 121; arch 10 line 508); null otherwise.",
+          "description": "For kind turn, the turn whose one commit carries the call (arch 02 line 121; arch 10 line 508), a clock turn's id for a firing on the handle's actor (NQ-RT-4); null otherwise.",
           "anyOf": [
             {
               "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
@@ -262,9 +262,17 @@
               "description": "Unproven sender: a code to the contact on file, in words that never confirm a booking exists (arch 06 line 299; RULES 6.2); the choice waits for the code typed back within 10 minutes (proveCode).",
               "type": "string",
               "enum": ["proofCodeSent"]
+            },
+            "proofCodeId": {
+              "description": "The code this commit sent (purpose unprovenSender; where codes are kept is K-22's, named in words), which proveCode takes when it comes back (RULES 6.2; S13-45). The code itself never comes back to the caller.",
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "openQuestionId": {
+              "description": "The open question in the sender's own conversation that takes the code typed back there (S13-45: typed back in the same conversation; FS line 701), opened in this commit (openQuestions.opened). Its answer goes to proveCode, whose redecideTurnId names this turn, so the waiting choice is decided again once the code is proven (gateOutcome wait).",
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
             }
           },
-          "required": ["limit", "outcome", "action"],
+          "required": ["limit", "outcome", "action", "proofCodeId", "openQuestionId"],
           "additionalProperties": false
         },
         {
@@ -493,14 +501,14 @@
     },
     "limit6Outcome": {
       "title": "Limit6Outcome",
-      "description": "Limit 6's outcome when it fails (arch 06 line 309). Each action has one kind of outcome (gateOutcome): oneQuestion is ask; nothingChanged is refuse.",
+      "description": "Limit 6's outcome when it fails (arch 06 line 309), only after decide's one Sonnet re-read (K-02 v1 decideResult.reread true). With reread false a value that fails its words commits nothing: the gate refuses before any write (gateAndCommit.errors valueFailsWords), C-116 runs the turn's one re-read, and the turn loop sends the turn to the gate again (arch 02 line 119; arch 06 lines 289, 309; Q-41). Each action has one kind of outcome (gateOutcome): oneQuestion is ask; nothingChanged is refuse.",
       "oneOf": [
         {
           "title": "Limit6Outcome_oneQuestion",
           "type": "object",
           "properties": {
             "limit": {
-              "description": "Limit 6: Values (arch 06 line 309). The one Sonnet re-read is decide's and has run before the gate (arch 02 line 119; K-02 v1 decideResult.reread).",
+              "description": "Limit 6: Values (arch 06 line 309), failing after decide's one Sonnet re-read ran (K-02 v1 decideResult.reread true; arch 02 line 119; Q-41). The named rule rereadBeforeQuestion refuses this outcome on a decide result with reread false.",
               "const": 6
             },
             "outcome": {
@@ -509,7 +517,7 @@
               "enum": ["ask"]
             },
             "action": {
-              "description": "After the re-read, one question (arch 06 line 309).",
+              "description": "Still failing after the one Sonnet re-read: one question, and nothing changes for that part (arch 06 lines 289, 309).",
               "type": "string",
               "enum": ["oneQuestion"]
             }
@@ -522,7 +530,7 @@
           "type": "object",
           "properties": {
             "limit": {
-              "description": "Limit 6: Values (arch 06 line 309). The one Sonnet re-read is decide's and has run before the gate (arch 02 line 119; K-02 v1 decideResult.reread).",
+              "description": "Limit 6: Values (arch 06 line 309), failing after decide's one Sonnet re-read ran (K-02 v1 decideResult.reread true), as for oneQuestion.",
               "const": 6
             },
             "outcome": {
@@ -652,7 +660,7 @@
       "type": "object",
       "properties": {
         "context": {
-          "description": "K-02 v1's context bundle, passed to decide unchanged (CQ-25 settled: the AI gateway's two calls a read are the wire form, not the Tool API's).",
+          "description": "K-02 v1's context bundle, passed to decide unchanged (CQ-25 settled: the AI gateway's two calls a read are the wire form, not the Tool API's). writer.handle is the writer's own number, the turn's own data: C-114 leaves it out of the prompt.",
           "$ref": "../model/model.v1.schema.json#/$defs/context"
         },
         "flagged": {
@@ -879,11 +887,11 @@
     },
     "plannerVerbs.errors": {
       "title": "PlannerVerbsErrors",
-      "description": "Refused, nothing written for the planner's part: plannerVerbs' errors.",
+      "description": "Refused: code commits none of the planner's verb; its parts take the passed-on path instead, which the turn's commit writes ('I've passed this on.': arch 02 line 123). plannerVerbs' errors.",
       "oneOf": [
         {
           "title": "PlannerRefusedError",
-          "description": "Code refused the planner's output: an answer naming a fact the context does not hold, or an ask with more than one question (K-02 v1 README: code checks; C-092). The part takes the passed-on path: 'I've passed this on.' (arch 02 line 123).",
+          "description": "Code refused the planner's output: an answer naming a fact the context does not hold, or an ask with more than one question (K-02 v1 README: code checks; C-092). The verb is not committed and the part takes the passed-on path: 'I've passed this on.' (arch 02 line 123). gateAndCommit.response.planner is then null; v1 returns no reason (README open gaps).",
           "type": "object",
           "properties": {
             "error": {
@@ -1102,14 +1110,14 @@
         },
         {
           "title": "CoreAction_saveSetupStep",
-          "description": "A setup step the actor names in a turn: a staff member's ready text matched by its join link's short code (S2-05; MC C9). Other setup writes in a turn are the effects of the choice decide picked (partResult.gives).",
+          "description": "The one setup step the actor names in a turn: a staff member's ready text matched by its join link's short code (S2-05; MC C9), so its request takes only S2-05's variant (saveSetupStepInTurn). Every other setup write in a turn is the effect of the choice decide picked, which limits 1 to 6 check at the gate (partResult.gives; arch 02 line 121; arch 06 lines 295 to 309).",
           "type": "object",
           "properties": {
             "call": {
               "const": "saveSetupStep"
             },
             "request": {
-              "$ref": "#/$defs/saveSetupStep.request"
+              "$ref": "#/$defs/saveSetupStepInTurn"
             }
           },
           "required": ["call", "request"],
@@ -1682,15 +1690,22 @@
     },
     "gateAndCommit.request": {
       "title": "GateAndCommitRequest",
-      "description": "Gate and commit a turn: the gate checks limits 1 to 6 on the agreed parts with their quotes; code adds each choice's effects; one transaction writes state, one outbox row per message (no plan yet), clock rows, effect rows and the event log under the turn id (arch 02 line 121; arch 06 lines 295 to 309; arch 10 line 508). It commits through K-05 v1 commitTurn, or for a clock's firing through K-05 v1 fireClock (QUESTIONS.md NQ-RT-4); effect rows and the waiting rows' moves (K-07 v1 waiting_chat to superseded or withdrawn) are K-05 v1.1's (T-071). A limit 4 or 5 refusal from the commit reloads once and gates again (arch 06 line 305). Reads: the primary, uncached (arch 02 line 117; arch 10 lines 504, 508). Repeat: safe: the turn id is the key; a repeat writes nothing and returns the first commit with repeated true (K-05 v1 commitTurn; tour line 418). Time budget: at most 300 ms (arch 04 line 223: 'Gate and commit').",
+      "description": "Gate and commit a turn: the gate checks limits 1 to 6 on the agreed parts with their quotes; code adds each choice's effects; one transaction writes state, one outbox row per message (no plan yet), clock rows, effect rows and the event log under the turn id (arch 02 line 121; arch 06 lines 295 to 309; arch 10 line 508). It commits through K-05 v1 commitTurn, or for a clock's firing through K-05 v1 fireClock (QUESTIONS.md NQ-RT-4: a turn on the handle's actor, or a sweep job for a row with no handle, with the clock branch, no decide reads and the firing's own trace id, CQ-06); effect rows and the waiting rows' moves (K-07 v1 waiting_chat to superseded or withdrawn) are K-05 v1.1's (T-071). A limit 4 or 5 refusal from the commit reloads once and gates again (arch 06 line 305). Reads: the primary, uncached (arch 02 line 117; arch 10 lines 504, 508). Repeat: safe: the turn id is the key, or for a firing with no turn the clock row; a repeat writes nothing and returns the first commit or firing with repeated true (K-05 v1 commitTurn and fireClock; tour line 418). Time budget: at most 300 ms (arch 04 line 223: 'Gate and commit').",
       "type": "object",
       "properties": {
         "caller": {
           "$ref": "#/$defs/caller"
         },
         "turn": {
-          "description": "The turn row the commit writes (K-05 v1 turn). For a clock's firing, the firing's turn (K-05 v1 fireClock.request.turn).",
-          "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+          "description": "The turn row the commit writes (K-05 v1 turn); every input but a clock's needs one. For a clock's firing (input.kind clock), the clock turn on the clock row's handle, or null when the firing's writes hold no outbox row (K-05 v1 fireClock.request.turn), as for any row no handle owns (K-04 turns.handle_id is not null). A clock turn has no texts: its one event id is the clock row's id (K-05 v1 default 9), its id is that event id's hash, as every turn's is (CQ-09), so one row's firing has one turn id and a repeat finds the first firing, and its trace id is the firing's own (CQ-06); its caller.kind is turn, with caller.turnId and caller.requestId its id. A firing with no turn is called with caller.kind clockFiring, caller.turnId null and caller.requestId the clock row's id. The named rule clockTurn checks these.",
+          "anyOf": [
+            {
+              "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "input": {
           "description": "What the turn acts on: decided texts, a clock's firing, or only core actions (the guard's keyword-only texts: arch 02 line 115).",
@@ -1723,7 +1738,7 @@
             },
             {
               "title": "ClockInput",
-              "description": "A clock's firing runs its branch with no decide reads (QUESTIONS.md NQ-RT-4; arch 02 line 127).",
+              "description": "A clock's firing runs its step's clock branch, the safe default and who is told, with no decide reads (QUESTIONS.md NQ-RT-4; arch 02 line 127), and answers fired (gateAndCommit.response), or notArmed, notDue or the clock row's versionChanged (gateAndCommit.errors). A version change on a row the branch read reloads once and runs the branch again, as limit 4 does (arch 06 line 305).",
               "type": "object",
               "properties": {
                 "kind": {
@@ -1779,10 +1794,158 @@
         }
       },
       "required": ["caller", "turn", "input", "core", "now"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "input": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "clock"
+              }
+            },
+            "required": ["kind"]
+          }
+        },
+        "required": ["input"]
+      },
+      "then": {
+        "description": "A clock's firing: its turn may be null (K-05 v1 fireClock.request.turn); the named rule clockTurn checks the caller and the turn's id rule."
+      },
+      "else": {
+        "description": "Decided texts or core actions only: the turn is required (K-05 v1 commitTurn).",
+        "properties": {
+          "turn": {
+            "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+          }
+        }
+      }
     },
     "gateAndCommit.response": {
       "title": "GateAndCommitResponse",
+      "description": "committed for a turn's decided texts or core actions (gateAndCommit.committed); fired for a clock's firing (gateAndCommit.fired; K-05 v1 fireClock.response).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/gateAndCommit.committed"
+        },
+        {
+          "$ref": "#/$defs/gateAndCommit.fired"
+        }
+      ]
+    },
+    "effectWritten": {
+      "title": "EffectWritten",
+      "description": "An effect row a commit or a firing wrote, to run after it (K-07 v1 effect rows; K-05 v1.1, T-071).",
+      "type": "object",
+      "properties": {
+        "effectId": {
+          "description": "The effect id reconciliation matches by (arch 10 line 550).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "kind": {
+          "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectKind"
+        }
+      },
+      "required": ["effectId", "kind"],
+      "additionalProperties": false
+    },
+    "openQuestionsWritten": {
+      "title": "OpenQuestionsWritten",
+      "description": "The open questions a commit or a firing opened and closed (K-05 v1 writes.openQuestions).",
+      "type": "object",
+      "properties": {
+        "opened": {
+          "description": "Open questions opened (K-05 v1 writes.openQuestions.open).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "closed": {
+          "description": "Open questions closed (answered, defaulted or withdrawn).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        }
+      },
+      "required": ["opened", "closed"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.fired": {
+      "title": "GateAndCommitFired",
+      "description": "A clock's firing, once (K-05 v1 fireClock.response): the row moved to fired and its step's clock branch committed with it in one transaction (arch 02 line 127; arch 10 lines 508, 540). A repeat, such as the minute sweep after the actor's alarm (they race by design: arch 10 line 540), writes nothing and returns the first firing with repeated true: a row already fired is never an error.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "fired"
+        },
+        "clockRowId": {
+          "description": "The clock row fired (input.clockRowId).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "version": {
+          "description": "The clock row's version after the firing (K-05 v1 fireClock.response.version).",
+          "$ref": "#/$defs/version"
+        },
+        "firedAt": {
+          "description": "When it fired: the first firing's time on a repeat.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "turnId": {
+          "description": "The clock turn's id, or null for a firing with no turn (K-05 v1 fireClock.response.turnId).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "repeated": {
+          "description": "true when the row had fired before: nothing was written and the first firing comes back (K-05 v1 fireClock).",
+          "type": "boolean"
+        },
+        "core": {
+          "description": "One result per core action the firing carried, in the request's order; empty for most firings.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coreResult"
+          }
+        },
+        "written": {
+          "description": "What the firing's branch wrote: rows with their versions (a phone row named by its handle id: K-08 v1 default 3), outbox rows in commit order, promotions (K-05 v1 commitResult).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/commitResult"
+        },
+        "effects": {
+          "description": "Effect rows written with the firing (K-05 v1.1 fireClock writes.effects; with no turn, under the firing's job id).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effectWritten"
+          }
+        },
+        "openQuestions": {
+          "description": "The questions the branch opened and closed: a question's own clock closes it as defaulted (K-05 v1 fire-once).",
+          "$ref": "#/$defs/openQuestionsWritten"
+        }
+      },
+      "required": [
+        "result",
+        "clockRowId",
+        "version",
+        "firedAt",
+        "turnId",
+        "repeated",
+        "core",
+        "written",
+        "effects",
+        "openQuestions"
+      ],
+      "additionalProperties": false
+    },
+    "gateAndCommit.committed": {
+      "title": "GateAndCommitCommitted",
       "description": "Committed: per part either committed or the failed limit and its outcome, and what the one commit wrote.",
       "type": "object",
       "properties": {
@@ -1800,14 +1963,14 @@
           "type": "boolean"
         },
         "parts": {
-          "description": "One result per decide part, in order; empty for a clock's or a core-only turn.",
+          "description": "One result per decide part, in order; empty for a core-only turn.",
           "type": "array",
           "items": {
             "$ref": "#/$defs/partResult"
           }
         },
         "planner": {
-          "description": "The planner's verb as committed, or null.",
+          "description": "The planner's verb as committed; null when no planner ran, or when code refused its output (plannerVerbs.errors), whose parts then take the passed-on path.",
           "anyOf": [
             {
               "$ref": "#/$defs/plannerVerbs.response"
@@ -1825,49 +1988,18 @@
           }
         },
         "written": {
-          "description": "What the commit wrote: rows with their versions, outbox rows in commit order, promotions (K-05 v1).",
+          "description": "What the commit wrote: rows with their versions (a phone row named by its handle id: K-08 v1 default 3), outbox rows in commit order, promotions (K-05 v1).",
           "$ref": "../data-access/data-access.v1.schema.json#/$defs/commitResult"
         },
         "effects": {
           "description": "Effect rows written in the commit, to run after it (K-07 v1 effect rows; written through K-05 v1.1's commitTurn, T-071, frozen): a calendar write, a charge, or contacts/add for a mobile saved (CQ-04; Q-03).",
           "type": "array",
           "items": {
-            "title": "EffectWritten",
-            "type": "object",
-            "properties": {
-              "effectId": {
-                "description": "The effect id reconciliation matches by (arch 10 line 550).",
-                "$ref": "../common/formats.v1.schema.json#/$defs/id"
-              },
-              "kind": {
-                "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectKind"
-              }
-            },
-            "required": ["effectId", "kind"],
-            "additionalProperties": false
+            "$ref": "#/$defs/effectWritten"
           }
         },
         "openQuestions": {
-          "title": "OpenQuestionsWritten",
-          "type": "object",
-          "properties": {
-            "opened": {
-              "description": "Open questions opened (K-05 v1 writes.openQuestions.open).",
-              "type": "array",
-              "items": {
-                "$ref": "../common/formats.v1.schema.json#/$defs/id"
-              }
-            },
-            "closed": {
-              "description": "Open questions closed (answered, defaulted or withdrawn).",
-              "type": "array",
-              "items": {
-                "$ref": "../common/formats.v1.schema.json#/$defs/id"
-              }
-            }
-          },
-          "required": ["opened", "closed"],
-          "additionalProperties": false
+          "$ref": "#/$defs/openQuestionsWritten"
         }
       },
       "required": [
@@ -1935,6 +2067,88 @@
           },
           "required": ["error", "rule", "parts"],
           "additionalProperties": false
+        },
+        {
+          "title": "ValueFailsWordsError",
+          "description": "Limit 6 failed and decide has not re-read (K-02 v1 decideResult.reread false): a value does not re-parse from its source words (arch 06 line 309). Refused before any write, the turn's core actions included: the AI layer runs the turn's one Sonnet re-read (C-116; arch 02 line 119: 'a value that fails its words: one Sonnet re-read per turn'; arch 06 line 289; Q-41) and the turn loop sends the turn here again with the re-read in decide (reread true); only then does a value that still fails take limit 6's outcome (limit6Outcome). Never answered when reread is true (the named rule rereadBeforeQuestion). Only parts the gate checks are named: parts a safety outcome holds are held, not gated (partResult held), so a danger text's checked line never waits for the re-read (README default 25).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "valueFailsWords"
+            },
+            "parts": {
+              "description": "Each part with a value that fails its words, in decide's order.",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "PartValuesFailed",
+                "type": "object",
+                "properties": {
+                  "part": {
+                    "description": "The part's index in decide.parts (K-02 v1 decideResult.parts).",
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "fields": {
+                    "description": "The part's fields whose values fail their words, by name (K-02 v1 field.name).",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": ["part", "fields"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["error", "parts"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ClockNotArmedError",
+          "description": "A clock's firing only: the row is still waiting (never armed) or was cancelled, so nothing fires and nothing was written (K-05 v1 fireClock notArmed). A row already fired answers fired with repeated true, never this error.",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notArmed"
+            },
+            "clockRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "state": {
+              "description": "K-04 clock_rows.state.",
+              "type": "string",
+              "enum": ["waiting", "cancelled"]
+            }
+          },
+          "required": ["error", "clockRowId", "state"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ClockNotDueError",
+          "description": "A clock's firing only: firedAt is before the row's due time and the firing is not staging's Fire now (input.by fireNow: BP 9.4), so nothing was written (K-05 v1 fireClock notDue).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notDue"
+            },
+            "clockRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "dueAt": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+            }
+          },
+          "required": ["error", "clockRowId", "dueAt"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ClockRowChangedError",
+          "description": "A clock's firing only: the clock row's own version is not input.expectVersion (it was armed again or moved after it was read), so nothing was written; changed names the clock row (K-05 v1 fireClock versionChanged; arch 10 line 506). A turn's rows that changed are never this error: limit 4's outcome stops their parts.",
+          "$ref": "#/$defs/versionChangedError"
         },
         {
           "$ref": "#/$defs/constraintError"
@@ -2079,7 +2293,7 @@
           "enum": ["send", "sendAndLog", "rewrite", "passedOn"]
         },
         "checks": {
-          "description": "Each attempt's check result, in order: the attempt sent, then the fallback when code ran it (K-03 v1 checkResult).",
+          "description": "Each attempt's check result, in order: the attempt sent, then the fallback when code ran it (K-03 v1 checkResult). Its checked final parts hold filled values (slot values, codes, links) the composer never got: for the one rewrite, C-118 sends the model only each failed check and its detail, and C-092's details name slots, never filled values.",
           "type": "array",
           "items": {
             "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/checkResult"
@@ -2342,7 +2556,7 @@
           "enum": ["outcome_message_sent", "booking_private", "safe_readback"]
         },
         "releasedByOutcomeId": {
-          "description": "For safe_readback, the safety read of the 'we're safe' text itself (K-34 v1 released_by_outcome_id); null otherwise.",
+          "description": "For safe_readback, the safety read of the 'we're safe' text itself (K-34 v1 released_by_outcome_id), which must be a text from the held handle's own chat (A3-24, A3-25; security review of T-018): another handle's text is refused (notAllowed). Null otherwise.",
           "$ref": "#/$defs/nullableId"
         }
       },
@@ -2431,6 +2645,9 @@
           "additionalProperties": false
         },
         {
+          "$ref": "#/$defs/notAllowedError"
+        },
+        {
           "$ref": "#/$defs/notFoundError"
         },
         {
@@ -2443,7 +2660,7 @@
     },
     "recordStopOrStart.request": {
       "title": "RecordStopOrStartRequest",
-      "description": "Record STOP, START and a work phone's answer to 'which texts?' (RULES 7.2, 7.5, 7.7; MC C1): a STOP (any of msgtext.js's 16 opt-out words, the text only that word: arch 02 line 115) sets the phone's stopped flag and clears chat open, across every business since one number serves them all, and adds a consent row that withdraws texts (K-29 v1 consents; K-04 v1 phones); CANCEL or CANCELAR also flags the visit (RULES 7.4; S13-28 rule 46); START clears it and adds a texts row; a work phone's STOP asks which texts, and no answer by the end of its next text hour means all (RULES 7.7). The stop reply is C1's every-business reply (Q-01's words). Written on return when PostgreSQL was down: the actor sent the reply and keeps the stopped flag (arch 11 line 566). Reads: the primary, uncached. Repeat: safe: the text's turn (or the clock row for workPhoneNoAnswer) is the key; a repeat answers repeated. Time budget: none in the sources.",
+      "description": "Record STOP, START and a work phone's answer to 'which texts?' (RULES 7.2, 7.5, 7.7; MC C1): a STOP (any of msgtext.js's 16 opt-out words, the text only that word: arch 02 line 115) sets the phone's stopped flag and clears chat open, across every business since one number serves them all, and adds a consent row that withdraws texts (K-29 v1 consents; K-04 v1 phones); CANCEL or CANCELAR also flags the visit (RULES 7.4; S13-28 rule 46); START clears it and adds a texts row; a work phone's STOP asks which texts, and no answer by the end of its next text hour means all (RULES 7.7). Each binds to the number it came from: START counts only from that phone's own START text, in the turn of that text or written on return by its actor (RULES 7.5: 'Only START ... turns texts back on'; MC C1), so a page, an agent, the console or a job can never turn texts back on; a stop for another number changes nothing (RULES 7.2: 'To stop texts to a number, reply STOP from it'); either answers notFromThatPhone. The stop reply is C1's every-business reply (Q-01's words). Written on return when PostgreSQL was down: the actor sent the reply and keeps the stopped flag (arch 11 line 566). Reads: the primary, uncached. Repeat: safe: the text's turn (or the clock row for workPhoneNoAnswer) is the key; a repeat answers repeated. Time budget: none in the sources.",
       "type": "object",
       "properties": {
         "caller": {
@@ -2455,7 +2672,12 @@
           "enum": ["stop", "start", "workPhoneAnswer", "workPhoneNoAnswer"]
         },
         "phoneNumber": {
+          "description": "The number the STOP, START or answer is for: the number it came from, never another (RULES 7.2, 7.5).",
           "$ref": "#/$defs/phoneNumber"
+        },
+        "inboundEventId": {
+          "description": "The inbound event the STOP, START or answer came in (K-06), from phoneNumber's own handle: for start it is required, with caller.kind turn (the turn of that text) or actorOnReturn (its actor writing on return), and the schema refuses any other caller (RULES 7.5; MC C1); for stop or workPhoneAnswer the text's event, or null for a stop made on a page, by email or by a call, which stops only the caller's own number (RULES 7.2); null for workPhoneNoAnswer, whose key is its clock row.",
+          "$ref": "#/$defs/nullableId"
         },
         "words": {
           "description": "The person's own words, kept as the consent row's exact words (K-29 v1 consents.exact_words).",
@@ -2489,12 +2711,37 @@
         "caller",
         "kind",
         "phoneNumber",
+        "inboundEventId",
         "words",
         "alsoCancelVisit",
         "workPhoneBusinessIds",
         "sentByActor"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "start"
+          }
+        },
+        "required": ["kind"]
+      },
+      "then": {
+        "description": "START only from the phone's own START text (RULES 7.5; MC C1): the turn of that text or its actor writing on return, with the text's event.",
+        "properties": {
+          "caller": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": ["turn", "actorOnReturn"]
+              }
+            }
+          },
+          "inboundEventId": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        }
+      }
     },
     "recordStopOrStart.response": {
       "title": "RecordStopOrStartResponse",
@@ -2593,6 +2840,21 @@
       "title": "RecordStopOrStartErrors",
       "description": "Refused, nothing written: recordStopOrStart's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
       "oneOf": [
+        {
+          "title": "NotFromThatPhoneError",
+          "description": "It did not come from phoneNumber itself, so nothing changes: a START that is not that phone's own START text (inboundEventId from another handle, or a caller other than that text's turn or its actor on return: RULES 7.5; MC C1), or a STOP for another number (from a turn, the number must be the turn's handle; on a page, by email or by a call, the caller's own mobile: RULES 7.2, 'A stop for another number changes nothing').",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notFromThatPhone"
+            },
+            "phoneNumber": {
+              "$ref": "#/$defs/phoneNumber"
+            }
+          },
+          "required": ["error", "phoneNumber"],
+          "additionalProperties": false
+        },
         {
           "title": "NotAWorkPhoneError",
           "description": "A work-phone kind for a phone with no owner, admin or staff role (RULES 7.7).",
@@ -3237,7 +3499,7 @@
     },
     "decideReviewItem.request": {
       "title": "DecideReviewItemRequest",
-      "description": "Decide a team review item, or set it waiting on someone else until a time (S11-52: the account owner has 3 business days to send their own papers). Only a person on Rosie's team decides (Q-18). What the decision changes is written by the journey call it names (journeys 1 and 11). Reads: the primary, uncached. Repeat: safe: a decided item answers repeated with its first decision; a wait compares the version. Time budget: none in the sources.",
+      "description": "Decide a team review item, or set it waiting on someone else until a time (S11-52: the account owner has 3 business days to send their own papers). Only a person on Rosie's team decides (Q-18). A done decision writes what it changes to the row under review, in its own part, in the same commit (K-37 v1 README: 'What the decision changes ... is written to the row under review in its own part'): for journey 1, control proven by the team (S1-75, S1-76: K-23 business_setup) and a new-work draft approved or kept offline (S1-03: K-24 new_work_drafts); the kinds of later journeys write back through the K-09 minor version of their journey (README open gaps). Reads: the primary, uncached. Repeat: safe: a decided item answers repeated with its first decision; a wait compares the version. Time budget: none in the sources.",
       "type": "object",
       "properties": {
         "caller": {
@@ -3260,12 +3522,52 @@
                   "const": "done"
                 },
                 "outcome": {
-                  "description": "The decision in plain words, without private values.",
+                  "description": "The decision in plain words, without private values (K-37 v1 review_items.outcome).",
                   "type": "string",
                   "minLength": 1
+                },
+                "writeBack": {
+                  "description": "What the decision writes to the row under review (the item's subject_table and subject_row_id), in the same commit; the action layer never reads outcome's words for it (arch 02 line 139). Null for a kind whose write-back is a later journey's (owner_claim, booking_cap, harm_report, missed_deadline). A write-back that does not fit the item's kind or subject is refused (writeBackNotForKind).",
+                  "anyOf": [
+                    {
+                      "title": "ReviewControlWriteBack",
+                      "description": "An item of kind control (S1-75 'Rosie's team checks') or listing_match (S1-76: the team checks a listing that does not match, or one already on Rosie; K-23 v1 business_setup.control_proven_at cites both): controlProven true writes K-23 business_setup.control_proven_at (the decision's time) and control_proven_via team_check (K-23 v1 business_setup_control_way_known), so the go-live check (S1-32) finds control proven; false writes nothing there, and that company stays offline with its setup saved (S1-75 safe default).",
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "const": "business_setup"
+                        },
+                        "controlProven": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["table", "controlProven"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "title": "ReviewNewWorkWriteBack",
+                      "description": "An item of kind new_work (S1-03: 'A person checks every service against the official rules for that work, within 1 business day'): writes K-24 v1 new_work_drafts.state, approved (it can go live) or kept_offline (it stays offline, saved; S11-58). Telling Sam the result (S1-03: 'Sam hears the result within 1 business day') is a message from a call made alone, which waits for K-05's commit with no turn (CQ-44; README open gaps).",
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "const": "new_work_drafts"
+                        },
+                        "state": {
+                          "description": "K-24 v1 new_work_drafts.state after the decision.",
+                          "type": "string",
+                          "enum": ["approved", "kept_offline"]
+                        }
+                      },
+                      "required": ["table", "state"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
-              "required": ["state", "outcome"],
+              "required": ["state", "outcome", "writeBack"],
               "additionalProperties": false
             },
             {
@@ -3301,18 +3603,50 @@
         "decidedAt": {
           "$ref": "#/$defs/nullableUtc"
         },
+        "written": {
+          "description": "Each row written, with its version after the commit (K-05 v1 rowRef): the review item, and for a done decision with a write-back the row under review (K-23 business_setup, keyed by its business; K-24 new_work_drafts). Empty on a repeat.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rowRef"
+          }
+        },
         "repeated": {
           "description": "true when already decided.",
           "type": "boolean"
         }
       },
-      "required": ["state", "decidedAt", "repeated"],
+      "required": ["state", "decidedAt", "written", "repeated"],
       "additionalProperties": false
     },
     "decideReviewItem.errors": {
       "title": "DecideReviewItemErrors",
       "description": "Refused, nothing written: decideReviewItem's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
       "oneOf": [
+        {
+          "title": "WriteBackNotForKindError",
+          "description": "The write-back does not fit the item: business_setup is control's and listing_match's, new_work_drafts is new_work's, and any other kind takes none in v1; or the item's subject row is another (K-37 v1 subject_table, subject_row_id).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "writeBackNotForKind"
+            },
+            "kind": {
+              "description": "The item's kind (K-37 v1 review_items.kind).",
+              "type": "string",
+              "enum": [
+                "new_work",
+                "control",
+                "listing_match",
+                "owner_claim",
+                "booking_cap",
+                "harm_report",
+                "missed_deadline"
+              ]
+            }
+          },
+          "required": ["error", "kind"],
+          "additionalProperties": false
+        },
         {
           "title": "NotTeamError",
           "description": "The person is not on Rosie's team (Q-18).",
@@ -3728,29 +4062,70 @@
     },
     "sendProofCode.request": {
       "title": "SendProofCodeRequest",
-      "description": "Send a proof code (RULES 6.2; S13-45; MC C9): to the email on file, or by asking the person to text it from that mobile, since Rosie never texts first; in words that never confirm a booking exists (limit 1: arch 06 line 299). A code lives 10 minutes; 5 wrong give a 15-minute pause. The code itself never comes back to the caller on an email route, and never reaches the event log: the email row's final parts hold it, so that row's event-log entry leaves the final parts out (K-08 v1.1 proof_code.sent; T-1077's action-layer review). S1-75's control code goes to the listing's email (route listingEmail, purpose control; Q-02), never to a person's handle. Where codes are kept is K-22's (not yet frozen). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers with the same code row, not a new code. Time budget: the code lives 10 minutes (RULES 6.2).",
+      "description": "Send a proof code (RULES 6.2; S13-45; MC C9): to the email on file, or by asking the person to text it from that mobile, since Rosie never texts first; in words that never confirm a booking exists (limit 1: arch 06 line 299). A code lives 10 minutes; 5 wrong give a 15-minute pause. The code itself never comes back to the caller on an email route, and never reaches the event log: the email row's final parts hold it, so that row's event-log entry leaves the final parts out (K-08 v1.1 proof_code.sent; T-1077's action-layer review). S1-75's control code goes to the listing's email (route listingEmail, purpose control; Q-02), never to a person's handle. The owner's email at sign-up (FS row B13) is typed on S1-10's secure page: route typedEmail writes its handle and sends the code there (purpose emailCheck). Where codes are kept is K-22's (not yet frozen). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers with the same code row, not a new code. Time budget: the code lives 10 minutes (RULES 6.2).",
       "type": "object",
       "properties": {
         "caller": {
           "$ref": "#/$defs/caller"
         },
         "purpose": {
-          "description": "unprovenSender: limit 1 (arch 06 line 299); newContact: a new phone or email, limit 3 (arch 06 line 303); signIn: a page sign-in (S13-45); emailCheck: the owner's email at sign-up (FS row B13); control: S1-75's proof that the business is theirs, a code to the listing's email, else Rosie's team (Q-02).",
+          "description": "unprovenSender: limit 1 (arch 06 line 299); newContact: a new phone or email, limit 3 (arch 06 line 303); signIn: a page sign-in (S13-45); emailCheck: the owner's email at sign-up (FS row B13, required: S1-10, S1-77), typed on the secure page and proven by its code typed on the page before it is used (route typedEmail); control: S1-75's proof that the business is theirs, a code to the listing's email, else Rosie's team (Q-02).",
           "type": "string",
           "enum": ["unprovenSender", "newContact", "signIn", "emailCheck", "control"]
         },
         "route": {
-          "description": "emailOnFile: an email to the address on file; textFromMobile: the person texts the code from that mobile (MC C9); listingEmail: for control only, an email to the listing's email (K-23 business_setup.listing_email; S1-75; Q-02).",
+          "description": "emailOnFile: an email to the address on file; textFromMobile: the person texts the code from that mobile (MC C9); listingEmail: for control only, an email to the listing's email (K-23 business_setup.listing_email; S1-75; Q-02); typedEmail: for emailCheck only, an email to the address typed on the page (typedEmail).",
           "type": "string",
-          "enum": ["emailOnFile", "textFromMobile", "listingEmail"]
+          "enum": ["emailOnFile", "textFromMobile", "listingEmail", "typedEmail"]
         },
         "contactHandleId": {
-          "description": "The email address or mobile the code proves (K-04 v1 handles); null for control, which proves the business, not a contact.",
+          "description": "The email address or mobile the code proves (K-04 v1 handles); null for control, which proves the business, not a contact, and for typedEmail, whose handle this call writes.",
           "$ref": "#/$defs/nullableId"
+        },
+        "typedEmail": {
+          "description": "For route typedEmail (purpose emailCheck), the owner's email as typed on the secure page (FS row B13; S1-10 lines 172 to 173: 'The secure page also asks one owner email ... The email is proven with a code sent to it, typed on the page. Until then it isn't used.'): this call writes its K-04 v1 handle (kind email, the address in lower case) when the address is new, so the code's email row has its recipient (K-04 outbox_rows.recipient_handle_id), keeps it as the person's owner email, not yet proven (K-22's account email, named in words: T-031), and sends the code there. The call acts for no person until the code is right: the person the code is for is kept on the server with the code, never taken from the page (K-22, T-031), so caller.personId is null. proveCode, once the code is right, marks the email proven (K-22's email_proven_at) and links the handle to the person (K-04 v1 person_handles); it is used for nothing before. Null for every other route.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/emailAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
-      "required": ["caller", "purpose", "route", "contactHandleId"],
-      "additionalProperties": false
+      "required": ["caller", "purpose", "route", "contactHandleId", "typedEmail"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "route": {
+            "const": "typedEmail"
+          }
+        },
+        "required": ["route"]
+      },
+      "then": {
+        "description": "The owner's email typed on the page (FS row B13): the purpose is emailCheck, the address is given, and no handle exists yet.",
+        "properties": {
+          "purpose": {
+            "const": "emailCheck"
+          },
+          "contactHandleId": {
+            "type": "null"
+          },
+          "typedEmail": {
+            "$ref": "#/$defs/emailAddress"
+          }
+        }
+      },
+      "else": {
+        "description": "Every other route sends to a contact or listing already on file.",
+        "properties": {
+          "typedEmail": {
+            "type": "null"
+          }
+        }
+      }
     },
     "sendProofCode.response": {
       "title": "SendProofCodeResponse",
@@ -3765,11 +4140,11 @@
           "$ref": "../common/formats.v1.schema.json#/$defs/utc"
         },
         "outboxRowId": {
-          "description": "For emailOnFile, the email row; null otherwise.",
+          "description": "For an email route (emailOnFile, listingEmail, typedEmail), the email row, whose final parts hold the code; null for textFromMobile.",
           "$ref": "#/$defs/nullableId"
         },
         "readyText": {
-          "description": "For textFromMobile, the ready text shown to the person; null otherwise.",
+          "description": "For textFromMobile, the ready text shown to the person; null otherwise. It holds the code, so like the email row's final parts it never enters a span, a trace or the event log (K-08 v1.1 proof_code.sent).",
           "anyOf": [
             {
               "description": "The words to text from that mobile, with the code in them.",
@@ -3848,7 +4223,7 @@
           "minLength": 1
         },
         "fromHandleId": {
-          "description": "For textFromMobile, the handle it came from, which must be the mobile; null on a page.",
+          "description": "The handle the code came from: for textFromMobile it must be the mobile it proves; for a code typed back in a chat, that chat's handle (S13-45: the same conversation; limit 1's question, limit1Outcome.openQuestionId); null on a page.",
           "$ref": "#/$defs/nullableId"
         },
         "at": {
@@ -3870,19 +4245,30 @@
               "const": "proven"
             },
             "handleId": {
-              "description": "The contact proven (K-04 v1 handles), or null for a control code.",
+              "description": "The contact proven (K-04 v1 handles): for unprovenSender the sender's own handle; for emailCheck the email handle sendProofCode wrote, now linked to the person (K-04 v1 person_handles), marked proven on their account (K-22's email_proven_at, named in words) and usable; null for a control code.",
               "$ref": "#/$defs/nullableId"
             },
             "controlBusinessId": {
               "description": "For a control code, the business whose control is proven (K-23 business_setup.control_proven_at, control_proven_via listing_code; S1-75); null otherwise.",
               "$ref": "#/$defs/nullableId"
             },
+            "redecideTurnId": {
+              "description": "For a code limit 1 sent (purpose unprovenSender), the turn whose part waits for it (limit1Outcome proofCodeSent): its choice is decided again from today's record, as releaseSafetyHold's redecideTurnId (arch 06 line 299; gateOutcome wait); null otherwise.",
+              "anyOf": [
+                {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
             "repeated": {
               "description": "true when checked before.",
               "type": "boolean"
             }
           },
-          "required": ["result", "handleId", "controlBusinessId", "repeated"],
+          "required": ["result", "handleId", "controlBusinessId", "redecideTurnId", "repeated"],
           "additionalProperties": false
         },
         {
@@ -4420,7 +4806,7 @@
     },
     "saveSetupStep.request": {
       "title": "SaveSetupStepRequest",
-      "description": "Save one setup step of journeys 1 and 2 and write the keys it gives (arch 12 line 590: the Tool API generated from the master's needs and gives keys; 02-contracts K-09 'Journey 1', 'Journey 2'; README 'Journeys 1 and 2'). In a turn, a step's write is the effect code adds for the choice decide picked, inside gateAndCommit's one commit, and the part's result names the keys it gave (partResult.gives); from a page (registration screens, the staff page, the pay page: K-21) or the console it is called alone and commits under caller.requestId, which waits for K-05's commit with no turn (CQ-44). The step must be one the record has reached with its needs given (needsMissing otherwise). Reads: the primary, uncached. Repeat: safe: the turn or request id is the key; a repeat writes nothing and answers repeated. Time budget: in a turn, inside gateAndCommit's 300 ms (arch 04 line 223); alone, none in the sources.",
+      "description": "Save one setup step of journeys 1 and 2 and write the keys it gives (arch 12 line 590: the Tool API generated from the master's needs and gives keys; 02-contracts K-09 'Journey 1', 'Journey 2'; README 'Journeys 1 and 2'). In a turn, a step's write is the effect code adds for the choice decide picked, inside gateAndCommit's one commit after limits 1 to 6 pass, and the part's result names the keys it gave (partResult.gives); only S2-05's ready text rides as a core action (saveSetupStepInTurn); from a page (registration screens, the staff page, the pay page: K-21) or the console it is called alone and commits under caller.requestId, which waits for K-05's commit with no turn (CQ-44). The step must be one the record has reached with its needs given (needsMissing otherwise). Reads: the primary, uncached. Repeat: safe: the turn or request id is the key; a repeat writes nothing and answers repeated. Time budget: in a turn, inside gateAndCommit's 300 ms (arch 04 line 223); alone, none in the sources.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/caller" },
@@ -4596,7 +4982,7 @@
             },
             {
               "title": "SetupS1_10",
-              "description": "S1-10, 'Checks the owner's mobile and ID, once': the owner's mobile, proven by their own text (MC C9), and the ID uploaded on the secure page, which counts as the ID confirmed, with no face match and no ID-check service (MC C10). Writes the K-04 v1 phone row and K-22's owner mobile and ID upload record (K-22 not frozen: named in words). Gives id_checked and mobile.",
+              "description": "S1-10, 'Checks the owner's mobile and ID, once': the owner's mobile, proven by their own text (MC C9), and the ID uploaded on the secure page, which counts as the ID confirmed, with no face match and no ID-check service (MC C10). Writes the K-04 v1 phone row and K-22's owner mobile and ID upload record (K-22 not frozen: named in words). The owner's email on the same page (FS row B13) is proven by its own code first: sendProofCode purpose emailCheck, route typedEmail, then proveCode (S1-10: 'Until then it isn't used'). Gives id_checked and mobile.",
               "type": "object",
               "properties": {
                 "step": { "const": "S1-10" },
@@ -4658,7 +5044,7 @@
             },
             {
               "title": "SetupS1_12",
-              "description": "S1-12, 'Sends the price list as a photo': the services read from the photo (C-120, K-02 v1.1 at F14) and read back, saved on the owner's exact yes (limits 3 and 6: arch 06 lines 303, 309). Services are K-25's (not frozen: named in words). Gives services.",
+              "description": "S1-12, 'Sends the price list as a photo': the services read from the owner's own list (a photo read by C-120, K-02 v1.1 at F14; or the form, typed or said), never a made-up price; a line that cannot be read is left out until Sam says (S1-12 safe default). No read-back here: the money card (S1-13) shows the prices with the money (MASTER-FLOW-A line 290), and a photo's values take the owner's yes there, where limit 6 re-parses them from the read-back (arch 06 line 309). Services are K-25's (not frozen: named in words). Gives services.",
               "type": "object",
               "properties": {
                 "step": { "const": "S1-12" },
@@ -4687,13 +5073,9 @@
                     "required": ["name", "price", "minutes"],
                     "additionalProperties": false
                   }
-                },
-                "yesEventId": {
-                  "description": "The owner's exact yes to the read-back.",
-                  "$ref": "#/$defs/id"
                 }
               },
-              "required": ["step", "companyId", "photoObjectKey", "services", "yesEventId"],
+              "required": ["step", "companyId", "photoObjectKey", "services"],
               "additionalProperties": false
             },
             {
@@ -5067,27 +5449,7 @@
               "required": ["step", "people"],
               "additionalProperties": false
             },
-            {
-              "title": "SetupS2_05",
-              "description": "S2-05, 'Texts each person one invite', under MC C9: the person joins by texting the join link's ready text from the mobile the owner entered ('Says yes': K-29 v1 chat_links.used_at and a consent row of kind texts with its chat_link_id; K-22's status joined, named in words). A ready text from another mobile takes S2-09's wrong-number path and never joins (Q-08: 'Never: join someone on another person's word'); STOP is recordStopOrStart's (S2-08); no reply is the 48-hour clock's (S2-07). Gives nothing (S2-06 gives profile).",
-              "type": "object",
-              "properties": {
-                "step": { "const": "S2-05" },
-                "chatLinkId": { "$ref": "#/$defs/id" },
-                "fromPhoneNumber": { "$ref": "#/$defs/phoneNumber" },
-                "eventId": {
-                  "description": "The inbound text carrying the ready text (K-06).",
-                  "$ref": "#/$defs/id"
-                },
-                "words": {
-                  "description": "The text as received; it carries the link's short code.",
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": ["step", "chatLinkId", "fromPhoneNumber", "eventId", "words"],
-              "additionalProperties": false
-            },
+            { "$ref": "#/$defs/setupStepS2_05" },
             {
               "title": "SetupS2_06",
               "description": "S2-06, 'Joins and fills in the secure page': the staff page (K-22, not frozen: named in words). Gives profile.",
@@ -5192,6 +5554,42 @@
       "required": ["caller", "expectVersion", "step"],
       "additionalProperties": false
     },
+    "setupStepS2_05": {
+      "title": "SetupS2_05",
+      "description": "S2-05, 'Texts each person one invite', under MC C9: the person joins by texting the join link's ready text from the mobile the owner entered ('Says yes': K-29 v1 chat_links.used_at and a consent row of kind texts with its chat_link_id; K-22's status joined, named in words). A ready text from another mobile takes S2-09's wrong-number path and never joins (Q-08: 'Never: join someone on another person's word'); STOP is recordStopOrStart's (S2-08); no reply is the 48-hour clock's (S2-07). Gives nothing (S2-06 gives profile). The one setup step that rides as a core action of a turn (saveSetupStepInTurn).",
+      "type": "object",
+      "properties": {
+        "step": { "const": "S2-05" },
+        "chatLinkId": { "$ref": "#/$defs/id" },
+        "fromPhoneNumber": { "$ref": "#/$defs/phoneNumber" },
+        "eventId": {
+          "description": "The inbound text carrying the ready text (K-06).",
+          "$ref": "#/$defs/id"
+        },
+        "words": {
+          "description": "The text as received; it carries the link's short code.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["step", "chatLinkId", "fromPhoneNumber", "eventId", "words"],
+      "additionalProperties": false
+    },
+    "saveSetupStepInTurn": {
+      "title": "SaveSetupStepInTurn",
+      "description": "saveSetupStep as a core action of a turn (coreAction, gateAndCommit.request.core): only S2-05's ready text, which the actor matches by its join link's short code (S2-05; MC C9) and which is itself the person's own yes from the mobile the owner entered. Every other setup step's write in a turn is the effect code adds for the choice decide picked, so limits 1 to 6 check it at the gate (partResult; arch 02 line 121; arch 06 lines 295 to 309): a consent such as S1-25's fee_ok, S1-27's Stripe account, S1-29's terms and bill card, S2-02's team and S2-24's staff going live never ride in a turn's core (security review of T-018). The response and errors are saveSetupStep's.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/caller" },
+        "expectVersion": {
+          "description": "The chat link's version as read (limit 4: arch 06 line 305), or null.",
+          "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
+        },
+        "step": { "$ref": "#/$defs/setupStepS2_05" }
+      },
+      "required": ["caller", "expectVersion", "step"],
+      "additionalProperties": false
+    },
     "saveSetupStep.response": {
       "title": "SaveSetupStepResponse",
       "description": "The step saved: the keys it gave and what it wrote.",
@@ -5209,7 +5607,7 @@
           "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
         },
         "written": {
-          "description": "Each row written, with its version after the commit (K-05 v1 rowRef).",
+          "description": "Each row written, with its version after the commit (K-05 v1 rowRef); a phone row is named by its handle id, never its number (K-08 v1 default 3).",
           "type": "array",
           "items": { "$ref": "#/$defs/rowRef" }
         },
