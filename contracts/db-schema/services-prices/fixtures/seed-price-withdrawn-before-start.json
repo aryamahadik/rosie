@@ -1,0 +1,102 @@
+{
+  "after": ["seed-service-money-paths.json"],
+  "rows": [
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lee-plumbing-faucet-rebuild",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "plumber",
+        "name": "Faucet rebuild (bring the faucet or its cartridge)",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "30 minutes",
+        "position": 2,
+        "active": true,
+        "extras": "{\"pf.services\":{\"service\":\"Faucet rebuild (bring the faucet or its cartridge)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"both: at the shop, or at the customer's home as a $75 home visit paid in full\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lee-plumbing-faucet-rebuild-office",
+        "service_id": "svc-lee-plumbing-faucet-rebuild",
+        "business_id": "biz-lee-home-services",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-lee-home-services-office",
+        "path": "list|card|counter",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lee-plumbing-faucet-rebuild-35",
+        "business_id": "biz-lee-home-services",
+        "service_id": "svc-lee-plumbing-faucet-rebuild",
+        "service_money_id": null,
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 3500,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "effective_to": "2026-11-02T05:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lee-plumbing-faucet-rebuild-40",
+        "business_id": "biz-lee-home-services",
+        "service_id": "svc-lee-plumbing-faucet-rebuild",
+        "service_money_id": null,
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 4000,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-11-02T05:00:00Z",
+        "effective_to": "2026-11-02T05:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lee-plumbing-faucet-rebuild-35-again",
+        "business_id": "biz-lee-home-services",
+        "service_id": "svc-lee-plumbing-faucet-rebuild",
+        "service_money_id": null,
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 3500,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-11-02T05:00:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    }
+  ]
+}

@@ -556,24 +556,24 @@
           "type": "text",
           "null": true,
           "audience": ["owner"],
-          "description": "The time condition's days, as ISO weekday digits in order (1 Monday to 7 Sunday), such as 6 for Saturdays or 67 for weekends; null: every day.",
-          "source": "arch 05 line 253 (time); arch 09 lines 457, 478 ('Rows for price rules ... A new combination is a new row')"
+          "description": "The time condition's days, as ISO weekday digits in order (1 Monday to 7 Sunday), such as 6 for Saturdays or 67 for weekends, read in the visit's zone, else the business's (README rule 8); null: every day.",
+          "source": "arch 05 line 253 (time); arch 09 lines 457, 478 ('Rows for price rules ... A new combination is a new row'); S13-03 ('a visit at the business uses the business's time zone, and a visit at the customer's place uses that place's'); QUESTIONS.md CQ-05 (the visit's zone, else the business's)"
         },
         {
           "name": "from_time",
           "type": "time",
           "null": true,
           "audience": ["owner"],
-          "description": "The time condition's start, a clock time in the business's zone, such as 17:00 for 'after 5pm'; null: from the day's start.",
-          "source": "arch 05 line 253 (time); fixtures/v1/test-kit/shops/movers.json ('Evening vault visit: $40, after 5pm')"
+          "description": "The time condition's start, a clock time in the visit's zone, else the business's (README rule 8), such as 17:00 for 'after 5pm'; null: from the day's start.",
+          "source": "arch 05 line 253 (time); fixtures/v1/test-kit/shops/movers.json ('Evening vault visit: $40, after 5pm'); S13-03; QUESTIONS.md CQ-05"
         },
         {
           "name": "until_time",
           "type": "time",
           "null": true,
           "audience": ["owner"],
-          "description": "The time condition's end, not included, a clock time in the business's zone; null: to the day's end.",
-          "source": "arch 05 line 253 (time)"
+          "description": "The time condition's end, not included, a clock time in the visit's zone, else the business's (README rule 8); null: to the day's end.",
+          "source": "arch 05 line 253 (time); S13-03; QUESTIONS.md CQ-05"
         },
         {
           "name": "price_cents",
@@ -620,7 +620,7 @@
           "type": "timestamptz",
           "null": true,
           "audience": ["owner"],
-          "description": "When it stops: the change that closed it opened the next row at the same instant. Null: in effect. A booking made before keeps its price, even for a visit after.",
+          "description": "When it stops: the change that closed it opened the next row at the same instant. Null: in effect. Equal to effective_from: withdrawn or corrected before it started, an empty range that prices no visit and overlaps no rule. A booking made before keeps its price, even for a visit after.",
           "source": "arch 09 line 488 ('A change closes one row and opens the next. A booking keeps the price it was made with, even for a visit after the change'); S11-54 ('Haircuts already booked keep $35, even after Nov 2'); RULES 3.7"
         },
         {
@@ -739,8 +739,8 @@
         },
         {
           "name": "price_rules_dates_in_order",
-          "expression": "effective_to is null or effective_to > effective_from",
-          "source": "arch 09 line 488"
+          "expression": "effective_to is null or effective_to >= effective_from",
+          "source": "arch 09 line 488 ('A change closes one row and opens the next'); S11-54 (a price set for later dates): one withdrawn or corrected before it starts is closed at its own start, an empty range that prices no visit and that price_rules_one_in_effect skips (README, Prices)"
         }
       ],
       "indexes": [

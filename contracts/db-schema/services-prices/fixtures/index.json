@@ -33,6 +33,14 @@
       "source": "S1-81 ('The owner lists each space or thing: its name, how many it fits, which services use it'); FS row K04; FS line 741; FS section 2b (item_service); Q-46; fixtures/v1/test-kit/shops/boarding.json (services_shape: per-night prices, the suite's $40 deposit, the inn's $20 fee)"
     },
     {
+      "file": "seed-price-withdrawn-before-start.json",
+      "version": "v1",
+      "table": "price_rules",
+      "expect": "accept",
+      "shows": "A price set for a later date and withdrawn before it starts, with no delete and no edit in place: Lee Plumbing's faucet rebuild at the office counter ($35 from the money card, a card saved for the $20 fee, paid at the counter) is given S11-54's raise, $40 for visits from Mon Nov 2, so its $35 row is closed at that instant; withdrawn before Nov 2, the $40 row is closed at its own start (effective_to equal to effective_from: an empty range, which prices no visit and which price_rules_one_in_effect and the price resolver both skip) and a $35 row opens at that instant, so a visit that starts at midnight on Mon Nov 2, or any time after, is priced $35",
+      "source": "arch 09 line 488 ('Effective dates on every price and rule. A change closes one row and opens the next'); S11-54 ('Sam raises the haircut to $40 for visits from Mon Nov 2'); S11-53 ('Every change is read back first'); README rule 6 (no delete and no edit in place of a price); fixtures/v1/test-kit/shops/plumber.json (the counter board's 'Faucet rebuild (bring the faucet or its cartridge)': one price, $35, 30 min, a card saved for the $20 fee, paid at the counter); SPEC-master 6 and S1-04 (Lee Plumbing in Lee Home Services)"
+    },
+    {
       "file": "invalid/refuse-overlapping-effective-dates.json",
       "version": "v1",
       "table": "price_rules",
