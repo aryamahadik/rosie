@@ -32,6 +32,7 @@ export default defineConfig({
             ...workspaces.map((workspace) => `${workspace}/src/**/*.test.ts`),
             "db/repo/**/*.test.ts",
             "db/seeds/**/*.test.ts",
+            "fixtures/**/*.test.ts",
           ],
           exclude: ["**/node_modules/**", "**/*.worker.test.ts", "**/*.int.test.ts"],
         },
