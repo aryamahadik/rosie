@@ -201,7 +201,7 @@
     },
     "linkDroppedError": {
       "title": "LinkDroppedError",
-      "description": "The provider refused the link's tokens, so nothing works until the person reconnects: the refresh answered invalid_grant (access revoked, a Google refresh token unused for six months or past its 7-day Testing life, an admin's restriction) or Graph asked for interaction (README spike rows 7, 16). The caller tells the Tool API calendarLinkDropped with why tokenRevoked (K-09 v1): the owner is texted at once, that person's open times come off, booked visits stay (arch 11 line 580; S12-13).",
+      "description": "The provider refused the link's tokens, so nothing works until the person reconnects: the refresh answered invalid_grant (access revoked, a Google refresh token unused for six months or past its 7-day Testing life) or admin_policy_enforced (an admin restricted the service), or Graph asked for interaction (README spike rows 7, 16). The caller tells the Tool API calendarLinkDropped with why tokenRevoked (K-09 v1): the owner is texted at once, that person's open times come off, booked visits stay (arch 11 line 580; S12-13).",
       "type": "object",
       "properties": {
         "error": { "const": "linkDropped" },
