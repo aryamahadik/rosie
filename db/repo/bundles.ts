@@ -8,7 +8,8 @@
 //
 // Every call answers with the contract's outcome (contracts/data-access fixtures): a response, or an error shape such as
 // `notPublished`. A serialization failure (40001), a deadlock (40P01) or a lost connection (postgres.js's
-// CONNECTION_CLOSED, CONNECTION_DESTROYED and CONNECTION_ENDED as 08006; SQLSTATE class 08; 57P01 to 57P03) answers
+// CONNECTION_CLOSED, CONNECTION_DESTROYED, CONNECTION_ENDED and the socket's ECONNRESET, EPIPE and ETIMEDOUT as 08006;
+// SQLSTATE class 08; 57P01 to 57P03) answers
 // `transient`: nothing was written and the same request may be sent again. Times are UTC text ending in Z. Every value reaches the database as a bound parameter.
 //
 // Publishing never changes the active id. Switching serializes on one transaction-level advisory lock, then locks the
@@ -110,7 +111,15 @@ const TRANSIENT_SQLSTATES = new Set(["40001", "40P01", "57P01", "57P02", "57P03"
  * postgres.js's own codes for a connection that is gone. They carry no SQLSTATE, so they answer 08006
  * (connection_failure), a default listed in the handoff.
  */
-const LOST_CONNECTION_CODES = new Set(["CONNECTION_CLOSED", "CONNECTION_DESTROYED", "CONNECTION_ENDED"]);
+const LOST_CONNECTION_CODES = new Set([
+  "CONNECTION_CLOSED",
+  "CONNECTION_DESTROYED",
+  "CONNECTION_ENDED",
+  // A reset or broken socket reaches the call as the socket's own error, with no CONNECTION_CLOSED.
+  "ECONNRESET",
+  "EPIPE",
+  "ETIMEDOUT",
+]);
 const LOST_CONNECTION_SQLSTATE = "08006";
 /** Held for the length of a switch of the active bundle. */
 const ACTIVE_SWITCH_LOCK = "rosie.bundles.active";
@@ -128,8 +137,9 @@ function sameId(a: BundleId, b: BundleId): boolean {
   return a.hash === b.hash && a.build === b.build;
 }
 
-function isLostConnection(error: unknown): boolean {
-  const code = (error as { code?: unknown }).code;
+/** True for an error that says the connection the call ran on is gone or going (see the codes above). */
+export function isLostConnection(error: unknown): boolean {
+  const code = (error as { code?: unknown } | null | undefined)?.code;
   return (
     typeof code === "string" && (LOST_CONNECTION_CODES.has(code) || /^(08[0-9A-Z]{3}|57P0[123])$/.test(code))
   );
@@ -139,10 +149,20 @@ function isLostConnection(error: unknown): boolean {
  * One transaction on one reserved connection (read committed, like sql.begin). postgres.js's own `begin` answers a
  * failure with a `rollback` written to the connection even when that connection is gone, and that write throws from a
  * timer, outside any promise, which would end the process. Here a lost connection is rethrown without a rollback (the
- * server rolled the transaction back when the backend went), and the connection is always released.
+ * server rolled the transaction back when the backend went). A lost connection is also never released: in postgres.js
+ * 3.4.9 `release()` puts the connection back in the open queue even after it moved to the closed queue (or before the
+ * socket's close event does), and the next query on that client is then written to a null socket. Left unreleased, the
+ * connection stays where postgres.js's own close handling puts it and reconnects for the next query. Every other
+ * outcome releases the connection.
  */
 async function inTransaction<T>(sql: Sql, fn: (tx: Sql) => Promise<T>): Promise<T> {
+  // postgres.js 3.4.9 keeps a killed connection's last query and its FATAL, and the first query after the reconnect
+  // fails with that stale error. A failed `reserve()` stays queued and strands the connection it was given, so the
+  // stale error is taken here by an ordinary query (which is rejected cleanly) and `reserve()` then finds a
+  // connection that has already answered once. The failure of this one query is a transient answer like any other.
+  await sql`select 1`;
   const reserved = await sql.reserve();
+  let lost = false;
   try {
     await reserved`begin`;
     let result: T;
@@ -156,13 +176,18 @@ async function inTransaction<T>(sql: Sql, fn: (tx: Sql) => Promise<T>): Promise<
     }
     await reserved`commit`;
     return result;
+  } catch (error) {
+    lost = isLostConnection(error);
+    throw error;
   } finally {
-    reserved.release();
+    if (!lost) {
+      reserved.release();
+    }
   }
 }
 
 function transientOrThrow(error: unknown): TransientError {
-  const code = (error as { code?: unknown }).code;
+  const code = (error as { code?: unknown } | null | undefined)?.code;
   if (typeof code === "string") {
     if (TRANSIENT_SQLSTATES.has(code) || /^08[0-9A-Z]{3}$/.test(code)) {
       return { error: "transient", sqlstate: code };

@@ -3,6 +3,7 @@
 // and contracts/data-access (the calls' requests and outcomes); hashes made up here are sha256 of a label, never data.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import net from "node:net";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient, resolvePrimaryUrl } from "./client";
@@ -10,6 +11,7 @@ import {
   type BundleId,
   type PublishBundleCopyRequest,
   type StoredText,
+  isLostConnection,
   publishBundleCopy,
   readActiveBundle,
   readBundleValue,
@@ -761,18 +763,73 @@ describe("a lost connection answers transient (K-05 README: every call)", () => 
   const LOCK_NAME = "rosie.bundles.active";
   const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
+  /** A TCP relay to the database whose client-side sockets can be reset (an RST, which the client reads as ECONNRESET). */
+  async function startRelay(
+    target: URL,
+  ): Promise<{ port: number; reset: () => void; stop: () => Promise<void> }> {
+    const pairs: { client: net.Socket; upstream: net.Socket }[] = [];
+    const server = net.createServer((client) => {
+      const upstream = net.connect(Number(target.port || 5432), target.hostname);
+      pairs.push({ client, upstream });
+      client.on("error", () => undefined);
+      upstream.on("error", () => undefined);
+      client.pipe(upstream);
+      upstream.pipe(client);
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    return {
+      port: typeof address === "object" && address !== null ? address.port : 0,
+      reset: () => {
+        for (const pair of pairs) {
+          pair.client.resetAndDestroy();
+          pair.upstream.destroy();
+        }
+      },
+      stop: () =>
+        new Promise<void>((resolve) => {
+          for (const pair of pairs) {
+            pair.client.destroy();
+            pair.upstream.destroy();
+          }
+          server.close(() => {
+            resolve();
+          });
+        }),
+    };
+  }
+
+  interface Killed<T> {
+    /** The answer of the killed call. */
+    answer: T;
+    /** The same request sent again on the killed client itself, until one answers without transient (at most 4). */
+    resends: T[];
+  }
+
   /**
-   * Runs `call` on its own one-connection client while a second connection holds a lock the call waits on, then
-   * terminates the call's backend (pg_terminate_backend) from a third connection, and returns the call's answer.
+   * Runs `call` on its own one-connection client while a second connection holds a lock the call waits on, then cuts the
+   * call's connection from outside (`terminate`: pg_terminate_backend from a third connection; `reset`: the client's
+   * socket, behind a relay, is reset), and returns the call's answer and the same request sent again on that client.
    */
   async function answerAfterKill<T>(
     take: (tx: postgres.TransactionSql) => Promise<unknown>,
     call: (sql: Sql) => Promise<T>,
-  ): Promise<T> {
+    cut: "terminate" | "reset" = "terminate",
+  ): Promise<Killed<T>> {
     const url = resolvePrimaryUrl();
     const holder = postgres(url, { max: 1, onnotice: () => undefined });
     const killer = postgres(url, { max: 1, onnotice: () => undefined });
-    const victim = createClient({ primaryUrl: url, schema: db.schema, max: 1 });
+    const relay = cut === "reset" ? await startRelay(new URL(url)) : null;
+    const victimUrl = (() => {
+      if (relay === null) {
+        return url;
+      }
+      const through = new URL(url);
+      through.hostname = "127.0.0.1";
+      through.port = String(relay.port);
+      return through.toString();
+    })();
+    const victim = createClient({ primaryUrl: victimUrl, schema: db.schema, max: 1 });
     try {
       // The holder keeps its lock until told to let go.
       let letGo: () => void = () => undefined;
@@ -805,20 +862,49 @@ describe("a lost connection answers transient (K-05 README: every call)", () => 
         }
       }
       expect(waiting).toBe(true);
-      await killer`select pg_terminate_backend(${pid})`;
+      if (relay === null) {
+        await killer`select pg_terminate_backend(${pid})`;
+      } else {
+        relay.reset();
+      }
 
       const answer = await answering;
       letGo();
       await holding;
-      return answer;
+      // The same request again on the killed client. closed() in postgres.js keeps the killed query's FATAL, so the
+      // first query after the reconnect may answer transient once more; a later one must succeed. A hung call fails
+      // the test by its timeout; a null-socket write would end the process.
+      const resends: T[] = [];
+      for (let attempt = 0; attempt < 4; attempt += 1) {
+        const again = await call(victim.primary);
+        resends.push(again);
+        if (!(
+          typeof again === "object" &&
+          again !== null &&
+          (again as { error?: string }).error === "transient"
+        )) {
+          break;
+        }
+      }
+      return { answer, resends };
     } finally {
       await victim.close();
+      await relay?.stop();
       await killer.end({ timeout: 5 });
       await holder.end({ timeout: 5 });
     }
   }
 
   const lostConnection = /^(08[0-9A-Z]{3}|57P0[123])$/;
+  /** At most one stale transient (closed() keeps the killed query's FATAL), then the answer the card's call gives. */
+  function expectResentOnTheKilledClient(resends: unknown[], expected: Record<string, unknown>): void {
+    expect(resends.length).toBeGreaterThanOrEqual(1);
+    expect(resends.length).toBeLessThanOrEqual(2);
+    for (const stale of resends.slice(0, -1)) {
+      expect(stale).toMatchObject({ error: "transient" });
+    }
+    expect(resends.at(-1)).toMatchObject(expected);
+  }
   const lockTables = (tx: postgres.TransactionSql): Promise<unknown> =>
     tx`lock table ${tx(db.schema)}.bundles, ${tx(db.schema)}.bundle_values in access exclusive mode`;
 
@@ -831,38 +917,83 @@ describe("a lost connection answers transient (K-05 README: every call)", () => 
     await publishBundleCopy(db.sql, a);
     await publishBundleCopy(db.sql, b);
     await setActiveBundle(db.sql, { bundleId: idOf(a), expectActive: null, at: "2026-11-08T10:00:00Z" });
-    const answer = await answerAfterKill(
+    const { answer, resends } = await answerAfterKill(
       (tx) => tx`select pg_advisory_xact_lock(hashtext(${LOCK_NAME}))`,
       (sql) => setActiveBundle(sql, { bundleId: idOf(b), expectActive: idOf(a), at: "2026-11-08T11:00:00Z" }),
     );
     expect(answer).toMatchObject({ error: "transient" });
     expect((answer as { sqlstate: string }).sqlstate).toMatch(lostConnection);
-    // Nothing was written: a is still the one active bundle, and a switch still works.
-    expect(await activeIds(db.sql)).toEqual([idOf(a)]);
-    expect(
-      await setActiveBundle(db.sql, { bundleId: idOf(b), expectActive: idOf(a), at: "2026-11-08T11:00:00Z" }),
-    ).toMatchObject({ result: "activated", repeated: false });
+    // The same request on the killed client: transient at most once more, then it switches (nothing was written before).
+    expectResentOnTheKilledClient(resends, { result: "activated", repeated: false });
+    expect(await activeIds(db.sql)).toEqual([idOf(b)]);
   }, 30_000);
+
+  it("setActiveBundle on a socket that is reset answers transient (08006), skips the rollback, and the same client then switches", async () => {
+    await emptyTables(db.sql);
+    const [a, b] = [bundleOf("reset a", 1), bundleOf("reset b", 2)] as [
+      PublishBundleCopyRequest,
+      PublishBundleCopyRequest,
+    ];
+    await publishBundleCopy(db.sql, a);
+    await publishBundleCopy(db.sql, b);
+    await setActiveBundle(db.sql, { bundleId: idOf(a), expectActive: null, at: "2026-11-08T10:00:00Z" });
+    const { answer, resends } = await answerAfterKill(
+      (tx) => tx`select pg_advisory_xact_lock(hashtext(${LOCK_NAME}))`,
+      (sql) => setActiveBundle(sql, { bundleId: idOf(b), expectActive: idOf(a), at: "2026-11-08T11:00:00Z" }),
+      "reset",
+    );
+    expect(answer).toEqual({ error: "transient", sqlstate: "08006" });
+    expectResentOnTheKilledClient(resends, { result: "activated", repeated: false });
+    expect(await activeIds(db.sql)).toEqual([idOf(b)]);
+  }, 30_000);
+
+  it("publishBundleCopy, readActiveBundle and readBundleValue on a socket that is reset answer transient (08006), and the same client then answers", async () => {
+    await emptyTables(db.sql);
+    const published = bundleOf("reset published", 1);
+    const stored = bundleOf("reset read", 2);
+    await publishBundleCopy(db.sql, stored);
+    const publish = await answerAfterKill(lockTables, (sql) => publishBundleCopy(sql, published), "reset");
+    expect(publish.answer).toEqual({ error: "transient", sqlstate: "08006" });
+    expectResentOnTheKilledClient(publish.resends, { result: "published", repeated: false });
+    const active = await answerAfterKill(lockTables, (sql) => readActiveBundle(sql), "reset");
+    expect(active.answer).toEqual({ error: "transient", sqlstate: "08006" });
+    expectResentOnTheKilledClient(active.resends, { error: "noActiveBundle" });
+    const value = await answerAfterKill(
+      lockTables,
+      (sql) => readBundleValue(sql, { key: stored.manifestKey }),
+      "reset",
+    );
+    expect(value.answer).toEqual({ error: "transient", sqlstate: "08006" });
+    expectResentOnTheKilledClient(value.resends, { result: "value" });
+  }, 60_000);
+
+  it("isLostConnection and the answers: ECONNRESET, EPIPE and ETIMEDOUT are lost connections; a constraint refusal is not", () => {
+    for (const code of ["ECONNRESET", "EPIPE", "ETIMEDOUT", "CONNECTION_CLOSED", "08006", "57P01"]) {
+      expect(isLostConnection(Object.assign(new Error("x"), { code }))).toBe(true);
+    }
+    for (const code of ["23505", "40001", "ECONNREFUSED", "CONNECT_TIMEOUT"]) {
+      expect(isLostConnection(Object.assign(new Error("x"), { code }))).toBe(false);
+    }
+  });
 
   it("publishBundleCopy, readActiveBundle and readBundleValue waiting on a table lock, their backends terminated, answer transient", async () => {
     await emptyTables(db.sql);
     const published = bundleOf("kill published", 1);
     await publishBundleCopy(db.sql, bundleOf("kill read", 2));
     const publish = await answerAfterKill(lockTables, (sql) => publishBundleCopy(sql, published));
-    expect(publish).toMatchObject({ error: "transient" });
-    expect((publish as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    expect(publish.answer).toMatchObject({ error: "transient" });
+    expect((publish.answer as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    // The killed publish wrote nothing: the same request on the killed client publishes it for the first time.
+    expectResentOnTheKilledClient(publish.resends, { result: "published", repeated: false });
     const active = await answerAfterKill(lockTables, (sql) => readActiveBundle(sql));
-    expect(active).toMatchObject({ error: "transient" });
-    expect((active as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    expect(active.answer).toMatchObject({ error: "transient" });
+    expect((active.answer as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    expectResentOnTheKilledClient(active.resends, { error: "noActiveBundle" });
     const value = await answerAfterKill(lockTables, (sql) =>
       readBundleValue(sql, { key: bundleOf("kill read", 2).manifestKey }),
     );
-    expect(value).toMatchObject({ error: "transient" });
-    expect((value as { sqlstate: string }).sqlstate).toMatch(lostConnection);
-    // The killed publish wrote nothing, and the same request can be sent again.
-    expect(await publishBundleCopy(db.sql, published)).toMatchObject({
-      result: "published",
-      repeated: false,
-    });
+    expect(value.answer).toMatchObject({ error: "transient" });
+    expect((value.answer as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    expectResentOnTheKilledClient(value.resends, { result: "value" });
   }, 60_000);
 });
