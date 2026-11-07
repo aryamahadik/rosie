@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/port-geo/port-geo.v1.schema.json",
   "title": "PortGeoV1",
-  "description": "K-17 v1, the geo port: one call, geocode, that turns a town, a ZIP code or a street address into map points, each with its precision, a normalized address and the point's time zone, or says nothing matched (02-contracts K-17; arch 05 line 237; B4-77, B4-30, S12-07; FS rows L02, L03; CQ-08; Q-25). Provider-neutral: only fields every geo provider candidate of T-1122 (adapters/spikes/geo-provider/FINDINGS.md) can fill, in Rosie's own terms; the vendor's wire format stays inside the adapter (02-contracts section 5). The call's request, response and errors are geocode.request, geocode.response and geocode.errors under $defs, and geocode.exchange pairs one request with its outcome, which is what every exchange fixture is (02-contracts section 2 item 2). geocode.span is the K-08 v1 portCall span the call writes, with no address in it. The root is any one of these, so the type generator writes a type for each (ADR-005). The distance itself is never the port's: it is computed in PostGIS on the stored points (Q-25's default). Not model-facing, so number and length limits are schema rules here.",
+  "description": "K-17 v1, the geo port: one call, geocode, that turns a town, a ZIP code or a street address into map points, each with its precision, a normalized address, its US state and the point's time zone, or says nothing matched (02-contracts K-17; arch 05 line 237; B4-77, B4-30, B4-31, S12-07; FS rows L02, L03; CQ-08; Q-25). Provider-neutral: only fields every geo provider candidate of T-1122 (adapters/spikes/geo-provider/FINDINGS.md) can fill, in Rosie's own terms; the vendor's wire format stays inside the adapter (02-contracts section 5). The call's request, response and errors are geocode.request, geocode.response and geocode.errors under $defs, and geocode.exchange pairs one request with its outcome, which is what every exchange fixture is (02-contracts section 2 item 2). geocode.span is the K-08 v1 portCall span the call writes, with no address in it. The root is any one of these, so the type generator writes a type for each (ADR-005). The distance itself is never the port's: it is computed in PostGIS on the stored points (Q-25's default). Not model-facing, so number and length limits are schema rules here.",
   "anyOf": [{ "$ref": "#/$defs/geocode.exchange" }, { "$ref": "#/$defs/geocode.span" }],
   "$defs": {
     "zone": {
@@ -43,9 +43,15 @@
       "required": ["lat", "lng"],
       "additionalProperties": false
     },
+    "usState": {
+      "title": "GeoState",
+      "description": "A US state as its two-letter USPS code, such as MA (B4-30 'in a state whose form the business filled in'; 'The address decides which state's rules apply to the job'). Each adapter maps its provider's own field to it: Google's administrative_area_level_1 short_name, Mapbox's context.region.region_code, Geocodio's address_components state_province, HERE's address.stateCode (README, 'Which field of each candidate fills each port field'). Never a full name (Massachusetts) or a country-prefixed code (US-MA).",
+      "type": "string",
+      "pattern": "^[A-Z]{2}$"
+    },
     "match": {
       "title": "GeocodeMatch",
-      "description": "One place the text matched: its point, the precision of that point, the provider's normalized one-line address and the point's time zone (02-contracts K-17 'a map point, its precision and a normalized address'; CQ-08 'the geo port returns each point's zone'). No distance: the distance is computed in PostGIS on the stored point (Q-25's default; arch 05 line 237 'within 10 mi · PostGIS').",
+      "description": "One place the text matched: its point, the precision of that point, the provider's normalized one-line address, the US state it lies in and the point's time zone (02-contracts K-17 'a map point, its precision and a normalized address'; B4-30, B4-31 the state; CQ-08 'the geo port returns each point's zone'). No distance: the distance is computed in PostGIS on the stored point (Q-25's default; arch 05 line 237 'within 10 mi · PostGIS').",
       "type": "object",
       "properties": {
         "point": {
@@ -61,12 +67,16 @@
           "type": "string",
           "minLength": 1
         },
+        "state": {
+          "description": "The US state the match lies in, as its two-letter USPS code, or null when the provider's result gives none the adapter can map to one (B4-30: 'The address decides which state's rules apply to the job'; 'only addresses in states whose form it filled in are offered'; B4-31: 'A town in a state whose form Sam hasn't filled in gets the same answer'). The key is on every match; its value is nullable because no candidate's documents promise a state on every result. A null state never counts as a state whose form the business filled in: the safe default holds (B4-30 'ask for the address again; nothing is booked until it checks'; at the town check, B4-77 'ask for the ZIP; the street address on the page decides').",
+          "anyOf": [{ "$ref": "#/$defs/usState" }, { "type": "null" }]
+        },
         "timeZone": {
           "description": "The point's time zone, since a visit at the customer's place uses that place's zone (S13-03; arch 06 line 309; CQ-08's default: 'the geo port returns each point's zone ... the provider pick (Q-25) must supply it').",
           "$ref": "#/$defs/zone"
         }
       },
-      "required": ["point", "precision", "normalizedAddress", "timeZone"],
+      "required": ["point", "precision", "normalizedAddress", "state", "timeZone"],
       "additionalProperties": false
     },
     "geocode.request": {

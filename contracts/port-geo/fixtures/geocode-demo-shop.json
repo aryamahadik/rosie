@@ -8,6 +8,7 @@
         "point": { "lat": 40.1, "lng": -90.2 },
         "precision": "exact",
         "normalizedAddress": "123 Demo St, Anytown",
+        "state": "MA",
         "timeZone": "America/New_York"
       }
     ]

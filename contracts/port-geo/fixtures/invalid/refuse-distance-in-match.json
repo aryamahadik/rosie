@@ -8,6 +8,7 @@
         "point": { "lat": 40.02, "lng": -90.03 },
         "precision": "exact",
         "normalizedAddress": "42 Oak St, Springfield",
+        "state": "MA",
         "timeZone": "America/New_York",
         "distanceMiles": 2.1
       }

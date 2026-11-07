@@ -8,6 +8,7 @@
         "point": { "lat": 40.03, "lng": -90.02 },
         "precision": "zip",
         "normalizedAddress": "02139",
+        "state": "MA",
         "timeZone": "America/New_York"
       }
     ]

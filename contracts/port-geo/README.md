@@ -12,13 +12,14 @@ Each reviewer checks its own side (02-contracts section 1): the integrations eng
 
 ## What it defines
 
-One call, **geocode**: a town, a ZIP code or a street address in; map points out, each with its precision, a normalized address and the point's time zone, or "not found" (02-contracts K-17). It serves flow B's travel area at sign-up (FS rows L02, L03; S1-21), the town or ZIP check before any times (B4-77, S12-07), the street address on the secure page (B4-30), the business's map pin (FS row B03) and search by distance (arch 05 line 237).
+One call, **geocode**: a town, a ZIP code or a street address in; map points out, each with its precision, a normalized address, its US state and the point's time zone, or "not found" (02-contracts K-17). It serves flow B's travel area at sign-up (FS rows L02, L03; S1-21), the town or ZIP check before any times (B4-77, S12-07), the street address on the secure page and its state (B4-30, B4-31), the business's map pin (FS row B03) and search by distance (arch 05 line 237).
 
 | Definition (`$defs`) | What it is                                                                                 | Source                                      |
 | -------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------- |
 | `geocode.request`    | `kind` (`zip`, `town`, `streetAddress`) and `text`, the words as typed                     | B4-77, B4-30; FS row L02; arch 05 line 237  |
 | `geocode.response`   | `geocode.found` (`matches`, best first, at least one) or `geocode.notFound`                | 02-contracts K-17; FINDINGS.md section 2    |
-| `match`              | `point` (`lat`, `lng`), `precision`, `normalizedAddress`, `timeZone`                       | 02-contracts K-17; CQ-08; S13-03            |
+| `match`              | `point` (`lat`, `lng`), `precision`, `normalizedAddress`, `state`, `timeZone`              | 02-contracts K-17; B4-30, B4-31; CQ-08      |
+| `usState`            | A US state's two-letter USPS code (`MA`), the type of a match's `state`                    | B4-30, B4-31                                |
 | `geocode.errors`     | `error` (`unavailable`, `rateLimited`, `badRequest`) and `retryAfterSeconds`               | arch 10 line 540                            |
 | `geocode.exchange`   | One call and its outcome, an answer or an error: what every exchange fixture is            | 02-contracts section 2 item 2               |
 | `geocode.span`       | The K-08 v1 `portCall` span the call writes, with a closed list of what it got and decided | K-08 v1 README (`portCall`, provider `geo`) |
@@ -46,6 +47,12 @@ The root is any one exchange or span, so the type generator writes a type for ea
 
 A **partial match** is an answer with a coarser precision than the `kind` asked, such as a town found for a street address (`geocode-street-partial.json`). It is told apart by `precision`, never by an error (`refuse-partial-as-error.json`): B4-30's safe default asks for the address again, and nothing is booked until it checks. A provider's own values (ROOFTOP, rooftop, range_interpolation, houseNumber …) never cross the port (`refuse-vendor-precision.json`).
 
+The adapter's rules for a provider answer that does not fit the kind asked:
+
+- **Coarser than a town** (a county, a state or a country, such as Geocodio's `accuracy_type` county or state, HERE's `resultType` administrativeArea, Mapbox's feature types region, district or country, Google's `administrative_area_level_*` or `country` results): the adapter drops that result, since no precision here can carry it. If no result at town precision or finer is left, the answer is `notFound`, never an error, and never a match at `town`.
+- **Coarser than the kind asked**, but town or finer (a town found for a street address): kept as the provider gave it, a partial match at its own coarser precision. The adapter never raises a precision.
+- **Finer than the kind asked** (an `exact` or `street` point for a ZIP or a town; a `zip` result for a town): the point is kept, and its precision is capped at the kind's own level (`zip` for a ZIP, `town` for a town; a street address takes any). So a match is never finer than the text allows, the check the contract test makes.
+
 ### Not found, several matches and errors
 
 - **Not found** (`not-found.json`): nothing matched, the answer to an empty result (FINDINGS.md section 2). It is an answer, not an error. B4-77's safe default follows: ask for the ZIP; the street address on the page decides.
@@ -55,6 +62,15 @@ A **partial match** is an answer with a coarser precision than the `kind` asked,
 ### The time zone (CQ-08)
 
 Every match carries its point's IANA zone (`refuse-match-without-time-zone.json`), since a visit at the customer's place uses that place's zone (S13-03; arch 06 line 309). This is CQ-08's default: "the geo port returns each point's zone; the geo double gives a fixed zone per test address; the provider pick (Q-25) must supply it." Of T-1122's candidates, Geocodio, HERE and Google give it (Google by a second paid call); Mapbox and the US Census Geocoder do not (FINDINGS.md section 2, "FLAG: time zone"). So the zone is a requirement on the pick, as CQ-08 says: with Mapbox the adapter would need its own zone source, and Census cannot be the provider anyway (no ZIP or town lookups). FINDINGS.md recommends Geocodio, which fills every field here and allows stored points (DL-067: the geo pick awaiting Jay's cost OK).
+
+### The state (B4-30, B4-31)
+
+Every match carries `state`, the US state it lies in as its two-letter USPS code (`MA`), or `null`. B4-30 checks the typed address "inside Sam's 25 miles, and in a state whose form the business filled in", because "the address decides which state's rules apply to the job" ("only addresses in states whose form it filled in are offered"); B4-31 gives "a town in a state whose form Sam hasn't filled in" the same answer as a town outside the miles. The typed address page has only a street-address field (B4-30's form), and `normalizedAddress` is free text with no promised format, so the state can come only from here.
+
+- **Nullable, not optional:** the key is on every match, at every precision (all are town or finer). Its value may be `null` because no candidate's documents promise a state on every result: Google's short names "will closely match ISO 3166-2 subdivisions ... however this is not guaranteed", Mapbox's context sub-objects depend "upon the data coverage", and whether Geocodio and HERE give one on a ZIP or town result is unverified (the table below). The adapter also gives `null` for a value that is not a two-letter USPS code (HERE's stateCode outside the US, such as QLD).
+- **The action layer's safe default when it is `null`:** a null state never counts as a state whose form the business filled in, so nothing is offered or booked on it. On the page, B4-30's "ask for the address again; nothing is booked until it checks"; at the town or ZIP check, B4-77's "ask for the ZIP; the street address on the page decides" (`geocode-town-no-state.json`).
+- **Never a name or a prefixed code:** `Massachusetts` or `US-MA` is refused (`refuse-state-not-two-letter.json`); the adapter maps its provider's field to the code (the table below).
+- The state is not an address and still stays out of the span, which keeps its closed list (no step needs it there).
 
 ### Distance is never the port's
 
@@ -68,16 +84,26 @@ The request's text and the answer's `normalizedAddress` are addresses: neither e
 
 From T-1122's findings (`adapters/spikes/geo-provider/FINDINGS.md`, read on 2026-11-07; the bracketed ids are its sources). The value-by-value mapping is the adapter's, written from the chosen provider's own documents in its vendor spike once the CTO picks (Q-25; not this task).
 
-| Port field          | Google (Geocoding and Time Zone APIs)                                        | Mapbox (Geocoding v6)                                               | Geocodio (v2.1)                      | HERE (Geocoding & Search v7)                                      | US Census Geocoder                          |
-| ------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------- |
-| `kind`              | an address, or `components=postal_code:` or `locality:` with no address [G1] | `types`: address, postcode, place [M1]                              | addresses, cities and ZIP codes [C1] | `resultType`: houseNumber, street, postalCodePoint, locality [H1] | street addresses only [U1]                  |
-| `point`             | the result's lat/lng [G1]                                                    | the feature's coordinates [M1]                                      | `location` [C1]                      | `position` [H2]                                                   | its matched point, from address ranges [U2] |
-| `precision`         | `geometry.location_type`, ROOFTOP to APPROXIMATE [G1]                        | `coordinates.accuracy` (rooftop to interpolated), `match_code` [M1] | `accuracy_type`, `accuracy` [C1]     | `resultType` [H1]                                                 | interpolated (approximate points) [U2]      |
-| `normalizedAddress` | `formatted_address`                                                          | `full_address`                                                      | `formatted_address` [C1]             | `address.label` [H2]                                              | its matched address                         |
-| `timeZone`          | Time Zone API `timeZoneId`, a second call per point [G2]                     | none [M1]; only Tilequery on a custom tileset [M2]                  | the `timezone` append's name [C2]    | `show=tz`: `timeZone.name` [H2]                                   | none [U1]                                   |
-| not found           | an empty result                                                              | an empty result                                                     | an empty result                      | an empty result                                                   | an empty result                             |
+| Port field                           | Google (Geocoding and Time Zone APIs)                                                              | Mapbox (Geocoding v6)                                                     | Geocodio (v2.1)                                                        | HERE (Geocoding & Search v7)                                      | US Census Geocoder                          |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------- |
+| `kind`                               | an address, or `components=postal_code:` or `locality:` with no address [G1]                       | `types`: address, postcode, place [M1]                                    | addresses, cities and ZIP codes [C1]                                   | `resultType`: houseNumber, street, postalCodePoint, locality [H1] | street addresses only [U1]                  |
+| `point`                              | the result's lat/lng [G1]                                                                          | the feature's coordinates [M1]                                            | `location` [C1]                                                        | `position` [H2]                                                   | its matched point, from address ranges [U2] |
+| `precision`                          | `geometry.location_type`, ROOFTOP to APPROXIMATE [G1]                                              | `coordinates.accuracy` (rooftop to interpolated), `match_code` [M1]       | `accuracy_type`, `accuracy` [C1]                                       | `resultType` [H1]                                                 | interpolated (approximate points) [U2]      |
+| `normalizedAddress`                  | `formatted_address`                                                                                | `full_address`                                                            | `formatted_address` [C1]                                               | `address.label` [H2]                                              | its matched address                         |
+| `state`                              | the `address_components` entry of type `administrative_area_level_1`: its `short_name` ("CA") [G1] | `context.region.region_code` ("UT"; not `region_code_full`, "US-UT") [M1] | `address_components.state_province`, two letters in the US ("VA") [C1] | `address.stateCode` ("CA" in its US examples) [H5]                | unverified (not read)                       |
+| `timeZone`                           | Time Zone API `timeZoneId`, a second call per point [G2]                                           | none [M1]; only Tilequery on a custom tileset [M2]                        | the `timezone` append's name [C2]                                      | `show=tz`: `timeZone.name` [H2]                                   | none [U1]                                   |
+| not found                            | an empty result                                                                                    | an empty result                                                           | an empty result                                                        | an empty result                                                   | an empty result                             |
+| coarser than a town (dropped; above) | `administrative_area_level_*` or `country` results [G1]                                            | feature types `region`, `district`, `country` [M1]                        | `accuracy_type` `county`, `state` [C1]                                 | `resultType` `administrativeArea` [H1]                            | none (street addresses only) [U1]           |
 
 Every candidate fills `point`, `precision`, `normalizedAddress` and not found from a street address; all but Census also from a ZIP and a town. `timeZone` is CQ-08's requirement on the pick (above).
+
+The `state` row was read on 2026-11-07 for T-026's second round from each provider's public geocoding documentation, through a summarizing fetch (DL-066), as T-1122 did; FINDINGS.md does not list these fields. [G1], [M1] and [C1] are the pages FINDINGS.md cites; [H5] is HERE's "Address results" page (updated 2026-06-17), https://docs.here.com/geocoding-and-search/docs/result-types-address. What the pages show and leave open:
+
+- **Google** [G1]: `short_name` is "an abbreviated textual name for the address component, if available", and `administrative_area_level_1` short names "will closely match ISO 3166-2 subdivisions ... however this is not guaranteed". Present on a ZIP or town result: unverified.
+- **Mapbox** [M1]: the context "may include a sub-object" for region, and "which sub-objects are included is dependent upon the data coverage available". Present on every US result: unverified.
+- **Geocodio** [C1]: in the US the state is a "2-letter abbreviation (e.g., VA, CA)". Present on a ZIP or town result: unverified (the page's ZIP examples did not show `address_components`).
+- **HERE** [H5]: US examples carry `stateCode` "CA" (a state result, a postal-code result); outside the US it is not a USPS code (IDF, QLD) and one example has none. Present on a US house-number or town result: unverified.
+- **US Census Geocoder:** unverified (not read; it cannot be the provider).
 
 ## The double (02-contracts K-17; C-220)
 
@@ -92,9 +118,16 @@ Fixed points and zones for the test addresses; the exchange fixtures are its ans
 | town `Riverton`                            | town, 40.58, -90 (40 miles north of 1200 Main St) | `geocode-town-riverton.json`  | S12-07, B4-31                                    |
 | streetAddress `42 Oak St, Riverton`        | town, Riverton's point (a partial match)          | `geocode-street-partial.json` | B4-30                                            |
 | zip `02139`                                | zip, 40.03, -90.02                                | `geocode-zip.json`            | arch 05 line 237                                 |
+| town `Anytown`                             | town, 40.1, -90.2, state null                     | `geocode-town-no-state.json`  | B4-30, B4-31 (the null state)                    |
 | town `the mall`                            | notFound                                          | `not-found.json`              | B4-77                                            |
 
-Every zone is `America/New_York`, the zone of every demo business in K-04 v1's and K-23 v1's seeds. The double also fakes `unavailable` and `rateLimited` (`error-unavailable.json`, `error-rate-limited.json`). How a test asks it for an error or for an address it does not know (it answers notFound) is C-220's.
+Every zone is `America/New_York`, the zone of every demo business in K-04 v1's and K-23 v1's seeds. Every state is `MA` (the lead's example for T-026's second round; it fits the double's ZIP 02139 and its zone), except Anytown's town answer, which shows the null state; like the points, the state is an illustration. The double's world is one state, so B4-31's "town in a state whose form Sam hasn't filled in" is tested on the action layer's side, with a business whose filled-in forms leave out `MA`.
+
+How a test drives the double:
+
+- **An answer:** the double answers a request whose `kind` and `text` equal an accepted answer fixture's request (exactly, as written there) with that fixture's outcome.
+- **An unknown address:** any other request answers `notFound`, never an error (as `not-found.json` shows).
+- **An error:** the test sets the double, before the call, to fail its next call with one of the error fixtures' outcomes (`error-unavailable.json`, `error-rate-limited.json`, or `badRequest`); that call returns the error and writes its span with the error code, and later calls answer as before. The setting is the double's test-only option, never a field of the port's request. The error fixtures' requests are the calls a test makes with that setting on (they share their text with `geocode-town.json` and `geocode-zip.json`).
 
 ## Producers and consumers (02-contracts K-17)
 
@@ -104,9 +137,9 @@ Every zone is `America/New_York`, the zone of every demo business in K-04 v1's a
 
 ## Fixtures (`fixtures/`, listed in `fixtures/index.json`)
 
-Accepted: `geocode-zip.json`, `geocode-street.json`, `geocode-town.json`, `not-found.json` (the card's four); `geocode-street-partial.json` (a partial match); `geocode-town-riverton.json` (S12-07's town outside the 25 miles); `geocode-travel-centre.json` (flow B's centre at sign-up); `geocode-demo-shop.json` (the demo shops' address); `error-unavailable.json`, `error-rate-limited.json`; `span-geocode.json` (`geocode.span`). Refused, in `fixtures/invalid/`: `refuse-partial-as-error.json`, `refuse-vendor-precision.json`, `refuse-match-without-time-zone.json`, `refuse-distance-in-match.json`, `refuse-not-found-with-match.json`, `refuse-town-in-span.json`. Each refused fixture is refused for its one reason: with that one fault fixed (the partial answered as a town match, `exact` for ROOFTOP, the zone added, the distance dropped, the match dropped, the town dropped from the span) it is accepted (checked 2026-11-07).
+Accepted: `geocode-zip.json`, `geocode-street.json`, `geocode-town.json`, `not-found.json` (the card's four); `geocode-street-partial.json` (a partial match); `geocode-town-riverton.json` (S12-07's town outside the 25 miles); `geocode-travel-centre.json` (flow B's centre at sign-up); `geocode-demo-shop.json` (the demo shops' address); `geocode-town-no-state.json` (a match with a null state); `error-unavailable.json`, `error-rate-limited.json`; `span-geocode.json` (`geocode.span`). Refused, in `fixtures/invalid/`: `refuse-partial-as-error.json`, `refuse-vendor-precision.json`, `refuse-match-without-time-zone.json`, `refuse-distance-in-match.json`, `refuse-not-found-with-match.json`, `refuse-state-not-two-letter.json`, `refuse-town-in-span.json`. Each refused fixture is refused for its one reason: with that one fault fixed (the partial answered as a town match, `exact` for ROOFTOP, the zone added, the distance dropped, the match dropped, `MA` for Massachusetts, the town dropped from the span) it is accepted (checked 2026-11-07).
 
-Names and values come from the master's sample cast and fixture set v1's demo shops (Alex, Sam; Lee Home Services and its 1200 Main St, Alex's 42 Oak St in Springfield, Riverton; Lee's Barbershop's 123 Demo St, Anytown), never a real person (rule 9). One value comes from elsewhere: the ZIP code 02139, arch 05 line 237's own example request ("near 02139"), since neither the cast nor the demo shops has a ZIP code; it is no one's personal data, and the double places it beside its Springfield. Span ids follow K-08 v1's fixtures, with bundle v0's id (K-01 `bundle-v0-skeleton.json`).
+Names and values come from the master's sample cast and fixture set v1's demo shops (Alex, Sam; Lee Home Services and its 1200 Main St, Alex's 42 Oak St in Springfield, Riverton; Lee's Barbershop's 123 Demo St, Anytown), never a real person (rule 9). One value comes from elsewhere: the ZIP code 02139, arch 05 line 237's own example request ("near 02139"), since neither the cast nor the demo shops has a ZIP code; it is no one's personal data, and the double places it beside its Springfield. The state `MA` is the lead's example code for T-026's second round, no one's personal data either. Span ids follow K-08 v1's fixtures, with bundle v0's id (K-01 `bundle-v0-skeleton.json`).
 
 ## Defaults used (T-026)
 
@@ -117,16 +150,18 @@ Names and values come from the master's sample cast and fixture set v1's demo sh
 5. **Matches, best first,** so a town two states share can be told (B4-77 asks for the ZIP); every provider answers with a list, and not found is its empty answer.
 6. **The double's world:** K-23 v1's illustrative seed points, the cast's towns, and the demo businesses' zone, America/New_York.
 7. **Three errors** (unavailable, rateLimited with Retry-After, badRequest); nothing about the place is an error.
+8. **The state** (B4-30, B4-31): on every match, the two-letter USPS code or `null`, since no candidate's documents promise it on every result; a null state never counts as a filled-in state's (B4-30's and B4-77's safe defaults). The double's state is `MA`.
+9. **The adapter's fit rules:** a result coarser than a town is dropped (none left: `notFound`); one coarser than the kind asked, but town or finer, is a partial match at its own precision; one finer than the kind asked is capped at the kind's level.
 
 ## Open gaps
 
 - **Q-25** (the provider and its cost): the pick, its key's name and its vendor spike (the value-by-value mapping, recorded samples) wait for the CTO and Jay (BP 3.7 J-17). FINDINGS.md recommends Geocodio.
 - **CQ-08** (where a visit address's zone comes from): default 1. If the pick cannot give a zone, the adapter needs its own zone source; the port does not change.
-- **New (the state):** B4-30 says "the address decides which state's rules apply" and B4-31 refuses "a town in a state whose form Sam hasn't filled in", but FINDINGS.md names only the one-line address for every candidate, so v1 has no separate state field. Proposed: a v1.1 that adds the state (an optional field, additive) once the pick's spike confirms each candidate's field; meanwhile the action layer reads no state from the port.
+- **The state's presence** on a ZIP or town result (in v1 since T-026's second round, default 8): unverified for each candidate (above); the pick's vendor spike records it from samples. The port does not change: a missing state is `null`.
 - **New (a hint for ambiguous towns):** no source gives the port a place to bias toward (such as the business's travel centre); B4-77 asks for the ZIP instead. A bias would be an optional request field in a minor version.
 - **New (time budget):** no source gives the geocode call a time budget; the calling stage's budget applies (arch 04 "Latency budget targets").
 - **New (coverage):** the candidates' coverage differs (Geocodio: US, Canada, Mexico, UK, Australia, New Zealand; Census: US only); v1 assumes US addresses, as the cast's are.
 
 ## Change log
 
-- v1, 2026-11-07 (T-026): first version, frozen: geocode's request, response, errors and exchange, its K-08 span; the fixtures and their index; the freeze record and `frozen.json`.
+- v1, 2026-11-07 (T-026): first version, frozen: geocode's request, response, errors and exchange, its K-08 span; the fixtures and their index; the freeze record and `frozen.json`. Second round, before merge (the action-layer engineer's review): each match's `state` (`usState`), with `geocode-town-no-state.json` and `refuse-state-not-two-letter.json`; the adapter's fit rules and how a test drives the double.

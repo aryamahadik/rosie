@@ -13,15 +13,15 @@
       "version": "v1",
       "def": "geocode.exchange",
       "expect": "accept",
-      "shows": "Alex types his street address on the secure page as '42 Oak Street, Springfield': one exact match with the normalized address '42 Oak St, Springfield', its point and its zone, which B4-30 checks against Sam's 25 miles in PostGIS",
-      "source": "02-contracts K-17 Fixtures; B4-30 in master-B.json (form row 'Street address (Alex types it)': '42 Oak St, Springfield'); B4-77 ('Alex's home in Springfield is inside it'); S13-03; CQ-08; Q-25"
+      "shows": "Alex types his street address on the secure page as '42 Oak Street, Springfield': one exact match with the normalized address '42 Oak St, Springfield', its point, its state MA and its zone, which B4-30 checks against Sam's 25 miles in PostGIS and against the states whose form the business filled in",
+      "source": "02-contracts K-17 Fixtures; B4-30 in master-B.json (form row 'Street address (Alex types it)': '42 Oak St, Springfield'; 'in a state whose form the business filled in'); B4-77 ('Alex's home in Springfield is inside it'); S13-03; CQ-08; Q-25"
     },
     {
       "file": "geocode-town.json",
       "version": "v1",
       "def": "geocode.exchange",
       "expect": "accept",
-      "shows": "The town in Alex's request, Springfield, checked against the travel area before any times: one match at town precision with the town's point and zone",
+      "shows": "The town in Alex's request, Springfield, checked against the travel area before any times: one match at town precision with the town's point, its state MA and its zone",
       "source": "02-contracts K-17 Fixtures; B4-77 in master-B.json ('the town or ZIP in the request is checked against the travel area, before any times'; 'Alex's home in Springfield is inside it'); FS row L02; CQ-08"
     },
     {
@@ -63,6 +63,14 @@
       "expect": "accept",
       "shows": "The demo shops' address, 123 Demo St, Anytown (Lee's Barbershop's in fixture set v1), geocoded to one exact match for the business's map pin",
       "source": "fixture set v1 test-kit/shops/barber.json ('address': '123 Demo St, Anytown (demo)'); FS row B03 ('address + map pin'); K-23 v1 (T-032) seed-location-travel-centre.json (POINT(-90.2 40.1))"
+    },
+    {
+      "file": "geocode-town-no-state.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "A match whose provider result gives no state the adapter can map to a two-letter USPS code: the town Anytown at town precision with state null. The key is still there; a null state never counts as a state whose form the business filled in, so the step's safe default holds (B4-30 ask for the address again; at the town check, B4-77 ask for the ZIP)",
+      "source": "Lead note for T-026 round 2 (nullable state with the action layer's safe default); B4-30 in master-B.json ('in a state whose form the business filled in'; safe default 'ask for the address again; nothing is booked until it checks'); B4-31; B4-77 safe default; fixture set v1 test-kit/shops/barber.json (Anytown); Mapbox [M1] ('Which sub-objects are included is dependent upon the data coverage')"
     },
     {
       "file": "error-unavailable.json",
@@ -127,6 +135,14 @@
       "expect": "refuse",
       "shows": "A notFound answer that still lists a match: refused, since not found carries no matches (without them it is not-found.json)",
       "source": "FINDINGS.md section 2 ('Not found: the port's answer to an empty result'); B4-77"
+    },
+    {
+      "file": "invalid/refuse-state-not-two-letter.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "refuse",
+      "shows": "Alex's street address answered with the state's full name, Massachusetts (Google's long_name rather than its short_name): refused, since the state is the two-letter USPS code (with MA it is geocode-street.json)",
+      "source": "Lead note for T-026 round 2 ('the US state ... as the two-letter USPS code (MA)'; 'a refused fixture (for example a state that is not a two-letter code)'); B4-30; Google [G1] (address_components long_name and short_name)"
     },
     {
       "file": "invalid/refuse-town-in-span.json",
