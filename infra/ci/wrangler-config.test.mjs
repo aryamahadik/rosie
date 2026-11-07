@@ -61,6 +61,23 @@ describe("wrangler.jsonc BUNDLES KV binding (T-277)", () => {
   });
 });
 
+describe("wrangler.jsonc clock-sweep cron trigger (T-278)", () => {
+  it("declares exactly one cron, every minute, at the top level", () => {
+    assert.deepEqual(config.triggers, { crons: ["* * * * *"] });
+  });
+
+  it("leaves env.staging without its own copy", () => {
+    assert.equal(config.env.staging.triggers, undefined);
+  });
+
+  it("adds no production route or key", () => {
+    assert.equal(config.routes, undefined);
+    assert.equal(config.route, undefined);
+    assert.deepEqual(config.secrets, { required: [] });
+    assert.ok(!/(sk_|key|token)/i.test(JSON.stringify(config.triggers)));
+  });
+});
+
 describe("wrangler.jsonc HandleActor binding", () => {
   it("declares exactly the HANDLE_ACTOR binding on class HandleActor", () => {
     assert.deepEqual(config.durable_objects, {
