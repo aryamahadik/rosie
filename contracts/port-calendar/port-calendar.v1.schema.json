@@ -1222,7 +1222,7 @@
         "result": { "const": "written" },
         "providerEventId": { "$ref": "#/$defs/providerEventId" },
         "alreadyWritten": {
-          "description": "true: an earlier try of this write made the event, and this try found it by the repeat guard. false: this try made it, also when an earlier write of the same key made an event that was deleted since, by Rosie's calendarDelete or by the person; that deleted event is never answered as written (event-write-again.json).",
+          "description": "true: an earlier try of this write made the event, and this try found it by the repeat guard. false: this try made it, as when an earlier write of the same key, another effect, made an event that was deleted since, by Rosie's calendarDelete or by the person: that earlier event is never answered as this write's (event-write-again.json).",
           "type": "boolean"
         }
       },
