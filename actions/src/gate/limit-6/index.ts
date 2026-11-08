@@ -91,6 +91,7 @@ export {
 } from "./facts";
 export {
   ASKS_BEFORE_NOTHING_CHANGES,
+  askCountOf,
   decideValues,
   flowOf,
   nothingChangedOutcome,
