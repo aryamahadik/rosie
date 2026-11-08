@@ -88,16 +88,17 @@ export function holdsWhole(source: string, needle: string): boolean {
 }
 
 /**
- * What is code-supplied: each slot value (K-03 `slotValues`), each fact the composer was given, the reader's name and
- * the master line's words outside its slots. A quote is none: it holds someone's words, not a fact (arch 07 line 409).
+ * What is code-supplied: each slot value (K-03 `slotValues`), each fact the composer was given, the reader's name, the
+ * business's name (the one that fills a fixed line's <business>) and the master line's words outside its slots. A
+ * quote is none: it holds someone's words, not a fact (arch 07 line 409).
  */
 export function statedBy(parts: FinalParts, context: CheckContext): (item: string) => boolean {
   const facts = [...parts.slotValues, ...context.facts]
     .filter((fact) => fact.slot !== QUOTE_SLOT)
     .map((fact) => fact.value);
-  const reader = context.readerName === null ? [] : [context.readerName];
+  const names = [context.readerName, context.businessName].filter((name) => name !== null);
   const master = context.masterText === null ? [] : [context.masterText.replace(/\{\{[^{}]*\}\}/g, " ")];
-  const sources = [...facts, ...reader, ...master].map(matchForm);
+  const sources = [...facts, ...names, ...master].map(matchForm);
   return (item) => {
     const needle = matchForm(item);
     return needle !== "" && sources.some((source) => holdsWhole(source, needle));

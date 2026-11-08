@@ -1,9 +1,9 @@
 // An option that is only an opt-out word (arch 07 line 415: "in options, an option that is only an opt-out word
 // ('Cancel visit', never 'Cancel'; PLAIN-WORDS §3)"). msgtext.js line 95 gives the reason: a chat app may send a
-// button's words, so a button that is only an opt-out word would stop the texts instead; typed options (msgtext.js line
-// 64) put the label in the words, and a reader may reply with it. The words are msgtext.js's 16 (OPTOUT, line 29), which the
-// bundle carries as K-01 `sharedLists.keywords.optOut` for the guard, the lint and these checks to read (T-134
-// compiles it); this file holds no list of its own.
+// button's words, so a button that is only an opt-out word would stop the texts instead; typed options (msgtext.js
+// line 64) put the label in the words, and a reader may reply with it. The words are msgtext.js's 16 (OPTOUT, line
+// 29), which the bundle carries as K-01 `sharedLists.keywords.optOut` for the guard, the lint and these checks to read
+// (T-134 compiles it); this file holds no list of its own.
 
 /** A label's letters alone, in capitals and without accents: "Stop!", "opt-out" and "Cancel." read STOP, OPTOUT, CANCEL. */
 export function lettersOf(text: string): string {

@@ -517,6 +517,15 @@ describe("values: each value a code-supplied fact (arch 07 line 409; S13-28 rule
     ]);
   });
 
+  it("passes the business's own name where a sentence starts, as code supplies it", () => {
+    const named = textOf("Lee's Barbershop can see you Sat Oct 24 at 11:00am.", VISIT);
+    expect(valuesFaults(named, contextFor(named))).toEqual([]);
+    expect(valuesFaults(named, contextFor(named, { businessName: null }))).toEqual([
+      "The name Lee is not a code-supplied fact; write each name as its slot.",
+      "The name Barbershop is not a code-supplied fact; write each name as its slot.",
+    ]);
+  });
+
   it("passes a value the composer was given as a fact, and the reader's name", () => {
     const thanks = textOf("Thanks, Sam. Riley can see you at 11:00am, and the fee is $20.", [RILEY, TIME]);
     const given = contextFor(thanks, { facts: [{ slot: "fee", value: "$20" }], readerName: "Sam" });
