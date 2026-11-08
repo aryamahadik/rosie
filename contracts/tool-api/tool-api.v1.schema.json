@@ -125,7 +125,7 @@
           ]
         },
         "personId": {
-          "description": "The person the caller acts for, when known: the sender of the turn's texts, the signed-in person on a page, the customer an agent token is bound to, or the team member at the console (limit 1: arch 06 line 299). The action layer states it per call as the session's rosie.person_id, which K-22's row predicates read (T-031 round 3; K-22 is not frozen, so named in words: README open gaps).",
+          "description": "The person the caller acts for, when known: the sender of the turn's texts, the signed-in person on a page, the customer an agent token is bound to, or the team member at the console (limit 1: arch 06 line 299). The action layer states it per call as the session's rosie.person_id, which K-22 v1's row predicates read (K-22 v1 README rule 4). Null while the call acts for no one, as a sign-in call, S1-10's owner email included, does until its code is right (K-22 v1 rule 4); sendProofCode.request.forPersonId then names whom the code is for.",
           "anyOf": [
             {
               "$ref": "../common/formats.v1.schema.json#/$defs/id"
@@ -2070,7 +2070,7 @@
         },
         {
           "title": "ValueFailsWordsError",
-          "description": "Limit 6 failed and decide has not re-read (K-02 v1 decideResult.reread false): a value does not re-parse from its source words (arch 06 line 309). Refused before any write, the turn's core actions included: the AI layer runs the turn's one Sonnet re-read (C-116; arch 02 line 119: 'a value that fails its words: one Sonnet re-read per turn'; arch 06 line 289; Q-41) and the turn loop sends the turn here again with the re-read in decide (reread true); only then does a value that still fails take limit 6's outcome (limit6Outcome). Never answered when reread is true (the named rule rereadBeforeQuestion). Only parts the gate checks are named: parts a safety outcome holds are held, not gated (partResult held), so a danger text's checked line never waits for the re-read (README default 25).",
+          "description": "Limit 6 failed and decide has not re-read (K-02 v1 decideResult.reread false): a value does not re-parse from its source words (arch 06 line 309). Refused before any write, the turn's core actions included: the AI layer runs the turn's one Sonnet re-read (C-116; arch 02 line 119: 'a value that fails its words: one Sonnet re-read per turn'; arch 06 line 289; Q-41) and the turn loop sends the turn here again with the re-read in decide (reread true); only then does a value that still fails take limit 6's outcome (limit6Outcome). Never answered when reread is true (the named rule rereadBeforeQuestion). Only parts the gate checks are named: parts a safety outcome holds are held, not gated (partResult held), so a danger text's checked line never waits for the re-read (README default 25). A bare STOP never waits for it either: the handle actor runs a text that is only an opt-out word in its own core-only turn (input.kind coreOnly), never joined to a turn of decided texts (README default 35).",
           "type": "object",
           "properties": {
             "error": {
@@ -4062,14 +4062,14 @@
     },
     "sendProofCode.request": {
       "title": "SendProofCodeRequest",
-      "description": "Send a proof code (RULES 6.2; S13-45; MC C9): to the email on file, or by asking the person to text it from that mobile, since Rosie never texts first; in words that never confirm a booking exists (limit 1: arch 06 line 299). A code lives 10 minutes; 5 wrong give a 15-minute pause. The code itself never comes back to the caller on an email route, and never reaches the event log: the email row's final parts hold it, so that row's event-log entry leaves the final parts out (K-08 v1.1 proof_code.sent; T-1077's action-layer review). S1-75's control code goes to the listing's email (route listingEmail, purpose control; Q-02), never to a person's handle. The owner's email at sign-up (FS row B13) is typed on S1-10's secure page: route typedEmail writes its handle and sends the code there (purpose emailCheck). Where codes are kept is K-22's (not yet frozen). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers with the same code row, not a new code. Time budget: the code lives 10 minutes (RULES 6.2).",
+      "description": "Send a proof code (RULES 6.2; S13-45; MC C9): to the email on file, or by asking the person to text it from that mobile, since Rosie never texts first; in words that never confirm a booking exists (limit 1: arch 06 line 299). A code lives 10 minutes; 5 wrong give a 15-minute pause. The code itself never comes back to the caller on an email route, and never reaches the event log: the email row's final parts hold it, so that row's event-log entry leaves the final parts out (K-08 v1.1 proof_code.sent; T-1077's action-layer review). S1-75's control code goes to the listing's email (route listingEmail, purpose control; Q-02), never to a person's handle. The owner's email at sign-up (FS row B13) is typed on S1-10's secure page: route typedEmail writes its handle and sends the code there (purpose emailCheck). The code is kept as a K-22 v1 proof_codes row, only its keyed hash, never the code: its purpose, person, business, recipient handle and channel come from this request as README 'Proof codes in K-22 v1' maps them, and its person is forPersonId, whoever the call acts for (K-22 v1 rules 4 and 5). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers with the same code row, not a new code. Time budget: the code lives 10 minutes (RULES 6.2).",
       "type": "object",
       "properties": {
         "caller": {
           "$ref": "#/$defs/caller"
         },
         "purpose": {
-          "description": "unprovenSender: limit 1 (arch 06 line 299); newContact: a new phone or email, limit 3 (arch 06 line 303); signIn: a page sign-in (S13-45); emailCheck: the owner's email at sign-up (FS row B13, required: S1-10, S1-77), typed on the secure page and proven by its code typed on the page before it is used (route typedEmail); control: S1-75's proof that the business is theirs, a code to the listing's email, else Rosie's team (Q-02).",
+          "description": "Each is one K-22 v1 proof_codes.purpose (README 'Proof codes in K-22 v1'). unprovenSender: limit 1 (arch 06 line 299), a code to the contact on file typed back in the sender's own conversation (RULES 6.1), which proves the sender's handle as that person's: K-22 v1 link_record (RULES 6.5; S13-45: 'Before a phone links to an old record'); newContact: a new phone or email, limit 3 (arch 06 line 303): K-22 v1 contact_change (D75); signIn: a page sign-in (S13-45; S11-52): K-22 v1 sign_in; emailCheck: the owner's email at sign-up (FS row B13, required: S1-10, S1-77), typed on the secure page and proven by its code typed on the page before it is used (route typedEmail): K-22 v1 owner_email; control: S1-75's proof that the business is theirs, a code to the listing's email, else Rosie's team (Q-02): K-22 v1 listing_control. K-22 v1's new_device, closing_or_export and hand_over have no purpose here (README open gap 24).",
           "type": "string",
           "enum": ["unprovenSender", "newContact", "signIn", "emailCheck", "control"]
         },
@@ -4079,11 +4079,11 @@
           "enum": ["emailOnFile", "textFromMobile", "listingEmail", "typedEmail"]
         },
         "contactHandleId": {
-          "description": "The email address or mobile the code proves (K-04 v1 handles); null for control, which proves the business, not a contact, and for typedEmail, whose handle this call writes.",
+          "description": "The email address or mobile the code proves (K-04 v1 handles); null for control, which proves the business, not a contact, and for typedEmail, whose handle this call writes. For those two the call writes the email's K-04 v1 handle when it is new (the listing's email, K-23 v1 business_setup.listing_email, or the typed address), since the code row names where it went (K-22 v1 proof_codes.sent_to_handle_id, not null) and the email row its recipient (K-04 v1 outbox_rows.recipient_handle_id).",
           "$ref": "#/$defs/nullableId"
         },
         "typedEmail": {
-          "description": "For route typedEmail (purpose emailCheck), the owner's email as typed on the secure page (FS row B13; S1-10 lines 172 to 173: 'The secure page also asks one owner email ... The email is proven with a code sent to it, typed on the page. Until then it isn't used.'): this call writes its K-04 v1 handle (kind email, the address in lower case) when the address is new, so the code's email row has its recipient (K-04 outbox_rows.recipient_handle_id), keeps it as the person's owner email, not yet proven (K-22's account email, named in words: T-031), and sends the code there. The call acts for no person until the code is right: the person the code is for is kept on the server with the code, never taken from the page (K-22, T-031), so caller.personId is null. proveCode, once the code is right, marks the email proven (K-22's email_proven_at) and links the handle to the person (K-04 v1 person_handles); it is used for nothing before. Null for every other route.",
+          "description": "For route typedEmail (purpose emailCheck), the owner's email as typed on the secure page (FS row B13; S1-10 lines 172 to 173: 'The secure page also asks one owner email ... The email is proven with a code sent to it, typed on the page. Until then it isn't used.'): this call writes its K-04 v1 handle (kind email, the address in lower case) when the address is new, so the code's email row has its recipient (K-04 outbox_rows.recipient_handle_id), keeps it as the owner email of forPersonId's account, not yet proven (K-22 v1 accounts.email, written on the runtime side: K-22 v1 README 'Every path that binds a person', S1-10), and sends the code there. The call acts for no person until the code is right (K-22 v1 rule 4), so caller.personId is null; whose account it is comes from forPersonId, which the page's server side sets from the secure page's own link, never from the browser. proveCode, once the code is right, marks the email proven (K-22 v1 accounts.email_proven_at) and links the handle to that person (K-04 v1 person_handles); it is used for nothing before. Null for every other route.",
           "anyOf": [
             {
               "$ref": "#/$defs/emailAddress"
@@ -4092,10 +4092,69 @@
               "type": "null"
             }
           ]
+        },
+        "forPersonId": {
+          "description": "The person the code is for (K-22 v1 proof_codes.person_id): the person it proves, and for emailCheck the person whose account the typed email goes on (K-22 v1 accounts, keyed by person_id; K-22 v1 README, S1-10 path: 'the typed email goes on the account'). The server sets it, never the browser: for emailCheck the page's server side (K-21) takes it from the secure page's own signed link, which Rosie made for one person (S1-10's link for the owner, or on the helper path for the helper, whose own sign-in it sets; S1-77's link for the owner the helper named: MASTER-FLOW-A lines 141 to 143, 182), so a helper's request and the owner's for one business differ here; for signIn, the account the typed mobile or email finds on the runtime side (K-22 v1 README, 'Every path that binds a person', S11-52); for unprovenSender, the decider whose contact on file the gate sends the code to (limit 1: arch 06 line 299); for newContact, the person whose new contact it proves. It names whom the code is for, not whom the call acts for: on signIn and emailCheck caller.personId is null, and rosie.person_id stays unset until proveCode finds the code right (K-22 v1 rule 4: 'a sign-in call (S11-52, and S1-10's owner email): no person until its code is right'). Null only for control, whose code proves a business, not a person (K-22 v1 proof_codes.person_id and proof_codes_who).",
+          "$ref": "#/$defs/nullableId"
         }
       },
-      "required": ["caller", "purpose", "route", "contactHandleId", "typedEmail"],
+      "required": ["caller", "purpose", "route", "contactHandleId", "typedEmail", "forPersonId"],
       "additionalProperties": false,
+      "dependentSchemas": {
+        "purpose": {
+          "description": "What the purpose, which every request carries, asks of whom the code is for and whom the call acts for (K-22 v1 proof_codes_who and rule 4). Keyed on purpose rather than written as an allOf beside properties, so the generated type keeps the request's fields.",
+          "allOf": [
+            {
+              "description": "Whom the code is for (K-22 v1 proof_codes_who): a control code proves a business and names no person; every other code names the person it proves.",
+              "if": {
+                "properties": {
+                  "purpose": {
+                    "const": "control"
+                  }
+                },
+                "required": ["purpose"]
+              },
+              "then": {
+                "properties": {
+                  "forPersonId": {
+                    "type": "null"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "forPersonId": {
+                    "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                  }
+                }
+              }
+            },
+            {
+              "description": "A sign-in's send and the owner email's send act for no person until the code is right (K-22 v1 rule 4): caller.personId is null, and forPersonId names whom the code is for.",
+              "if": {
+                "properties": {
+                  "purpose": {
+                    "enum": ["signIn", "emailCheck"]
+                  }
+                },
+                "required": ["purpose"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": {
+                      "personId": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
       "if": {
         "properties": {
           "route": {
@@ -4208,7 +4267,7 @@
     },
     "proveCode.request": {
       "title": "ProveCodeRequest",
-      "description": "Check a proof code typed back, or texted from the mobile it proves (RULES 6.2; S13-45): within 10 minutes and from the right contact, the contact is proven; a wrong code counts one of 5 tries, and the fifth gives a 15-minute pause. Reads: the primary, uncached. Repeat: keyed: the inbound event or page request id is the key, and a repeat answers its first result; every new event counts a try. Time budget: the code lives 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
+      "description": "Check a proof code typed back, or texted from the mobile it proves (RULES 6.2; S13-45): within 10 minutes and from the right contact, the contact is proven; a wrong code counts one of 5 tries, and the fifth gives a 15-minute pause. The code's person is the one its send named (sendProofCode.request.forPersonId; K-22 v1 proof_codes.person_id), which the server keeps with the code id and never takes from this request; on a sign-in's or the owner email's code caller.personId is null, and the call acts for no one until the code is right (K-22 v1 rule 4). Reads: the primary, uncached. Repeat: keyed: the inbound event or page request id is the key, and a repeat answers its first result; every new event counts a try. Time budget: the code lives 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
       "type": "object",
       "properties": {
         "caller": {
@@ -4245,7 +4304,7 @@
               "const": "proven"
             },
             "handleId": {
-              "description": "The contact proven (K-04 v1 handles): for unprovenSender the sender's own handle; for emailCheck the email handle sendProofCode wrote, now linked to the person (K-04 v1 person_handles), marked proven on their account (K-22's email_proven_at, named in words) and usable; null for a control code.",
+              "description": "The contact proven (K-04 v1 handles): for unprovenSender the sender's own handle; for emailCheck the email handle sendProofCode wrote, now linked to the code's person (sendProofCode.request.forPersonId; K-04 v1 person_handles), marked proven on that person's account (K-22 v1 accounts.email_proven_at) and usable; null for a control code.",
               "$ref": "#/$defs/nullableId"
             },
             "controlBusinessId": {
