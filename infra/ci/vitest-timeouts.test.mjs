@@ -1,6 +1,8 @@
 // T-1073: the unit project's per-test and per-hook time limits are 30 s, sized for the build Mac under parallel load
-// (Vitest's default is 5 s). No project lowers a limit below that default. No TypeScript parser: this reads the few
-// lines it needs as text, like parity-placement.test.mjs.
+// (Vitest's default is 5 s). No project lowers a limit below that default. T-1113: the integration project runs its
+// files one after another (fileParallelism: false; DL-106, DL-196), so files that share one PostgreSQL never pass its
+// 100 connections; the root and the other projects leave file parallelism on. No TypeScript parser: this reads the
+// few lines it needs as text, like parity-placement.test.mjs.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -40,5 +42,20 @@ test("no project lowers a time limit below Vitest's default", () => {
       const value = limit(project(name), key);
       if (value !== undefined) assert.ok(value >= VITEST_DEFAULT_MS, `${name}.${key} is ${value}`);
     }
+  }
+});
+
+// Whether a text has a line that sets fileParallelism (a comment that names it does not count).
+const setsFileParallelism = (text) => /^\s*fileParallelism\s*:/m.test(text);
+
+test("the integration project runs its files one at a time: fileParallelism: false", () => {
+  assert.match(project("integration"), /^\s*fileParallelism:\s*false\s*,/m);
+});
+
+test("only the integration project sets fileParallelism; the root and every other project keep parallel files", () => {
+  const rootOptions = vitestConfig.slice(0, vitestConfig.indexOf("projects:"));
+  assert.ok(!setsFileParallelism(rootOptions), "the root config sets fileParallelism");
+  for (const name of PROJECTS.filter((p) => p !== "integration")) {
+    assert.ok(!setsFileParallelism(project(name)), `${name} sets fileParallelism`);
   }
 });
