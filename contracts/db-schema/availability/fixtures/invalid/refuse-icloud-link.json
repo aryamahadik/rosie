@@ -1,0 +1,21 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "calendar_links",
+    "values": {
+      "id": "callink-avery-icloud",
+      "person_id": "person-avery",
+      "provider": "apple",
+      "state": "connecting",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["calendar_links_provider_known"]
+    }
+  }
+}

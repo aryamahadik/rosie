@@ -1,0 +1,19 @@
+{
+  "after": ["seed-calendar-link.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "select",
+    "table": "calendar_links",
+    "columns": ["id", "provider", "state", "tokens"],
+    "where": {
+      "id": "callink-riley-google"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

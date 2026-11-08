@@ -1,0 +1,62 @@
+{
+  "after": ["seed-session-seats.json"],
+  "rows": [
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-yoga-yin",
+        "business_id": "biz-yoga-studio",
+        "kind_id": "yoga",
+        "name": "Yin class",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "1 hour",
+        "position": 3,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-yin-sat-nov-14",
+        "business_id": "biz-yoga-studio",
+        "kind": "class_session",
+        "name": "Yin class, Sat Nov 14 11:30am",
+        "person_id": null,
+        "active": true,
+        "version": 1
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-yoga-studio"
+    },
+    "action": "insert",
+    "table": "class_sessions",
+    "values": {
+      "resource_id": "res-yin-sat-nov-14",
+      "resource_kind": "class_session",
+      "business_id": "biz-yoga-studio",
+      "class_id": null,
+      "service_id": "svc-yoga-yin",
+      "during": "[2026-11-14T16:30:00Z,2026-11-14T17:30:00Z)",
+      "time_zone": "America/New_York",
+      "teacher_resource_id": null,
+      "teacher_kind": "worker",
+      "room_resource_id": "res-studio-room",
+      "room_kind": "room",
+      "location_id": "loc-yoga-studio-shop",
+      "minimum": null,
+      "status": "scheduled",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23P01",
+      "constraintOneOf": ["class_sessions_one_per_room"]
+    }
+  }
+}

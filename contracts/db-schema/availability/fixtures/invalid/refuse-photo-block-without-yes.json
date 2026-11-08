@@ -1,0 +1,29 @@
+{
+  "after": ["seed-busy-block.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-movers"
+    },
+    "action": "insert",
+    "table": "busy_blocks",
+    "values": {
+      "id": "busy-sam-movers-photo-sat-nov-21",
+      "business_id": "biz-movers",
+      "person_id": "person-sam",
+      "source": "photo",
+      "calendar_link_id": null,
+      "provider_event_ref": null,
+      "during": "[2026-11-21T13:00:00Z,2026-11-21T17:00:00Z)",
+      "time_zone": "America/New_York",
+      "confirmed_at": null,
+      "confirmed_by_person_id": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["busy_blocks_source_fields"]
+    }
+  }
+}

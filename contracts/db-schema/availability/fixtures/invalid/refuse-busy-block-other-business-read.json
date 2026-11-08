@@ -1,0 +1,18 @@
+{
+  "after": ["seed-busy-block.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-yoga-studio"
+    },
+    "action": "select",
+    "table": "busy_blocks",
+    "where": {
+      "id": "busy-riley-sat-nov-7"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

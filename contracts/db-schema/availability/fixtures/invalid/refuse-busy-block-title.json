@@ -1,0 +1,25 @@
+{
+  "after": ["seed-calendar-link.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "busy_blocks",
+    "values": {
+      "id": "busy-riley-sat-nov-7-titled",
+      "business_id": null,
+      "person_id": "person-riley",
+      "source": "calendar",
+      "calendar_link_id": "callink-riley-google",
+      "provider_event_ref": "gcal-ev-riley-personal-nov07-2",
+      "during": "[2026-11-07T19:00:00Z,2026-11-07T20:00:00Z)",
+      "time_zone": "America/New_York",
+      "title": "Doctor's appointment",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "42703"
+    }
+  }
+}

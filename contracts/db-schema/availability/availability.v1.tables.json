@@ -1,0 +1,1525 @@
+{
+  "part": "availability",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "weekly_hours",
+      "description": "Weekly open hours (H01; FS schedule row, kind hours): one row per open span on one day of the week, for a location (its opening hours, H01), a bookable resource (a worker's own hours, at one of the business's locations or any; a room's or vehicle's) or a space or thing (S1-81: 'A space has its own hours'). Days and times are local times read in the zone the row names. A span past midnight is two rows, one on each day; a new combination is a new row (arch 09 line 478). A resource or space with no rows of its own keeps its location's hours (README default 4).",
+      "source": "FS line 726 (schedule: owner location, staff, place_or_thing; kind hours; day, start, end); FS rows H01 ('Opening hours', weekly hours, [G] prefill the owner confirms), K04 ('hours'); FS section 10 ('Opening hours ... the owner confirms each one'); arch 09 lines 457 ('Hours & time off: person · window · kind'), 464, 478; S1-21 ('Hours · From your Google listing'); S1-81; FS line 743; K-23 v1 README ('A location's opening hours (H01) ... are K-27's schedule rows owned by the location or the place'); 02-contracts row K-27",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The span's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "arch 10 line 546; FS line 726"
+        },
+        {
+          "name": "owner_kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Whose hours: location (a shop's, office's or meeting spot's opening hours, H01), resource (a worker's own hours, or a room's or vehicle's: K-04 resources) or place (a space's or thing's hours: K-23 places_or_things).",
+          "source": "FS line 726 (schedule owner: location, staff, place_or_thing); FS rows H01, K04; S1-81"
+        },
+        {
+          "name": "location_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a location's hours, the location (K-23 locations.id). For a resource's hours, the location it works at in that span (FS line 743: a person works at several of a business's places, 'and which days they're at each'); null there: at any of the business's locations. Always null for a place.",
+          "source": "FS lines 722 (location: hours H01), 726, 743; K-23 v1 locations"
+        },
+        {
+          "name": "resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a resource's hours, the worker, room or vehicle (K-04 resources.id), held to it with resource_kind by the foreign key; null otherwise. A class session's time is its class_sessions row, never an hours row.",
+          "source": "FS line 726 (owner staff); FS line 743; K-04 v1 resources (CQ-03); arch 05 line 255"
+        },
+        {
+          "name": "resource_kind",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The resource's kind, copied from K-04 resources and held to it by the foreign key on (resource_id, resource_kind): worker, room or vehicle. Null with resource_id.",
+          "source": "K-04 v1 resources_id_kind_key; arch 05 line 255"
+        },
+        {
+          "name": "place_or_thing_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a space's or thing's hours, the space or thing (K-23 places_or_things.id); null otherwise.",
+          "source": "S1-81 ('Its hours'; 'A space has its own hours'); FS row K04; K-23 v1 places_or_things ('Its hours and closed days are K-27 schedule rows owned by it')"
+        },
+        {
+          "name": "weekday",
+          "type": "smallint",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The day of the week, ISO numbers 1 (Monday) to 7 (Sunday), as K-22's on_call days.",
+          "source": "FS line 726 (day); FS row H01 (weekly hours); K-22 v1 on_call.days"
+        },
+        {
+          "name": "opens_at",
+          "type": "time",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the span opens: a local time of day read in time_zone, such as 09:00.",
+          "source": "FS line 726 (start); FS row H01; fixtures/v1/test-kit/shops/barber.json google_prefill hours ('Mon-Fri 9am-5pm, Sat 10am-2pm')"
+        },
+        {
+          "name": "closes_at",
+          "type": "time",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the span closes: a local time of day read in time_zone, later than opens_at; 24:00 closes at midnight. A span past midnight is two rows.",
+          "source": "FS line 726 (end); FS row H01"
+        },
+        {
+          "name": "time_zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The IANA zone the day and times are read in: the business's (K-04 businesses.time_zone), copied when the row is written, so every time of day here names its zone and a location in another zone (S11-53: 'A second place, or a new state') keeps its own.",
+          "source": "CQ-05 (the visit's zone, else the business's); CQ-09 ('every time ... with its IANA zone'); S13-03; K-04 v1 businesses.time_zone; S11-53, S11-59"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506 ('Versions and compare-and-set on ... schedules'); K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "weekly_hours_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "weekly_hours_location_fk",
+          "columns": ["location_id"],
+          "references": { "table": "locations", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "weekly_hours_resource_fk",
+          "columns": ["resource_id", "resource_kind"],
+          "references": { "table": "resources", "columns": ["id", "kind"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "weekly_hours_place_fk",
+          "columns": ["place_or_thing_id"],
+          "references": { "table": "places_or_things", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "exclude": [
+        {
+          "name": "weekly_hours_no_overlap",
+          "using": "gist",
+          "elements": [
+            { "column": "owner_kind", "operator": "=" },
+            { "expression": "coalesce(resource_id, place_or_thing_id, location_id)", "operator": "=" },
+            { "column": "weekday", "operator": "=" },
+            {
+              "expression": "tsrange(date '2000-01-03' + opens_at, date '2000-01-03' + closes_at, '[)')",
+              "operator": "&&"
+            }
+          ],
+          "source": "FS line 726; arch 09 line 478 (a new combination is a new row): two spans of one owner on one day never overlap, so the hours read back once"
+        }
+      ],
+      "checks": [
+        {
+          "name": "weekly_hours_owner_kind_known",
+          "expression": "owner_kind in ('location', 'resource', 'place')",
+          "source": "FS line 726 (schedule owner)"
+        },
+        {
+          "name": "weekly_hours_one_owner",
+          "expression": "(owner_kind = 'location' and location_id is not null and resource_id is null and place_or_thing_id is null) or (owner_kind = 'resource' and resource_id is not null and place_or_thing_id is null) or (owner_kind = 'place' and place_or_thing_id is not null and location_id is null and resource_id is null)",
+          "source": "FS line 726 (one owner per schedule row); FS line 743"
+        },
+        {
+          "name": "weekly_hours_resource_kind_known",
+          "expression": "(resource_id is null) = (resource_kind is null) and (resource_kind is null or resource_kind in ('worker', 'room', 'vehicle'))",
+          "source": "arch 05 line 255 (worker, room or vehicle); K-04 v1 resources_kind_known"
+        },
+        {
+          "name": "weekly_hours_weekday_known",
+          "expression": "weekday between 1 and 7",
+          "source": "FS line 726 (day); K-22 v1 on_call_days_known (ISO days)"
+        },
+        {
+          "name": "weekly_hours_span_in_order",
+          "expression": "opens_at < closes_at",
+          "source": "FS line 726 (start, end)"
+        },
+        {
+          "name": "weekly_hours_time_zone_form",
+          "expression": "time_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09 (an IANA zone name); K-04 v1 businesses_time_zone_form"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "weekly_hours_business_day_idx",
+          "columns": ["business_id", "weekday"],
+          "why": "The times card and search read a business's open spans for a day (A4-14; arch 05 line 259)."
+        },
+        {
+          "name": "weekly_hours_resource_idx",
+          "columns": ["resource_id"],
+          "where": "resource_id is not null",
+          "why": "A worker's own hours, for the times card and the Team page (S2-21)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "time_off",
+      "description": "Time off, closed days and blocked times (H02; FS schedule row, kind time off): a window of instants in which an owner of hours (the whole business, a location, a resource, or a space or thing) takes no new bookings. A team member's day off asked by text waits for the owner's OK, and new bookings with them in it pause meanwhile (S11-43, S11-44); the owner's BLOCK takes effect on the read-back's yes (S11-13); a space or room closed for a day (S1-81, S1-83). Visits already booked inside it stay until the owner picks what happens to them (S11-13, S11-106); their reservations are K-04's. No reason is kept: a reason can be a health detail (RULES 4.5).",
+      "source": "FS line 726 (kind time off); FS row H02 ('Time off, closed days, blocked times (per person; per space)'); arch 09 lines 457 ('Hours & time off: person · window · kind'), 478; S11-12, S11-13, S11-43, S11-44, S11-45, S11-78, S11-79, S11-89; S1-81 ('can be closed for a day, like a person's time off'); S1-83 ('A teacher's time off or a closed room shows on the Team page'); Q-10 ('Staff with no calendar block their time by text'); RULES 2.6",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The window's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id). A person on two businesses has a row at each business they ask, since OFF asks 'Which business?' (S11-43).",
+          "source": "arch 10 line 546; S11-43 ('Someone on two businesses: OFF, LATE and DONE ask Which business?'); S11-13 ('Block which business?')"
+        },
+        {
+          "name": "owner_kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Whose time: business (the whole business: S11-13's BLOCK), location, resource (a worker's time off or block; a room or vehicle closed) or place (a space or thing closed).",
+          "source": "FS line 726 (schedule owner); FS row H02 (per person; per space); S11-13; S11-43; S1-81; S1-83"
+        },
+        {
+          "name": "location_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a location, the location (K-23 locations.id); null otherwise.",
+          "source": "FS lines 722, 726; K-23 v1 locations"
+        },
+        {
+          "name": "resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a resource, the worker, room or vehicle (K-04 resources.id), held to it with resource_kind by the foreign key; null otherwise.",
+          "source": "FS line 726 (owner staff); S11-43; S1-83 ('a closed room'); K-04 v1 resources"
+        },
+        {
+          "name": "resource_kind",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The resource's kind, copied from K-04 resources: worker, room or vehicle. Null with resource_id.",
+          "source": "K-04 v1 resources_id_kind_key"
+        },
+        {
+          "name": "place_or_thing_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a space or thing, the space or thing (K-23 places_or_things.id); null otherwise.",
+          "source": "S1-81; K-23 v1 places_or_things"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "off: a person's time off, such as a day off (S11-43); closed: a location, room, vehicle, space or thing closed, such as a closed day (S1-81, H02); blocked: a block of times, the owner's BLOCK for some hours or a whole day (S11-13) or a person blocking their own time by text (Q-10).",
+          "source": "arch 09 line 457 ('kind'); FS row H02 ('Time off, closed days, blocked times'); S11-13, S11-43; S1-81; Q-10"
+        },
+        {
+          "name": "during",
+          "type": "tstzrange",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "The window, [start, end), as instants (UTC). A whole day runs from midnight to midnight in time_zone, so 'Off all day Mon Nov 2' is [Mon 00:00, Tue 00:00) there.",
+          "source": "arch 09 line 457 ('window'); S11-13 ('for some hours or a whole day'); S11-43 ('Off all day Mon Nov 2'); CQ-09"
+        },
+        {
+          "name": "time_zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The IANA zone the window was given in and is read back in: the business's (K-04 businesses.time_zone), copied when the row is written.",
+          "source": "CQ-05; CQ-09; S13-03; K-04 v1 businesses.time_zone"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "null": false,
+          "default": "'ok'",
+          "audience": ["staff", "owner"],
+          "description": "asked: a team member asked and the owner has not answered; new bookings with them in the window pause meanwhile (S11-43, S11-78). ok: in force, the owner's own (S11-13) or OK'd (S11-44's 1 OK). declined: the owner said no, so the time opens again (S11-45). lapsed: no answer by 8:00am the day before in time_zone, so the day stays as booked and the pause lifts (S11-44, S11-89). cancelled: taken back by the person who asked, or lifted by the owner. Only asked and ok rows take times out of offer.",
+          "source": "S11-43 ('pauses new ones for Riley that day'); S11-44 ('No answer by 8:00am the day before: the day stays as booked'; 1 OK, 2 Say no); S11-45; S11-78; S11-89 ('The pause lifts'); S11-13"
+        },
+        {
+          "name": "asked_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who asked for it or set it (persons.id): the team member who texted OFF, or the owner who texted BLOCK.",
+          "source": "S11-43 ('Riley asks for a day off'); S11-13 ('Sam texts BLOCK')"
+        },
+        {
+          "name": "asked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When it was asked for, or set on the read-back's yes.",
+          "source": "S11-43; S11-13"
+        },
+        {
+          "name": "status_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When it took its status: asked_at for asked, and for a row the owner set at once; the owner's answer for ok or declined; 8:00am the day before, in time_zone, for lapsed; the moment it was taken back for cancelled.",
+          "source": "S11-44; S11-89; S11-13"
+        },
+        {
+          "name": "status_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who gave it its status (persons.id): the asker for asked; the owner, or an admin the owner lets answer, for ok or declined (K-22 team_powers); whoever took it back for cancelled; null for lapsed, which the clock sets (K-04 clock_rows).",
+          "source": "S11-44 ('Asks Sam'); S2-15 and K-22 v1 team_powers (who may OK what); S11-89 (no answer)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "time_off_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "time_off_location_fk",
+          "columns": ["location_id"],
+          "references": { "table": "locations", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "time_off_resource_fk",
+          "columns": ["resource_id", "resource_kind"],
+          "references": { "table": "resources", "columns": ["id", "kind"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "time_off_place_fk",
+          "columns": ["place_or_thing_id"],
+          "references": { "table": "places_or_things", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "time_off_asked_by_fk",
+          "columns": ["asked_by_person_id"],
+          "references": { "table": "persons", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "time_off_status_by_fk",
+          "columns": ["status_by_person_id"],
+          "references": { "table": "persons", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "time_off_owner_kind_known",
+          "expression": "owner_kind in ('business', 'location', 'resource', 'place')",
+          "source": "FS line 726; FS row H02; S11-13"
+        },
+        {
+          "name": "time_off_one_owner",
+          "expression": "(owner_kind = 'business' and location_id is null and resource_id is null and place_or_thing_id is null) or (owner_kind = 'location' and location_id is not null and resource_id is null and place_or_thing_id is null) or (owner_kind = 'resource' and resource_id is not null and location_id is null and place_or_thing_id is null) or (owner_kind = 'place' and place_or_thing_id is not null and location_id is null and resource_id is null)",
+          "source": "FS line 726 (one owner per schedule row)"
+        },
+        {
+          "name": "time_off_resource_kind_known",
+          "expression": "(resource_id is null) = (resource_kind is null) and (resource_kind is null or resource_kind in ('worker', 'room', 'vehicle'))",
+          "source": "arch 05 line 255; K-04 v1 resources_kind_known"
+        },
+        {
+          "name": "time_off_kind_known",
+          "expression": "kind in ('off', 'closed', 'blocked')",
+          "source": "FS row H02; arch 09 line 457"
+        },
+        {
+          "name": "time_off_kind_fits_owner",
+          "expression": "(kind <> 'off' or resource_kind is not distinct from 'worker') and (kind <> 'closed' or resource_kind is distinct from 'worker')",
+          "source": "FS row H02 ('per person; per space'): time off is a person's; a place, room or vehicle is closed"
+        },
+        {
+          "name": "time_off_status_known",
+          "expression": "status in ('asked', 'ok', 'declined', 'lapsed', 'cancelled')",
+          "source": "S11-43, S11-44, S11-45, S11-89; S11-13"
+        },
+        {
+          "name": "time_off_status_by_known",
+          "expression": "(status = 'lapsed') = (status_by_person_id is null)",
+          "source": "S11-44, S11-89 (no answer: the clock lapses it)"
+        },
+        {
+          "name": "time_off_asked_is_asker",
+          "expression": "status <> 'asked' or (status_by_person_id is not distinct from asked_by_person_id and status_at = asked_at)",
+          "source": "S11-43"
+        },
+        {
+          "name": "time_off_times_in_order",
+          "expression": "status_at >= asked_at",
+          "source": "S11-43, S11-44"
+        },
+        {
+          "name": "time_off_window_bounded",
+          "expression": "not isempty(during) and not lower_inf(during) and not upper_inf(during)",
+          "source": "arch 09 line 457 ('window'); S11-13 ('for some hours or a whole day')"
+        },
+        {
+          "name": "time_off_time_zone_form",
+          "expression": "time_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09 (an IANA zone name); K-04 v1 businesses_time_zone_form"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "time_off_business_during_idx",
+          "columns": ["business_id", "during"],
+          "using": "gist",
+          "where": "status in ('asked', 'ok')",
+          "why": "The times card and search take out a business's windows in force over the times asked (RULES 2.6; S11-43)."
+        },
+        {
+          "name": "time_off_resource_idx",
+          "columns": ["resource_id"],
+          "where": "resource_id is not null",
+          "why": "A person's time off, or a closed room, on the Team page (S1-83; S2-21)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "classes",
+      "description": "The class timetable (K01, K02; S1-83 'Sets the class timetable from a photo'): one row per class that meets each week, with the service a seat in it sells, its day and time, who teaches and the room, where it meets, the seats Rosie can book and the fewest it needs to run. Each dated session is a class_sessions row with its own K-04 resource and class_seats counter, made from it. A class taken off the timetable is set inactive, never deleted, so its sessions keep their class.",
+      "source": "FS line 726 (schedule owner class, kind session: day, start, end, seats, minimum, teacher, room); FS rows K01, K02; S1-82, S1-83; A4-33; 02-contracts row K-27 ('sessions with seats, minimum, teacher, room'); 02-contracts K-02 v1.1 (class timetable: day and time, who teaches and the room; never the spots or the minimum)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The class's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service a seat in it sells (K-25 services.id), whose name, price and money path the times card and the booking line read (A4-33; K-30), held to a service of the same business by classes_service_fk.",
+          "source": "A4-33 ('the times are the sessions in the timetable set at sign-up'); A4-66 ('A seat in a session'); S1-83; K-25 v1 services.id, services_id_business_key"
+        },
+        {
+          "name": "weekday",
+          "type": "smallint",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The day of the week it meets, ISO numbers 1 (Monday) to 7 (Sunday).",
+          "source": "S1-83 ('Each class gets its day and time'); FS row K01 (day); FS line 726 (day)"
+        },
+        {
+          "name": "starts_at",
+          "type": "time",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When it starts each week: a local time of day read in time_zone, such as 10:00.",
+          "source": "S1-83 ('its day and time'); FS row K01 (time); FS line 726 (start)"
+        },
+        {
+          "name": "ends_at",
+          "type": "time",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When it ends: a local time of day read in time_zone, later than starts_at.",
+          "source": "FS line 726 (end); S1-83"
+        },
+        {
+          "name": "time_zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The IANA zone its day and times are read in: the business's (K-04 businesses.time_zone), copied when the row is written.",
+          "source": "CQ-05; CQ-09; S13-03; K-04 v1 businesses.time_zone"
+        },
+        {
+          "name": "teacher_resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who teaches it (K-04 resources.id, a worker), shown with each session (A4-33: 'Each shows its teacher, room and seats left'); null: the timetable names nobody and the owner staffs it (A4-33: 'Nobody is booked by name').",
+          "source": "S1-83 ('who teaches'); FS row K01 (teacher); A4-33; FS line 726 (teacher)"
+        },
+        {
+          "name": "teacher_kind",
+          "type": "text",
+          "null": false,
+          "default": "'worker'",
+          "audience": "never",
+          "description": "Always worker: it holds teacher_resource_id to a worker resource by the foreign key on (teacher_resource_id, teacher_kind).",
+          "source": "K-04 v1 resources_id_kind_key"
+        },
+        {
+          "name": "room_resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The room it meets in (K-04 resources.id, a room), shown with each session; null: no room named, or it meets away (location_id).",
+          "source": "S1-83 ('and the room'); FS row K01 (room); A4-33; FS line 726 (room)"
+        },
+        {
+          "name": "room_kind",
+          "type": "text",
+          "null": false,
+          "default": "'room'",
+          "audience": "never",
+          "description": "Always room: it holds room_resource_id to a room resource by the foreign key on (room_resource_id, room_kind).",
+          "source": "K-04 v1 resources_id_kind_key"
+        },
+        {
+          "name": "location_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Where it meets (K-23 locations.id): the business's shop, or, when it meets away, a meeting spot from the business's list, with where it ends (S1-83); null: no place named.",
+          "source": "S1-83 ('Where a session meets away from the business, its meeting point and where it ends come from the business's list of spots'); FS row L04; K-23 v1 locations"
+        },
+        {
+          "name": "seats",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The spots Rosie can book in each session (K02; S1-83: 'How many spots Rosie can book'), asked of the owner, never read from a photo. Each session's K-04 class_seats.capacity starts from it, and that counter is the one that binds (CHECK taken <= capacity). The rest are kept for walk-ins and other platforms; a connected class system replaces the number (D88).",
+          "source": "S1-83; FS row K02 ('Seats Rosie can book per session'); K-04 v1 class_seats; 02-contracts K-02 v1.1 (never the spots)"
+        },
+        {
+          "name": "minimum",
+          "type": "integer",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "The fewest it needs to run (K02; S1-83: 'The fewest it needs to run'), asked of the owner, never read from a photo; null: none, so it always runs.",
+          "source": "S1-83; FS row K02 ('the fewest to run'); A4-33 ('Each session has a smallest size'); 02-contracts K-02 v1.1 (never the minimum)"
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "null": false,
+          "default": "true",
+          "audience": ["owner"],
+          "description": "Whether sessions are still made from it; false: taken off the timetable, with its row kept.",
+          "source": "S1-83; S11-57 (the owner changes the timetable in Settings)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "classes_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "classes_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": { "table": "services", "columns": ["id", "business_id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "classes_teacher_fk",
+          "columns": ["teacher_resource_id", "teacher_kind"],
+          "references": { "table": "resources", "columns": ["id", "kind"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "classes_room_fk",
+          "columns": ["room_resource_id", "room_kind"],
+          "references": { "table": "resources", "columns": ["id", "kind"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "classes_location_fk",
+          "columns": ["location_id"],
+          "references": { "table": "locations", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "classes_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "arch 10 line 546 (a session's class is its own business's: class_sessions_class_fk)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "classes_weekday_known",
+          "expression": "weekday between 1 and 7",
+          "source": "S1-83; FS row K01"
+        },
+        {
+          "name": "classes_times_in_order",
+          "expression": "starts_at < ends_at",
+          "source": "FS line 726 (start, end)"
+        },
+        {
+          "name": "classes_time_zone_form",
+          "expression": "time_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09 (an IANA zone name); K-04 v1 businesses_time_zone_form"
+        },
+        {
+          "name": "classes_teacher_is_worker",
+          "expression": "teacher_kind = 'worker'",
+          "source": "S1-83 ('who teaches'); arch 05 line 255"
+        },
+        {
+          "name": "classes_room_is_room",
+          "expression": "room_kind = 'room'",
+          "source": "S1-83 ('the room'); arch 05 line 255"
+        },
+        {
+          "name": "classes_seats_positive",
+          "expression": "seats > 0",
+          "source": "S1-83; FS row K02; K-04 v1 class_seats_capacity_positive"
+        },
+        {
+          "name": "classes_minimum_positive",
+          "expression": "minimum is null or minimum >= 1",
+          "source": "S1-83; FS row K02"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "classes_business_service_idx",
+          "columns": ["business_id", "service_id"],
+          "where": "active",
+          "why": "The classes of the service a customer picked (A4-33), and the timetable read back (S1-83)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "class_sessions",
+      "description": "One dated session of a class, or a one-off session such as a workshop (A4-33; S1-83): its time, teacher, room, place and minimum, the count at the cutoff and whether it was called off. The session is a K-04 resources row of kind class_session, whose class_seats row counts its seats (CHECK taken <= capacity) and whose K-04 reservations are the seats booked or saved; this row never repeats them. Customers book a seat, never a person (A4-33).",
+      "source": "FS line 726 (kind session: seats, minimum, teacher, room); FS row K02 ('the fewest to run, the cutoff'; 'owner decides at the cutoff'); S1-83; A4-33; K-04 v1 resources (kind class_session), class_seats, reservations; arch 05 line 255; arch 10 line 510",
+      "columns": [
+        {
+          "name": "resource_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The session (K-04 resources.id, kind class_session): one row per session.",
+          "source": "K-04 v1 resources (CQ-03: 'a class session whose seats are a class_seats counter row'); arch 10 line 510"
+        },
+        {
+          "name": "resource_kind",
+          "type": "text",
+          "null": false,
+          "default": "'class_session'",
+          "audience": "never",
+          "description": "Always class_session: it holds the row to a class-session resource by the foreign key on (resource_id, resource_kind).",
+          "source": "K-04 v1 resources_id_kind_key; K-04 v1 class_seats.resource_kind"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "class_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The timetable class it was made from (classes.id), held to the same business by the foreign key; null for a one-off session, such as a workshop.",
+          "source": "A4-33 ('the sessions in the timetable set at sign-up'); S1-83; fixtures/v1/test-kit/shops/yoga.json (the handstand workshop, Sat 11:00am)"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service a seat in it sells (K-25 services.id), copied from its class when there is one, held to a service of the same business by class_sessions_service_fk.",
+          "source": "A4-33; A4-66; K-25 v1 services.id, services_id_business_key"
+        },
+        {
+          "name": "during",
+          "type": "tstzrange",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When it meets, [start, end), as instants (UTC), read in time_zone; each of its K-04 reservations holds the same range.",
+          "source": "A4-33 ('Sat Oct 24 · 9:00am'); FS line 726 (start, end); K-04 v1 reservations.during; CQ-09"
+        },
+        {
+          "name": "time_zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The IANA zone its times are read back in: its class's, else the business's (K-04 businesses.time_zone).",
+          "source": "CQ-05; CQ-09; S13-03"
+        },
+        {
+          "name": "teacher_resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who teaches this session (K-04 resources.id, a worker): its class's teacher, or whoever the owner puts in when the teacher is out ('nothing moves for the customer: the owner just staffs it'); null: nobody named.",
+          "source": "A4-33 ('Each shows its teacher'; 'If the teacher is out, nothing moves for the customer'); S1-83"
+        },
+        {
+          "name": "teacher_kind",
+          "type": "text",
+          "null": false,
+          "default": "'worker'",
+          "audience": "never",
+          "description": "Always worker (the foreign key on (teacher_resource_id, teacher_kind)).",
+          "source": "K-04 v1 resources_id_kind_key"
+        },
+        {
+          "name": "room_resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The room it meets in (K-04 resources.id, a room); null: none, or it meets away.",
+          "source": "A4-33 ('room'); S1-83"
+        },
+        {
+          "name": "room_kind",
+          "type": "text",
+          "null": false,
+          "default": "'room'",
+          "audience": "never",
+          "description": "Always room (the foreign key on (room_resource_id, room_kind)).",
+          "source": "K-04 v1 resources_id_kind_key"
+        },
+        {
+          "name": "location_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Where it meets (K-23 locations.id): its class's place, or a meeting spot for a one-off; null: no place named.",
+          "source": "S1-83 ('its meeting point and where it ends'); K-23 v1 locations"
+        },
+        {
+          "name": "minimum",
+          "type": "integer",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "The fewest it needs to run, copied from its class (or the owner's for a one-off); null: none, so it runs whatever the count.",
+          "source": "S1-83; FS row K02; A4-33 ('Each session has a smallest size and a cutoff')"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "null": false,
+          "default": "'scheduled'",
+          "audience": ["customer", "staff", "owner"],
+          "description": "scheduled: on, and bookable while seats are left (A4-33: 'Only sessions with a seat left show'); cancelled: called off by the owner, at the cutoff or later, so anything paid goes back to everyone and each person is told (S1-83), and its K-04 resource stops being bookable in the same commit.",
+          "source": "S1-83 ('Too few: the owner decides to run it or cancel. No answer: it runs'; 'A cancelled class returns anything paid to everyone, and each person is told'); A4-33"
+        },
+        {
+          "name": "counted_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When Rosie counted its bookings at the cutoff, before it starts; null: not yet, or no minimum.",
+          "source": "S1-83 ('At the plug-in's cutoff, Rosie counts the bookings'); FS row K02 ('the cutoff')"
+        },
+        {
+          "name": "too_few",
+          "type": "boolean",
+          "null": true,
+          "audience": ["owner"],
+          "description": "Whether that count was under its minimum, so the owner was asked to run it or cancel; with no answer it runs (S1-83). Set with counted_at.",
+          "source": "S1-83; FS row K02 ('owner decides at the cutoff'); A4-33 ('Too few by then: the owner decides, before the visit')"
+        },
+        {
+          "name": "cancelled_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When it was called off; null unless cancelled.",
+          "source": "S1-83"
+        },
+        {
+          "name": "cancelled_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who called it off (persons.id): the owner, or an admin the owner lets decide.",
+          "source": "S1-83 ('the owner decides to run it or cancel')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["resource_id"],
+      "foreignKeys": [
+        {
+          "name": "class_sessions_resource_fk",
+          "columns": ["resource_id", "resource_kind"],
+          "references": { "table": "resources", "columns": ["id", "kind"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "class_sessions_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "class_sessions_class_fk",
+          "columns": ["class_id", "business_id"],
+          "references": { "table": "classes", "columns": ["id", "business_id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "class_sessions_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": { "table": "services", "columns": ["id", "business_id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "class_sessions_teacher_fk",
+          "columns": ["teacher_resource_id", "teacher_kind"],
+          "references": { "table": "resources", "columns": ["id", "kind"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "class_sessions_room_fk",
+          "columns": ["room_resource_id", "room_kind"],
+          "references": { "table": "resources", "columns": ["id", "kind"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "class_sessions_location_fk",
+          "columns": ["location_id"],
+          "references": { "table": "locations", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "class_sessions_cancelled_by_fk",
+          "columns": ["cancelled_by_person_id"],
+          "references": { "table": "persons", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "exclude": [
+        {
+          "name": "class_sessions_one_per_room",
+          "using": "gist",
+          "elements": [
+            { "column": "room_resource_id", "operator": "=" },
+            { "column": "during", "operator": "&&" }
+          ],
+          "where": "status = 'scheduled' and room_resource_id is not null",
+          "source": "arch 05 line 255 ('Double booking is blocked ... per worker, room or vehicle'); S1-83 (each class's room): two sessions never meet in one room at once"
+        },
+        {
+          "name": "class_sessions_one_per_teacher",
+          "using": "gist",
+          "elements": [
+            { "column": "teacher_resource_id", "operator": "=" },
+            { "column": "during", "operator": "&&" }
+          ],
+          "where": "status = 'scheduled' and teacher_resource_id is not null",
+          "source": "arch 05 line 255; S1-83 (who teaches): one teacher never teaches two sessions at once"
+        }
+      ],
+      "checks": [
+        {
+          "name": "class_sessions_kind",
+          "expression": "resource_kind = 'class_session'",
+          "source": "K-04 v1 class_seats_kind"
+        },
+        {
+          "name": "class_sessions_teacher_is_worker",
+          "expression": "teacher_kind = 'worker'",
+          "source": "A4-33; arch 05 line 255"
+        },
+        {
+          "name": "class_sessions_room_is_room",
+          "expression": "room_kind = 'room'",
+          "source": "A4-33; arch 05 line 255"
+        },
+        {
+          "name": "class_sessions_status_known",
+          "expression": "status in ('scheduled', 'cancelled')",
+          "source": "S1-83"
+        },
+        {
+          "name": "class_sessions_during_bounded",
+          "expression": "not isempty(during) and not lower_inf(during) and not upper_inf(during)",
+          "source": "FS line 726 (start, end); K-04 v1 reservations_during_bounded"
+        },
+        {
+          "name": "class_sessions_time_zone_form",
+          "expression": "time_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09 (an IANA zone name); K-04 v1 businesses_time_zone_form"
+        },
+        {
+          "name": "class_sessions_minimum_positive",
+          "expression": "minimum is null or minimum >= 1",
+          "source": "S1-83; FS row K02"
+        },
+        {
+          "name": "class_sessions_counted_whole",
+          "expression": "(counted_at is null) = (too_few is null) and (counted_at is null or counted_at < lower(during))",
+          "source": "S1-83 ('At the plug-in's cutoff, Rosie counts the bookings'); A4-33 ('before the visit')"
+        },
+        {
+          "name": "class_sessions_cancelled_has_time",
+          "expression": "(status = 'cancelled') = (cancelled_at is not null) and (cancelled_at is null) = (cancelled_by_person_id is null)",
+          "source": "S1-83"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "class_sessions_service_idx",
+          "columns": ["service_id", "during"],
+          "where": "status = 'scheduled'",
+          "why": "A service's sessions, soonest first, for the times card (A4-33)."
+        },
+        {
+          "name": "class_sessions_class_idx",
+          "columns": ["class_id"],
+          "where": "class_id is not null",
+          "why": "A class's sessions, when sessions are made from the timetable or the class changes (S1-83; S11-57)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "calendar_links",
+      "description": "A person's own calendar linked to Rosie (H03; S1-24; S2-06): Google or Microsoft, busy times only. A link is the person's, never one business's: one person has one calendar across every company (S1-24; FS line 743; K-16 v1 calendarLinkId), so a person has one live link, with one change subscription (one Google channel or one Graph subscription) and one set of busy blocks, and each business they work in reads it through its own calendar_link_shares row (S1-38's carry-over adds one, never asking twice), seeing only free or busy through it. It holds only what the database needs: the person, the provider, the state, the sync marks (the provider's cursor and change subscription) and the OAuth tokens, sealed under the person's key. The row is written when the person starts connecting, with no tokens yet, and the connect's return seals the tokens into it (K-16 v1 connectStart, connectReturn). No secure link is texted to connect or reconnect it (MC 8 'Calendars'; Q-10).",
+      "source": "FS row H03 ('Calendar link per person (Rosie sees only busy times)'); FS lines 723 (staff.calendar_link), 743 ('one calendar'); S1-24 (gives calendar: 'One person has one calendar across every kind of work and company'; 'Each person can link their own calendar when they join'); S1-38 ('The ID, mobile, calendar and bill card carry over, never asked twice'); S2-02, S2-06; arch 05 lines 261, 265, 271; arch 11 lines 578, 580; S12-13, S12-14; MC 8 'Calendars'; Q-10, Q-11, Q-56; 02-contracts row K-27 ('calendar links per person') and section 8 (calendar: K-27); K-16 v1 calendarLinkId ('a link belongs to a person, never to one business'), connectStart.request, tokensKept, watch.response",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The link's id: an opaque string code makes and never parses (CQ-09); K-16 v1's calendarLinkId.",
+          "source": "CQ-09 (other ids are opaque strings); K-16 v1 calendarLinkId"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Whose calendar (persons.id); their key in K-04 sealing_keys seals the tokens. Each person links their own, and has at most one live link (calendar_links_one_live_per_person).",
+          "source": "S1-24 ('Each person can link their own calendar when they join'; 'One person has one calendar across every kind of work and company'); arch 05 line 261 ('Each person links their own calendar'); FS line 743; K-16 v1 connectStart.request personId"
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "google or microsoft (Microsoft 365 and Outlook). Apple iCloud is not linked (Q-11).",
+          "source": "MC 8 'Calendars' ('Google and Microsoft, two-way, busy times only'); arch 05 line 261; Q-11"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'connecting'",
+          "audience": ["staff", "owner"],
+          "description": "connecting: the person started connecting on a page they already have open (K-16 v1 connectStart: 'The caller (C-189) writes the link row first'), so the row exists with no tokens yet and nothing is read or watched; it takes no time out of offer (S1-24's safe default: 'nothing blocked yet'), and a start not finished, or declined, leaves it connecting for the next start to reuse. linked: the connect's return sealed the tokens (K-16 v1 connectReturn, tokensKept), and busy times are read in (arch 05 line 261). dropped: its change subscription could not be renewed after the effects retries, or the provider refused its tokens, so that person's open times are not offered at any business that reads the link until it is reconnected; booked visits stay and the rest of the team is still offered (arch 05 line 271; arch 11 line 580; S12-13); a reconnect leaves it dropped until the return. unlinked: ended (the person took it off, left every team that reads it, or linked another calendar), its tokens erased and its busy blocks deleted.",
+          "source": "K-16 v1 connectStart.request, connectReturn.response, tokensKept; S1-24 (safe default: 'nothing blocked yet, with one reminder'); arch 05 line 271 ('a renewal still failing after section 10's Effects retries is a dropped link'); arch 11 line 580; S12-13, S12-14; RULES 8.7"
+        },
+        {
+          "name": "tokens",
+          "type": "bytea",
+          "null": true,
+          "audience": "never",
+          "sealedBy": "person_id",
+          "description": "The provider's OAuth tokens (the refresh token, and the access token with its expiry) as one value sealed under the person's key in K-04 sealing_keys (arch 05 line 271: 'Links keep their tokens sealed under the person's key'), never plain and never in a message, log or trace. Only the runtime side writes it: the calendar adapter seals it at the connect's return and seals each refresh again (K-16 v1 tokensKept: 'The adapter seals and keeps them at connectReturn'), and the Tool API can neither read nor write it (README rule 5). Null while connecting and once unlinked. Its inner form is K-16's.",
+          "source": "arch 05 line 271; arch 01 line 93; BP rule 7; RULES 4.10; 02-contracts K-16 ('the tokens sealed under the person's key'); K-16 v1 tokensKept, connectReturn.response (tokens: sealedUnderPersonKey); migration 0003 (sealing_keys reached only from the runtime side)"
+        },
+        {
+          "name": "linked_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the connect's return sealed the tokens (K-16 v1 connectReturn linkedAt), first or at a reconnect; null while connecting, and on a link unlinked before it was ever linked.",
+          "source": "S1-24 ('Connected'); K-16 v1 connectReturn.response linkedAt; S12-13, S12-14 (reconnect)"
+        },
+        {
+          "name": "sync_cursor",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Where the next read of changes starts: Google's sync token or Microsoft's delta link; null before the first full read, or after the provider refuses it, so the next read is a full one.",
+          "source": "arch 05 line 261 ('read with sync tokens'; 'read with delta queries'); 02-contracts K-16 ('Watch and renew')"
+        },
+        {
+          "name": "synced_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the last read of changes finished (after a push, the 30-minute poll or a full read); a linked person's times are offered only up to 90 days after it. Null before the first; a reconnect's return nulls it with sync_cursor, since the return moves linked_at past it (calendar_links_times_in_order) and everything since the drop is read again.",
+          "source": "arch 05 line 265 ('Rosie reads 90 days ahead ... and never offers a linked person's time past that'); arch 11 lines 578 (the 30-minute poll), 580 (a reconnect reads everything since)"
+        },
+        {
+          "name": "subscription_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The change subscription: Google's channel id or Microsoft Graph's subscription id, by which a notification finds this link; null while it has none.",
+          "source": "arch 05 line 261 ('Google sends change notifications'; 'Graph change notifications'); arch 05 line 271"
+        },
+        {
+          "name": "subscription_resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Google's resource id for the watched calendar, which stopping the channel needs; null for Microsoft, or with no subscription. Its writer is K-16 v1.1's watch and renew answers (lead card T-1082): K-16 v1's answers do not carry it, so until then it stays null.",
+          "source": "arch 05 line 261; 02-contracts K-16 ('Watch and renew'); K-16 v1 README spike row 1 (channels/stop with id and resourceId); lead card T-1082"
+        },
+        {
+          "name": "subscribed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the current subscription started or was last renewed; null with subscription_id.",
+          "source": "arch 05 line 271 ('renewed when half its life is left')"
+        },
+        {
+          "name": "subscription_expires_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the current subscription expires. It is renewed when half its life is left, at subscribed_at plus half of (subscription_expires_at - subscribed_at); null with subscription_id.",
+          "source": "arch 05 line 271"
+        },
+        {
+          "name": "dropped_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When it dropped; the owner of each business that reads it is texted at once (S12-13). Null unless dropped; a reconnect's return clears it.",
+          "source": "arch 11 line 580 ('The owner is texted at once'); S12-13"
+        },
+        {
+          "name": "dropped_why",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "renewal_failed: a renewal still failing after the effects retries (arch 05 line 271; arch 10 line 542); access_refused: the provider refused its tokens, so nothing can be read. Set with dropped_at.",
+          "source": "arch 05 line 271; arch 10 line 542; S12-13 ('stopped sharing with Rosie')"
+        },
+        {
+          "name": "drop_reminded_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the one reminder went, the link still not reconnected 24 hours after it dropped; null: not yet.",
+          "source": "arch 11 line 580 ('Not reconnected in 24 hours: one reminder'); S12-14"
+        },
+        {
+          "name": "unlinked_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When it was unlinked; null unless unlinked.",
+          "source": "RULES 8.7 (access ends when a person leaves); S11-49"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and each write (a sync mark, a renewal, a token refresh, a drop, a reconnect) compares and sets it, so two writers of one link never both move it. One version covers the tokens and the sync marks: a token refresh during a call raises it, so a caller whose compare-and-set of the cursor or the subscription then fails with versionChanged re-reads the row and applies its write again (safe: the same cursor reads the same changes, K-16 v1 readChanges).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2; K-16 v1 tokensKept (refresh and seal again), readChanges.request ('Repeating it with the same cursor is safe')"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "calendar_links_person_fk",
+          "columns": ["person_id"],
+          "references": { "table": "persons", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "calendar_links_one_live_per_person",
+          "columns": ["person_id"],
+          "where": "state <> 'unlinked'",
+          "source": "FS row H03 ('Calendar link per person'); FS line 743 ('one calendar'); S1-24 ('One person has one calendar across every kind of work and company'); 02-contracts row K-27 ('calendar links per person'); K-16 v1 calendarLinkId, watch.response (one person has one link)"
+        },
+        {
+          "name": "calendar_links_subscription_key",
+          "columns": ["provider", "subscription_id"],
+          "where": "subscription_id is not null",
+          "source": "arch 05 line 261 (a notification names its channel or subscription); K-16 v1 README default 16 (Graph's 409 answers the person's one subscription)"
+        },
+        {
+          "name": "calendar_links_id_person_key",
+          "columns": ["id", "person_id"],
+          "source": "S1-24 (each person links their own): a share and a busy block keep their link's person (calendar_link_shares_link_fk, busy_blocks_link_fk)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "calendar_links_provider_known",
+          "expression": "provider in ('google', 'microsoft')",
+          "source": "MC 8 'Calendars' ('Google and Microsoft'); Q-11 (Apple iCloud not linked); 02-contracts K-16 refuse-icloud"
+        },
+        {
+          "name": "calendar_links_state_known",
+          "expression": "state in ('connecting', 'linked', 'dropped', 'unlinked')",
+          "source": "K-16 v1 connectStart.request (the row written first), connectReturn.response; arch 05 line 271; arch 11 line 580"
+        },
+        {
+          "name": "calendar_links_tokens_while_live",
+          "expression": "(state in ('linked', 'dropped')) = (tokens is not null)",
+          "source": "K-16 v1 tokensKept ('The adapter seals and keeps them at connectReturn'); arch 05 line 271 (tokens sealed); RULES 4.10 (nothing kept that is no longer needed)"
+        },
+        {
+          "name": "calendar_links_linked_has_time",
+          "expression": "(state <> 'connecting' or linked_at is null) and (state not in ('linked', 'dropped') or linked_at is not null)",
+          "source": "K-16 v1 connectReturn.response linkedAt; S1-24 ('Connected')"
+        },
+        {
+          "name": "calendar_links_connecting_unread",
+          "expression": "state <> 'connecting' or (sync_cursor is null and synced_at is null and subscription_id is null)",
+          "source": "K-16 v1 connectReturn.response ('the caller then starts the link's watch and its first read'): a link with no tokens yet is never read or watched"
+        },
+        {
+          "name": "calendar_links_dropped_has_time",
+          "expression": "(state = 'dropped') = (dropped_at is not null) and (dropped_at is null) = (dropped_why is null) and (dropped_why is null or dropped_why in ('renewal_failed', 'access_refused'))",
+          "source": "arch 05 line 271; arch 11 line 580; S12-13"
+        },
+        {
+          "name": "calendar_links_reminded_while_dropped",
+          "expression": "drop_reminded_at is null or (state = 'dropped' and drop_reminded_at >= dropped_at)",
+          "source": "arch 11 line 580; S12-14"
+        },
+        {
+          "name": "calendar_links_unlinked_has_time",
+          "expression": "(state = 'unlinked') = (unlinked_at is not null)",
+          "source": "RULES 8.7"
+        },
+        {
+          "name": "calendar_links_subscription_whole",
+          "expression": "(subscription_id is null) = (subscribed_at is null) and (subscription_id is null) = (subscription_expires_at is null) and (subscription_resource_id is null or subscription_id is not null) and (subscription_expires_at is null or subscription_expires_at > subscribed_at) and (state <> 'unlinked' or subscription_id is null)",
+          "source": "arch 05 lines 261, 271"
+        },
+        {
+          "name": "calendar_links_times_in_order",
+          "expression": "(dropped_at is null or dropped_at >= linked_at) and (unlinked_at is null or unlinked_at >= linked_at) and (synced_at is null or synced_at >= linked_at)",
+          "source": "S1-24; S12-13"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "calendar_links_renewal_idx",
+          "columns": ["subscription_expires_at"],
+          "where": "state = 'linked' and subscription_id is not null",
+          "why": "The links whose subscription nears half its life, for renewal (arch 05 line 271)."
+        },
+        {
+          "name": "calendar_links_person_idx",
+          "columns": ["person_id"],
+          "why": "A person's links, live and unlinked: S1-38's carry-over finds the live one, erasure finds them all (FS line 743; RULES 4.10)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "A link is a person's, across every business they work in (S1-24: 'One person has one calendar across every kind of work and company'; FS line 743; K-16 v1 calendarLinkId: 'a link belongs to a person, never to one business'), so it has no business column. A Tool API call sees a link only through a live calendar_link_shares row of its own business, or in the call of the link's own person (K-22 v1 rosie.person_id), and never the tokens; every write is the runtime side's (README rule 5)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "calendar_link_shares",
+      "description": "A business that reads a person's calendar link: one row per link and business, while it reads it. A person links one calendar (S1-24; FS line 743), and each business they work in reads that one link through its own row: the business whose page the person connected on (registration screen 16, the owner console, the staff page: Q-10), and each next business S1-38's carry-over adds ('The ID, mobile, calendar and bill card carry over, never asked twice'). Through it the business sees only free or busy: the link's state and its busy blocks' times, never the tokens or what an event is (S1-24: 'Rosie sees only when Sam is busy, never what the job is'). So one change subscription and one set of busy blocks serve every business. A business stops reading it when the person takes it off that business or leaves its team (RULES 8.7): the row is ended, never deleted or reopened.",
+      "source": "S1-24 ('One person has one calendar across every kind of work and company'; 'Each person can link their own calendar when they join'); S1-38; S11-43 ('Each business sees only busy times from the other'); FS line 743 ('one calendar'; 'A booking in any of their businesses blocks that time in all of them'); FS row H03; arch 10 line 546; RULES 8.7; 02-contracts row K-27 ('calendar links per person'); K-16 v1 calendarLinkId",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The share's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "calendar_link_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The link the business reads (calendar_links.id), held to its person by calendar_link_shares_link_fk.",
+          "source": "S1-24; K-16 v1 calendarLinkId"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Whose calendar (persons.id), copied from the link and held to it by calendar_link_shares_link_fk, so the Tool API's insert policy admits only the call's own person's link (README rule 5: each person shares their own).",
+          "source": "S1-24 ('Each person can link their own calendar when they join'); arch 05 line 261; K-22 v1 rule 4 (rosie.person_id)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business that reads the link (businesses.id): the business whose page the person connected on, or the next business S1-38 carried it over to.",
+          "source": "arch 10 line 546; S1-24; S1-38; S2-06; Q-10"
+        },
+        {
+          "name": "shared_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When the business started reading the link: the connect's start on its page (K-16 v1 connectStart), or S1-38's carry-over.",
+          "source": "S1-24; S1-38; K-16 v1 connectStart.request"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the business stopped reading it: the person took it off this business, left its team (RULES 8.7), linked another calendar, or the link was unlinked; null while it reads it.",
+          "source": "RULES 8.7 (access ends when a person leaves); S11-49"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "calendar_link_shares_link_fk",
+          "columns": ["calendar_link_id", "person_id"],
+          "references": { "table": "calendar_links", "columns": ["id", "person_id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "calendar_link_shares_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "calendar_link_shares_one_per_person",
+          "columns": ["business_id", "person_id"],
+          "where": "ended_at is null",
+          "source": "S1-24 ('One person has one calendar'); FS line 743: a business reads one calendar per person, so a repeated connect start or carry-over never adds a second"
+        }
+      ],
+      "checks": [
+        {
+          "name": "calendar_link_shares_times_in_order",
+          "expression": "ended_at is null or ended_at >= shared_at",
+          "source": "S1-24; RULES 8.7"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "calendar_link_shares_link_idx",
+          "columns": ["calendar_link_id"],
+          "where": "ended_at is null",
+          "why": "The businesses that read a link: the read policies of calendar_links and busy_blocks (README rule 5), and a drop told to each business's owner (S12-13; C-182)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "busy_blocks",
+      "description": "When a person is busy, never what (S1-24: 'Rosie sees only when Sam is busy, never what the job is'): start, end and source only (arch 05 line 261). From a linked calendar, one row per busy event, or per repeat of a repeating event, read 90 days ahead (arch 05 line 265): such a block is its link's, so its person's, written once however many businesses read the link, and each of them reads it through its live calendar_link_shares row; or from a photo of the owner's schedule, one row per time read back, written only on the owner's yes (S1-24; arch 05 line 263; limit 6), for the business whose owner said it. An open time for the person at a business is outside every busy block it reads (RULES 2.6). The table has no column for a title, description, place, attendee or organizer, so none can be stored (refuse-busy-block-title).",
+      "source": "arch 05 lines 259, 261 ('Rosie keeps each busy block's start, end and source, never its title'), 263, 265; arch 11 line 578; S1-24 (gives calendar); S12-33 ('The event's title is never shown'); RULES 2.6; MC 8 'Calendars' ('busy times only'); 02-contracts row K-27 ('busy blocks with start, end and source, never the title'); 02-contracts K-02 v1.1 (schedule: busy times with start and end, never what the job is)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The block's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a photo block, the business whose owner said yes to its times, where it blocks the person (businesses.id); null for a calendar block, which is its link's, and is read by each business that reads the link through its live share (README rule 5).",
+          "source": "arch 10 line 546; S1-24; FS line 743; K-16 v1 calendarLinkId"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Whose busy time (persons.id): the link's person (held to it by busy_blocks_link_fk), or, for a photo, the person whose schedule it is (S1-24: the owner's own).",
+          "source": "arch 05 line 261 ('the person's busy blocks'); S1-24; FS line 743"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "calendar: read from a linked calendar; photo: read from a photo of the schedule and confirmed by the owner.",
+          "source": "arch 05 lines 261 ('start, end and source'), 263"
+        },
+        {
+          "name": "calendar_link_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a calendar block, the link it was read through (calendar_links.id), held to the same person by the foreign key; null for a photo.",
+          "source": "arch 05 line 261"
+        },
+        {
+          "name": "provider_event_ref",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a calendar block, the provider's id for the event, or for one repeat of a repeating event: with the link, the key a change or deletion finds the row by. An opaque id, never a title, and never shown. Null for a photo.",
+          "source": "arch 05 line 265 ('expanding repeating events'); 02-contracts K-16 ('Read changes into busy blocks')"
+        },
+        {
+          "name": "during",
+          "type": "tstzrange",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the person is busy, [start, end), as instants (UTC); an all-day event spans its days in time_zone. The owner may see that a person is busy then, never what (S1-24).",
+          "source": "arch 05 line 265 ('Times are kept in UTC with the event's zone'); S1-24; CQ-09"
+        },
+        {
+          "name": "time_zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The event's IANA zone as the provider gives it, else its calendar's (arch 05 line 265: 'Times are kept in UTC with the event's zone'); for a photo, the zone its times were read back in (the business's).",
+          "source": "arch 05 line 265; CQ-05; CQ-09"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "For a photo, when the owner said yes to the read-back of its times, which is when they start to block (limit 6); null for a calendar block.",
+          "source": "arch 05 line 263 ('its times block on the owner's yes (S1-24; limit 6)'); arch 06 line 309"
+        },
+        {
+          "name": "confirmed_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a photo, who said that yes (persons.id); null for a calendar block.",
+          "source": "arch 05 line 263; S1-24"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one (a moved event rewrites its row's times), and a writer compares and sets it.",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "busy_blocks_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "busy_blocks_person_fk",
+          "columns": ["person_id"],
+          "references": { "table": "persons", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "busy_blocks_link_fk",
+          "columns": ["calendar_link_id", "person_id"],
+          "references": { "table": "calendar_links", "columns": ["id", "person_id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "busy_blocks_confirmed_by_fk",
+          "columns": ["confirmed_by_person_id"],
+          "references": { "table": "persons", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "busy_blocks_event_key",
+          "columns": ["calendar_link_id", "provider_event_ref"],
+          "where": "source = 'calendar'",
+          "source": "arch 05 line 265 (one block per event, repeats expanded): a repeated or late notification rewrites the same row"
+        }
+      ],
+      "checks": [
+        {
+          "name": "busy_blocks_source_known",
+          "expression": "source in ('calendar', 'photo')",
+          "source": "arch 05 lines 261, 263"
+        },
+        {
+          "name": "busy_blocks_source_fields",
+          "expression": "(source = 'calendar' and business_id is null and calendar_link_id is not null and provider_event_ref is not null and confirmed_at is null and confirmed_by_person_id is null) or (source = 'photo' and business_id is not null and calendar_link_id is null and provider_event_ref is null and confirmed_at is not null and confirmed_by_person_id is not null)",
+          "source": "arch 05 lines 261, 263 ('its times block on the owner's yes'); S1-24; limit 6; FS line 743 (a calendar block is its link's, so its person's)"
+        },
+        {
+          "name": "busy_blocks_during_bounded",
+          "expression": "not isempty(during) and not lower_inf(during) and not upper_inf(during)",
+          "source": "arch 05 line 261 (start, end)"
+        },
+        {
+          "name": "busy_blocks_time_zone_form",
+          "expression": "time_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09 (an IANA zone name); K-04 v1 businesses_time_zone_form"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "busy_blocks_person_during_idx",
+          "columns": ["person_id", "during"],
+          "using": "gist",
+          "why": "The times card, search and the fresh read before a booking find a person's blocks over the times asked (arch 05 line 259; A6-10)."
+        },
+        {
+          "name": "busy_blocks_link_idx",
+          "columns": ["calendar_link_id"],
+          "where": "calendar_link_id is not null",
+          "why": "A link's blocks: the read policy through its shares (README rule 5), a full read replacing them, and their delete when it is unlinked."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "A calendar block is its link's, so a person's across every business they work in (FS line 743), and has no business: a Tool API call sees it only through a live calendar_link_shares row of its own business. A photo block has its business, and a Tool API call sees and writes only its own business's photo blocks (README rule 5)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

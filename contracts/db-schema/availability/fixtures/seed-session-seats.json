@@ -1,0 +1,180 @@
+{
+  "after": [
+    "seed-hours.json",
+    "../../core/fixtures/seed-class-seats.json",
+    "../../kinds-of-work/fixtures/seed-kinds-sample.json"
+  ],
+  "rows": [
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-yoga-handstand-workshop",
+        "business_id": "biz-yoga-studio",
+        "kind_id": "yoga",
+        "name": "Handstand workshop",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "2 hours",
+        "position": 1,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-yoga-hot-flow",
+        "business_id": "biz-yoga-studio",
+        "kind_id": "yoga",
+        "name": "Hot Flow class",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "1 hour",
+        "position": 2,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "classes",
+      "values": {
+        "id": "class-yoga-hot-flow-sat",
+        "business_id": "biz-yoga-studio",
+        "service_id": "svc-yoga-hot-flow",
+        "weekday": 6,
+        "starts_at": "10:00",
+        "ends_at": "11:00",
+        "time_zone": "America/New_York",
+        "teacher_resource_id": "res-maya",
+        "teacher_kind": "worker",
+        "room_resource_id": "res-studio-room",
+        "room_kind": "room",
+        "location_id": "loc-yoga-studio-shop",
+        "seats": 12,
+        "minimum": 3,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-hot-flow-sat-nov-7",
+        "business_id": "biz-yoga-studio",
+        "kind": "class_session",
+        "name": "Hot Flow class, Sat Nov 7 10:00am",
+        "person_id": null,
+        "active": false,
+        "version": 2
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-hot-flow-sat-nov-14",
+        "business_id": "biz-yoga-studio",
+        "kind": "class_session",
+        "name": "Hot Flow class, Sat Nov 14 10:00am",
+        "person_id": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "class_seats",
+      "values": {
+        "resource_id": "res-hot-flow-sat-nov-7",
+        "resource_kind": "class_session",
+        "business_id": "biz-yoga-studio",
+        "capacity": 12,
+        "taken": 0,
+        "version": 3
+      }
+    },
+    {
+      "table": "class_seats",
+      "values": {
+        "resource_id": "res-hot-flow-sat-nov-14",
+        "resource_kind": "class_session",
+        "business_id": "biz-yoga-studio",
+        "capacity": 12,
+        "taken": 0,
+        "version": 1
+      }
+    },
+    {
+      "table": "class_sessions",
+      "values": {
+        "resource_id": "res-handstand-workshop",
+        "resource_kind": "class_session",
+        "business_id": "biz-yoga-studio",
+        "class_id": null,
+        "service_id": "svc-yoga-handstand-workshop",
+        "during": "[2026-11-14T16:00:00Z,2026-11-14T18:00:00Z)",
+        "time_zone": "America/New_York",
+        "teacher_resource_id": "res-maya",
+        "teacher_kind": "worker",
+        "room_resource_id": "res-studio-room",
+        "room_kind": "room",
+        "location_id": "loc-yoga-studio-shop",
+        "minimum": 4,
+        "status": "scheduled",
+        "counted_at": null,
+        "too_few": null,
+        "cancelled_at": null,
+        "cancelled_by_person_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "class_sessions",
+      "values": {
+        "resource_id": "res-hot-flow-sat-nov-14",
+        "resource_kind": "class_session",
+        "business_id": "biz-yoga-studio",
+        "class_id": "class-yoga-hot-flow-sat",
+        "service_id": "svc-yoga-hot-flow",
+        "during": "[2026-11-14T15:00:00Z,2026-11-14T16:00:00Z)",
+        "time_zone": "America/New_York",
+        "teacher_resource_id": "res-maya",
+        "teacher_kind": "worker",
+        "room_resource_id": "res-studio-room",
+        "room_kind": "room",
+        "location_id": "loc-yoga-studio-shop",
+        "minimum": 3,
+        "status": "scheduled",
+        "counted_at": null,
+        "too_few": null,
+        "cancelled_at": null,
+        "cancelled_by_person_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "class_sessions",
+      "values": {
+        "resource_id": "res-hot-flow-sat-nov-7",
+        "resource_kind": "class_session",
+        "business_id": "biz-yoga-studio",
+        "class_id": "class-yoga-hot-flow-sat",
+        "service_id": "svc-yoga-hot-flow",
+        "during": "[2026-11-07T15:00:00Z,2026-11-07T16:00:00Z)",
+        "time_zone": "America/New_York",
+        "teacher_resource_id": "res-maya",
+        "teacher_kind": "worker",
+        "room_resource_id": "res-studio-room",
+        "room_kind": "room",
+        "location_id": "loc-yoga-studio-shop",
+        "minimum": 3,
+        "status": "cancelled",
+        "counted_at": "2026-11-06T15:00:00Z",
+        "too_few": true,
+        "cancelled_at": "2026-11-06T15:20:00Z",
+        "cancelled_by_person_id": "person-sam",
+        "version": 3
+      }
+    }
+  ]
+}
