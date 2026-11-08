@@ -16,6 +16,7 @@ import {
   optionsNamedIn,
   readTimeWords,
   reparse,
+  timeReadingOf,
   wholePhraseFault,
   zonesNamedIn,
   type FieldType,
@@ -1185,5 +1186,167 @@ describe("what joins a phrase, and what does not (DL-199 items 1 and 3)", () => 
       expect(wholePhraseFault("time", sunday3pm, text, text, context)).toBeNull();
       expect(wholePhraseFault("time", at("2026-11-01T04:00:00Z"), text, "tomorrow", context)).toBe("differs");
     }
+  });
+});
+
+// ---- round 5 (DL-209): a bare hour beside a day joins its phrase whatever other time the text holds -------------------
+
+describe("a bare hour beside a day joins the day's phrase whatever other time the text holds: H1 to H3 (DL-209)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] }; // Sat Oct 31, 10:00am EDT
+  const spanish: ReparseContext = { ...context, languages: ["es"] };
+  const at = (utc: string) => ({ utc, zone: NEW_YORK });
+  const H1 = "my 2pm doesn't work. can we do Thursday, 3?";
+  const H2 = "can't make my 2pm, 3 tomorrow?";
+  const H3 = "a las 2 no puedo. ¿el jueves, 3?";
+  const THURSDAY = at("2026-11-05T05:00:00Z"); // Thu Nov 5 at its start (EST)
+  const SUNDAY = at("2026-11-01T04:00:00Z"); // Sun Nov 1 at its start (still EDT)
+
+  it("the reading takes no bare hour when the text names another time; bareHours gives the hour beside the day anyway", () => {
+    const reading = timeReadingOf(H1);
+    expect(reading.read.kind).toBe("time");
+    const hour = foldWords(H1).indexOf("3?");
+    expect(reading.bareHours).toEqual([{ at: hour, end: hour + 1 }]);
+    expect(reading.spans.some((span) => span.at === hour)).toBe(false);
+    expect(readings("Thursday, 3", context.sentAt, NEW_YORK)).toEqual([
+      "2026-11-05T08:00:00Z",
+      "2026-11-05T20:00:00Z",
+    ]);
+  });
+
+  it.each([
+    ["H1: 'Thursday' out of '... Thursday, 3?'", H1, "Thursday", THURSDAY, context],
+    ["H2: 'tomorrow' out of '... 3 tomorrow?'", H2, "tomorrow", SUNDAY, context],
+    ["H3: 'el jueves' out of '... ¿el jueves, 3?'", H3, "el jueves", THURSDAY, spanish],
+  ] as const)(
+    "%s, read at its start, differs: the hour is part of the day's phrase",
+    (_case, text, words, value, given) => {
+      expect(reparse("time", value, words, given)).toEqual({ ok: true });
+      expect(wholePhraseFault("time", value, text, words, given)).toBe("differs");
+    },
+  );
+
+  it("the whole 'Thursday, 3' and 'el jueves, 3' pass as 3pm or 3am (CQ-119's default: either reading passes)", () => {
+    for (const utc of ["2026-11-05T20:00:00Z", "2026-11-05T08:00:00Z"]) {
+      expect(wholePhraseFault("time", at(utc), H1, "Thursday, 3", context)).toBeNull();
+      expect(wholePhraseFault("time", at(utc), H3, "el jueves, 3", spanish)).toBeNull();
+    }
+    expect(wholePhraseFault("time", at("2026-11-05T21:00:00Z"), H1, "Thursday, 3", context)).toBe("differs");
+  });
+
+  it("in H2 the hour joins '2pm' by its comma too (DL-199's join), so '3 tomorrow' is refused as well: never a pass", () => {
+    expect(wholePhraseFault("time", at("2026-11-01T20:00:00Z"), H2, "3 tomorrow", context)).toBe("differs");
+    expect(wholePhraseFault("time", at("2026-10-31T18:00:00Z"), H2, "2pm", context)).toBe("differs");
+    expect(
+      wholePhraseFault("time", at("2026-11-01T20:00:00Z"), "can we do 3 tomorrow?", "3 tomorrow", context),
+    ).toBeNull();
+  });
+
+  it("an hour before the day, after a comma, or with the other time first: each cut of the day differs", () => {
+    for (const text of [
+      "2pm is out. 3 tomorrow?",
+      "2pm is out. tomorrow, 3?",
+      "2pm is out. tomorrow 3?",
+      "tomorrow, 3? my 2pm is out",
+      "3, tomorrow? 2pm is out",
+    ]) {
+      expect(wholePhraseFault("time", SUNDAY, text, "tomorrow", context)).toBe("differs");
+    }
+  });
+
+  it("an hour beside a day whose phrase names its own time of day stays out of it: 'table for 2 tomorrow at 3pm'", () => {
+    const text = "table for 2 tomorrow at 3pm, my 11am is out";
+    expect(wholePhraseFault("time", at("2026-11-01T20:00:00Z"), text, "tomorrow at 3pm", context)).toBeNull();
+    expect(wholePhraseFault("time", SUNDAY, text, "tomorrow", context)).toBe("differs");
+  });
+});
+
+describe("the readers learn a bare hour after a part-of-day word (DL-209, the round 4 review's N2)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] };
+  const at = (utc: string) => ({ utc, zone: NEW_YORK });
+  const SUNDAY = at("2026-11-01T04:00:00Z");
+
+  it.each([
+    ["tomorrow morning, 9", ["2026-11-01T14:00:00Z"]],
+    ["tomorrow morning 9", ["2026-11-01T14:00:00Z"]],
+    ["tomorrow afternoon, 3", ["2026-11-01T20:00:00Z"]],
+    ["tomorrow evening at 7", ["2026-11-02T00:00:00Z"]],
+    ["tomorrow night, 9", ["2026-11-02T02:00:00Z"]],
+  ] as const)("'%s' reads with its part of the day: %j", (words, expected) => {
+    expect(readings(words, context.sentAt, NEW_YORK)).toEqual(expected);
+  });
+
+  it("Spanish: 'mañana por la tarde, 3' is Sun Nov 1 at 3pm; 'mañana por la mañana, 9' at 9am", () => {
+    expect(readings("mañana por la tarde, 3", context.sentAt, NEW_YORK, ["es"])).toEqual([
+      "2026-11-01T20:00:00Z",
+    ]);
+    expect(readings("mañana por la mañana, 9", context.sentAt, NEW_YORK, ["es"])).toEqual([
+      "2026-11-01T14:00:00Z",
+    ]);
+  });
+
+  it.each([
+    ["can you do tomorrow morning, 9", "tomorrow morning", "tomorrow morning, 9", "2026-11-01T14:00:00Z"],
+    ["can you do tomorrow evening at 7", "tomorrow evening", "tomorrow evening at 7", "2026-11-02T00:00:00Z"],
+    ["tomorrow night 9 works", "tomorrow night", "tomorrow night 9", "2026-11-02T02:00:00Z"],
+    [
+      "my 2pm is out. tomorrow morning, 9?",
+      "tomorrow morning",
+      "tomorrow morning, 9",
+      "2026-11-01T14:00:00Z",
+    ],
+  ] as const)("in '%s', '%s' alone differs; '%s' passes", (text, cut, whole, utc) => {
+    expect(wholePhraseFault("time", SUNDAY, text, cut, context)).toBe("differs");
+    expect(wholePhraseFault("time", at(utc), text, whole, context)).toBeNull();
+  });
+
+  it("a count after a part-of-day word that names its time stays a count: 'tomorrow afternoon at 3, 2 of us'", () => {
+    const text = "tomorrow afternoon at 3, 2 of us";
+    expect(readTimeWords(text).kind).toBe("time");
+    expect(
+      wholePhraseFault("time", at("2026-11-01T20:00:00Z"), text, "tomorrow afternoon at 3", context),
+    ).toBeNull();
+  });
+});
+
+describe("the money reader learns a currency code beside an amount and 'M' as million (DL-209, the round 4 review's N1)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] };
+  const money = (words: string) => amountsIn(words).map((amount) => amount.money);
+  const usd = (amount: number) => ({ cents: amount, currency: "USD" });
+
+  it.each([
+    ["MXN $40", [{ cents: 4000, currency: "MXN" }]],
+    ["CAD$40", [{ cents: 4000, currency: "CAD" }]],
+    ["usd $40", [{ cents: 4000, currency: "USD" }]],
+    ["40$ CAD", [{ cents: 4000, currency: "CAD" }]],
+    ["40 $ pesos", [{ cents: 4000, currency: "MXN" }]],
+    ["$1M", [{ cents: 100_000_000, currency: "USD" }]],
+    ["$1.5m", [{ cents: 150_000_000, currency: "USD" }]],
+    ["$1MM", [{ cents: 100_000_000, currency: "USD" }]],
+    ["$2B", [{ cents: 200_000_000_000, currency: "USD" }]],
+    ["$3bn", [{ cents: 300_000_000_000, currency: "USD" }]],
+    ["40m", [{ cents: 4_000_000_000, currency: "USD" }]],
+  ] as const)("'%s' reads as %j", (words, expected) => {
+    expect(money(words)).toEqual(expected);
+  });
+
+  it.each([
+    ["raise haircut to MXN $40", "$40", usd(4000), "MXN $40", { cents: 4000, currency: "MXN" }],
+    ["raise haircut to 40$ CAD", "40$", usd(4000), "40$ CAD", { cents: 4000, currency: "CAD" }],
+  ] as const)(
+    "in '%s', '%s' as dollars differs; the whole '%s' passes in its own currency",
+    (text, cut, value, whole, own) => {
+      expect(reparse("money", value, cut, context)).toEqual({ ok: true });
+      expect(wholePhraseFault("money", value, text, cut, context)).toBe("differs");
+      expect(wholePhraseFault("money", own, text, whole, context)).toBeNull();
+      expect(wholePhraseFault("money", value, text, whole, context)).toBe("differs");
+    },
+  );
+
+  it("'$1M' is a million: as $1 it differs, '$1' is cut out of it, and the whole passes as $1,000,000", () => {
+    const text = "raise haircut to $1M";
+    expect(reparse("money", usd(100), "$1M", context)).toEqual({ ok: false, why: "differs" });
+    expect(wholePhraseFault("money", usd(100), text, "$1M", context)).toBe("differs");
+    expect(wholePhraseFault("money", usd(100), text, "$1", context)).toBe("noText");
+    expect(wholePhraseFault("money", usd(100_000_000), text, "$1M", context)).toBeNull();
   });
 });

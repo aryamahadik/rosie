@@ -23,7 +23,9 @@
 //      leave out fails: "40" out of "40%" (noText), "40¢" or "40 euros" (differs), "$1" out of "$1 million" (differs),
 //      "3 tomorrow" out of "quarter to 3 tomorrow", "tomorrow at 3pm" out of "the day after tomorrow at 3pm", "at 3" out
 //      of "tomorrow afternoon at 3", "tomorrow" out of "tomorrow at noon" (differs), "tomorrow at 3pm" out of "tomorrow
-//      at 3pm, PST" for a New York visit (wrongZone);
+//      at 3pm, PST" for a New York visit (wrongZone). A bare hour beside a day joins the day's phrase whatever other time
+//      the text holds (DL-209): "Thursday" out of "my 2pm doesn't work. can we do Thursday, 3?" differs, as do
+//      "tomorrow morning" out of "tomorrow morning, 9", "$40" out of "MXN $40" and "$1M" read as $1;
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -32,7 +34,8 @@
 //
 // The residual (DL-199 item 4; CQ-121): words no reader knows are not read, so a cut beside them is not caught here:
 // "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from", "around 3" with no
-// cue the time reader knows, "$40 off", and a sentence mark (". ! ? ;") between a day and its time (values/phrase.ts).
+// cue the time reader knows, "$40 off", and a sentence mark (". ! ? ;") between a day and its time ("at 3pm" out of
+// "tomorrow. at 3pm"), which the lead confirmed as part of the residual at round 5 (DL-209; values/phrase.ts).
 // Limit 3's read-back shows the person every value before any commit, and limit 5 checks a time against the open times,
 // so neither books on such a cut.
 //
@@ -65,6 +68,12 @@
 //      amount being no part of its value ("$40/hr" is $40, as "$12 a foot" is $12) are values/phrase.ts's and
 //      values/money.ts's (DL-189, DL-199). A currency sign the reader does not know is no dollar (ISO's XXX), "pesos"
 //      are Mexican pesos, and "mil" is a thousand in a Spanish text and a million in an English one (values/money.ts).
+//  10. Round 5 (DL-209): a bare hour beside a day or after a part-of-day word joins the phrase beside it when the time
+//      reader takes it reading that phrase with the hour on its own, so "2" of "table for 2 tomorrow at 3pm" stays out
+//      (values/phrase.ts step 3b); a comma not followed by a digit may end a bare hour ("3, tomorrow"); "M" or "MM" right
+//      after an amount is a million and "B" or "bn" a billion, glued to the number only ("$1M"; "$1 M" is not read); a
+//      currency code right before a sign names its currency ("MXN $40"), as does a currency word right after a sign
+//      ("40$ CAD") (values/times.ts, values/money.ts).
 
 import {
   foundAtWordEdges,

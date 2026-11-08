@@ -17,7 +17,12 @@
 // a reading read (each day, time of day, elapsed time and morning or afternoon word), so a reader of the whole value
 // phrase sees what was left unread; those spans, joined by spaces, commas or cues, are the time's whole phrase in a
 // person's text (values/phrase.ts; T-304 round 4, DL-199): "the day after tomorrow at 3pm", "tomorrow afternoon at 3",
-// "tomorrow at noon", "mañana al mediodía", "tomorrow, 3pm". Nothing here keeps or logs words.
+// "tomorrow at noon", "mañana al mediodía", "tomorrow, 3pm". A bare number is an hour right beside a day ("Thu 2",
+// "Thursday, 3", "3 tomorrow") or right after a part-of-day word ("tomorrow morning, 9" is 9am, "tomorrow night, 9"
+// 9pm: T-304 round 5, DL-209), and the reading takes one only when the words name no other time of day; bareHours gives
+// every such number whatever else the words hold, so the whole value phrase takes the hour beside its day even when
+// another time stands elsewhere in the text ("my 2pm doesn't work. can we do Thursday, 3?"). Nothing here keeps or logs
+// words.
 
 import { numberPhrasesIn, numberWordsOf } from "./numbers";
 import {
@@ -199,7 +204,8 @@ const MERIDIEM_TIME = /(?<![\d:/.$])(\d{1,2})(?: ?(am|pm)\b|([ap])\b)/g;
 const OCLOCK_TIME = /(?<![\d:/.$])(\d{1,2}) ?oclock\b/g;
 const CUE = String.raw`(?:at|a las|a la|para las)`;
 const CUED_TIME = new RegExp(String.raw`\b${CUE} (\d{1,2})(?![\d:/.%])`, "g");
-const BARE_NUMBER = /(?<![\w.,:/$])(\d{1,2})(?![\w.,:/%$])/g;
+/** A bare number of one or two digits; a comma may end it unless a digit follows ("3, tomorrow"; never "1,200"). */
+const BARE_NUMBER = /(?<![\w.,:/$])(\d{1,2})(?![\w.:/%$]|,\d)/g;
 
 /** A number joined to a time of day by "or", "to", a dash or "and" ("3 or 4pm", "2-5pm"): the words name two. */
 const JOINED_BEFORE = /(?<![\w.,:/$])\d{1,2}(?::\d{2})? ?(?:or|o|to|-|and|y|a) ?$/;
@@ -285,6 +291,28 @@ function besideOnly(folded: string, a: Span, b: Span): boolean {
   return /^[ ,]*$/.test(between);
 }
 
+/** What may stand between a part-of-day word and the bare hour after it: spaces, commas and "at" (DL-209). */
+const AFTER_PART_OF_DAY = /^(?:[ ,]|\bat\b)*$/;
+
+/** Whether `found` stands right after a part-of-day word of `hints`, with only spaces, commas or "at" between. */
+function afterPartOfDay(folded: string, hints: readonly Span[], found: Span): boolean {
+  return hints.some(
+    (hint) => hint.end <= found.at && AFTER_PART_OF_DAY.test(folded.slice(hint.end, found.at)),
+  );
+}
+
+/**
+ * Every bare number the reader reads as an hour where it stands, whatever other time the words name (T-304 round 5,
+ * DL-209): right beside a day, only spaces or commas between, on either side ("Thu 2", "Thursday, 3", "3 tomorrow", "3,
+ * tomorrow", "Sat Oct 24, 11"), or right after a part-of-day word, only spaces, commas or "at" between ("tomorrow
+ * morning, 9", "tomorrow night 9"), whose morning or afternoon it takes.
+ */
+function bareHoursIn(folded: string, days: readonly Span[], hints: readonly Span[]): Found[] {
+  return findAll(folded, BARE_NUMBER).filter(
+    (found) => days.some((day) => besideOnly(folded, day, found)) || afterPartOfDay(folded, hints, found),
+  );
+}
+
 const meridiemOf = (word: string | undefined, letter: string | undefined): "am" | "pm" | null => {
   if (word === "am" || letter === "a") return "am";
   if (word === "pm" || letter === "p") return "pm";
@@ -367,6 +395,11 @@ export interface TimeReading {
   readonly read: TimeRead;
   /** Each run of the folded words read: a day, a time of day, an elapsed time, a morning or afternoon word. */
   readonly spans: readonly Span[];
+  /**
+   * Each bare number the reader reads as an hour where it stands, beside a day or after a part-of-day word, whatever
+   * other time the words name (DL-209). The reading takes one only when the words name no other time of day.
+   */
+  readonly bareHours: readonly Span[];
 }
 
 /** Reads what the words say about one time, in the languages given. */
@@ -384,12 +417,16 @@ export function timeReadingOf(
     ...findAll(folded, AM_HINTS).map(({ at, end }) => ({ at, end })),
     ...findAll(folded, PM_HINTS).map(({ at, end }) => ({ at, end })),
   ];
-  const read = readFolded(folded, languages);
-  return { read: read.read, spans: [...read.spans, ...hints] };
+  const read = readFolded(folded, languages, hints);
+  return { read: read.read, spans: [...read.spans, ...hints], bareHours: read.bareHours };
 }
 
-/** Reads one time from folded words: the reading and the spans it took. */
-function readFolded(folded: string, languages: readonly ValueLanguage[]): TimeReading {
+/** Reads one time from folded words, with their morning and afternoon words: the reading and the spans it took. */
+function readFolded(
+  folded: string,
+  languages: readonly ValueLanguage[],
+  hints: readonly Span[],
+): TimeReading {
   const counted = countedIn(folded, languages);
   const taken: Span[] = [];
   const daySpans: Span[] = [];
@@ -478,10 +515,11 @@ function readFolded(folded: string, languages: readonly ValueLanguage[]): TimeRe
       clocks.push({ kind: "clock", hour, minute: 0, meridiem });
     }
   }
+  const bareHours = bareHoursIn(folded, daySpans, hints);
   if (clocks.length === 0) {
-    // A bare number is an hour only right beside the day it is on: "Thu 2", "tomorrow 3", "Sat Oct 24, 11".
-    for (const found of findAll(folded, BARE_NUMBER)) {
-      if (!daySpans.some((day) => besideOnly(folded, day, found))) continue;
+    // A bare number is an hour only right beside the day it is on ("Thu 2", "tomorrow 3", "Sat Oct 24, 11") or right
+    // after a part-of-day word ("tomorrow morning, 9": DL-209), and only when the words name no other time of day.
+    for (const found of bareHours) {
       if (takeClock(found))
         clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem: null });
     }
@@ -495,7 +533,12 @@ function readFolded(folded: string, languages: readonly ValueLanguage[]): TimeRe
     return next !== undefined && EITHER.test(folded.slice(span.end, next.at));
   });
   const spans: readonly Span[] = taken;
-  if (joined || either) return { read: { kind: "several" }, spans };
+  const reading = (read: TimeRead): TimeReading => ({
+    read,
+    spans,
+    bareHours: bareHours.map(({ at, end }) => ({ at, end })),
+  });
+  if (joined || either) return reading({ kind: "several" });
 
   const am = AM_HINTS.test(folded);
   const pm = pmFromDay || PM_HINTS.test(folded);
@@ -513,15 +556,15 @@ function readFolded(folded: string, languages: readonly ValueLanguage[]): TimeRe
       clock: null,
       hint: null,
     };
-    return { read: alone ? { kind: "time", time } : { kind: "several" }, spans };
+    return reading(alone ? { kind: "time", time } : { kind: "several" });
   }
-  if (day.length > 1 || weekday.length > 1 || clock.length > 1) return { read: { kind: "several" }, spans };
+  if (day.length > 1 || weekday.length > 1 || clock.length > 1) return reading({ kind: "several" });
   const [oneDay = null] = day;
   const [oneWeekday = null] = weekday;
   const [oneClock = null] = clock;
-  if (oneDay === null && oneWeekday === null && oneClock === null) return { read: { kind: "none" }, spans };
+  if (oneDay === null && oneWeekday === null && oneClock === null) return reading({ kind: "none" });
   const time: TimeWords = { elapsedMs: null, day: oneDay, weekday: oneWeekday, clock: oneClock, hint };
-  return { read: { kind: "time", time }, spans };
+  return reading({ kind: "time", time });
 }
 
 /**
