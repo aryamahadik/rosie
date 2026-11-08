@@ -168,15 +168,43 @@ async function committedAs<T>(role: Role, businessId: string | null, fn: (tx: Tx
   return result as T;
 }
 
-/** The SQLSTATE, constraint and message of a refused statement. */
-async function refusal(
-  promise: Promise<unknown>,
-): Promise<{ code: string | undefined; constraint: string | undefined; message: string }> {
+/** Runs `fn` in one transaction as the tables' owner (the migrations' role, whom no grant stops), then rolls it back. */
+async function asOwner<T>(fn: (tx: Tx) => Promise<T>): Promise<T> {
+  try {
+    await db.sql.begin(async (tx) => {
+      throw new RolledBack(await fn(tx));
+    });
+  } catch (error) {
+    if (error instanceof RolledBack) {
+      return error.answer as T;
+    }
+    throw error;
+  }
+  throw new Error("the check's transaction was not rolled back");
+}
+
+/** The SQLSTATE, constraint, column and message of a refused statement. */
+async function refusal(promise: Promise<unknown>): Promise<{
+  code: string | undefined;
+  constraint: string | undefined;
+  column: string | undefined;
+  message: string;
+}> {
   try {
     await promise;
   } catch (error) {
-    const failure = error as { code?: string; constraint_name?: string; message?: string };
-    return { code: failure.code, constraint: failure.constraint_name, message: failure.message ?? "" };
+    const failure = error as {
+      code?: string;
+      constraint_name?: string;
+      column_name?: string;
+      message?: string;
+    };
+    return {
+      code: failure.code,
+      constraint: failure.constraint_name,
+      column: failure.column_name,
+      message: failure.message ?? "",
+    };
   }
   throw new Error("the statement was accepted; the database should have refused it");
 }
@@ -343,7 +371,7 @@ describe("the migration against the frozen table list (K-29 v1 conversations and
     });
   }
 
-  it("triggers: chat_links raises its version on every update (0002's rule); consents refuses every edit", async () => {
+  it("triggers: chat_links keeps its code and ready text as issued and lets its places only grow (T-1094), and raises its version on every update (0002's rule); consents refuses every edit", async () => {
     const triggers = await db.sql<{ table: string; name: string; definition: string }[]>`
       select c.relname as table, t.tgname as name, pg_get_triggerdef(t.oid) as definition
       from pg_trigger t join pg_class c on c.oid = t.tgrelid
@@ -351,13 +379,24 @@ describe("the migration against the frozen table list (K-29 v1 conversations and
       order by 1, 2
     `;
     expect(triggers.map((trigger) => [trigger.table, trigger.name])).toEqual([
+      ["chat_links", "chat_links_kept_as_issued"],
       ["chat_links", "chat_links_version_raised"],
       ["consents", "consents_never_edited"],
     ]);
-    expect(triggers[0]?.definition).toContain("BEFORE UPDATE ON");
-    expect(triggers[0]?.definition).toContain("FOR EACH ROW EXECUTE FUNCTION enforce_version_raise()");
-    expect(triggers[1]?.definition).toContain("BEFORE DELETE OR UPDATE ON");
-    expect(triggers[1]?.definition).toContain("FOR EACH ROW EXECUTE FUNCTION consents_refuse_edit()");
+    const definitionOf = (name: string): string =>
+      triggers.find((trigger) => trigger.name === name)?.definition ?? "";
+    expect(definitionOf("chat_links_kept_as_issued")).toContain("BEFORE UPDATE ON");
+    expect(definitionOf("chat_links_kept_as_issued")).toContain(
+      "FOR EACH ROW EXECUTE FUNCTION chat_links_refuse_rewrite()",
+    );
+    expect(definitionOf("chat_links_version_raised")).toContain("BEFORE UPDATE ON");
+    expect(definitionOf("chat_links_version_raised")).toContain(
+      "FOR EACH ROW EXECUTE FUNCTION enforce_version_raise()",
+    );
+    expect(definitionOf("consents_never_edited")).toContain("BEFORE DELETE OR UPDATE ON");
+    expect(definitionOf("consents_never_edited")).toContain(
+      "FOR EACH ROW EXECUTE FUNCTION consents_refuse_edit()",
+    );
     for (const table of TABLES) {
       expect(table.versioned, table.name).toBe(table.name === "chat_links");
     }
@@ -404,7 +443,7 @@ describe("the migration against the frozen table list (K-29 v1 conversations and
     }
   });
 
-  it("grants: both roles select, insert and update chat_links, and only select and insert consents; PUBLIC holds nothing", async () => {
+  it("grants: both roles select and insert chat_links and update four of its columns only (T-1094), and only select and insert consents; PUBLIC holds nothing", async () => {
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
       select r.role, c.relname as table, p.privilege
       from unnest(${[...ROLES]}::text[]) as r(role)
@@ -418,10 +457,29 @@ describe("the migration against the frozen table list (K-29 v1 conversations and
       ROLES.flatMap((role) => [
         { role, table: "chat_links", privilege: "INSERT" },
         { role, table: "chat_links", privilege: "SELECT" },
-        { role, table: "chat_links", privilege: "UPDATE" },
         { role, table: "consents", privilege: "INSERT" },
         { role, table: "consents", privilege: "SELECT" },
       ]),
+    );
+    // chat_links' UPDATE is on the columns K-29 changes (given_via grows, the owner told again, used, the version), so
+    // the ready text stays as issued (table list line 71); consents takes no update on any column.
+    const updatable = await db.sql<{ role: string; table: string; column: string }[]>`
+      select r.role, c.relname as table, a.attname as column
+      from unnest(${[...ROLES]}::text[]) as r(role)
+        cross join pg_class c
+        join pg_attribute a on a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
+      where c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql(OWN_TABLES)}
+        and has_column_privilege(r.role, c.oid, a.attnum, 'UPDATE')
+      order by 1, 2, 3
+    `;
+    expect(updatable).toEqual(
+      ROLES.flatMap((role) =>
+        ["given_via", "owner_retold_at", "used_at", "version"].map((column) => ({
+          role,
+          table: "chat_links",
+          column,
+        })),
+      ),
     );
     const publicGrants = await db.sql<{ table: string }[]>`
       select c.relname as table from pg_class c cross join lateral aclexplode(c.relacl) a
@@ -430,16 +488,22 @@ describe("the migration against the frozen table list (K-29 v1 conversations and
     expect(publicGrants).toEqual([]);
   });
 
-  it("neither role owns a table or the trigger function: they stay the migrations' role's", async () => {
+  it("neither role owns a table or a trigger function: they stay the migrations' role's", async () => {
     const owners = await db.sql<{ name: string; owner: string; me: string }[]>`
       select c.relname as name, pg_get_userbyid(c.relowner) as owner, current_user as me from pg_class c
       where c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql(OWN_TABLES)}
       union all
       select p.proname, pg_get_userbyid(p.proowner), current_user from pg_proc p
-      where p.pronamespace = ${db.schema}::regnamespace and p.proname = 'consents_refuse_edit'
+      where p.pronamespace = ${db.schema}::regnamespace
+        and p.proname in ('consents_refuse_edit', 'chat_links_refuse_rewrite')
       order by 1
     `;
-    expect(owners.map((row) => row.name)).toEqual(["chat_links", "consents", "consents_refuse_edit"]);
+    expect(owners.map((row) => row.name)).toEqual([
+      "chat_links",
+      "chat_links_refuse_rewrite",
+      "consents",
+      "consents_refuse_edit",
+    ]);
     for (const row of owners) {
       expect(row.owner, row.name).toBe(row.me);
       expect(ROLES, row.name).not.toContain(row.owner);
@@ -1020,6 +1084,145 @@ describe("row-level security on chat_links and consents (K-29 rule 4)", () => {
     const move = (tx: Tx): Promise<unknown> =>
       tx`update chat_links set business_id = ${YOGA}, version = version + 1 where id = 'chatlink-ben-haircut'`;
     expect((await refusal(as(TOOL_API, BARBERSHOP, move))).code).toBe("42501");
+  });
+
+  it("neither role may change a link's ready text, kept as issued, or its code (T-1094; table list line 71); the owner told again and the ready text arriving still update", async () => {
+    const rewrite = (tx: Tx): Promise<unknown> =>
+      tx`update chat_links set ready_text = 'Hey, text me. Ref 4K7Q', version = version + 1
+         where id = 'chatlink-ben-haircut'`;
+    const recode = (tx: Tx): Promise<unknown> =>
+      tx`update chat_links set short_code = '7QK4', ready_text = 'YES. Ref 7QK4', version = version + 1
+         where id = 'chatlink-pat-invite'`;
+    for (const [role, scope] of [
+      [TOOL_API, BARBERSHOP],
+      [RUNTIME, null],
+    ] as const) {
+      for (const change of [rewrite, recode]) {
+        const refused = await refusal(as(role, scope, change));
+        expect(refused.code, role).toBe("42501");
+        expect(refused.message, role).toContain("permission denied for table chat_links");
+      }
+      expect(
+        await as(
+          role,
+          scope,
+          (tx) =>
+            tx`update chat_links set owner_retold_at = '2026-10-21T15:00:00Z', used_at = '2026-10-22T08:00:00Z',
+                 version = version + 1
+               where id = 'chatlink-pat-invite' returning version`,
+        ),
+        role,
+      ).toEqual([{ version: 3 }]);
+    }
+  });
+});
+
+describe("chat_links_kept_as_issued: a link's code and ready text stay as issued and its places only grow, whoever updates it (T-1094; table list lines 71 and 79; DL-149)", () => {
+  const BEN_LINK = "chatlink-ben-haircut";
+  const PAT_LINK = "chatlink-pat-invite";
+  const PLACES = ["booking_page", "confirmation_email", "customer_ai", "owner"];
+
+  beforeAll(async () => {
+    await reset();
+    await loadFixtures(["seed-chat-link.json"]);
+  }, 60_000);
+
+  it(
+    "given_via only grows: a list that leaves out a place the link was given is refused under either role and for the tables' owner (42501, column given_via), naming the table and never a value; the row stays as it was",
+    SLOW,
+    async () => {
+      const before = await getChatLink(db.sql, BEN_LINK);
+      expect(before?.givenVia).toEqual(["booking_page", "confirmation_email"]);
+      // One place left out, then the other, every place swapped for a new one, and a new place in place of an old one.
+      for (const givenVia of [
+        ["booking_page"],
+        ["confirmation_email"],
+        ["customer_ai"],
+        ["booking_page", "owner"],
+      ]) {
+        const shrink = (tx: Tx): Promise<unknown> =>
+          tx`update chat_links set given_via = ${givenVia}::text[], version = version + 1 where id = ${BEN_LINK}`;
+        const outcomes = [
+          [`${TOOL_API} at ${BARBERSHOP}`, await refusal(as(TOOL_API, BARBERSHOP, shrink))],
+          [`${RUNTIME} unscoped`, await refusal(as(RUNTIME, null, shrink))],
+          [`${RUNTIME} at ${BARBERSHOP}`, await refusal(as(RUNTIME, BARBERSHOP, shrink))],
+          ["the tables' owner", await refusal(asOwner(shrink))],
+        ] as const;
+        for (const [who, outcome] of outcomes) {
+          const label = `${who}: ${givenVia.join(", ")}`;
+          expect([outcome.code, outcome.column], label).toEqual(["42501", "given_via"]);
+          expect(outcome.message, label).toContain("chat_links");
+          expect(outcome.message, label).toContain("only grow");
+          for (const place of PLACES) {
+            expect(outcome.message, label).not.toContain(place);
+          }
+        }
+      }
+      expect(await getChatLink(db.sql, BEN_LINK)).toEqual(before);
+    },
+  );
+
+  it(
+    "without its fault the update passes: a new place added, the same places in another order, or the list left as it is, under either role and for the tables' owner",
+    SLOW,
+    async () => {
+      for (const givenVia of [
+        ["booking_page", "confirmation_email", "customer_ai"],
+        ["confirmation_email", "booking_page"],
+        ["booking_page", "confirmation_email"],
+      ]) {
+        const give = (tx: Tx): Promise<{ givenVia: string[]; version: number }[]> =>
+          tx<{ givenVia: string[]; version: number }[]>`
+            update chat_links set given_via = ${givenVia}::text[], version = version + 1 where id = ${BEN_LINK}
+            returning given_via as "givenVia", version
+          `;
+        const label = givenVia.join(", ");
+        expect(await as(TOOL_API, BARBERSHOP, give), label).toEqual([{ givenVia, version: 4 }]);
+        expect(await as(RUNTIME, null, give), label).toEqual([{ givenVia, version: 4 }]);
+        expect(await asOwner(give), label).toEqual([{ givenVia, version: 4 }]);
+      }
+    },
+  );
+
+  it("the tables' owner, whom no grant stops, cannot change a link's code or ready text either: the trigger refuses it (42501, naming the column), never a value, and the row stays as issued", async () => {
+    const before = await getChatLink(db.sql, PAT_LINK);
+    expect([before?.shortCode, before?.readyText]).toEqual(["P5J3", "YES. Ref P5J3"]);
+    const changes: [string, (tx: Tx) => Promise<unknown>][] = [
+      [
+        "ready_text",
+        (tx) =>
+          tx`update chat_links set ready_text = 'Yes, I join. Ref P5J3', version = version + 1 where id = ${PAT_LINK}`,
+      ],
+      [
+        "short_code",
+        (tx) => tx`update chat_links set short_code = 'Q8M2', version = version + 1 where id = ${PAT_LINK}`,
+      ],
+      [
+        "short_code",
+        (tx) =>
+          tx`update chat_links set short_code = 'Q8M2', ready_text = 'YES. Ref Q8M2', version = version + 1
+             where id = ${PAT_LINK}`,
+      ],
+    ];
+    for (const [column, change] of changes) {
+      const outcome = await refusal(asOwner(change));
+      expect([outcome.code, outcome.column], column).toEqual(["42501", column]);
+      expect(outcome.message, column).toContain("chat_links");
+      expect(outcome.message, column).toContain("kept as issued");
+      for (const value of ["P5J3", "Q8M2", "YES", "join"]) {
+        expect(outcome.message, column).not.toContain(value);
+      }
+    }
+    expect(await getChatLink(db.sql, PAT_LINK)).toEqual(before);
+    // Without its fault the owner's update passes: the code and the text set to what they hold, the ready text arriving.
+    expect(
+      await asOwner(
+        (tx) =>
+          tx`update chat_links set short_code = short_code, ready_text = ready_text, used_at = '2026-10-22T08:00:00Z',
+               version = version + 1
+             where id = ${PAT_LINK} returning version`,
+      ),
+    ).toEqual([{ version: 3 }]);
   });
 });
 

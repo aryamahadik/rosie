@@ -8,7 +8,8 @@
 // scoped by withBusiness() as a call is scoped, and is rolled back. The rows come only from K-07 v1's fixtures (Lee's
 // Barbershop and the master's sample cast) on K-04 v1's seeds. A turn, booking or person a K-07 effect names that K-04
 // does not seed is stood in by K-04's seed row of that table under the K-07 id (a person: the id alone), committed with
-// the seeds.
+// the seeds. T-1094 (DL-149) took the Tool API's grants on effects and provider_events away, so every read or write of
+// them made as the Tool API is refused by privilege, scoped or not; the runtime side's are as 0015 made them.
 import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { type Sql, type Tx, withBusiness } from "./scope";
@@ -712,7 +713,7 @@ describe("the migration against the frozen table list (K-07 v1 schema addition)"
     }
   });
 
-  it("grants: select, insert and update to both roles on effects and provider_events; rosie_job alone on outbox_claims, with delete", async () => {
+  it("grants: select, insert and update to rosie_job alone on effects and provider_events (T-1094), and on outbox_claims with delete; the Tool API holds none", async () => {
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
       select r.role, c.relname as table, p.privilege
       from unnest(${[...ROLES]}::text[]) as r(role)
@@ -724,9 +725,9 @@ describe("the migration against the frozen table list (K-07 v1 schema addition)"
     `;
     const rows = (role: Role, table: string, privileges: string[]) =>
       privileges.map((privilege) => ({ role, table, privilege }));
+    // T-1094 (DL-149) took 0015's SELECT, INSERT and UPDATE on effects and provider_events from the Tool API: every
+    // K-05 v1.1 call that reads or writes them runs on the runtime side.
     expect(held).toEqual([
-      ...rows(TOOL_API, "effects", ["INSERT", "SELECT", "UPDATE"]),
-      ...rows(TOOL_API, "provider_events", ["INSERT", "SELECT", "UPDATE"]),
       ...rows(RUNTIME, "effects", ["INSERT", "SELECT", "UPDATE"]),
       ...rows(RUNTIME, "outbox_claims", ["DELETE", "INSERT", "SELECT", "UPDATE"]),
       ...rows(RUNTIME, "provider_events", ["INSERT", "SELECT", "UPDATE"]),
@@ -739,6 +740,14 @@ describe("the migration against the frozen table list (K-07 v1 schema addition)"
         and a.grantee <> c.relowner and a.grantee not in (${TOOL_API}::regrole, ${RUNTIME}::regrole)
     `;
     expect(others).toEqual([]);
+    // And the Tool API is no grantee of any of the three: no entry of its own is left in their grants.
+    const toolApi = await db.sql<{ table: string; privilege: string }[]>`
+      select c.relname as table, a.privilege_type as privilege
+      from pg_class c cross join lateral aclexplode(c.relacl) a
+      where c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql(OWN_TABLES)}
+        and a.grantee = ${TOOL_API}::regrole
+    `;
+    expect(toolApi).toEqual([]);
   });
 
   it("neither role owns a table: they stay the migrations' role's", async () => {
@@ -1327,17 +1336,44 @@ describe("each rule of the table list refuses a row that breaks it, for that one
 });
 
 describe("writes under a scope: the commit's per-write scope, and a contact effect on the runtime side", () => {
-  it("the Tool API writes an effect only under its own business: another business's scope or none is refused (42501)", async () => {
-    expect(await as(TOOL_API, BARBERSHOP, (tx) => insertReturning(tx, "effects", CHARGE))).toMatchObject({
-      id: CHARGE.id,
-    });
-    for (const scope of [YOGA_STUDIO, null]) {
-      const outcome = await refusal(as(TOOL_API, scope, (tx) => insertReturning(tx, "effects", CHARGE)));
-      expect(outcome.code, String(scope)).toBe("42501");
+  it("the Tool API writes no effect, under its own business's scope, another business's or none: refused by privilege (42501; T-1094)", async () => {
+    // Lee's Barbershop's deposit, which 0015's policy let the Tool API write under that business's scope, and the
+    // contact effect, which has no business: neither is written, so no Tool API path queues an effect for the runner.
+    for (const scope of [BARBERSHOP, YOGA_STUDIO, null]) {
+      for (const values of [CHARGE, CONTACT]) {
+        const outcome = await refusal(as(TOOL_API, scope, (tx) => insertReturning(tx, "effects", values)));
+        const label = `${String(scope)}: ${textOf(values.id)}`;
+        expect(outcome.code, label).toBe("42501");
+        expect(outcome.message, label).toContain("permission denied for table effects");
+      }
     }
-    // A contact effect has no business, so no business scope may write it.
-    const contact = await refusal(as(TOOL_API, BARBERSHOP, (tx) => insertReturning(tx, "effects", CONTACT)));
-    expect(contact.code).toBe("42501");
+  });
+
+  it("the Tool API records no provider event, not even one for its own business: refused by privilege (42501), so no Tool API path takes an event id before the gateway (T-1094)", async () => {
+    expect(CALENDAR_EVENT.business_id).toBe(BARBERSHOP);
+    const records: ((tx: Tx) => Promise<unknown>)[] = [
+      (tx) => insertRow(tx, "provider_events", CALENDAR_EVENT),
+      // recordProviderEvent's own form (K-05 v1.1 item 23).
+      (tx) => tx`
+        insert into provider_events ${tx(columnValues(tx, "provider_events", CALENDAR_EVENT))}
+        on conflict (provider, provider_event_id) do nothing
+      `,
+    ];
+    for (const scope of [BARBERSHOP, null]) {
+      for (const record of records) {
+        const outcome = await refusal(as(TOOL_API, scope, record));
+        expect(outcome.code, String(scope)).toBe("42501");
+        expect(outcome.message, String(scope)).toContain("permission denied for table provider_events");
+      }
+    }
+    // The gateway's own recording, on the runtime side with no scope, still stores the event.
+    expect(
+      await as(RUNTIME, null, (tx) => insertReturning(tx, "provider_events", CALENDAR_EVENT)),
+    ).toMatchObject({
+      provider: CALENDAR_EVENT.provider,
+      provider_event_id: CALENDAR_EVENT.provider_event_id,
+      business_id: BARBERSHOP,
+    });
   });
 
   it("the runtime side writes a business's effect under that business's scope (per write), and a contact effect only unscoped", async () => {
@@ -1407,29 +1443,34 @@ describe("row-level security and privileges on the stored rows", () => {
     expect(await ownerCount("effects", YOGA_STUDIO)).toBe(0);
   });
 
-  it("the Tool API with no scope reads no effect and no provider event", async () => {
+  it("the Tool API with no scope reads no effect and no provider event: refused by privilege (42501; T-1094)", async () => {
     for (const table of SCOPED_TABLES) {
       expect(await countRows(db.sql, table), table).toBeGreaterThan(0);
-      expect(await as(TOOL_API, null, (tx) => countRows(tx, table)), table).toBe(0);
+      const outcome = await refusal(as(TOOL_API, null, (tx) => countRows(tx, table)));
+      expect(outcome.code, table).toBe("42501");
+      expect(outcome.message, table).toContain(`permission denied for table ${table}`);
     }
   });
 
-  it("the Tool API scoped to a business reads exactly that business's rows, never one with no business", async () => {
+  it("the Tool API scoped to a business reads none of their rows either, its own business's included: refused by privilege (42501; T-1094)", async () => {
     for (const table of SCOPED_TABLES) {
+      expect(await ownerCount(table, BARBERSHOP), table).toBeGreaterThan(0);
       for (const business of [BARBERSHOP, YOGA_STUDIO]) {
-        expect(await as(TOOL_API, business, (tx) => countRows(tx, table)), `${table} ${business}`).toBe(
-          await ownerCount(table, business),
-        );
-        expect(
-          await as(TOOL_API, business, (tx) => countWithNoBusiness(tx, table)),
-          `${table} ${business}`,
-        ).toBe(0);
+        for (const read of [countRows, countWithNoBusiness]) {
+          const outcome = await refusal(as(TOOL_API, business, (tx) => read(tx, table)));
+          expect(outcome.code, `${table} ${business}`).toBe("42501");
+          expect(outcome.message, `${table} ${business}`).toContain(`permission denied for table ${table}`);
+        }
       }
     }
-    // Lee's Barbershop's deposit, read from the yoga studio's scope: no row; from its own: the row.
+    // Lee's Barbershop's deposit, read by the Tool API from its own scope or the yoga studio's: refused. The runtime
+    // side reads it under its business's scope, and from the yoga studio's finds no row.
     const read = (tx: Tx) => tx`select id from effects where id = ${textOf(CHARGE.id)}`;
-    expect(await as(TOOL_API, YOGA_STUDIO, read)).toHaveLength(0);
-    expect(await as(TOOL_API, BARBERSHOP, read)).toHaveLength(1);
+    for (const scope of [YOGA_STUDIO, BARBERSHOP]) {
+      expect((await refusal(as(TOOL_API, scope, read))).code, scope).toBe("42501");
+    }
+    expect(await as(RUNTIME, YOGA_STUDIO, read)).toHaveLength(0);
+    expect(await as(RUNTIME, BARBERSHOP, read)).toHaveLength(1);
   });
 
   it("the runtime side with no scope reads every row, those with no business included; with a scope set, only that business's", async () => {
@@ -1447,12 +1488,27 @@ describe("row-level security and privileges on the stored rows", () => {
     }
   });
 
-  it("an update from another business's scope finds no row; from its own it raises the version", async () => {
+  it("an update from another business's scope finds no row, from its own it raises the version (the runtime side); the Tool API's update is refused by privilege (42501; T-1094)", async () => {
     const bump = (tx: Tx) =>
       tx`update effects set version = version + 1 where id = ${textOf(CHARGE.id)} returning id`;
-    for (const role of ROLES) {
-      expect(await as(role, YOGA_STUDIO, bump), role).toHaveLength(0);
-      expect(await as(role, BARBERSHOP, bump), role).toHaveLength(1);
+    const handle = (tx: Tx) =>
+      tx`update provider_events set handled_at = '2026-11-07T15:20:04Z', version = version + 1
+         where provider = 'stripe' and provider_event_id = ${textOf(STRIPE_EVENT.provider_event_id)}
+         returning provider_event_id as id`;
+    for (const [table, update] of [
+      ["effects", bump],
+      ["provider_events", handle],
+    ] as const) {
+      expect(await as(RUNTIME, YOGA_STUDIO, update), table).toHaveLength(0);
+      expect(await as(RUNTIME, BARBERSHOP, update), table).toHaveLength(1);
+      // A pending effect or an event changed by a Tool API path: refused, scoped or not.
+      for (const scope of [BARBERSHOP, YOGA_STUDIO, null]) {
+        const outcome = await refusal(as(TOOL_API, scope, update));
+        expect(outcome.code, `${table} ${String(scope)}`).toBe("42501");
+        expect(outcome.message, `${table} ${String(scope)}`).toContain(
+          `permission denied for table ${table}`,
+        );
+      }
     }
   });
 

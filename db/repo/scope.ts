@@ -4,6 +4,12 @@
 // set_config(..., is_local = true), so PostgreSQL drops it at COMMIT or ROLLBACK: a connection returned to the pool
 // carries no scope, and the next transaction on it starts unscoped. The runtime side (jobs that work across businesses
 // by handle) runs a plain transaction and never sets it.
+//
+// A Tool API call never runs with no scope (T-1094; T-191's security review, note b; QUESTIONS.md CQ-70's default).
+// With none, rosie_app sees no business's row, but rosie_job, the runtime side's role, sees every business's rows, so a
+// Tool API path that runs as rosie_job (a business-scoped read that also needs a table only the runtime side holds,
+// such as handles or phones) would fail open. Such a path calls requireBusinessScope() inside its transaction before
+// its first read, and withBusiness() refuses a callback that ends with its scope emptied or changed.
 import type postgres from "postgres";
 
 export type Sql = postgres.Sql;
@@ -48,10 +54,32 @@ export async function readBusinessScope(sql: Sql | Tx): Promise<string | null> {
   return scope === null || scope === "" ? null : scope;
 }
 
+/** A Tool API call with no business scope, or one that ended under another scope than it began with. Names no value. */
+export class BusinessScopeError extends Error {
+  override name = "BusinessScopeError";
+}
+
+/**
+ * The business scope the transaction `tx` runs under, as PostgreSQL reads it; refused with BusinessScopeError when there
+ * is none (never set, or ''). A Tool API path that runs as rosie_job calls it inside its transaction before its first
+ * read: rosie_job with no scope reads every business's rows, where rosie_app with none reads no business's.
+ */
+export async function requireBusinessScope(tx: Sql | Tx): Promise<string> {
+  const scope = await readBusinessScope(tx);
+  if (scope === null) {
+    throw new BusinessScopeError(
+      "a Tool API call needs a business scope: with none, the runtime side's role reads every business's rows",
+    );
+  }
+  return scope;
+}
+
 /**
  * Runs `fn` in one transaction scoped to `businessId`: the scope is set first, `fn` runs, and the transaction commits
  * (or rolls back when `fn` throws). The scope exists only inside the transaction. On the replica the transaction is
- * read only.
+ * read only. Before the commit the scope must still be `businessId`: a callback that emptied it (rosie_job then reads
+ * every business's rows) or changed it is refused with BusinessScopeError, the transaction rolls back, and nothing it
+ * read is returned.
  */
 export async function withBusiness<T>(
   sql: Sql,
@@ -62,7 +90,11 @@ export async function withBusiness<T>(
   assertBusinessId(businessId);
   const run = async (tx: Tx): Promise<T> => {
     await setBusinessScope(tx, businessId);
-    return fn(tx);
+    const result = await fn(tx);
+    if ((await requireBusinessScope(tx)) !== businessId) {
+      throw new BusinessScopeError("a Tool API call must end under the business scope it began with");
+    }
+    return result;
   };
   const result = options.readOnly === true ? await sql.begin("read only", run) : await sql.begin(run);
   return result as T;

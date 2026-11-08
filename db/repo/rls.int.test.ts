@@ -1,15 +1,18 @@
 // T-191: row-level security per business on every business-scoped core table, with the Tool API's role and the runtime
 // side's role, against local PostgreSQL (`npm run db:up`; `npm run test:integration -- db/repo/rls`). The schema comes
-// from migrating a fresh test schema, with every accepted K-04 v1 seed loaded.
+// from migrating a fresh test schema, with every accepted K-04 v1 seed loaded. T-1094 narrows it: the definer functions
+// answer only what K-05 needs, a business-scoped call reads one mobile's handle id, chat_links takes updates on four
+// columns only, the Tool API holds nothing on effects and provider_events, and a Tool API path that runs as rosie_job
+// refuses an empty scope.
 //
 // The test's connection is the migrations' role (locally a superuser that owns every table), which bypasses row-level
 // security. So every check runs in its own transaction under SET LOCAL ROLE: rosie_app, the Tool API (K-05 scope
 // business), or rosie_job, the runtime side (the guard, the dispatcher, the clock sweep), scoped by withBusiness() as a
 // call is scoped. Each of those transactions is rolled back, so the seeds stay as loaded.
 import { readFileSync } from "node:fs";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createResource } from "./bookings-head";
-import { type Sql, type Tx, withBusiness } from "./scope";
+import { BusinessScopeError, requireBusinessScope, type Sql, type Tx, withBusiness } from "./scope";
 import { createTestDatabase, type TestDatabase } from "./test-db";
 
 const CORE_DIR = new URL("../../contracts/db-schema/core/", import.meta.url);
@@ -18,7 +21,16 @@ const RUNTIME = "rosie_job";
 type Role = typeof TOOL_API | typeof RUNTIME;
 const ROLES: readonly Role[] = [TOOL_API, RUNTIME];
 const PRIVILEGES = ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"];
-const FUNCTIONS = ["reservations_booked_overlap", "reservations_saved_times"];
+/** The security-definer functions, in name order: 0012's two (T-1085, narrowed by T-1094) and T-1094's handle read. */
+const FUNCTIONS = ["handles_id_of_mobile", "reservations_booked_overlap", "reservations_saved_times"];
+/** Who may run each function besides its owner (T-1094: the handle read is the Tool API's alone). */
+const RUNS: Record<string, readonly Role[]> = {
+  handles_id_of_mobile: [TOOL_API],
+  reservations_booked_overlap: [TOOL_API, RUNTIME],
+  reservations_saved_times: [TOOL_API, RUNTIME],
+};
+/** The four chat_links columns K-29 changes, the only ones either role may update (T-1094; DL-121, T-192's N4). */
+const CHAT_LINK_UPDATES = ["given_via", "owner_retold_at", "used_at", "version"];
 const SLOW = { timeout: 60_000 };
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
@@ -385,7 +397,7 @@ describe("the two roles", () => {
     }
   });
 
-  it("neither role owns a table or a function: event_log, its trigger function and the two functions stay the migrations' role's", async () => {
+  it("neither role owns a table or a function: event_log, its trigger function and the three definer functions stay the migrations' role's", async () => {
     const owned = await db.sql<{ owner: string; name: string }[]>`
       select pg_get_userbyid(c.relowner) as owner, c.relname as name from pg_class c
       where c.relnamespace = ${db.schema}::regnamespace and pg_get_userbyid(c.relowner) in (${TOOL_API}, ${RUNTIME})
@@ -668,13 +680,19 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       if (role === TOOL_API && table.name === "team_pages") {
         return ["INSERT"];
       }
+      // T-1094 (DL-149): the Tool API holds nothing on K-07's effects and provider_events, which only the runtime side's
+      // K-05 v1.1 calls read and write.
+      if (role === TOOL_API && ["effects", "provider_events"].includes(table.name)) {
+        return [];
+      }
       if (role === TOOL_API && table.rowLevelSecurity.scope !== "business") {
         return [];
       }
       return [
         "SELECT",
         "INSERT",
-        ...(table.versioned ? ["UPDATE"] : []),
+        // chat_links takes UPDATE on four of its columns only, never on the whole row (T-1094; the next check).
+        ...(table.versioned && table.name !== "chat_links" ? ["UPDATE"] : []),
         // K-05 item 29 removes a person's handle link; K-07 deletes a claim at a row's move to waiting_chat.
         ...(role === RUNTIME && ["person_handles", "outbox_claims"].includes(table.name) ? ["DELETE"] : []),
       ].sort();
@@ -697,6 +715,36 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     expect(held).toEqual(want);
     // The migrations' own table is no role's.
     expect(held.filter((row) => row.table === "schema_migrations")).toEqual([]);
+  });
+
+  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own (T-1094)", async () => {
+    const columnGrants = await db.sql<
+      { table: string; column: string; grantee: string; privilege: string }[]
+    >`
+      select c.relname as table, a.attname as column,
+             case when g.grantee = 0 then 'PUBLIC' else pg_get_userbyid(g.grantee) end as grantee,
+             g.privilege_type as privilege
+      from pg_attribute a
+        join pg_class c on c.oid = a.attrelid
+        cross join lateral aclexplode(a.attacl) g
+      where c.relnamespace = ${db.schema}::regnamespace and a.attacl is not null
+      order by 1, 2, 3, 4
+    `;
+    expect(columnGrants).toEqual(
+      CHAT_LINK_UPDATES.flatMap((column) =>
+        [...ROLES].sort().map((grantee) => ({ table: "chat_links", column, grantee, privilege: "UPDATE" })),
+      ),
+    );
+    // has_column_privilege agrees, column by column: the ready text, the code and every other column stay as issued.
+    const updatable = await db.sql<{ role: string; column: string }[]>`
+      select r.role, a.attname as column
+      from unnest(${[...ROLES]}::text[]) as r(role)
+        cross join pg_attribute a
+      where a.attrelid = ${`${db.schema}.chat_links`}::regclass and a.attnum > 0 and not a.attisdropped
+        and has_column_privilege(r.role, a.attrelid, a.attnum, 'UPDATE')
+      order by 1, 2
+    `;
+    expect(updatable).toEqual(ROLES.flatMap((role) => CHAT_LINK_UPDATES.map((column) => ({ role, column }))));
   });
 
   it("refuse-event-log-update.json under the runtime side: refused by privilege (42501), before the trigger", async () => {
@@ -753,7 +801,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
   });
 });
 
-describe("the two functions that read across businesses (K-05 item 8; T-1085)", () => {
+describe("the security-definer functions: the two that read across businesses (K-05 item 8; T-1085) and the handle read (T-1094)", () => {
   it("are security definer, owned by the tables' owner (not bound by row-level security), bound when made, with a pinned search_path", async () => {
     const rows = await db.sql<
       {
@@ -783,6 +831,12 @@ describe("the two functions that read across businesses (K-05 item 8; T-1085)", 
     };
     expect(rows).toEqual([
       {
+        name: "handles_id_of_mobile",
+        ...shared,
+        args: "mobile_wanted text",
+        result: "text",
+      },
+      {
         name: "reservations_booked_overlap",
         ...shared,
         args: "resource_wanted text, worker_wanted text, during_wanted tstzrange",
@@ -797,7 +851,16 @@ describe("the two functions that read across businesses (K-05 item 8; T-1085)", 
     ]);
   });
 
-  it("only the two roles may run them (and their owner): never PUBLIC", async () => {
+  it("no other function of the schema is security definer: reservations_saved_times stays the only read of saved times across businesses", async () => {
+    const definers = await db.sql<{ name: string }[]>`
+      select p.proname as name from pg_proc p
+      where p.pronamespace = ${db.schema}::regnamespace and p.prosecdef
+      order by 1
+    `;
+    expect(definers.map((row) => row.name)).toEqual(FUNCTIONS);
+  });
+
+  it("only the roles each one names may run them (and their owner): the handle read the Tool API's alone, never PUBLIC", async () => {
     const grants = await db.sql<{ name: string; grantee: string }[]>`
       select p.proname as name, case when a.grantee = 0 then 'PUBLIC' else pg_get_userbyid(a.grantee) end as grantee
       from pg_proc p cross join lateral aclexplode(p.proacl) a
@@ -808,7 +871,7 @@ describe("the two functions that read across businesses (K-05 item 8; T-1085)", 
     const [me] = await db.sql<{ name: string }[]>`select current_user as name`;
     expect(grants).toEqual(
       FUNCTIONS.flatMap((name) =>
-        [me?.name ?? "", TOOL_API, RUNTIME].sort().map((grantee) => ({ name, grantee })),
+        [me?.name ?? "", ...(RUNS[name] ?? [])].sort().map((grantee) => ({ name, grantee })),
       ),
     );
   });
@@ -841,5 +904,141 @@ describe("the two functions that read across businesses (K-05 item 8; T-1085)", 
       overlap: true,
       scope: "biz-yoga-studio",
     });
+  });
+
+  it("the booked-overlap probe crosses businesses only through the worker: another business's resource asked by its id answers nothing, and with no scope a resource matches nowhere (T-1094; FS line 743)", async () => {
+    const probe =
+      (resource: string, worker: string | null) =>
+      async (tx: Tx): Promise<boolean | undefined> => {
+        const [row] = await tx<{ yes: boolean }[]>`
+          select reservations_booked_overlap(${resource}, ${worker}::text,
+            tstzrange('2026-10-24T15:10:00Z', '2026-10-24T15:20:00Z', '[)')) as yes
+        `;
+        return row?.yes;
+      };
+    // Riley's booked haircut is on res-riley, Lee's Barbershop's worker (seed-reservation). From the yoga studio, by the
+    // worker: yes; by Lee's Barbershop's resource id alone: nothing.
+    expect(await as(TOOL_API, "biz-yoga-studio", probe("res-maya", "person-riley"))).toBe(true);
+    expect(await as(TOOL_API, "biz-yoga-studio", probe("res-riley", null))).toBe(false);
+    // Lee's Barbershop's own scope matches its resource by id; with no scope, under either role, it is matched nowhere.
+    expect(await as(TOOL_API, "biz-lees-barbershop", probe("res-riley", null))).toBe(true);
+    for (const role of ROLES) {
+      expect(await as(role, null, probe("res-riley", null)), role).toBe(false);
+    }
+  });
+});
+
+describe("handles_id_of_mobile: a business-scoped call reads the handle id of one mobile it names, and nothing else (T-1094; K-05 item 8, v1.2 item 26)", () => {
+  const read =
+    (mobile: string) =>
+    (tx: Tx): Promise<Record<string, unknown>[]> =>
+      tx<Record<string, unknown>[]>`select * from handles_id_of_mobile(${mobile})`;
+
+  it("answers the Tool API, under any business's scope, the mobile's handle id alone: one column, one value", async () => {
+    for (const business of await businessIds()) {
+      expect(await as(TOOL_API, business, read("+15555550101")), business).toEqual([
+        { handles_id_of_mobile: "handle-alex" },
+      ]);
+    }
+    // A stopped mobile's handle the same (seed-phone-stopped): the id carries no flag and no other column.
+    expect(await as(TOOL_API, "biz-lees-barbershop", read("+15555550106"))).toEqual([
+      { handles_id_of_mobile: "handle-ben" },
+    ]);
+    // The tables themselves stay closed to the Tool API (MC C1).
+    for (const table of ["handles", "phones"]) {
+      const refused = await refusal(as(TOOL_API, "biz-lees-barbershop", (tx) => rowCount(tx, table)));
+      expect(refused.code, table).toBe("42501");
+    }
+  });
+
+  it("answers nothing for an unknown number, for an address that is not a mobile's, and with no scope or a scope that ended", async () => {
+    const nothing = [{ handles_id_of_mobile: null }];
+    // +15555550199 is a number no seed's handle has; alex@example.com is Alex's email handle (seed-person-roles).
+    expect(await as(TOOL_API, "biz-lees-barbershop", read("+15555550199"))).toEqual(nothing);
+    expect(await as(TOOL_API, "biz-lees-barbershop", read("alex@example.com"))).toEqual(nothing);
+    expect(await as(TOOL_API, null, read("+15555550101"))).toEqual(nothing);
+    expect(
+      await as(TOOL_API, null, async (tx) => {
+        await tx`select set_config('rosie.business_id', '', true)`;
+        return read("+15555550101")(tx);
+      }),
+    ).toEqual(nothing);
+  });
+
+  it("is not the runtime side's to run: rosie_job reads handles itself and is refused it (42501)", async () => {
+    const refused = await refusal(as(RUNTIME, "biz-lees-barbershop", read("+15555550101")));
+    expect(refused.code).toBe("42501");
+    expect(refused.message).toContain("permission denied for function handles_id_of_mobile");
+  });
+});
+
+describe("a Tool API path that runs as rosie_job refuses an empty scope (T-1094; T-191's security review, note b; CQ-70)", () => {
+  const bookings = (tx: Tx): Promise<number> => rowCount(tx, "bookings");
+  /** Reads bookings only once requireBusinessScope() has found the transaction's scope. */
+  const guarded = async (tx: Tx): Promise<number> => {
+    await requireBusinessScope(tx);
+    return bookings(tx);
+  };
+  /** withBusiness() as a Tool API call runs it, on the runtime side's role. */
+  const onJob = <T>(fn: (tx: Tx) => Promise<T>): Promise<T> =>
+    withBusiness(db.sql, "biz-lees-barbershop", async (tx) => {
+      await tx.unsafe(`set local role ${RUNTIME}`);
+      return fn(tx);
+    });
+  const refusedEntry = {
+    id: "evlog-t1094-refused",
+    trace_id: "trace-t1094-0001",
+    job_id: "job-t1094-scope",
+    actor_kind: "job",
+    kind: "clock_row.armed",
+  };
+
+  it("withBusiness refuses an empty or blank business id before it opens a transaction", async () => {
+    const callback = vi.fn(() => Promise.resolve());
+    for (const empty of ["", "   "]) {
+      await expect(withBusiness(db.sql, empty, callback)).rejects.toThrow(TypeError);
+    }
+    expect(callback).not.toHaveBeenCalled();
+  });
+
+  it("requireBusinessScope refuses rosie_job's transaction with no scope, or a scope that ended (''), before it reads; with a scope it answers that scope", async () => {
+    const all = await rowCount(db.sql, "bookings");
+    const lees = (await ownerRows("biz-lees-barbershop")).bookings;
+    expect(lees).toBeLessThan(all);
+    // What the check stops: with no scope, the runtime side's role reads every business's bookings.
+    expect(await as(RUNTIME, null, bookings)).toBe(all);
+    await expect(as(RUNTIME, null, guarded)).rejects.toThrow(BusinessScopeError);
+    await expect(
+      as(RUNTIME, null, async (tx) => {
+        await tx`select set_config('rosie.business_id', '', true)`;
+        return guarded(tx);
+      }),
+    ).rejects.toThrow(BusinessScopeError);
+    expect(await as(RUNTIME, "biz-lees-barbershop", requireBusinessScope)).toBe("biz-lees-barbershop");
+    expect(await as(RUNTIME, "biz-lees-barbershop", guarded)).toBe(lees);
+  });
+
+  it("withBusiness on rosie_job: a call that empties its scope, or changes it, is refused and rolled back, and nothing it read is returned", async () => {
+    const all = await rowCount(db.sql, "bookings");
+    const lees = (await ownerRows("biz-lees-barbershop")).bookings;
+    expect(await onJob(bookings)).toBe(lees);
+    let seen = -1;
+    await expect(
+      onJob(async (tx) => {
+        await tx`select set_config('rosie.business_id', '', true)`;
+        seen = await bookings(tx);
+        await tx`insert into event_log ${tx(refusedEntry)}`;
+        return seen;
+      }),
+    ).rejects.toThrow(BusinessScopeError);
+    // The emptied scope did read every business's rows inside the call: none of it left, and its write was undone.
+    expect(seen).toBe(all);
+    expect(await db.sql`select id from event_log where id = ${refusedEntry.id}`).toHaveLength(0);
+    await expect(
+      onJob(async (tx) => {
+        await tx`select set_config('rosie.business_id', 'biz-yoga-studio', true)`;
+        return bookings(tx);
+      }),
+    ).rejects.toThrow(BusinessScopeError);
   });
 });
