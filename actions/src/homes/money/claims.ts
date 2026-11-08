@@ -12,9 +12,10 @@
 // The claims are read from the words with the record's own money phrases (record.lint.phrases.money: "deposit paid",
 // "paid in full", "card is saved", "no card saved", "nothing taken", "keep the deposit", "goes back to your card",
 // "refunded to your card", "paid with a credit", "credit from your pack") and the words of S13-55's rules, after the
-// apostrophe folding the Values check reads with (values.ts: ’ and ‘ as '), in the folded form gate.ts finds money words
-// in (its default 8). What comes back holds labels only, never the words read, so a refusal reaches a log or the rewrite
-// as labels.
+// apostrophe folding the Values check reads with (values.ts: ’ and ‘ as '), in each folded form gate.ts finds money
+// words in (its defaults 8 to 10: marks as word ends, a word a narrow space splits read joined, a text with a bidi
+// control read as an override shows it and backwards too); a claim read in any of them counts. What comes back holds
+// labels only, never the words read, so a refusal reaches a log or the rewrite as labels.
 //
 // Rounds 3 and 4 (DL-182, DL-187). Card holds and charges on silence are no longer read by meaning: the money-topic gate
 // (gate.ts) refuses every sentence that holds one money word, sign or slot and is not an approved line, a denial
@@ -23,12 +24,13 @@
 //     (C-092) and the slot filler (C-088): a message goes through this one;
 //   - checkMoneyLine(text, reading): the claim check alone, with the hold and silence topics refused on every booking
 //     and no line approved (any money sentence that holds a hold word, or names a reply, an answer or silence).
-// "Charged" and "you paid" say money was taken, and so do "deposit paid" and "paid in full" said as statements and
-// "refunded" in any form ("was refunded", "we refunded", "The business refunded your $40."; DL-182 2, DL-187 3): they
-// hold only once the booking took it (moneyTaken: from the money step on, written, something paid now), never on money
-// only asked for before the money step. A term keeps the record's reading (round 2's default 1): "Paid in full when you
-// book" says what the booking asks, "the {{back}} you paid goes back to the card" what goes back on a cancel. Two
-// defaults (DL-187 3, each fail-closed):
+// "Charged" and "you paid" say money was taken, and so do "deposit paid" and "paid in full" said as statements,
+// "refunded" in any form ("was refunded", "we refunded", "The business refunded your $40."; DL-182 2, DL-187 3) and a
+// refund said as a noun ("We issued your refund.", "your refund went through"; DL-194 3): they hold only once the
+// booking took it (moneyTaken: from the money step on, written, something paid now), never on money only asked for
+// before the money step. A term keeps the record's reading (round 2's default 1): "Paid in full when you book" says what
+// the booking asks, "the {{back}} you paid goes back to the card" what goes back on a cancel. Three defaults (DL-187 3,
+// DL-194 3, each fail-closed):
 //   1. A term's words open their sentence or a part of it (after , : ; · ( or a dash), with no subject or auxiliary
 //      before them, and the record's own term words follow later in the sentence: "when you book", "when they book" or
 //      "when booking". Any other reading is a statement, so a past statement ("Your deposit was paid at booking.") is
@@ -36,9 +38,18 @@
 //   2. "Refunded" is a statement in every form but one: a refund of a supposed payment said as a term ("Anything you
 //      paid the business is refunded its own way", pay.back's row), which says no money was taken, as "anything you
 //      paid" states no payment (round 2's default 1).
+//   3. A refund said as a noun is a statement when it names the refund at hand (your, our, their, his, her, its, my,
+//      the, this or that refund, an amount, a slot or full, partial, whole, complete, card or deposit between: "the $40
+//      refund"), a refund given (issued, processed, sent, made, gave, given, granted, got, gotten, received, started,
+//      initiated, completed or approved, then perhaps "you" and "a", then the refund: "we issued a refund", "sent you a
+//      full refund") or a refund said to go (refund, perhaps "of $40" or "for $40", then is, was, were, has, have, had,
+//      went, goes, came, comes, cleared, posted, arrived, landed, issued, processed, sent, started, initiated, approved,
+//      completed, complete, done or on its way: "a refund was sent", "Refund issued."). A refund named as a term
+//      ("Cancel in time: a full refund", "gets a refund") and the verb ("nothing to refund", pay.back's row; "the
+//      business refunds it its own way") state none.
 // Residual risk (DL-187 5): what gate.ts's header names; a sentence with no money word, sign or slot is not this check's.
 
-import { foldedForm, gateMoneyText, topicRefusals, type MoneyGate } from "./gate";
+import { foldedForms, gateMoneyText, topicRefusals, type MoneyGate } from "./gate";
 import { depositTaken, holds, moneyTaken, type MoneyReading } from "./money";
 
 /** The claims a money line can make (labels). */
@@ -114,6 +125,29 @@ const TERM = String.raw`(?=[^.!?\n]*\b(?:when (?:you|they) book|when booking)\b)
  */
 const SUPPOSED_REFUND = String.raw`\b(?:anything|everything|whatever|all)\s+(?:(?:that|which)\s+)?(?:you(?:'ve|\s+have|\s+had)?\s+)?(?:already\s+)?paid\b[^.!?\n;]*?\b(?:is|are|gets?|will\s+be)\s+`;
 
+/** What may stand between a refund's determiner and the noun (default 3): an amount or a slot, full, partial, card ... */
+const REFUND_MODIFIERS = String.raw`(?:(?:${AMOUNT}|full|partial|whole|complete|card|deposit)\s+)*`;
+
+/**
+ * A refund said as a noun that states it happened (DL-194 3, default 3): the refund at hand ("your refund", "the $40
+ * refund"), a refund given ("we issued a refund", "sent you a full refund") or a refund said to go ("a refund was sent",
+ * "refund issued", "your refund went through"). Read after "refunded", in the same claim.
+ */
+const REFUND_NOUN: readonly RegExp[] = [
+  new RegExp(
+    String.raw`\b(?:your|our|their|his|her|its|my|the|this|that)\s+${REFUND_MODIFIERS}refunds?\b`,
+    "i",
+  ),
+  new RegExp(
+    String.raw`\b(?:issued|processed|sent|made|gave|given|granted|got|gotten|received|started|initiated|completed|approved)\s+(?:you\s+)?(?:an?\s+)?${REFUND_MODIFIERS}refunds?\b`,
+    "i",
+  ),
+  new RegExp(
+    String.raw`\brefunds?(?:\s+(?:of|for)\s+${AMOUNT})?\s+(?:is|was|were|has|have|had|went|goes|came|comes|cleared|posted|arrived|landed|issued|processed|sent|started|initiated|approved|completed|complete|done|on\s+(?:its|the)\s+way)\b`,
+    "i",
+  ),
+];
+
 /** A claim's words; `said` marks words that say the money was taken, which hold only once it was (DL-182 2). */
 interface ClaimWords {
   readonly claim: MoneyClaim;
@@ -161,11 +195,12 @@ const CLAIM_WORDS: readonly ClaimWords[] = [
     ],
   },
   // "Refunded" in any form ("was refunded", "we refunded", "the business refunded"): money went back, so it was taken
-  // (DL-182 2, DL-187 3); a refund of a supposed payment said as a term is the one form that is not (default 2).
+  // (DL-182 2, DL-187 3); a refund of a supposed payment said as a term is the one form that is not (default 2). So does
+  // a refund said as a noun that states it happened ("We issued your refund.", "your refund went through"; DL-194 3).
   {
     claim: "backToCard",
     said: true,
-    patterns: [new RegExp(String.raw`(?<!${SUPPOSED_REFUND})refunded`, "i")],
+    patterns: [new RegExp(String.raw`(?<!${SUPPOSED_REFUND})refunded`, "i"), ...REFUND_NOUN],
   },
   // What goes back on a cancel in time: a term.
   {
@@ -246,9 +281,17 @@ interface ReadClaim {
   readonly said: boolean;
 }
 
-/** The claims read from a text's words, in the folded form money words are found in (gate.ts foldedForm, default 8); the words are not kept. */
+/**
+ * The claims read from a text's words, in each folded form money words are found in (gate.ts foldedForms, defaults 8
+ * to 10: a word a narrow space splits read joined, a text with a bidi control read as an override shows it and
+ * backwards too); a claim read in any one of them counts. The words are not kept.
+ */
 function readClaims(text: string): ReadClaim[] {
-  const words = foldedForm(text);
+  return foldedForms(text).flatMap(claimsIn);
+}
+
+/** The claims read from one folded form of a text's words. */
+function claimsIn(words: string): ReadClaim[] {
   const found: ReadClaim[] = [];
   if (HOLD_SLOT.test(words)) found.push({ claim: "cardHold", said: false });
   if (FEE_PER_SERVICE.some((pattern) => pattern.test(words)))
