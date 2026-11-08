@@ -1,0 +1,29 @@
+{
+  "call": "renewClaim",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-stop.json"],
+    "now": "2026-11-07T15:06:37Z",
+    "note": "The dispatcher renews its claim just before sending Alex's confirmation, after his STOP committed. The renewal's own read of the phone says stopped: the confirmation is neither a safety line nor a stop reply, so the dispatcher sends nothing and marks the row droppedStopped (C-125). A STOP that commits after this read and before Linq accepts the part is the window that is left (README 'The stop and the send')."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "claimer": "dispatcher-1",
+    "claimNo": 1,
+    "idempotencyKey": "out-alex-booked-riley/1/1",
+    "at": "2026-11-07T15:06:37Z"
+  },
+  "outcome": {
+    "result": "renewed",
+    "outboxRowId": "out-alex-booked-riley",
+    "claim": {
+      "claimer": "dispatcher-1",
+      "claimedAt": "2026-11-07T15:06:35Z",
+      "lapsesAt": "2026-11-07T15:07:37Z",
+      "claimNo": 1,
+      "firstTryAt": "2026-11-07T15:06:37Z",
+      "nextTryNotBefore": null
+    },
+    "recipient": { "stopped": true, "chatOpen": false, "version": 4 }
+  }
+}

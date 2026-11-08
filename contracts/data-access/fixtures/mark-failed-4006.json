@@ -1,0 +1,29 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["renew-claim-first-send.json"],
+    "now": "2026-11-07T15:06:36Z",
+    "note": "Instead of mark-failed-retry-after: Linq answers Alex's words part with 4006, which may still deliver (arch 01 line 65; K-11 mayStillDeliver), and names no message id (K-11 error-4006.json). The part is failed with no next try yet: a new key goes only if no receipt comes within 1 minute (K-07 rule 2). The row stays sending and its version rises."
+  },
+  "request": {
+    "outcome": "failed",
+    "idempotencyKey": "out-alex-booked-riley/1/1",
+    "errorCode": "4006",
+    "retry": false,
+    "at": "2026-11-07T15:06:36Z",
+    "providerMessageId": null
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-alex-booked-riley",
+    "partNo": 1,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": false,
+    "openQuestionId": null,
+    "nextKey": null,
+    "row": { "state": "sending", "version": 4 }
+  }
+}

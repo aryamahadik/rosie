@@ -1,0 +1,27 @@
+{
+  "call": "armClock",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-a7-03-delivered-by-key.json"],
+    "now": "2026-10-23T14:05:04Z",
+    "note": "arm-clock's exchange in this chain: A7-03's first delivery receipt is the words' late one after the 4006 (markPart said firstDelivery), so the clock row arms 24 h from it and the question moves from waiting to open (K-05 v1 default 8)."
+  },
+  "request": {
+    "openQuestionId": "oq-a7-03-alex",
+    "deliveredAt": "2026-10-23T14:05:04Z",
+    "dueAt": "2026-10-24T14:05:04Z",
+    "dueZone": "America/New_York"
+  },
+  "outcome": {
+    "result": "armed",
+    "repeated": false,
+    "clock": {
+      "clockRowId": "clock-oq-a7-03-alex",
+      "version": 2,
+      "armedAt": "2026-10-23T14:05:04Z",
+      "dueAt": "2026-10-24T14:05:04Z",
+      "dueZone": "America/New_York",
+      "handleId": "handle-alex"
+    }
+  }
+}

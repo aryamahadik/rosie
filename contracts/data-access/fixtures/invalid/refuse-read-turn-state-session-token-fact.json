@@ -1,0 +1,6 @@
+{
+  "handleId": "handle-sam",
+  "businessId": null,
+  "bookingIds": [],
+  "facts": [{ "key": "session.token", "table": "sessions", "rowId": "session-sam-oct26", "column": "token_sha256" }]
+}

@@ -1,0 +1,89 @@
+{
+  "call": "readTurnState",
+  "given": {
+    "k04Seeds": ["seed-open-question.json", "seed-outbox-row.json", "seed-phone-chat-open.json", "seed-pause.json"],
+    "after": [],
+    "now": "2026-10-23T14:06:12Z",
+    "note": "Alex's poll answer 'A' to A7-03 (evt-alex-0008): the frontier reads the barbershop's state under the barbershop's scope. His address pause is the movers' and cleared, so no pause is read; the two facts are the slots A7-03's message names, each from its one home row with that row's version. A7-03 went out as out-a7-03-alex (K-04 seed-outbox-row): its words at 14:05:03 and its poll at 14:05:05, Linq's linq-msg-demo-0002, which his vote names (K-06 poll-vote); the email copy has not gone."
+  },
+  "request": {
+    "handleId": "handle-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingIds": ["booking-alex-haircut"],
+    "facts": [
+      { "key": "biz.name", "table": "businesses", "rowId": "biz-lees-barbershop", "column": "name" },
+      { "key": "pro.name", "table": "persons", "rowId": "person-riley", "column": "name" }
+    ]
+  },
+  "outcome": {
+    "result": "turnState",
+    "handleId": "handle-alex",
+    "handle": { "kind": "phone", "address": "+15555550101" },
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-23T14:06:12Z",
+    "persons": [{ "personId": "person-alex", "language": "en", "version": 1 }],
+    "roles": [{ "roleId": "role-alex-barber", "personId": "person-alex", "role": "customer", "version": 1 }],
+    "phone": {
+      "number": "+15555550101",
+      "stopped": false,
+      "stopAt": null,
+      "chatOpen": true,
+      "chatWay": "imessage",
+      "linqContactAddedAt": "2026-10-12T16:20:00Z",
+      "pollVotedAt": "2026-10-23T14:06:10Z",
+      "optoutLineDeliveredAt": "2026-10-12T16:20:00Z",
+      "version": 3
+    },
+    "openQuestions": [
+      {
+        "id": "oq-a7-03-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-haircut",
+        "personId": "person-alex",
+        "turnId": "turn-alex-move-1",
+        "step": "A7-03",
+        "status": "open",
+        "options": [
+          { "id": "A7-03/1", "label": "Sat 12:00pm" },
+          { "id": "A7-03/2", "label": "Sat 2:00pm" },
+          { "id": "A7-03/3", "label": "Sat 3:30pm" }
+        ],
+        "readback": null,
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
+        "clock": "24 h",
+        "sentAt": "2026-10-23T14:05:05Z",
+        "pollId": "linq-msg-demo-0002",
+        "askCount": 1,
+        "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+        "version": 2
+      }
+    ],
+    "bookings": [
+      {
+        "id": "booking-alex-haircut",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "bookerPersonId": "person-alex",
+        "servedPersonId": "person-alex",
+        "payerPersonId": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 7
+      }
+    ],
+    "pauses": [],
+    "consents": [],
+    "facts": [
+      {
+        "key": "biz.name",
+        "table": "businesses",
+        "rowId": "biz-lees-barbershop",
+        "column": "name",
+        "value": "Lee's Barbershop",
+        "version": 3
+      },
+      { "key": "pro.name", "table": "persons", "rowId": "person-riley", "column": "name", "value": "Riley", "version": 1 }
+    ]
+  }
+}

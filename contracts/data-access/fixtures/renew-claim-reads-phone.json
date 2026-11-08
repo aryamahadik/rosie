@@ -1,0 +1,29 @@
+{
+  "call": "renewClaim",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-in-order.json"],
+    "now": "2026-11-07T15:06:35Z",
+    "note": "renew-claim-first-send's exchange in its v1.2 form, run instead of it: the renewal just before the words part goes also reads Alex's phone row in its own transaction, FOR SHARE, so the stopped flag the dispatcher acts on is the one read with the renewal, with no other read before the send."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "claimer": "dispatcher-1",
+    "claimNo": 1,
+    "idempotencyKey": "out-alex-booked-riley/1/1",
+    "at": "2026-11-07T15:06:35Z"
+  },
+  "outcome": {
+    "result": "renewed",
+    "outboxRowId": "out-alex-booked-riley",
+    "claim": {
+      "claimer": "dispatcher-1",
+      "claimedAt": "2026-11-07T15:06:35Z",
+      "lapsesAt": "2026-11-07T15:07:35Z",
+      "claimNo": 1,
+      "firstTryAt": "2026-11-07T15:06:35Z",
+      "nextTryNotBefore": null
+    },
+    "recipient": { "stopped": false, "chatOpen": true, "version": 3 }
+  }
+}

@@ -1,0 +1,2471 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.2.schema.json",
+  "title": "DataAccessV1dot2",
+  "description": "K-05 v1.2, a minor version of the data-access calls (T-072). It only adds to v1.1 (data-access.v1.1.schema.json, frozen and unchanged, referred to here, which refers on to v1): every v1.1 definition is here under its own name, the unchanged ones by reference; the changed ones (given, claimedRow, markPart.request, claimedEffect, renewClaim.response and the responses and exchanges that use them) take only new optional fields, so every v1 and v1.1 exchange is a v1.2 exchange. Added: four reads on PostgreSQL's primary, uncached (arch 02 line 117; arch 10 lines 504, 538), each stating its business scope (arch 10 line 546): readTurnState (the frontier's stored state: a handle's open questions, the target booking heads with versions, the record flags, facts by key from their home rows, consent rows; QUESTIONS.md M2-action-adapters.1), handleTargets (the guard's targets: roles, open questions, bookings; NQ-RT-2), sendState (limit 8's recipient send state; NQ-RT-2) and handleSealingKey (get or create a handle's sealing key; NQ-RT-1). And what the builds since have shown, each additive and from a frozen source (DL-103 (5), DL-104): the claimed outbox row's port (K-07 outboxRow.port; T-259), markPart delivered by the part's key (K-11 partKey; T-257), the stopped flag read in renewClaim's transaction (T-259), and one K-08 v1.1 effect.claimed entry per row claimEffects and serviceBack claim (CQ-43; K-05 v1.1 open gap 15). Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/commitTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/writePlan.exchange"
+    },
+    {
+      "$ref": "#/$defs/unplannedRows.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimOutbox.exchange"
+    },
+    {
+      "$ref": "#/$defs/markPart.exchange"
+    },
+    {
+      "$ref": "#/$defs/markRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/armClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/cancelClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/dueClocks.exchange"
+    },
+    {
+      "$ref": "#/$defs/fireClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/reserve.exchange"
+    },
+    {
+      "$ref": "#/$defs/release.exchange"
+    },
+    {
+      "$ref": "#/$defs/extend.exchange"
+    },
+    {
+      "$ref": "#/$defs/readActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBundleValue.exchange"
+    },
+    {
+      "$ref": "#/$defs/publishBundleCopy.exchange"
+    },
+    {
+      "$ref": "#/$defs/setActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/parkTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/renewClaim.exchange"
+    },
+    {
+      "$ref": "#/$defs/dispatcherGivesUp.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimEffects.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordEffectResult.exchange"
+    },
+    {
+      "$ref": "#/$defs/serviceBack.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordProviderEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/reconciliationRefund.exchange"
+    },
+    {
+      "$ref": "#/$defs/writeAllSet.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleTargets.exchange"
+    },
+    {
+      "$ref": "#/$defs/sendState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleSealingKey.exchange"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/nullableId"
+    },
+    "utc": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/nullableUtc"
+    },
+    "zone": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/zone"
+    },
+    "bundleId": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/bundleId"
+    },
+    "phoneNumber": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/phoneNumber"
+    },
+    "tableName": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/tableName"
+    },
+    "version": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/version"
+    },
+    "sqlstate": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/sqlstate"
+    },
+    "rowRef": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/rowRef"
+    },
+    "changedRow": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/changedRow"
+    },
+    "during": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/during"
+    },
+    "given": {
+      "title": "Given",
+      "description": "What an exchange assumes before its request runs, so QA's contract tests can set it up against local PostgreSQL with the parts migrated (02-contracts K-05 'Contract test'): the K-04 seed fixtures loaded, the data-access fixtures run first, and the clock. From v1.2 (T-072) partSeeds may name seed fixtures of the other frozen database parts too (a turn state's consent rows are K-29's), left out when there are none, so every v1 and v1.1 given is a v1.2 given.",
+      "type": "object",
+      "properties": {
+        "k04Seeds": {
+          "description": "K-04 v1 seed fixtures (contracts/db-schema/core/fixtures/), each loaded with its own 'after' chain.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^seed-[a-z0-9-]+[.]json$"
+          }
+        },
+        "partSeeds": {
+          "description": "Seed fixtures of the other frozen database parts, as '<part>/<file>' for contracts/db-schema/<part>/fixtures/<file>, such as 'conversations-consent/seed-consent-stop-row.json' (K-29 v1), each loaded with its own 'after' chain, whose paths are relative to that part's own fixtures folder (K-29 README). Left out: none. New in v1.2.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+/seed-[a-z0-9-]+[.]json$"
+          }
+        },
+        "after": {
+          "description": "Fixtures of this folder whose requests run first, in order.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+[.]json$"
+          }
+        },
+        "now": {
+          "description": "The database's now() when the request runs (the test's fake clock).",
+          "$ref": "#/$defs/utc"
+        },
+        "note": {
+          "description": "Anything else the exchange assumes, in plain words.",
+          "type": "string"
+        }
+      },
+      "required": ["k04Seeds", "after", "now"],
+      "additionalProperties": false
+    },
+    "transientError": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/transientError"
+    },
+    "notFoundError": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/notFoundError"
+    },
+    "versionChangedError": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/versionChangedError"
+    },
+    "constraintError": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/constraintError"
+    },
+    "turn": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/turn"
+    },
+    "stateWrite": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/stateWrite"
+    },
+    "stateTable": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/stateTable"
+    },
+    "openQuestionNew": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/openQuestionNew"
+    },
+    "openQuestionClose": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/openQuestionClose"
+    },
+    "clockKind": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/clockKind"
+    },
+    "clockNew": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/clockNew"
+    },
+    "clockCancel": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/clockCancel"
+    },
+    "channel": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/channel"
+    },
+    "sendClass": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/sendClass"
+    },
+    "outboxRowNew": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/outboxRowNew"
+    },
+    "reservationConfirm": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reservationConfirm"
+    },
+    "reservationLetGo": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reservationLetGo"
+    },
+    "sealedValues": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/sealedValues"
+    },
+    "eventEntry": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/eventEntry"
+    },
+    "writes": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writes"
+    },
+    "outboxRowWritten": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/outboxRowWritten"
+    },
+    "promotion": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/promotion"
+    },
+    "skippedInLine": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/skippedInLine"
+    },
+    "commitResult": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/commitResult"
+    },
+    "reservationLostError": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reservationLostError"
+    },
+    "commitTurn.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/commitTurn.request"
+    },
+    "commitTurn.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/commitTurn.response"
+    },
+    "commitTurn.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/commitTurn.errors"
+    },
+    "commitTurn.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/commitTurn.exchange"
+    },
+    "writePlan.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writePlan.request"
+    },
+    "writePlan.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writePlan.response"
+    },
+    "writePlan.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writePlan.errors"
+    },
+    "writePlan.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writePlan.exchange"
+    },
+    "unplannedRows.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/unplannedRows.request"
+    },
+    "unplannedRows.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/unplannedRows.response"
+    },
+    "unplannedRows.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/unplannedRows.errors"
+    },
+    "unplannedRows.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/unplannedRows.exchange"
+    },
+    "claimOutbox.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/claimOutbox.request"
+    },
+    "claimedPart": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/claimedPart"
+    },
+    "claimedRow": {
+      "title": "ClaimedRow",
+      "description": "A claimed outbox row: what the dispatcher needs to run limit 8 and send it (arch 06 line 313; arch 02 line 125). v1.1 added claim and claimedFrom. v1.2 (T-072) adds port, always written by a v1.2 call: the port the row goes by, which follows its channel as K-07 v1's outboxRow says (email by the email port, imessage, rcs and sms by Linq), so limit 8 refuses exactly a send by an SMS port (K-07 refuse-sms-channel.json; DL-012; T-259). There is no SMS port, so a claimed row never names one.",
+      "type": "object",
+      "properties": {
+        "outboxRowId": {
+          "$ref": "#/$defs/id"
+        },
+        "version": {
+          "description": "The row's version after the claim; marks compare it.",
+          "$ref": "#/$defs/version"
+        },
+        "commitSeq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "recipientHandleId": {
+          "$ref": "#/$defs/id"
+        },
+        "recipientPersonId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "businessId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "openQuestionId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "channel": {
+          "$ref": "#/$defs/channel"
+        },
+        "sendClass": {
+          "$ref": "#/$defs/sendClass"
+        },
+        "versionsRead": {
+          "description": "Limit 8 checks them unchanged at send (arch 06 line 313).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rowRef"
+          }
+        },
+        "finalParts": {
+          "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/finalParts"
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/claimedPart"
+          },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "traceId": {
+          "$ref": "#/$defs/id"
+        },
+        "claim": {
+          "description": "The claim taken (K-07 outboxClaim; outbox_claims): claimer and claimedAt this call's, lapsesAt claimedAt + 60 s (K-07 default 2), claimNo raised from the row's last claim, and firstTryAt and nextTryNotBefore kept from it (null at a first claim). New in v1.1.",
+          "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/outboxClaim"
+        },
+        "claimedFrom": {
+          "description": "checked, held or sending (a claim that lapsed, taken again): K-07's moves to sending by claimOutbox. New in v1.1.",
+          "enum": ["checked", "held", "sending"]
+        },
+        "port": {
+          "description": "The port the row goes by (K-07 v1 outboxRow.port, 'in K-05's names'): linq for the imessage, rcs and sms channels (Linq's own services on Rosie's one number: DL-031), email (Resend, K-12) for the email channel. K-04 outbox_rows holds no port column, so the claim gives it from the channel, as K-07 v1's outboxRow ties them. There is no SMS port (DL-012), so limit 8 refuses a send by any port but these two before anything is read (C-125). New in v1.2; a v1.2 call always writes it.",
+          "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/port"
+        }
+      },
+      "required": [
+        "outboxRowId",
+        "version",
+        "commitSeq",
+        "recipientHandleId",
+        "recipientPersonId",
+        "businessId",
+        "bookingId",
+        "openQuestionId",
+        "channel",
+        "sendClass",
+        "versionsRead",
+        "finalParts",
+        "parts",
+        "traceId"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "channel": {
+            "const": "email"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "port": {
+            "const": "email"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "port": {
+            "const": "linq"
+          }
+        }
+      }
+    },
+    "claimOutbox.response": {
+      "title": "ClaimOutboxResponse",
+      "description": "Claimed rows, per recipient in commit order, and the held rows later rows passed. v1.2: each claimed row also names its port (claimedRow).",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "claimed"
+        },
+        "claimed": {
+          "description": "Per recipient in commit order.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/claimedRow"
+          }
+        },
+        "passedHeld": {
+          "description": "Rows held for text hours that later rows passed (arch 02 line 125).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "outboxRowId": {
+                "$ref": "#/$defs/id"
+              },
+              "heldUntil": {
+                "$ref": "#/$defs/utc"
+              }
+            },
+            "required": ["outboxRowId", "heldUntil"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "claimed", "passedHeld"],
+      "additionalProperties": false
+    },
+    "claimOutbox.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/claimOutbox.errors"
+    },
+    "claimOutbox.exchange": {
+      "title": "ClaimOutboxExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "claimOutbox"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/claimOutbox.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/claimOutbox.response"
+            },
+            {
+              "$ref": "#/$defs/claimOutbox.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "markPart.request": {
+      "title": "MarkPartRequest",
+      "description": "What happened to one part (02-contracts K-05 item 3): another send under the same key after a timeout or crash (attempt), accepted by the provider with its ids (sent), its delivery receipt (delivered: arch 02 line 127), or a reported failure (failed: the next try gets a new key, arch 01 line 65). v1.1 added a failure's message id, Retry-After and a safety line's other ways. v1.2 (T-072): a delivery receipt may also name its part by the part's key (K-11 partKey), found by it when no part holds the receipt's message id, so a late receipt after a 4001 or 4006 finds its part (K-11 README 'A late receipt after 4001 or 4006'; T-257). sent already names its part by key.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "const": "attempt"
+            },
+            "idempotencyKey": {
+              "type": "string",
+              "pattern": "^.+/[12]/[1-9][0-9]*$"
+            },
+            "at": {
+              "$ref": "#/$defs/utc"
+            }
+          },
+          "required": ["outcome", "idempotencyKey", "at"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "const": "sent"
+            },
+            "idempotencyKey": {
+              "type": "string",
+              "pattern": "^.+/[12]/[1-9][0-9]*$"
+            },
+            "providerMessageId": {
+              "description": "The provider's message id (K-04 outbox_parts.linq_message_id; K-11 names its form).",
+              "$ref": "#/$defs/id"
+            },
+            "providerOptionIds": {
+              "description": "For a poll, the provider's option ids (K-04 outbox_parts.linq_option_ids), else null.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/id"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "at": {
+              "$ref": "#/$defs/utc"
+            }
+          },
+          "required": ["outcome", "idempotencyKey", "providerMessageId", "providerOptionIds", "at"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "const": "delivered"
+            },
+            "providerMessageId": {
+              "description": "The receipt's message id (K-06 status.messageId): the part is found by it first (K-04 outbox_parts_linq_message_idx).",
+              "$ref": "#/$defs/id"
+            },
+            "at": {
+              "$ref": "#/$defs/utc"
+            },
+            "idempotencyKey": {
+              "description": "The part's key the receipt echoes (K-11 partKey: Linq echoes the part's idempotency key on message.sent and message.delivered; the gateway hands it on beside the K-06 event). Used only when no part holds providerMessageId: the part under this key is then the receipt's when it holds no message id of its own (a 4001 or 4006 gave none: K-11 error-4006.json), and the receipt's message id is stored on it, so a later receipt finds it the first way. A part under this key that holds another message id is not the receipt's (notFound). Left out or null: the receipt echoed none. On SMS, Linq's message.sent is the receipt (arch 02 line 127), so the same holds for it. New in v1.2.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^.+/[12]/[1-9][0-9]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["outcome", "providerMessageId", "at"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "const": "failed"
+            },
+            "idempotencyKey": {
+              "type": "string",
+              "pattern": "^.+/[12]/[1-9][0-9]*$"
+            },
+            "errorCode": {
+              "description": "The provider's error code, such as 4001 or 4006 (K-04 outbox_parts.error_code).",
+              "type": "string",
+              "minLength": 1
+            },
+            "retry": {
+              "description": "Whether a next try follows (section 07's rules, K-07): true makes the next key, try + 1.",
+              "type": "boolean"
+            },
+            "at": {
+              "$ref": "#/$defs/utc"
+            },
+            "providerMessageId": {
+              "description": "The provider's message id when the failure report carries one (a 4001 or 4006 response), stored in outbox_parts.linq_message_id when the part has none. New in v1.1.",
+              "$ref": "#/$defs/nullableId"
+            },
+            "nextTryNotBefore": {
+              "description": "The provider's Retry-After as a time, stored in outbox_claims.next_try_not_before. Only with retry true. New in v1.1.",
+              "$ref": "#/$defs/nullableUtc"
+            },
+            "followUps": {
+              "description": "A failed safety line's rows for every other way the person allows, written with its first reported failure (arch 02 line 125; K-07 retry rule 3, followUp safetyOtherWay). New in v1.1.",
+              "type": "array",
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/followUpRow"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "why": {
+                        "const": "safetyOtherWay"
+                      }
+                    }
+                  }
+                ]
+              },
+              "minItems": 1
+            },
+            "events": {
+              "description": "With followUps: their event-log entries (K-08 outbox_row.created, one per row). New in v1.1.",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/eventEntry"
+              },
+              "minItems": 1
+            }
+          },
+          "required": ["outcome", "idempotencyKey", "errorCode", "retry", "at"],
+          "additionalProperties": false,
+          "dependentRequired": {
+            "followUps": ["events"],
+            "events": ["followUps"]
+          },
+          "if": {
+            "properties": {
+              "retry": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "nextTryNotBefore": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "markPart.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response"
+    },
+    "markPart.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/markPart.errors"
+    },
+    "markPart.exchange": {
+      "title": "MarkPartExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "markPart"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/markPart.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/markPart.response"
+            },
+            {
+              "$ref": "#/$defs/markPart.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "markRow.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/markRow.request"
+    },
+    "markRow.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/markRow.response"
+    },
+    "markRow.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/markRow.errors"
+    },
+    "markRow.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/markRow.exchange"
+    },
+    "armClock.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/armClock.request"
+    },
+    "armedClock": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/armedClock"
+    },
+    "armClock.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/armClock.response"
+    },
+    "armClock.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/armClock.errors"
+    },
+    "armClock.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/armClock.exchange"
+    },
+    "cancelClock.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/cancelClock.request"
+    },
+    "cancelClock.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/cancelClock.response"
+    },
+    "cancelClock.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/cancelClock.errors"
+    },
+    "cancelClock.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/cancelClock.exchange"
+    },
+    "dueClocks.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dueClocks.request"
+    },
+    "dueClock": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dueClock"
+    },
+    "dueClocks.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dueClocks.response"
+    },
+    "dueClocks.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dueClocks.errors"
+    },
+    "dueClocks.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dueClocks.exchange"
+    },
+    "fireClock.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/fireClock.request"
+    },
+    "fireClock.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/fireClock.response"
+    },
+    "fireClock.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/fireClock.errors"
+    },
+    "fireClock.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/fireClock.exchange"
+    },
+    "door": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/door"
+    },
+    "savedFor": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/savedFor"
+    },
+    "reserve.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reserve.request"
+    },
+    "reserve.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reserve.response"
+    },
+    "reserve.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reserve.errors"
+    },
+    "reserve.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reserve.exchange"
+    },
+    "release.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/release.request"
+    },
+    "release.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/release.response"
+    },
+    "release.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/release.errors"
+    },
+    "release.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/release.exchange"
+    },
+    "extend.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/extend.request"
+    },
+    "extend.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/extend.response"
+    },
+    "extend.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/extend.errors"
+    },
+    "extend.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/extend.exchange"
+    },
+    "readActiveBundle.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/readActiveBundle.request"
+    },
+    "readActiveBundle.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/readActiveBundle.response"
+    },
+    "readActiveBundle.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/readActiveBundle.errors"
+    },
+    "readActiveBundle.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/readActiveBundle.exchange"
+    },
+    "storedText": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/storedText"
+    },
+    "readBundleValue.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/readBundleValue.request"
+    },
+    "readBundleValue.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/readBundleValue.response"
+    },
+    "readBundleValue.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/readBundleValue.errors"
+    },
+    "readBundleValue.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/readBundleValue.exchange"
+    },
+    "publishBundleCopy.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/publishBundleCopy.request"
+    },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/publishBundleCopy.errors"
+    },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/setActiveBundle.request"
+    },
+    "setActiveBundle.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/setActiveBundle.response"
+    },
+    "setActiveBundle.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/setActiveBundle.errors"
+    },
+    "setActiveBundle.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/setActiveBundle.exchange"
+    },
+    "parkTurn.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/parkTurn.request"
+    },
+    "parkTurn.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/parkTurn.response"
+    },
+    "parkTurn.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/parkTurn.errors"
+    },
+    "parkTurn.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/parkTurn.exchange"
+    },
+    "wrongStateError": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/wrongStateError"
+    },
+    "claimLostError": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/claimLostError"
+    },
+    "effectNew": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/effectNew"
+    },
+    "effectLetGo": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/effectLetGo"
+    },
+    "effectWrites": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/effectWrites"
+    },
+    "waitingChatWrites": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/waitingChatWrites"
+    },
+    "followUpRow": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/followUpRow"
+    },
+    "renewClaim.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/renewClaim.request"
+    },
+    "renewClaim.response": {
+      "title": "RenewClaimResponse",
+      "description": "Renewed: lapsesAt is at + 60 s; firstTryAt is set to at if it was null and kept otherwise; nextTryNotBefore is cleared; the outbox row's own version does not change (v1.1 item 14). v1.2 (T-072) adds recipient, always written by a v1.2 call: the recipient's phone flags read in this same transaction, FOR SHARE, so the stopped flag the dispatcher acts on before sending the part is the one the renewal saw, with no other read between the renewal and the send (T-259: the window from the stopped flag's last read to Linq's acceptance of the part; README 'The stop and the send').",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "renewed"
+        },
+        "outboxRowId": {
+          "$ref": "#/$defs/id"
+        },
+        "claim": {
+          "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/outboxClaim"
+        },
+        "recipient": {
+          "description": "The recipient's phone row (K-04 phones, by the row's recipient handle) as this transaction read it: the stopped flag (arch 03 line 175; RULES 7.2), chat open (RULES 4.1b) and the row's version. Null for a recipient with no phone row (an email handle). Limit 8's rule on it is C-125's: a stopped phone gets only a safety line or a stop reply; any other part is not sent and the row is marked droppedStopped. New in v1.2.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/phoneFlags"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["result", "outboxRowId", "claim"],
+      "additionalProperties": false
+    },
+    "renewClaim.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/renewClaim.errors"
+    },
+    "renewClaim.exchange": {
+      "title": "RenewClaimExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "renewClaim"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/renewClaim.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/renewClaim.response"
+            },
+            {
+              "$ref": "#/$defs/renewClaim.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "dispatcherGivesUp.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dispatcherGivesUp.request"
+    },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dispatcherGivesUp.errors"
+    },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": {
+      "title": "ClaimEvent",
+      "description": "The event-log entry a claim of an effect row appends (K-08 v1.1 kind effect.claimed: 'claimEffects ... and serviceBack ...: one entry per row'; CQ-43; arch 09 lines 457, 492: every write appends who, what, old and new, when and why). The call writes it itself, since it picks its rows (SKIP LOCKED) and the caller cannot name them: id '<effect id>/claimed/<the effect's version after the claim>', so each claim of a row has its own; actor job (the effects runner: K-05 v1.1 default 24); table effects and the effect id; old and new values as K-08 v1.1 names them (state always; claimed_by and claim_lapses_at; first_try_at for a run that starts; tries and runs for a run after an outage), so old_values.state names the state it was claimed from; why null, since K-08 v1's why (event-trace.v1.schema.json /$defs/why: a step, a choice, a limit, a safe default, an outage path or a provider event, nothing else) has nothing a claim could name, and K-08 v1.1's event-effect-claimed-* rows carry none; nothing sealed. It is appended with the effect's turn id, or its job id when it has none, its trace id and the turn's bundle (null for a job), as a result's entry is (v1.1 item 21; K-08 default 20), and its zone is the effect's business's (K-04 businesses.time_zone), or null (UTC) for an effect with no business. New in v1.2.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/eventEntry"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "effect.claimed"
+            },
+            "actorKind": {
+              "const": "job"
+            },
+            "actorPersonId": {
+              "type": "null"
+            },
+            "tableName": {
+              "const": "effects"
+            },
+            "sealed": {
+              "type": "null"
+            },
+            "why": {
+              "description": "Null: old_values.state names the state it was claimed from, and K-08 v1's why has no field for it (README item 33, default 37).",
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "claimedEffect": {
+      "title": "ClaimedEffect",
+      "description": "An effect row the effects runner now holds: the row as it stands after the claim (K-07 effectRow, running), its version, the state it was claimed from, and the claim. v1.2 (T-072) adds event, always written by a v1.2 call: the K-08 v1.1 effect.claimed entry appended for this claim in the same transaction (CQ-43; closes v1.1 open gap 15).",
+      "type": "object",
+      "properties": {
+        "effect": {
+          "allOf": [
+            {
+              "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectRow"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "const": "running"
+                }
+              }
+            }
+          ]
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "claimedFrom": {
+          "description": "pending (claimEffects: a new run), running (claimEffects: a claim that lapsed, taken again) or outage (serviceBack: the run after the outage).",
+          "enum": ["pending", "running", "outage"]
+        },
+        "claimedBy": {
+          "$ref": "#/$defs/id"
+        },
+        "claimLapsesAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "event": {
+          "description": "The effect.claimed entry this claim appended (claimEvent). New in v1.2.",
+          "$ref": "#/$defs/claimEvent"
+        }
+      },
+      "required": ["effect", "version", "claimedFrom", "claimedBy", "claimLapsesAt"],
+      "additionalProperties": false
+    },
+    "claimEffects.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/claimEffects.request"
+    },
+    "claimEffects.response": {
+      "title": "ClaimEffectsResponse",
+      "description": "The rows claimed, oldest first, each now running under this claimer until claimLapsesAt (v1.1 item 20). v1.2: each with the effect.claimed entry the claim appended (claimedEffect.event).",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "claimed"
+        },
+        "claimed": {
+          "description": "Oldest first.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/claimedEffect"
+          }
+        }
+      },
+      "required": ["result", "claimed"],
+      "additionalProperties": false
+    },
+    "claimEffects.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/claimEffects.errors"
+    },
+    "claimEffects.exchange": {
+      "title": "ClaimEffectsExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "claimEffects"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/claimEffects.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/claimEffects.response"
+            },
+            {
+              "$ref": "#/$defs/claimEffects.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "serviceBack.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/serviceBack.request"
+    },
+    "serviceBack.response": {
+      "title": "ServiceBackResponse",
+      "description": "The rows claimed, oldest first: each starts a new run (runs + 1, tries 0, firstTryAt now) and is running under this claimer (v1.1 item 22). v1.2: each with the effect.claimed entry the claim appended (claimedEffect.event).",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "claimed"
+        },
+        "claimed": {
+          "description": "Oldest first.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/claimedEffect"
+          }
+        }
+      },
+      "required": ["result", "claimed"],
+      "additionalProperties": false
+    },
+    "serviceBack.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/serviceBack.errors"
+    },
+    "serviceBack.exchange": {
+      "title": "ServiceBackExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "serviceBack"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/serviceBack.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/serviceBack.response"
+            },
+            {
+              "$ref": "#/$defs/serviceBack.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/recordEffectResult.errors"
+    },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writeAllSet.request"
+    },
+    "writeAllSet.response": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writeAllSet.response"
+    },
+    "writeAllSet.errors": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writeAllSet.errors"
+    },
+    "writeAllSet.exchange": {
+      "$ref": "data-access.v1.1.schema.json#/$defs/writeAllSet.exchange"
+    },
+    "columnName": {
+      "title": "ColumnName",
+      "description": "A column name as K-04 (or a later domain part) spells it (02-contracts section 2 item 3). New in v1.2.",
+      "type": "string",
+      "pattern": "^[a-z_][a-z0-9_]*$"
+    },
+    "factTable": {
+      "title": "FactTable",
+      "description": "A fact's home table: a table name as a frozen table list spells it, never sealing_keys and never a table only Rosie's team reads. No column of a person's sealing key is a fact (rule 7; arch 01 line 93: deleting the key erases the data, so no copy of it may outlive the row), nor any column of the tables no business may read, its owner included, whose Tool API grant has no SELECT: K-34 v1 harm_reports (safety-incidents rule 4), K-36 v1 team_pages and team_page_recipients (notifications rule 2), and K-37 v1 parked_turns, dead_letters, gap_cases, review_items and live_turn_labels (platform-review rule 2). A request that names one is refused, readTurnState answers unknownFact for one and never returns one (README item 26, default 30; refuse-read-turn-state-sealing-key-fact, refuse-read-turn-state-returns-sealing-key, refuse-read-turn-state-returns-harm-report). The columns that hold a secret's hash in tables a fact may read (K-22 v1 proof_codes and sessions) are refused by secretColumn. New in v1.2; the team-only tables from T-072 round 3.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/tableName"
+        },
+        {
+          "not": {
+            "description": "K-04 v1 sealing_keys (person_id, wrapped_key, wrapping_key_name, created_at, erased_at and version), and every column of the team-only tables K-34 v1 harm_reports, K-36 v1 team_pages and team_page_recipients, and K-37 v1 parked_turns, dead_letters, gap_cases, review_items and live_turn_labels, are never facts.",
+            "enum": [
+              "sealing_keys",
+              "harm_reports",
+              "team_pages",
+              "team_page_recipients",
+              "parked_turns",
+              "dead_letters",
+              "gap_cases",
+              "review_items",
+              "live_turn_labels"
+            ]
+          }
+        }
+      ]
+    },
+    "secretColumn": {
+      "title": "SecretColumn",
+      "description": "A fact's home (table and column) that holds a secret's hash, which is never a fact (rule 7): K-22 v1 people-access proof_codes.code_hash (a proof code's keyed hash; the code itself is stored nowhere), sessions.token_sha256 (a session token's hash) and sessions.device_sha256 (a device's hash), which no Tool API call reads or searches (K-22 README rule 5). factRef and factValue are never one of these, so readTurnState answers unknownFact for one and never returns one, on the runtime side (businessId null) too, where no grant stands between the read and the row (README item 26, default 30; refuse-read-turn-state-session-token-fact). New in v1.2 (T-072 round 3).",
+      "type": "object",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "table": {
+              "const": "proof_codes"
+            },
+            "column": {
+              "const": "code_hash"
+            }
+          },
+          "required": ["table", "column"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "table": {
+              "const": "sessions"
+            },
+            "column": {
+              "enum": ["token_sha256", "device_sha256"]
+            }
+          },
+          "required": ["table", "column"]
+        }
+      ]
+    },
+    "role": {
+      "title": "Role",
+      "description": "A person's role at a business, as K-04 person_roles names it (FS line 723): owner, admin, staff, own_business (someone with their own business on the staff list: FS T01) or customer. New in v1.2.",
+      "enum": ["owner", "admin", "staff", "own_business", "customer"]
+    },
+    "phoneFlags": {
+      "title": "PhoneFlags",
+      "description": "A mobile's stop and chat flags from its K-04 phones row: stopped (arch 03 line 175: only stop replies, safety lines and a new booking's texts after its fresh yes; RULES 7.2), chat open (RULES 4.1b: set by its first text to Rosie's number, cleared by STOP, set again by START) and the row's version. New in v1.2.",
+      "type": "object",
+      "properties": {
+        "stopped": {
+          "description": "K-04 phones.stopped.",
+          "type": "boolean"
+        },
+        "chatOpen": {
+          "description": "K-04 phones.chat_open.",
+          "type": "boolean"
+        },
+        "version": {
+          "description": "K-04 phones.version.",
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": ["stopped", "chatOpen", "version"],
+      "additionalProperties": false
+    },
+    "phoneRead": {
+      "title": "PhoneRead",
+      "description": "A mobile's K-04 phones row as a read gives it, in K-05's names (FS line 728; RULES 4.1b, 4.3, 7.2, 7.5; MC C9). The number is the handle's address. New in v1.2.",
+      "type": "object",
+      "properties": {
+        "number": {
+          "description": "phones.number (E.164).",
+          "$ref": "#/$defs/phoneNumber"
+        },
+        "stopped": {
+          "description": "phones.stopped: the stopped flag (arch 03 line 175; RULES 7.2).",
+          "type": "boolean"
+        },
+        "stopAt": {
+          "description": "phones.stop_at: when the last STOP came, or null.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "chatOpen": {
+          "description": "phones.chat_open (RULES 4.1b).",
+          "type": "boolean"
+        },
+        "chatWay": {
+          "description": "phones.chat_way: the service Linq reports for the chat (imessage, rcs or sms), or null before the first text (Q-33).",
+          "anyOf": [
+            {
+              "enum": ["imessage", "rcs", "sms"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "linqContactAddedAt": {
+          "description": "phones.linq_contact_added_at: when the mobile was added as a Linq contact, or null: not added (MC C9; Q-03).",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "pollVotedAt": {
+          "description": "phones.poll_voted_at: its first poll vote, or null (arch 07 line 379).",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "optoutLineDeliveredAt": {
+          "description": "phones.optout_line_delivered_at, or null (RULES 4.3; Q-30).",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "version": {
+          "description": "phones.version.",
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": [
+        "number",
+        "stopped",
+        "stopAt",
+        "chatOpen",
+        "chatWay",
+        "linqContactAddedAt",
+        "pollVotedAt",
+        "optoutLineDeliveredAt",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "openQuestionRead": {
+      "title": "OpenQuestionRead",
+      "description": "A live open question sent to a handle (K-04 open_questions with status waiting or open: arch 01 line 63; arch 09 line 490; tour lines 423 to 427), as the guard lists it and the frontier builds its options from it (arch 03 line 159: 'every one sent to this handle'; questions about other bookings add only their options, labeled by business, date and time), with the send time and poll id K-02 v1's openQuestion carries (model.v1.schema.json /$defs/openQuestion: sentAt, pollId), read from K-04 v1's outbox rows that ask it and go to its own handle (outbox_rows.open_question_id, recipient_handle_id) and their parts that have gone, sent or delivered, never pending or failed (outbox_parts.state, kind, sent_at, delivered_at, linq_message_id; K-07 v1 part states). New in v1.2.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "open_questions.business_id, or null before there is one.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "personId": {
+          "description": "The person asked, when known.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "turnId": {
+          "description": "The turn that opened it (open_questions.turn_id).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "step": {
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "status": {
+          "description": "waiting (sent, no delivery receipt yet) or open (K-04; K-05 v1 default 8).",
+          "enum": ["waiting", "open"]
+        },
+        "options": {
+          "description": "The options as sent, in order (K-03 option).",
+          "type": "array",
+          "items": {
+            "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/option"
+          }
+        },
+        "readback": {
+          "description": "The read-back an exact yes binds to, or null (arch 01 line 89).",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "versionsRead": {
+          "description": "The versions it was decided on (limit 4).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rowRef"
+          }
+        },
+        "clock": {
+          "description": "The step's Clock line as it applies, or null (step 9's default).",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sentAt": {
+          "description": "When it went out (K-02 v1 openQuestion.sentAt: sent to this handle; arch 01 line 63; arch 02 line 127): the latest time a part went among the parts of the outbox rows that ask it and go to its own handle (outbox_rows.open_question_id, and recipient_handle_id the question's handle_id; K-04 v1), so an email copy to another handle never counts. A part has gone when it is sent or delivered, never while pending and never once failed (K-07 v1), and it went at its outbox_parts.sent_at, or at its delivered_at when Linq's acceptance was never recorded (a 4001 or 4006 that delivered anyway: K-07 failed to delivered; README item 31). So a question asked again gives its newest send (README default 41); null until a part has gone. New in v1.2.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "pollId": {
+          "description": "The poll it went out as, so a vote answers its own poll (K-02 v1 openQuestion.pollId; arch 03 line 187): the linq_message_id of the latest part of kind poll that has gone (sent or delivered, never failed) among those rows' parts, which a vote names as K-06 v1 poll.pollId (K-04 seed-outbox-row: linq-msg-demo-0002); a poll delivered after a 4001 or 4006 gives the id its receipt stored (README item 31). Null for a question that went out as text only or by email, whose poll has not gone yet, or whose poll failed, even after Linq accepted it, since its options then go again as plain text (K-02: null when it went out as text; K-07 outbox-poll-failed-plain; README default 41). New in v1.2.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "askCount": {
+          "description": "open_questions.ask_count.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "bundleId": {
+          "description": "The bundle it was asked under (open_questions.bundle_hash, bundle_build; arch 10 line 548).",
+          "$ref": "#/$defs/bundleId"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": [
+        "id",
+        "businessId",
+        "bookingId",
+        "personId",
+        "turnId",
+        "step",
+        "status",
+        "options",
+        "readback",
+        "versionsRead",
+        "clock",
+        "sentAt",
+        "pollId",
+        "askCount",
+        "bundleId",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "bookingHead": {
+      "title": "BookingHead",
+      "description": "A booking head row as a read gives it (K-04 bookings: CQ-03; FS line 729), with its version (limit 4) and the record flags it carries, private and deceased (arch 03 line 175). The rest of the booking is K-30's. New in v1.2.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        },
+        "flow": {
+          "enum": ["A", "B"]
+        },
+        "stage": {
+          "description": "entry, booked, checked_in, done or cancelled: the hub follows it (arch 03 line 163).",
+          "enum": ["entry", "booked", "checked_in", "done", "cancelled"]
+        },
+        "bookerPersonId": {
+          "$ref": "#/$defs/id"
+        },
+        "servedPersonId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "payerPersonId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "private": {
+          "description": "The private flag (A3-50): only the person served, those they added and the business are reached.",
+          "type": "boolean"
+        },
+        "deceased": {
+          "description": "The deceased flag (A7-81): reminders and sales texts stop, nothing new is charged.",
+          "type": "boolean"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": [
+        "id",
+        "businessId",
+        "flow",
+        "stage",
+        "bookerPersonId",
+        "servedPersonId",
+        "payerPersonId",
+        "private",
+        "deceased",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "factRef": {
+      "title": "FactRef",
+      "description": "A fact the frontier needs, named by its key and its one home: the table, the row's primary key as text and the column (arch 02 line 117: 'each fact once, from its one home'; S13-30; K-02 v1 fact row ids). Which home a key has is the frontier's and the bundle's (C-075), never this call's; that the request names each key once is the frontier's check (a second value for one key is refused there). Never a column of sealing_keys or of a table only Rosie's team reads (factTable), nor a secret's hash (secretColumn). New in v1.2.",
+      "type": "object",
+      "not": {
+        "$ref": "#/$defs/secretColumn"
+      },
+      "properties": {
+        "key": {
+          "description": "The fact's key, such as biz.name.",
+          "type": "string",
+          "minLength": 1
+        },
+        "table": {
+          "$ref": "#/$defs/factTable"
+        },
+        "rowId": {
+          "description": "The home row's primary key as text (K-02 v1 fact rowId; K-04 versions_read).",
+          "$ref": "#/$defs/id"
+        },
+        "column": {
+          "$ref": "#/$defs/columnName"
+        }
+      },
+      "required": ["key", "table", "rowId", "column"],
+      "additionalProperties": false
+    },
+    "factValue": {
+      "title": "FactValue",
+      "description": "A fact read from its home row on the primary: its key and home, the column's value and the row's version, which a commit compares and sets (limit 4: arch 06 line 305). The value is written as K-04's seed fixtures write values: JSON for jsonb, JSON booleans and numbers, and PostgreSQL text input for the rest (a timestamptz in UTC ending in Z, a time as HH:MM). Never a column of sealing_keys, so no key, wrapped or not, reaches the Tool API, the frontier or the model's context, nor a column of a table only Rosie's team reads (factTable), nor a secret's hash (secretColumn). New in v1.2.",
+      "type": "object",
+      "not": {
+        "$ref": "#/$defs/secretColumn"
+      },
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "table": {
+          "$ref": "#/$defs/factTable"
+        },
+        "rowId": {
+          "$ref": "#/$defs/id"
+        },
+        "column": {
+          "$ref": "#/$defs/columnName"
+        },
+        "value": {
+          "description": "The column's value now, or null."
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": ["key", "table", "rowId", "column", "value", "version"],
+      "additionalProperties": false
+    },
+    "pauseRead": {
+      "title": "PauseRead",
+      "description": "An open pause (K-04 pauses with cleared_at null): the paused record flag on a person or a phone (arch 03 line 175: visits and requests wait for the owner; A3-48). Address pauses are not read here (README open gap 17). New in v1.2.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "enum": ["person", "phone"]
+        },
+        "personId": {
+          "description": "For a person, who; null for a phone.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "phoneNumber": {
+          "description": "For a phone, the number; null for a person.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/phoneNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "setByTurnId": {
+          "description": "pauses.set_by_turn_id, or null when a page set it.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "setAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": ["id", "target", "personId", "phoneNumber", "setByTurnId", "setAt", "version"],
+      "additionalProperties": false
+    },
+    "consentRead": {
+      "title": "ConsentRead",
+      "description": "A consent row as a read gives it (K-29 v1 consents: every yes and every stop as its own row, never edited, so it has no version; the newest row for one person, kind, business and contact decides: K-29 README). The exact words stay in the row (audience never; their sha256 names them: arch 09 line 492). New in v1.2.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "personId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business, or null for a STOP or START row, which covers every business (RULES 7.2, 7.5).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "kind": {
+          "enum": ["texts", "photos_shown", "ticked_terms", "plan_terms", "fee_ok", "health_agreement"]
+        },
+        "revoked": {
+          "description": "True for a row that withdraws (a stop, an old contact).",
+          "type": "boolean"
+        },
+        "handleId": {
+          "description": "The contact it is about; required for texts.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "wordsSha256": {
+          "description": "consents.words_sha256: the sha256 of the words shown, lowercase hex.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "at": {
+          "$ref": "#/$defs/utc"
+        },
+        "channel": {
+          "enum": ["text", "email", "page", "ai"]
+        },
+        "chatLinkId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "turnId": {
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "personId",
+        "businessId",
+        "kind",
+        "revoked",
+        "handleId",
+        "bookingId",
+        "wordsSha256",
+        "at",
+        "channel",
+        "chatLinkId",
+        "turnId"
+      ],
+      "additionalProperties": false
+    },
+    "unknownFactError": {
+      "title": "UnknownFactError",
+      "description": "A fact names a table or column that no frozen database part lists, a table whose rows carry no version (a fact is compared and set by its row's version: limit 4), any column of sealing_keys or of a table only Rosie's team reads (factTable), or a secret's hash (K-22 proof_codes.code_hash, sessions.token_sha256, sessions.device_sha256: secretColumn), none of which is ever a fact (rule 7). The call builds its reads from the names a frozen table list gives, never from the request's words alone. Nothing was read. New in v1.2.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "const": "unknownFact"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "table": {
+          "$ref": "#/$defs/tableName"
+        },
+        "column": {
+          "$ref": "#/$defs/columnName"
+        }
+      },
+      "required": ["error", "key", "table", "column"],
+      "additionalProperties": false
+    },
+    "readTurnState.request": {
+      "title": "ReadTurnStateRequest",
+      "description": "Read the stored state a turn's frontier is built from (QUESTIONS.md M2-action-adapters.1's default: 'read turn state', primary and uncached, under the business scope; arch 02 line 117: the frontier's facts, each once from its one home; arch 03 lines 157 to 175: open questions, the target booking's stage, the record flags). One business per call: the call runs under the request's business (rosie.business_id set for the transaction, arch 10 line 546; K-04 v1 rule 4), so it never reads another business's rows; a turn about two businesses' bookings reads each in its own call (arch 03 line 159). With businessId null (sign-up, before there is a business) it runs on the runtime side and returns, of the business-scoped tables, only rows with no business; the rows K-04 scopes none (the handle's people, its phone) are read as always. Reads: the primary, uncached (arch 10 lines 504, 538). Repeat: safe, a read. Time budget: inside 'Build the frontier (uncached reads)', 150 ms (arch 04 line 215). New in v1.2.",
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "description": "The turn's handle (K-04 handles; arch 01 line 55).",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business the read runs under, or null before there is one.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingIds": {
+          "description": "The target booking heads the turn needs with their versions: the guard's targets of this business (handleTargets) and the bookings of its open questions. Each must be found under the scope (notFound otherwise).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "facts": {
+          "description": "The facts the frontier's steps need, each by its key and its home (factRef), never a column of sealing_keys or of a table only Rosie's team reads, nor a secret's hash (unknownFact). Each home row must be found under the scope (notFound otherwise).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/factRef"
+          }
+        }
+      },
+      "required": ["handleId", "businessId", "bookingIds", "facts"],
+      "additionalProperties": false
+    },
+    "readTurnState.response": {
+      "title": "ReadTurnStateResponse",
+      "description": "The turn's stored state, as one read of the primary saw it (one transaction, so every row and version is from one moment): the handle's kind and address; the handle's persons and their roles at this business; its phone; every live open question sent to the handle at this business (or with no business), with its send time and poll id; the target booking heads with their versions and the booking record flags (private, deceased); the open pauses on the handle's persons and phone at this business (paused); the phone's stopped flag (stopped); the consent rows of the handle's persons at this business; and each fact with its row and version. Every list is present, empty when there is none. New in v1.2.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "turnState"
+        },
+        "handleId": {
+          "$ref": "#/$defs/id"
+        },
+        "handle": {
+          "description": "The turn's handle as K-04 handles holds it, its kind and address (K-02 v1 context writer.handle: 'The phone number or email address that wrote'; arch 01 line 55), read for every handle: an email handle and a first text, which have no phone row (phone null), included. handles is scoped none (K-04 v1 rule 4), so every business scope reads it. Never logged or traced (K-08). New in v1.2.",
+          "$ref": "../inbound-event/inbound-event.v1.schema.json#/$defs/handle"
+        },
+        "businessId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "persons": {
+          "description": "The people who write from this handle (K-04 person_handles, persons), in person id order: each with the language Rosie stored for them (arch 06; K-02 v1 context gives role and language) and the row's version.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personId": {
+                "$ref": "#/$defs/id"
+              },
+              "language": {
+                "description": "persons.language, a BCP 47 tag, or null: the business's language.",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "version": {
+                "$ref": "#/$defs/version"
+              }
+            },
+            "required": ["personId", "language", "version"],
+            "additionalProperties": false
+          }
+        },
+        "roles": {
+          "description": "Their live roles at this business (K-04 person_roles with ended_at null), in role id order; none with no business.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "roleId": {
+                "$ref": "#/$defs/id"
+              },
+              "personId": {
+                "$ref": "#/$defs/id"
+              },
+              "role": {
+                "$ref": "#/$defs/role"
+              },
+              "version": {
+                "$ref": "#/$defs/version"
+              }
+            },
+            "required": ["roleId", "personId", "role", "version"],
+            "additionalProperties": false
+          }
+        },
+        "phone": {
+          "description": "The handle's phone row, or null (an email handle, or a number whose first turn has not yet written one). Its stopped flag is a record flag (arch 03 line 175).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/phoneRead"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "openQuestions": {
+          "description": "Every live open question sent to this handle at this business (with no business: those with none), in id order (compared, never parsed: CQ-09; K-04 open_questions has no time column), each with its send time and poll id, read from the outbox rows that ask it and go to this handle, under the same scope (README item 26).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/openQuestionRead"
+          }
+        },
+        "bookings": {
+          "description": "The requested booking heads, in the request's order.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/bookingHead"
+          }
+        },
+        "pauses": {
+          "description": "Open pauses on the handle's persons or its phone at this business, in id order.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pauseRead"
+          }
+        },
+        "consents": {
+          "description": "The consent rows of the handle's persons at this business, oldest first (by at, a tie to the lower id: K-29 v1). A STOP or START row has no business, so no business scope reads it (K-29 rule 4): its effect reaches the turn as the phone's stopped flag.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consentRead"
+          }
+        },
+        "facts": {
+          "description": "The requested facts, in the request's order, each with its row's version.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/factValue"
+          }
+        }
+      },
+      "required": [
+        "result",
+        "handleId",
+        "handle",
+        "businessId",
+        "readAt",
+        "persons",
+        "roles",
+        "phone",
+        "openQuestions",
+        "bookings",
+        "pauses",
+        "consents",
+        "facts"
+      ],
+      "additionalProperties": false
+    },
+    "readTurnState.errors": {
+      "title": "ReadTurnStateErrors",
+      "description": "notFound: the handle, a requested booking or a fact's home row does not exist, or the business scope hides it (another business's row: K-04 v1 rule 4), named by the first one missing; unknownFact (a column no frozen table list gives, a table with no version, any column of sealing_keys or of a table only Rosie's team reads, or a secret's hash: factTable, secretColumn); transient. Nothing is returned.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/unknownFactError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readTurnState.exchange": {
+      "title": "ReadTurnStateExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readTurnState"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readTurnState.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readTurnState.response"
+            },
+            {
+              "$ref": "#/$defs/readTurnState.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "handleTargets.request": {
+      "title": "HandleTargetsRequest",
+      "description": "The guard's targets for a handle (arch 02 line 115: 'It then lists the handle's roles, open questions and bookings'; QUESTIONS.md NQ-RT-2's default: 'a handle's targets', primary and uncached). Scope: the runtime side, across businesses by handle, as K-04 v1 rule 4 names the actor's guard; each target names its business, so the reads that follow run under that business's scope (readTurnState; the Tool API). Reads: the primary, uncached (arch 10 lines 504, 538). Repeat: safe, a read. Time budget: none in the sources. New in v1.2.",
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "description": "The turn's handle (made at first sight by handleSealingKey).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["handleId"],
+      "additionalProperties": false
+    },
+    "handleTargets.response": {
+      "title": "HandleTargetsResponse",
+      "description": "Every target of the handle across every business: its people with their live roles per business; every live open question sent to it; the bookings its people booked or are served by (K-04 bookings_booker_idx, bookings_served_idx: 'The guard lists a handle's bookings'); and its phone's stop and chat flags. Every list is present, empty when there is none; nothing at all is the doors (arch 03 line 165). New in v1.2.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "targets"
+        },
+        "handleId": {
+          "$ref": "#/$defs/id"
+        },
+        "readAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "persons": {
+          "description": "The people who write from this handle (one handle can be several people: arch 01 line 55), in person id order, each with its live roles (K-04 person_roles, ended_at null) in business id order, then role.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personId": {
+                "$ref": "#/$defs/id"
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "roleId": {
+                      "$ref": "#/$defs/id"
+                    },
+                    "businessId": {
+                      "$ref": "#/$defs/id"
+                    },
+                    "role": {
+                      "$ref": "#/$defs/role"
+                    },
+                    "version": {
+                      "$ref": "#/$defs/version"
+                    }
+                  },
+                  "required": ["roleId", "businessId", "role", "version"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["personId", "roles"],
+            "additionalProperties": false
+          }
+        },
+        "openQuestions": {
+          "description": "Every live open question sent to this handle, every business's, in id order (arch 03 line 159; S13-12).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/openQuestionRead"
+          }
+        },
+        "bookings": {
+          "description": "The bookings whose booker or person served is one of the handle's people, every stage, every business's, in id order (the stage picks the hub: arch 03 line 163).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/bookingHead"
+          }
+        },
+        "phone": {
+          "description": "The handle's phone flags, or null for an email handle or a number with no phone row yet.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/phoneFlags"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["result", "handleId", "readAt", "persons", "openQuestions", "bookings", "phone"],
+      "additionalProperties": false
+    },
+    "handleTargets.errors": {
+      "title": "HandleTargetsErrors",
+      "description": "notFound: no such handle; transient.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "handleTargets.exchange": {
+      "title": "HandleTargetsExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "handleTargets"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/handleTargets.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/handleTargets.response"
+            },
+            {
+              "$ref": "#/$defs/handleTargets.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "sendState.request": {
+      "title": "SendStateRequest",
+      "description": "Limit 8's recipient send state for one outbox row, read just before a send (arch 06 line 313; QUESTIONS.md NQ-RT-2's default: 'a recipient's send state', primary and uncached; T-259). The call reads the row's own recipient, business, booking, open question and versions read from the row: the caller passes no copy of them. Scope: the runtime side, as K-04 v1 rule 4 names the dispatcher, since a STOP row has no business and the rows a message read may span businesses (arch 03 line 159). Reads: the primary, uncached (arch 10 lines 504, 538). Repeat: safe, a read. Time budget: inside 'Send ≤ 1 s' (arch 04 line 227). New in v1.2.",
+      "type": "object",
+      "properties": {
+        "outboxRowId": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["outboxRowId"],
+      "additionalProperties": false
+    },
+    "sendState.response": {
+      "title": "SendStateResponse",
+      "description": "What limit 8 reads about a row's recipient, all from one read of the primary (one transaction): the row's state and version; the recipient's handle and person; the phone's stopped flag, open chat and Linq contact, with the chat Linq knows; the newest texts consent row that covers this contact here; the audience text hours follow; the zone (the visit's, else the business's: CQ-05); the business's H04 text hours; the staging test phone's override (BP 9.4); each row the message read at its version now; whether its booking or question has closed; and the record flags the dispatcher checks (arch 03 line 175): the booking's private and deceased flags with the person served, and the open pauses at the row's business on its recipient. Limit 8's rules on it, and what each flag holds back, are C-125's. New in v1.2.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "sendState"
+        },
+        "outboxRowId": {
+          "$ref": "#/$defs/id"
+        },
+        "rowState": {
+          "description": "The row's state now, in K-07's words.",
+          "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/rowState"
+        },
+        "rowVersion": {
+          "description": "The row's version now; markRow compares it.",
+          "$ref": "#/$defs/version"
+        },
+        "readAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "recipient": {
+          "description": "The row's recipient: its handle (K-04 handles) and person (outbox_rows.recipient_person_id).",
+          "type": "object",
+          "properties": {
+            "handleId": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "enum": ["phone", "email"]
+            },
+            "address": {
+              "description": "handles.address: the E.164 number or the email address the row goes to. Never logged or traced (K-08).",
+              "type": "string",
+              "minLength": 1
+            },
+            "personId": {
+              "$ref": "#/$defs/nullableId"
+            }
+          },
+          "required": ["handleId", "kind", "address", "personId"],
+          "additionalProperties": false
+        },
+        "phone": {
+          "description": "The recipient's phone row: stopped, chat open, the Linq contact (linqContactAddedAt) and the service Linq reports; null for an email handle.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/phoneRead"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "chat": {
+          "description": "The handle's chat with Rosie's number (K-04 threads, kind chat: one per handle, MC C1) and Linq's id for it, or null when there is none yet; the service is phone.chatWay.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "threadId": {
+                  "$ref": "#/$defs/id"
+                },
+                "linqChatId": {
+                  "description": "threads.linq_chat_id, or null until Linq reports it.",
+                  "$ref": "#/$defs/nullableId"
+                },
+                "version": {
+                  "$ref": "#/$defs/version"
+                }
+              },
+              "required": ["threadId", "linqChatId", "version"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "textsConsent": {
+          "description": "The newest texts consent row for this contact that covers the row's business: its business's or every business's (K-29 v1 consents_handle_kind_at_idx: 'limit 8's texts check read a contact's newest texts row'; RULES 7.1, 7.2), by at, a tie to the lower id; null when there is none. For an email contact it is the stop record, since only a phone carries the stopped flag.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "consentId": {
+                  "$ref": "#/$defs/id"
+                },
+                "businessId": {
+                  "$ref": "#/$defs/nullableId"
+                },
+                "revoked": {
+                  "type": "boolean"
+                },
+                "at": {
+                  "$ref": "#/$defs/utc"
+                }
+              },
+              "required": ["consentId", "businessId", "revoked", "at"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "audience": {
+          "description": "Whose text hours apply (RULES 4.3: customers from 9am, the owner and team from 8am): owner when the recipient person holds a live owner role at the row's business, team for admin, staff or own_business (FS T01), customer otherwise, a row with no business or no person included (README default 31).",
+          "enum": ["customer", "owner", "team"]
+        },
+        "zone": {
+          "description": "The zone text hours are read in: visitZone, else businessZone (CQ-05's default); null when the row has neither.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/zone"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "visitZone": {
+          "description": "The zone of the visit the row is about (S13-03). Null in v1.2: no frozen part stores a visit's zone until K-30 (bookings and visits) freezes, so CQ-05 falls to the business's zone (K-05 v1 default 4).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/zone"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "businessZone": {
+          "description": "The row's business's zone (K-04 businesses.time_zone), or null for a row with no business.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/zone"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "textHours": {
+          "description": "The row's business's text hours (H04: K-04 businesses.text_hours_start and text_hours_end, default 8am to 8pm), as HH:MM, or null for a row with no business.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "string",
+                  "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "end": {
+                  "type": "string",
+                  "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                }
+              },
+              "required": ["start", "end"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "textHoursOverride": {
+          "description": "Whether the staging test phone's text-hours override is on for this number: the release flag staging.text-hours-override, scope phone:<number>, enabled (K-04 release_flags and seed-flag.json; QUESTIONS.md M3-M3b.4; BP 9.4). The caller honours it on staging only (C-125); false for an email handle.",
+          "type": "boolean"
+        },
+        "currentVersions": {
+          "description": "Each row of the outbox row's versions_read, read now from its home table, at its version now, in versions_read's order; a row that no longer exists is left out (limit 8 counts it as changed).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rowRef"
+          }
+        },
+        "booking": {
+          "description": "The row's booking head now (stage, the person served, the record flags private and deceased, and version), or null when the row has none. The flags are the ones arch 03 line 175 says the dispatcher checks: deceased (A7-81: reminders and sales texts stop) and private (A3-50: only the person served, those they added and the business are reached), with the person served to check private against (README item 28, default 42).",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/$defs/id"
+                },
+                "stage": {
+                  "enum": ["entry", "booked", "checked_in", "done", "cancelled"]
+                },
+                "servedPersonId": {
+                  "description": "bookings.served_person_id: the person served, or null until known. New in v1.2.",
+                  "$ref": "#/$defs/nullableId"
+                },
+                "private": {
+                  "description": "bookings.private (A3-50). New in v1.2.",
+                  "type": "boolean"
+                },
+                "deceased": {
+                  "description": "bookings.deceased (A7-81). New in v1.2.",
+                  "type": "boolean"
+                },
+                "version": {
+                  "$ref": "#/$defs/version"
+                }
+              },
+              "required": ["id", "stage", "servedPersonId", "private", "deceased", "version"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pauses": {
+          "description": "The paused flag the dispatcher checks (arch 03 line 175: 'visits and requests wait for the owner', A3-48): the open pauses (K-04 pauses, cleared_at null) at the row's business on its recipient person or on the recipient's phone (K-04 pauses_open_person_idx, pauses_open_phone_idx: 'The gate and the dispatcher check a person's pause'), in id order; empty when there is none, and for a row with no business, since every pause names its business (README default 42). Address pauses are not read (open gap 17). New in v1.2.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pauseRead"
+          }
+        },
+        "openQuestion": {
+          "description": "The row's open question now (status and version), or null when the row asks none.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/$defs/id"
+                },
+                "status": {
+                  "enum": ["waiting", "open", "answered", "defaulted", "withdrawn"]
+                },
+                "version": {
+                  "$ref": "#/$defs/version"
+                }
+              },
+              "required": ["id", "status", "version"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closed": {
+          "description": "Whether the row's booking or question has closed, so a stale row is withdrawn rather than composed again (arch 06 line 313; K-07 rowState withdrawn): the booking when its stage is done or cancelled (README default 32), the question when its status is answered, defaulted or withdrawn (K-04 open_questions.closed_at); false when the row has none.",
+          "type": "object",
+          "properties": {
+            "booking": {
+              "type": "boolean"
+            },
+            "question": {
+              "type": "boolean"
+            }
+          },
+          "required": ["booking", "question"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "result",
+        "outboxRowId",
+        "rowState",
+        "rowVersion",
+        "readAt",
+        "recipient",
+        "phone",
+        "chat",
+        "textsConsent",
+        "audience",
+        "zone",
+        "visitZone",
+        "businessZone",
+        "textHours",
+        "textHoursOverride",
+        "currentVersions",
+        "booking",
+        "pauses",
+        "openQuestion",
+        "closed"
+      ],
+      "additionalProperties": false
+    },
+    "sendState.errors": {
+      "title": "SendStateErrors",
+      "description": "notFound: no such outbox row; transient. Limit 8 sends nothing on either (it fails closed: T-259).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "sendState.exchange": {
+      "title": "SendStateExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "sendState"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/sendState.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sendState.response"
+            },
+            {
+              "$ref": "#/$defs/sendState.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "handleSealingKey.request": {
+      "title": "HandleSealingKeyRequest",
+      "description": "Get or create a handle's sealing key (QUESTIONS.md NQ-RT-1's default: the handle's key, created on first sight of the handle and linked to the person once known; arch 02 line 109: the gateway 'writes the sealed event to the handle's actor'; arch 01 line 93). On K-04 v1 as frozen a key is a person's (sealing_keys by person_id), so the handle's key is a key of one of its people: at first sight the call writes the handle, a person with no name yet and their link, and that person's key; and when every person on the handle has had their key erased (RULES 4.10), it writes the same way a fresh person with no name, linked to the handle, and that person's key, so the number's next text, a stop in other words, START, HELP or a danger text included, is still sealed and reaches a turn (README item 29; open gap 18, closed). The key never appears in the exchange (rule 7): the call hands the caller the data key, unwrapped under the named Workers secret as a key object for AES-256-GCM that cannot be exported (db/repo/sealing.ts's form, T-182), beside the response. Scope: the runtime side; every table it touches is scoped none in K-04 (handles, persons, person_handles, sealing_keys). Reads and writes the primary, uncached. Repeat: safe: a second call finds what the first wrote. Time budget: inside the gateway's 1 s answer (arch 02 line 109). New in v1.2.",
+      "type": "object",
+      "properties": {
+        "handle": {
+          "description": "The handle as the inbound event names it (K-06 v1 handle: kind and address, as K-04 handles.address writes it).",
+          "$ref": "../inbound-event/inbound-event.v1.schema.json#/$defs/handle"
+        },
+        "newHandleId": {
+          "description": "The id the handle row takes if this call writes it (an opaque id code makes: CQ-09); unused when the handle exists.",
+          "$ref": "#/$defs/id"
+        },
+        "newPersonId": {
+          "description": "The id the person row takes if this call writes it: at first sight, or when every person on the handle has had their key erased; unused otherwise.",
+          "$ref": "#/$defs/id"
+        },
+        "wrappingKeyName": {
+          "description": "The name of the Workers secret a new key is wrapped under (K-04 sealing_keys.wrapping_key_name; NQ-DB-1's default: one environment key wraps every data key). A name, never a value (rule 7); the call reads the secret from the environment.",
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        }
+      },
+      "required": ["handle", "newHandleId", "newPersonId", "wrappingKeyName"],
+      "additionalProperties": false
+    },
+    "handleSealingKey.response": {
+      "title": "HandleSealingKeyResponse",
+      "description": "The handle, the person whose key seals its texts, what this call wrote, and what K-04's row says about the key: never its bytes, wrapped or not. New in v1.2.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "key"
+        },
+        "handleId": {
+          "$ref": "#/$defs/id"
+        },
+        "personId": {
+          "description": "The person whose key it is: the oldest held key among the handle's people (sealing_keys.created_at, a tie to the lower person id), else a key made now for the first of its people with none (the lower person id), else, with no person yet or with every person's key erased, the person made now with no name.",
+          "$ref": "#/$defs/id"
+        },
+        "created": {
+          "description": "What this call wrote: the handle row, the person row with its person_handles link, the key row.",
+          "type": "object",
+          "properties": {
+            "handle": {
+              "type": "boolean"
+            },
+            "person": {
+              "type": "boolean"
+            },
+            "key": {
+              "type": "boolean"
+            }
+          },
+          "required": ["handle", "person", "key"],
+          "additionalProperties": false
+        },
+        "key": {
+          "description": "K-04 sealing_keys as the row stands: the wrapping secret's name, when the key was made, and the row's version.",
+          "type": "object",
+          "properties": {
+            "wrappingKeyName": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            },
+            "createdAt": {
+              "$ref": "#/$defs/utc"
+            },
+            "version": {
+              "$ref": "#/$defs/version"
+            }
+          },
+          "required": ["wrappingKeyName", "createdAt", "version"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["result", "handleId", "personId", "created", "key"],
+      "additionalProperties": false
+    },
+    "handleSealingKey.errors": {
+      "title": "HandleSealingKeyErrors",
+      "description": "constraint: a new id already taken (23505); transient. The gateway answers 503 on either and stores nothing (arch 02 line 109), and the provider retries. A handle whose every person's key was erased is no error: the call writes a fresh person and key (README item 29).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/constraintError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "handleSealingKey.exchange": {
+      "title": "HandleSealingKeyExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "handleSealingKey"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/handleSealingKey.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/handleSealingKey.response"
+            },
+            {
+              "$ref": "#/$defs/handleSealingKey.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "handle": { "kind": "phone", "address": "+15555550108" },
+  "newHandleId": "handle-gw-0108",
+  "newPersonId": "person-gw-0108",
+  "wrappingKeyName": "SEALING_WRAP_KEY",
+  "wrappingKey": "bm90LWEtcmVhbC1rZXktbm90LWEtcmVhbC1rZXktMDA="
+}

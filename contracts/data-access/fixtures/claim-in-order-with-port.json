@@ -1,0 +1,126 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["write-plan-owner.json"],
+    "now": "2026-11-07T15:06:35Z",
+    "note": "claim-in-order's exchange in its v1.2 form, run instead of it: each claimed row also carries its claim (v1.1) and its port (v1.2), here linq for both imessage rows, so limit 8 refuses exactly a send by an SMS port (T-259)."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "now": "2026-11-07T15:06:35Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-alex-booked-riley",
+        "version": 3,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-alex",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-riley-nov14",
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "quick_reply",
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+        "finalParts": {
+          "row": "out-alex-booked-riley",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am",
+              "calendarFile": "new",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            { "slot": "pro.name", "value": "Riley" },
+            { "slot": "biz.name", "value": "Lee's Barbershop" },
+            { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+          ],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-alex-booked-riley/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0012",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-07T15:06:35Z",
+          "lapsesAt": "2026-11-07T15:07:35Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq"
+      },
+      {
+        "outboxRowId": "out-sam-booked-riley",
+        "version": 3,
+        "commitSeq": 2,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-riley-nov14",
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "routine",
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+        "finalParts": {
+          "row": "out-sam-booked-riley",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "New booking: Alex M. with Riley.\nSat Nov 14, 11:00am",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            { "slot": "name", "value": "Alex M." },
+            { "slot": "pro.name", "value": "Riley" },
+            { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+          ],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-booked-riley/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0012",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-07T15:06:35Z",
+          "lapsesAt": "2026-11-07T15:07:35Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq"
+      }
+    ],
+    "passedHeld": []
+  }
+}

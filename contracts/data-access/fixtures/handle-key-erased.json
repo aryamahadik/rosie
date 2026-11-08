@@ -1,0 +1,22 @@
+{
+  "call": "handleSealingKey",
+  "given": {
+    "k04Seeds": ["seed-sealing-key.json"],
+    "after": [],
+    "now": "2026-11-08T15:00:00Z",
+    "note": "Ben T.'s number texts again after his key was erased (K-04 seed-sealing-key: erased 2026-11-02). No person on the handle holds a key, so, as at first sight, the call writes a person with no name linked to the handle and that person's key, and the gateway seals the text with it: a stop in other words, START, HELP or a danger text from this number is still recorded (open gap 18, closed). Ben's erased key stays erased and his link stays; nothing of his is unsealed."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550106" },
+    "newHandleId": "handle-gw-0106",
+    "newPersonId": "person-gw-0106",
+    "wrappingKeyName": "SEALING_WRAP_KEY"
+  },
+  "outcome": {
+    "result": "key",
+    "handleId": "handle-ben",
+    "personId": "person-gw-0106",
+    "created": { "handle": false, "person": true, "key": true },
+    "key": { "wrappingKeyName": "SEALING_WRAP_KEY", "createdAt": "2026-11-08T15:00:00Z", "version": 1 }
+  }
+}

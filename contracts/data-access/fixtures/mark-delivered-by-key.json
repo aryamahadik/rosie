@@ -1,0 +1,27 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["mark-failed-4006.json"],
+    "now": "2026-11-07T15:06:50Z",
+    "note": "Linq's delivery receipt for the 4006 part comes within the minute, with its message id and the part's key echoed (K-11 partKey; verify-delivered-after-4006.json). No part holds that message id, so the call finds the part by its key: it holds no message id of its own, so the receipt is its. The part moves failed to delivered (K-07 'a 4001 or 4006 that delivered anyway') and keeps the message id, the row moves sending to delivered, and it is the row's first delivery, so no new key goes."
+  },
+  "request": {
+    "outcome": "delivered",
+    "providerMessageId": "linq-msg-demo-0101",
+    "at": "2026-11-07T15:06:49Z",
+    "idempotencyKey": "out-alex-booked-riley/1/1"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-alex-booked-riley",
+    "partNo": 1,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": true,
+    "openQuestionId": null,
+    "nextKey": null,
+    "row": { "state": "delivered", "version": 5 }
+  }
+}

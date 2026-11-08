@@ -1,0 +1,22 @@
+{
+  "call": "handleSealingKey",
+  "given": {
+    "k04Seeds": ["seed-sealing-key.json"],
+    "after": [],
+    "now": "2026-11-07T16:00:00Z",
+    "note": "A text from Alex's mobile reaches the gateway. His handle, person and key exist (K-04 seed-sealing-key), so nothing is written and the new ids go unused."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550101" },
+    "newHandleId": "handle-gw-0101",
+    "newPersonId": "person-gw-0101",
+    "wrappingKeyName": "SEALING_WRAP_KEY"
+  },
+  "outcome": {
+    "result": "key",
+    "handleId": "handle-alex",
+    "personId": "person-alex",
+    "created": { "handle": false, "person": false, "key": false },
+    "key": { "wrappingKeyName": "SEALING_WRAP_KEY", "createdAt": "2026-10-12T16:20:00Z", "version": 1 }
+  }
+}

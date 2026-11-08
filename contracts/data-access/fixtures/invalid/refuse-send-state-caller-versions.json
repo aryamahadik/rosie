@@ -1,0 +1,4 @@
+{
+  "outboxRowId": "out-alex-booked-riley",
+  "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }]
+}

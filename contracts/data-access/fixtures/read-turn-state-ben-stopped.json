@@ -1,0 +1,79 @@
+{
+  "call": "readTurnState",
+  "given": {
+    "k04Seeds": ["seed-pause.json"],
+    "partSeeds": ["conversations-consent/seed-consent-stop-row.json"],
+    "after": [],
+    "now": "2026-10-22T15:00:00Z",
+    "note": "Ben T. texts 'Is my haircut still on?' after his STOP and after Sam paused his phone. Under the barbershop's scope the frontier gets the record flags (the phone stopped, the phone paused, the booking neither private nor deceased) and his consent row at the barbershop; his STOP row has no business, so no business scope reads it (K-29 rule 4): its effect is the phone's stopped flag. RULES 7.3: the reply is 'Texts are off. Reply START, or call the business.'"
+  },
+  "request": {
+    "handleId": "handle-ben",
+    "businessId": "biz-lees-barbershop",
+    "bookingIds": ["booking-ben-haircut"],
+    "facts": []
+  },
+  "outcome": {
+    "result": "turnState",
+    "handleId": "handle-ben",
+    "handle": { "kind": "phone", "address": "+15555550106" },
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-22T15:00:00Z",
+    "persons": [{ "personId": "person-ben", "language": "en", "version": 1 }],
+    "roles": [{ "roleId": "role-ben-barber", "personId": "person-ben", "role": "customer", "version": 1 }],
+    "phone": {
+      "number": "+15555550106",
+      "stopped": true,
+      "stopAt": "2026-10-20T13:00:00Z",
+      "chatOpen": false,
+      "chatWay": "imessage",
+      "linqContactAddedAt": "2026-10-05T17:00:00Z",
+      "pollVotedAt": null,
+      "optoutLineDeliveredAt": "2026-10-05T17:00:02Z",
+      "version": 3
+    },
+    "openQuestions": [],
+    "bookings": [
+      {
+        "id": "booking-ben-haircut",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "bookerPersonId": "person-ben",
+        "servedPersonId": "person-ben",
+        "payerPersonId": "person-ben",
+        "private": false,
+        "deceased": false,
+        "version": 2
+      }
+    ],
+    "pauses": [
+      {
+        "id": "pause-ben-phone",
+        "target": "phone",
+        "personId": null,
+        "phoneNumber": "+15555550106",
+        "setByTurnId": null,
+        "setAt": "2026-10-21T18:00:00Z",
+        "version": 1
+      }
+    ],
+    "consents": [
+      {
+        "id": "consent-ben-texts-yes",
+        "personId": "person-ben",
+        "businessId": "biz-lees-barbershop",
+        "kind": "texts",
+        "revoked": false,
+        "handleId": "handle-ben",
+        "bookingId": "booking-ben-haircut",
+        "wordsSha256": "6787b8ed87e3d9d839bbfe158d1aaeaafd1b945cac4ae704933e78649be5208d",
+        "at": "2026-10-05T17:00:00Z",
+        "channel": "text",
+        "chatLinkId": "chatlink-ben-haircut",
+        "turnId": null
+      }
+    ],
+    "facts": []
+  }
+}

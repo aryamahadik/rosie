@@ -1,0 +1,113 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-in-order.json"],
+    "now": "2026-11-07T15:06:36Z",
+    "note": "A second after the dispatcher claimed his confirmation, and before any part went, Alex texts STOP. The guard's code path commits the stop as one turn (K-09 draft recordStopOrStart): the phone's flag, with its chat closed, and the STOP row for every business, written in the same commit (K-29 README), and the stop reply as a reply in the same turn (K-09 draft default 6). Needs K-29's consents table migrated."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-stop-1",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0014"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0014",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "phones", "rowId": "+15555550101", "version": 3 }],
+    "writes": {
+      "state": [
+        {
+          "op": "update",
+          "table": "phones",
+          "key": { "number": "+15555550101" },
+          "expectVersion": 3,
+          "set": { "stopped": true, "stop_at": "2026-11-07T15:06:36Z", "chat_open": false }
+        },
+        {
+          "op": "insert",
+          "table": "consents",
+          "values": {
+            "id": "consent-alex-stop",
+            "person_id": "person-alex",
+            "business_id": null,
+            "kind": "texts",
+            "revoked": true,
+            "handle_id": "handle-alex",
+            "exact_words": "STOP",
+            "words_sha256": "04dedf8afeb8a4177a009f41bb78018af601e341ed4322d4073911c9ac879726",
+            "at": "2026-11-07T15:06:36Z",
+            "channel": "text",
+            "turn_id": "turn-alex-stop-1"
+          }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-alex-stop-reply",
+          "recipientHandleId": "handle-alex",
+          "recipientPersonId": "person-alex",
+          "businessId": null,
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "phones", "rowId": "+15555550101", "version": 4 }]
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-phone-alex-stopped-1",
+          "kind": "phone.stopped",
+          "zone": null,
+          "businessId": null,
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": null,
+          "tableName": "phones",
+          "rowId": "handle-alex",
+          "oldValues": { "stopped": false, "chat_open": true, "stop_at": null },
+          "newValues": { "stopped": true, "chat_open": false, "stop_at": "2026-11-07T15:06:36Z" },
+          "sealed": null,
+          "why": { "choice": "optOut" },
+          "approvedBy": { "kind": "consentRow", "consent_id": "consent-alex-stop" },
+          "proofs": null
+        },
+        {
+          "id": "log-consent-alex-stop",
+          "kind": "consent.withdrawn",
+          "zone": null,
+          "businessId": null,
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": null,
+          "tableName": "consents",
+          "rowId": "consent-alex-stop",
+          "oldValues": null,
+          "newValues": { "kind": "texts", "revoked": true, "business_id": null },
+          "sealed": null,
+          "why": { "choice": "optOut" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-stop-1",
+    "committedAt": "2026-11-07T15:06:36Z",
+    "repeated": false,
+    "committed": {
+      "written": [{ "table": "phones", "rowId": "+15555550101", "version": 4 }],
+      "outboxRows": [{ "id": "out-alex-stop-reply", "commitSeq": 3 }],
+      "promoted": []
+    }
+  }
+}
