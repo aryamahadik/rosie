@@ -26,7 +26,14 @@ import {
   FOUR_WAYS,
   MONEY_POINTS,
   MoneyHomeError,
+  approvedMoneyLines,
   checkMoneyLine,
+  checkMoneyText,
+  gateMoneyText,
+  readApprovedLines,
+  sentencesOf,
+  type ApprovedMoneyLines,
+  type MoneyGate,
   firstFit,
   fourWays,
   ledgerFacts,
@@ -298,6 +305,7 @@ describe("each pay.* row of A-record.json is chosen for its when conditions", ()
 
   it("a money slot's line is its first-fit row, refused only where the row claims what the booking did not take", () => {
     const refusedRows = new Set<string>();
+    const refusedOnceTaken = new Set<string>();
     for (const flow of FLOWS)
       for (const { money: reading, rows } of comparedOf(flow)) {
         for (const line of moneyLines(reading, record(flow))) {
@@ -311,11 +319,34 @@ describe("each pay.* row of A-record.json is chosen for its when conditions", ()
           expect(line.refused.length).toBeGreaterThan(0);
           for (const refusal of line.refused) expect(refusal.why).toBe("notTaken");
           refusedRows.add(`${flow} ${line.slot} ${String(line.row)}`);
+          if (reading.took) refusedOnceTaken.add(`${flow} ${line.slot} ${String(line.row)}`);
+          else if (!(line.slot === "pay.late" && line.row === 3))
+            for (const refusal of line.refused)
+              expect(["depositPaid", "paidInFull"]).toContain(refusal.claim);
         }
       }
     // pay.late's last row names a fee and a saved card; it has no row for a booking with no fee (pay.noshow has one,
-    // "won't charge anything"), so a booking with no card or no fee is refused it.
-    expect([...refusedRows].sort()).toEqual(["A pay.late 3", "B pay.late 3"]);
+    // "won't charge anything"), so a booking with no card or no fee is refused it. From the money step on, it is the
+    // only row refused.
+    expect([...refusedOnceTaken].sort()).toEqual(["A pay.late 3", "B pay.late 3"]);
+    // Round 3 (DL-182, 2): before the money step, the records' statement rows ("{{deposit}} deposit paid, ...", "Paid in
+    // full · nothing to collect") would say money was taken that was only asked for, so they are refused there too.
+    expect([...refusedRows].sort()).toEqual([
+      "A pay.late 3",
+      "A pay.staff 10",
+      "A pay.staff 12",
+      "A pay.staff 8",
+      "A pay.staff 9",
+      "A pay.took 7",
+      "A pay.took 8",
+      "B pay.late 3",
+      "B pay.staff 10",
+      "B pay.staff 11",
+      "B pay.staff 12",
+      "B pay.staff 9",
+      "B pay.took 7",
+      "B pay.took 8",
+    ]);
     const late = record("A").rows["pay.late"]?.[3]?.text ?? "";
     expect(moneyClaims(late)).toEqual(["cardSaved", "fee"]);
   });
@@ -917,5 +948,371 @@ describe("the money home in the registry (T-586)", () => {
     for (const flow of FLOWS)
       for (const { money } of comparedOf(flow).slice(0, 300))
         for (const point of module.points) expect(isLabel(module.rule(point, { money })), point).toBe(true);
+  });
+});
+
+// Round 3 (DL-182): the money-topic gate. A money sentence passes only as an approved line (the records' rows, S13-55's
+// own lines, a message text of either master flow), a denial included; approved lines then go through the claim check.
+
+/** A line with straight apostrophes, then curly ones (’, and ‘ as some keyboards type it). */
+function threeForms(line: string): string[] {
+  return [line, line.replaceAll("'", "’"), line.replaceAll("'", "‘")];
+}
+
+const HOLD = { claim: "cardHold", why: "neverHold" } as const;
+const SILENCE = { claim: "chargeOnSilence", why: "neverChargeOnSilence" } as const;
+const NOT_FROM_RECORD = { claim: "moneySentence", why: "moneyNotFromRecord" } as const;
+const BY_WHY = {
+  neverHold: HOLD,
+  neverChargeOnSilence: SILENCE,
+  moneyNotFromRecord: NOT_FROM_RECORD,
+} as const;
+type GateWhy = keyof typeof BY_WHY;
+
+let approvedSoFar: ApprovedMoneyLines | null = null;
+
+/** The approved lines read from both emitted flows: their records' rows, S13-55's lines and every message text. */
+function approved(): ApprovedMoneyLines {
+  approvedSoFar ??= readApprovedLines(src.flows);
+  return approvedSoFar;
+}
+
+function gate(slotValues?: readonly { slot: string; value: string }[]): MoneyGate {
+  return slotValues === undefined ? { approved: approved() } : { approved: approved(), slotValues };
+}
+
+const NOTHING_APPROVED: MoneyGate = { approved: approvedMoneyLines([]) };
+
+/** The bookings the gate is read on: a card, a deposit, the full price, nothing (B), a credit, a deposit only asked. */
+function gateReadings(): MoneyReading[] {
+  return [
+    readMoney(oneService("A", "list|card|counter"), record("A")),
+    readMoney(oneService("A", "list|deposit|counter"), record("A")),
+    readMoney(oneService("A", "list|full|none"), record("A")),
+    readMoney(oneService("B", "list|none|bill"), record("B")),
+    readMoney(bookingAt("A", "list|card|counter +credit-plus"), record("A")),
+    readMoney(oneService("A", "list|deposit|counter", false), record("A")),
+  ];
+}
+
+/** A text with each slot that was given a value written as that value, as the slot filler writes it. */
+function filledWith(text: string, values: readonly { slot: string; value: string }[]): string {
+  return text.replace(
+    /\{\{\s*([a-z][a-z0-9]*(?:\.[a-z][a-z0-9]*)?)\s*(?::[^{}|]*)?(?:\|[^{}]*)?\}\}/g,
+    (raw, name: string) => values.find((given) => given.slot === name)?.value ?? raw,
+  );
+}
+
+function stringsOf(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap(stringsOf);
+  if (typeof value === "object" && value !== null) return Object.values(value).flatMap(stringsOf);
+  return [];
+}
+
+describe("round 3 (DL-182): a money sentence passes only as an approved line, and a denial no longer exempts it", () => {
+  /** Every line the security reviewer gave in rounds 1 and 2, with the label it fails with. */
+  const REVIEWER: readonly (readonly [string, GateWhy])[] = [
+    // Round 1, (a) to (e).
+    ["Your card will be held for $40 until the visit.", "neverHold"],
+    ["Your saved card is held for {{deposit}} until Sat 11:00am.", "neverHold"],
+    ["If you don't reply by Fri 11am, we'll charge the $20 fee to your card.", "neverChargeOnSilence"],
+    [
+      "If you haven't answered within 24 hours, the late-cancel fee is charged to the saved card.",
+      "neverChargeOnSilence",
+    ],
+    ["If we don't get a reply by 7pm, we'll charge your card.", "neverChargeOnSilence"],
+    // Round 2, items 1 to 3.
+    ["We'll place a $40 hold on your card but won't charge it unless you cancel late.", "neverHold"],
+    ["We'll place a temporary $40 hold on your card that won't be charged.", "neverHold"],
+    ["If you don't reply by 7pm, we'll charge the fee with no further notice.", "neverChargeOnSilence"],
+    ["No reply by 7pm means we charge the fee and can't refund it.", "neverChargeOnSilence"],
+    ["A hold (not a charge) goes on your card for $40.", "neverHold"],
+    ["Not replying by 7pm means we'll charge your card.", "neverChargeOnSilence"],
+    ["Without hearing from you by 7pm, we'll charge the fee.", "neverChargeOnSilence"],
+    // Round 2, notes 2 to 5.
+    ["Your card has now been charged $55.", "moneyNotFromRecord"],
+    ["We've now charged your card.", "moneyNotFromRecord"],
+    ["The $55 you paid is confirmed.", "moneyNotFromRecord"],
+    ["We'll hold onto $40 on your card.", "neverHold"],
+    ["We'll hold the money until the visit.", "neverHold"],
+  ];
+
+  it("every line the security reviewer gave in rounds 1 and 2 fails with its label, straight or curly, on every booking", () => {
+    let checked = 0;
+    for (const [line, why] of REVIEWER)
+      for (const text of threeForms(line))
+        for (const reading of gateReadings()) {
+          const check = checkMoneyText(text, reading, gate());
+          expect(check.ok, text).toBe(false);
+          expect(check.refused, text).toContainEqual(BY_WHY[why]);
+          expect(gateMoneyText(text, gate()).refused, text).toContainEqual(BY_WHY[why]);
+          // The claim check alone refuses the hold and the silence topics too, with no line approved.
+          if (why !== "moneyNotFromRecord")
+            expect(checkMoneyLine(text, reading).refused, text).toContainEqual(BY_WHY[why]);
+          checked += 1;
+        }
+    expect(checked).toBe(REVIEWER.length * 3 * 6);
+  });
+
+  it("a denial no longer exempts a money sentence: round 2's denied clauses now fail with their labels", () => {
+    const denied: readonly (readonly [string, GateWhy])[] = [
+      ["We never hold your card.", "neverHold"],
+      ["Nothing is held on your card.", "neverHold"],
+      ["No $40 hold is ever placed on your card.", "neverHold"],
+      ["We never place a hold on your card.", "neverHold"],
+      ["If you don't reply, we won't charge your card.", "neverChargeOnSilence"],
+      [
+        "If you haven't answered within 24 hours, nothing is charged to the saved card.",
+        "neverChargeOnSilence",
+      ],
+      ["If we don't get a reply by 7pm, there's no charge.", "neverChargeOnSilence"],
+      ["If you don't answer, nothing is charged.", "neverChargeOnSilence"],
+      ["If you don't reply, the bill comes after the visit.", "neverChargeOnSilence"],
+    ];
+    for (const [line, why] of denied)
+      for (const text of threeForms(line))
+        for (const reading of gateReadings()) {
+          expect(checkMoneyText(text, reading, gate()).refused, text).toContainEqual(BY_WHY[why]);
+          expect(checkMoneyLine(text, reading).refused, text).toContainEqual(BY_WHY[why]);
+        }
+  });
+
+  it("a model's rewording of an approved money line fails with moneyNotFromRecord; the line itself passes", () => {
+    const rows = Object.values(record("A").rows).flatMap((list) => list.map((row) => row.text));
+    const reworded: readonly (readonly [string, string])[] = [
+      ["The card is saved for a {{keep}} fee", "Your card is saved for a {{keep}} fee"],
+      [
+        "may keep its {{keep}} fee from what you paid; anything above it goes back",
+        "may keep the {{keep}} fee from what you paid; the rest goes back",
+      ],
+      ["Paid in full when you book: {{paid}}", "You pay in full when you book: {{paid}}"],
+      [
+        "{{deposit}} deposit paid, toward the {{price}}",
+        "Your {{deposit}} deposit is paid, toward the {{price}}",
+      ],
+      [
+        "The {{back}} you paid goes back to the card it was paid with.",
+        "The {{back}} you paid goes back to your card.",
+      ],
+      [
+        "Nothing was charged, and the saved card won't be used.",
+        "Nothing was charged, and your saved card won't be used.",
+      ],
+      ["may charge its {{keep}} fee to the saved card", "will charge its {{keep}} fee to the saved card"],
+      [
+        "The {{due}} rest, charged to the saved card at the end",
+        "The {{due}} rest is charged to your saved card at the end",
+      ],
+    ];
+    for (const [line, words] of reworded) {
+      expect(rows, line).toContain(line);
+      expect(gateMoneyText(line, gate()), line).toEqual({ ok: true, refused: [] });
+      expect(gateMoneyText(line, NOTHING_APPROVED).ok, line).toBe(false);
+      expect(gateMoneyText(words, gate()), words).toEqual({ ok: false, refused: [NOT_FROM_RECORD] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(words, reading, gate()).refused, words).toContainEqual(NOT_FROM_RECORD);
+    }
+  });
+
+  it("every row of both records that is a money sentence passes as written and fails once reworded", () => {
+    let money = 0;
+    for (const flow of FLOWS)
+      for (const rows of Object.values(record(flow).rows))
+        for (const { text } of rows) {
+          const alone = gateMoneyText(text, NOTHING_APPROVED);
+          if (alone.ok || sentencesOf(text).length !== 1) continue;
+          money += 1;
+          expect(gateMoneyText(text, gate()).ok, text).toBe(true);
+          const words = `${text.replace(/[.!?]$/u, "")} for you`;
+          expect(gateMoneyText(words, gate()).refused, words).toEqual(alone.refused);
+        }
+    expect(money).toBeGreaterThan(20);
+  });
+
+  it("slots stand for the values the slot filler gave: a filled line passes only with those values, as its own words", () => {
+    const keep = [{ slot: "keep", value: "$20" }];
+    expect(gateMoneyText("The card is saved for a {{keep}} fee.", gate()).ok).toBe(true);
+    expect(gateMoneyText("The card is saved for a $20 fee.", gate(keep)).ok).toBe(true);
+    expect(gateMoneyText("The card is saved for a $20 fee.", gate()).refused).toEqual([NOT_FROM_RECORD]);
+    expect(gateMoneyText("The card is saved for a $30 fee.", gate(keep)).refused).toEqual([NOT_FROM_RECORD]);
+    // A value stands for its slot alone: the words around it are still the line's own.
+    expect(gateMoneyText("We hold $40, and the card is saved for a $20 fee.", gate(keep)).refused).toEqual([
+      HOLD,
+    ]);
+    expect(gateMoneyText("The card is saved for a $20 fee unless you reply.", gate(keep)).refused).toEqual([
+      SILENCE,
+    ]);
+  });
+
+  it("the records' rows pass on the bookings that pick them, as written and filled with the booking's ledger amounts", () => {
+    const seen = new Set<string>();
+    for (const flow of FLOWS)
+      for (const { money: reading, rows } of comparedOf(flow)) {
+        const values = Object.entries(ledgerFacts(reading)).map(([slot, amount]) => ({
+          slot,
+          value: `$${String(amount.cents / 100)}`,
+        }));
+        for (const [slot, row] of Object.entries(rows)) {
+          if (row === null) continue;
+          const text = record(flow).rows[slot as keyof MoneyRecord["rows"]]?.[row]?.text ?? "";
+          const filled = filledWith(text, values);
+          const key = `${text}|${filled}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          expect(gateMoneyText(text, gate()).ok, text).toBe(true);
+          expect(gateMoneyText(filled, gate(values)).ok, filled).toBe(true);
+          const others = checkMoneyText(filled, reading, gate(values)).refused.filter(
+            (refusal) => refusal.why !== "notTaken",
+          );
+          expect(others, filled).toEqual([]);
+        }
+      }
+    expect(seen.size).toBeGreaterThan(100);
+  }, 120_000);
+
+  it("S13-55's own lines pass as approved lines; with nothing approved, their money sentences fail with their labels", () => {
+    for (const line of S13_55_LINES)
+      expect(gateMoneyText(line, gate()), line).toEqual({ ok: true, refused: [] });
+    expect(gateMoneyText(S13_55_LINES[0] ?? "", NOTHING_APPROVED).refused).toEqual([HOLD]);
+    expect(gateMoneyText(S13_55_LINES[1] ?? "", NOTHING_APPROVED).refused).toEqual([SILENCE]);
+  });
+
+  it("the master corpus, every string of both flows (round 2's probe): each message text, row and S13-55 line passes; a note is no message", () => {
+    const all = new Set<string>();
+    const sendable = new Set<string>();
+    for (const flow of FLOWS) {
+      const graph = src.flows[flow];
+      for (const text of stringsOf(graph)) all.add(text);
+      for (const rows of Object.values(record(flow).rows)) for (const row of rows) sendable.add(row.text);
+      const steps = objAt(graph, ["steps"]);
+      const home = objAt(steps, [record(flow).home]);
+      for (const text of [...stringsOf(home.does), ...stringsOf(home.more), ...stringsOf(home.rule)])
+        sendable.add(text);
+      for (const step of Object.values(steps)) {
+        if (typeof step !== "object" || step === null) continue;
+        const fields = step as Record<string, unknown>;
+        for (const text of stringsOf(fields.say)) sendable.add(text);
+        if (typeof fields.vary === "object" && fields.vary !== null)
+          for (const patch of Object.values(fields.vary as Record<string, unknown>)) {
+            const words = patch as Record<string, unknown>;
+            for (const text of [...stringsOf(words.say), ...stringsOf(words.addSay)]) sendable.add(text);
+          }
+        if (typeof fields.fallbackText === "string") sendable.add(fields.fallbackText);
+      }
+    }
+    expect(all.size).toBeGreaterThan(10_000);
+    expect(sendable.size).toBeGreaterThan(1000);
+    expect([...sendable].filter((text) => !gateMoneyText(text, gate()).ok)).toEqual([]);
+    // What the gate refuses is the master's own notes and rules, which are never sent: S11-13's note among them.
+    const refused = [...all].filter((text) => !sendable.has(text) && !gateMoneyText(text, gate()).ok);
+    expect(refused.length).toBeGreaterThan(0);
+    const note = "Silence: charged as their terms say.";
+    expect(refused.some((text) => text.includes(note))).toBe(true);
+    expect(gateMoneyText(note, gate()).refused).toEqual([SILENCE]);
+  }, 120_000);
+
+  it("a money action word with no money object passes: 'We'll hold your 10am'", () => {
+    const passing = [
+      "We'll hold your 10am.",
+      "We’ll hold your 10am.",
+      "We'll keep your spot until Fri 11am.",
+      "Riley will block off Sat morning for you.",
+      "Take a seat when you get here.",
+    ];
+    for (const text of passing) {
+      expect(gateMoneyText(text, gate()), text).toEqual({ ok: true, refused: [] });
+      expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(text, reading, gate()), text).toEqual({ ok: true, claims: [], refused: [] });
+    }
+  });
+
+  it("a sentence ends only at . ! ? or a line break: a comma, dash, parenthesis, quote or semicolon never parts a money word from its object", () => {
+    for (const text of [
+      "Your card, as agreed, will be held for $40.",
+      "Your card (as agreed) will be held.",
+      "Your card — as agreed — will be held.",
+      "We'll hold it; it goes on your card.",
+      "We'll place a “hold” on your card.",
+    ])
+      expect(gateMoneyText(text, gate()).refused, text).toEqual([HOLD]);
+    expect(gateMoneyText("If you don't reply by 7pm; we'll charge it.", gate()).refused).toEqual([SILENCE]);
+    // A line break ends a sentence: the card with an amount is still a money sentence of its own.
+    expect(gateMoneyText("We'll hold it.\nYour card, $40.", gate()).refused).toEqual([NOT_FROM_RECORD]);
+  });
+});
+
+describe("round 3 (DL-182, 2): 'deposit paid', 'paid in full' and 'refunded' said as statements need money the booking took", () => {
+  it("'deposit paid' and 'paid in full' said as statements fail before the money step and pass once taken; a term stays a term", () => {
+    const asked = readMoney(oneService("A", "list|deposit|counter", false), record("A"));
+    const taken = readMoney(oneService("A", "list|deposit|counter"), record("A"));
+    for (const text of [
+      "Your $40 deposit was paid.",
+      "Your deposit is paid.",
+      "Deposit paid: $40.",
+      "You paid the $40 deposit.",
+    ]) {
+      expect(checkMoneyLine(text, asked).refused, text).toEqual([{ claim: "depositPaid", why: "notTaken" }]);
+      expect(checkMoneyLine(text, taken).ok, text).toBe(true);
+    }
+    const askedFull = readMoney(oneService("A", "list|full|none", false), record("A"));
+    const takenFull = readMoney(oneService("A", "list|full|none"), record("A"));
+    const unwrittenFull = readMoney({ ...oneService("A", "list|full|none"), written: false }, record("A"));
+    for (const text of ["Paid in full.", "Your visit is paid in full.", "You've paid in full: $55."]) {
+      for (const reading of [askedFull, unwrittenFull])
+        expect(checkMoneyLine(text, reading).refused, text).toContainEqual({
+          claim: "paidInFull",
+          why: "notTaken",
+        });
+      expect(checkMoneyLine(text, takenFull).ok, text).toBe(true);
+    }
+    // The record's term row (pay.asks): what the booking asks when it is booked, before the money step too.
+    expect(checkMoneyLine("Paid in full when you book: $55", askedFull)).toEqual({
+      ok: true,
+      claims: ["paidInFull"],
+      refused: [],
+    });
+    expect(moneyLines(askedFull, record("A")).find((line) => line.slot === "pay.asks")).toMatchObject({
+      ok: true,
+      text: "Paid in full when you book: {{paid}}",
+    });
+  });
+
+  it("'refunded', 'was refunded' and 'we refunded' fail before the money step and pass once taken; 'goes back to the card' stays a term", () => {
+    const asked = readMoney(oneService("A", "list|deposit|counter", false), record("A"));
+    const taken = readMoney(oneService("A", "list|deposit|counter"), record("A"));
+    for (const text of [
+      "Your $40 deposit was refunded.",
+      "We refunded your $40.",
+      "Refunded to your card: $40.",
+      "We've already refunded the deposit.",
+      "The $40 has been refunded to your card.",
+    ]) {
+      expect(checkMoneyLine(text, asked).refused, text).toEqual([{ claim: "backToCard", why: "notTaken" }]);
+      expect(checkMoneyLine(text, taken).ok, text).toBe(true);
+    }
+    expect(checkMoneyLine("The $40 you paid goes back to the card it was paid with.", asked)).toEqual({
+      ok: true,
+      claims: ["paidNow", "backToCard"],
+      refused: [],
+    });
+  });
+
+  it("the record's statement rows ('{{deposit}} deposit paid, toward the {{price}}') are refused before the money step and pass once taken", () => {
+    const took = (reading: MoneyReading) =>
+      moneyLines(reading, record("A")).find((line) => line.slot === "pay.took");
+    expect(took(readMoney(oneService("A", "list|deposit|counter", false), record("A")))).toEqual({
+      slot: "pay.took",
+      ok: false,
+      row: 8,
+      refused: [{ claim: "depositPaid", why: "notTaken" }],
+      why: "claims",
+    });
+    expect(took(readMoney(oneService("A", "list|deposit|counter"), record("A")))).toMatchObject({
+      ok: true,
+      row: 8,
+      text: "{{deposit}} deposit paid, toward the {{price}}",
+    });
   });
 });

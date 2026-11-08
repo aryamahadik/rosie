@@ -27,9 +27,12 @@ export interface MoneyHomeContext {
   readonly signedSchedule?: boolean;
 }
 
-/** The claim points (every money claim but the two that have points of their own). */
+/**
+ * The claim points: every money claim but the two that have points of their own, and the gate's money sentence the
+ * record did not write (DL-182), which is a refusal of words, never a claim a step makes about a booking.
+ */
 const CLAIM_POINTS: readonly MoneyClaim[] = MONEY_CLAIMS.filter(
-  (claim) => claim !== "cardHold" && claim !== "chargeOnSilence",
+  (claim) => claim !== "cardHold" && claim !== "chargeOnSilence" && claim !== "moneySentence",
 );
 
 /** The money home's points, each a label (T-586: unique across the homes). */
