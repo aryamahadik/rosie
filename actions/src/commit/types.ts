@@ -7,8 +7,9 @@
 // request and answer, reached through the Tool API's call types, so the commit and the base read one shape.
 //
 // What a passed part writes (the walk after its choice, its step's writes: arch 03 line 191), what a core action writes
-// (the shared-core calls), the safety holds open now and the K-05 call itself are ports, given to the commit: each is
-// another task's (CommitPorts below), so the commit is tested with doubles and fails closed while one is not built.
+// (the shared-core calls), what is open now (the safety holds and the turn's unread texts) and the K-05 call itself are
+// ports, given to the commit: each is another task's (CommitPorts below), so the commit is tested with doubles and fails
+// closed while one is not built.
 
 import type * as K05 from "../../../contracts/generated/data-access/data-access.v1.1";
 import type { Choice, GatedVerbPart, GateRequest, LimitRegistry, SetupKey } from "../gate/framework";
@@ -65,6 +66,17 @@ export type BundleMismatch = Extract<ErrorsOf<"gateAndCommit">, { error: "bundle
 export type SafetyHold = NonNullable<
   NonNullable<Extract<CoreResult, { call: "recordSafetyOutcome" }>["response"]>["hold"]
 >;
+
+/**
+ * What is open on the turn's handle at commit time (QUESTIONS.md CQ-65 with its DL-127 and DL-128 addenda): the safety
+ * holds, and the turn's texts not yet read, by event id (K-06 v1 eventId): each text still being read, unwired, given up
+ * with no hold row, or with no safety row. An unread text holds every part but a protective one, as a threat's hold does
+ * (hold.ts). T-1088's runtime CommitContext carries the same event ids beside the holds; T-251 wires the two.
+ */
+export interface OpenHolds {
+  readonly holds: readonly SafetyHold[];
+  readonly unreadEventIds: readonly string[];
+}
 
 // ---- what a part or a core action writes ---------------------------------------------------------------------------
 
@@ -148,23 +160,25 @@ export interface CommitTurnContext<Repo = unknown> {
  *   - commitTurn: K-05 v1.1 commitTurn (T-306 wires the database engineer's data-access call; tests use a fake);
  *   - writesOf: what a passed part's choice writes (the walk after a choice, arch 03 line 191, and each step's writes);
  *   - runCore: one shared-core call made in the turn (K-09 v1 `coreAction`; M3b's calls), in the request's order;
- *   - openHolds: the safety holds open on the turn's handle, read at commit time (QUESTIONS.md CQ-65's replaced default:
- *     the commit path reads them again, so a hold opened mid-turn binds this commit too). K-05 v1.2 has no read for K-34's
- *     holds yet (its open gap 26).
- * runCore and writesOf are handed the holds in force: those open on the handle, with those the turn's earlier core
- * actions opened (a safety outcome's hold binds the core actions after it), so a core call that is not protective holds
- * itself back with its own answer (K-09 v1 coreResult: "A refused core action stops only itself").
+ *   - openHolds: what is open on the turn's handle, read at commit time (OpenHolds: the safety holds and the turn's
+ *     unread texts; QUESTIONS.md CQ-65: the commit path reads them again, so a hold opened mid-turn binds this commit
+ *     too). K-05 v1.2 has no read for K-34's holds yet (its open gap 26).
+ * runCore and writesOf are handed what is open in force: the holds open on the handle with those the turn's earlier core
+ * actions opened (a safety outcome's hold binds the core actions after it), and the unread texts. So a core call that is
+ * not protective holds itself back with its own answer (K-09 v1 coreResult: "A refused core action stops only itself"),
+ * and while anything is open a protective part's walk stops at its first routine row (DL-128: A3-50's answer rejoins the
+ * booking, MASTER-FLOW-A.md lines 1736 and 1745; T-251 builds both).
+ * openHolds, runCore and writesOf must have no outside effect: a repeated turn (a lost reply, a lapsed turn's rerun) runs
+ * all three again before K-05 answers `repeated` (K-05 v1 item 1), so each only reads, inside the call's business scope,
+ * and hands back what the commit is to write. Nothing is sent, charged, stored or told outside the one K-05 request
+ * (arch 10 line 508: exactly once).
  * Each throws CommitNotBuiltError until its task lands (notBuiltPorts), so the commit fails closed.
  */
 export interface CommitPorts<Repo = unknown> {
   commitTurn(request: CommitTurnRequest, call: CallContext<Repo>): Promise<CommitTurnAnswer>;
-  writesOf(
-    part: PassedPart,
-    turn: CommitTurnContext<Repo>,
-    holds: readonly SafetyHold[],
-  ): Promise<UnitWrites>;
-  runCore(action: CoreAction, turn: CommitTurnContext<Repo>, holds: readonly SafetyHold[]): Promise<CoreRun>;
-  openHolds(turn: CommitTurnContext<Repo>): Promise<readonly SafetyHold[]>;
+  writesOf(part: PassedPart, turn: CommitTurnContext<Repo>, open: OpenHolds): Promise<UnitWrites>;
+  runCore(action: CoreAction, turn: CommitTurnContext<Repo>, open: OpenHolds): Promise<CoreRun>;
+  openHolds(turn: CommitTurnContext<Repo>): Promise<OpenHolds>;
 }
 
 /** What gateAndCommit runs with: limits 1 to 6 (../gate/limits.ts in the Worker) and the commit's ports. */

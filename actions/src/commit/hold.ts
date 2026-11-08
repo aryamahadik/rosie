@@ -7,19 +7,30 @@
 //   2. The bundle (CQ-72's default 2; K-09 v1 bundleMismatch): the turn row carries the bundle pinned at the turn's start
 //      (K-05 v1 turn.bundleId; arch 10 line 548). A context or decide result naming another bundle is refused before any
 //      limit runs: nothing is written.
-//   3. Safety holds (CQ-65's replaced default, DL-119; arch 06 lines 315 to 329): while a hold is open on the handle, only
-//      changes that only protect (a STOP, a death report, the A3-48 pause or the A3-50 private flag: the any-time rows
-//      whose effect is a record flag, and their handler steps; a hand-off to a person) and the safety flow (the danger
-//      read's own steps, a clear "we're safe" with a fresh read-back: A3-22 to A3-26) commit; every routine part is held
-//      (K-09 v1 partResult `held`). A threat's hold (release rule never) lets only the protective changes through. Held
-//      parts are held back before the gate, so no limit runs for them (K-09 v1 valueFailsWords: "parts a safety outcome
-//      holds are held, not gated"). Every open hold holds, whatever its rule: an at-once hold binds until it is released.
+//   3. Safety holds (CQ-65 with its DL-127 and DL-128 addenda; arch 06 lines 315 to 329). What is open at commit time is
+//      each safety hold on the handle (K-09 v1 safetyHold) and each of the turn's texts not yet read (types.ts OpenHolds).
+//      A part commits only if every open hold lets it through ("Several at once: The strictest holds", arch 06 line 327)
+//      and, unless it only protects, no text is unread:
+//        - every hold, and an unread text, lets the protective changes through ("Changes that only protect, such as a
+//          stop, stricter contact or a death report, commit at once", arch 06 line 329; the A3-48 pause; A3-50's private
+//          booking; their twins in the master): PROTECTIVE_ROWS and PROTECTIVE_STEPS;
+//        - an emergency, crisis-words or unsure hold (release rule after_safe: "After a clear 'we're safe', with a fresh
+//          read-back (A3-24, A3-25)", arch 06 line 323) also lets its own release through: SAFETY_FLOW_STEPS;
+//        - nothing else. The other safety steps rejoin the booking, so they are held under every open hold: the danger
+//          read A3-22 and its flow B twin B3-17 (their "No" and "Safety steps, then go on" branches rejoin:
+//          MASTER-FLOW-A.md lines 1667 and 1670, MASTER-FLOW-B.md lines 1447 and 1450), A3-23 ("Then the booking goes
+//          on, marked urgent", A line 1675), A3-26 ("Then the booking can go on", A line 1758), A3-49 ("the booking goes
+//          on", A line 1731) and B3-31 (B line 1538). So is a hand-off, which is not in CQ-65's protective list: whoever
+//          a safety outcome must tell, the outcome itself tells (arch 06 line 329).
+//      A threat's hold (never), a hold released once the booking is private (when_private), an at-once hold until it is
+//      released, and an unread text all let only the protective changes through. Held parts are held back before the
+//      gate, so no limit runs for them (K-09 v1 valueFailsWords: "parts a safety outcome holds are held, not gated").
 //   4. One question first (CQ-73's default): a part the gate passed on the booking of a part decide ended in one question
 //      (oneQuestion, or the verb ask) waits for the answer: it is answered `asked` and writes nothing.
 
 import type { Choice, DecidePart, Decided } from "../gate/framework";
 import { CommitRefusedError } from "./errors";
-import type { BundleMismatch, GateAndCommitRequest, SafetyHold, TurnRow } from "./types";
+import type { BundleMismatch, GateAndCommitRequest, OpenHolds, SafetyHold, TurnRow } from "./types";
 
 // ---- 1. the turn ------------------------------------------------------------------------------------------------------
 
@@ -71,57 +82,54 @@ export function bundleMismatchOf(request: GateAndCommitRequest, turn: TurnRow): 
 // ---- 3. safety holds --------------------------------------------------------------------------------------------------
 
 /**
- * The any-time rows whose effect only protects, as a record flag (bundle v1 any-time table `flags`; arch 03 line 175; arch
- * 06 line 329: "Changes that only protect, such as a stop, stricter contact or a death report, commit at once"): stop
- * (stopped), death (deceased), threat (paused, A3-48) and child, elder or unsafe at home (private, A3-50).
+ * The any-time rows whose effect is a protective record flag and whose handler is a protective step (bundle v1 any-time
+ * table, contracts/bundle/fixtures/anytime-table.json): stop (flag stopped; handler A7-11), death (deceased; A7-81) and
+ * threat (paused; A3-48). Not the child, elder or unsafe-at-home row: its handler is the danger read itself (A3-22), whose
+ * hotline branch rejoins the booking (A3-49); only its private booking is protective, by its step (A3-50, B3-32).
  */
-export const PROTECTIVE_ROWS: readonly string[] = [
-  "stop",
-  "death",
-  "threat",
-  "child-elder-or-unsafe-at-home",
-];
+export const PROTECTIVE_ROWS: readonly string[] = ["stop", "death", "threat"];
 
 /**
- * The handler steps of those rows (01-inventory any-time rows 2, 3, 5 and 6; QUESTIONS.md CQ-65: "the A3-48 pause"): the
- * threat's pause (A3-48, flow B's B3-30), the unsafe-at-home private booking (A3-50, B3-32), a death report (A7-81) and a
- * STOP (A7-11, B7-15; a staff member's at joining, S2-08). A choice at one of them is protective too.
+ * The steps whose change only protects (DL-128), each with its place in the master (A: MASTER-FLOW-A.md; B:
+ * MASTER-FLOW-B.md). A flow B twin is the same step under the same heading and words:
+ *   - a STOP: A7-11 "No more texts; the visit stays" (A line 3929, branch "Alex texts STOP or CANCEL" line 3927), its twin
+ *     B7-15 (B line 3938), and a staff member's STOP to the invite, S2-08 "Confirms the stop; tells Sam" (A line 1290);
+ *   - a death report: A7-81 "Stops texts and charges for a customer who died" (A line 4053) and its twin B7-73 (B line
+ *     4067);
+ *   - the A3-48 pause: A3-48 "Tells Sam at once about a threat" (A line 1709) and its twin B3-30 (B line 1516);
+ *   - A3-50's private booking, which also makes contact stricter ("Their contact preferences get stricter", A line 1661;
+ *     "Someone else's word only makes these stricter", line 1744): A3-50 "Makes the booking private and safe" (A line
+ *     1738) and its twin B3-32 (B line 1545).
+ * A choice at one of them is protective. Not here, so held while anything is open (fail closed): A7-98 and B7-88
+ * (updates to a new phone or email, A line 3946, B line 3961), which add a way in; and A7-88 and B7-71 (a threat after
+ * booking, A line 4014, B line 4029), which DL-128 does not name, while the threat row itself is protective (A3-48).
  */
 export const PROTECTIVE_STEPS: readonly string[] = [
+  "A7-11",
+  "B7-15",
+  "S2-08",
+  "A7-81",
+  "B7-73",
   "A3-48",
   "B3-30",
   "A3-50",
   "B3-32",
-  "A7-81",
-  "A7-11",
-  "B7-15",
-  "S2-08",
 ];
 
-/** The danger read's own any-time row: entering it is the safety flow (A3-22). */
-export const SAFETY_ROW = "danger-or-crisis";
-
 /**
- * The steps of the safety flow a hold lets through but a threat's (arch 06 lines 319 to 325; 01-inventory any-time rows 1
- * and 3): the danger outcome and its "we're safe" with a fresh read-back (A3-22 to A3-26; flow B's danger read, B3-17), and
- * the child or elder hotline with the team told that day (A3-49, B3-31). Flow B's own "we're safe" steps are not named in
- * the sources this task reads, so they are held until they are (fail closed).
+ * The release an emergency, crisis-words or unsure hold (release rule after_safe) waits for, a clear "we're safe" with a
+ * fresh read-back (arch 06 line 323): A3-24 "Sends the 911 safety message" ("After a clear 'we're safe, it's handled', the
+ * booking may go on", A line 1690) and A3-25 "Gives the 988 crisis line" ("The booking may go on in this chat only after a
+ * clear 'I'm safe right now'", A line 1701), and the flow B steps the master names with the same read-back: B3-19 (B line
+ * 1475) and B3-20 (B line 1489). Only an after-safe hold lets them through.
  */
-export const SAFETY_FLOW_STEPS: readonly string[] = [
-  "A3-22",
-  "A3-23",
-  "A3-24",
-  "A3-25",
-  "A3-26",
-  "A3-49",
-  "B3-17",
-  "B3-31",
-];
+export const SAFETY_FLOW_STEPS: readonly string[] = ["A3-24", "A3-25", "B3-19", "B3-20"];
 
 /**
- * What a part is to a hold: protective (only protects: it commits under every hold), the safety flow (it commits under
- * every hold but a threat's), routine (held while any hold is open), or none (a verb that writes nothing: ask, no_op,
- * redact, none_fits).
+ * What a part is to what is open: protective (it only protects: every hold and an unread text let it through), the
+ * safety flow (an after-safe hold's own release: only an after-safe hold lets it through), routine (every other part,
+ * the other safety steps and a hand-off included: held while any hold is open or any text is unread), or none (a verb
+ * that writes nothing: ask, no_op, redact, none_fits; the gate answers it asked or noAction, so there is nothing to hold).
  */
 export type HoldClass = "protective" | "safetyFlow" | "routine" | "none";
 
@@ -133,8 +141,8 @@ export function holdClassOf(part: DecidePart, choice: Choice | null): HoldClass 
     case "none_fits":
       return "none";
     case "hand_off":
-      // A hand to a person adds no person, way in, money or authority: it only gets someone to look (arch 06 line 329).
-      return "protective";
+      // Held under every open hold (DL-128): it is not in CQ-65's protective list.
+      return "routine";
     case "pass_on":
       return "routine";
     case "choose":
@@ -142,25 +150,38 @@ export function holdClassOf(part: DecidePart, choice: Choice | null): HoldClass 
       if (choice === null) return "routine";
       if (choice.anytimeRow !== null && PROTECTIVE_ROWS.includes(choice.anytimeRow)) return "protective";
       if (PROTECTIVE_STEPS.includes(choice.step)) return "protective";
-      if (choice.anytimeRow === SAFETY_ROW || SAFETY_FLOW_STEPS.includes(choice.step)) return "safetyFlow";
+      if (SAFETY_FLOW_STEPS.includes(choice.step)) return "safetyFlow";
       return "routine";
     default:
       return "routine";
   }
 }
 
-/** Whether the open holds keep a part of this class back: a threat's (never) lets only protective changes through. */
-export function isHeld(holdClass: HoldClass, holds: readonly SafetyHold[]): boolean {
-  if (holds.length === 0) return false;
+/** Whether one open hold lets a part of this class through (arch 06 lines 319 to 329; DL-128). */
+export function letsThrough(hold: SafetyHold, holdClass: HoldClass): boolean {
   switch (holdClass) {
     case "none":
     case "protective":
-      return false;
-    case "safetyFlow":
-      return holds.some((hold) => hold.releaseRule === "never");
-    case "routine":
       return true;
+    case "safetyFlow":
+      return hold.releaseRule === "after_safe";
+    case "routine":
+      return false;
   }
+}
+
+/**
+ * Whether what is open keeps a part of this class back: it commits only if every open hold lets it through (the strictest
+ * holds: arch 06 line 327) and, unless it is protective, none of the turn's texts is unread (CQ-65's DL-127 addendum).
+ */
+export function isHeld(
+  holdClass: HoldClass,
+  holds: readonly SafetyHold[],
+  unreadEventIds: readonly string[] = [],
+): boolean {
+  if (holdClass === "none" || holdClass === "protective") return false;
+  if (unreadEventIds.length > 0) return true;
+  return holds.some((hold) => !letsThrough(hold, holdClass));
 }
 
 /** The offered choice a choose or enter names; null for another verb, or a choice the context does not hold. */
@@ -169,13 +190,15 @@ export function choiceOf(decided: Decided, part: DecidePart): Choice | null {
   return decided.context.choices.find((offered) => offered.choiceId === part.choice) ?? null;
 }
 
-/** The parts of decide the open holds keep back, by index (empty for a turn with no decided texts or no hold). */
-export function heldParts(request: GateAndCommitRequest, holds: readonly SafetyHold[]): ReadonlySet<number> {
+/** The parts of decide that what is open keeps back, by index (empty for a turn with no decided texts, or nothing open). */
+export function heldParts(request: GateAndCommitRequest, open: OpenHolds): ReadonlySet<number> {
   const held = new Set<number>();
-  if (request.input.kind !== "decided" || holds.length === 0) return held;
+  if (request.input.kind !== "decided") return held;
+  if (open.holds.length === 0 && open.unreadEventIds.length === 0) return held;
   const { decided } = request.input;
   decided.decide.parts.forEach((entry, index) => {
-    if (isHeld(holdClassOf(entry.part, choiceOf(decided, entry.part)), holds)) held.add(index);
+    const holdClass = holdClassOf(entry.part, choiceOf(decided, entry.part));
+    if (isHeld(holdClass, open.holds, open.unreadEventIds)) held.add(index);
   });
   return held;
 }

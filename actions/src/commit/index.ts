@@ -27,7 +27,6 @@ export {
   PROTECTIVE_ROWS,
   PROTECTIVE_STEPS,
   SAFETY_FLOW_STEPS,
-  SAFETY_ROW,
   askedBookings,
   bookingKey,
   bundleMismatchOf,
@@ -36,6 +35,7 @@ export {
   heldParts,
   holdClassOf,
   isHeld,
+  letsThrough,
   type HoldClass,
 } from "./hold";
 export type {
@@ -61,6 +61,7 @@ export type {
   EventEntry,
   GateAndCommitAnswer,
   GateAndCommitRequest,
+  OpenHolds,
   OpenQuestionClose,
   OpenQuestionNew,
   OutboxRowNew,

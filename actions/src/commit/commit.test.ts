@@ -20,6 +20,7 @@ import {
   samKinds,
   scriptedLimits,
   twoRequests,
+  withRead,
   wordsIn,
   type LimitCall,
   type Script,
@@ -34,7 +35,7 @@ import {
   type ScopeEvent,
 } from "../tool-api/test-support";
 import { CommitNotBuiltError, CommitRefusedError, defaultCommitDeps, gateAndCommit } from "./index";
-import { holdClassOf, isHeld } from "./hold";
+import { holdClassOf, isHeld, letsThrough } from "./hold";
 import {
   S1_02,
   contractChecks,
@@ -49,6 +50,7 @@ import {
   s1_02SafetyOutcome,
   samKindsWrites,
   type Doubles,
+  type PortCalls,
 } from "./test-support";
 import type {
   CommitDeps,
@@ -590,7 +592,7 @@ describe("parts under a safety hold are held back before the gate (CQ-65's repla
     expect(deps.calls.coreHolds).toEqual([["hold-sam-0002"], ["hold-sam-0002", "hold-alex-0204"]]);
   });
 
-  it("only protective changes pass a threat's hold; the safety flow passes every other hold", () => {
+  it("only protective changes pass a threat's hold; the safety flow passes an after-safe hold", () => {
     const decided = samKinds();
     const [option, , , , danger] = decided.context.choices;
     if (danger === undefined) throw new Error("context-s1-02 changed");
@@ -612,11 +614,11 @@ describe("parts under a safety hold are held back before the gate (CQ-65's repla
     ];
     expect(table).toEqual([
       ["an open question's option", "routine"],
-      ["the danger row", "safetyFlow"],
+      ["the danger row", "routine"],
       ["the stop row", "protective"],
       ["a 'we're safe' answer", "safetyFlow"],
       ["the threat's pause", "protective"],
-      ["a hand-off", "protective"],
+      ["a hand-off", "routine"],
       ["a pass-on", "routine"],
       ["a no-op", "none"],
     ]);
@@ -643,6 +645,304 @@ describe("parts under a safety hold are held back before the gate (CQ-65's repla
       parts: [{ part: 0, choiceId: danger.choiceId, result: "committed" }],
     });
     expect(ported.calls.writesOf).toEqual([0]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// What each open hold lets through (DL-128; QUESTIONS.md CQ-65 with its DL-127 and DL-128 addenda)
+
+const AT_ONCE_HOLD: SafetyHold = { holdId: "hold-sam-0003", releaseRule: "at_once", blocksBooking: false };
+const WHEN_PRIVATE_HOLD: SafetyHold = {
+  holdId: "hold-sam-0004",
+  releaseRule: "when_private",
+  blocksBooking: false,
+};
+/** A second emergency, crisis-words or unsure hold, opened by another text. */
+const AFTER_SAFE_HOLD_TOO: SafetyHold = {
+  holdId: "hold-sam-0005",
+  releaseRule: "after_safe",
+  blocksBooking: false,
+};
+/** One hold of each release rule (K-09 v1 safetyHold.releaseRule). */
+const EACH_HOLD = [AT_ONCE_HOLD, WHEN_PRIVATE_HOLD, AFTER_SAFE_HOLD, NEVER_HOLD] as const;
+/** Sam's text, not yet read at commit time (its event id). */
+const UNREAD = "evt-sam-0001";
+
+/** An any-time row's name (bundle v1 any-time table; K-02 v1 choice.anytimeRow). */
+type AnytimeRow = NonNullable<Choice["anytimeRow"]>;
+
+/** One part of a test turn: an option of Sam's open question at a step, an any-time row entered at its step, a hand-off. */
+type TestPart =
+  | { readonly verb: "choose"; readonly step: string; readonly quote: string }
+  | { readonly verb: "enter"; readonly row: AnytimeRow; readonly step: string; readonly quote: string }
+  | { readonly verb: "hand_off"; readonly quote: string };
+
+const choose = (step: string, quote = "Barbershop"): TestPart => ({ verb: "choose", step, quote });
+const enter = (row: AnytimeRow, step: string, quote = "plumbing"): TestPart => ({
+  verb: "enter",
+  row,
+  step,
+  quote,
+});
+const HAND_OFF: TestPart = { verb: "hand_off", quote: "electrical" };
+
+/**
+ * Sam's S1-02 turn (K-02 context-s1-02.json) with its parts replaced, both reads agreeing: a choose answers Sam's open
+ * question with an option of its own at its step, an enter takes the danger row's any-time choice moved to its row and
+ * step, and a hand-off asks for a person. Every quote is words of Sam's text, so the gate's checks hold.
+ */
+function samTurn(parts: readonly TestPart[]): Decided {
+  const decided = samKinds();
+  const [option, , , , anytime] = decided.context.choices;
+  const { question } = option;
+  if (anytime === undefined || question === null) throw new Error("context-s1-02 changed");
+  const decideParts = parts.map((each, index): DecidePart => {
+    if (each.verb === "hand_off") {
+      return { verb: "hand_off", quote: each.quote, reason: "Sam asks for a person.", about: "other" };
+    }
+    const choiceId = `c-${String(10 + index)}`;
+    if (each.verb === "choose") {
+      decided.context.choices.push({ ...copy(option), choiceId, step: each.step, fields: [] });
+      return { verb: "choose", quote: each.quote, question, choice: choiceId, fields: [] };
+    }
+    decided.context.choices.push({ ...copy(anytime), choiceId, step: each.step, anytimeRow: each.row });
+    return { verb: "enter", quote: each.quote, choice: choiceId, fields: [] };
+  });
+  const [first, ...rest] = decideParts;
+  if (first === undefined) throw new Error("a test turn has parts");
+  return withRead(decided, { language: "en", parts: [first, ...rest] });
+}
+
+/** What part `index` of a test turn writes once it commits: one message of its own, so the K-05 request shows it. */
+function messageOf(index: number, step: string): UnitWrites {
+  const row: OutboxRowNew = {
+    id: `out-part-${String(index)}`,
+    recipientHandleId: "handle-sam",
+    recipientPersonId: "person-sam",
+    businessId: "biz-lees-barbershop",
+    bookingId: null,
+    channel: "imessage",
+    sendClass: "quick_reply",
+    openQuestionId: null,
+    copyOfRowId: null,
+    versionsRead: [],
+  };
+  return { ...noWrites({ step, choice: null }), messages: [row] };
+}
+
+const messagesOf = (indexes: readonly number[]): string[] =>
+  indexes.map((index) => `out-part-${String(index)}`);
+
+interface UnderHolds {
+  /** Each part's result, in decide's order. */
+  readonly results: string[];
+  /** The messages in the one K-05 request: the parts that wrote. */
+  readonly written: string[];
+  /** The parts any limit ran for. */
+  readonly gated: number[];
+  readonly calls: PortCalls;
+}
+
+/** A test turn committed through the Tool API base, with `holds` open on the handle and `unread` texts. */
+async function commitUnder(
+  parts: readonly TestPart[],
+  holds: readonly SafetyHold[],
+  unread: readonly string[] = [],
+): Promise<UnderHolds> {
+  const writes: Record<number, UnitWrites> = {};
+  parts.forEach((each, index) => {
+    writes[index] = messageOf(index, each.verb === "hand_off" ? "S11-19" : each.step);
+  });
+  const ported = doublePorts({ writes, holds, unread });
+  const limitCalls: LimitCall[] = [];
+  const called = await callCommit(gateRequest(samTurn(parts)), {
+    limits: scriptedLimits({}, limitCalls),
+    ports: ported.ports,
+  });
+  expect(called.answer).toMatchObject({ result: "committed", repeated: false });
+  const answer = called.answer as { parts: { result: string }[] };
+  return {
+    results: answer.parts.map((each) => each.result),
+    written: onlyRequest(ported.k05.requests).writes.outboxRows.map((row) => row.id),
+    gated: [...new Set(limitCalls.map((call) => call.part))],
+    calls: ported.calls,
+  };
+}
+
+/**
+ * A turn with a part of each kind: a routine answer (0); the protective changes, by any-time row (1 STOP, 2 death, 3
+ * threat) and by each step the master names (4 to 11); the after-safe release (12, A3-24); a hand-off (13).
+ */
+const MIXED: readonly TestPart[] = [
+  choose("S1-02"),
+  enter("stop", "A7-11"),
+  enter("death", "A7-81"),
+  enter("threat", "A3-48"),
+  choose("A3-50"),
+  choose("B3-30"),
+  choose("B3-32"),
+  choose("A7-11"),
+  choose("B7-15"),
+  choose("S2-08"),
+  choose("A7-81"),
+  choose("B7-73"),
+  choose("A3-24"),
+  HAND_OFF,
+];
+const PROTECTIVE_PARTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+/** MIXED's results when only the protective changes commit. */
+const ONLY_PROTECTIVE = MIXED.map((_, index) => (PROTECTIVE_PARTS.includes(index) ? "committed" : "held"));
+
+describe("what each open hold lets through (DL-128; CQ-65's addenda)", () => {
+  it("an after-safe hold holds each of the six safety steps that rejoin the booking, and the danger rows", async () => {
+    for (const part of [
+      choose("A3-22"),
+      choose("A3-23"),
+      choose("A3-26"),
+      choose("A3-49"),
+      choose("B3-17"),
+      choose("B3-31"),
+      enter("danger-or-crisis", "A3-22"),
+      enter("child-elder-or-unsafe-at-home", "A3-22"),
+    ]) {
+      const ran = await commitUnder([part], [AFTER_SAFE_HOLD]);
+      const step = part.verb === "hand_off" ? "hand_off" : part.step;
+      expect(ran.results, step).toEqual(["held"]);
+      expect(ran.gated, step).toEqual([]);
+      expect(ran.calls.writesOf, step).toEqual([]);
+      expect(ran.written, step).toEqual([]);
+    }
+  });
+
+  it("A3-24 and A3-25, and their flow B twins B3-19 and B3-20, pass an after-safe hold, and no other kind", async () => {
+    for (const step of ["A3-24", "A3-25", "B3-19", "B3-20"]) {
+      const ran = await commitUnder([choose(step)], [AFTER_SAFE_HOLD]);
+      expect(ran.results, step).toEqual(["committed"]);
+      expect(ran.gated, step).toEqual([0]);
+      expect(ran.written, step).toEqual(["out-part-0"]);
+      for (const hold of [AT_ONCE_HOLD, WHEN_PRIVATE_HOLD, NEVER_HOLD]) {
+        const held = await commitUnder([choose(step)], [hold]);
+        expect(held.results, `${step} ${hold.releaseRule}`).toEqual(["held"]);
+        expect(held.written, `${step} ${hold.releaseRule}`).toEqual([]);
+      }
+    }
+  });
+
+  it("under a threat's hold (and an at-once or when-private one), only the protective parts commit", async () => {
+    for (const hold of [NEVER_HOLD, AT_ONCE_HOLD, WHEN_PRIVATE_HOLD]) {
+      const ran = await commitUnder(MIXED, [hold]);
+      expect(ran.results, hold.releaseRule).toEqual(ONLY_PROTECTIVE);
+      expect(ran.gated, hold.releaseRule).toEqual(PROTECTIVE_PARTS);
+      expect(ran.calls.writesOf, hold.releaseRule).toEqual(PROTECTIVE_PARTS);
+      expect(ran.written, hold.releaseRule).toEqual(messagesOf(PROTECTIVE_PARTS));
+    }
+    // The same turn under an after-safe hold: its release (part 12) commits too, and nothing else does.
+    const afterSafe = await commitUnder(MIXED, [AFTER_SAFE_HOLD]);
+    expect(afterSafe.calls.writesOf).toEqual([...PROTECTIVE_PARTS, 12]);
+    expect(afterSafe.written).toEqual(messagesOf([...PROTECTIVE_PARTS, 12]));
+  });
+
+  it("under an unread text, only the protective parts commit, and the unread ids reach every port that writes", async () => {
+    for (const holds of [[], [AFTER_SAFE_HOLD]]) {
+      const ran = await commitUnder(MIXED, holds, [UNREAD]);
+      expect(ran.results, String(holds.length)).toEqual(ONLY_PROTECTIVE);
+      expect(ran.written, String(holds.length)).toEqual(messagesOf(PROTECTIVE_PARTS));
+      expect(ran.calls.writesOfOpen.map((open) => open.unread)).toEqual(PROTECTIVE_PARTS.map(() => [UNREAD]));
+    }
+    // A core action is handed the unread texts too: S1-02's safety outcome runs, and its routine part is held.
+    const deps = s1_02Deps({ unread: [UNREAD] });
+    const called = await callCommit(copy(gateExchange(S1_02).request), deps);
+    expect(called.answer).toMatchObject({ parts: [{ part: 0, result: "held" }] });
+    expect(deps.calls.coreUnread).toEqual([[UNREAD]]);
+    expect(deps.calls.writesOf).toEqual([]);
+  });
+
+  it("a hand-off is held under each kind of hold and under an unread text; with nothing open it is gated", async () => {
+    for (const hold of EACH_HOLD) {
+      const ran = await commitUnder([HAND_OFF], [hold]);
+      expect(ran.results, hold.releaseRule).toEqual(["held"]);
+      expect(ran.gated, hold.releaseRule).toEqual([]);
+      expect(ran.written, hold.releaseRule).toEqual([]);
+    }
+    const unread = await commitUnder([HAND_OFF], [], [UNREAD]);
+    expect(unread.results).toEqual(["held"]);
+    expect(unread.written).toEqual([]);
+    const open = await commitUnder([HAND_OFF], []);
+    expect(open.results).toEqual(["committed"]);
+    expect(open.written).toEqual(["out-part-0"]);
+  });
+
+  it("several holds at once take the strictest", async () => {
+    expect(
+      EACH_HOLD.map((hold) => [
+        hold.releaseRule,
+        letsThrough(hold, "protective"),
+        letsThrough(hold, "safetyFlow"),
+        letsThrough(hold, "routine"),
+      ]),
+    ).toEqual([
+      ["at_once", true, false, false],
+      ["when_private", true, false, false],
+      ["after_safe", true, true, false],
+      ["never", true, false, false],
+    ]);
+    const parts = [choose("A3-24"), enter("stop", "A7-11"), choose("S1-02")];
+    for (const [name, holds, release] of [
+      ["two after-safe holds", [AFTER_SAFE_HOLD, AFTER_SAFE_HOLD_TOO], "committed"],
+      ["after safe and at once", [AFTER_SAFE_HOLD, AT_ONCE_HOLD], "held"],
+      ["after safe and when private", [AFTER_SAFE_HOLD, WHEN_PRIVATE_HOLD], "held"],
+      ["after safe and never", [AFTER_SAFE_HOLD, NEVER_HOLD], "held"],
+      ["every kind", EACH_HOLD, "held"],
+    ] as const) {
+      const ran = await commitUnder(parts, holds);
+      expect(ran.results, name).toEqual([release, "committed", "held"]);
+    }
+  });
+
+  it("each protective change passes every kind of hold and an unread text; a contact change and a later threat do not", () => {
+    const decided = samKinds();
+    const [option, , , , anytime] = decided.context.choices;
+    if (anytime === undefined) throw new Error("context-s1-02 changed");
+    const { part } = decided.decide.parts[0];
+    const entering: DecidePart = { verb: "enter", quote: part.quote, choice: anytime.choiceId, fields: [] };
+    const classes = [
+      ...["A7-11", "B7-15", "S2-08", "A7-81", "B7-73", "A3-48", "B3-30", "A3-50", "B3-32"].map(
+        (step): [string, string] => [step, holdClassOf(part, { ...option, step })],
+      ),
+      ...(
+        [
+          ["stop", "A7-11"],
+          ["death", "A7-81"],
+          ["threat", "A3-48"],
+        ] as const
+      ).map(([row, step]): [string, string] => [
+        row,
+        holdClassOf(entering, { ...anytime, anytimeRow: row, step }),
+      ]),
+    ];
+    expect(classes).toEqual(classes.map(([name]) => [name, "protective"]));
+    for (const hold of EACH_HOLD)
+      expect(isHeld("protective", [hold], [UNREAD]), hold.releaseRule).toBe(false);
+    expect(isHeld("protective", EACH_HOLD, [UNREAD])).toBe(false);
+    for (const step of ["A7-98", "B7-88", "A7-88", "B7-71"]) {
+      expect(holdClassOf(part, { ...option, step }), step).toBe("routine");
+    }
+    expect(isHeld("routine", [], [UNREAD])).toBe(true);
+    expect(isHeld("safetyFlow", [AFTER_SAFE_HOLD], [UNREAD])).toBe(true);
+  });
+
+  it("a repeated turn runs openHolds, runCore and writesOf again before K-05 answers repeated (types.ts: no outside effect)", async () => {
+    const k05 = k05Fake();
+    const deps = s1_02Deps({ k05, core: [s1_02CoreRun(), s1_02CoreRun()] });
+    const first = await callCommit(copy(gateExchange(S1_02).request), deps);
+    const again = await callCommit(copy(gateExchange(S1_02).request), deps);
+    expect(first.answer).toMatchObject({ result: "committed", repeated: false });
+    expect(again.answer).toMatchObject({ result: "committed", repeated: true });
+    expect(deps.calls.openHolds).toBe(2);
+    expect(deps.calls.runCore).toHaveLength(2);
+    expect(deps.calls.writesOf).toEqual([0, 0]);
+    expect(k05.requests).toHaveLength(2);
+    expect(k05.commits).toHaveLength(1);
   });
 });
 

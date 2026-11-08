@@ -6,9 +6,10 @@
 //      turn's own, under its turn id and trace (hold.ts checkTurn; CQ-69: the id is the lease's, never made here);
 //   2. the bundle: a context or decide result naming another bundle than the turn's pin answers bundleMismatch, before
 //      any limit runs (CQ-72's default 2);
-//   3. the holds: the safety holds open on the handle are read now, at commit time; the turn's core actions run in order,
-//      each handed the holds in force (a safety outcome's hold binds what follows it); routine parts are held back before
-//      the gate under any of them (hold.ts; CQ-65's replaced default, DL-119);
+//   3. the holds: what is open on the handle is read now, at commit time (the safety holds and the turn's unread texts);
+//      the turn's core actions run in order, each handed what is open in force (a safety outcome's hold binds what
+//      follows it); a part commits only if every open hold lets it through and, unless it only protects, no text is
+//      unread; every other part is held back before the gate (hold.ts; CQ-65 with its DL-127 and DL-128 addenda);
 //   4. the gate (T-298): decide's output checked, then limits 1 to 6 on each part the holds let through; a refusal of the
 //      whole call (decideRefused, valueFailsWords) comes back as it is, and a limit not built yet throws (notBuilt);
 //   5. one question first: a passed part on the booking of a part decide ended in one question waits (CQ-73's default);
@@ -64,6 +65,7 @@ import type {
   CoreRun,
   GateAndCommitAnswer,
   GateAndCommitRequest,
+  OpenHolds,
   PartResult,
   PassedPart,
   SafetyHold,
@@ -122,23 +124,24 @@ function holdOpenedBy({ result }: CoreRun): SafetyHold | null {
 }
 
 /**
- * The turn's core actions, run in the request's order, each handed the holds in force: those open on the handle, and
- * those the core actions before it opened. Returns the runs and every hold in force after them.
+ * The turn's core actions, run in the request's order, each handed what is open in force: the holds open on the handle
+ * and those the core actions before it opened, and the turn's unread texts. Returns the runs and what is open after them.
  */
 async function runCoreActions<Repo>(
   ports: CommitPorts<Repo>,
   context: CommitTurnContext<Repo>,
-  stored: readonly SafetyHold[],
-): Promise<{ runs: CoreRun[]; holds: SafetyHold[] }> {
-  const holds = [...stored];
+  stored: OpenHolds,
+): Promise<{ runs: CoreRun[]; open: OpenHolds }> {
+  const holds: SafetyHold[] = [...stored.holds];
+  const unreadEventIds = [...stored.unreadEventIds];
   const runs: CoreRun[] = [];
   for (const action of context.request.core) {
-    const run = await ports.runCore(action, context, [...holds]);
+    const run = await ports.runCore(action, context, copy({ holds, unreadEventIds }));
     runs.push(run);
     const opened = holdOpenedBy(run);
     if (opened !== null) holds.push(opened);
   }
-  return { runs, holds };
+  return { runs, open: { holds, unreadEventIds } };
 }
 
 const GATED_VERBS: readonly string[] = ["choose", "enter", "pass_on", "hand_off"];
@@ -260,8 +263,8 @@ async function gateAndCommitOnce<Repo>(
   const context: CommitTurnContext<Repo> = { request, turn, repo: call.repo, businessId: call.businessId };
 
   const stored = await ports.openHolds(context);
-  const { runs: core, holds } = await runCoreActions(ports, context, stored);
-  const held = heldParts(request, holds);
+  const { runs: core, open } = await runCoreActions(ports, context, stored);
+  const held = heldParts(request, open);
 
   // The gate gets its own copy: a limit reads the turn, and what it reads cannot change what is committed.
   const verdict = await runGate(copy(request), call, holdingBack(deps.limits, held));
@@ -286,7 +289,7 @@ async function gateAndCommitOnce<Repo>(
       parts.push(waitingResult(gated));
       continue;
     }
-    const writes = await ports.writesOf(passed, context, [...holds]);
+    const writes = await ports.writesOf(passed, context, copy(open));
     units.push({ writes, answer: answerOf(decided, passed, writes) });
     parts.push(partResultOf(gated, writes.gives));
   }

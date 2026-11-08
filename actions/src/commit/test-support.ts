@@ -25,6 +25,7 @@ import type {
   CoreResult,
   CoreRun,
   EffectNew,
+  OpenHolds,
   PassedPart,
   RowRef,
   SafetyHold,
@@ -232,14 +233,29 @@ export function whyOfChoice(choice: Choice | null): Why {
   return { step: choice.step, choice: choice.branch ?? choice.label };
 }
 
+/** What one port call was handed of what is open: the hold ids and the unread event ids. */
+export interface OpenSeen {
+  readonly holds: string[];
+  readonly unread: string[];
+}
+
+const seen = (open: OpenHolds): OpenSeen => ({
+  holds: open.holds.map((hold) => hold.holdId),
+  unread: [...open.unreadEventIds],
+});
+
 export interface PortCalls {
   /** The parts writesOf was asked for, by index, in order. */
   readonly writesOf: number[];
+  /** What each writesOf call was handed of what is open, in order. */
+  readonly writesOfOpen: OpenSeen[];
   /** The core actions run, by call name, in order. */
   readonly runCore: string[];
   /** The ids of the holds each core action was handed, in order. */
   readonly coreHolds: string[][];
-  /** How many times the holds were read. */
+  /** The unread event ids each core action was handed, in order. */
+  readonly coreUnread: string[][];
+  /** How many times what is open was read. */
   openHolds: number;
 }
 
@@ -250,30 +266,45 @@ export interface Doubles {
   readonly core?: readonly CoreRun[];
   /** The holds open on the handle. */
   readonly holds?: readonly SafetyHold[];
+  /** The turn's texts not yet read, by event id. */
+  readonly unread?: readonly string[];
   readonly k05?: K05Fake;
 }
 
 /** The commit's ports as doubles, every call written down. */
 export function doublePorts(doubles: Doubles = {}): { ports: CommitPorts; calls: PortCalls; k05: K05Fake } {
   const k05 = doubles.k05 ?? k05Fake();
-  const calls: PortCalls = { writesOf: [], runCore: [], coreHolds: [], openHolds: 0 };
+  const calls: PortCalls = {
+    writesOf: [],
+    writesOfOpen: [],
+    runCore: [],
+    coreHolds: [],
+    coreUnread: [],
+    openHolds: 0,
+  };
   const core = [...(doubles.core ?? [])];
   const ports: CommitPorts = {
     commitTurn: (request, call) => k05.commitTurn(request, call),
-    writesOf(part: PassedPart) {
+    writesOf(part: PassedPart, _turn, open) {
       calls.writesOf.push(part.index);
+      calls.writesOfOpen.push(seen(open));
       return Promise.resolve(copy(doubles.writes?.[part.index] ?? noWrites(whyOfChoice(part.choice))));
     },
-    runCore(action: CoreAction, _turn, holds) {
+    runCore(action: CoreAction, _turn, open) {
       calls.runCore.push(action.call);
-      calls.coreHolds.push(holds.map((hold) => hold.holdId));
+      const handed = seen(open);
+      calls.coreHolds.push(handed.holds);
+      calls.coreUnread.push(handed.unread);
       const run = core[calls.runCore.length - 1];
       if (run === undefined) return Promise.reject(new Error("no core run scripted"));
       return Promise.resolve(copy(run));
     },
     openHolds() {
       calls.openHolds += 1;
-      return Promise.resolve(copy([...(doubles.holds ?? [])]));
+      return Promise.resolve({
+        holds: copy([...(doubles.holds ?? [])]),
+        unreadEventIds: [...(doubles.unread ?? [])],
+      });
     },
   };
   return { ports, calls, k05 };
