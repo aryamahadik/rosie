@@ -2,7 +2,7 @@
 // decide and its one re-read, then gate and commit through the lease. See turn.ts. D-017 joins it: `setLeaseHooks
 // (turnHooks)`, `setTurnDeps(...)`, and `turnReplyCore` as the guard's replies' core (`setReplyDeps`).
 
-export { turnReplyCore, withKeywordCommit, type KeywordCommitter } from "./keywords";
+export { turnReplyCore } from "./keywords";
 export {
   commitThroughToolApi,
   runTurn,
