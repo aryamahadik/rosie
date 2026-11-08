@@ -31,6 +31,144 @@ const RUNS: Record<string, readonly Role[]> = {
 };
 /** The four chat_links columns K-29 changes, the only ones either role may update (T-1094; DL-121, T-192's N4). */
 const CHAT_LINK_UPDATES = ["given_via", "owner_retold_at", "used_at", "version"];
+// K-22 v1.1's four named exceptions (T-204; DL-169). Its README's rules 4, 5 and 8 give four tables policies other than
+// 0012's pair, rosie_app column grants on three of them and five security-definer calls of their own;
+// people-access.int.test.ts checks each against the README word for word. Every other table and function stays held to
+// this file's generic checks.
+/**
+ * (a), (b) The policies on K-22's four excepted tables, by table, in name order. README rule 4 (contact_changes) and
+ * rule 8 (page_links): 0012's <table>_runtime beside one Tool API policy per command. Rule 5 (proof_codes, sessions:
+ * scope none, row-level security on): Tool API rows bound to the call's person, beside a runtime policy on every row.
+ */
+const K22_POLICIES: Record<string, readonly string[]> = {
+  contact_changes: [
+    "contact_changes_runtime",
+    "contact_changes_tool_api_insert",
+    "contact_changes_tool_api_select",
+  ],
+  page_links: [
+    "page_links_runtime",
+    "page_links_tool_api_insert",
+    "page_links_tool_api_select",
+    "page_links_tool_api_update",
+  ],
+  proof_codes: ["proof_codes_runtime", "proof_codes_tool_api_insert", "proof_codes_tool_api_select"],
+  sessions: [
+    "sessions_runtime",
+    "sessions_tool_api_insert",
+    "sessions_tool_api_select",
+    "sessions_tool_api_update",
+  ],
+};
+/**
+ * (c) rosie_app's 63 column grants on K-22's tables, never a hash. README rule 5: it reads every proof_codes column but
+ * code_hash and inserts a send's ten; it reads every sessions column but token_sha256 and device_sha256 and updates
+ * four. Rule 8: it reads every page_links column but code_sha256, inserts an issue's nine and updates the end.
+ */
+const K22_COLUMN_GRANTS: { table: string; privilege: string; columns: readonly string[] }[] = [
+  {
+    table: "proof_codes",
+    privilege: "SELECT",
+    columns: [
+      "id",
+      "purpose",
+      "person_id",
+      "business_id",
+      "sent_to_handle_id",
+      "channel",
+      "hash_key_name",
+      "sent_at",
+      "expires_at",
+      "wrong_tries",
+      "last_wrong_at",
+      "paused_until",
+      "used_at",
+      "version",
+    ],
+  },
+  {
+    table: "proof_codes",
+    privilege: "INSERT",
+    columns: [
+      "id",
+      "purpose",
+      "person_id",
+      "business_id",
+      "sent_to_handle_id",
+      "channel",
+      "code_hash",
+      "hash_key_name",
+      "sent_at",
+      "expires_at",
+    ],
+  },
+  {
+    table: "sessions",
+    privilege: "SELECT",
+    columns: [
+      "id",
+      "person_id",
+      "proven_via",
+      "proof_code_id",
+      "started_at",
+      "last_seen_at",
+      "expires_at",
+      "ended_at",
+      "ended_why",
+      "version",
+    ],
+  },
+  { table: "sessions", privilege: "UPDATE", columns: ["last_seen_at", "ended_at", "ended_why", "version"] },
+  {
+    table: "page_links",
+    privilege: "SELECT",
+    columns: [
+      "id",
+      "business_id",
+      "person_id",
+      "purpose",
+      "step_id",
+      "sent_to_handle_id",
+      "issued_at",
+      "expires_at",
+      "ended_at",
+      "ended_why",
+      "ended_by_contact_change_id",
+      "version",
+    ],
+  },
+  {
+    table: "page_links",
+    privilege: "INSERT",
+    columns: [
+      "id",
+      "business_id",
+      "person_id",
+      "purpose",
+      "step_id",
+      "code_sha256",
+      "sent_to_handle_id",
+      "issued_at",
+      "expires_at",
+    ],
+  },
+  {
+    table: "page_links",
+    privilege: "UPDATE",
+    columns: ["ended_at", "ended_why", "ended_by_contact_change_id", "version"],
+  },
+];
+/**
+ * (d) K-22's five security-definer calls, in name order: README rule 5's four and rule 8's page_link_for_code. Kept out
+ * of FUNCTIONS, whose checks expect search_path=pg_catalog, pg_temp: rules 5 and 8 pin these to <schema>, pg_temp.
+ */
+const K22_FUNCTIONS = [
+  "check_proof_code",
+  "device_known",
+  "page_link_for_code",
+  "proof_code_limits",
+  "session_for_token",
+];
 const SLOW = { timeout: 60_000 };
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
@@ -156,6 +294,13 @@ const scopedOf = (tables: readonly ContractTable[]): { name: string; column: str
 const SCOPED = scopedOf(TABLES);
 /** Every business-scoped table in the schema, for the catalog's lists. */
 const ALL_SCOPED = scopedOf(ALL_TABLES);
+/**
+ * (a), (b) The tables with row-level security on and policies, in name order: every business-scoped table, and K-22's
+ * proof_codes and sessions, scoped none (README rule 5).
+ */
+const POLICY_TABLES = [
+  ...new Set([...ALL_SCOPED.map((table) => table.name), ...Object.keys(K22_POLICIES)]),
+].sort();
 /** The tables that span businesses (scope none). */
 const SPANNING = TABLES.filter((table) => table.rowLevelSecurity.scope === "none").map((table) => table.name);
 
@@ -343,7 +488,7 @@ describe("the migration: row-level security on every business-scoped core table 
     expect(forced).toEqual([]);
   });
 
-  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job", async () => {
+  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's four of README rules 4, 5 and 8)", async () => {
     const policies = await db.sql<
       {
         table: string;
@@ -360,10 +505,18 @@ describe("the migration: row-level security on every business-scoped core table 
       from pg_policies where schemaname = ${db.schema}
       order by tablename, policyname
     `;
-    expect([...new Set(policies.map((policy) => policy.table))]).toEqual(
-      ALL_SCOPED.map((table) => table.name).sort(),
-    );
-    for (const table of ALL_SCOPED) {
+    expect([...new Set(policies.map((policy) => policy.table))]).toEqual(POLICY_TABLES);
+    // (a) K-22's named exceptions: contact_changes (README rule 4), page_links (rule 8), proof_codes and sessions (rule
+    // 5) hold their own policies, by name here; people-access.int.test.ts checks each word for word against the README.
+    for (const [table, names] of Object.entries(K22_POLICIES)) {
+      expect(
+        policies.filter((policy) => policy.table === table).map((policy) => policy.name),
+        table,
+      ).toEqual(names);
+    }
+    for (const table of ALL_SCOPED.filter(
+      (candidate) => !Object.keys(K22_POLICIES).includes(candidate.name),
+    )) {
       const own = policies.filter((policy) => policy.table === table.name);
       expect(own.map((policy) => [policy.name, policy.permissive, policy.roles, policy.command])).toEqual([
         [`${table.name}_runtime`, "PERMISSIVE", [RUNTIME], "ALL"],
@@ -460,7 +613,13 @@ describe("the two roles", () => {
                    and has_schema_privilege(${RUNTIME}, ${again.schema}, 'USAGE') as usage
           from pg_class c where c.relnamespace = ${again.schema}::regnamespace and c.relkind = 'r'
         `;
-        expect(row).toEqual({ on: ALL_SCOPED.length, policies: 2 * ALL_SCOPED.length, usage: true });
+        // (b) K-22's named exceptions: row-level security is on for proof_codes and sessions as well (README rule 5),
+        // and its four excepted tables hold their own policies (rules 4, 5 and 8) in place of 0012's two.
+        expect(row).toEqual({
+          on: POLICY_TABLES.length,
+          policies: POLICY_TABLES.reduce((sum, name) => sum + (K22_POLICIES[name]?.length ?? 2), 0),
+          usage: true,
+        });
       } finally {
         await again.drop();
       }
@@ -752,7 +911,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     expect(held.filter((row) => row.table === "schema_migrations")).toEqual([]);
   });
 
-  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own (T-1094)", async () => {
+  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8)", async () => {
     const columnGrants = await db.sql<
       { table: string; column: string; grantee: string; privilege: string }[]
     >`
@@ -765,7 +924,22 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       where c.relnamespace = ${db.schema}::regnamespace and a.attacl is not null
       order by 1, 2, 3, 4
     `;
-    expect(columnGrants).toEqual(
+    // (c) K-22's named exception: rosie_app's column grants on proof_codes and sessions (README rule 5) and page_links
+    // (rule 8), every grantee's on those three tables held to exactly them; people-access.int.test.ts checks them too.
+    const k22Tables = K22_COLUMN_GRANTS.map((grant) => grant.table);
+    const key = (grant: { table: string; column: string; grantee: string; privilege: string }): string =>
+      `${grant.table} ${grant.column} ${grant.grantee} ${grant.privilege}`;
+    expect(
+      columnGrants
+        .filter((grant) => k22Tables.includes(grant.table))
+        .map(key)
+        .sort(),
+    ).toEqual(
+      K22_COLUMN_GRANTS.flatMap(({ table, privilege, columns }) =>
+        columns.map((column) => key({ table, column, grantee: TOOL_API, privilege })),
+      ).sort(),
+    );
+    expect(columnGrants.filter((grant) => !k22Tables.includes(grant.table))).toEqual(
       CHAT_LINK_UPDATES.flatMap((column) =>
         [...ROLES].sort().map((grantee) => ({ table: "chat_links", column, grantee, privilege: "UPDATE" })),
       ),
@@ -886,13 +1060,15 @@ describe("the security-definer functions: the two that read across businesses (K
     ]);
   });
 
-  it("no other function of the schema is security definer: reservations_saved_times stays the only read of saved times across businesses", async () => {
+  it("no other function of the schema is security definer but K-22's five (README rules 5 and 8): reservations_saved_times stays the only read of saved times across businesses", async () => {
     const definers = await db.sql<{ name: string }[]>`
       select p.proname as name from pg_proc p
       where p.pronamespace = ${db.schema}::regnamespace and p.prosecdef
       order by 1
     `;
-    expect(definers.map((row) => row.name)).toEqual(FUNCTIONS);
+    // (d) K-22's named exception: README rule 5's four calls and rule 8's page_link_for_code are security definer too,
+    // pinned to <schema>, pg_temp; people-access.int.test.ts checks each (owner, search_path, arguments, EXECUTE).
+    expect(definers.map((row) => row.name)).toEqual([...FUNCTIONS, ...K22_FUNCTIONS].sort());
   });
 
   it("only the roles each one names may run them (and their owner): the handle read the Tool API's alone, never PUBLIC", async () => {
