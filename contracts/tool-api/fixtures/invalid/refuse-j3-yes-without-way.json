@@ -9,6 +9,7 @@
   },
   "bookingId": "booking-tessa-desk",
   "expectVersion": 1,
+  "customerVersion": null,
   "answer": "yesSendLink",
   "readBack": {
     "exactWords": "Book this for Tessa? Did Tessa agree to messages from Rosie? / Drain clearing · Thu Oct 22 / arriving 12–2pm · Casey / For Tessa, 18 or older / Tessa · no mobile on file / No Rosie $2: Lee Home Services added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
