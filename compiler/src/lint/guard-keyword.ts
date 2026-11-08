@@ -23,8 +23,9 @@
 //   - of its elements, the buttons (msgtext.js line 9, `ui.buttons`: taps numbered 1, 2, 3), each a label or a
 //     [key, label] pair (msgtext.js bKey and bLab, lines 33-35). Each word of a pair is read, as K-01's keywordButton
 //     reads it; a key is one letter or digit (msgtext.js line 91), so only a label can match in the sources.
-//   Not read: a card's one link button (`ui.card.button`, msgtext.js line 5: it opens its link and sends no words), and
-//   times, list rows and stars, whose reply is a letter or a number: neither msgtext.js line 95 nor K-01 reads them.
+//   Not read, as neither msgtext.js line 95 nor K-01's check reads them: a card's one action (`ui.card.button`,
+//   msgtext.js line 5, shown with its link), and times, list rows and stars, whose reply is a letter or a number
+//   (msgtext.js lines 7, 8 and 13).
 // A step a trade switched off (an `off` op on it, or on a branch it sits under: overlay/apply.ts AppliedStep.off and
 // AppliedBranch.off) is not read: its words are never sent, so nothing can be tapped. The master has none.
 //
