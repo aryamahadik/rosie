@@ -3,10 +3,10 @@
 name: ci
 
 on:
-  # A task branch runs once, through its pull request; main runs after each merge (DL-065, lever 1).
+  # main runs after each merge. A task branch runs its checks once, in merge-check.yml, which runs every step
+  # below on the branch rebased onto main (DL-065, lever 1; T-1086, CQ-53).
   push:
     branches: [main]
-  pull_request:
 
 permissions:
   contents: read

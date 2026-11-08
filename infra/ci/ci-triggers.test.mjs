@@ -1,4 +1,5 @@
-// T-1058: ci.yml runs once per push (pull_request, plus push to main only), and keeps every step. T-1078: it has
+// T-1058: ci.yml keeps every step. T-1086: it runs on push to main only (no pull_request; merge-check runs every
+// one of its steps on a task branch). T-1078: it has
 // no parity step (merge-check.yml runs the parity shards); infra/ci/parity-placement.test.mjs proves that.
 // No YAML dependency: this reads only the few lines it needs from the workflow file.
 import { test } from "node:test";
@@ -50,8 +51,39 @@ test("push runs on main only", () => {
   assert.deepEqual(names, ["main"]);
 });
 
-test("pull_request is present", () => {
-  assert.ok("pull_request" in triggers());
+test("pull_request is absent: a task branch's checks run once, in merge-check", () => {
+  const t = triggers();
+  assert.ok(!("pull_request" in t), "on.pull_request is absent");
+  assert.ok(!("pull_request_target" in t), "on.pull_request_target is absent");
+  assert.ok("push" in t, "ci still runs on push to main");
+});
+
+// The command of every single-line "run:" step of one job in a workflow file (a step by its command).
+function runCommands(path, job) {
+  const jobLines = readFileSync(path, "utf8").split("\n");
+  const start = jobLines.findIndex((l) => l === `  ${job}:`);
+  assert.notEqual(start, -1, `${path} has job "${job}"`);
+  const out = [];
+  for (let i = start + 1; i < jobLines.length; i++) {
+    const l = jobLines[i];
+    if (/^ {2}\S/.test(l) || /^\S/.test(l)) break;
+    const m = /^ {8}run: (.+)$/.exec(l);
+    if (m && m[1] !== "|" && m[1] !== ">") out.push(m[1].trim());
+  }
+  return out;
+}
+
+test("every run step of ci's job is also a run step of merge-check's merge-check job", () => {
+  const mergeCheck = fileURLToPath(new URL("../../.github/workflows/merge-check.yml", import.meta.url));
+  const ci = runCommands(file, "checks");
+  const merge = new Set(runCommands(mergeCheck, "merge-check"));
+  assert.ok(ci.length >= 10, "ci's job has its run steps");
+  for (const command of ci) {
+    assert.ok(
+      merge.has(command),
+      `merge-check runs "${command}", so cutting ci's pull_request run drops no check`,
+    );
+  }
 });
 
 test("concurrency cancels in-progress runs of the same ref", () => {
