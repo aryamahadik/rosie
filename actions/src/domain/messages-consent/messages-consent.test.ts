@@ -798,10 +798,13 @@ describe("consent rows: append-only, bound to the read-back (K-29 v1; FS line 75
     await expect(service.yes({ ...alexYes, fromHandleId: null })).rejects.toThrow(
       new ConsentRefusedError("notFromThem"),
     );
-    // A yes on the secure page is proven by the page, not by a handle (K-21).
+    // A yes on the secure page is proven by the page, not by a handle (K-21); a handle named is still his own.
     await expect(service.yes({ ...alexYes, channel: "page", fromHandleId: null })).resolves.toMatchObject({
       op: "insert",
     });
+    await expect(service.yes({ ...alexYes, channel: "page", fromHandleId: "handle-sam" })).rejects.toThrow(
+      new ConsentRefusedError("notFromThem"),
+    );
     await expect(
       service.stop({
         id: "consent-alex-stop-ben",

@@ -182,8 +182,9 @@ export interface YesRequest {
   readonly personId: string;
   readonly kind: ConsentKind;
   /**
-   * What the yes answered: the words shown (the read-back, the card, the terms ticked), kept as they were shown, and the
-   * turn that committed it, whose open question holds the versions read (K-29 README "Bound to the read-back").
+   * What the yes answered: the words shown (the read-back, the card, the terms ticked), kept as they were shown, which
+   * for an exact yes are the read-back limit 3 bound it to (arch 06 line 303; T-301), and the turn that committed it,
+   * whose open question holds the versions read (K-29 README "Bound to the read-back").
    */
   readonly readBack: { readonly words: string; readonly turnId: string | null };
   /** When the yes was given: an instant in UTC ending in Z. */
@@ -195,7 +196,7 @@ export interface YesRequest {
   readonly bookingId?: string | null;
   /** The chat link whose ready text gave it (texts only: MC C9; RULES 7.1, "a yes on a forwarded link"). */
   readonly chatLinkId?: string | null;
-  /** For a yes by text or email: the handle it came from, one of the person's own (RULES 7.1). */
+  /** The handle it came from: required for a yes by text or email, and whenever given one of the person's own (RULES 7.1). */
   readonly fromHandleId?: string | null;
 }
 
@@ -476,9 +477,9 @@ export function createMessagesConsent(options: MessagesConsentOptions): Messages
     checkConsentValues({ ...values, words_sha256: "" });
 
     const own = new Set(await reader.handleIdsOfPerson(request.personId));
-    if (request.channel === "text" || request.channel === "email") {
-      if (fromHandleId === null || !own.has(fromHandleId)) throw new ConsentRefusedError("notFromThem");
-    }
+    const byContact = request.channel === "text" || request.channel === "email";
+    const fromThem = fromHandleId === null ? !byContact : own.has(fromHandleId);
+    if (!fromThem) throw new ConsentRefusedError("notFromThem");
     if (handleId !== null && !own.has(handleId)) throw new ConsentRefusedError("notTheirContact");
     if (request.kind === "texts" && handleId !== null) {
       const phone = await reader.phoneOfHandle(handleId);
