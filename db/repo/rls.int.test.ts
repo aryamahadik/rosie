@@ -2,7 +2,8 @@
 // side's role, against local PostgreSQL (`npm run db:up`; `npm run test:integration -- db/repo/rls`). The schema comes
 // from migrating a fresh test schema, with every accepted K-04 v1 seed loaded. T-1094 narrows it: the definer functions
 // answer only what K-05 needs, a business-scoped call reads one mobile's handle id, chat_links takes updates on four
-// columns only, and a Tool API path that runs as rosie_job refuses an empty scope.
+// columns only, the Tool API holds nothing on effects and provider_events, and a Tool API path that runs as rosie_job
+// refuses an empty scope.
 //
 // The test's connection is the migrations' role (locally a superuser that owns every table), which bypasses row-level
 // security. So every check runs in its own transaction under SET LOCAL ROLE: rosie_app, the Tool API (K-05 scope
@@ -678,6 +679,11 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       // K-36 v1 README rule 2: the Tool API adds a page to Rosie's team and never reads, changes or removes one.
       if (role === TOOL_API && table.name === "team_pages") {
         return ["INSERT"];
+      }
+      // T-1094 (DL-149): the Tool API holds nothing on K-07's effects and provider_events, which only the runtime side's
+      // K-05 v1.1 calls read and write.
+      if (role === TOOL_API && ["effects", "provider_events"].includes(table.name)) {
+        return [];
       }
       if (role === TOOL_API && table.rowLevelSecurity.scope !== "business") {
         return [];
