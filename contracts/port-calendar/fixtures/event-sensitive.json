@@ -1,0 +1,29 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-10-20T15:00:05Z",
+    "note": "Lee Associates, a therapy practice, has the sensitive switch on. Alex's first session with Maya on Sat Oct 24 at 11:00am goes on Maya's Outlook calendar as 'Visit' and Alex's initials only: no business name, no service, no first name (RULES 4.6; S13-22; arch 05 line 267). The session's length is an illustration; the demo shop gives none."
+  },
+  "request": {
+    "calendarLinkId": "callink-maya-microsoft",
+    "provider": "microsoft",
+    "eventKey": {
+      "bookingId": "booking-alex-maya-oct24",
+      "visitId": "visit-alex-maya-oct24",
+      "personId": "person-maya"
+    },
+    "idempotencyKey": "eff-cal-demo-0004",
+    "start": "2026-10-24T15:00:00Z",
+    "end": "2026-10-24T16:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": true,
+      "initials": "A.M."
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "graph-event-demo-0001",
+    "alreadyWritten": false
+  }
+}

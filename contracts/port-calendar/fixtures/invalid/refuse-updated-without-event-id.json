@@ -1,0 +1,31 @@
+{
+  "call": "calendarUpdate",
+  "given": {
+    "now": "2026-11-20T18:02:04Z",
+    "note": "event-move-no-id.json with one fault: the update answers updated but names no event. Refused: an event the adapter found by its key and updated is always named, so the effect's providerObjectId is known."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov28",
+      "visitId": "visit-alex-riley-nov28",
+      "personId": "person-riley"
+    },
+    "providerEventId": null,
+    "idempotencyKey": "eff-cal-demo-0006",
+    "start": "2026-11-28T16:30:00Z",
+    "end": "2026-11-28T17:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": false,
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "firstName": "Alex"
+    }
+  },
+  "outcome": {
+    "result": "updated",
+    "providerEventId": null
+  }
+}

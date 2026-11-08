@@ -1,0 +1,30 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-10-20T15:00:05Z",
+    "note": "event-sensitive.json with one fault: the sensitive event also names the service. Refused: with the sensitive switch on the event shows only 'Visit' and initials, never the service or the reason (RULES 4.6; arch 05 line 267)."
+  },
+  "request": {
+    "calendarLinkId": "callink-maya-microsoft",
+    "provider": "microsoft",
+    "eventKey": {
+      "bookingId": "booking-alex-maya-oct24",
+      "visitId": "visit-alex-maya-oct24",
+      "personId": "person-maya"
+    },
+    "idempotencyKey": "eff-cal-demo-0004",
+    "start": "2026-10-24T15:00:00Z",
+    "end": "2026-10-24T16:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": true,
+      "initials": "A.M.",
+      "service": "First session"
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "graph-event-demo-0001",
+    "alreadyWritten": false
+  }
+}

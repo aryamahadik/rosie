@@ -1,0 +1,15 @@
+{
+  "record": "renewal",
+  "note": "renewal-failed-dropped-link.json with one fault: the link is dropped after three failed tries. Refused: a renewal is dropped only when it is still failing after the effect retries, five tries in 10 minutes (arch 05 line 271; arch 10 line 542).",
+  "calendarLinkId": "callink-sam-microsoft",
+  "personId": "person-sam",
+  "provider": "microsoft",
+  "watchId": "graph-sub-sam-01",
+  "dueAt": "2026-11-09T21:21:00Z",
+  "tries": [
+    { "attempt": 1, "at": "2026-11-09T21:21:00Z", "outcome": { "error": "unavailable", "retryAfterSeconds": null } },
+    { "attempt": 2, "at": "2026-11-09T21:23:00Z", "outcome": { "error": "unavailable", "retryAfterSeconds": null } },
+    { "attempt": 3, "at": "2026-11-09T21:25:00Z", "outcome": { "error": "rateLimited", "retryAfterSeconds": 120 } }
+  ],
+  "end": { "result": "dropped", "why": "renewalFailed", "droppedAt": "2026-11-09T21:25:00Z" }
+}

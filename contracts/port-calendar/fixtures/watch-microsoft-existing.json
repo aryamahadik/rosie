@@ -1,0 +1,19 @@
+{
+  "call": "watch",
+  "given": {
+    "now": "2026-11-02T21:24:00Z",
+    "note": "Sam's first watch: its first try at 21:22 made the Graph subscription, but the answer was lost to a timeout (unavailable), so the watch is tried again as a renewal is (renewal.life, watchId null). Graph answers this try 409 for a duplicate (README spike row 8). The adapter finds the existing subscription in Graph's list of the subscriptions Rosie's app made for Sam (spike row 17) and answers it: the same subscription, its expiry as Graph holds it, startedAt now and renewAt halfway (arch 05 line 271). The link is watched, so no renewal drops it as renewalFailed."
+  },
+  "request": {
+    "calendarLinkId": "callink-sam-microsoft",
+    "provider": "microsoft"
+  },
+  "outcome": {
+    "result": "watching",
+    "calendarLinkId": "callink-sam-microsoft",
+    "watchId": "graph-sub-sam-01",
+    "startedAt": "2026-11-02T21:24:00Z",
+    "expiresAt": "2026-11-09T21:21:00Z",
+    "renewAt": "2026-11-06T09:22:30Z"
+  }
+}

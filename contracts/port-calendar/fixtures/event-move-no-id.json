@@ -1,0 +1,31 @@
+{
+  "call": "calendarUpdate",
+  "given": {
+    "now": "2026-11-20T18:02:04Z",
+    "note": "Alex books a haircut with Riley for Sat Nov 28 at 11:00am. The calendar_write's first try answers unavailable, and before its next try Alex moves the visit to 11:30am, so the move's commit wrote this calendar_update with no providerEventId: the write had made no event yet. The runner holds the update behind the write, the earlier effect of the same booking, visit and person; the write's second try makes the event, and then the update runs: the adapter finds Rosie's own event by its key on Riley's link and moves it (arch 05 line 267: 'a move updates that visit's event'; K-07 v1 effect-calendar-move: the event found by booking, visit and person). The booking's date and ids are an illustration."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov28",
+      "visitId": "visit-alex-riley-nov28",
+      "personId": "person-riley"
+    },
+    "providerEventId": null,
+    "idempotencyKey": "eff-cal-demo-0006",
+    "start": "2026-11-28T16:30:00Z",
+    "end": "2026-11-28T17:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": false,
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "firstName": "Alex"
+    }
+  },
+  "outcome": {
+    "result": "updated",
+    "providerEventId": "gcal-event-demo-0002"
+  }
+}

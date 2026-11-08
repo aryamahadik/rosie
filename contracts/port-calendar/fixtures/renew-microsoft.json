@@ -1,0 +1,21 @@
+{
+  "call": "renew",
+  "given": {
+    "now": "2026-11-06T09:21:30Z",
+    "note": "Half of the life of Sam's Graph subscription is left. The adapter sets a new expiry on the same subscription, which also reauthorizes it, so the watchId stays and nothing is replaced."
+  },
+  "request": {
+    "calendarLinkId": "callink-sam-microsoft",
+    "provider": "microsoft",
+    "watchId": "graph-sub-sam-01"
+  },
+  "outcome": {
+    "result": "renewed",
+    "calendarLinkId": "callink-sam-microsoft",
+    "watchId": "graph-sub-sam-01",
+    "replacedWatchId": null,
+    "startedAt": "2026-11-06T09:21:30Z",
+    "expiresAt": "2026-11-13T09:20:30Z",
+    "renewAt": "2026-11-09T21:21:00Z"
+  }
+}

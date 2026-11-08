@@ -1,0 +1,42 @@
+{
+  "effectId": "eff-cal-demo-0001",
+  "turnId": "turn-alex-book-1",
+  "jobId": null,
+  "businessId": "biz-lees-barbershop",
+  "bookingId": "booking-alex-riley-nov14",
+  "kind": "calendar_write",
+  "port": "calendar",
+  "calendarProvider": "google",
+  "visitId": "visit-alex-riley-nov14",
+  "personId": "person-riley",
+  "handleId": null,
+  "amount": null,
+  "portRequest": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov14",
+      "visitId": "visit-alex-riley-nov14",
+      "personId": "person-riley"
+    },
+    "idempotencyKey": "eff-cal-demo-0001",
+    "start": "2026-11-14T16:00:00Z",
+    "end": "2026-11-14T16:30:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": false,
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "firstName": "Alex"
+    }
+  },
+  "idempotencyKey": "eff-cal-demo-0001",
+  "state": "succeeded",
+  "tries": 1,
+  "runs": 1,
+  "firstTryAt": "2026-11-07T15:06:33Z",
+  "providerObjectId": "gcal-event-demo-0001",
+  "errorCode": null,
+  "ledgerLineId": null,
+  "traceId": "trace-alex-0012"
+}

@@ -1,0 +1,98 @@
+{
+  "call": "readChanges",
+  "given": {
+    "now": "2026-11-02T21:23:00Z",
+    "note": "The first read after Sam links his Outlook calendar: a full read over the 90 days ahead, repeating events expanded (arch 05 line 265). Two occurrences of a repeating event and an all-day out-of-office day are busy; an event marked free and an invite Sam declined are left out. The jobs already on it now block those times (S1-24).",
+    "calendar": [
+      {
+        "key": "graph-ev-sam-series-01-20261105",
+        "start": "2026-11-05T19:00:00Z",
+        "end": "2026-11-05T20:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "graph-ev-sam-series-01-20261112",
+        "start": "2026-11-12T19:00:00Z",
+        "end": "2026-11-12T20:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "graph-ev-sam-allday-02",
+        "start": "2026-11-25T05:00:00Z",
+        "end": "2026-11-26T05:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "graph-ev-sam-free-03",
+        "start": "2026-11-06T17:00:00Z",
+        "end": "2026-11-06T18:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "free",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "graph-ev-sam-invite-04",
+        "start": "2026-11-10T15:00:00Z",
+        "end": "2026-11-10T16:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "declined",
+        "own": false,
+        "deleted": false
+      }
+    ]
+  },
+  "request": {
+    "calendarLinkId": "callink-sam-microsoft",
+    "provider": "microsoft",
+    "trigger": "initial",
+    "cursor": null,
+    "window": { "from": "2026-11-02T21:23:00Z", "to": "2027-01-31T21:23:00Z" }
+  },
+  "outcome": {
+    "result": "changes",
+    "calendarLinkId": "callink-sam-microsoft",
+    "provider": "microsoft",
+    "full": true,
+    "busy": [
+      {
+        "key": "graph-ev-sam-series-01-20261105",
+        "start": "2026-11-05T19:00:00Z",
+        "end": "2026-11-05T20:00:00Z",
+        "zone": "America/New_York",
+        "source": { "provider": "microsoft", "calendarLinkId": "callink-sam-microsoft" }
+      },
+      {
+        "key": "graph-ev-sam-series-01-20261112",
+        "start": "2026-11-12T19:00:00Z",
+        "end": "2026-11-12T20:00:00Z",
+        "zone": "America/New_York",
+        "source": { "provider": "microsoft", "calendarLinkId": "callink-sam-microsoft" }
+      },
+      {
+        "key": "graph-ev-sam-allday-02",
+        "start": "2026-11-25T05:00:00Z",
+        "end": "2026-11-26T05:00:00Z",
+        "zone": "America/New_York",
+        "source": { "provider": "microsoft", "calendarLinkId": "callink-sam-microsoft" }
+      }
+    ],
+    "removed": [],
+    "cursor": "graph-delta-sam-0001",
+    "readAt": "2026-11-02T21:23:02Z"
+  }
+}

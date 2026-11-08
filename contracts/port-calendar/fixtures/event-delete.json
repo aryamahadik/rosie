@@ -1,0 +1,23 @@
+{
+  "call": "calendarDelete",
+  "given": {
+    "now": "2026-11-13T14:00:01Z",
+    "note": "Alex calls the visit off. The calendar_delete effect (K-07 effect-calendar-delete) deletes that visit's event from Riley's calendar (arch 05 line 267: 'a call-off or a change of person deletes it')."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov14",
+      "visitId": "visit-alex-riley-nov14",
+      "personId": "person-riley"
+    },
+    "providerEventId": "gcal-event-demo-0001",
+    "idempotencyKey": "eff-cal-demo-0003"
+  },
+  "outcome": {
+    "result": "deleted",
+    "providerEventId": "gcal-event-demo-0001",
+    "alreadyGone": false
+  }
+}

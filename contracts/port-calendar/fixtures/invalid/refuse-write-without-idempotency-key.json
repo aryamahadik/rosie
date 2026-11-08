@@ -1,0 +1,30 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-11-24T14:00:03Z",
+    "note": "event-write-again.json with one fault: the request carries no idempotencyKey. Refused: every calendar request carries its effect's one idempotency key, the same on every try, and the adapter makes the provider's repeat guard from it; without it, Riley's write after the visit came back has exactly the request of Riley's first write, so the adapter cannot tell a retry from a new effect (K-07 v1 rule 8; arch 10 line 542: 'on one idempotency key')."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov28",
+      "visitId": "visit-alex-riley-nov28",
+      "personId": "person-riley"
+    },
+    "start": "2026-11-28T16:30:00Z",
+    "end": "2026-11-28T17:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": false,
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "firstName": "Alex"
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "gcal-event-demo-0003",
+    "alreadyWritten": false
+  }
+}

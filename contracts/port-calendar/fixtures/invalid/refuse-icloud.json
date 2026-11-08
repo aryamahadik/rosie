@@ -1,0 +1,21 @@
+{
+  "call": "connectStart",
+  "given": {
+    "now": "2026-11-02T15:00:00Z",
+    "note": "connect-start-google.json with one fault: Riley asks to link an Apple iCloud calendar. Refused: iCloud is not linked (Q-11's default: 'An iCloud user links Google or Outlook, or the owner blocks the times'; MC 8 'Calendars': Apple iCloud still waits on Jay)."
+  },
+  "request": {
+    "provider": "icloud",
+    "personId": "person-riley",
+    "calendarLinkId": "callink-riley-google",
+    "startedOn": "staffPage"
+  },
+  "outcome": {
+    "result": "started",
+    "provider": "google",
+    "authorizeUrl": "https://calendar-double.example.com/consent?provider=google&state=state-riley-google-0001",
+    "state": "state-riley-google-0001",
+    "scopes": ["https://www.googleapis.com/auth/calendar.events.owned"],
+    "expiresAt": "2026-11-02T15:15:00Z"
+  }
+}

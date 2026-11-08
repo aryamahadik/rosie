@@ -1,0 +1,19 @@
+{
+  "call": "watch",
+  "given": {
+    "now": "2026-11-02T15:02:00Z",
+    "note": "Right after linking, Riley's calendar gets its change subscription: a Google channel on the primary calendar's events, to the gateway's address on the Workers host, asked for the longest life Google allows (its default, 7 days). renewAt is halfway, when half its life is left (arch 05 line 271)."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google"
+  },
+  "outcome": {
+    "result": "watching",
+    "calendarLinkId": "callink-riley-google",
+    "watchId": "gcal-channel-riley-01",
+    "startedAt": "2026-11-02T15:02:00Z",
+    "expiresAt": "2026-11-09T15:02:00Z",
+    "renewAt": "2026-11-06T03:02:00Z"
+  }
+}

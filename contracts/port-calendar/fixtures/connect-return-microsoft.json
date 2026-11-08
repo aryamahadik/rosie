@@ -1,0 +1,23 @@
+{
+  "call": "connectReturn",
+  "given": {
+    "now": "2026-11-02T21:16:30Z",
+    "note": "Microsoft sends Sam back with the state and a code, used within its minute. The tokens are sealed under Sam's key with the link; S1-24's answer follows: 'Connected. The jobs already on it now block those times', once the first read is in (changes-full-read.json). The code is a placeholder."
+  },
+  "request": {
+    "provider": "microsoft",
+    "state": "state-sam-microsoft-0001",
+    "code": "placeholder-auth-code-sam-microsoft",
+    "error": null,
+    "receivedAt": "2026-11-02T21:16:30Z"
+  },
+  "outcome": {
+    "result": "linked",
+    "provider": "microsoft",
+    "personId": "person-sam",
+    "calendarLinkId": "callink-sam-microsoft",
+    "scopesGranted": ["offline_access", "Calendars.Read", "Calendars.ReadWrite"],
+    "tokens": "sealedUnderPersonKey",
+    "linkedAt": "2026-11-02T21:16:31Z"
+  }
+}

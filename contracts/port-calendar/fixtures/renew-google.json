@@ -1,0 +1,21 @@
+{
+  "call": "renew",
+  "given": {
+    "now": "2026-11-06T03:02:00Z",
+    "note": "Half of the life of Riley's channel is left. Google channels do not renew, so the adapter starts a new channel and stops the old one after it; for a moment both are live, and a push on either is taken."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "watchId": "gcal-channel-riley-01"
+  },
+  "outcome": {
+    "result": "renewed",
+    "calendarLinkId": "callink-riley-google",
+    "watchId": "gcal-channel-riley-02",
+    "replacedWatchId": "gcal-channel-riley-01",
+    "startedAt": "2026-11-06T03:02:00Z",
+    "expiresAt": "2026-11-13T03:02:00Z",
+    "renewAt": "2026-11-09T15:02:00Z"
+  }
+}

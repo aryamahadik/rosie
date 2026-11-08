@@ -1,0 +1,21 @@
+{
+  "call": "connectReturn",
+  "given": {
+    "now": "2026-11-02T14:40:20Z",
+    "note": "On a first try Riley unticks the calendar box on Google's consent page (granular consent: a person may grant only some of the scopes asked). The token answer lacks calendar.events.owned, so nothing is linked, the partial grant is revoked and discarded, and the page asks again (the second try is connect-return-google.json). The code is a placeholder."
+  },
+  "request": {
+    "provider": "google",
+    "state": "state-riley-google-0000",
+    "code": "placeholder-auth-code-riley-google-first-try",
+    "error": null,
+    "receivedAt": "2026-11-02T14:40:20Z"
+  },
+  "outcome": {
+    "result": "scopesMissing",
+    "provider": "google",
+    "personId": "person-riley",
+    "calendarLinkId": "callink-riley-google",
+    "missing": ["https://www.googleapis.com/auth/calendar.events.owned"]
+  }
+}

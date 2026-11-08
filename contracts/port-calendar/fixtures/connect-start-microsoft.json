@@ -1,0 +1,21 @@
+{
+  "call": "connectStart",
+  "given": {
+    "now": "2026-11-02T21:15:00Z",
+    "note": "At sign-up, on registration screen 16, Sam picks 'Connect your calendar or booking system' and his Outlook calendar (S1-24; FS screen 16, row H03; Q-10: on a page already open). The scopes are the narrowest Microsoft list: a refresh token, read for the subscription, read and write for the events."
+  },
+  "request": {
+    "provider": "microsoft",
+    "personId": "person-sam",
+    "calendarLinkId": "callink-sam-microsoft",
+    "startedOn": "registration"
+  },
+  "outcome": {
+    "result": "started",
+    "provider": "microsoft",
+    "authorizeUrl": "https://calendar-double.example.com/consent?provider=microsoft&state=state-sam-microsoft-0001",
+    "state": "state-sam-microsoft-0001",
+    "scopes": ["offline_access", "Calendars.Read", "Calendars.ReadWrite"],
+    "expiresAt": "2026-11-02T21:30:00Z"
+  }
+}

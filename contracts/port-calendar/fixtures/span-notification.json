@@ -1,0 +1,19 @@
+{
+  "trace_id": "trace-gcal-0001",
+  "span_id": "span-gcal-0001-01",
+  "seq": 1,
+  "hop": "providerWebhook",
+  "at": "2026-11-12T21:15:00.000Z",
+  "ms": 35,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": null,
+  "job_id": "job-gateway-gcal-0001",
+  "handle_ref": null,
+  "business_id": null,
+  "provider": "google_calendar",
+  "call": "verifyNotification",
+  "got": { "watch": "gcal-channel-riley-03", "link": "callink-riley-google", "notices": 1 },
+  "decided": { "result": "accepted", "stored": 1, "unknownWatches": 0 },
+  "outcome": "ok",
+  "error_code": null
+}

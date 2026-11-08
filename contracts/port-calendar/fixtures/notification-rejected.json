@@ -1,0 +1,25 @@
+{
+  "call": "verifyNotification",
+  "given": {
+    "now": "2026-11-12T21:20:00Z",
+    "note": "A post arrives naming Riley's channel, but its channel token is not the one made for that channel. It is not Google's: the gateway answers 401 and drops it, storing nothing (arch 02 line 109: 'Bad signature: 401, dropped').",
+    "verifier": "wrong"
+  },
+  "request": {
+    "provider": "google",
+    "kind": "push",
+    "channelId": "gcal-channel-riley-03",
+    "channelToken": "made-at-test-time",
+    "resourceId": "gcal-resource-riley-primary",
+    "resourceState": "exists",
+    "messageNumber": "8",
+    "channelExpiration": null,
+    "receivedAt": "2026-11-12T21:20:00Z",
+    "traceId": "trace-gcal-0002"
+  },
+  "outcome": {
+    "result": "rejected",
+    "httpStatus": 401,
+    "why": "verifierMismatch"
+  }
+}

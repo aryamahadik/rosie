@@ -1,0 +1,21 @@
+{
+  "call": "connectStart",
+  "given": {
+    "now": "2026-11-02T21:15:00Z",
+    "note": "connect-start-microsoft.json with one fault: the connect starts from a link texted to Sam. Refused: no link is texted for it; people connect only on a page they already have open (MC 8 'Calendars'; Q-10)."
+  },
+  "request": {
+    "provider": "microsoft",
+    "personId": "person-sam",
+    "calendarLinkId": "callink-sam-microsoft",
+    "startedOn": "textedLink"
+  },
+  "outcome": {
+    "result": "started",
+    "provider": "microsoft",
+    "authorizeUrl": "https://calendar-double.example.com/consent?provider=microsoft&state=state-sam-microsoft-0001",
+    "state": "state-sam-microsoft-0001",
+    "scopes": ["offline_access", "Calendars.Read", "Calendars.ReadWrite"],
+    "expiresAt": "2026-11-02T21:30:00Z"
+  }
+}

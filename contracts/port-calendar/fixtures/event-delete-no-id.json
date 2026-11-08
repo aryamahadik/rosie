@@ -1,0 +1,23 @@
+{
+  "call": "calendarDelete",
+  "given": {
+    "now": "2026-11-30T15:01:04Z",
+    "note": "Ben T. books a haircut with Sam for Sat Dec 5 at 2:00pm. Graph rate-limits the calendar_write's first try with Retry-After 60 seconds, and before its next try Ben calls the visit off, so the call-off's commit wrote this calendar_delete with no providerEventId: the write had made no event yet. The runner holds the delete behind the write, the earlier effect of the same booking, visit and person; the write's second try makes the event, and then the delete runs: the adapter finds Rosie's own event by its key on Sam's link and deletes it, so the called-off visit does not stay on Sam's calendar (arch 05 line 267: 'a call-off or a change of person deletes it'). The booking's date and ids are an illustration."
+  },
+  "request": {
+    "calendarLinkId": "callink-sam-microsoft",
+    "provider": "microsoft",
+    "eventKey": {
+      "bookingId": "booking-ben-sam-dec05",
+      "visitId": "visit-ben-sam-dec05",
+      "personId": "person-sam"
+    },
+    "providerEventId": null,
+    "idempotencyKey": "eff-cal-demo-0007"
+  },
+  "outcome": {
+    "result": "deleted",
+    "providerEventId": "graph-event-demo-0003",
+    "alreadyGone": false
+  }
+}

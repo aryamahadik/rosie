@@ -1,0 +1,24 @@
+{
+  "call": "freeBusy",
+  "given": {
+    "now": "2026-11-07T15:06:29Z",
+    "note": "Alex says yes to a haircut with Riley on Sat Nov 14 at 11:00am. Before the booking is written, Rosie checks Riley's calendar once more, live, over the visit's time (A6-10: 'Rosie checks the calendars once more, then saves the booking'; arch 05 line 259). Nothing is there, so the time is still free and the commit goes ahead (K-05 commit-writes-effect, a second later).",
+    "calendar": []
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "purpose": "bookingWrite",
+    "from": "2026-11-14T16:00:00Z",
+    "to": "2026-11-14T16:30:00Z"
+  },
+  "outcome": {
+    "result": "read",
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "from": "2026-11-14T16:00:00Z",
+    "to": "2026-11-14T16:30:00Z",
+    "busy": [],
+    "readAt": "2026-11-07T15:06:29Z"
+  }
+}

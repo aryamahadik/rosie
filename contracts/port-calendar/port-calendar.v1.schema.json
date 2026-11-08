@@ -1,0 +1,1530 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/port-calendar/port-calendar.v1.schema.json",
+  "title": "PortCalendarV1",
+  "description": "K-16 v1, the calendar port: one interface with two adapters, Google Calendar and Microsoft Graph (02-contracts K-16; MC 8 'Calendars': 'Google and Microsoft are approved: two-way, busy times only'). Its calls: connect a person's calendar from a page they already have open (connectStart, connectReturn); start and renew the change subscription a link's pushes come through (watch, renew); check and parse a push at the gateway (verifyNotification); read changes into busy blocks with no title (readChanges); the fresh free/busy read when a booking is written (freeBusy); and write, move and delete one event per visit per booked person (calendarWrite, calendarUpdate, calendarDelete, run as K-07 v1 effect rows). Each call's request, response and errors are definitions under $defs named <call>.request, <call>.response and <call>.errors, and <call>.exchange pairs one request with its outcome, which is what every exchange fixture is (02-contracts section 2 item 2). renewal.life is a renewal's tries up to its end, renewed or a dropped link; calendarEffect.row is a K-07 v1 effect row with this port's request in it; calendar.span is the K-08 v1 span every outside call writes. The root is any one of these, so the type generator writes a type for each (ADR-005). The vendors' wire formats stay inside the adapters (02-contracts section 5); the README records what the spike found in Google's and Microsoft's public documents. Tokens never cross the port: a link's access and refresh tokens are kept sealed under the person's key with the link and referred to only by calendarLinkId (arch 05 line 271; rule 7). Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/connectStart.exchange" },
+    { "$ref": "#/$defs/connectReturn.exchange" },
+    { "$ref": "#/$defs/watch.exchange" },
+    { "$ref": "#/$defs/renew.exchange" },
+    { "$ref": "#/$defs/verifyNotification.exchange" },
+    { "$ref": "#/$defs/readChanges.exchange" },
+    { "$ref": "#/$defs/freeBusy.exchange" },
+    { "$ref": "#/$defs/calendarWrite.exchange" },
+    { "$ref": "#/$defs/calendarUpdate.exchange" },
+    { "$ref": "#/$defs/calendarDelete.exchange" },
+    { "$ref": "#/$defs/renewal.life" },
+    { "$ref": "#/$defs/calendarEffect.row" },
+    { "$ref": "#/$defs/calendar.span" }
+  ],
+  "$defs": {
+    "id": {
+      "title": "Id",
+      "description": "An opaque id code compares as a whole and never parses (CQ-09). Google's and Microsoft's own ids are opaque too (README spike rows 1, 4, 13); fixtures use readable placeholders, as K-07 and K-11 do.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "utc": {
+      "title": "Utc",
+      "description": "An instant in UTC (CQ-09; arch 05 line 265: 'Times are kept in UTC with the event's zone').",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "zone": {
+      "title": "Zone",
+      "description": "An IANA time zone name, such as America/New_York (CQ-09). Graph names a zone the Windows way (README spike row 13: 'Pacific Standard Time'); the adapter maps it to the IANA name.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/zone"
+    },
+    "provider": {
+      "title": "CalendarProvider",
+      "description": "Which calendar a link is on: google (Google Calendar) or microsoft (Microsoft 365 and Outlook, through Microsoft Graph) (MC 8 'Calendars'; arch 05 line 261; K-07 v1 effect rows' calendarProvider). Apple iCloud is not linked, so no value names it (Q-11's default: 'Not linked. An iCloud user links Google or Outlook, or the owner blocks the times'; refuse-icloud.json).",
+      "type": "string",
+      "enum": ["google", "microsoft"]
+    },
+    "calendarLinkId": {
+      "title": "CalendarLinkId",
+      "description": "One person's linked calendar: the link row K-27 (availability, F14) holds, with its tokens sealed under the person's key and its subscription (02-contracts K-27; arch 05 line 271), and the id K-09 v1's calendarLinkDropped and calendarLinkBack carry. An opaque id until K-27 freezes. A person has one calendar across every kind of work and company (S1-24: 'One person has one calendar across every kind of work and company'; FS line 743), so a link belongs to a person, never to one business.",
+      "$ref": "#/$defs/id"
+    },
+    "watchId": {
+      "title": "WatchId",
+      "description": "One change subscription of a link: Google's notification channel id, which the adapter makes and Google sends back as X-Goog-Channel-ID, or Graph's subscription id, which Graph gives (README spike rows 1, 2, 8). Opaque.",
+      "$ref": "#/$defs/id"
+    },
+    "providerEventId": {
+      "title": "ProviderEventId",
+      "description": "The provider's id of the event Rosie wrote for a visit, kept as the K-07 v1 calendar_write effect row's providerObjectId (K-07 effects_calendar_event_idx; arch 05 line 267). A move or a call-off names it when its commit knew it, and otherwise names the event by its eventKey alone (calendarUpdate.request, calendarDelete.request). Opaque.",
+      "$ref": "#/$defs/id"
+    },
+    "eventKey": {
+      "title": "CalendarEventKey",
+      "description": "What Rosie's event for a visit is keyed by: the booking, the visit and the booked person whose calendar holds it (arch 05 line 267: 'an effect row writes one event per visit to each booked person's calendar, keyed by the booking id, visit and person'; K-07 v1 effect rows' bookingId, visitId and personId). Each of Rosie's events carries its key in a private marker, so an update or delete with no providerEventId finds the visit's event by its key on the link, and the reads leave Rosie's events out (README 'Rosie's own events'). A key's calendar effects run in commit order (calendarEffect.row). A key can be written again: a visit's person changed back reuses it, and that write makes a new event (calendarWrite.response).",
+      "type": "object",
+      "properties": {
+        "bookingId": { "description": "The booking (K-04 bookings).", "$ref": "#/$defs/id" },
+        "visitId": { "description": "The visit (K-30 names the visit row).", "$ref": "#/$defs/id" },
+        "personId": {
+          "description": "The booked person whose calendar holds the event (arch 05 line 267).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["bookingId", "visitId", "personId"],
+      "additionalProperties": false
+    },
+    "effectIdempotencyKey": {
+      "title": "EffectIdempotencyKey",
+      "description": "The calendar effect's one idempotency key, K-07 v1's effectRow.idempotencyKey in K-07's form: 'one idempotency key over all its tries' (arch 10 line 542: 'retry network errors 5 times in 10 minutes on one idempotency key'; K-07 v1 rule 8), unique per effect and the same on every try and every run. It is opaque, as an id is (/$defs/id; CQ-09): built only from ids or a random value, such as the effect id, and never from a name, initials, a service, a phone number, an email address or any words, since what is made from it is kept with the event at the provider and the effectRun span records it (got.idempotencyKey, a K-08 label: an id or a code, never a person's words, K-08 v1 README 'Never the raw number or words'; arch 05 line 267: with the sensitive switch on, 'only Visit and initials'; RULES 4.5: 'When unsure, treat it as private'). Fixtures use readable placeholders that carry no person's name, as they do for ids (README 'Fixtures'). The commit writes it into the row's portRequest as the row's own idempotencyKey (K-05 v1.1 effectNew takes both), so the effects runner (C-109) sends portRequest as it stands and the adapter has the key in the request on every try (calendarEffect.row). The adapter makes the provider's repeat guard from a one-way hash of it and never gives the provider the key itself: the first 32 characters of the key's SHA-256 in lowercase hex are Google's client-chosen event id (hex digits are base32hex letters) and Graph's transactionId (README 'Rosie's own events'; default 19). Every calendarWrite, calendarUpdate and calendarDelete request carries it, as K-11 v1's sendPart.request carries its part's K-07 key (refuse-write-without-idempotency-key.json).",
+      "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectRow/properties/idempotencyKey"
+    },
+    "startedOn": {
+      "title": "ConnectStartedOn",
+      "description": "Where the person started connecting: a page they already have open, since no link is texted for it (MC 8 'Calendars': 'no secure link is sent for this for now'; Q-10's default: 'People connect only on a page they already have open (registration screen 16, the owner console, the staff page). No text is sent just to give a calendar link'; FS screen 16, row H03). registration: registration screen 16 (S1-24); ownerConsole: the owner console; staffPage: the staff page (S2-06; S1-24 'Each person can link their own calendar when they join'). No value names a texted link (refuse-texted-connect.json).",
+      "type": "string",
+      "enum": ["registration", "ownerConsole", "staffPage"]
+    },
+    "scope": {
+      "title": "CalendarScope",
+      "description": "One OAuth scope the connect asks for: the narrowest that covers K-16 (T-1123 findings, adapters/spikes/calendar-oauth/FINDINGS.md; README spike rows 6, 14). Google: calendar.events.owned ('See, create, change, and delete events on Google calendars you own'). Microsoft: Calendars.ReadWrite to write events, Calendars.Read because Graph's event subscriptions need it ('Microsoft Graph subscriptions don't support write access permissions when only read access permissions are needed'), and offline_access for a refresh token.",
+      "type": "string",
+      "enum": [
+        "https://www.googleapis.com/auth/calendar.events.owned",
+        "offline_access",
+        "Calendars.Read",
+        "Calendars.ReadWrite"
+      ]
+    },
+    "googleScopes": {
+      "title": "GoogleCalendarScopes",
+      "description": "The scopes a Google connect asks for, and all a link holds: calendar.events.owned alone (T-1123: 'the narrowest single scope that covers K-16, on calendars the person owns'). It allows events.list, events.watch and the event writes, not freebusy.query, so the fresh read is an events.list over the slot (README spike rows 5, 6).",
+      "const": ["https://www.googleapis.com/auth/calendar.events.owned"]
+    },
+    "microsoftScopes": {
+      "title": "MicrosoftCalendarScopes",
+      "description": "The delegated permissions a Microsoft connect asks for, and all a link holds: offline_access (a refresh token), Calendars.Read (event subscriptions: README spike row 14) and Calendars.ReadWrite (create, update and delete events; delta and calendarView) (T-1123 [M2], [M3], [M5]). None needs an admin's consent (T-1123 [M1]); no application permission is used.",
+      "const": ["offline_access", "Calendars.Read", "Calendars.ReadWrite"]
+    },
+    "tokensKept": {
+      "title": "TokensKept",
+      "description": "Where a link's access and refresh tokens are: sealed under the person's key with the link (arch 05 line 271: 'Links keep their tokens sealed under the person's key'; K-04 v1 sealing_keys; K-27's link row when it freezes), referred to only by calendarLinkId. The adapter seals and keeps them at connectReturn, unseals them for each call, refreshes them, and seals the new ones; no request, answer, span or log holds a token value, an authorization code past connectReturn, or a client secret (rule 7; contracts README convention 9).",
+      "const": "sealedUnderPersonKey"
+    },
+    "window": {
+      "title": "ReadWindow",
+      "description": "The span of time a read covers: from now to 90 days ahead (arch 05 line 265: 'Rosie reads 90 days ahead, expanding repeating events, and never offers a linked person's time past that'; S12-13; DD). The caller sets it; the contract test checks the 90 days.",
+      "type": "object",
+      "properties": {
+        "from": { "$ref": "#/$defs/utc" },
+        "to": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["from", "to"],
+      "additionalProperties": false
+    },
+    "blockSource": {
+      "title": "BusyBlockSource",
+      "description": "Where a busy block came from: the provider and the link (arch 05 line 261: 'Rosie keeps each busy block's start, end and source, never its title').",
+      "type": "object",
+      "properties": {
+        "provider": { "$ref": "#/$defs/provider" },
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" }
+      },
+      "required": ["provider", "calendarLinkId"],
+      "additionalProperties": false
+    },
+    "busyBlock": {
+      "title": "BusyBlock",
+      "description": "One busy time on a person's calendar: its key, start and end in UTC, the event's zone, and its source; never its title, place, notes or guests (arch 05 line 261: 'Rosie keeps each busy block's start, end and source, never its title'; S1-24 'Rosie sees only when Sam is busy, never what the job is'; S12-33 'The event's title is never shown to Sam or anyone'; refuse-busy-block-with-title.json). One block per instance: a repeating event comes as its instances inside the read window (arch 05 line 265).",
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "The instance's own key, the provider's id for that event or occurrence, so a later change to it replaces the block and a removal finds it (README spike rows 4, 12, 13). Opaque; never a title.",
+          "$ref": "#/$defs/id"
+        },
+        "start": { "description": "Inclusive start (README spike row 4).", "$ref": "#/$defs/utc" },
+        "end": { "description": "Exclusive end, after start.", "$ref": "#/$defs/utc" },
+        "zone": {
+          "description": "The event's zone (arch 05 line 265: 'Times are kept in UTC with the event's zone'; DD); for an all-day event or one with no zone, the calendar's own zone (README spike rows 3, 13).",
+          "$ref": "#/$defs/zone"
+        },
+        "source": { "$ref": "#/$defs/blockSource" }
+      },
+      "required": ["key", "start", "end", "zone", "source"],
+      "additionalProperties": false
+    },
+    "busyTime": {
+      "title": "BusyTime",
+      "description": "A busy time in a fresh read: start and end in UTC, nothing else (arch 05 line 259; A6-10 'Rosie checks the calendars once more, then saves the booking').",
+      "type": "object",
+      "properties": {
+        "start": { "$ref": "#/$defs/utc" },
+        "end": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["start", "end"],
+      "additionalProperties": false
+    },
+    "eventContent": {
+      "title": "CalendarEventContent",
+      "description": "What Rosie's event shows, as parts the adapter writes into the event's title, and nothing more: no notes, place, guests or customer details (arch 05 line 267). Plain: the business's display name, the service and the first name of the person served, or for a child the parent's (RULES 4.7). Sensitive: only 'Visit' and initials (RULES 4.6; S13-22; DD), or 'Visit' alone when the name gives no initials, never the service (refuse-sensitive-with-service.json).",
+      "oneOf": [
+        {
+          "title": "PlainEventContent",
+          "type": "object",
+          "properties": {
+            "sensitive": { "const": false },
+            "businessName": {
+              "description": "The business's display name (arch 05 line 267).",
+              "type": "string",
+              "minLength": 1
+            },
+            "service": {
+              "description": "The service booked (arch 05 line 267).",
+              "type": "string",
+              "minLength": 1
+            },
+            "firstName": {
+              "description": "The first name of the person served; for a child, the parent's (arch 05 line 267; RULES 4.7: 'Staff and owner texts name only the parent and the time or class'). The caller picks which.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["sensitive", "businessName", "service", "firstName"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SensitiveEventContent",
+          "type": "object",
+          "properties": {
+            "sensitive": { "const": true },
+            "initials": {
+              "description": "The initials of the person served, one letter and a dot for each of one to four name parts, such as A.M. (RULES 4.6: 'Link previews, day lists and job offers show only the display name, times and initials'; arch 05 line 267: 'with the sensitive switch on, only Visit and initials'; K-03 v1's initials form). Each letter is a capital (Unicode Lu or Lt) or a letter of an alphabetic script with no capitals, such as Hebrew or Arabic (Lo), since Rosie answers in the language of the text (arch 06 line 341) and S13-22 limits no script (event-sensitive-no-case.json, event-sensitive-arabic.json); never a full name (refuse-initials-full-name.json). Never a letter of Han (Chinese characters, Japanese kanji), Hangul (Korean), Hiragana, Katakana or Yi: each such letter is a whole syllable or word, and a name part is often one, so initials of them spell the name, as 张.伟. spells 张伟 (S13-22: 'show times and initials'; RULES 4.5: 'When unsure, treat it as private'; refuse-initials-chinese-name.json). A name part with no letter that can be an initial, such as one written only in those scripts, gives none, as D41's form gives none for a word with no Latin letter (the master's initials(), overlay-core.js line 1356). null: the name gives no initial at all, and the adapter writes 'Visit' alone, so the client still gets the event (README default 18; event-sensitive-no-initials.json). Otherwise the adapter writes 'Visit' with them. C-138 takes the initials from the name after Unicode NFKC normalization, so a compatibility character that stands for a whole word becomes its letters first: the Arabic ligature U+FDF4 (Muhammad) is one Lo letter that would pass as an initial and spell the name, and NFKC makes it محمد, whose initial is م.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^((?![\\p{Script=Han}\\p{Script=Hangul}\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Yi}])[\\p{Lu}\\p{Lt}\\p{Lo}]\\.){1,4}$"
+                },
+                { "type": "null" }
+              ]
+            }
+          },
+          "required": ["sensitive", "initials"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "linkDroppedError": {
+      "title": "LinkDroppedError",
+      "description": "The provider refused the link's tokens, so nothing works until the person reconnects: the refresh answered invalid_grant (access revoked, a Google refresh token unused for six months or past its 7-day Testing life) or admin_policy_enforced (an admin restricted the service), or Graph asked for interaction (README spike rows 7, 16). The caller tells the Tool API calendarLinkDropped with why tokenRevoked (K-09 v1): the owner is texted at once, that person's open times come off, booked visits stay (arch 11 line 580; S12-13).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "linkDropped" },
+        "why": {
+          "description": "K-09 v1 calendarLinkDropped's why.",
+          "const": "tokenRevoked"
+        }
+      },
+      "required": ["error", "why"],
+      "additionalProperties": false
+    },
+    "transientError": {
+      "title": "CalendarTransientError",
+      "description": "The call failed, and nothing is known: unavailable (the provider failed or timed out), rateLimited (with any Retry-After: arch 10 line 540), or badRequest (the provider refused the request itself). An effect is retried on its one key at most 5 times in 10 minutes (arch 10 line 542; K-07 v1); a renewal the same way, then the link is dropped (arch 05 line 271; renewal.life).",
+      "type": "object",
+      "properties": {
+        "error": { "type": "string", "enum": ["unavailable", "rateLimited", "badRequest"] },
+        "retryAfterSeconds": {
+          "description": "The provider's Retry-After in whole seconds on a rate limit, when it gave one; otherwise null (arch 10 line 540).",
+          "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        }
+      },
+      "required": ["error", "retryAfterSeconds"],
+      "additionalProperties": false,
+      "if": { "properties": { "error": { "enum": ["unavailable", "badRequest"] } } },
+      "then": { "properties": { "retryAfterSeconds": { "type": "null" } } }
+    },
+    "linkError": {
+      "title": "CalendarLinkError",
+      "description": "The errors of every call that uses a link's tokens: the link dropped, or a transient failure.",
+      "anyOf": [{ "$ref": "#/$defs/linkDroppedError" }, { "$ref": "#/$defs/transientError" }]
+    },
+    "doubleEvent": {
+      "title": "CalendarDoubleEvent",
+      "description": "Fixtures only, never sent: one event instance on the calendar double's fake calendar (02-contracts K-16 'The double: fake calendars, notifications, a dropped link and a clash'), in the double's own neutral terms, never with a title. The double turns these into its answer with the adapters' event rules (README 'Busy, free and Rosie's own').",
+      "type": "object",
+      "properties": {
+        "key": { "$ref": "#/$defs/id" },
+        "start": { "$ref": "#/$defs/utc" },
+        "end": { "$ref": "#/$defs/utc" },
+        "zone": { "$ref": "#/$defs/zone" },
+        "shownAs": {
+          "description": "How the event shows its time: busy, tentative or free (Google transparency and status; Graph showAs: README spike rows 4, 13).",
+          "type": "string",
+          "enum": ["busy", "tentative", "free"]
+        },
+        "invite": {
+          "description": "The person's own answer when the event is an invite: none (their own event), accepted, tentative, declined, or needsAction (not answered).",
+          "type": "string",
+          "enum": ["none", "accepted", "tentative", "declined", "needsAction"]
+        },
+        "own": {
+          "description": "true for an event Rosie wrote (arch 05 line 267: 'Rosie's own events never come back in as busy').",
+          "type": "boolean"
+        },
+        "deleted": {
+          "description": "true when the event was deleted or cancelled since the cursor.",
+          "type": "boolean"
+        }
+      },
+      "required": ["key", "start", "end", "zone", "shownAs", "invite", "own", "deleted"],
+      "additionalProperties": false
+    },
+    "given": {
+      "title": "Given",
+      "description": "Fixtures only, never sent: what a fixture assumes before the call (the moment it runs, a note, and for the double its fake calendar or how a push's verifier was made).",
+      "type": "object",
+      "properties": {
+        "now": { "$ref": "#/$defs/utc" },
+        "note": { "description": "The case in plain words.", "type": "string", "minLength": 1 },
+        "verifier": {
+          "description": "For a push: how its verifier was made. valid: Google's channel token or Graph's clientState made for its watch from the test environment's push secret; wrong: anything else. The fixture holds no verifier (rule 7): the contract test makes it at run time, as K-11's fixtures sign at run time (README 'Checking a push').",
+          "type": "string",
+          "enum": ["valid", "wrong"]
+        },
+        "calendar": {
+          "description": "For a read: the events the double reports, every one in the window on a full read, the changed ones since the cursor on an incremental read.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/doubleEvent" }
+        }
+      },
+      "required": ["now", "note"],
+      "additionalProperties": false
+    },
+
+    "connectStart.request": {
+      "title": "ConnectStartRequest",
+      "description": "Start linking a person's Google or Microsoft calendar (02-contracts K-16 'Connect: an OAuth start link for Google or Microsoft and its return'; S1-24; S2-06). The caller (C-189 calendar connect) has written the link row first, a new one or the dropped one being reconnected (S12-13 'Reconnect your calendar'). Repeating it is safe: each call makes a new start link, and only the one the person finishes counts. No outside call: the adapter builds the provider's consent address.",
+      "type": "object",
+      "properties": {
+        "provider": { "$ref": "#/$defs/provider" },
+        "personId": {
+          "description": "The person linking their own calendar (S1-24 'Each person can link their own calendar when they join').",
+          "$ref": "#/$defs/id"
+        },
+        "calendarLinkId": {
+          "description": "The link the tokens will be kept with: new, or a dropped link being reconnected (S12-13, S12-14).",
+          "$ref": "#/$defs/calendarLinkId"
+        },
+        "startedOn": { "$ref": "#/$defs/startedOn" }
+      },
+      "required": ["provider", "personId", "calendarLinkId", "startedOn"],
+      "additionalProperties": false
+    },
+    "connectStart.response": {
+      "title": "ConnectStartResponse",
+      "description": "Where the page sends the person's browser: the provider's consent page for exactly the narrowest scopes, with offline access, the state and a PKCE challenge (README spike rows 7, 16). The adapter keeps the pending connect (person, link, verifier) under the state until expiresAt.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "started" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "authorizeUrl": {
+          "description": "The consent page's address: Google's or Microsoft's authorize endpoint from the adapter, the double's own page from the double. It holds the client id, the redirect on the staging host (J-13, Q-56; J-05) and the state, never a secret.",
+          "type": "string",
+          "pattern": "^https://[^\\s]+$"
+        },
+        "state": {
+          "description": "The one-time value that ties the provider's return to this start (README spike rows 7, 16: 'state', against cross-site request forgery). Not a secret, but unguessable.",
+          "$ref": "#/$defs/id"
+        },
+        "scopes": {
+          "description": "The scopes asked for: googleScopes or microsoftScopes, by provider, nothing wider (refuse-scope-widened.json).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/scope" }
+        },
+        "expiresAt": {
+          "description": "When the pending connect stops being accepted (README default 4).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "provider", "authorizeUrl", "state", "scopes", "expiresAt"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "provider": { "const": "google" } } },
+          "then": { "properties": { "scopes": { "$ref": "#/$defs/googleScopes" } } }
+        },
+        {
+          "if": { "properties": { "provider": { "const": "microsoft" } } },
+          "then": { "properties": { "scopes": { "$ref": "#/$defs/microsoftScopes" } } }
+        }
+      ]
+    },
+    "connectStart.errors": {
+      "title": "ConnectStartError",
+      "description": "notConfigured: this environment has no OAuth app for the provider (J-13: 'the OAuth apps are approved but not made yet'; Q-56: the calendar double meanwhile). The page offers S1-24's other answers; its safe default holds: 'nothing blocked yet, with one reminder'.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "notConfigured" },
+        "provider": { "$ref": "#/$defs/provider" }
+      },
+      "required": ["error", "provider"],
+      "additionalProperties": false
+    },
+    "connectStart.exchange": {
+      "title": "ConnectStartExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "connectStart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/connectStart.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/connectStart.response" }, { "$ref": "#/$defs/connectStart.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "connectReturn.request": {
+      "title": "ConnectReturnRequest",
+      "description": "The provider's return to Rosie's redirect, as the page Worker received it: the state, and the authorization code or the provider's error (README spike rows 7, 16). The code is a one-time credential: it is exchanged once, here, and never logged, stored or put in a span; it expires in about a minute on Microsoft. Fixtures hold a placeholder.",
+      "type": "object",
+      "properties": {
+        "provider": { "$ref": "#/$defs/provider" },
+        "state": {
+          "description": "The state the provider sent back, as received.",
+          "type": "string",
+          "minLength": 1
+        },
+        "code": {
+          "description": "The authorization code, or null when the provider sent an error.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "error": {
+          "description": "The provider's error, such as access_denied when the person said no, or null with a code.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "receivedAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["provider", "state", "code", "error", "receivedAt"],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": { "code": { "type": "string" }, "error": { "type": "null" } }
+        },
+        {
+          "properties": { "code": { "type": "null" }, "error": { "type": "string" } }
+        }
+      ]
+    },
+    "connectReturn.response": {
+      "title": "ConnectReturnResponse",
+      "description": "linked: the code was exchanged, every scope asked was granted, and the tokens are sealed under the person's key with the link (arch 05 line 271); the caller then starts the link's watch and its first read. declined: the person said no on the consent page. scopesMissing: the person unticked a scope Rosie needs (Google's granular consent: 'users may not grant your app access to all of them', README spike row 7); nothing is linked, the partial grant is revoked, and the page asks again. For declined and scopesMissing S1-24's safe default holds: nothing blocked yet, with one reminder.",
+      "oneOf": [
+        {
+          "title": "ConnectLinked",
+          "type": "object",
+          "properties": {
+            "result": { "const": "linked" },
+            "provider": { "$ref": "#/$defs/provider" },
+            "personId": { "$ref": "#/$defs/id" },
+            "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+            "scopesGranted": {
+              "description": "googleScopes or microsoftScopes, by provider: every scope asked.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/scope" }
+            },
+            "tokens": { "$ref": "#/$defs/tokensKept" },
+            "linkedAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": [
+            "result",
+            "provider",
+            "personId",
+            "calendarLinkId",
+            "scopesGranted",
+            "tokens",
+            "linkedAt"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": { "properties": { "provider": { "const": "google" } } },
+              "then": { "properties": { "scopesGranted": { "$ref": "#/$defs/googleScopes" } } }
+            },
+            {
+              "if": { "properties": { "provider": { "const": "microsoft" } } },
+              "then": { "properties": { "scopesGranted": { "$ref": "#/$defs/microsoftScopes" } } }
+            }
+          ]
+        },
+        {
+          "title": "ConnectDeclined",
+          "type": "object",
+          "properties": {
+            "result": { "const": "declined" },
+            "provider": { "$ref": "#/$defs/provider" },
+            "personId": { "$ref": "#/$defs/id" },
+            "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" }
+          },
+          "required": ["result", "provider", "personId", "calendarLinkId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ConnectScopesMissing",
+          "type": "object",
+          "properties": {
+            "result": { "const": "scopesMissing" },
+            "provider": { "$ref": "#/$defs/provider" },
+            "personId": { "$ref": "#/$defs/id" },
+            "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+            "missing": {
+              "description": "The scopes asked but not granted.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/scope" },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": ["result", "provider", "personId", "calendarLinkId", "missing"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "connectReturn.errors": {
+      "title": "ConnectReturnError",
+      "description": "stateUnknown: the state matches no pending connect (forged, used already, or past expiresAt), so nothing is linked and no person is known; exchangeFailed: the provider refused the code (invalid_grant: expired or used: README spike rows 7, 16), so the person starts again; or a transient failure of the token endpoint.",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": { "error": { "enum": ["stateUnknown", "exchangeFailed"] } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "connectReturn.exchange": {
+      "title": "ConnectReturnExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "connectReturn" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/connectReturn.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/connectReturn.response" }, { "$ref": "#/$defs/connectReturn.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "watch.request": {
+      "title": "WatchRequest",
+      "description": "Start a link's change subscription, so changes come as pushes (02-contracts K-16 'Watch and renew'; arch 05 line 261: 'Google sends change notifications ... Microsoft 365 and Outlook send Graph change notifications'). Google: a channel on the person's primary calendar's events; Graph: a subscription to /me/events for created, updated and deleted, with lifecycle notifications, both to the gateway's address on the Workers host (README spike rows 1, 8, 9). The caller calls it once per link and otherwise renews; a failed try is retried as a renewal is (renewal.life with watchId null). A retry after a lost answer: Google makes a new channel on each try, so the channel whose answer was lost lapses unused (its pushes count in unknownWatches); Graph answers 409 for a duplicate, and the adapter answers the existing subscription (watch.response). A K-08 portCall span.",
+      "type": "object",
+      "properties": {
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" }
+      },
+      "required": ["calendarLinkId", "provider"],
+      "additionalProperties": false
+    },
+    "watch.response": {
+      "title": "WatchResponse",
+      "description": "The subscription is live: its id, when it started and expires, and renewAt, the moment half its life is left, when it is renewed (arch 05 line 271: 'Each change subscription is renewed when half its life is left'). The adapter asks for the longest life each allows: Google's channel time-to-live (default 604800 s, 7 days), Graph's 10,080 minutes less a minute for events (README spike rows 1, 8). Graph's 409 for a duplicate (README spike row 8) means the link's subscription is already there, made by an earlier try whose answer was lost: the adapter finds it in Graph's list of the subscriptions Rosie's app made for the signed-in person (README spike row 17) and answers it, watching, with its own id and expiresAt, startedAt the moment of this answer and renewAt halfway (watch-microsoft-existing.json). The adapter does the same wherever it makes a Graph subscription, as renew does for one Graph removed. So a duplicate is never an error, and renewal.life never drops a working link as renewalFailed.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "watching" },
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "watchId": { "$ref": "#/$defs/watchId" },
+        "startedAt": { "$ref": "#/$defs/utc" },
+        "expiresAt": { "description": "As the provider answered it.", "$ref": "#/$defs/utc" },
+        "renewAt": {
+          "description": "Halfway from startedAt to expiresAt (arch 05 line 271); the contract test checks it.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "calendarLinkId", "watchId", "startedAt", "expiresAt", "renewAt"],
+      "additionalProperties": false
+    },
+    "watch.errors": {
+      "title": "WatchError",
+      "description": "The link dropped, or a transient failure; Graph's failed validation handshake is badRequest (README spike row 9), and Graph's 409 for a duplicate is not an error (watch.response). A first watch is retried as a renewal is (renewal.life with watchId null).",
+      "$ref": "#/$defs/linkError"
+    },
+    "watch.exchange": {
+      "title": "WatchExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "watch" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/watch.request" },
+        "outcome": { "anyOf": [{ "$ref": "#/$defs/watch.response" }, { "$ref": "#/$defs/watch.errors" }] }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "renew.request": {
+      "title": "RenewRequest",
+      "description": "Renew a link's subscription at renewAt (arch 05 line 271), or when Graph sends reauthorizationRequired (README spike row 11). Google has no renewal: the adapter starts a new channel and stops the old one after it, both live in the overlap; Graph renews by a new expirationDateTime, which also reauthorizes, and a subscription Graph removed is made again (README spike rows 1, 8, 11). A K-08 portCall span; tried as renewal.life says.",
+      "type": "object",
+      "properties": {
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "watchId": { "description": "The subscription being renewed.", "$ref": "#/$defs/watchId" }
+      },
+      "required": ["calendarLinkId", "provider", "watchId"],
+      "additionalProperties": false
+    },
+    "renew.response": {
+      "title": "RenewResponse",
+      "description": "Renewed: the live subscription, its new life and renewAt. On Google watchId is the new channel and replacedWatchId the old one, now stopped; on Graph watchId is unchanged and replacedWatchId is null, unless Graph had removed the subscription and a new one was made.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "renewed" },
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "watchId": { "$ref": "#/$defs/watchId" },
+        "replacedWatchId": { "anyOf": [{ "$ref": "#/$defs/watchId" }, { "type": "null" }] },
+        "startedAt": { "$ref": "#/$defs/utc" },
+        "expiresAt": { "$ref": "#/$defs/utc" },
+        "renewAt": { "description": "Halfway again (arch 05 line 271).", "$ref": "#/$defs/utc" }
+      },
+      "required": [
+        "result",
+        "calendarLinkId",
+        "watchId",
+        "replacedWatchId",
+        "startedAt",
+        "expiresAt",
+        "renewAt"
+      ],
+      "additionalProperties": false
+    },
+    "renew.errors": {
+      "title": "RenewError",
+      "description": "The link dropped, or a transient failure (renewal.life).",
+      "$ref": "#/$defs/linkError"
+    },
+    "renew.exchange": {
+      "title": "RenewExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "renew" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/renew.request" },
+        "outcome": { "anyOf": [{ "$ref": "#/$defs/renew.response" }, { "$ref": "#/$defs/renew.errors" }] }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "renewal.try": {
+      "title": "RenewalTry",
+      "description": "One try of a renewal (or of a first watch), on the effect retry rule (arch 10 line 542).",
+      "type": "object",
+      "properties": {
+        "attempt": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "at": { "$ref": "#/$defs/utc" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/watch.response" },
+            { "$ref": "#/$defs/renew.response" },
+            { "$ref": "#/$defs/linkError" }
+          ]
+        }
+      },
+      "required": ["attempt", "at", "outcome"],
+      "additionalProperties": false
+    },
+    "renewal.life": {
+      "title": "RenewalLife",
+      "description": "One renewal from when it is due to its end (02-contracts K-16: 'each subscription renewed when half its life is left, and a renewal still failing after arch 10's effect retries is a dropped link'; arch 05 line 271). Each try is one K-08 portCall span with its attempt. renewed: a try succeeded. dropped: five tries within 10 minutes all failed (why renewalFailed; arch 10 line 542: 'retry network errors 5 times in 10 minutes'), or a try found the tokens refused (why tokenRevoked); the caller tells the Tool API calendarLinkDropped with that why (K-09 v1), and S12-13 follows: the owner is texted at once, that person's open times come off, booked visits stay, and one reminder goes after 24 hours (arch 11 line 580; S12-14). watchId null: a first watch, retried the same way.",
+      "type": "object",
+      "properties": {
+        "record": { "const": "renewal" },
+        "note": { "type": "string", "minLength": 1 },
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "personId": {
+          "description": "Whose link (K-09 v1 calendarLinkDropped personId).",
+          "$ref": "#/$defs/id"
+        },
+        "provider": { "$ref": "#/$defs/provider" },
+        "watchId": { "anyOf": [{ "$ref": "#/$defs/watchId" }, { "type": "null" }] },
+        "dueAt": { "description": "The subscription's renewAt.", "$ref": "#/$defs/utc" },
+        "tries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/renewal.try" },
+          "minItems": 1,
+          "maxItems": 5
+        },
+        "end": {
+          "oneOf": [
+            {
+              "title": "RenewalRenewed",
+              "type": "object",
+              "properties": { "result": { "const": "renewed" } },
+              "required": ["result"],
+              "additionalProperties": false
+            },
+            {
+              "title": "RenewalDropped",
+              "type": "object",
+              "properties": {
+                "result": { "const": "dropped" },
+                "why": {
+                  "description": "K-09 v1 calendarLinkDropped's why: renewalFailed or tokenRevoked.",
+                  "type": "string",
+                  "enum": ["renewalFailed", "tokenRevoked"]
+                },
+                "droppedAt": { "description": "The last try's time (K-09 droppedAt).", "$ref": "#/$defs/utc" }
+              },
+              "required": ["result", "why", "droppedAt"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "record",
+        "note",
+        "calendarLinkId",
+        "personId",
+        "provider",
+        "watchId",
+        "dueAt",
+        "tries",
+        "end"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "renewalFailed comes only after the fifth try, every one a transient failure (arch 10 line 542; refuse-dropped-before-five-tries.json).",
+          "if": {
+            "properties": {
+              "end": {
+                "type": "object",
+                "properties": { "why": { "const": "renewalFailed" } },
+                "required": ["why"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tries": {
+                "type": "array",
+                "minItems": 5,
+                "items": {
+                  "type": "object",
+                  "properties": { "outcome": { "$ref": "#/$defs/transientError" } }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "tokenRevoked comes from a try the provider answered with the tokens refused.",
+          "if": {
+            "properties": {
+              "end": {
+                "type": "object",
+                "properties": { "why": { "const": "tokenRevoked" } },
+                "required": ["why"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tries": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": { "outcome": { "$ref": "#/$defs/linkDroppedError" } }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "renewed comes from a try that succeeded.",
+          "if": {
+            "properties": { "end": { "type": "object", "properties": { "result": { "const": "renewed" } } } }
+          },
+          "then": {
+            "properties": {
+              "tries": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "outcome": {
+                      "anyOf": [{ "$ref": "#/$defs/watch.response" }, { "$ref": "#/$defs/renew.response" }]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "googlePush": {
+      "title": "GooglePush",
+      "description": "Google's push as the gateway received it: a POST with no body, its X-Goog-* headers read into these fields (README spike row 2).",
+      "type": "object",
+      "properties": {
+        "provider": { "const": "google" },
+        "kind": { "const": "push" },
+        "channelId": { "description": "X-Goog-Channel-ID: the watchId.", "type": "string", "minLength": 1 },
+        "channelToken": {
+          "description": "X-Goog-Channel-Token as sent, empty when missing: the verifier the adapter set on the channel (README 'Checking a push'). Fixtures hold a placeholder; given.verifier says how it was made.",
+          "type": "string"
+        },
+        "resourceId": { "description": "X-Goog-Resource-ID.", "type": "string" },
+        "resourceState": {
+          "description": "X-Goog-Resource-State: sync (the channel was made), exists (an event was created, changed or deleted) or not_exists.",
+          "type": "string",
+          "minLength": 1
+        },
+        "messageNumber": {
+          "description": "X-Goog-Message-Number: 1 for sync, then increasing, not always by one.",
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        },
+        "channelExpiration": {
+          "description": "X-Goog-Channel-Expiration as sent, or null.",
+          "anyOf": [{ "type": "string" }, { "type": "null" }]
+        },
+        "receivedAt": { "$ref": "#/$defs/utc" },
+        "traceId": {
+          "description": "The trace the gateway opened at receipt (arch 10 line 548; K-08 v1 opened_by a calendar webhook).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "provider",
+        "kind",
+        "channelId",
+        "channelToken",
+        "resourceId",
+        "resourceState",
+        "messageNumber",
+        "channelExpiration",
+        "receivedAt",
+        "traceId"
+      ],
+      "additionalProperties": false
+    },
+    "graphValidation": {
+      "title": "GraphValidation",
+      "description": "Graph's validation handshake: a POST to the notification or lifecycle address with ?validationToken=... when a subscription is made (README spike row 9).",
+      "type": "object",
+      "properties": {
+        "provider": { "const": "microsoft" },
+        "kind": { "const": "validation" },
+        "validationToken": {
+          "description": "The token, URL-decoded; opaque, its form may change.",
+          "type": "string",
+          "minLength": 1
+        },
+        "receivedAt": { "$ref": "#/$defs/utc" },
+        "traceId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["provider", "kind", "validationToken", "receivedAt", "traceId"],
+      "additionalProperties": false
+    },
+    "graphNotice": {
+      "title": "GraphNotice",
+      "description": "One item of a Graph POST's value list: a change notification (changeType) or a lifecycle notification (lifecycleEvent), never both (README spike rows 10, 11). Rosie asks for basic notifications only, so no event data comes in it.",
+      "type": "object",
+      "properties": {
+        "notificationId": {
+          "description": "The change notification's own id, or null (a lifecycle notification shows none).",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "subscriptionId": { "description": "The watchId.", "type": "string", "minLength": 1 },
+        "clientState": {
+          "description": "The verifier the adapter set on the subscription, as sent (README 'Checking a push'). Fixtures hold a placeholder; given.verifier says how it was made.",
+          "type": "string"
+        },
+        "changeType": {
+          "anyOf": [{ "type": "string", "enum": ["created", "updated", "deleted"] }, { "type": "null" }]
+        },
+        "lifecycleEvent": {
+          "anyOf": [
+            { "type": "string", "enum": ["reauthorizationRequired", "subscriptionRemoved", "missed"] },
+            { "type": "null" }
+          ]
+        },
+        "subscriptionExpirationDateTime": {
+          "description": "As sent, or null.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        }
+      },
+      "required": [
+        "notificationId",
+        "subscriptionId",
+        "clientState",
+        "changeType",
+        "lifecycleEvent",
+        "subscriptionExpirationDateTime"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        { "properties": { "changeType": { "type": "string" }, "lifecycleEvent": { "type": "null" } } },
+        { "properties": { "changeType": { "type": "null" }, "lifecycleEvent": { "type": "string" } } }
+      ]
+    },
+    "graphNotifications": {
+      "title": "GraphNotifications",
+      "description": "Graph's POST of change or lifecycle notifications, parsed from its JSON body; one POST may hold several, for different subscriptions (README spike row 10).",
+      "type": "object",
+      "properties": {
+        "provider": { "const": "microsoft" },
+        "kind": { "const": "notifications" },
+        "notifications": { "type": "array", "items": { "$ref": "#/$defs/graphNotice" }, "minItems": 1 },
+        "receivedAt": { "$ref": "#/$defs/utc" },
+        "traceId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["provider", "kind", "notifications", "receivedAt", "traceId"],
+      "additionalProperties": false
+    },
+    "calendarNotice": {
+      "title": "CalendarNotice",
+      "description": "A stored push's payload in Rosie's terms (the K-07 v1 provider event's payload, which 'K-14, K-16' parse): the link, the subscription, and what to do. changed (Google exists or not_exists; Graph created, updated or deleted) and missed (Graph: notifications were lost): read changes now (readChanges, trigger push). reauthorizationRequired: renew now. watchRemoved (Graph subscriptionRemoved): watch again, then read changes (README spike rows 2, 10, 11). Never an event's content.",
+      "type": "object",
+      "properties": {
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "watchId": { "$ref": "#/$defs/watchId" },
+        "notice": {
+          "type": "string",
+          "enum": ["changed", "missed", "reauthorizationRequired", "watchRemoved"]
+        }
+      },
+      "required": ["calendarLinkId", "watchId", "notice"],
+      "additionalProperties": false
+    },
+    "calendarProviderEvent": {
+      "title": "CalendarProviderEvent",
+      "description": "The provider event row the gateway writes for one verified push item: K-07 v1's providerEvent, stored once by (provider, providerEventId) (arch 02 line 109: 'Stripe and calendar events go to PostgreSQL'; K-05 v1.1 recordProviderEvent). providerEventId is Google's channel id and message number joined by a colon, Graph's notification id, or for a Graph lifecycle notification its subscription id, event and subscription expiry joined by colons (README default 9). eventType is the provider's own name (K-07: 'K-14 and K-16 name the list'): Google exists or not_exists; Graph created, updated, deleted, reauthorizationRequired, subscriptionRemoved or missed. A link is a person's, so businessId is null; a push reports on no effect row (S12-33), so effectId is null.",
+      "allOf": [
+        { "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/providerEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "provider": { "enum": ["google_calendar", "microsoft_calendar"] },
+            "eventType": {
+              "enum": [
+                "exists",
+                "not_exists",
+                "created",
+                "updated",
+                "deleted",
+                "reauthorizationRequired",
+                "subscriptionRemoved",
+                "missed"
+              ]
+            },
+            "businessId": { "type": "null" },
+            "effectId": { "type": "null" },
+            "payload": { "$ref": "#/$defs/calendarNotice" }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "provider": { "const": "google_calendar" } } },
+              "then": { "properties": { "eventType": { "enum": ["exists", "not_exists"] } } }
+            },
+            {
+              "if": { "properties": { "provider": { "const": "microsoft_calendar" } } },
+              "then": {
+                "properties": {
+                  "eventType": {
+                    "enum": [
+                      "created",
+                      "updated",
+                      "deleted",
+                      "reauthorizationRequired",
+                      "subscriptionRemoved",
+                      "missed"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "verifyNotification.request": {
+      "title": "VerifyNotificationRequest",
+      "description": "One push as the gateway (C-044) received it (02-contracts K-16 consumers: 'runtime engineer: C-044 gateway (notifications to PostgreSQL)'; arch 02 line 109: 'Stripe · calendar hooks: verify · scrub cards · dedupe · store sealed · acknowledge in < 1 s'): Google's push, Graph's validation handshake, or Graph's notifications.",
+      "oneOf": [
+        { "$ref": "#/$defs/googlePush" },
+        { "$ref": "#/$defs/graphValidation" },
+        { "$ref": "#/$defs/graphNotifications" }
+      ]
+    },
+    "verifyNotification.response": {
+      "title": "VerifyNotificationResponse",
+      "description": "What the gateway answers. validation: 200 with the token as text/plain, within 10 seconds, nothing stored (README spike row 9). accepted: every item's verifier matched its watch; each item of a watch Rosie holds is stored once as a provider event (a known provider event id is dropped), each item of a watch Rosie no longer holds is counted and dropped, then 200 in under 1 s (arch 02 line 109; Graph wants a 2xx within 3 s, README spike row 10). ignored: Google's sync message, which only says the channel was made: 200, nothing stored. rejected: a verifier did not match, or the push could not be read: 401, dropped (arch 02 line 109: 'Bad signature: 401, dropped'). A failed write answers 503 so the provider retries (arch 02 line 109); that answer is the gateway's, after this call.",
+      "oneOf": [
+        {
+          "title": "NotificationValidation",
+          "type": "object",
+          "properties": {
+            "result": { "const": "validation" },
+            "httpStatus": { "const": 200 },
+            "contentType": { "const": "text/plain" },
+            "body": { "description": "The validation token, as received.", "type": "string", "minLength": 1 }
+          },
+          "required": ["result", "httpStatus", "contentType", "body"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NotificationAccepted",
+          "type": "object",
+          "properties": {
+            "result": { "const": "accepted" },
+            "httpStatus": { "const": 200 },
+            "events": { "type": "array", "items": { "$ref": "#/$defs/calendarProviderEvent" } },
+            "unknownWatches": {
+              "description": "Items of a watch Rosie no longer holds (stopped, replaced or its link removed): acknowledged so the provider stops, never stored.",
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": ["result", "httpStatus", "events", "unknownWatches"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NotificationIgnored",
+          "type": "object",
+          "properties": {
+            "result": { "const": "ignored" },
+            "httpStatus": { "const": 200 },
+            "why": { "const": "syncMessage" }
+          },
+          "required": ["result", "httpStatus", "why"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NotificationRejected",
+          "type": "object",
+          "properties": {
+            "result": { "const": "rejected" },
+            "httpStatus": { "const": 401 },
+            "why": { "type": "string", "enum": ["verifierMismatch", "unreadable"] }
+          },
+          "required": ["result", "httpStatus", "why"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "verifyNotification.exchange": {
+      "title": "VerifyNotificationExchange",
+      "description": "One push and the gateway's answer. Safe to repeat: a known provider event id is dropped (arch 02 line 109). Inside the gateway's 1 s answer; reads the push secret (README 'Tokens and keys').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "verifyNotification" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/verifyNotification.request" },
+        "outcome": { "$ref": "#/$defs/verifyNotification.response" }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "Graph's handshake is answered with its token.",
+          "if": {
+            "properties": {
+              "request": { "type": "object", "properties": { "kind": { "const": "validation" } } }
+            }
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "result": { "const": "validation" } } }
+            }
+          }
+        },
+        {
+          "description": "A Google push carries a verifier, and is accepted, ignored (sync) or rejected.",
+          "if": {
+            "properties": { "request": { "type": "object", "properties": { "kind": { "const": "push" } } } }
+          },
+          "then": {
+            "properties": {
+              "given": { "type": "object", "required": ["verifier"] },
+              "outcome": {
+                "type": "object",
+                "properties": { "result": { "enum": ["accepted", "ignored", "rejected"] } }
+              }
+            }
+          }
+        },
+        {
+          "description": "Graph's notifications carry verifiers, and are accepted or rejected.",
+          "if": {
+            "properties": {
+              "request": { "type": "object", "properties": { "kind": { "const": "notifications" } } }
+            }
+          },
+          "then": {
+            "properties": {
+              "given": { "type": "object", "required": ["verifier"] },
+              "outcome": {
+                "type": "object",
+                "properties": { "result": { "enum": ["accepted", "rejected"] } }
+              }
+            }
+          }
+        },
+        {
+          "description": "A wrong verifier is always rejected (arch 02 line 109: 'Bad signature: 401, dropped').",
+          "if": {
+            "properties": {
+              "given": {
+                "type": "object",
+                "properties": { "verifier": { "const": "wrong" } },
+                "required": ["verifier"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "result": { "const": "rejected" } } }
+            }
+          }
+        }
+      ]
+    },
+
+    "readChanges.request": {
+      "title": "ReadChangesRequest",
+      "description": "Read a link's changes into busy blocks (02-contracts K-16 'Read changes into busy blocks'; arch 05 lines 261, 265): Google's events list with its sync token, Graph's calendarView delta (README spike rows 3, 12). trigger: initial, the first read after linking; push, a stored push (calendarNotice changed or missed); poll, the 30-minute poll from the minute sweep (arch 11 line 578; C-137), the same call for every link; reconnect, a dropped link back, 'everything since it dropped' (S12-14; arch 11 line 580). Primary uncached writes follow in the caller (K-27). Repeating it with the same cursor is safe. A K-08 portCall span.",
+      "type": "object",
+      "properties": {
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "trigger": { "type": "string", "enum": ["initial", "push", "poll", "reconnect"] },
+        "cursor": {
+          "description": "The cursor the last read answered (Google's nextSyncToken, Graph's deltaLink), kept with the link; null for a full read. Not a credential: useless without the link's tokens.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "window": { "$ref": "#/$defs/window" }
+      },
+      "required": ["calendarLinkId", "provider", "trigger", "cursor", "window"],
+      "additionalProperties": false,
+      "if": { "properties": { "trigger": { "const": "initial" } } },
+      "then": { "properties": { "cursor": { "type": "null" } } }
+    },
+    "readChanges.response": {
+      "title": "ReadChangesResponse",
+      "description": "The busy blocks that are new or changed, the keys that are no longer busy, and the next cursor. Every event is busy, tentative ones too, except one marked free or a declined invite; Rosie's own events never come back in (arch 05 lines 265, 267; README 'Busy, free and Rosie's own'). full: a full read (the first, a cursor the provider no longer accepts, or a window that moved), so the caller replaces all of the link's blocks with busy, and removed is empty; otherwise busy replaces or adds blocks by key and removed drops keys (a key never stored is ignored).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "changes" },
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "full": { "type": "boolean" },
+        "busy": { "type": "array", "items": { "$ref": "#/$defs/busyBlock" } },
+        "removed": {
+          "description": "Keys of instances deleted, cancelled, declined, marked free, or moved out of the window.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "cursor": { "description": "For the next read.", "type": "string", "minLength": 1 },
+        "readAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "calendarLinkId", "provider", "full", "busy", "removed", "cursor", "readAt"],
+      "additionalProperties": false,
+      "if": { "properties": { "full": { "const": true } } },
+      "then": { "properties": { "removed": { "type": "array", "maxItems": 0 } } }
+    },
+    "readChanges.errors": {
+      "title": "ReadChangesError",
+      "description": "The link dropped, or a transient failure; the next push or poll reads again.",
+      "$ref": "#/$defs/linkError"
+    },
+    "readChanges.exchange": {
+      "title": "ReadChangesExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readChanges" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readChanges.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/readChanges.response" }, { "$ref": "#/$defs/readChanges.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "freeBusy.request": {
+      "title": "FreeBusyRequest",
+      "description": "A fresh free/busy read of one link over a span (02-contracts K-16; arch 05 line 259: 'Search reads them from the read replica, so a booking is written only after a fresh free/busy read'). purpose bookingWrite: when the booking is written, over the visit's time (A6-10, B6-10: 'Rosie checks the calendars once more, then saves the booking'); clashCheck: a dropped link back, over the time ahead, before its times are offered again (S12-13 'Yes: checks for clashes'; K-09 v1 calendarLinkBack). The provider is read live: Google's events list over the span, Graph's calendarView, with the readChanges event rules (README spike rows 5, 15). Repeating it is safe. A K-08 portCall span.",
+      "type": "object",
+      "properties": {
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "purpose": { "type": "string", "enum": ["bookingWrite", "clashCheck"] },
+        "from": { "$ref": "#/$defs/utc" },
+        "to": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["calendarLinkId", "provider", "purpose", "from", "to"],
+      "additionalProperties": false
+    },
+    "freeBusy.response": {
+      "title": "FreeBusyResponse",
+      "description": "The busy times inside the span, with no key, title or zone; Rosie's own events never among them (arch 05 line 267). An empty list means the span is free on this calendar.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "read" },
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "from": { "$ref": "#/$defs/utc" },
+        "to": { "$ref": "#/$defs/utc" },
+        "busy": { "type": "array", "items": { "$ref": "#/$defs/busyTime" } },
+        "readAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "calendarLinkId", "provider", "from", "to", "busy", "readAt"],
+      "additionalProperties": false
+    },
+    "freeBusy.errors": {
+      "title": "FreeBusyError",
+      "description": "The link dropped, or a transient failure. A6-10's safe default holds meanwhile: 'the booking isn't written until the time is still free'.",
+      "$ref": "#/$defs/linkError"
+    },
+    "freeBusy.exchange": {
+      "title": "FreeBusyExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "freeBusy" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/freeBusy.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/freeBusy.response" }, { "$ref": "#/$defs/freeBusy.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "calendarWrite.request": {
+      "title": "CalendarWriteRequest",
+      "description": "Write one event for one visit on one booked person's calendar, after the commit (arch 05 line 267: 'After the commit, an effect row writes one event per visit to each booked person's calendar'; A6-10 'It shows on Riley's phone calendar too'). Run as K-07 v1's calendar_write effect, whose portRequest this is. Repeating it is safe: its idempotencyKey, the effect's one key, the same on every try (K-07 v1 rule 8; the span's got.idempotencyKey), makes the provider's repeat guard, so a retry answers the event an earlier try made. A later write of the same eventKey is a new effect with its own idempotencyKey, so it makes a new event when the key's earlier event was deleted, as when a visit's person is changed back (README 'Rosie's own events'; event-write-again.json). A K-08 effectRun span.",
+      "type": "object",
+      "properties": {
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "eventKey": { "$ref": "#/$defs/eventKey" },
+        "idempotencyKey": { "$ref": "#/$defs/effectIdempotencyKey" },
+        "start": { "$ref": "#/$defs/utc" },
+        "end": { "$ref": "#/$defs/utc" },
+        "zone": { "description": "The visit's zone (S13-03).", "$ref": "#/$defs/zone" },
+        "content": { "$ref": "#/$defs/eventContent" }
+      },
+      "required": [
+        "calendarLinkId",
+        "provider",
+        "eventKey",
+        "idempotencyKey",
+        "start",
+        "end",
+        "zone",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "calendarWrite.response": {
+      "title": "CalendarWriteResponse",
+      "description": "Written: the provider's event id (the effect's providerObjectId), and whether it was there already from an earlier try.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "written" },
+        "providerEventId": { "$ref": "#/$defs/providerEventId" },
+        "alreadyWritten": {
+          "description": "true: an earlier try of this write, with the same idempotencyKey, made the event, and this try found it by the repeat guard. false: this try made it, as when an earlier write of the same eventKey, another effect with another idempotencyKey, made an event that was deleted since, by Rosie's calendarDelete or by the person: that earlier event is never answered as this write's (event-write-again.json).",
+          "type": "boolean"
+        }
+      },
+      "required": ["result", "providerEventId", "alreadyWritten"],
+      "additionalProperties": false
+    },
+    "calendarWrite.errors": {
+      "title": "CalendarWriteError",
+      "description": "The link dropped, or a transient failure, retried on the effect's one key (K-07 v1 rule 8).",
+      "$ref": "#/$defs/linkError"
+    },
+    "calendarWrite.exchange": {
+      "title": "CalendarWriteExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "calendarWrite" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/calendarWrite.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/calendarWrite.response" }, { "$ref": "#/$defs/calendarWrite.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "calendarUpdate.request": {
+      "title": "CalendarUpdateRequest",
+      "description": "Update a visit's event: a move changes its times (arch 05 line 267: 'a move updates that visit's event'; B8-37), a change to what is booked its content. The event is named by its providerEventId when the commit knew it, else by its eventKey alone: the adapter finds Rosie's own event by that key on that link (README 'Rosie's own events'; event-move-no-id.json). Run as K-07 v1's calendar_update effect, after every earlier calendar effect of its key (calendarEffect.row). Repeating it is safe: it sets the same times and content again, and its idempotencyKey is the effect's one key on every try (K-07 v1 rule 8; the span's got.idempotencyKey). A K-08 effectRun span.",
+      "type": "object",
+      "properties": {
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "eventKey": { "$ref": "#/$defs/eventKey" },
+        "providerEventId": {
+          "description": "The event's id when the commit knew it (the key's calendar_write had succeeded: its providerObjectId); null when the commit came while that write was pending, retrying or waiting out an outage, since K-05 v1.1 gives a commit no way to amend a written portRequest. Null: the event is found by eventKey.",
+          "anyOf": [{ "$ref": "#/$defs/providerEventId" }, { "type": "null" }]
+        },
+        "idempotencyKey": { "$ref": "#/$defs/effectIdempotencyKey" },
+        "start": { "$ref": "#/$defs/utc" },
+        "end": { "$ref": "#/$defs/utc" },
+        "zone": { "$ref": "#/$defs/zone" },
+        "content": { "$ref": "#/$defs/eventContent" }
+      },
+      "required": [
+        "calendarLinkId",
+        "provider",
+        "eventKey",
+        "providerEventId",
+        "idempotencyKey",
+        "start",
+        "end",
+        "zone",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "calendarUpdate.response": {
+      "title": "CalendarUpdateResponse",
+      "description": "updated: the event, found by its id or its key, has the request's times and content, and providerEventId names it (refuse-updated-without-event-id.json). gone: the link has no live event of Rosie's for the request's id or key, as when the person deleted it from their own calendar, so nothing is updated and it is not written again (README default 12; open gap); providerEventId is the request's, null when the request named none.",
+      "type": "object",
+      "properties": {
+        "result": { "type": "string", "enum": ["updated", "gone"] },
+        "providerEventId": { "anyOf": [{ "$ref": "#/$defs/providerEventId" }, { "type": "null" }] }
+      },
+      "required": ["result", "providerEventId"],
+      "additionalProperties": false,
+      "if": { "properties": { "result": { "const": "updated" } } },
+      "then": { "properties": { "providerEventId": { "$ref": "#/$defs/providerEventId" } } }
+    },
+    "calendarUpdate.errors": {
+      "title": "CalendarUpdateError",
+      "description": "The link dropped, or a transient failure (K-07 v1 rule 8).",
+      "$ref": "#/$defs/linkError"
+    },
+    "calendarUpdate.exchange": {
+      "title": "CalendarUpdateExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "calendarUpdate" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/calendarUpdate.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/calendarUpdate.response" },
+            { "$ref": "#/$defs/calendarUpdate.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "calendarDelete.request": {
+      "title": "CalendarDeleteRequest",
+      "description": "Delete a visit's event: a call-off, or a change of person (arch 05 line 267: 'a call-off or a change of person deletes it'). The event is named by its providerEventId when the commit knew it, else by its eventKey alone: the adapter finds Rosie's own event by that key on that link (README 'Rosie's own events'; event-delete-no-id.json). Run as K-07 v1's calendar_delete effect, after every earlier calendar effect of its key (calendarEffect.row). Repeating it is safe: an event already gone, or no event for the key, answers deleted with alreadyGone, and its idempotencyKey is the effect's one key on every try (K-07 v1 rule 8; the span's got.idempotencyKey). A K-08 effectRun span.",
+      "type": "object",
+      "properties": {
+        "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "eventKey": { "$ref": "#/$defs/eventKey" },
+        "providerEventId": {
+          "description": "The event's id when the commit knew it (the key's calendar_write had succeeded: its providerObjectId); null when the commit came while that write was pending, retrying or waiting out an outage, since K-05 v1.1 gives a commit no way to amend a written portRequest. Null: the event is found by eventKey.",
+          "anyOf": [{ "$ref": "#/$defs/providerEventId" }, { "type": "null" }]
+        },
+        "idempotencyKey": { "$ref": "#/$defs/effectIdempotencyKey" }
+      },
+      "required": ["calendarLinkId", "provider", "eventKey", "providerEventId", "idempotencyKey"],
+      "additionalProperties": false
+    },
+    "calendarDelete.response": {
+      "title": "CalendarDeleteResponse",
+      "description": "Deleted, and whether it was gone already (the person deleted it, an earlier try did, or the key never had an event). alreadyGone false: this try deleted the event, found by its id or its key, and providerEventId names it. alreadyGone true: providerEventId is the request's, null when the request named none.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "deleted" },
+        "providerEventId": { "anyOf": [{ "$ref": "#/$defs/providerEventId" }, { "type": "null" }] },
+        "alreadyGone": { "type": "boolean" }
+      },
+      "required": ["result", "providerEventId", "alreadyGone"],
+      "additionalProperties": false,
+      "if": { "properties": { "alreadyGone": { "const": false } } },
+      "then": { "properties": { "providerEventId": { "$ref": "#/$defs/providerEventId" } } }
+    },
+    "calendarDelete.errors": {
+      "title": "CalendarDeleteError",
+      "description": "The link dropped, or a transient failure (K-07 v1 rule 8).",
+      "$ref": "#/$defs/linkError"
+    },
+    "calendarDelete.exchange": {
+      "title": "CalendarDeleteExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "calendarDelete" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/calendarDelete.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/calendarDelete.response" },
+            { "$ref": "#/$defs/calendarDelete.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "calendarEffect.row": {
+      "title": "CalendarEffectRow",
+      "description": "A K-07 v1 calendar effect row with this port's request as its portRequest (K-07 v1: 'the request in the port's terms ... whose shape K-14, K-16 and K-11 give'): calendar_write carries calendarWrite.request, calendar_update calendarUpdate.request, calendar_delete calendarDelete.request. The commit writes the request's idempotencyKey equal to the row's own idempotencyKey (K-05 v1.1 effectNew takes both), so the effects runner (C-109) sends it as it stands on every try and every run, and the adapter's repeat guard needs nothing outside the request (effectIdempotencyKey); that its idempotencyKey, eventKey and provider match the row's idempotencyKey, bookingId, visitId, personId and calendarProvider is the contract test's check. Order: for one eventKey (the row's booking, visit and person), the runner runs the calendar effects in commit order, starting one only when every earlier effect of that key has ended (succeeded, or cancelled by letGo). So a write still pending, retrying or waiting out an outage holds a later update or delete of its key behind it, and that update or delete, committed before the write's event id was known, names the event by its key (providerEventId null) and finds the event the write made (arch 05 line 267: 'a move updates that visit's event, a call-off or a change of person deletes it'; K-07 v1 effect-calendar-move: the event found by booking, visit and person). Effects of different keys, such as the delete for the old person and the write for the new one at a change of person, do not wait for each other.",
+      "allOf": [
+        { "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectRow" },
+        {
+          "type": "object",
+          "properties": {
+            "kind": { "enum": ["calendar_write", "calendar_update", "calendar_delete"] }
+          },
+          "required": ["kind"],
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "calendar_write" } } },
+              "then": { "properties": { "portRequest": { "$ref": "#/$defs/calendarWrite.request" } } }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "calendar_update" } } },
+              "then": { "properties": { "portRequest": { "$ref": "#/$defs/calendarUpdate.request" } } }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "calendar_delete" } } },
+              "then": { "properties": { "portRequest": { "$ref": "#/$defs/calendarDelete.request" } } }
+            }
+          ]
+        }
+      ]
+    },
+
+    "calendar.span": {
+      "title": "CalendarSpan",
+      "description": "The K-08 v1 span a calendar call writes, with provider google_calendar or microsoft_calendar and the call by this contract's name (K-08 v1 README 'Outside calls': 'call is the port call by its port contract's name'): connectReturn, watch, renew, readChanges and freeBusy on the portCall hop, with their attempt (K-08 v1: 'a fresh calendar free/busy read when a booking is written and a watch renewal'); calendarWrite, calendarUpdate and calendarDelete on effectRun, attempt being the effect's try; verifyNotification on providerWebhook. connectStart makes no outside call and writes no span. What it got and decided is a closed list, so no title, address, token or code ever enters it (K-08 v1 'never the raw number or words'; refuse-title-in-span.json).",
+      "allOf": [
+        { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/span" },
+        {
+          "type": "object",
+          "properties": {
+            "hop": { "enum": ["portCall", "effectRun", "providerWebhook"] },
+            "provider": { "enum": ["google_calendar", "microsoft_calendar"] },
+            "call": {
+              "enum": [
+                "connectReturn",
+                "watch",
+                "renew",
+                "verifyNotification",
+                "readChanges",
+                "freeBusy",
+                "calendarWrite",
+                "calendarUpdate",
+                "calendarDelete"
+              ]
+            },
+            "got": {
+              "description": "What the call got: ids and labels only.",
+              "type": "object",
+              "properties": {
+                "step": {
+                  "description": "The step that asked, such as A6-10, S1-24, S12-13 or S12-33.",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label"
+                },
+                "link": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label" },
+                "watch": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label" },
+                "trigger": { "type": "string", "enum": ["initial", "push", "poll", "reconnect"] },
+                "purpose": { "type": "string", "enum": ["bookingWrite", "clashCheck"] },
+                "effect": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label" },
+                "booking": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label" },
+                "visit": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label" },
+                "idempotencyKey": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label" },
+                "previousTry": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label" },
+                "notices": { "description": "Items in the push.", "type": "integer", "minimum": 0 }
+              },
+              "additionalProperties": false
+            },
+            "decided": {
+              "description": "What it decided: a result, counts and yes or no.",
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "enum": [
+                    "linked",
+                    "declined",
+                    "scopesMissing",
+                    "watching",
+                    "renewed",
+                    "validation",
+                    "accepted",
+                    "ignored",
+                    "rejected",
+                    "changes",
+                    "read",
+                    "written",
+                    "updated",
+                    "gone",
+                    "deleted"
+                  ]
+                },
+                "full": { "type": "boolean" },
+                "blocks": { "description": "Busy blocks answered.", "type": "integer", "minimum": 0 },
+                "removed": { "description": "Keys answered removed.", "type": "integer", "minimum": 0 },
+                "busy": { "description": "Busy times in a fresh read.", "type": "integer", "minimum": 0 },
+                "stored": { "description": "Provider events stored.", "type": "integer", "minimum": 0 },
+                "unknownWatches": { "type": "integer", "minimum": 0 },
+                "eventWritten": { "type": "boolean" },
+                "eventUpdated": { "type": "boolean" },
+                "eventDeleted": { "type": "boolean" },
+                "alreadyDone": { "type": "boolean" },
+                "outageRow": { "type": "boolean" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["hop", "provider", "call"],
+          "allOf": [
+            {
+              "if": {
+                "properties": { "call": { "enum": ["calendarWrite", "calendarUpdate", "calendarDelete"] } }
+              },
+              "then": { "properties": { "hop": { "const": "effectRun" } } }
+            },
+            {
+              "if": { "properties": { "call": { "const": "verifyNotification" } } },
+              "then": { "properties": { "hop": { "const": "providerWebhook" } } }
+            },
+            {
+              "if": {
+                "properties": {
+                  "call": { "enum": ["connectReturn", "watch", "renew", "readChanges", "freeBusy"] }
+                }
+              },
+              "then": { "properties": { "hop": { "const": "portCall" } } }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

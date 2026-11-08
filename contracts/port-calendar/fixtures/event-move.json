@@ -1,0 +1,31 @@
+{
+  "call": "calendarUpdate",
+  "given": {
+    "now": "2026-11-08T14:00:02Z",
+    "note": "Alex moves the haircut to 11:30am. The calendar_update effect (K-07 effect-calendar-move) updates that visit's event on Riley's calendar, found by its provider event id (arch 05 line 267: 'a move updates that visit's event'; B8-37)."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov14",
+      "visitId": "visit-alex-riley-nov14",
+      "personId": "person-riley"
+    },
+    "providerEventId": "gcal-event-demo-0001",
+    "idempotencyKey": "eff-cal-demo-0002",
+    "start": "2026-11-14T16:30:00Z",
+    "end": "2026-11-14T17:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": false,
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "firstName": "Alex"
+    }
+  },
+  "outcome": {
+    "result": "updated",
+    "providerEventId": "gcal-event-demo-0001"
+  }
+}
