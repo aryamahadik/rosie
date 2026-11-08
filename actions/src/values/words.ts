@@ -68,3 +68,50 @@ export interface Span {
 export function overlaps(found: Span, taken: readonly Span[]): boolean {
   return taken.some((other) => found.at < other.end && other.at < found.end);
 }
+
+// ---- words found in a text at word edges (T-304 round 2, DL-184) ------------------------------------------------------
+//
+// A quote or a value's words count only where they stand in the text whole: where they start and end at a word edge.
+// Words cut out of a longer word or number say something the person never said: "40" out of "raise haircut to 140",
+// "tomorrow at 1" out of "tomorrow at 10", "$1" out of "$1,200", "Oct 2" out of "Oct 24", "2" out of "12 people", "1" out
+// of "10am", "yes" out of "yesterday", "no" out of "know". At each place the words stand in the text, word for word:
+//   1. no letter or digit right before or right after them;
+//   2. no , . : or / followed by a digit right after them ("$1" of "$1,200", "at 10" of "at 10:30"), and, at the start,
+//      none right before words that start with a digit ("200" of "$1,200", "30" of "10:30", "24" of "10/24");
+//   3. no hyphen, dash or apostrophe joining them to a letter or digit on either side ("twenty" of "twenty-five", "$12"
+//      of "$12-15", "Thu 2" of "Thu 2-5", "can" of "can't").
+// Rule 1 and rule 2's end are DL-184's own; rule 2's start and rule 3 are the same edge for a number's own marks and for
+// words joined into one (default, for ops/QUESTIONS.md). Nothing here keeps or logs the words.
+
+const LAST_IS_WORD = /[\p{L}\p{N}\p{M}]$/u;
+const FIRST_IS_WORD = /^[\p{L}\p{N}\p{M}]/u;
+const FIRST_IS_DIGIT = /^\p{N}/u;
+const LAST_IS_NUMBER_MARK = /[,.:/]$/u;
+const NUMBER_MARK_THEN_DIGIT = /^[,.:/]\p{N}/u;
+const JOINED_BEFORE = /[\p{L}\p{N}\p{M}][-‐‑‒–—'’]$/u;
+const JOINED_AFTER = /^[-‐‑‒–—'’][\p{L}\p{N}]/u;
+const NOT_SPACE = /\S/u;
+
+/** Whether `words`, standing in `text` from `at` to `end`, start and end at a word edge there (rules 1 to 3). */
+function standsWhole(text: string, words: string, at: number, end: number): boolean {
+  // Two code points either side are all the rules read; four code units hold two of any.
+  const before = text.slice(Math.max(0, at - 4), at);
+  const after = text.slice(end, end + 4);
+  if (LAST_IS_WORD.test(before) || FIRST_IS_WORD.test(after)) return false;
+  if (NUMBER_MARK_THEN_DIGIT.test(after)) return false;
+  if (LAST_IS_NUMBER_MARK.test(before) && FIRST_IS_DIGIT.test(words)) return false;
+  return !JOINED_BEFORE.test(before) && !JOINED_AFTER.test(after);
+}
+
+/**
+ * Whether `words` are found in `text` word for word (case, spacing and punctuation as they are), in at least one place
+ * where they start and end at a word edge: not cut out of a longer word or number. Words with no character but spaces are
+ * never found.
+ */
+export function foundAtWordEdges(text: string, words: string): boolean {
+  if (!NOT_SPACE.test(words)) return false;
+  for (let at = text.indexOf(words); at !== -1; at = text.indexOf(words, at + 1)) {
+    if (standsWhole(text, words, at, at + words.length)) return true;
+  }
+  return false;
+}

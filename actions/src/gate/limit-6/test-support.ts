@@ -2,10 +2,11 @@
 // ports (K-04's business head zone, where a visit happens, C-120's photo reading) and for limits 1 to 5 (T-299 to
 // T-303), never for limit 6. Values come only from the contracts' fixtures and the master's sample cast and examples:
 // K-02 v1's S1-02 and two-requests fixtures, K-09 v1's gate exchanges, K-04 v1's business head seeds, S1-12's price
-// board and S1-13's money card read-back word for word, S11-20's "raise haircut to 40", A3-07's Spanish. The geo double's
-// world puts every demo business in America/New_York (K-17 README, "The double"); Lee Home Services' flow B visit in Los
-// Angeles is this double's illustration of a visit address in another zone, as the card asks. Phone numbers are in the
-// 555-01xx range (rule 9).
+// board and S1-13's money card read-back word for word, S11-20's "raise haircut to 40", A3-07's Spanish, and the security
+// review's cut words of round 1 (DL-184: "raise haircut to 140", "tomorrow at 10", "$1,200", "Oct 24", "12 people",
+// "10am"). The geo double's world puts every demo business in America/New_York (K-17 README, "The double"); Lee Home
+// Services' flow B visit in Los Angeles is this double's illustration of a visit address in another zone, as the card
+// asks. Phone numbers are in the 555-01xx range (rule 9).
 
 import { contractFile } from "../../tool-api/test-support";
 import type {
@@ -519,12 +520,17 @@ export const SATURDAY_BEFORE_CHANGE = "2026-10-31T14:00:00Z";
 /**
  * Alex texts `words` on Sat Oct 31 at 10:00am to move his haircut (the any-time row move, A7-03's handler), decide giving
  * `time_saved` as `value` from `cited`. With `bookingId` null it is a new booking's door, read in the business's zone.
+ * `sentAt` sends the text at another time (UTC).
  */
 export function haircutMoveRequest(
   value: Field["value"],
   cited: string,
   words: string,
-  options: { readonly bookingId?: string | null; readonly language?: string | null } = {},
+  options: {
+    readonly bookingId?: string | null;
+    readonly language?: string | null;
+    readonly sentAt?: string;
+  } = {},
 ): GateRequest {
   const bookingId = options.bookingId === undefined ? HAIRCUT : options.bookingId;
   const target = targetAt(
@@ -555,7 +561,7 @@ export function haircutMoveRequest(
     turnId: `turn-alex-haircut-${bookingId ?? "new"}`,
     flow: "A",
     writer: ALEX,
-    texts: [typed("evt-alex-0301", words, SATURDAY_BEFORE_CHANGE)],
+    texts: [typed("evt-alex-0301", words, options.sentAt ?? SATURDAY_BEFORE_CHANGE)],
     choices: [choice],
     parts: [partFor(choice, words, [field("time_saved", value, cited)])],
     ...(options.language === undefined ? {} : { language: options.language }),
@@ -582,10 +588,23 @@ export function settingsChoice(): Choice {
 
 /** Sam's S11-20 "raise haircut to 40", decide giving the service and the price `price` from `priceWords`. */
 export function raisePriceRequest(price: Field["value"], priceWords: string, reread = false): GateRequest {
-  const words = "raise haircut to 40";
+  return priceChangeRequest("raise haircut to 40", price, priceWords, reread);
+}
+
+/**
+ * Sam's S11-20 price change for the haircut in his own words `words` ("raise haircut to 140", "raise haircut to $1,200"),
+ * decide giving the service from "haircut" and the price `price` from `priceWords`.
+ */
+export function priceChangeRequest(
+  words: string,
+  price: Field["value"],
+  priceWords: string,
+  reread = false,
+): GateRequest {
   const choice = settingsChoice();
+  const said = words === "raise haircut to 40" ? "" : `${words.replace(/\W+/g, "-")}-`;
   return requestFor({
-    turnId: `turn-sam-raise-haircut-${priceWords.replace(/\W+/g, "-")}`,
+    turnId: `turn-sam-raise-haircut-${said}${priceWords.replace(/\W+/g, "-")}`,
     flow: "A",
     writer: SAM,
     texts: [typed("evt-sam-1120", words, "2026-10-26T15:40:00Z")],
@@ -595,6 +614,86 @@ export function raisePriceRequest(price: Field["value"], priceWords: string, rer
     ],
     reread,
   });
+}
+
+// ---- Alex asks to bring a group (a new booking's door, with a count) -------------------------------------------------
+
+/** Mon Oct 19 2026, 10:05am in New York (EDT): before the master's own "Sat Oct 24 · 11:00am". */
+export const MONDAY_OCT_19 = "2026-10-19T14:05:00Z";
+
+/**
+ * Alex texts `words` to the barbershop's door for a new booking (A3-51), decide giving how many people come, `people`
+ * (an integer field), as `value` from `cited`.
+ */
+export function groupRequest(value: Field["value"], cited: string, words: string): GateRequest {
+  const choice = newBookingDoor({
+    choiceId: "c-01",
+    step: "A3-51",
+    label: "A new booking",
+    definition: "Something new.",
+    target: targetAt(BARBERSHOP),
+    fields: [{ name: "people", type: "integer" }],
+  });
+  return requestFor({
+    turnId: "turn-alex-group",
+    flow: "A",
+    writer: ALEX,
+    texts: [typed("evt-alex-0401", words, MONDAY_OCT_19)],
+    choices: [choice],
+    parts: [partFor(choice, words, [field("people", value, cited)])],
+  });
+}
+
+// ---- Alex picks one of the times offered (an open question's options, with a choice field) ---------------------------
+
+/** A4-14's question to Alex with the two times it offers, as options labelled "10am" and "11am". */
+export const TIME_QUESTION = "oq-a4-14-alex";
+
+/**
+ * Alex answers A4-14's offered times ("10am", "11am") with `words`, decide choosing the first option, c-01, with the pick
+ * `time_pick` (a choice field: an offered option's id) as `value` from `cited`. `askCount` is the question's.
+ */
+export function timePickRequest(
+  value: Field["value"],
+  cited: string,
+  words: string,
+  askCount = 1,
+): GateRequest {
+  const target = targetAt(BARBERSHOP);
+  const fields: Choice["fields"] = [{ name: "time_pick", type: "choice" }];
+  const offered = (choiceId: string, label: string): Choice =>
+    optionChoice({
+      choiceId,
+      step: "A4-14",
+      question: TIME_QUESTION,
+      label,
+      definition: "Alex picks the time.",
+      target,
+      fields,
+    });
+  const first = offered("c-01", "10am");
+  return requestFor({
+    turnId: "turn-alex-time-pick",
+    flow: "A",
+    writer: ALEX,
+    texts: [typed("evt-alex-0402", words, MONDAY_OCT_19)],
+    choices: [first, offered("c-02", "11am")],
+    openQuestions: [questionOf(TIME_QUESTION, "A4-14", target, "2026-10-19T14:00:00Z", askCount)],
+    parts: [partFor(first, words, [field("time_pick", value, cited)])],
+  });
+}
+
+/** The request with an open question its step `step` asked about `target`, asked `askCount` times, in its context. */
+export function askedAbout(
+  request: GateRequest,
+  step: string,
+  target: Target,
+  askCount: number,
+): GateRequest {
+  const call = copy(request);
+  const id = `oq-${step.toLowerCase()}-asked-${String(askCount)}`;
+  decidedIn(call).context.openQuestions.push(questionOf(id, step, target, "2026-10-19T14:00:00Z", askCount));
+  return call;
 }
 
 // ---- Sam sends his price board as a photo (S1-12), read back on the money card (S1-13) --------------------------------

@@ -5,6 +5,10 @@
 // These are K-02 v1's two named rules, optionOffered and quoteInText (contracts/model/model.rules.mjs states them and
 // "does not implement them"; K-09 v1 gateAndCommit.request: "its named rules are the gate's"), with the verbs and the
 // non-empty words the K-02 schema holds, so a decide output that reaches the gate unvalidated is refused the same way.
+// quoteInText is held a little stricter than the rules file's plain substring (T-304 round 2, DL-184): a quote, a field's
+// words and pass_on's or redact's words count only where they stand in a text whole, at word edges (actions/src/values
+// foundAtWordEdges, the rule limit 6 reads values by), so "yes" cut out of "yesterday" or "no" out of "know" is no quote.
+// Every accepted K-02 and K-09 fixture still passes (T-298's precedent: stricter only while they all do).
 // Each part, in order, is checked for its verb, then its quote, then its option, then each value's words; the first
 // check a part fails is its problem. The agreed parts (decide.parts) come first, then every read's parts, as the named
 // rules check them all.
@@ -12,6 +16,7 @@
 // What comes back names a rule, a part's index, a check and a reason as a label: never a quote's or a value's words,
 // which may be a person's own (K-08 v1 README: "never the raw number or words").
 
+import { foundAtWordEdges } from "../../values";
 import type { Choice, Decided, DecidePart, DecideRefused } from "./types";
 
 /** decide's eight verbs (K-02 v1 `decidePart`; arch 03 line 183). */
@@ -106,9 +111,12 @@ function offeredIn(decided: Decided): Offered {
   };
 }
 
-/** Words that are there and found, exactly, in the words of one of the turn's texts (K-02 v1 quoteInText). */
+/**
+ * Words that are there and found, exactly, in the words of one of the turn's texts (K-02 v1 quoteInText), standing there
+ * whole: starting and ending at a word edge, never cut out of a longer word or number (values foundAtWordEdges; DL-184).
+ */
 function inText(offered: Offered, words: string): boolean {
-  return NOT_SPACE.test(words) && offered.texts.some((text) => text.includes(words));
+  return NOT_SPACE.test(words) && offered.texts.some((text) => foundAtWordEdges(text, words));
 }
 
 type Failed = Pick<DecideProblem, "check" | "why">;
