@@ -13,9 +13,11 @@ import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:tes
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import commitFirst from "../../../contracts/data-access/fixtures/commit-first.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
 import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
 import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
+import safetyThreat from "../../../contracts/model/fixtures/safety-threat.json";
 import safetyTimeoutDangerWord from "../../../contracts/model/fixtures/safety-timeout-danger-word.json";
 import {
   durableObjectActor,
@@ -24,20 +26,36 @@ import {
   type HandleActorRpc,
   type InboundEvent,
 } from "../gateway";
-import { fakeKeyStore } from "../gateway/test-support";
+import { fakeKeyStore, present } from "../gateway/test-support";
+import { fakeBundles } from "../bundle/test-support";
 import {
   setBatchHooks,
+  setBundleDeps,
+  setLeaseHooks,
   setSafetyDeps,
   type BatchEntry,
   type ClosedBatch,
+  type CommitAnswer,
+  type CommitContext,
+  type CommitTurnAnswer,
+  type CommitTurnRequest,
   type HandleActor,
   type HoldEntry,
+  type LeasedTurn,
+  type OpenHold,
   type SafetyEntry,
 } from "../actor";
 import type { ModelCall } from "../trace/types";
 import { timeoutResult } from "./rules";
 import { harness, type Harness } from "./test-support";
-import type { SafetyDeps, SafetyReadAnswer, SafetyReadPort, SafetyReadRequest, SafetyResult } from "./types";
+import type {
+  RecordSafetyOutcomeRequest,
+  SafetyDeps,
+  SafetyReadAnswer,
+  SafetyReadPort,
+  SafetyReadRequest,
+  SafetyResult,
+} from "./types";
 
 type Json = Record<string, unknown>;
 
@@ -77,6 +95,7 @@ interface ResumeRpc {
   readHolds(): Promise<HoldEntry[]>;
   readBatches(): Promise<BatchEntry[]>;
   routineHeld(): Promise<boolean>;
+  markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
 }
@@ -158,6 +177,32 @@ function verdict(result: SafetyResult): SafetyReadAnswer {
 
 const idsOf = (batch: ClosedBatch): string[] => batch.entries.map((entry) => entry.event.eventId);
 
+/** The actor's own turn lease, wired (round 4): each turn the lease hands its work, and what each commit was handed. */
+interface Lease {
+  turns: LeasedTurn[];
+  contexts: CommitContext[];
+}
+
+/**
+ * Commits this run of the turn through the lease, inside the actor, as the turn's work does: commit-first.json's request
+ * for this turn (the gate's writes are the fixture's), which the K-05 double answers as committed.
+ */
+function commitOf(turn: LeasedTurn): Promise<CommitAnswer> {
+  const base = commitFirst.request as unknown as CommitTurnRequest;
+  const request: CommitTurnRequest = {
+    ...base,
+    turn: {
+      ...base.turn,
+      id: turn.turnId,
+      eventIds: turn.eventIds,
+      traceId: turn.traceId,
+      joinedTraceIds: turn.joinedTraceIds,
+      tries: turn.tries,
+    },
+  };
+  return runInDurableObject(stub(), () => turn.commit(request));
+}
+
 interface Run {
   h: Harness;
   /** The reads the actor sent before the eviction (that read never answered). */
@@ -185,11 +230,18 @@ interface Run {
  * 4 s deadline has no timer (with `deadlineRuns`, it runs on the fake clock, so the timeout rule can apply before a cut);
  * after it, the read answers `answers` after `delayMs` and the deadline runs on the fake clock. With `before`, its doubles
  * are the ones in place until the first cut instead (round 3: a read that answers, a core that refuses, a Linq send that
- * never ends), on the fake clock.
+ * never ends), on the fake clock. With `lease` (round 4), closed batches go to the actor's own turn lease, wired with the
+ * turn's work (each turn kept in `lease.turns`) and K-05's commit double (each context kept in `lease.contexts`; it
+ * commits whatever it is sent, so a test shows what T-252's gate is handed), not to `handed`.
  */
 async function withEviction(
   answers: Record<string, SafetyResult>,
-  options: { delayMs?: number; deadlineRuns?: boolean; before?: (h: Harness) => SafetyDeps },
+  options: {
+    delayMs?: number;
+    deadlineRuns?: boolean;
+    before?: (h: Harness) => SafetyDeps;
+    lease?: Lease;
+  },
   body: (run: Run) => Promise<void>,
 ): Promise<void> {
   const h = harness(keys, answers, { delayMs: options.delayMs ?? 0 });
@@ -209,13 +261,33 @@ async function withEviction(
         : { now: () => h.clock.now(), after: () => new Promise<void>(() => undefined) },
   };
   const restoreSafety = setSafetyDeps(stalled);
-  const restoreBatch = setBatchHooks({
-    clock: h.clock,
-    toLease: (batch) => {
-      handed.push(batch);
-    },
-  });
+  const lease = options.lease;
+  const restoreBatch = setBatchHooks(
+    lease === undefined
+      ? {
+          clock: h.clock,
+          toLease: (batch) => {
+            handed.push(batch);
+          },
+        }
+      : { clock: h.clock },
+  );
   const restores: (() => void)[] = [];
+  if (lease !== undefined) {
+    const first = commitFirst.outcome as unknown as CommitTurnAnswer;
+    restores.push(
+      setLeaseHooks({
+        runTurn: (turn) => {
+          lease.turns.push(turn);
+        },
+        commit: (request, at) => {
+          lease.contexts.push(at);
+          return Promise.resolve({ ...first, turnId: request.turn.id });
+        },
+      }),
+      setBundleDeps(fakeBundles().deps),
+    );
+  }
   const run: Run = {
     h,
     cutOff,
@@ -1354,5 +1426,383 @@ describe("a danger outcome cut off before its line and record are done", () => {
         await expectRecordKept(run.h, asResult(safetyTimeoutDangerWord));
       },
     );
+  });
+});
+
+// Round 4 (DL-144; the architect's round 3 FAIL on 159d36b). A: a cut after the danger was noted but before its hold was
+// written (during the handle's ids or the core's record) left the text pending with no hold, and the batch's held() kept
+// that batch, and every later one, a STOP's included, back for as long as its re-reads said No. Now the hold is written
+// from every outcome kept for the text when the danger is noted, before the core is called, and the batch goes on: holds
+// bind commits, not hand-offs (CQ-65). B: a waiting text's No made every other waiting text due at once, so two such texts
+// read each other back to back; now only a text that no longer waits does that, and never for an open danger, which keeps
+// its own 30 s re-read.
+describe("a danger cut off before the core answers (round 4)", () => {
+  const STOP_TEXT = "STOP";
+  const THREAT_TEXT = "if Riley messes up my hair again I'll hurt him";
+
+  /** A core that takes the record and never answers (the cut comes during it); each request is kept in `attempts`. */
+  function hangingCore(h: Harness, attempts: RecordSafetyOutcomeRequest[]): SafetyDeps["core"] {
+    return {
+      recordSafetyOutcome(request) {
+        attempts.push(request);
+        return new Promise(() => undefined);
+      },
+      sendFixedLine: (request) => h.core.sendFixedLine(request),
+      releaseSafetyHold: (request) => h.core.releaseSafetyHold(request),
+    };
+  }
+
+  it("a cut during recordSafetyOutcome: the hold written from its outcomes stands, so after the wake the batch goes on while the re-reads say No, a STOP in the next batch reaches its turn and commit with the danger's hold beside it, and the line goes once with its record kept", async () => {
+    const danger = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    const lease: Lease = { turns: [], contexts: [] };
+    const attempts: RecordSafetyOutcomeRequest[] = [];
+    await withEviction(
+      { "evt-1": danger },
+      { lease, before: (h) => ({ ...h.deps, core: hangingCore(h, attempts) }) },
+      async (run) => {
+        await arrive("evt-1", SMOKE_TEXT);
+        // 0 s: the read says An emergency (no danger word). The danger is noted and its hold written from its outcomes
+        // before the core is called; the core never answers.
+        await vi.waitFor(() => {
+          expect(attempts.map((request) => request.caller.requestId)).toEqual(["safety:evt-1"]);
+        });
+        expect(await actorOf().readHolds()).toEqual([
+          { eventId: "evt-1", holdId: null, rule: "after_safe", blocksBooking: true, released: false },
+        ]);
+        expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-1", state: "reading" }]);
+
+        // 1 s: the cut, during the core's call. The re-reads now say No, then An emergency (the 33 s one).
+        await run.h.clock.advance(1000);
+        const reads: SafetyReadRequest[] = [];
+        await run.evict({
+          ...run.h.deps,
+          read: {
+            read(request) {
+              reads.push(request);
+              const again = reads.filter((each) => each.eventId === "evt-1").length;
+              return Promise.resolve(
+                verdict(
+                  request.eventId === "evt-1" && again >= 2
+                    ? danger
+                    : { ...asResult(safetyNo), eventId: request.eventId },
+                ),
+              );
+            },
+          },
+        });
+
+        // 3 s: the stored alarm wakes a new instance. The text is read again (No: the first verdict stands, nothing is
+        // sent) and stays scheduled; the batch, closed now, goes to the lease all the same, with the hold open.
+        await run.h.clock.advance(2000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(lease.turns.map((turn) => turn.eventIds)).toEqual([["evt-1"]]);
+        });
+        const hold: OpenHold = {
+          eventId: "evt-1",
+          holdId: null,
+          rule: "after_safe",
+          outcomes: ["An emergency"],
+          blocksBooking: true,
+        };
+        expect(present(lease.turns[0], "the turn").holds).toEqual([hold]);
+        await vi.waitFor(() => {
+          expect(reads.map((request) => request.eventId)).toEqual(["evt-1"]);
+        });
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 33_000 });
+        });
+        expect(await commitOf(present(lease.turns[0], "the turn"))).toMatchObject({ result: "committed" });
+
+        // 5 s: a STOP arrives; its batch closes at 8 s and reaches its own turn, and its commit is handed the danger's
+        // hold and no unread text. T-305's hold rule (actions/src/commit/hold.ts isHeld, merged) then commits the STOP (a
+        // protective change passes every hold) and holds every routine part (an after-safe hold lets none through); the
+        // lease refuses nothing itself.
+        await run.h.clock.advance(2000);
+        await arrive("evt-2", STOP_TEXT);
+        await run.settle();
+        await run.h.clock.advance(3000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(lease.turns.map((turn) => turn.eventIds)).toEqual([["evt-1"], ["evt-2"]]);
+        });
+        const stopTurn = present(lease.turns[1], "the STOP's turn");
+        expect(stopTurn.holds).toEqual([hold]);
+        expect(await commitOf(stopTurn)).toMatchObject({ result: "committed" });
+        expect(lease.contexts).toEqual([
+          { holds: [hold], unread: [] },
+          { holds: [hold], unread: [] },
+        ]);
+        expect(run.h.core.recorded).toEqual([]);
+        expect(run.h.direct.sent).toEqual([]);
+
+        // 33 s: the stored re-read says An emergency: the line goes once, through the core (the same request id as the
+        // try the cut lost), whose hold takes the place of the one written before its call; nothing else is sent.
+        await run.h.clock.advance(25_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.core.recorded).toHaveLength(1);
+        });
+        expect(run.h.core.recorded[0]).toMatchObject({
+          at: 33_000,
+          request: { caller: { requestId: "safety:evt-1" }, safety: danger },
+          response: { safetyLine: { fixedLineId: "safetyEmergency" } },
+        });
+        await vi.waitFor(async () => {
+          expect(await actorOf().readSafety()).toMatchObject([
+            { eventId: "evt-1", state: "done", danger: true, path: "outbox", lineId: "safetyEmergency" },
+            { eventId: "evt-2", state: "done", danger: false, path: "none" },
+          ]);
+          expect((await scheduleOf()).map((entry) => entry.kind)).not.toContain("safetyRead");
+        });
+        expect(await actorOf().readHolds()).toEqual([
+          {
+            eventId: "evt-1",
+            holdId: "hold-evt-1",
+            rule: "after_safe",
+            blocksBooking: true,
+            released: false,
+          },
+        ]);
+        expect(reads.map((request) => request.eventId)).toEqual(["evt-1", "evt-2", "evt-1"]);
+        expect(run.h.core.fixed).toEqual([]);
+        expect(run.h.direct.sent).toEqual([]);
+      },
+    );
+  });
+
+  it("a re-applied danger's hold takes the strictest rule of every outcome kept, not only the re-read's: a threat cut off before the core answered, then read as An emergency, keeps the threat's never hold with the core's id (the architect's note a)", async () => {
+    const threat = { ...asResult(safetyThreat), eventId: "evt-1" };
+    const emergency = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    const lease: Lease = { turns: [], contexts: [] };
+    await withEviction(
+      { "evt-1": emergency },
+      {
+        lease,
+        before: (h) => ({
+          ...h.deps,
+          read: { read: () => Promise.resolve(verdict(threat)) },
+          core: hangingCore(h, []),
+        }),
+      },
+      async (run) => {
+        await arrive("evt-1", THREAT_TEXT);
+        await vi.waitFor(async () => {
+          expect(await actorOf().readHolds()).toMatchObject([
+            { eventId: "evt-1", holdId: null, rule: "never", released: false },
+          ]);
+        });
+        await run.h.clock.advance(1000);
+        await run.evict();
+
+        // 3 s: woken; the re-read says An emergency. The core records it (its hold: after-safe, by that read alone), and
+        // the hold kept is the threat's never, with the core's id; the line goes once.
+        await run.h.clock.advance(2000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.core.recorded).toHaveLength(1);
+        });
+        expect(run.h.core.recorded[0]?.response).toMatchObject({
+          hold: { holdId: "hold-evt-1", releaseRule: "after_safe" },
+        });
+        await vi.waitFor(async () => {
+          expect(await actorOf().readSafety()).toMatchObject([
+            { eventId: "evt-1", state: "done", danger: true, path: "outbox" },
+          ]);
+        });
+        expect(await actorOf().readHolds()).toMatchObject([
+          { eventId: "evt-1", holdId: "hold-evt-1", rule: "never", released: false },
+        ]);
+        expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("neverReleased");
+
+        // The batch went on; its commit is handed the never hold with both outcomes, so only protective changes commit.
+        await vi.waitFor(() => {
+          expect(lease.turns.map((turn) => turn.eventIds)).toEqual([["evt-1"]]);
+        });
+        expect(await commitOf(present(lease.turns[0], "the turn"))).toMatchObject({ result: "committed" });
+        expect(lease.contexts).toEqual([
+          {
+            holds: [
+              {
+                eventId: "evt-1",
+                holdId: "hold-evt-1",
+                rule: "never",
+                outcomes: ["A threat to staff or others", "An emergency"],
+                blocksBooking: true,
+              },
+            ],
+            unread: [],
+          },
+        ]);
+      },
+    );
+  });
+
+  it("an open danger found with no hold on resume (its hold's write failed before the cut) gets it from its kept outcomes then, and its batch goes on", async () => {
+    const danger = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    await withEviction(
+      { "evt-1": danger },
+      { before: (h) => ({ ...h.deps, core: hangingCore(h, []) }) },
+      async (run) => {
+        await arrive("evt-1", SMOKE_TEXT);
+        await vi.waitFor(async () => {
+          expect(await actorOf().readHolds()).toHaveLength(1);
+        });
+        // The hold's write is lost (a storage that failed then): the danger is noted, with no hold.
+        await runInDurableObject(stub(), (_, state) => {
+          state.storage.sql.exec("DELETE FROM safety_holds");
+        });
+        await run.h.clock.advance(1000);
+        // After the cut the re-read never answers, so only the resume can write the hold.
+        await run.evict({ ...run.h.deps, read: { read: () => new Promise(() => undefined) } });
+
+        // 3 s: woken; the resume writes the hold from the outcomes kept for the text, and the batch goes on with it.
+        await run.h.clock.advance(2000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+        });
+        expect(await actorOf().readHolds()).toEqual([
+          { eventId: "evt-1", holdId: null, rule: "after_safe", blocksBooking: false, released: false },
+        ]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        expect(await actorOf().routineHeld()).toBe(true);
+      },
+    );
+  });
+
+  it("on the late path, an open danger whose hold's write failed (its unread hold still open) gets its hold at the next re-read, though that read says No, so its batch goes on", async () => {
+    const danger = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    await withEviction(
+      { "evt-1": danger },
+      {
+        before: (h) => ({
+          ...h.deps,
+          // The read sent on arrival answers An emergency at 6 s, past the deadline; the core takes the record and never
+          // answers.
+          read: {
+            async read() {
+              await h.clock.after(6000);
+              return verdict(danger);
+            },
+          },
+          core: hangingCore(h, []),
+        }),
+      },
+      async (run) => {
+        await arrive("evt-1", SMOKE_TEXT);
+        await run.h.clock.advance(4000);
+        await vi.waitFor(() => {
+          expect(run.h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([
+            [4000, "outage"],
+          ]);
+        });
+        await run.h.clock.advance(2000);
+        await vi.waitFor(async () => {
+          expect(await actorOf().readHolds()).toMatchObject([{ eventId: "evt-1", rule: "after_safe" }]);
+        });
+        // The hold's write is lost (a storage that failed then): the danger is noted, its unread hold still open.
+        await runInDurableObject(stub(), (_, state) => {
+          state.storage.sql.exec(
+            "INSERT OR REPLACE INTO safety_holds (event_id, hold_id, rule, blocks_booking, released) VALUES ('evt-1', NULL, 'unread', 0, 0)",
+          );
+        });
+        await run.h.clock.advance(1000);
+        await run.evict({
+          ...run.h.deps,
+          read: { read: () => Promise.resolve(verdict({ ...asResult(safetyNo), eventId: "evt-1" })) },
+        });
+
+        // 34 s: the stored re-read says No. The first verdict stands: nothing is sent, the hold is written from the kept
+        // outcomes in place of the unread hold, and the batch goes on with it.
+        await run.h.clock.advance(27_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+        });
+        expect(await actorOf().readHolds()).toEqual([
+          { eventId: "evt-1", holdId: null, rule: "after_safe", blocksBooking: false, released: false },
+        ]);
+        expect(run.h.core.fixed).toHaveLength(1);
+        expect(run.h.direct.sent).toEqual([]);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 64_000 });
+        });
+      },
+    );
+  });
+
+  it("two open dangers whose re-reads answer No are each read once per 30 s: one's No never makes the other due at once (the architect's B)", async () => {
+    const h = harness(keys, {});
+    const reads: SafetyReadRequest[] = [];
+    // Each text's first read says An emergency; every re-read says No. PostgreSQL is down and Linq refuses, so neither
+    // line goes and both texts stay open.
+    const read: SafetyReadPort = {
+      read(request) {
+        reads.push(request);
+        const first = reads.filter((each) => each.eventId === request.eventId).length === 1;
+        return Promise.resolve(
+          verdict({
+            ...asResult(first ? safetyEmergencyNow : safetyNo),
+            eventId: request.eventId,
+          }),
+        );
+      },
+    };
+    const restoreSafety = setSafetyDeps({ ...h.deps, read });
+    const restoreBatch = setBatchHooks({ clock: h.clock, toLease: () => undefined });
+    const readsOf = (eventId: string): number => reads.filter((each) => each.eventId === eventId).length;
+    try {
+      h.core.down = true;
+      h.direct.fail = true;
+      await arrive("evt-1", SMOKE_TEXT);
+      await actorOf().safetyIdle();
+      await h.clock.advance(1000);
+      await arrive("evt-2", "the dryer in the back room is smoking and the lights went out");
+      await actorOf().safetyIdle();
+      expect(await actorOf().readSafety()).toMatchObject([
+        { eventId: "evt-1", state: "lineFailed", danger: true },
+        { eventId: "evt-2", state: "lineFailed", danger: true },
+      ]);
+      await vi.waitFor(async () => {
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 30_000 });
+      });
+
+      // Each 30 s window: evt-1 is read at its due time (30 s, 60 s), evt-2 at its own (31 s, 61 s), and the safety entry
+      // moves to the next one due. The alarm is run again after each answer: a No must not have made the other text due.
+      for (const [at, one, two, next] of [
+        [30_000, 2, 1, 31_000],
+        [31_000, 2, 2, 60_000],
+        [60_000, 3, 2, 61_000],
+        [61_000, 3, 3, 90_000],
+      ] as const) {
+        await h.clock.advance(at - h.clock.now());
+        await runDurableObjectAlarm(stub());
+        await vi.waitFor(async () => {
+          expect([readsOf("evt-1"), readsOf("evt-2")]).toEqual([one, two]);
+          expect((await scheduleOf()).filter((entry) => entry.kind === "safetyRead")).toEqual([
+            { kind: "safetyRead", due_ms: next },
+          ]);
+        });
+        for (let again = 0; again < 3; again += 1) {
+          await runDurableObjectAlarm(stub());
+          await actorOf().batchIdle();
+        }
+        expect([readsOf("evt-1"), readsOf("evt-2")]).toEqual([one, two]);
+      }
+      expect(h.direct.sent).toEqual([]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "after_safe", released: false },
+        { eventId: "evt-2", rule: "after_safe", released: false },
+      ]);
+    } finally {
+      restoreBatch();
+      restoreSafety();
+    }
   });
 });

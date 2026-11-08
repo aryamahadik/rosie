@@ -37,6 +37,15 @@
 // gets its line by the timeout rule. Only a text whose outcome is complete drops a later answer, and a hold written again
 // for the same text is never looser than the open one.
 //
+// The danger's hold is written in that same step, before the core is called (T-1088 round 4, DL-144; the architect's
+// round 3 gap A): from every outcome kept for the text, the strictest rule of them all (arch 06 line 327), in place of an
+// unread hold; the core's hold then takes its place, never looser, and an eviction before the core answers leaves the text
+// among the holds (a resume or a re-read writes it again if it is missing). So a danger text is always read: its batch
+// goes on, and its hold binds the commit, where a STOP or a protecting change still commits (holds bind commits, not
+// hand-offs: CQ-65, DL-119; T-305's hold rule). On return, only a text that no longer waits makes the others due at once,
+// and only those still waiting for a verdict: a text whose danger's line or record is not done keeps its own 30 s re-read
+// and makes nothing due (round 3 gap B), so two such texts never trigger each other's reads.
+//
 // This file keeps the hold's state and says so (`routineHeld`, `readSafety`, `unreadTexts`); it does not batch. Never
 // logged or put in a span: a word, an evidence quote, a number.
 
@@ -391,8 +400,10 @@ export class SafetyOnArrival {
         // Its read found danger before the cut, and the line or its record was not done (T-1088 round 3). No timeout
         // rule: a verdict came. It is no longer being read: it is read again now, and a danger verdict goes through the
         // same send path with the same idempotency key (`applyLate`), so the line goes once and its record is kept. Until
-        // then it stays scheduled, as an unread hold's re-read is.
+        // then it stays scheduled, as an unread hold's re-read is, among the holds (round 4: its hold from its kept
+        // outcomes, written again here if the cut came before it was).
         this.finish(eventId, "lineFailed", true, "none", null, null);
+        this.holdFromKept(eventId);
         this.nextReread(set, eventId);
         if (text !== undefined) this.reread(set, text, row.arrived_ms);
         continue;
@@ -545,10 +556,11 @@ export class SafetyOnArrival {
   /**
    * True when one of these texts has not been read yet, so the batch that holds it waits (CQ-65 as DL-119 replaced it):
    * its read is running or was never wired; no verdict came (its unread hold is open: only a verdict lifts it, T-247 note
-   * a); the outage path failed with no verdict; or its danger outcome is not complete and no hold is open for it yet (a
-   * danger text is always in the holds or unread). A text the read found danger in, with its hold open, has been read:
-   * its outcome hold does not keep the batch back, it binds the turn's commit. A text with no safety row at all is the
-   * actor's to find (note d).
+   * a); or the outage path failed with no verdict. A text the read found danger in has been read, whether or not its line
+   * has gone and its record is kept (round 4, DL-144): its hold, written from its kept outcomes before the core is called,
+   * does not keep the batch back, it binds the turn's commit, so a STOP in that batch or a later one still commits. A
+   * danger text whose hold could not be written is among the texts not read at commit time (`unreadTexts`). A text with no
+   * safety row at all is the actor's to find (note d).
    */
   unreadAmong(eventIds: readonly string[]): boolean {
     if (eventIds.length === 0) return false;
@@ -560,10 +572,7 @@ export class SafetyOnArrival {
              AND (e.state IN ('reading', 'unwired')
                   OR (e.state = 'lineFailed' AND e.danger = 0)
                   OR EXISTS (SELECT 1 FROM safety_holds h
-                             WHERE h.event_id = e.event_id AND h.rule = 'unread' AND h.released = 0)
-                  OR (EXISTS (SELECT 1 FROM safety_pending p WHERE p.event_id = e.event_id)
-                      AND NOT EXISTS (SELECT 1 FROM safety_holds h
-                                      WHERE h.event_id = e.event_id AND h.released = 0)))
+                             WHERE h.event_id = e.event_id AND h.rule = 'unread' AND h.released = 0))
            LIMIT 1`,
           JSON.stringify(eventIds),
         )
@@ -594,9 +603,10 @@ export class SafetyOnArrival {
 
   /**
    * The texts not read yet, by event id in arrival order, beside the open holds (QUESTIONS.md CQ-65's addendum, DL-127):
-   * still being read, never wired, given up with no hold open, or with a danger outcome not complete and no hold open yet.
-   * A commit is handed them (CommitContext.unread), and T-252's gate counts each as an open hold. A text under an open
-   * hold (unread or an outcome's) is among `openHolds` instead; a text with no safety row at all is the actor's to find.
+   * still being read, never wired, given up with no hold open, or with a danger outcome not complete and no hold open (its
+   * hold could not be written: fails closed). A commit is handed them (CommitContext.unread), and T-252's gate counts each
+   * as an open hold. A text under an open hold (unread or an outcome's) is among `openHolds` instead; a text with no safety
+   * row at all is the actor's to find.
    */
   unreadTexts(): string[] {
     return this.host.storage.sql
@@ -892,6 +902,9 @@ export class SafetyOnArrival {
     if (this.landing.has(eventId)) return;
     const pending = this.dangerPending(eventId);
     if (!pending && !this.unreadHoldOpen(eventId)) return;
+    // An open danger is among the holds whatever this answer says (round 4): its hold from its kept outcomes, written
+    // again here if the cut came before it was.
+    if (pending) this.holdFromKept(eventId);
     const { sql } = this.host.storage;
     const { answer } = late;
     const verdict = answer !== "failed" && answer !== "nothing" && !answer.result.timedOut ? answer : null;
@@ -913,13 +926,13 @@ export class SafetyOnArrival {
       }
     }
     if (use === null) {
-      // Nothing to apply: the text stays held, nothing is sent, and it is read again 30 s on.
+      // Nothing to apply: the text stays held, nothing is sent, and it is read again 30 s on. It still waits, so it makes
+      // no other text due (round 4, the architect's round 3 gap B): each waiting text keeps its own 30 s re-read.
       this.nextReread(set, eventId);
       const noLine = answer === "failed" || answer === "nothing";
       const shown = noLine ? timeoutResult(eventId, []) : answer.result;
       const calls = noLine ? timeoutCalls() : answer.modelCalls;
       this.recordSpan(set, handoff, arrivedAt, shown, calls, "reread", "none", null, answer === "failed");
-      if (verdict !== null) this.onReturn(set, eventId);
       return;
     }
     this.landing.add(eventId);
@@ -985,6 +998,42 @@ export class SafetyOnArrival {
     );
   }
 
+  /**
+   * Writes a danger's hold from these outcomes (every outcome kept for the text: the strictest rule of them all, arch 06
+   * line 327, so a re-applied danger never takes only its latest read's rule), in place of the text's unread hold, before
+   * the core is called (T-1088 round 4, DL-144; the architect's round 3 gap A and note a). It stands until the core's hold
+   * takes its place (`sendDanger`), never looser than the open one. A storage that fails here must not keep the line from
+   * going: the text then stays among the texts not read at commit time, and a resume or re-read writes the hold again.
+   */
+  private holdFromOutcomes(
+    eventId: string,
+    outcomes: readonly SafetyOutcome[],
+    blocksBooking: boolean,
+  ): void {
+    const rule = strictestHold(outcomes);
+    if (rule === null) return;
+    try {
+      this.writeHold(eventId, null, rule, blocksBooking);
+    } catch {
+      // Not written: `unreadTexts` names the text to the commit until a resume or re-read writes it (`holdFromKept`).
+    }
+  }
+
+  /**
+   * An open danger whose hold is missing (the cut came before it was written) gets it from the outcomes kept for it, on
+   * resume or re-read; one with its hold open keeps it as it is (never looser).
+   */
+  private holdFromKept(eventId: string): void {
+    try {
+      const open = this.host.storage.sql
+        .exec("SELECT 1 FROM safety_holds WHERE event_id = ? AND released = 0 AND rule <> 'unread'", eventId)
+        .toArray();
+      if (open.length === 0) this.holdFromOutcomes(eventId, this.outcomesOf(eventId), false);
+    } catch {
+      // The storage failed: the text stays among the texts not read at commit time, and the next re-read tries again.
+    }
+  }
+
   /** The outcome labels kept for this text (none yet: empty). */
   private outcomesOf(eventId: string): SafetyOutcome[] {
     const row = this.host.storage.sql
@@ -995,16 +1044,20 @@ export class SafetyOnArrival {
 
   /**
    * A read gave a verdict: the model is back (arch 11 line 564: "On return: danger first, then stops, then the rest in
-   * order"). Every other text that waits for a read (its unread hold open, or its danger outcome not complete), and whose
-   * read is not out here, is due for its re-read now, so the actor's alarm reads them at once, in arrival order: danger
-   * among them gets its line as its verdict lands, and the batches they kept back go on in order.
+   * order"). Every other text that waits for a verdict (its unread hold open), and whose read is not out here, is due for
+   * its re-read now, so the actor's alarm reads them at once, in arrival order: danger among them gets its line as its
+   * verdict lands, and the batches they kept back go on in order. Round 4 (the architect's round 3 gap B): only a text
+   * that no longer waits does this (as in round 2), and a text whose danger's line or record is not done is never made due
+   * here (its verdict came; what it waits for is its line, not the model). So two such texts never make each other due on
+   * every answer, and each keeps its own 30 s re-read (arch 11 line 564).
    */
   private onReturn(set: SafetyDeps, readNow: string): void {
     const waiting = this.waiting();
     if (waiting.length === 0) return;
+    if (waiting.some((row) => row.event_id === readNow)) return;
     const now = set.clock.now();
     for (const row of waiting) {
-      if (row.event_id === readNow || this.busy(row.event_id)) continue;
+      if (row.event_id === readNow || this.busy(row.event_id) || this.dangerPending(row.event_id)) continue;
       if (row.due_ms !== null && row.due_ms > now) this.setReread(row.event_id, now);
     }
   }
@@ -1040,8 +1093,15 @@ export class SafetyOnArrival {
     );
     try {
       if (dangers.length > 0) {
-        // Noted before the hold or any send: until the line has gone and its record is kept, an eviction cannot lose it.
+        // Noted before any send: until the line has gone and its record is kept, an eviction cannot lose it. Its hold is
+        // written in the same step, before the core is called (round 4), from every outcome kept for it: the text is among
+        // the holds from here on, whatever cuts the work off, so its batch goes on and its hold binds the commit.
         this.markDangerPending(eventId);
+        this.holdFromOutcomes(
+          eventId,
+          outcomes,
+          result.dangerWords.some((match) => match.list === "plugin"),
+        );
         const sent = await this.sendDanger(set, handoff, arrivedAt, result);
         path = sent.path;
         lineId = sent.lineId;
@@ -1143,9 +1203,10 @@ export class SafetyOnArrival {
   }
 
   /**
-   * Writes a danger outcome's hold in place of the text's unread hold. Written again for the same text (its danger
-   * applied again after a cut or a failed line), it is never looser than the open one: the stricter rule stays (a
-   * threat's is never released, A3-48), as do a hold id the core gave and a booking block. Returns the rule kept.
+   * Writes a danger outcome's hold in place of the text's unread hold. Written again for the same text (the core's hold
+   * after the one written before its call, or its danger applied again after a cut or a failed line), it is never looser
+   * than the open one: the stricter rule stays (a threat's is never released, A3-48), as do a hold id the core gave and a
+   * booking block. Returns the rule kept.
    */
   private writeHold(
     eventId: string,
@@ -1174,7 +1235,9 @@ export class SafetyOnArrival {
   /**
    * The checked line for danger: the core's outbox row when it answers, else straight through Linq. The outcome is
    * complete (`clearDangerPending`) once the core has answered (it holds the record and the line's outbox row), or once
-   * the direct line has gone (or none is needed) and its record is kept; a line that fails leaves it open.
+   * the direct line has gone (or none is needed) and its record is kept; a line that fails leaves it open. The hold
+   * written before the call (`holdFromOutcomes`) stands until the core's hold takes its place, with the core's id and never
+   * looser; a core answer with no hold leaves it as it is (K-09 gives no hold only for No: fails closed).
    */
   private async sendDanger(
     set: SafetyDeps,
