@@ -3,12 +3,14 @@
 // None is written here: each is read from a committed file, K-01 v1's own accepted fixtures above all, or is a plain
 // placeholder that cannot pass for a real value (an all-zero hash, the epoch).
 //
-//   bundle id      T-150 gives it (from the hashes of the stored values). Stand-in: hash 64 zeros, build 1.
+//   bundle id      T-150 gives it: `compiler build --build <n>` (compiler/src/bundle-id) takes the content hash of the
+//                  stored values, as K-01 spells it, with build number n. Stand-in: hash 64 zeros, build 1.
 //   built at       the publish gives it; a build writes no clock time of its own (byte-identical builds). Stand-in: the
 //                  epoch, 1970-01-01T00:00:00Z.
-//   inputs         T-150 gives every input's hash (Master Corrections, LINES.md, the approved overlays, fixture set
-//                  v1's MANIFEST.sha256). Stand-in: the entries of fixtures/master/SHA256SUMS (T-130) for the two flows,
-//                  LINES.md, the three reference scripts and the trades the bundle holds.
+//   inputs         T-150 gives every input K-01 names with its hash, the same `--build <n>` (compiler/src/bundle-id/
+//                  inputs.ts: Master Corrections, the approved overlays and fixture set v1's MANIFEST.sha256 too).
+//                  Stand-in: the entries of fixtures/master/SHA256SUMS (T-130) for the two flows, LINES.md, the three
+//                  reference scripts and the trades the bundle holds.
 //   prompts        the AI engineer's (C-119), packed from the files the build is given. Stand-in: the sample prompts
 //                  of contracts/bundle/fixtures/manifest.json.
 //   models, policy the AI engineer's (C-121). Stand-in: manifest.json's, which are arch 11 line 564's model ids and
@@ -167,7 +169,7 @@ export function standInBundleId(): StandInValue<BundleId> {
     value: { ...STANDIN_BUNDLE_ID },
     standIn: {
       what: "bundle id",
-      owner: "T-150: pass --bundle-id <hash>/<build>",
+      owner: "T-150: pass --build <n> (or a whole --bundle-id <hash>/<build>)",
       from: `hash ${STANDIN_BUNDLE_ID.hash}, build ${String(STANDIN_BUNDLE_ID.build)}`,
     },
   };
@@ -213,7 +215,8 @@ export function standInInputs(trades: readonly TradeId[]): StandInValue<InputFil
     value: inputs,
     standIn: {
       what: "inputs",
-      owner: "T-150 (adds Master Corrections, the approved overlays and fixture set v1's MANIFEST.sha256)",
+      owner:
+        "T-150: pass --build <n> (every input K-01 names: Master Corrections, the approved overlays and fixture set v1's MANIFEST.sha256 too)",
       from: "fixtures/master/SHA256SUMS",
     },
   };

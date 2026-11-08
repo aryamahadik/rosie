@@ -1,11 +1,18 @@
 // `compiler build`: compiles fixture set v1 into a bundle directory that validates against K-01 v1 (T-149; C-058).
 //
-//   npm run cli --workspace compiler -- build --out <dir> [--trades <id,id,...>] [--bundle-id <hash>/<build>]
+//   npm run cli --workspace compiler -- build --out <dir> [--trades <id,id,...>]
+//                                           [--build <n> | --bundle-id <hash>/<build>]
 //                                           [--built-at <utc>] [--prompts <file>] [--models <file>]
 //
 //   --out        the folder to write, new or empty; a relative path is read from the folder npm was run in (INIT_CWD).
 //   --trades     the trades to compile, by id (default: every trade of fixture set v1).
-//   --bundle-id  the bundle id, T-150's (default: the stand-in, 64 zeros and build 1).
+//   --build      a numbered build (T-150; CQ-09; compiler/src/bundle-id): the bundle id is the content hash of the
+//                compiled values, as K-01 v1 spells it, with build number n (a whole number from 1, counting publishes:
+//                the publish picks it, T-152), and the manifest lists every input K-01 names with its sha256 (the two
+//                flows, the trades, Master Corrections, LINES.md, the approved overlays, fixture set v1's manifest and
+//                the reference scripts). After writing, the id is checked again from the files read back.
+//                Without it, the bundle id and the inputs are the stand-ins (T-149) or the --bundle-id given.
+//   --bundle-id  the bundle id, given whole (default: the stand-in, 64 zeros and build 1). Not with --build.
 //   --built-at   when it was built, in UTC (default: the stand-in, the epoch: a build writes no clock time).
 //   --prompts    a JSON file giving each prompt one turn runs on, safetyRead, decide, planner and composer, as
 //                { "version": "...", "file": "<text file, from the JSON file's folder>" } or { "version", "text" }:
@@ -16,11 +23,13 @@
 // the trade overlays, and the tree's sha256: two builds from the same inputs print the same one.
 //
 // Node runs this file as TypeScript as it is (the CLI's note), and the compiler's modules import each other without a
-// file extension, which Node's own resolver does not complete. So the emitter is loaded only when the command runs,
-// after a resolve hook that completes a relative import from a compiler .ts file with `.ts` or `/index.ts`.
+// file extension, which Node's own resolver does not complete. So the emitter and the bundle id module are loaded only
+// when the command runs, after a resolve hook that completes a relative import from a compiler .ts file with `.ts` or
+// `/index.ts`.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { registerHooks } from "node:module";
 import { dirname, isAbsolute, resolve } from "node:path";
+import type * as Ids from "../../bundle-id/index";
 import type * as Emit from "../../emit/index";
 import type { CliIo, Command } from "../index.ts";
 
@@ -57,12 +66,21 @@ async function loadEmitter(): Promise<typeof Emit> {
   return (await import(new URL("../../emit/index.ts", import.meta.url).href)) as typeof Emit;
 }
 
+/** The bundle id module (T-150), loaded once the resolve hook is in place. */
+async function loadBundleIds(): Promise<typeof Ids> {
+  completeImports();
+  return (await import(new URL("../../bundle-id/index.ts", import.meta.url).href)) as typeof Ids;
+}
+
 /** A command line this command does not take. */
 class UsageError extends Error {
   override name = "UsageError";
 }
 
-const FLAGS = ["--out", "--trades", "--bundle-id", "--built-at", "--prompts", "--models"] as const;
+const USAGE =
+  "usage: build --out <dir> [--trades <id,...>] [--build <n> | --bundle-id <hash>/<build>] [--built-at <utc>] [--prompts <file>] [--models <file>]";
+
+const FLAGS = ["--out", "--trades", "--build", "--bundle-id", "--built-at", "--prompts", "--models"] as const;
 type Flag = (typeof FLAGS)[number];
 
 function parse(args: readonly string[]): Partial<Record<Flag, string>> {
@@ -115,24 +133,47 @@ function bundleId(text: string): Emit.BundleId {
   return { hash: match[1] ?? "", build: Number(match[2]) };
 }
 
+function buildNumber(ids: typeof Ids, text: string): number {
+  try {
+    return ids.parseBuildNumber(text);
+  } catch (error) {
+    if (!(error instanceof ids.BundleIdError)) throw error;
+    throw new UsageError(`--build ${text}: expected a build number, a whole number from 1`);
+  }
+}
+
+/** The manifest's inputs counted by kind, in K-01's order, with each version written (Master Corrections'). */
+function inputCounts(ids: typeof Ids, inputs: readonly Emit.InputFile[]): string {
+  return ids.INPUT_KINDS.map((kind) => {
+    const listed = inputs.filter((input) => input.kind === kind);
+    const versions = listed.flatMap((input) => (input.version === undefined ? [] : [input.version]));
+    return `${kind} ${String(listed.length)}${versions.length > 0 ? ` (${versions.join("; ")})` : ""}`;
+  }).join(", ");
+}
+
 async function run(args: string[], io: CliIo): Promise<number> {
   let given: Partial<Record<Flag, string>>;
   try {
     given = parse(args);
     if (given["--out"] === undefined) throw new UsageError("--out <dir> is required");
+    if (given["--build"] !== undefined && given["--bundle-id"] !== undefined)
+      throw new UsageError(
+        "--build and --bundle-id are given together: a numbered build makes its own bundle id",
+      );
   } catch (error) {
     if (!(error instanceof UsageError)) throw error;
     io.err(error.message);
-    io.err(
-      "usage: build --out <dir> [--trades <id,...>] [--bundle-id <hash>/<build>] [--built-at <utc>] [--prompts <file>] [--models <file>]",
-    );
+    io.err(USAGE);
     return 2;
   }
   const emit = await loadEmitter();
+  const ids = await loadBundleIds();
   const options: Emit.BuildOptions = {};
+  let build: number | undefined;
   try {
     if (given["--trades"] !== undefined)
       options.trades = given["--trades"].split(",").filter((id) => id !== "");
+    if (given["--build"] !== undefined) build = buildNumber(ids, given["--build"]);
     if (given["--bundle-id"] !== undefined) options.bundleId = bundleId(given["--bundle-id"]);
     if (given["--built-at"] !== undefined) options.builtAt = given["--built-at"];
     if (given["--prompts"] !== undefined)
@@ -152,9 +193,18 @@ async function run(args: string[], io: CliIo): Promise<number> {
     );
     return 2;
   }
-  const built = await emit.buildBundle(options);
+  const numbered = build === undefined ? null : await ids.buildNumberedBundle({ ...options, build });
+  const built = numbered ?? (await emit.buildBundle(options));
   emit.writeBundle(out, built.files);
   const problems = emit.checkBundleDir(out);
+  if (numbered !== null && problems.length === 0) {
+    // The id again, from the files on disk: the content hash of the values read back is the id's hash.
+    const back = emit.readBundleDir(out);
+    problems.push(...ids.bundleIdProblems(back.bundle.manifest));
+    const hash = ids.contentHashOfFiles(back.files);
+    if (hash !== numbered.bundleId.hash)
+      problems.push(`the content hash of the files read back is ${hash}, not ${numbered.bundleId.hash}`);
+  }
   if (problems.length > 0) {
     io.err(`the bundle written to ${given["--out"]} is not sound:`);
     for (const problem of problems.slice(0, 40)) io.err(`  ${problem}`);
@@ -165,6 +215,14 @@ async function run(args: string[], io: CliIo): Promise<number> {
     io.out(`stand-in: ${standIn.what} from ${standIn.from} (the real one: ${standIn.owner})`);
   for (const [list, sources] of Object.entries(built.listSources))
     for (const source of sources) io.out(`list ${list}: ${source}`);
+  if (numbered !== null) {
+    const { hash, build: number } = numbered.bundleId;
+    io.out(
+      `bundle id: ${hash}/${String(number)}, the content hash of the ${String(built.files.length - 1)} stored values (K-01 v1) with build ${String(number)}`,
+    );
+    const inputs = built.bundle.manifest.inputs as Emit.InputFile[];
+    io.out(`inputs: ${String(inputs.length)}, each with its sha256: ${inputCounts(ids, inputs)}`);
+  }
   const sizes = built.files.map((file) => ({ path: file.path, bytes: emit.byteLength(file.text) }));
   const trades = sizes.filter((file) => file.path.startsWith("trade/"));
   for (const file of sizes)
@@ -185,6 +243,10 @@ async function run(args: string[], io: CliIo): Promise<number> {
   io.out(
     `read back from ${given["--out"]} and validated against K-01 v1 (Ajv 2020-12, strict): the manifest, 2 flow graphs and ${String(trades.length)} trade overlays; each file's size and sha256 as the manifest's storage lists them`,
   );
+  if (numbered !== null)
+    io.out(
+      `bundle id read back from ${given["--out"]}: the content hash of the stored values on disk is the id's hash`,
+    );
   io.out(
     `tree sha256: ${emit.treeSha256(built.files)} (${String(built.files.length)} files in ${given["--out"]})`,
   );
