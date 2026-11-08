@@ -6,82 +6,27 @@
 // answer) 503, so Linq retries for 30 minutes, with nothing stored; otherwise 200. After the verify the event is
 // scrubbed, then (texts, photos, reactions, votes, edits) sealed and written to the handle's actor, or (receipts) handed
 // scrubbed to the dispatcher's door (hand-off.ts). The trace id opens at receipt, one K-08 `receive` span ends every answer,
-// and the answer carries x-trace-id. Never logged: a body, a phone number, the webhook secret.
+// and the answer carries x-trace-id. Never logged: a body, a phone number, the webhook secret. The answer rules it shares
+// with the Stripe and calendar doors are answer.ts's.
 
-import { isLabel, logSink, openTrace, type BundleId, type TraceContext } from "../trace";
+import { isLabel } from "../trace";
+import {
+  labelFacts,
+  logFailure,
+  openWebhookTrace,
+  readBundleId,
+  respond,
+  type Answer,
+  type WebhookEnvironment,
+} from "./answer";
 import { HandoffError, prepareHandoff } from "./hand-off";
 import type { GatewayDeps, StoreAnswer, VerifyWebhookResult } from "./types";
-
-/** Bundle v0's id (K-01 bundle-v0-skeleton), the stand-in until a bundle registry can be read (K-08 README default 1). */
-export const DEFAULT_BUNDLE_ID: BundleId = {
-  hash: "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
-  build: 1,
-};
 
 // The webhook's headers by Linq's standard names (K-11 README spike row 2). The adapter's wire format is T-413's; these
 // three names only fill K-11's request fields, and a missing one becomes "" (the schema's own rule for `signature`).
 const HEADER_ID = "webhook-id";
 const HEADER_TIMESTAMP = "webhook-timestamp";
 const HEADER_SIGNATURE = "webhook-signature";
-
-interface Answer {
-  status: 200 | 400 | 401 | 503;
-  error?: string;
-}
-
-function respond(answer: Answer, traceId: string): Response {
-  const body =
-    answer.error === undefined
-      ? { ok: true, trace_id: traceId }
-      : { ok: false, error: answer.error, trace_id: traceId };
-  return new Response(JSON.stringify(body), {
-    status: answer.status,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store",
-      "x-trace-id": traceId,
-    },
-  });
-}
-
-function logFailure(traceId: string, stage: string, error: unknown): void {
-  // The error's name only: its message could carry words from the body.
-  const name = error instanceof Error ? error.name : "unknown";
-  console.log(
-    JSON.stringify({ level: "error", msg: "gateway_failed", trace_id: traceId, stage, error: name }),
-  );
-}
-
-async function readBundleId(deps: GatewayDeps): Promise<BundleId> {
-  try {
-    return await deps.bundleId();
-  } catch {
-    return DEFAULT_BUNDLE_ID;
-  }
-}
-
-function openContext(
-  deps: GatewayDeps,
-  bundleId: BundleId,
-  environment: string,
-  version: string,
-): TraceContext {
-  const options = {
-    openedBy: "textWebhook" as const,
-    sink: logSink({ environment, version }),
-    ...(deps.now === undefined ? {} : { now: deps.now }),
-  };
-  try {
-    return openTrace({ ...options, bundleId });
-  } catch {
-    return openTrace({ ...options, bundleId: DEFAULT_BUNDLE_ID });
-  }
-}
-
-export interface WebhookEnvironment {
-  environment: string;
-  version: string;
-}
 
 /**
  * Handles one Linq webhook POST. The unsigned request's own x-trace-id is not kept: a webhook comes from Linq, which
@@ -94,7 +39,7 @@ export async function handleLinqWebhook(
 ): Promise<Response> {
   const now = deps.now ?? Date.now;
   const bundleId = await readBundleId(deps);
-  const context = openContext(deps, bundleId, where.environment, where.version);
+  const context = openWebhookTrace(deps, bundleId, where, "textWebhook");
   const timing = context.start("receive");
   const receivedAt = new Date(now()).toISOString();
 
@@ -195,7 +140,7 @@ export async function handleLinqWebhook(
       outcome: outcome,
       provider: "linq",
       ...(eventId !== undefined && isLabel(eventId) ? { eventId } : {}),
-      got: sanitizeFacts(got),
+      got: labelFacts(got),
       decided,
       errorCode,
     });
@@ -209,9 +154,4 @@ export async function handleLinqWebhook(
 /** The positive check: the verify result is an event, by its own word. The type holds three results; a later one reads as not an event. */
 function isNotEvent(result: string): boolean {
   return result !== "event";
-}
-
-/** Keeps only the facts that are labels: a kind or service the port gave that is not one would make the span refused. */
-function sanitizeFacts(facts: Record<string, string>): Record<string, string> {
-  return Object.fromEntries(Object.entries(facts).filter(([, value]) => isLabel(value)));
 }

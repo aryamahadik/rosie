@@ -4,6 +4,7 @@
 // - Sealing the event and writing it to the handle's actor is T-243's; the scrub is T-242's (runtime/src/scrub).
 
 import type { BundleId } from "../trace";
+import type { ProviderDoors } from "./providers/types";
 import type { HandleRef, SealedBox, SealingKeyStore } from "./seal";
 
 /** K-06 v1's inbound event, as far as the gateway reads it; the rest rides through untouched (the gateway seals the words, T-243). */
@@ -110,4 +111,9 @@ export interface GatewayDeps {
   bundleId: () => BundleId | Promise<BundleId>;
   /** Epoch milliseconds; Date.now in the Worker. */
   now?: () => number;
+  /**
+   * The Stripe and calendar doors' ports and store (T-275, providers/); left out, each answers by failing, so those
+   * routes answer 503 and store nothing until D-017 joins them.
+   */
+  providers?: ProviderDoors;
 }
