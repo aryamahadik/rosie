@@ -45,11 +45,13 @@ import {
   LANGUAGE_RULE,
   MASTER_LINE_RULE,
   ROLE_SENTENCE,
+  TERM_FACT_RULE,
   composeInputText,
   composerPromptText,
   planText,
   type ComposeInput,
   type MessagePlan,
+  type TermFact,
 } from "./index";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
@@ -595,6 +597,19 @@ describe("the prompt holds what the card gives", () => {
     for (const tag of INPUT_TAGS) expect(inputs).toContain(`- <${tag}>: `);
   });
 
+  it("a term fact (K-03 v1.1): <facts> names Rosie's own fixed terms, and rule 5's one exception says how one is stated", () => {
+    const inputs = sectionOf(COMPOSER_PROMPT_TEXT, "inputs");
+    expect(inputs).toContain(
+      "- <facts>: what this reader may see. Each is a slot and its value, or one of Rosie's own fixed terms: its words, with the source code copied them from and no slot. Only these may be stated.",
+    );
+    const rule5 = sectionOf(COMPOSER_PROMPT_TEXT, "style_rules")
+      .split("\n")
+      .find((line) => line.startsWith("5. "));
+    expect(rule5).toContain(TERM_FACT_RULE);
+    expect(TERM_FACT_RULE).toContain("never as a slot, never changed or translated, and never its source");
+    expect(COMPOSER_PROMPT_VERSION).toBe("composer-2");
+  });
+
   it("the language rule: never from a name; the example in another language is the language its reader wrote in", () => {
     expect(sectionOf(COMPOSER_PROMPT_TEXT, "language_rule")).toContain(LANGUAGE_RULE);
     const other = COMPOSER_EXAMPLES.find((example) => example.input.language !== "en");
@@ -675,5 +690,56 @@ describe("a row's input as the model reads it: tagged parts, every value data (S
     }
     // No inbound, no tag: <inbound> comes only in a reply to its sender.
     expect(composeInputText({ ...sam, inbound: null })).not.toContain("<inbound>");
+  });
+
+  /** K-03 v1.1's twin of input-s1-02.json (its index entry is v1.1's; the loader reads v1's alone). */
+  const twinInput = (): ComposeInput =>
+    readJson("contracts/message-plan/fixtures/input-s1-02-v1.1.json") as ComposeInput;
+  /** The <facts> part of an input's text. */
+  const factsPart = (text: string): string => /<facts>\n?([\s\S]*?)\n?<\/facts>/u.exec(text)?.[1] ?? "";
+
+  it("K-03 v1.1's twin reads as input-s1-02 but for its <facts>: each term fact, in order, as a fact with its source and its words exactly, never as a slot", () => {
+    const sam = contract.fixtures.read("input-s1-02.json") as ComposeInput;
+    const twin = twinInput();
+    const terms = twin.facts as readonly TermFact[];
+    expect(terms).toHaveLength(4);
+    const text = composeInputText(twin);
+    const withoutFacts = (words: string): string => words.replace(/<facts>[\s\S]*?<\/facts>/u, "<facts/>");
+    expect(withoutFacts(text)).toBe(withoutFacts(composeInputText(sam)));
+    const lines = factsPart(text).split("\n");
+    expect(lines).toHaveLength(terms.length);
+    lines.forEach((line, k) => {
+      const shown = /^<fact source="([^"]*)">([^<]*)<\/fact>$/u.exec(line);
+      expect(shown, line).not.toBeNull();
+      expect(unescapeData(shown?.[1] ?? "")).toBe(terms[k]?.source);
+      expect(unescapeData(shown?.[2] ?? "")).toBe(terms[k]?.value);
+    });
+    expect(factsPart(text)).not.toContain("slot=");
+  });
+
+  it("slot facts and term facts side by side: each reads its own way, in the input's order", () => {
+    const [relay] = COMPOSER_EXAMPLES;
+    if (relay === undefined) throw new Error("the first example is the relay");
+    const [term] = twinInput().facts;
+    if (term === undefined || !("source" in term)) throw new Error("the twin's first fact is a term fact");
+    const input: ComposeInput = { ...relay.input, facts: [term, ...relay.input.facts] };
+    expect(factsPart(composeInputText(input)).split("\n")).toEqual([
+      `<fact source="${term.source}">${term.value}</fact>`,
+      '<fact slot="alex.staff">Alex M.</fact>',
+      '<fact slot="relay.quote">Read it on the secure page</fact>',
+    ]);
+  });
+
+  it("a hostile term fact stays inside its own tag: its words come back exactly as data, and its source as an escaped attribute", () => {
+    const [relay] = COMPOSER_EXAMPLES;
+    if (relay === undefined) throw new Error("the first example is the relay");
+    const hostile: ComposeInput = { ...relay.input, facts: [{ value: HOSTILE, source: HOSTILE }] };
+    const plain: ComposeInput = { ...relay.input, facts: [{ value: "plain words", source: "plain words" }] };
+    const text = composeInputText(hostile);
+    expect(tagsOf(text)).toEqual(tagsOf(composeInputText(plain)));
+    expect(dataOf(text, "fact")).toEqual([HOSTILE]);
+    expect([...text.matchAll(/ source="([^"]*)"/gu)].map((match) => unescapeData(match[1] ?? ""))).toEqual([
+      HOSTILE,
+    ]);
   });
 });

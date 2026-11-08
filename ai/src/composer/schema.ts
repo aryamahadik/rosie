@@ -7,7 +7,12 @@
 // built once, and the slot list and the formats are fixed enums, never built per row (compiled grammars are cached 24
 // hours: T-360 finding 3). The lists the checks read (check.ts) come from the same file. The Worker cannot read files,
 // so the contract file is imported here.
+//
+// The input is K-03 v1.1's composeInput (README "v1.1", T-373 round 2): v1's, but for its facts, each a slot fact (v1's
+// `fact`) or a term fact (v1.1's `termFact`). v1.1 refers to v1 for every definition it leaves unchanged, the plan
+// among them, so the model-facing schema stays v1's; only the term fact's own patterns are read from the v1.1 file.
 
+import inputContract from "../../../contracts/message-plan/message-plan.v1.1.schema.json";
 import planContract from "../../../contracts/message-plan/message-plan.v1.schema.json";
 import type { JsonObject } from "../recorded-double/types";
 
@@ -15,6 +20,8 @@ import type { JsonObject } from "../recorded-double/types";
 export const PLAN_FILE = "message-plan/message-plan.v1.schema.json";
 /** The definition the model answers in. */
 export const PLAN_DEF = "plan";
+/** The contract file of K-03 v1.1, whose composeInput the composer takes (term facts among its facts). */
+export const INPUT_FILE = "message-plan/message-plan.v1.1.schema.json";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -127,3 +134,21 @@ export const REACHES = enumOf("reach");
 export const SLOTTED_TEXT = patternOf("slottedText");
 /** K-03 `language`: a two-letter code. */
 export const LANGUAGE = patternOf("language");
+
+/** K-03 v1.1's definitions, as its contract file holds them. */
+const V1_1_DEFS = (inputContract as unknown as { $defs: Readonly<Record<string, unknown>> }).$defs;
+
+/** A pattern of one property of K-03 v1.1's `termFact`, as Ajv reads it (a unicode RegExp). */
+function termFactPattern(property: "value" | "source"): RegExp {
+  const termFact = V1_1_DEFS.termFact;
+  const properties = isRecord(termFact) ? termFact.properties : undefined;
+  const node = isRecord(properties) ? properties[property] : undefined;
+  const pattern = isRecord(node) ? node.pattern : undefined;
+  if (typeof pattern !== "string") throw new Error(`K-03 v1.1's termFact has no pattern for ${property}`);
+  return new RegExp(pattern, "u");
+}
+
+/** K-03 v1.1 `termFact.value`: the term's words, as the step's card states them. */
+export const TERM_FACT_VALUE = termFactPattern("value");
+/** K-03 v1.1 `termFact.source`: the term's source line. */
+export const TERM_FACT_SOURCE = termFactPattern("source");

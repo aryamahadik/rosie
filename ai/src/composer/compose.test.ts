@@ -3,6 +3,11 @@
 // sent back through the AI gateway (T-361) by T-364's fake Messages API with its prompt cache; K-03's fixtures come
 // through the message-plan contract loader (T-1071), its refused fixtures from fixtures/invalid; the global fetch fails
 // the file if anything reaches it. Names and values are the master's sample cast (rule 9).
+//
+// Round 2 (K-03 v1.1, DL-145): the double reads K-03 v1 only (T-1071), so it holds S1-02's one plan, plan-s1-02.json,
+// keyed by v1's input-s1-02.json; K-03 v1.1 pairs that same plan, word for word, with input-s1-02's twin, whose term
+// facts hold its 15 and 2 (input-and-plan-s1-02.json). So the twin's call is answered with the double's S1-02 plan.
+// v1.1's fixtures are read by their v1.1 index entries (test-support.ts).
 
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -34,8 +39,14 @@ import {
   PROMPTS,
   composerOn,
   fakeComposerApi,
+  loadPlanRules,
   readJson,
   recordedInput,
+  v1dot1Entry,
+  v1dot1Errors,
+  v1dot1Fixture,
+  type InputAndPlan,
+  type PlanRules,
   type RecordedInput,
   type RowAnswer,
 } from "./test-support";
@@ -46,11 +57,13 @@ const globalFetch = vi.fn(() => {
 
 let contract: PlanContract;
 let double: RecordedDouble;
+let rules: PlanRules;
 
 beforeAll(async () => {
   vi.stubGlobal("fetch", globalFetch);
   contract = loadPlanContract();
   double = await loadRecordedDouble();
+  rules = await loadPlanRules();
 });
 afterAll(() => {
   expect(globalFetch).not.toHaveBeenCalled();
@@ -59,6 +72,14 @@ afterAll(() => {
 
 const k03 = (file: string): unknown => contract.fixtures.read(file);
 const invalid = (file: string): unknown => readJson(`contracts/message-plan/fixtures/invalid/${file}`);
+/** K-03 v1.1's twin of input-s1-02.json: the same input, with S1-02's four card terms as term facts. */
+const twinInput = (): ComposeInput => v1dot1Fixture("input-s1-02-v1.1.json") as ComposeInput;
+const pair = (file: string): InputAndPlan => v1dot1Fixture(file) as InputAndPlan;
+/** The S1-02 literals' refusal: plan-s1-02's fact line types $2 (a price) and 15 (a number). */
+const S1_02_LITERALS = [
+  { check: "literalValue", at: "lines[1].text", kind: "price" },
+  { check: "literalValue", at: "lines[1].text", kind: "number" },
+];
 /** The double's plan for exactly this input (it has no fallback plan). */
 const recordedPlan = (input: ComposeInput): Promise<JsonObject> =>
   double.composer(input as unknown as JsonObject);
@@ -125,9 +146,55 @@ describe("one row's K-03 input gives its plan, through the recorded-model double
     }
   });
 
-  it("input-s1-02.json with plan-s1-02.json: the double gives K-03's plan, a whole K-03 plan, but its fact line types a price and a number that input-s1-02's facts (none) do not hold, so it is refused, never returned", async () => {
+  it("input-s1-02-v1.1.json gives plan-s1-02.json: the double's S1-02 plan, whose 15 and 2 the twin's term facts hold, from one Haiku call, each term read as a fact with its source and no slot", async () => {
+    const v1 = k03("input-s1-02.json") as ComposeInput;
+    const twin = twinInput();
+    const plan = k03("plan-s1-02.json");
+    // The double's one S1-02 plan (keyed by v1's input; the double reads K-03 v1 only) is the plan K-03 v1.1 pairs with
+    // the twin, word for word; the twin is a v1.1 composeInput that v1's schema refuses for its term facts.
+    const recorded = await recordedPlan(v1);
+    expect(recorded).toEqual(plan);
+    expect(planProblems(recorded)).toEqual([]);
+    expect(pair("input-and-plan-s1-02.json")).toEqual({ input: twin, plan: recorded });
+    expect(v1dot1Entry("input-s1-02-v1.1.json")).toMatchObject({ def: "composeInput", expect: "accept" });
+    expect(v1dot1Errors("composeInput", twin)).toEqual([]);
+    expect(contract.validate("composeInput", twin)).not.toEqual([]);
+    expect(twin.facts).toHaveLength(4);
+    expect(twin.facts.every((fact) => "source" in fact && !("slot" in fact))).toBe(true);
+
+    const { answer, api } = await composeRow(twin, recorded);
+    expect(answer).toMatchObject({
+      status: "ok",
+      model: HAIKU_MODEL,
+      role: "haiku",
+      attempt: 1,
+      fallback: false,
+    });
+    expect(planOf(answer)).toEqual(plan);
+    expect(api.calls).toHaveLength(1);
+    const [call] = api.calls;
+    expect(call?.body.system).toEqual([
+      { type: "text", text: COMPOSER_PROMPT.text, cache_control: { type: "ephemeral" } },
+    ]);
+    expect(call?.body.messages).toEqual([{ role: "user", content: composeInputText(twin) }]);
+    const turn = composeInputText(twin);
+    expect(turn.split("<fact source=").length - 1).toBe(4);
+    expect(turn).not.toContain("<fact slot=");
+    expect(call?.body.output_config).toEqual({
+      effort: "low",
+      format: { type: "json_schema", schema: PLAN_SCHEMA },
+    });
+  });
+
+  it("v1's input-s1-02.json with plan-s1-02.json is refused for its two literals (refuse-plan-s1-02-on-v1-input.json): the double's own S1-02 recording, a whole K-03 plan, refused, never returned", async () => {
     const input = k03("input-s1-02.json") as ComposeInput;
     const plan = k03("plan-s1-02.json");
+    expect(v1dot1Entry("invalid/refuse-plan-s1-02-on-v1-input.json")).toMatchObject({
+      def: "inputAndPlan",
+      rule: "numbersHeldByFacts",
+      expect: "refuse",
+    });
+    expect(pair("invalid/refuse-plan-s1-02-on-v1-input.json")).toEqual({ input, plan });
     expect(await recordedPlan(input)).toEqual(plan);
     expect(planProblems(plan)).toEqual([]);
     expect(input.facts).toEqual([]);
@@ -136,12 +203,14 @@ describe("one row's K-03 input gives its plan, through the recorded-model double
     expect(answer).toEqual({
       status: "refused",
       stage: "plan",
-      problems: [
-        { check: "literalValue", at: "lines[1].text", kind: "price" },
-        { check: "literalValue", at: "lines[1].text", kind: "number" },
-      ],
+      problems: S1_02_LITERALS,
       modelCalls: expect.any(Array) as unknown,
     });
+    // K-03 v1.1's named rule refuses the same pair for the same two numbers, in the same line.
+    expect(rules.numbersHeldByFacts({ input, plan })).toEqual([
+      "plan.lines[1].text: states the number 15, which no fact of the input holds",
+      "plan.lines[1].text: states the number 2, which no fact of the input holds",
+    ]);
   });
 });
 
@@ -152,6 +221,17 @@ describe("a typed refusal, never a plan", () => {
     const api = fakeComposerApi([]);
     const answer = await composerOn(api.fetch).compose(input);
     expect(answer).toEqual({
+      status: "refused",
+      stage: "input",
+      problems: [{ check: "frontier", at: "frontier" }],
+      modelCalls: [],
+    });
+    expect(api.calls).toHaveLength(0);
+    // The same for a K-03 v1.1 input: input-s1-02's twin, with its term facts, plus the same frontier field.
+    const fixture = input as unknown as { frontier: unknown };
+    const twin = { ...twinInput(), frontier: fixture.frontier } as unknown as ComposeInput;
+    expect(v1dot1Errors("composeInput", twin)).not.toEqual([]);
+    expect(await composerOn(api.fetch).compose(twin)).toEqual({
       status: "refused",
       stage: "input",
       problems: [{ check: "frontier", at: "frontier" }],
@@ -257,6 +337,69 @@ describe("no plan carries a literal number, date or price the input's facts do n
         expect(JSON.stringify(answer)).not.toContain(words);
     },
   );
+
+  it("K-03 v1.1's named rule's pairs through the composer, where the facts are slot facts and term facts: input-and-plan-s1-02.json gives its plan; refuse-term-no-fact-holds.json is refused for its one reason, the $49 no fact holds, as numbersHeldByFacts refuses it", async () => {
+    const held = pair("input-and-plan-s1-02.json");
+    expect(v1dot1Entry("input-and-plan-s1-02.json")).toMatchObject({
+      def: "inputAndPlan",
+      rule: "numbersHeldByFacts",
+      expect: "accept",
+    });
+    expect(v1dot1Errors("inputAndPlan", held)).toEqual([]);
+    expect(rules.numbersHeldByFacts(held)).toEqual([]);
+    const ok = await composeRow(held.input, held.plan);
+    expect(planOf(ok.answer)).toEqual(held.plan);
+
+    const extra = pair("invalid/refuse-term-no-fact-holds.json");
+    expect(v1dot1Entry("invalid/refuse-term-no-fact-holds.json")).toMatchObject({
+      def: "inputAndPlan",
+      rule: "numbersHeldByFacts",
+      expect: "refuse",
+    });
+    // The schema accepts the pair, and the input is the twin: the rule alone refuses it.
+    expect(v1dot1Errors("inputAndPlan", extra)).toEqual([]);
+    expect(extra.input).toEqual(twinInput());
+    expect(rules.numbersHeldByFacts(extra)).toEqual([
+      "plan.lines[1].text: states the number 49, which no fact of the input holds",
+    ]);
+    const refused = await composeRow(extra.input, extra.plan);
+    expect(refused.answer).toEqual({
+      status: "refused",
+      stage: "plan",
+      problems: [{ check: "literalValue", at: "lines[1].text", kind: "price" }],
+      modelCalls: expect.any(Array) as unknown,
+    });
+    expect(refused.api.calls).toHaveLength(1);
+    // The refusal names the line and the kind, never the words or the number.
+    if (refused.answer.status !== "refused") throw new Error("expected a refusal");
+    expect(JSON.stringify(refused.answer.problems)).not.toMatch(/49|month|At most/u);
+    expect(JSON.stringify(refused.answer)).not.toContain("$49");
+  });
+
+  it("a term fact holds a literal by its own words alone: a changed term's number, or a number only its source holds, is refused", async () => {
+    const twin = twinInput();
+    const plan = k03("plan-s1-02.json") as MessagePlan;
+    const withFactLine = (text: string): MessagePlan => ({
+      ...plan,
+      lines: plan.lines.map((line, k) => (k === 1 ? { ...line, text } : line)),
+    });
+    const cases: [string, string][] = [
+      ["a changed setup time", "About 20 minutes for your first kind of work · Free to use"],
+      ["a changed fee", "Free to use · $3 a booking, counted at its check-in or DONE"],
+      // S1-02's sources hold "line 28" and "RULES 3.15"; a source never holds a literal.
+      ["a number only a source holds", "Free to use · See line 28"],
+    ];
+    for (const [what, text] of cases) {
+      const { answer } = await composeRow(twin, withFactLine(text));
+      expect(answer, what).toMatchObject({ status: "refused", stage: "plan" });
+      if (answer.status !== "refused") throw new Error(what);
+      expect(
+        answer.problems.map((problem) => problem.at),
+        what,
+      ).toEqual(["lines[1].text"]);
+      expect(rules.numbersHeldByFacts({ input: twin, plan: withFactLine(text) }), what).toHaveLength(1);
+    }
+  });
 
   it("a value a fact holds is not refused here (the Values check after the fill matches it to that fact, arch 07 line 409), nor are a slot's example words", async () => {
     const typed = await composeRow(
@@ -376,32 +519,43 @@ describe("never a word of the row or the plan in a span, a refusal or a log line
       const first = typed.lines[0];
       if (first === undefined) throw new Error("the relay plan has a first line");
       first.text = "{{alex.staff}} asks about Sun Oct 25 at $45";
+      // A K-03 v1.1 row too: the twin, with its term facts, gives its plan; the same row with a term no fact holds is refused.
+      const twin = twinInput();
+      const s1Plan = (await recordedPlan(k03("input-s1-02.json") as ComposeInput)) as unknown as MessagePlan;
+      const extra = pair("invalid/refuse-term-no-fact-holds.json");
       const api = fakeComposerApi([
         { input: confirmation, plan },
         { input: relay, plan: typed },
+        { input: twin, plan: s1Plan },
       ]);
       const composer = composerOn(api.fetch);
       const trace = newTrace();
       const ok = await composer.compose(confirmation, { trace });
       const refused = await composer.compose(relay, { trace });
+      const twinOk = await composer.compose(twin, { trace });
+      const twinRefused = await composerOn(fakeComposerApi([extra]).fetch).compose(extra.input, { trace });
       expect(ok.status).toBe("ok");
       expect(refused).toMatchObject({ status: "refused", stage: "plan" });
+      expect(twinOk.status).toBe("ok");
+      expect(twinRefused).toMatchObject({ status: "refused", stage: "plan" });
 
-      const seen = JSON.stringify(trace.toTrace()) + JSON.stringify(refused);
+      const seen = JSON.stringify(trace.toTrace()) + JSON.stringify(refused) + JSON.stringify(twinRefused);
       const words = [
-        ...[confirmation, relay].flatMap((input) => [
-          ...input.facts.map((fact) => fact.value),
+        ...[confirmation, relay, twin].flatMap((input) => [
+          ...input.facts.flatMap((fact) => ("source" in fact ? [fact.value, fact.source] : [fact.value])),
           ...input.conversation.map((message) => message.text),
           input.masterText.text,
           input.audience.name ?? "",
+          input.inbound?.text ?? "",
         ]),
-        ...plan.lines.map((line) => line.text),
+        ...[plan, s1Plan, extra.plan].flatMap((each) => each.lines.map((line) => line.text)),
         first.text,
         "Sun Oct 25",
         "$45",
+        "At most $49 a month",
         KEY,
       ].filter((text) => text.length >= 4);
-      expect(words.length).toBeGreaterThan(20);
+      expect(words.length).toBeGreaterThan(30);
       for (const text of words) expect(seen).not.toContain(text);
       for (const spy of spies) expect(spy).not.toHaveBeenCalled();
     } finally {

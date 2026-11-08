@@ -1,7 +1,8 @@
 // Types of the composer's call (T-373, C-118; arch 07 "Decide, then word", architecture.txt line 397; arch 01 "Message
-// plan", line 97). The K-03 v1 shapes (contracts/message-plan/message-plan.v1.schema.json: `composeInput` in, `plan`
-// out) are T-372's hand-written types in ./prompt/types.ts: the generated types are git-ignored (ADR-005) and the Worker
-// must not depend on them. The tests hold every list the checks read to the contract's own.
+// plan", line 97). The K-03 shapes (contracts/message-plan: v1.1's `composeInput` in, whose facts are slot facts and term
+// facts; v1's `plan` out, which v1.1 leaves unchanged) are T-372's hand-written types in ./prompt/types.ts: the generated
+// types are git-ignored (ADR-005) and the Worker must not depend on them. The tests hold every list the checks read to
+// the contract's own.
 
 import type { PromptCache } from "../cache";
 import type { AttemptFailure, CallOptions, FetchLike, GatewayBundle, ModelCall, ModelRole } from "../gateway";
@@ -12,7 +13,7 @@ export type { ComposeInput, MessagePlan, ModelCall, ModelRole };
 /**
  * Why a row is refused: a label and a place, never words (K-08 README: no message words in a span or a log line).
  *
- *   input             the input is not a K-03 v1 composeInput;
+ *   input             the input is not a K-03 v1.1 composeInput;
  *   frontier          the input carries the frontier, which the composer never gets (arch 07 line 397;
  *                     refuse-frontier-in-input.json);
  *   plan              the model's answer is not a K-03 v1 plan;
@@ -21,7 +22,8 @@ export type { ComposeInput, MessagePlan, ModelCall, ModelRole };
  *   holdSlot          a {{hold}} slot, refused since D66 (refuse-hold-slot.json);
  *   unknownSlot       a {{ that opens no slot of K-03's vocabulary;
  *   literalValue      a number, date or price typed in the plan's words, outside its slots, that no fact of the input
- *                     holds (rule 4: code fills every value; arch 07 lines 403 and 409).
+ *                     holds, a slot fact or a term fact (rule 4: code fills every value; arch 07 lines 403 and 409;
+ *                     K-03 v1.1 README "v1.1").
  */
 export const REFUSAL_CHECKS = [
   "input",

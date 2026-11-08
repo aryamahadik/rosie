@@ -1,10 +1,12 @@
 // Tests of the composer's schema and checks (T-373, C-118), offline:
 //   - the schema the model answers in is K-03 v1's plan, cut from the frozen file exactly as the contracts'
 //     structured-subset lint bundles it, and inside the structured-outputs subset by that lint;
-//   - the hand-written checks accept and refuse what K-03's own schema does (Ajv over the contract files, through the
-//     message-plan contract loader, T-1071), on every K-03 plan and input at hand and on damaged copies of each;
+//   - the hand-written checks accept and refuse what K-03's own schema does (Ajv over the contract files: the plan
+//     through the message-plan contract loader, T-1071; the input against K-03 v1.1's composeInput, whose facts are slot
+//     facts and term facts), on every K-03 plan and input at hand and on damaged copies of each;
 //   - each refusal is typed: the frontier, a format outside the five, {{hold}}, a slot outside the vocabulary;
-//   - the literal-value check: a number, date or price typed outside the slots is refused unless a fact holds it.
+//   - the literal-value check: a number, date or price typed outside the slots is refused unless a fact holds it, a
+//     slot fact or a term fact (facts[].value); on numbers it is K-03 v1.1's named rule numbersHeldByFacts exactly.
 
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -14,20 +16,36 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import planContractFile from "../../../contracts/message-plan/message-plan.v1.schema.json";
 import { loadPlanContract, type PlanContract } from "../recorded-double";
+import inputContractFile from "../../../contracts/message-plan/message-plan.v1.1.schema.json";
 import {
   FORMATS,
+  INPUT_FILE,
   PLAN_FILE,
   PLAN_SCHEMA,
   SLOT_NAMES,
+  TERM_FACT_SOURCE,
+  TERM_FACT_VALUE,
   bundlePlanDefinition,
   inputProblems,
   literalProblems,
   planAgainstInput,
   planProblems,
   type ComposeInput,
+  type ComposeProblem,
+  type InputFact,
   type MessagePlan,
 } from "./index";
-import { RECORDED_INPUTS, REPO_ROOT, readJson, recordedInput } from "./test-support";
+import {
+  RECORDED_INPUTS,
+  REPO_ROOT,
+  loadPlanRules,
+  readJson,
+  recordedInput,
+  v1dot1Errors,
+  v1dot1Fixture,
+  type InputAndPlan,
+  type PlanRules,
+} from "./test-support";
 
 interface SubsetLint {
   bundleSchema(target: { schema: string; def: string }): unknown;
@@ -42,10 +60,12 @@ const load = async <T>(file: string): Promise<T> =>
 
 let lint: SubsetLint;
 let contract: PlanContract;
+let rules: PlanRules;
 
 beforeAll(async () => {
   lint = await load<SubsetLint>("contracts/scripts/structured-subset-lint.mjs");
   contract = loadPlanContract();
+  rules = await loadPlanRules();
 });
 
 const PLAN_FIXTURES = [
@@ -59,8 +79,13 @@ const PLAN_FIXTURES = [
 const REFUSED_PLANS = ["refuse-format-not-allowed.json", "refuse-hold-slot.json"] as const;
 const invalid = (file: string): unknown => readJson(`contracts/message-plan/fixtures/invalid/${file}`);
 const k03 = (file: string): unknown => contract.fixtures.read(file);
+/** K-03 v1.1's twin of input-s1-02.json: the same input, with S1-02's four card terms as term facts. */
+const twinInput = (): ComposeInput => v1dot1Fixture("input-s1-02-v1.1.json") as ComposeInput;
+const pair = (file: string): InputAndPlan => v1dot1Fixture(file) as InputAndPlan;
+/** Every input at hand: K-03's v1 input and its v1.1 twin, and the double's five inputs. */
 const inputs = (): ComposeInput[] => [
   k03("input-s1-02.json") as ComposeInput,
+  twinInput(),
   ...RECORDED_INPUTS.map(recordedInput),
 ];
 
@@ -150,6 +175,23 @@ describe("the schema the model answers in is K-03 v1's plan", () => {
     expect(SLOT_NAMES).toHaveLength(52);
     expect(SLOT_NAMES).not.toContain("hold");
   });
+
+  it("reads the input's term fact from K-03 v1.1, whose plan is v1's own: the term's value and source patterns, and no slot", () => {
+    expect(INPUT_FILE).toBe("message-plan/message-plan.v1.1.schema.json");
+    const defs = (
+      inputContractFile as unknown as {
+        $defs: Record<
+          string,
+          { $ref?: string; required?: string[]; properties?: Record<string, { pattern?: string }> }
+        >;
+      }
+    ).$defs;
+    expect(defs.plan?.$ref).toBe("message-plan.v1.schema.json#/$defs/plan");
+    expect(defs.termFact?.required).toEqual(["value", "source"]);
+    expect(TERM_FACT_VALUE.source).toBe(defs.termFact?.properties?.value?.pattern);
+    expect(TERM_FACT_SOURCE.source).toBe(defs.termFact?.properties?.source?.pattern);
+    expect(TERM_FACT_VALUE.unicode && TERM_FACT_SOURCE.unicode).toBe(true);
+  });
 });
 
 describe("the checks refuse exactly what K-03's own schema refuses", () => {
@@ -169,11 +211,39 @@ describe("the checks refuse exactly what K-03's own schema refuses", () => {
     expect(refused).toBeGreaterThan(500);
   });
 
-  it("inputProblems: K-03's input, the double's five inputs, the frontier fixture and damaged copies of each", () => {
+  it("inputProblems: K-03 v1.1's composeInput over K-03's input and its v1.1 twin, the double's five inputs, the frontier fixture, inputs mixing slot and term facts, and damaged copies of each", () => {
     let compared = 0;
     let refused = 0;
-    const all: unknown[] = [...inputs(), invalid("refuse-frontier-in-input.json")];
+    let termFactsAccepted = 0;
+    const twin = twinInput();
+    const confirmation = recordedInput("confirmation-a6-14");
+    const mixed: ComposeInput = { ...confirmation, facts: [...confirmation.facts, ...twin.facts] };
+    const all: unknown[] = [...inputs(), mixed, invalid("refuse-frontier-in-input.json")];
     for (const input of all) {
+      for (const variant of [input, ...damagedCopies(input)]) {
+        const accepted = v1dot1Errors("composeInput", variant).length === 0;
+        expect(inputProblems(variant).length === 0, JSON.stringify(variant)).toBe(accepted);
+        compared += 1;
+        if (!accepted) refused += 1;
+        const facts = isObject(variant) ? variant.facts : undefined;
+        if (accepted && Array.isArray(facts) && facts.some((fact) => isObject(fact) && !("slot" in fact)))
+          termFactsAccepted += 1;
+      }
+    }
+    expect(compared).toBeGreaterThan(3000);
+    expect(refused).toBeGreaterThan(1500);
+    expect(termFactsAccepted).toBeGreaterThan(20);
+  });
+
+  it("inputProblems still refuses exactly what K-03 v1's own schema refuses on every v1 input and its damaged copies: v1.1 adds term facts and loosens nothing else", () => {
+    let compared = 0;
+    let refused = 0;
+    const v1Inputs: unknown[] = [
+      k03("input-s1-02.json"),
+      ...RECORDED_INPUTS.map(recordedInput),
+      invalid("refuse-frontier-in-input.json"),
+    ];
+    for (const input of v1Inputs) {
       for (const variant of [input, ...damagedCopies(input)]) {
         const accepted = contract.validate("composeInput", variant).length === 0;
         expect(inputProblems(variant).length === 0, JSON.stringify(variant)).toBe(accepted);
@@ -195,6 +265,35 @@ describe("each refusal is typed", () => {
     expect(inputProblems(without)).toEqual([]);
     // Any other field the input does not have is refused as well, as the input's shape.
     expect(inputProblems({ ...without, choices: [] })).toEqual([{ check: "input", at: "(root)" }]);
+  });
+
+  it("a term fact is K-03 v1.1's: its words and its source, and no slot; any other fact is the input's shape, as v1.1's schema says", () => {
+    const twin = twinInput();
+    expect(inputProblems(twin)).toEqual([]);
+    const withFacts = (facts: unknown[]): unknown => ({ ...twin, facts });
+    const bad: unknown[] = [
+      { value: "Free to use", source: "S1-02's card, line 3", slot: "fee" },
+      { value: "Free to use" },
+      { source: "S1-02's card, line 3" },
+      { value: "", source: "S1-02's card, line 3" },
+      { value: "\n", source: "S1-02's card, line 3" },
+      { value: "Free to use", source: "" },
+      { value: 2, source: "S1-02's card, line 4" },
+      { value: "Free to use", source: "S1-02's card, line 3", extra: "x" },
+    ];
+    for (const fact of bad) {
+      const input = withFacts([fact]);
+      expect(v1dot1Errors("composeInput", input), JSON.stringify(fact)).not.toEqual([]);
+      expect(inputProblems(input), JSON.stringify(fact)).toEqual([{ check: "input", at: "facts[0]" }]);
+    }
+    // Words that only look odd are still a term's words: v1.1 holds a term to "some words" and its source, nothing more.
+    for (const value of ["Free to use\n", "{{fee}} a booking", " "]) {
+      const input = withFacts([{ value, source: "S1-02's card" }]);
+      expect(v1dot1Errors("composeInput", input), value).toEqual([]);
+      expect(inputProblems(input), value).toEqual([]);
+    }
+    // The frontier is refused by name on a v1.1 input too.
+    expect(inputProblems({ ...twin, frontier: [] })).toEqual([{ check: "frontier", at: "frontier" }]);
   });
 
   it("a format outside K-03's five: refuse-format-not-allowed.json's contact card", () => {
@@ -237,7 +336,7 @@ describe("each refusal is typed", () => {
 
 describe("no plan carries a literal number, date or price the input's facts do not hold as a slot", () => {
   /** A one-line plan in `words`, for an input with these facts. */
-  function literals(words: string, facts: { slot: string; value: string }[] = []): unknown[] {
+  function literals(words: string, facts: InputFact[] = []): unknown[] {
     const base = k03("input-s1-02.json") as ComposeInput;
     const input = { ...base, facts } as ComposeInput;
     const plan: MessagePlan = {
@@ -313,4 +412,177 @@ describe("no plan carries a literal number, date or price the input's facts do n
       { check: "literalValue", at: "lines[1].text", kind: "number" },
     ]);
   });
+
+  it("a term fact holds a literal by its own words alone, never by its source, beside the slot facts", () => {
+    const SETUP = {
+      value: "About 15 minutes for your first kind of work",
+      source: "S1-02's card, line 1 (MASTER-FLOW-A.md line 28)",
+    };
+    const FEE = {
+      value: "$2 a booking, counted at its check-in or DONE, explained before you go live",
+      source: "S1-02's card, line 4; RULES 3.15",
+    };
+    expect(literals("About 15 minutes.", [SETUP])).toEqual([]);
+    expect(literals("$2 a booking.", [FEE])).toEqual([]);
+    expect(literals("$40 · About 15 minutes · $2 a booking.", [PRICE, SETUP, FEE])).toEqual([]);
+    expect(literals("About 16 minutes.", [SETUP])).toEqual([problem("number")]);
+    expect(literals("$3 a booking.", [FEE])).toEqual([problem("price")]);
+    expect(literals("$2.50 a booking.", [FEE])).toEqual([problem("price")]);
+    // Numbers only a source holds: "line 28", "RULES 3.15".
+    expect(literals("See line 28.", [SETUP])).toEqual([problem("number")]);
+    expect(literals("RULES 3.15.", [FEE])).toEqual([problem("number")]);
+  });
+
+  it("K-03 v1.1's named rule's fixtures: input-and-plan-s1-02.json is accepted; refuse-term-no-fact-holds.json is refused for its one reason and refuse-plan-s1-02-on-v1-input.json for its two literals; each is accepted once put right", () => {
+    const held = pair("input-and-plan-s1-02.json");
+    const extra = pair("invalid/refuse-term-no-fact-holds.json");
+    const onV1 = pair("invalid/refuse-plan-s1-02-on-v1-input.json");
+    expect(planAgainstInput(held.plan, held.input)).toEqual([]);
+    expect(planAgainstInput(extra.plan, extra.input)).toEqual([
+      { check: "literalValue", at: "lines[1].text", kind: "price" },
+    ]);
+    expect(planAgainstInput(onV1.plan, onV1.input)).toEqual([
+      { check: "literalValue", at: "lines[1].text", kind: "price" },
+      { check: "literalValue", at: "lines[1].text", kind: "number" },
+    ]);
+    // Without the added term the pair is input-and-plan-s1-02 (the same input); with the twin's term facts, so is v1's.
+    expect(extra.input).toEqual(held.input);
+    expect(onV1.plan).toEqual(held.plan);
+    expect(planAgainstInput(held.plan, extra.input)).toEqual([]);
+    expect(planAgainstInput(onV1.plan, held.input)).toEqual([]);
+  });
+
+  it("on numbers it is numbersHeldByFacts exactly: over every pair at hand and many numbers typed into each words field, the fields the rule names are the fields the check refuses", () => {
+    const pairs: InputAndPlan[] = [
+      pair("input-and-plan-s1-02.json"),
+      pair("invalid/refuse-term-no-fact-holds.json"),
+      pair("invalid/refuse-plan-s1-02-on-v1-input.json"),
+      ...RECORDED_PAIRS.map(([name, file]) => ({
+        input: recordedInput(name),
+        plan: k03(file) as MessagePlan,
+      })),
+    ];
+    // Amounts, times, dates, durations, counts and codes in digits (README "Named rule (v1.1)"), held by some facts and
+    // not by others, with runs a date or price might cut short ("10/255", "123pm", "12:300").
+    const TYPED = [
+      "0",
+      "2",
+      "$2",
+      "$2.50",
+      "5",
+      "7",
+      "15",
+      "49",
+      "$35",
+      "$20",
+      "5160",
+      "#5160",
+      "100%",
+      "1,234",
+      "3.15",
+      "11am",
+      "11:00am",
+      "2–5pm",
+      "123pm",
+      "12:300",
+      "10/255",
+      "Oct 24",
+      "Oct 25",
+      "2026-10-24",
+      "line 28",
+    ];
+    const fieldsOfRule = (problems: string[]): string[] =>
+      [...new Set(problems.map((line) => line.slice(0, line.indexOf(": ")).replace(/^plan\./u, "")))].sort();
+    const fieldsOfCheck = (problems: readonly ComposeProblem[]): string[] =>
+      [...new Set(problems.map((problem) => problem.at))].sort();
+    let compared = 0;
+    let refused = 0;
+    let accepted = 0;
+    for (const { input, plan } of pairs) {
+      expect(fieldsOfCheck(literalProblems(plan, input))).toEqual(
+        fieldsOfRule(rules.numbersHeldByFacts({ input, plan })),
+      );
+      for (const field of wordsFields(plan)) {
+        for (const typed of TYPED) {
+          const variant = withWords(plan, field, (words) => `${words} ${typed}`);
+          const ours = fieldsOfCheck(literalProblems(variant, input));
+          expect(ours, `${field} + ${typed}`).toEqual(
+            fieldsOfRule(rules.numbersHeldByFacts({ input, plan: variant })),
+          );
+          compared += 1;
+          if (ours.includes(field)) refused += 1;
+          else accepted += 1;
+        }
+      }
+    }
+    expect(compared).toBeGreaterThan(300);
+    expect(refused).toBeGreaterThan(200);
+    expect(accepted).toBeGreaterThan(20);
+  });
+
+  it("a literal's digits are whole runs, as the named rule reads them: '10/255' needs 255 held, not 25; '123pm' needs 123, not 23", () => {
+    const base = k03("input-s1-02.json") as ComposeInput;
+    const oneLine = (words: string): MessagePlan => ({
+      formats: ["text"],
+      lines: [{ role: "first", text: words }],
+      question: null,
+      pageType: null,
+      threadReplyTo: null,
+    });
+    const cases: [string, InputFact[], boolean][] = [
+      ["See you 10/255.", [{ slot: "day", value: "Oct 10" }, PRICE_25], false],
+      ["See you 10/25.", [{ slot: "day", value: "Oct 10" }, PRICE_25], true],
+      ["See you at 123pm.", [{ slot: "visit.code", value: "123" }], true],
+      ["See you at 123pm.", [{ slot: "visit.code", value: "23" }], false],
+      ["See you at 12:300.", [{ slot: "visit.time", value: "12:30" }], false],
+    ];
+    for (const [words, facts, held] of cases) {
+      const input: ComposeInput = { ...base, facts };
+      const plan = oneLine(words);
+      expect(literalProblems(plan, input).length === 0, words).toBe(held);
+      expect(rules.numbersHeldByFacts({ input, plan }).length === 0, words).toBe(held);
+    }
+  });
+
+  it("dates in words are the check's alone: the named rule states only the number part (README 'Named rule (v1.1)')", () => {
+    const held = pair("input-and-plan-s1-02.json");
+    const variant = withWords(held.plan, "lines[1].text", (words) => `${words} · Starts Saturday`);
+    expect(rules.numbersHeldByFacts({ input: held.input, plan: variant })).toEqual([]);
+    expect(literalProblems(variant, held.input)).toEqual([
+      { check: "literalValue", at: "lines[1].text", kind: "date" },
+    ]);
+  });
 });
+
+/** A price fact whose run, 25, is part of 255 but not 255. */
+const PRICE_25: InputFact = { slot: "price", value: "$25" };
+
+/** The double's five inputs with the K-03 plan each one answers. */
+const RECORDED_PAIRS: readonly (readonly [(typeof RECORDED_INPUTS)[number], string])[] = [
+  ["block-readback-poll", "plan-block-readback-poll.json"],
+  ["confirmation-a6-14", "plan-confirmation-a6-14.json"],
+  ["relay-private-a7-12", "plan-relay-private-a7-12.json"],
+  ["sensitive-a6-15", "plan-sensitive.json"],
+  ["tapback-thanks", "plan-tapback-thanks.json"],
+];
+
+/** A plan's words fields, as a refusal names them: each line's text, then the question's. */
+function wordsFields(plan: MessagePlan): string[] {
+  return [
+    ...plan.lines.map((_line, k) => `lines[${String(k)}].text`),
+    ...(plan.question === null ? [] : ["question.text"]),
+  ];
+}
+
+/** The plan with one words field's text changed. */
+function withWords(plan: MessagePlan, field: string, change: (words: string) => string): MessagePlan {
+  if (field === "question.text") {
+    if (plan.question === null) throw new Error("the plan has no question");
+    return { ...plan, question: { ...plan.question, text: change(plan.question.text) } };
+  }
+  const k = Number(/^lines\[(\d+)\]\.text$/u.exec(field)?.[1]);
+  return {
+    ...plan,
+    lines: plan.lines.map((line, n) => (n === k ? { ...line, text: change(line.text) } : line)),
+  };
+}

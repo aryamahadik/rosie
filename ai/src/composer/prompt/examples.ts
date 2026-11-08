@@ -16,13 +16,13 @@
 // (render.ts). Each example's plan validates against K-03 v1's `$defs/plan`, and no example holds a raw price, date or
 // name outside a slot or a code-supplied value, an emoji or a step id (prompt.test.ts).
 
-import type { ComposeInput, MessagePlan } from "./types";
+import type { ComposeInputV1, MessagePlan } from "./types";
 
-/** One worked example: what it shows, the row's input, the plan to return and why. */
+/** One worked example: what it shows, the row's input (a K-03 v1 input: slot facts only), the plan to return and why. */
 export interface ComposerExample {
   /** A short title, shown on the example. */
   readonly title: string;
-  readonly input: ComposeInput;
+  readonly input: ComposeInputV1;
   readonly plan: MessagePlan;
   /** Why the plan is worded as it is, in plain words. */
   readonly why: string;

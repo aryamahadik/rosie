@@ -1,13 +1,17 @@
 // The AI layer's checks on a composer row (T-373, C-118): the input before any call, the model's answer before it
 // leaves the AI layer. Each failure is a typed refusal (types.ts REFUSAL_CHECKS), never a plan.
 //
-//   inputProblems   the input is a K-03 v1 `composeInput`, and carries no frontier (arch 07 line 397: "never the
-//                   frontier"; refuse-frontier-in-input.json);
+//   inputProblems   the input is a K-03 v1.1 `composeInput` (each fact a slot fact or a term fact; every v1 input is
+//                   one), and carries no frontier (arch 07 line 397: "never the frontier"; refuse-frontier-in-input.json);
 //   planProblems    the answer is a K-03 v1 `plan` (refuse-format-not-allowed.json: a format outside the five;
 //                   refuse-hold-slot.json: {{hold}}, refused since D66);
 //   allowedFormatProblems  each format is one the input's allowedFormats lists (arch 07 line 365);
 //   literalProblems no number, date or price is typed in the plan's words, outside its slots, unless a fact of the
-//                   input holds it (rule 4: code fills every value; arch 07 line 403: only <facts> may be stated).
+//                   input holds it (rule 4: code fills every value; arch 07 line 403: only <facts> may be stated). The
+//                   facts are composeInput.facts[].value, slot facts' and term facts' alike, never a term's source (K-03
+//                   v1.1 README "Where the composer's literal check reads these facts"). Its numbers are K-03 v1.1's
+//                   named rule numbersHeldByFacts exactly: every run of digits outside the slots is held by a run of
+//                   some fact's value; dates written in words are held the same way, by a fact's words.
 //
 // Structured outputs keep a model to its schema, but a refusal or a cut-off answer may not match it (T-360 finding 4),
 // and no grammar knows the row's allowed formats or facts, so every answer is checked. The Worker cannot run Ajv (it
@@ -32,6 +36,8 @@ import {
   SITUATIONS,
   SLOT_NAMES,
   SLOTTED_TEXT,
+  TERM_FACT_SOURCE,
+  TERM_FACT_VALUE,
 } from "./schema";
 import type { ComposeInput, ComposeProblem, LiteralKind, MessagePlan, RefusalCheck } from "./types";
 
@@ -100,11 +106,20 @@ const isMessage = (value: unknown): boolean =>
   isTime(value.sentAt);
 const isMasterText = (value: unknown): boolean =>
   isRecord(value) && exactKeys(value, ["step", "text"]) && matches(STEP_ID, value.step) && isText(value.text);
-const isFact = (value: unknown): boolean =>
+/** A slot fact (K-03 `fact`): a slot of the vocabulary and its value. */
+const isSlotFact = (value: unknown): boolean =>
   isRecord(value) &&
   exactKeys(value, ["slot", "value"]) &&
   isIn(SLOT_NAMES, value.slot) &&
   isText(value.value);
+/** A term fact (K-03 v1.1 `termFact`): one of Rosie's own fixed terms, its words and its source line, and no slot. */
+const isTermFact = (value: unknown): boolean =>
+  isRecord(value) &&
+  exactKeys(value, ["value", "source"]) &&
+  matches(TERM_FACT_VALUE, value.value) &&
+  matches(TERM_FACT_SOURCE, value.source);
+/** One fact of the input (K-03 v1.1 `inputFact`): a slot fact or a term fact. */
+const isFact = (value: unknown): boolean => isSlotFact(value) || isTermFact(value);
 const isAudience = (value: unknown): boolean =>
   isRecord(value) &&
   exactKeys(value, ["role", "name", "way", "handlingLine"]) &&
@@ -127,7 +142,7 @@ function listPlaces(value: unknown, at: string, item: (entry: unknown) => boolea
 }
 
 /**
- * Each way `value` is not a K-03 v1 `composeInput`, one problem per place; a frontier field is its own check. Empty
+ * Each way `value` is not a K-03 v1.1 `composeInput`, one problem per place; a frontier field is its own check. Empty
  * when the input is whole.
  */
 export function inputProblems(value: unknown): ComposeProblem[] {
@@ -286,6 +301,7 @@ function found(pattern: RegExp, text: string): Found[] {
 
 const digitRuns = (text: string): string[] => found(DIGITS, text).map((run) => run.text);
 const wordsIn = (text: string): string[] => found(WORD, text).map((word) => word.text.toLowerCase());
+const overlaps = (a: Found | Literal, b: Found | Literal): boolean => a.start < b.end && b.start < a.end;
 
 /** One literal value in words: its kind and the parts a fact must hold, each digit run and each date word. */
 interface Literal {
@@ -295,23 +311,31 @@ interface Literal {
   readonly atoms: readonly string[];
 }
 
-/** The literal values in words outside slots: prices, dates and times, date words, and any other digits. */
+/**
+ * The literal values in words outside slots: prices, dates and times, date words, and any other digits. A literal's
+ * digits are the whole runs of digits of the words it touches, never part of one ("10/255" holds 10 and 255), and a
+ * run no price or date touches is a number of its own, so every run of digits is an atom of some literal: the runs
+ * K-03 v1.1's numbersHeldByFacts reads, each held or refused as that rule holds it.
+ */
 function literalsIn(words: string): Literal[] {
+  const runs = found(DIGITS, words);
+  const runsTouching = (match: Found): string[] =>
+    runs.filter((run) => overlaps(run, match)).map((run) => run.text);
   const literals: Literal[] = [];
   const take = (
     patterns: readonly RegExp[],
     kind: LiteralKind,
-    atomsOf: (text: string) => string[],
+    atomsOf: (match: Found) => string[],
   ): void => {
     for (const pattern of patterns)
       for (const match of found(pattern, words))
-        literals.push({ start: match.start, end: match.end, kind, atoms: atomsOf(match.text) });
+        literals.push({ start: match.start, end: match.end, kind, atoms: atomsOf(match) });
   };
-  take(PRICES, "price", digitRuns);
-  take(DATES_WITH_DIGITS, "date", digitRuns);
-  take(DATE_WORDS, "date", (text) => [text.toLowerCase()]);
-  for (const run of found(DIGITS, words)) {
-    if (!literals.some((literal) => run.start >= literal.start && run.start < literal.end))
+  take(PRICES, "price", runsTouching);
+  take(DATES_WITH_DIGITS, "date", runsTouching);
+  take(DATE_WORDS, "date", (match) => [match.text.toLowerCase()]);
+  for (const run of runs) {
+    if (!literals.some((literal) => overlaps(run, literal)))
       literals.push({ start: run.start, end: run.end, kind: "number", atoms: [run.text] });
   }
   return literals;
@@ -319,9 +343,10 @@ function literalsIn(words: string): Literal[] {
 
 /**
  * Each words field of the plan (its lines' text and its question's) that types a number, a date or a price outside its
- * slots that no fact of the input holds: one problem per field and kind. A digit run is held when a fact's value has
- * the same digit run; a date word when a fact's value has that word. Words inside a slot, its example words included,
- * are code's to replace, so they are never literals.
+ * slots that no fact of the input holds: one problem per field and kind. A digit run is held when a fact's value, a
+ * slot fact's or a term fact's, has the same digit run; a date word when a fact's value has that word. A term fact holds
+ * a literal only by its own words, never by its source. Words inside a slot, its example words included, are code's to
+ * replace, so they are never literals.
  */
 export function literalProblems(plan: MessagePlan, input: ComposeInput): ComposeProblem[] {
   const values = input.facts.map((fact) => fact.value);
