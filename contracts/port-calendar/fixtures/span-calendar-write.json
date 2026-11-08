@@ -14,11 +14,11 @@
   "call": "calendarWrite",
   "attempt": 1,
   "got": {
-    "effect": "eff-cal-riley-alex-nov14-write",
+    "effect": "eff-cal-demo-0001",
     "booking": "booking-alex-riley-nov14",
     "visit": "visit-alex-riley-nov14",
     "link": "callink-riley-google",
-    "idempotencyKey": "eff-cal-riley-alex-nov14-write"
+    "idempotencyKey": "eff-cal-demo-0001"
   },
   "decided": { "result": "written", "eventWritten": true, "alreadyDone": false, "outageRow": false },
   "outcome": "ok",

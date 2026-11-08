@@ -12,7 +12,7 @@
       "visitId": "visit-wei-maya-nov07",
       "personId": "person-maya"
     },
-    "idempotencyKey": "eff-cal-maya-wei-nov07-write",
+    "idempotencyKey": "eff-cal-demo-0011",
     "start": "2026-11-07T18:00:00Z",
     "end": "2026-11-07T19:00:00Z",
     "zone": "America/New_York",

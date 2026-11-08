@@ -1,5 +1,5 @@
 {
-  "effectId": "eff-cal-riley-alex-nov14-write",
+  "effectId": "eff-cal-demo-0001",
   "turnId": "turn-alex-book-1",
   "jobId": null,
   "businessId": "biz-lees-barbershop",
@@ -19,7 +19,7 @@
       "visitId": "visit-alex-riley-nov14",
       "personId": "person-riley"
     },
-    "idempotencyKey": "eff-cal-riley-alex-nov14-write",
+    "idempotencyKey": "eff-cal-demo-0001",
     "start": "2026-11-14T16:00:00Z",
     "end": "2026-11-14T16:30:00Z",
     "zone": "America/New_York",
@@ -30,7 +30,7 @@
       "firstName": "Alex"
     }
   },
-  "idempotencyKey": "eff-cal-riley-alex-nov14-write",
+  "idempotencyKey": "eff-cal-demo-0001",
   "state": "succeeded",
   "tries": 1,
   "runs": 1,

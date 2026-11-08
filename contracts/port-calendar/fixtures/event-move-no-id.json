@@ -13,7 +13,7 @@
       "personId": "person-riley"
     },
     "providerEventId": null,
-    "idempotencyKey": "eff-cal-riley-alex-nov28-move",
+    "idempotencyKey": "eff-cal-demo-0006",
     "start": "2026-11-28T16:30:00Z",
     "end": "2026-11-28T17:00:00Z",
     "zone": "America/New_York",

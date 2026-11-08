@@ -12,7 +12,7 @@
       "visitId": "visit-alex-maya-nov07",
       "personId": "person-maya"
     },
-    "idempotencyKey": "eff-cal-maya-alex-nov07-write",
+    "idempotencyKey": "eff-cal-demo-0010",
     "start": "2026-11-07T16:00:00Z",
     "end": "2026-11-07T17:00:00Z",
     "zone": "America/New_York",

@@ -13,7 +13,7 @@
       "personId": "person-riley"
     },
     "providerEventId": "gcal-event-demo-0001",
-    "idempotencyKey": "eff-cal-riley-alex-nov14-delete"
+    "idempotencyKey": "eff-cal-demo-0003"
   },
   "outcome": {
     "result": "deleted",
