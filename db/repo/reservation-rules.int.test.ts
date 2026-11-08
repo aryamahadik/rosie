@@ -31,6 +31,8 @@ const CONTRACTS = new URL("../../contracts/", import.meta.url);
 const ACCESS_DIR = new URL("data-access/fixtures/", CONTRACTS);
 const CORE_DIR = new URL("db-schema/core/fixtures/", CONTRACTS);
 const TOOL_API_ROLE = "rosie_app";
+/** Connections in the Tool API's client, toolApi. */
+const TOOL_API_POOL = 20;
 const HEAVY = { timeout: 120_000 };
 const SLOW = { timeout: 60_000 };
 
@@ -128,6 +130,8 @@ function expectContractAnswer(call: Exchange["call"], outcome: Outcome): void {
 let db: TestDatabase;
 /** Connections that run as rosie_app, the Tool API's role, with this file's schema first. */
 let toolApi: Sql;
+/** toolApi's application_name, this run's own, so a count of its backends waiting on a lock sees only them. */
+let toolApiName: string;
 
 function toolApiClient(max: number, name: string): Sql {
   return postgres(resolvePrimaryUrl(), {
@@ -139,7 +143,8 @@ function toolApiClient(max: number, name: string): Sql {
 
 beforeAll(async () => {
   db = await createTestDatabase({ name: "reservation_rules", client: { max: 20 } });
-  toolApi = toolApiClient(20, "rosie-t198-tool-api");
+  toolApiName = `rosie-t198-tool-api-${db.schema}`;
+  toolApi = toolApiClient(TOOL_API_POOL, toolApiName);
 }, 60_000);
 
 afterAll(async () => {
@@ -157,12 +162,14 @@ function seedRows(file: string, seen = new Set<string>()): SeedFile["rows"] {
   return [...seed.after.flatMap((before) => seedRows(before, seen)), ...seed.rows];
 }
 
-async function loadSeed(file: string): Promise<void> {
+/** Loads K-04 seeds in order, each after the seeds it names in `after`, every seed once. */
+async function loadSeed(...files: string[]): Promise<void> {
   const present = await db.sql<{ name: string }[]>`
     select table_name as name from information_schema.tables where table_schema = current_schema()
   `;
   const tables = new Set(present.map((row) => row.name));
-  for (const row of seedRows(file)) {
+  const seen = new Set<string>();
+  for (const row of files.flatMap((file) => seedRows(file, seen))) {
     if (tables.has(row.table)) {
       await db.sql`insert into ${db.sql(row.table)} ${db.sql(row.values)}`;
     }
@@ -286,6 +293,184 @@ async function openToolApiTransaction(
     }
   };
   return { tx: reserved, commit: () => end("commit"), rollback: () => end("rollback") };
+}
+
+/** Who a time is saved for, as the cap of 2 counts it: a mobile at every business, or an agent token at one. */
+type Holder = { phoneNumber: string } | { agentToken: string; businessId: string };
+
+const utcOf = (date: Date): string => date.toISOString().replace(".000Z", "Z");
+
+/** The times `holder` has saved that are still saved at `at` (held, ending after it), read as the tables' owner. */
+async function savedTimesAt(
+  holder: Holder,
+  at: string,
+): Promise<{ reservationId: string; heldUntil: string }[]> {
+  const rows =
+    "phoneNumber" in holder
+      ? await db.sql<{ id: string; held_until: Date }[]>`
+          select id, held_until from reservations
+          where for_phone_number = ${holder.phoneNumber} and state = 'held' and held_until > ${at}::timestamptz
+          order by held_until, id collate "C"
+        `
+      : await db.sql<{ id: string; held_until: Date }[]>`
+          select id, held_until from reservations
+          where for_agent_token = ${holder.agentToken} and business_id = ${holder.businessId} and state = 'held'
+            and held_until > ${at}::timestamptz
+          order by held_until, id collate "C"
+        `;
+  return rows.map((row) => ({ reservationId: row.id, heldUntil: utcOf(row.held_until) }));
+}
+
+/** Adds `count` rooms, spread over `businesses` in turn, so reserves of different rooms share no slot lock. */
+async function addRooms(count: number, businesses: string[]): Promise<{ id: string; businessId: string }[]> {
+  const rooms = Array.from({ length: count }, (_, i) => ({
+    id: `res-t198-room-${String(i)}`,
+    business_id: businesses[i % businesses.length] ?? LEES,
+    kind: "room",
+    name: `Room ${String(i + 1)}`,
+  }));
+  await db.sql`insert into resources ${db.sql(rooms)}`;
+  return rooms.map((room) => ({ id: room.id, businessId: room.business_id }));
+}
+
+/** Holds what `take` locks, in an open transaction of the tables' owner, until the function it returns ends it. */
+async function holdLock(take: (tx: Sql) => Promise<unknown>): Promise<() => Promise<void>> {
+  const reserved = await db.sql.reserve();
+  let open = true;
+  const end = async (): Promise<void> => {
+    if (!open) {
+      return;
+    }
+    open = false;
+    try {
+      await reserved`rollback`;
+    } finally {
+      reserved.release();
+    }
+  };
+  try {
+    await reserved`begin`;
+    await take(reserved);
+  } catch (error) {
+    await end();
+    throw error;
+  }
+  return end;
+}
+
+/** True once `count` backends of the client named `name` wait on a lock at once (polled every 50 ms, for at most 30 s). */
+async function lockWaiters(name: string, count: number): Promise<boolean> {
+  for (let attempt = 0; attempt < 600; attempt += 1) {
+    const [row] = await db.sql<{ waiting: number }[]>`
+      select count(*)::int as waiting from pg_stat_activity
+      where application_name = ${name} and wait_event_type = 'Lock'
+    `;
+    if ((row?.waiting ?? 0) >= count) {
+      return true;
+    }
+    await sleep(50);
+  }
+  return false;
+}
+
+/**
+ * Starts `attempts` on the Tool API's client while the tables' owner holds the cap's lock (`take`), waits until every
+ * connection of that client waits on a lock at once (each inside reserve, at the cap's lock, before its count), then
+ * lets the lock go and returns every answer.
+ */
+async function raceAtTheCapLock(
+  take: (tx: Sql) => Promise<unknown>,
+  attempts: (sql: Sql) => Promise<ReserveOutcome>[],
+): Promise<ReserveOutcome[]> {
+  const letGo = await holdLock(take);
+  try {
+    const racing = Promise.all(attempts(toolApi));
+    expect(await lockWaiters(toolApiName, TOOL_API_POOL)).toBe(true);
+    await letGo();
+    return await racing;
+  } finally {
+    await letGo();
+  }
+}
+
+/**
+ * Exactly one of `outcomes` is held, until `heldUntil`; every other is savedTimeCap naming `first` and the one held,
+ * in end order. Returns the id held.
+ */
+function expectOneHeld(
+  outcomes: ReserveOutcome[],
+  first: { reservationId: string; heldUntil: string },
+  heldUntil: string,
+): string {
+  expect(tally(outcomes)).toEqual({ held: 1, savedTimeCap: outcomes.length - 1 });
+  const won = outcomes.find((outcome) => "result" in outcome && outcome.result === "held");
+  if (won === undefined || !("result" in won)) {
+    throw new Error("no attempt was held");
+  }
+  expect(won).toMatchObject({ result: "held", heldUntil, repeated: false });
+  const saved = [first, { reservationId: won.reservationId, heldUntil }];
+  for (const outcome of outcomes) {
+    if ("error" in outcome) {
+      expect(outcome).toEqual({ error: "savedTimeCap", saved });
+    }
+  }
+  return won.reservationId;
+}
+
+type FirstTry = "waits" | "answers transient";
+
+/**
+ * Sends `asked` to extend() on a one-connection client of the Tool API's role while another connection holds the
+ * advisory lock `lockKey` (one of the slot's keys extend takes before the row's), so the extend waits on it. If its first
+ * try waits, `meanwhile` runs while it waits, then the lock is let go and the extend goes on; if it answers transient,
+ * its backend is cut while it waits (nothing written), then `meanwhile` runs. Returns the first try's answer.
+ */
+async function extendAround(
+  lockKey: string,
+  asked: ExtendRequest,
+  firstTry: FirstTry,
+  meanwhile: () => Promise<void>,
+): Promise<ExtendOutcome> {
+  const url = resolvePrimaryUrl();
+  const holder = postgres(url, { max: 1, onnotice: () => undefined });
+  const killer = postgres(url, { max: 1, onnotice: () => undefined });
+  const caller = await oneConnection("rosie-t198-extend-first-try");
+  let letGo: () => void = () => undefined;
+  const hold = new Promise<void>((resolve) => {
+    letGo = resolve;
+  });
+  try {
+    let locked: () => void = () => undefined;
+    const isLocked = new Promise<void>((resolve) => {
+      locked = resolve;
+    });
+    const holding = holder.begin(async (tx) => {
+      await tx`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`;
+      locked();
+      await hold;
+    });
+    await isLocked;
+    const answering = extend(caller.sql, asked);
+    expect(await waitsOnLock(caller.pid)).toBe(true);
+    if (firstTry === "answers transient") {
+      await killer`select pg_terminate_backend(${caller.pid})`;
+      const answer = await answering;
+      letGo();
+      await holding;
+      await meanwhile();
+      return answer;
+    }
+    await meanwhile();
+    letGo();
+    await holding;
+    return await answering;
+  } finally {
+    letGo();
+    await killer.end({ timeout: 5 });
+    await holder.end({ timeout: 5 });
+    // A killed connection is never released (reservation-rules.ts inBusinessTransaction), so nothing ends it but this.
+    await caller.sql.end({ timeout: firstTry === "answers transient" ? 0 : 5 });
+  }
 }
 
 // ---- the fixtures --------------------------------------------------------------------------------------------------
@@ -535,6 +720,97 @@ describe("a third saved time is refused, with both existing end times (arch 05 l
     },
   );
 
+  // From 1 saved time the lock decides (the security reviewer's note a on round 1): each attempt is for its own room,
+  // so no slot lock puts them in a row, and every connection waits on the cap's lock at once before any counts.
+  it(
+    "from 1 saved time, 50 parallel attempts for one mobile at three businesses, all at its phones row's lock at once: exactly 1 held, 49 refused",
+    HEAVY,
+    async () => {
+      await freshSeed();
+      const rooms = await addRooms(50, [LEES, YOGA, MOVERS]);
+      const at = "2026-11-07T15:07:00Z";
+      const outcomes = await raceAtTheCapLock(
+        (tx) => tx`select 1 from phones where number = ${ALEX} for update`,
+        (sql) =>
+          rooms.map((room, i) =>
+            reserve(
+              sql,
+              reserveRequest({
+                reservationId: `rsv-alex-race-${String(i)}`,
+                businessId: room.businessId,
+                resourceId: room.id,
+                during: { start: "2026-12-05T10:00:00Z", end: "2026-12-05T11:00:00Z" },
+                for: { phoneNumber: ALEX },
+                at,
+              }),
+            ),
+          ),
+      );
+      const avery = { reservationId: ALEX_AVERY, heldUntil: "2026-11-07T15:10:00Z" };
+      const won = expectOneHeld(outcomes, avery, plus(at, 10));
+      expect(await savedTimesAt({ phoneNumber: ALEX }, at)).toEqual([
+        avery,
+        { reservationId: won, heldUntil: plus(at, 10) },
+      ]);
+      const written = await db.sql<{ n: number }[]>`
+        select count(*)::int as n from reservations where id like 'rsv-alex-race-%'
+      `;
+      expect(written[0]?.n).toBe(1);
+    },
+  );
+
+  it(
+    "from 1 saved time, 50 parallel attempts for one agent token at one business, all at its lock at once: exactly 1 held, 49 refused",
+    HEAVY,
+    async () => {
+      await freshSeed();
+      const token = "agent-token-t198";
+      const first = reserveRequest({
+        reservationId: "rsv-token-first",
+        businessId: MOVERS,
+        resourceId: "res-truck-20",
+        during: { start: "2026-12-10T13:00:00Z", end: "2026-12-10T21:00:00Z" },
+        for: { agentToken: token },
+        at: "2026-11-07T15:05:00Z",
+      });
+      expect(await reserve(toolApi, first)).toMatchObject({
+        result: "held",
+        heldUntil: "2026-11-07T15:15:00Z",
+      });
+      const rooms = await addRooms(50, [MOVERS]);
+      const at = "2026-11-07T15:07:00Z";
+      // reservations.ts lockAndListSaved's key for a token at a business.
+      const tokenKey = `token:${MOVERS}:${token}`;
+      const outcomes = await raceAtTheCapLock(
+        (tx) => tx`select pg_advisory_xact_lock(hashtextextended(${tokenKey}, 0))`,
+        (sql) =>
+          rooms.map((room, i) =>
+            reserve(
+              sql,
+              reserveRequest({
+                reservationId: `rsv-token-race-${String(i)}`,
+                businessId: MOVERS,
+                resourceId: room.id,
+                during: { start: "2026-12-05T10:00:00Z", end: "2026-12-05T11:00:00Z" },
+                for: { agentToken: token },
+                at,
+              }),
+            ),
+          ),
+      );
+      const firstSaved = { reservationId: "rsv-token-first", heldUntil: "2026-11-07T15:15:00Z" };
+      const won = expectOneHeld(outcomes, firstSaved, plus(at, 10));
+      expect(await savedTimesAt({ agentToken: token, businessId: MOVERS }, at)).toEqual([
+        firstSaved,
+        { reservationId: won, heldUntil: plus(at, 10) },
+      ]);
+      const written = await db.sql<{ n: number }[]>`
+        select count(*)::int as n from reservations where id like 'rsv-token-race-%'
+      `;
+      expect(written[0]?.n).toBe(1);
+    },
+  );
+
   it("waiting rows never count: a mobile waiting next in line still saves two times, and its third names only those", async () => {
     await freshSeed();
     expect(await call(toolApi, exchangeOf("reserve-next-in-line.json"))).toMatchObject({ result: "waiting" });
@@ -770,6 +1046,7 @@ describe("extend() adds 10 minutes once, never on the ownAi door (README item 10
     ];
     for (const [i, [door, minutes]] of doors.entries()) {
       const id = `rsv-extend-${door}`;
+      // Saved for Alex's booking: a time held for an agent token is never extended (DL-173), and a booking has no cap.
       expect(
         await reserve(
           toolApi,
@@ -778,6 +1055,7 @@ describe("extend() adds 10 minutes once, never on the ownAi door (README item 10
             door,
             holdMinutes: minutes,
             during: hourSlot("2026-12-03T10:00:00Z", i),
+            for: { bookingId: "booking-alex-haircut" },
             at,
           }),
         ),
@@ -799,23 +1077,49 @@ describe("extend() adds 10 minutes once, never on the ownAi door (README item 10
 
   it("a class seat's saved time is extended the same way, and its session's seats stay as they are", async () => {
     await emptyTables();
-    await loadSeed("seed-class-seats.json");
-    const asked = extendRequest({ reservationId: "rsv-agent-workshop", businessId: YOGA });
+    await loadSeed("seed-reservation.json", "seed-class-seats.json");
+    const seats = (): Promise<{ taken: number; version: number }[]> => db.sql<
+      { taken: number; version: number }[]
+    >`
+      select taken, version from class_seats where resource_id = 'res-handstand-workshop'
+    `;
+    // The seed's seat is saved for an agent token: never extended (DL-173), and nothing changes.
+    expect(
+      await extend(toolApi, extendRequest({ reservationId: "rsv-agent-workshop", businessId: YOGA })),
+    ).toEqual({ error: "neverExtended", reservationId: "rsv-agent-workshop", door: "ownAi" });
+    expect(await heldAs("rsv-agent-workshop")).toEqual({
+      state: "held",
+      heldUntil: "2026-11-07T15:10:00Z",
+      extended: false,
+      version: 1,
+    });
+    expect(await seats()).toEqual([{ taken: 2, version: 3 }]);
+    // A seat saved for Alex's mobile (his second saved time, with Avery's) gets its one extension.
+    const seat = reserveRequest({
+      reservationId: "rsv-alex-workshop-second-seat",
+      businessId: YOGA,
+      resourceId: "res-handstand-workshop",
+      during: { start: "2026-11-14T16:00:00Z", end: "2026-11-14T18:00:00Z" },
+      for: { phoneNumber: ALEX },
+    });
+    expect(await reserve(toolApi, seat)).toMatchObject({
+      result: "held",
+      heldUntil: "2026-11-07T15:15:00Z",
+    });
+    expect(await seats()).toEqual([{ taken: 3, version: 4 }]);
+    const asked = extendRequest({ reservationId: seat.reservationId, businessId: YOGA });
     expect(await extend(toolApi, asked)).toEqual({
       result: "extended",
-      reservationId: "rsv-agent-workshop",
+      reservationId: seat.reservationId,
       version: 2,
-      heldUntil: "2026-11-07T15:20:00Z",
+      heldUntil: "2026-11-07T15:25:00Z",
     });
     expect(await extend(toolApi, { ...asked, expectVersion: 2 })).toEqual({
       error: "alreadyExtended",
-      reservationId: "rsv-agent-workshop",
-      heldUntil: "2026-11-07T15:20:00Z",
+      reservationId: seat.reservationId,
+      heldUntil: "2026-11-07T15:25:00Z",
     });
-    const seats = await db.sql<{ taken: number; version: number }[]>`
-      select taken, version from class_seats where resource_id = 'res-handstand-workshop'
-    `;
-    expect(seats).toEqual([{ taken: 2, version: 3 }]);
+    expect(await seats()).toEqual([{ taken: 3, version: 4 }]);
   });
 
   it("a time that is not saved now is notHeld with its state: at its end, past it, waiting, booked or released", async () => {
@@ -990,60 +1294,253 @@ describe("extend() adds 10 minutes once, never on the ownAi door (README item 10
     },
   );
 
-  it("a reserve for the same agent token at that business waits the same way", SLOW, async () => {
+  it("a time held for an agent token is neverExtended whatever door is named, before the one extension and the version, and nothing changes (DL-173; DL-171)", async () => {
     await freshSeed();
     expect(await call(toolApi, exchangeOf("reserve-ai-door-15-min.json"))).toMatchObject({ result: "held" });
-    const second = reserveRequest({
-      reservationId: "rsv-agent-truck-26-nov21",
-      businessId: MOVERS,
-      resourceId: "res-truck-26",
-      during: { start: "2026-11-21T13:00:00Z", end: "2026-11-21T21:00:00Z" },
-      for: { agentToken: "agent-token-demo-1" },
-      at: "2026-11-07T15:05:00Z",
-    });
-    expect(await reserve(toolApi, second)).toMatchObject({
-      result: "held",
-      heldUntil: "2026-11-07T15:15:00Z",
-    });
-    const open = await openToolApiTransaction(MOVERS);
-    const waiter = await oneConnection("rosie-t198-token-waiter");
-    try {
-      expect(
-        await extendIn(
-          open.tx,
-          extendRequest({
-            reservationId: second.reservationId,
-            businessId: MOVERS,
-            at: "2026-11-07T15:14:00Z",
-          }),
-        ),
-      ).toMatchObject({ result: "extended", heldUntil: "2026-11-07T15:25:00Z" });
-      const pending = reserve(
-        waiter.sql,
+    // The same token's time saved through the standard door: K-04 keeps no door, so it fails closed all the same.
+    expect(
+      await reserve(
+        toolApi,
         reserveRequest({
-          reservationId: "rsv-agent-truck-20-nov22",
+          reservationId: "rsv-agent-truck-26-nov21",
           businessId: MOVERS,
-          resourceId: "res-truck-20",
-          during: { start: "2026-11-22T13:00:00Z", end: "2026-11-22T21:00:00Z" },
+          resourceId: "res-truck-26",
+          during: { start: "2026-11-21T13:00:00Z", end: "2026-11-21T21:00:00Z" },
           for: { agentToken: "agent-token-demo-1" },
-          at: "2026-11-07T15:16:00Z",
+          at: "2026-11-07T15:05:00Z",
         }),
-      );
-      expect(await waitsOnLock(waiter.pid)).toBe(true);
-      await open.commit();
-      expect(await pending).toEqual({
-        error: "savedTimeCap",
-        saved: [
-          { reservationId: "rsv-agent-truck-20-nov20", heldUntil: "2026-11-07T15:20:00Z" },
-          { reservationId: "rsv-agent-truck-26-nov21", heldUntil: "2026-11-07T15:25:00Z" },
-        ],
-      });
-      expect(await getReservation(db.sql, "rsv-agent-truck-20-nov22")).toBeNull();
-    } finally {
-      await open.rollback();
-      await waiter.sql.end({ timeout: 5 });
+      ),
+    ).toMatchObject({ result: "held", heldUntil: "2026-11-07T15:15:00Z" });
+    const doors: ExtendRequest["door"][] = ["standard", "ownAi", "planCheck", "document", "ownerOk"];
+    for (const reservationId of ["rsv-agent-truck-20-nov20", "rsv-agent-truck-26-nov21"]) {
+      const before = await heldAs(reservationId);
+      for (const door of doors) {
+        for (const expectVersion of [1, 7]) {
+          for (const sql of [toolApi, db.sql]) {
+            const outcome = await extend(
+              sql,
+              extendRequest({
+                reservationId,
+                businessId: MOVERS,
+                door,
+                expectVersion,
+                at: "2026-11-07T15:12:00Z",
+              }),
+            );
+            expect(outcome, `${reservationId} ${door} ${String(expectVersion)}`).toEqual({
+              error: "neverExtended",
+              reservationId,
+              door: "ownAi",
+            });
+            expectContractAnswer("extend", outcome);
+          }
+        }
+      }
+      expect(await heldAs(reservationId)).toEqual(before);
     }
   });
+});
+
+// ---- no extend makes a third saved time -----------------------------------------------------------------------------
+
+describe("an extend never gives a third saved time: once a reserve or a promotion counted its time as ended, it stays ended (DL-173; arch 05 line 247)", () => {
+  interface Race {
+    name: string;
+    /** Seeds, and the holder's saved times before the race. */
+    setUp: () => Promise<void>;
+    /** The extend: its first try waits on `lockKey`, one of its slot's locks. */
+    asked: ExtendRequest;
+    lockKey: string;
+    /** Saved for the same holder at a later `at`, while the first try waits or after it answered transient. */
+    meanwhile: () => Promise<void>;
+    /** The extend's answer once it goes on, and when the same request is sent again. */
+    refused: ExtendOutcome;
+    /** The extended row's end, unchanged. */
+    oldEnd: string;
+    holder: Holder;
+    /** From the later `at` on, the holder's saved times: never more than 2. */
+    from: string;
+    savedFrom: { reservationId: string; heldUntil: string }[];
+  }
+
+  /** Alex's two saved times: Avery's (seed-reservation) until 15:10 and Riley's (reserve-10-min.json) until 15:15. */
+  const ALEX_RILEY = { reservationId: "rsv-alex-riley-nov14", heldUntil: "2026-11-07T15:15:00Z" };
+  const MAYA_NOV28 = { start: "2026-11-28T15:00:00Z", end: "2026-11-28T16:00:00Z" };
+  const notHeldAvery: ExtendOutcome = { error: "notHeld", reservationId: ALEX_AVERY, state: "held" };
+
+  const RACES: Race[] = [
+    {
+      name: "Alex's extend at 15:08, then a reserve for Alex at 15:11 that counted Avery's 15:10 as ended",
+      setUp: async () => {
+        await freshSeed();
+        expect(await call(toolApi, exchangeOf("reserve-10-min.json"))).toMatchObject({ result: "held" });
+      },
+      asked: extendRequest(),
+      lockKey: "resource:res-avery",
+      meanwhile: async () => {
+        expect(
+          await reserve(
+            toolApi,
+            reserveRequest({
+              reservationId: "rsv-alex-maya-nov28",
+              businessId: YOGA,
+              resourceId: "res-maya",
+              during: MAYA_NOV28,
+              for: { phoneNumber: ALEX },
+              at: "2026-11-07T15:11:00Z",
+            }),
+          ),
+        ).toMatchObject({ result: "held", heldUntil: "2026-11-07T15:21:00Z" });
+      },
+      refused: notHeldAvery,
+      oldEnd: "2026-11-07T15:10:00Z",
+      holder: { phoneNumber: ALEX },
+      from: "2026-11-07T15:11:00Z",
+      savedFrom: [ALEX_RILEY, { reservationId: "rsv-alex-maya-nov28", heldUntil: "2026-11-07T15:21:00Z" }],
+    },
+    {
+      name: "a token's extend at 15:14, then a reserve for the token at that business at 15:16 that counted its 15:15 as ended",
+      setUp: async () => {
+        await freshSeed();
+        expect(await call(toolApi, exchangeOf("reserve-ai-door-15-min.json"))).toMatchObject({
+          result: "held",
+        });
+        expect(
+          await reserve(
+            toolApi,
+            reserveRequest({
+              reservationId: "rsv-agent-truck-26-nov21",
+              businessId: MOVERS,
+              resourceId: "res-truck-26",
+              during: { start: "2026-11-21T13:00:00Z", end: "2026-11-21T21:00:00Z" },
+              for: { agentToken: "agent-token-demo-1" },
+              at: "2026-11-07T15:05:00Z",
+            }),
+          ),
+        ).toMatchObject({ result: "held", heldUntil: "2026-11-07T15:15:00Z" });
+      },
+      asked: extendRequest({
+        reservationId: "rsv-agent-truck-26-nov21",
+        businessId: MOVERS,
+        at: "2026-11-07T15:14:00Z",
+      }),
+      lockKey: "resource:res-truck-26",
+      meanwhile: async () => {
+        expect(
+          await reserve(
+            toolApi,
+            reserveRequest({
+              reservationId: "rsv-agent-truck-20-nov22",
+              businessId: MOVERS,
+              resourceId: "res-truck-20",
+              during: { start: "2026-11-22T13:00:00Z", end: "2026-11-22T21:00:00Z" },
+              for: { agentToken: "agent-token-demo-1" },
+              at: "2026-11-07T15:16:00Z",
+            }),
+          ),
+        ).toMatchObject({ result: "held", heldUntil: "2026-11-07T15:26:00Z" });
+      },
+      refused: { error: "neverExtended", reservationId: "rsv-agent-truck-26-nov21", door: "ownAi" },
+      oldEnd: "2026-11-07T15:15:00Z",
+      holder: { agentToken: "agent-token-demo-1", businessId: MOVERS },
+      from: "2026-11-07T15:16:00Z",
+      savedFrom: [
+        { reservationId: "rsv-agent-truck-20-nov20", heldUntil: "2026-11-07T15:20:00Z" },
+        { reservationId: "rsv-agent-truck-20-nov22", heldUntil: "2026-11-07T15:26:00Z" },
+      ],
+    },
+    {
+      name: "Alex's extend at 15:08, then a release at 15:11 that promoted Alex, next in line, counting Avery's 15:10 as ended",
+      setUp: async () => {
+        await freshSeed();
+        // An agent token saves Maya's time; Alex, with only Avery's saved, waits next in line for it.
+        expect(
+          await reserve(
+            toolApi,
+            reserveRequest({
+              reservationId: "rsv-token-maya-nov28",
+              businessId: YOGA,
+              resourceId: "res-maya",
+              during: MAYA_NOV28,
+              for: { agentToken: "agent-token-t198" },
+              at: "2026-11-07T15:05:00Z",
+            }),
+          ),
+        ).toMatchObject({ result: "held", heldUntil: "2026-11-07T15:15:00Z" });
+        expect(
+          await reserve(
+            toolApi,
+            reserveRequest({
+              reservationId: "rsv-alex-maya-nov28",
+              businessId: YOGA,
+              resourceId: "res-maya",
+              during: MAYA_NOV28,
+              for: { phoneNumber: ALEX },
+              waitIfSaved: true,
+              at: "2026-11-07T15:06:00Z",
+            }),
+          ),
+        ).toMatchObject({ result: "waiting", queuedAt: "2026-11-07T15:06:00Z" });
+        expect(await call(toolApi, exchangeOf("reserve-10-min.json"))).toMatchObject({ result: "held" });
+      },
+      asked: extendRequest(),
+      lockKey: "resource:res-avery",
+      meanwhile: async () => {
+        const released = await release(toolApi, {
+          reservationId: "rsv-token-maya-nov28",
+          businessId: YOGA,
+          expectVersion: 1,
+          why: "let_go",
+          at: "2026-11-07T15:11:00Z",
+        });
+        expect(released).toMatchObject({
+          result: "released",
+          promoted: {
+            reservationId: "rsv-alex-maya-nov28",
+            heldUntil: "2026-11-07T15:21:00Z",
+            forPhoneNumber: ALEX,
+          },
+          skipped: [],
+        });
+      },
+      refused: notHeldAvery,
+      oldEnd: "2026-11-07T15:10:00Z",
+      holder: { phoneNumber: ALEX },
+      from: "2026-11-07T15:11:00Z",
+      savedFrom: [ALEX_RILEY, { reservationId: "rsv-alex-maya-nov28", heldUntil: "2026-11-07T15:21:00Z" }],
+    },
+  ];
+
+  for (const firstTry of ["waits", "answers transient"] as const) {
+    for (const race of RACES) {
+      it(
+        `${race.name}; the extend's first try ${firstTry}, and the same request sent again`,
+        SLOW,
+        async () => {
+          await race.setUp();
+          const first = await extendAround(race.lockKey, race.asked, firstTry, race.meanwhile);
+          if (firstTry === "waits") {
+            expect(first).toEqual(race.refused);
+          } else {
+            expect(first).toMatchObject({ error: "transient" });
+            expect((first as { sqlstate: string }).sqlstate).toMatch(/^(08[0-9A-Z]{3}|57P0[123])$/);
+          }
+          expectContractAnswer("extend", first);
+          // K-05 README line 50: the same request may be sent again.
+          const again = await extend(toolApi, race.asked);
+          expect(again).toEqual(race.refused);
+          expectContractAnswer("extend", again);
+          expect(await heldAs(race.asked.reservationId)).toEqual({
+            state: "held",
+            heldUntil: race.oldEnd,
+            extended: false,
+            version: 1,
+          });
+          expect(await savedTimesAt(race.holder, race.from)).toEqual(race.savedFrom);
+        },
+      );
+    }
+  }
 });
 
 // ---- a lost connection ---------------------------------------------------------------------------------------------

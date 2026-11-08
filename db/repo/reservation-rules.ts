@@ -20,8 +20,10 @@
 //
 // extend() is this file's (item 10): a saved time gets its one extension, 10 more minutes on its old end (arch 05 line
 // 247: "Offered 10 more minutes once, before it ends"; Q-12's default), never on the ownAi door (MC C3: "the 15 minutes
-// are never extended"). K-04 v1 keeps no door on the row (K-05 open gap 2), so the caller names it. In one transaction
-// under the reservation's business (K-05 "Scope": business), as reserve and release run:
+// are never extended"). K-04 v1 keeps no door on the row (K-05 open gap 2), so the caller names it, and a time held for
+// an agent token is never extended, whatever door the caller names (DL-173; DL-171, where K-09's extendTime does the
+// same): nothing stored says it was not saved through the ownAi door, so the call fails closed until K-04 stores the
+// door. In one transaction under the reservation's business (K-05 "Scope": business), as reserve and release run:
 //   1. The row's slot, read without a lock. A row this business cannot see, or that does not exist, is notFound: every
 //      read also names the business, so another business's row answers notFound whichever role runs the call (the
 //      tables' owner, which row-level security does not bind, until T-1093).
@@ -33,12 +35,18 @@
 //      PostgreSQL fails one (40P01: T-187's finding); then the row FOR UPDATE. reserve and release take no clock row
 //      lock yet; once T-1084 has release cancel the row, taking it before the slot keeps this order.
 //   3. The checks, in item 10's order: not held, or its end has passed (held_until <= at, as release counts an ended
-//      time), is notHeld with the row's state; the ownAi door is neverExtended; the extension already given is
-//      alreadyExtended, so the same request again lands here and changes nothing (README: "the one extension is given
-//      once"); then the version is compared (versionChanged).
+//      time), is notHeld with the row's state; the ownAi door, or a time held for an agent token, is neverExtended (its
+//      door ownAi, the one the schema names); the extension already given is alreadyExtended, so the same request again
+//      lands here and changes nothing (README: "the one extension is given once"); then the version is compared
+//      (versionChanged).
 //   4. The cap's own lock for who the time is saved for (the phones row through reservations_saved_times, or the agent
-//      token's advisory lock: what reserve takes before it counts), so a reserve for the same mobile or token that comes
-//      while this extension is in flight waits for it and counts the saved time with its new end.
+//      token's advisory lock: what reserve and a promotion take before they count), and under it the holder's other
+//      saved times at `at`. With 2 already, a reserve or a promotion has counted this time as ended (its old end was at
+//      or before their own `at`), so extending it would give the holder a third (arch 05 line 247: "At most 2 saved
+//      times per mobile, and 2 per agent token per business", whichever `at` wins): it is notHeld, past its end (README
+//      item 10; DL-173). A reserve or a promotion for the same holder that comes while this extension is in flight
+//      waits for it and counts the saved time with its new end. A token's time never gets this far while step 3 refuses
+//      it; its count stays here for when K-04 stores the door.
 //   5. held_until rises by 10 minutes, extended is set and the version rises by one; the saved-time clock row's due time
 //      moves with it while it is armed (Q-12). A fired or cancelled one stays as it is; a saved-time row is armed when
 //      it is made (item 8), never waiting. Until reserve() writes that row (lead card T-1084) there is none to move.
@@ -54,6 +62,9 @@
 //   3. The saved-time clock row moves only while armed (commit-turn.ts default 3 cancels one only while waiting or armed).
 //   4. extend takes the slot's and the cap's locks as well as the row's (item 10 names only the row's), for steps 2 and 4.
 //   5. reserve() refuses an unknown door with a TypeError before any read, as it refuses wrong minutes for a known one.
+//   6. The cap's count comes last, after the version (step 4), so a repeat of the one extension still answers
+//      alreadyExtended (default 1); a time with 2 others is notHeld with its state, held (NotHeldError: "its end has
+//      passed").
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import { isLostConnection } from "./bundles";
 import {
@@ -98,6 +109,8 @@ export type ExtendOutcome = ExtendResponse | ExtendError;
 
 /** The one extension: 10 more minutes, once (arch 05 line 247; Q-12's default). */
 export const EXTEND_MINUTES = 10;
+/** At most this many saved times per mobile across businesses, or per agent token per business (arch 05 line 247). */
+const SAVED_TIME_CAP = 2;
 
 const DOORS: ReadonlySet<string> = new Set<Door>(["standard", "ownAi", "planCheck", "document", "ownerOk"]);
 const EXTEND_FIELDS = ["reservationId", "businessId", "expectVersion", "door", "at"] as const;
@@ -154,6 +167,12 @@ interface LockedRow {
   ended: boolean;
 }
 
+/** A saved time of the holder's: its id and end. */
+interface SavedRow {
+  id: string;
+  held_until: Date;
+}
+
 function assertId(value: unknown, what: string): void {
   if (typeof value !== "string" || value === "") {
     throw new TypeError(`extend: ${what} is a non-empty id`);
@@ -191,20 +210,34 @@ async function lockSlot(tx: Conn, resourceId: string, personId: string | null): 
 }
 
 /**
- * The lock reserve takes before it counts saved times against the cap of 2: a mobile's phones row, FOR UPDATE, through
- * reservations_saved_times (the Tool API's role has no grant on phones; the function locks the row for the rest of
- * this transaction), or an agent token's advisory lock at the business. A booking has no cap and takes none.
+ * Takes the lock reserve and a promotion take before they count saved times against the cap of 2, then lists the
+ * holder's saved times at `at` (held, ending after it), as they count them (db/repo/reservations.ts lockAndListSaved):
+ * a mobile's phones row, FOR UPDATE, through reservations_saved_times, which counts across every business and gives
+ * only ids and ends (the Tool API's role has no grant on phones; the function locks the row for the rest of this
+ * transaction); or an agent token's advisory lock at the business, then its held rows there. Each list is read after
+ * its lock is taken, so it sees what a reserve or a promotion committed while this call waited. A booking has no cap:
+ * no lock, no list.
  */
-async function lockSavedFor(tx: Conn, row: LockedRow, businessId: string, at: string): Promise<void> {
+async function lockAndListSaved(
+  tx: Conn,
+  row: LockedRow,
+  businessId: string,
+  at: string,
+): Promise<SavedRow[]> {
   if (row.for_phone_number !== null) {
-    await tx`
-      select count(*)::int as saved from reservations_saved_times(${row.for_phone_number}, ${at}::timestamptz)
+    return tx<SavedRow[]>`
+      select id, held_until from reservations_saved_times(${row.for_phone_number}, ${at}::timestamptz)
     `;
-    return;
   }
   if (row.for_agent_token !== null) {
     await tx`select pg_advisory_xact_lock(hashtextextended(${`token:${businessId}:${row.for_agent_token}`}, 0))`;
+    return tx<SavedRow[]>`
+      select id, held_until from reservations
+      where for_agent_token = ${row.for_agent_token} and business_id = ${businessId} and state = 'held'
+        and held_until > ${at}::timestamptz
+    `;
   }
+  return [];
 }
 
 /**
@@ -246,7 +279,8 @@ export async function extendIn(tx: Conn, request: ExtendRequest): Promise<Extend
   if (row.state !== "held" || row.held_until === null || row.ended) {
     return { error: "notHeld", reservationId: id, state: row.state };
   }
-  if (request.door === "ownAi") {
+  // A token's time may have been saved through the ownAi door, which K-04 does not record: refused as that door is.
+  if (request.door === "ownAi" || row.for_agent_token !== null) {
     return { error: "neverExtended", reservationId: id, door: "ownAi" };
   }
   if (row.extended) {
@@ -261,7 +295,11 @@ export async function extendIn(tx: Conn, request: ExtendRequest): Promise<Extend
     };
   }
 
-  await lockSavedFor(tx, row, businessId, request.at);
+  // Two other saved times at `at`: a reserve or a promotion counted this one as ended, and it stays ended.
+  const saved = await lockAndListSaved(tx, row, businessId, request.at);
+  if (saved.filter((other) => other.id !== id).length >= SAVED_TIME_CAP) {
+    return { error: "notHeld", reservationId: id, state: row.state };
+  }
   const [extended] = await tx<{ held_until: Date; version: number }[]>`
     update reservations
     set held_until = held_until + make_interval(mins => ${EXTEND_MINUTES}), extended = true,
@@ -326,8 +364,9 @@ async function inBusinessTransaction<T>(
 }
 
 /**
- * Gives a saved time its one extension, 10 more minutes on its end, never for the ownAi door, in one transaction under
- * the request's business (K-05 v1 item 6; README item 10).
+ * Gives a saved time its one extension, 10 more minutes on its end, in one transaction under the request's business
+ * (K-05 v1 item 6; README item 10): never for the ownAi door or a time held for an agent token (neverExtended), and
+ * never once the holder has 2 other saved times at `at`, which would make a third (notHeld).
  */
 export async function extend(sql: Sql, request: ExtendRequest): Promise<ExtendOutcome> {
   validateExtend(request);
