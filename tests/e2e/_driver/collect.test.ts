@@ -93,6 +93,21 @@ describe("collecting a trace by its trace id", () => {
     expect(Object.getOwnPropertyDescriptor(console, "log")).toEqual(before);
     expect(traceOf("trace-alex-0008-repeat", spansOfLogLines(capture.lines)).trace).toEqual(duplicate);
   });
+
+  it("gives every line to each capture running, and puts console.log back after the last stops, in any order", () => {
+    const before = Object.getOwnPropertyDescriptor(console, "log");
+    const first = captureConsoleLog();
+    console.log("one");
+    const second = captureConsoleLog();
+    console.log("two");
+    first.stop();
+    console.log("three");
+    expect(Object.getOwnPropertyDescriptor(console, "log")).not.toEqual(before);
+    second.stop();
+    expect(Object.getOwnPropertyDescriptor(console, "log")).toEqual(before);
+    expect(first.lines).toEqual(["one", "two"]);
+    expect(second.lines).toEqual(["two", "three"]);
+  });
 });
 
 describe("reading the outbox rows under a trace (K-07 v1)", () => {

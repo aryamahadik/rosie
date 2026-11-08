@@ -111,31 +111,39 @@ export interface LogCapture {
   readonly lines: readonly string[];
   /** A SpanReader over the captured lines. */
   readonly reader: SpanReader;
-  /** Puts console.log back. Safe to call twice. */
+  /** Stops this capture; the last one stopped puts console.log back. Safe to call twice. */
   stop(): void;
+}
+
+/** The line lists of the captures running now: each gets every line. */
+const listening = new Set<string[]>();
+/** console.log as it was before the first capture that is still running. */
+let saved: PropertyDescriptor | undefined;
+
+function writeLine(...args: unknown[]): void {
+  const line = args.map((arg) => (typeof arg === "string" ? arg : JSON.stringify(arg))).join(" ");
+  for (const lines of listening) lines.push(line);
 }
 
 /**
  * Collects console.log lines until stopped, without printing them: the log lines a Worker run in this process writes
- * (runtime/src/trace logSink writes each span with console.log). Another capture started later takes over until it
- * stops.
+ * (runtime/src/trace logSink writes each span with console.log). Captures running at the same time each get every
+ * line, and may stop in any order; console.log is put back when the last one stops.
  */
 export function captureConsoleLog(): LogCapture {
-  const descriptor = Object.getOwnPropertyDescriptor(console, "log");
   const lines: string[] = [];
-  const capture = (...args: unknown[]): void => {
-    lines.push(args.map((arg) => (typeof arg === "string" ? arg : JSON.stringify(arg))).join(" "));
-  };
-  console.log = capture;
-  let stopped = false;
+  if (listening.size === 0) {
+    saved = Object.getOwnPropertyDescriptor(console, "log");
+    console.log = writeLine;
+  }
+  listening.add(lines);
   return {
     lines,
     reader: () => [...lines],
     stop() {
-      if (stopped) return;
-      stopped = true;
-      if (console.log === capture && descriptor !== undefined)
-        Object.defineProperty(console, "log", descriptor);
+      if (!listening.delete(lines) || listening.size > 0) return;
+      if (saved !== undefined) Object.defineProperty(console, "log", saved);
+      saved = undefined;
     },
   };
 }

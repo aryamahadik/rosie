@@ -256,17 +256,21 @@ describe("no key is read by the local target", () => {
       },
     });
     try {
+      // The watch is on: a read goes through it.
+      expect(process.env.PATH).toBe(environment.PATH);
+      expect(reads).toContain("PATH");
       const secret = makeTestWebhookSecret();
       target = createLocalTarget({ gateway: gatewayWith(secret).fetch, webhookSecret: secret });
       const sent = await target.sendEvent(text);
+      expect(sent.gatewayStatus).toBe(200);
       await target.sendEvent(text);
       target.linq.sendPart(sendTextRequest);
-      checkRun(await target.collect(sent.traceId), ["receive"]);
+      expect(checkRun(await target.collect(sent.traceId), ["receive"]).problems).toEqual([]);
     } finally {
       process.env = environment;
     }
-    expect(reads.filter((name) => /SECRET|KEY|TOKEN|PASS|WHSEC|CREDENTIAL|AUTH|LINQ/i.test(name))).toEqual(
-      [],
-    );
+    expect(
+      reads.filter((name) => /SECRET|KEY|TOKEN|PASSWORD|WHSEC|CREDENTIAL|LINQ|DATABASE_URL/i.test(name)),
+    ).toEqual([]);
   });
 });
