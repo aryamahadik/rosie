@@ -152,6 +152,13 @@ const WEEKDAY_NAMES = alternation(WEEKDAYS);
 const MONTH_NAMES = alternation(MONTHS);
 const ORDINAL = "(?:st|nd|rd|th)";
 
+/**
+ * A day as the reader reads one in folded words, as a pattern's source (for the whole value phrase, values/phrase.ts):
+ * a relative day ("tomorrow", "pasado mañana", "tonight"), a weekday ("Fri", "next Friday", "el viernes"), a month and
+ * day ("Oct 24", "24 de octubre"), a numeric date ("10/24") or a day of the month ("the 24th").
+ */
+export const DAY_PATTERN = String.raw`(?:(?:the )?day after tomorrow|pasado manana|tomorrow|tomorow|tmrw|tmr|manana|today|hoy|tonight|esta noche|yesterday|ayer|(?:(?:this|next|este|el proximo|proximo|el) )?(?:${WEEKDAY_NAMES})|(?:${MONTH_NAMES})\.? \d{1,2}${ORDINAL}?|\d{1,2}${ORDINAL}? (?:of |de )?(?:${MONTH_NAMES})|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?|(?:the )?\d{1,2}${ORDINAL})`;
+
 const lookup = (names: readonly [string, number][], name: string | undefined): number | null =>
   names.find(([each]) => each === name)?.[1] ?? null;
 
