@@ -9,7 +9,10 @@
 // K-04's fixtures are seed rows and refused rows. Every entry of fixtures/index.json names its `table`, so the T-003
 // harness counts it as a seed row and leaves it to this test (common/fixtures-index.meta.schema.json, `table`). The
 // schema an entry names is the table list of its version, core.<version>.tables.json: v1 now; a later minor version
-// brings its own list and its own entries, each checked against its own list. The contract project has no database
+// brings its own list and its own entries, each checked against its own list. This file holds v1 and every later
+// additive minor version's fixtures (as DL-124 settled for K-06; DL-181): a check of all of a version's fixtures loads
+// the accepted fixtures of every version up to it first, and SQL a later version adds is read only with that version's
+// own list, so v1's checks still pass when v1.1 comes. The contract project has no database
 // (migrating one is the database engineer's side, on SIDE_CHECKS), so this file holds a model of a table list that loads
 // a fixture as PostgreSQL would and refuses with the SQLSTATE and the constraint PostgreSQL names: column types in the
 // README's input forms, not null and defaults, the primary key, unique keys (partial ones too), foreign keys, CHECK and
@@ -29,9 +32,11 @@
 //      field the README's file format requires makes the file refused; damaged copies that break one CHECK, unique key,
 //      foreign key, EXCLUDE or input form are refused by the one each breaks;
 //   4. what the table list cannot express, modeled here from the README, each also run on a damaged copy to show that it
-//      fires: row-level security per business (rule 4), the event log never edited (rule 5), the file format, the queue
-//      order of waiting rows, a class session's taken seats, the versions an open question or outbox row read, and the
-//      outbox row's plan and final parts as K-03 v1's rowPlan and finalParts (the open question's options as K-03's).
+//      fires: every update of a versioned table raising its version by one (rule 2, refused as the producer's migration
+//      0002 refuses it), row-level security per business (rule 4), the event log never edited (rule 5), the file format,
+//      the queue order of waiting rows, a class session's taken seats, the versions an open question or outbox row read,
+//      the outbox row's plan and final parts as K-03 v1's rowPlan and finalParts (the open question's options as K-03's)
+//      and its channel list as K-03 v1's, and the cast's phone numbers (555-01xx) and emails (example.com; rule 9).
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: a freshly migrated PostgreSQL schema
 //   compared with the table list, the seeds loaded into it and the refused rows refused there, and each consumer's reads
 //   and writes through K-05.
@@ -70,6 +75,30 @@ const ofVersion = (version: string, expectation: "accept" | "refuse"): FixtureEn
   entries.filter((entry) => entry.version === version && entry.expect === expectation);
 const acceptedEntries = entries.filter((entry) => entry.expect === "accept");
 const refusedEntries = entries.filter((entry) => entry.expect === "refuse");
+
+/** A version's major and minor number: v1 is [1, 0], v1.1 is [1, 1]. */
+function placeOf(version: string): [number, number] {
+  const match = /^v(\d+)(?:\.(\d+))?$/.exec(version);
+  if (match === null) throw new Error(`the index names a version this test cannot place: ${version}`);
+  return [Number(match[1]), Number(match[2] ?? "0")];
+}
+
+/**
+ * The index's versions at or before `version` within its major version, in order (for v1.1: v1, then v1.1). An additive
+ * minor version adds to the tables before it, so its fixtures load after the earlier versions' (DL-124, DL-181).
+ */
+function versionsUpTo(version: string): string[] {
+  const [major, minor] = placeOf(version);
+  const placed = versions.map((candidate) => ({ candidate, place: placeOf(candidate) }));
+  return placed
+    .filter(({ place }) => place[0] === major && place[1] <= minor)
+    .sort((a, b) => a.place[1] - b.place[1])
+    .map(({ candidate }) => candidate);
+}
+
+/** The accepted entries of every version up to `version`, the earlier versions' first, each version's in index order. */
+const acceptedUpTo = (version: string): FixtureEntry[] =>
+  versionsUpTo(version).flatMap((each) => ofVersion(each, "accept"));
 
 type Role = "runtime" | "toolApi";
 
@@ -786,6 +815,27 @@ const toolApi = (businessId: string): Session => ({ role: "toolApi", businessId 
 /** README rule 5: the application roles may insert and select on event_log, never update or delete it. */
 const NEVER_EDITED = new Set(["event_log"]);
 
+/**
+ * README rule 2 (line 54): every update of a table with versioned: true raises its version by one. The producer's
+ * migration 0002 (lines 12 to 25) refuses any other new version (left as it was, skipped ahead or null) in a BEFORE
+ * UPDATE trigger with SQLSTATE 23514 and the constraint <table>_version_raised. A row trigger runs on the rows
+ * row-level security lets the update see, and before its check of the new row and every constraint.
+ */
+function checkVersionRaised(table: Table, old: Row, row: Row): void {
+  if (!table.versioned) return;
+  const column = must(table.versionColumn, `the version column of ${table.name}`);
+  const before = old[column] ?? null;
+  if (typeof before !== "number") throw new Error(`${table.name}.${column} holds no version`);
+  const after = row[column] ?? null;
+  if (after !== before + 1)
+    throw new DbError(
+      "23514",
+      `update of ${table.name} must raise ${column} from ${String(before)} to ${String(before + 1)} (got ${JSON.stringify(after)})`,
+      `${table.name}_version_raised`,
+      column,
+    );
+}
+
 /** A database holding one table list, as the fixtures' two sides see it (README rule 4, rule 5). */
 export class Database {
   private readonly rows = new Map<string, Row[]>();
@@ -846,6 +896,10 @@ export class Database {
     this.rowsOf(table.name).push(row);
   }
 
+  /**
+   * PostgreSQL's order: the privilege (rule 5), row-level security's filter (a hidden row is not updated), then for each
+   * row the version trigger (rule 2) before the checks of the new row (see check).
+   */
   update(
     session: Session,
     tableName: string,
@@ -865,6 +919,7 @@ export class Database {
           throw new DbError("428C9", `column "${name}" can only be updated to DEFAULT`, null, name);
         row[name] = inputOf(column.type, raw, `${table.name}.${name}`);
       }
+      checkVersionRaised(table, old, row);
       this.check(session, table, row, old);
       rows[rows.indexOf(old)] = row;
     }
@@ -1204,21 +1259,27 @@ describe("db-schema core fixtures: the index, the count and the table list", () 
     );
   });
 
+  // Each version's accepted fixtures load after those of every version up to it, so a minor version whose fixtures
+  // seed only its new tables still gives every table rows (DL-181).
   for (const version of versions) {
-    it(`loads every accepted ${version} fixture together, each once, and every table of core.${version}.tables.json gets rows`, () => {
+    it(`loads every accepted fixture of each version up to ${version} together, each once, and every table of core.${version}.tables.json gets rows`, () => {
+      const accepted = acceptedUpTo(version);
+      expect(accepted.map((entry) => entry.file)).toEqual(
+        expect.arrayContaining(ofVersion(version, "accept").map((entry) => entry.file)),
+      );
       const db = freshDb(version);
       const loaded = new Set<string>();
-      for (const entry of ofVersion(version, "accept"))
-        expect(shown(load(db, entry.file, loaded)), entry.file).toBe("loaded");
-      for (const entry of ofVersion(version, "accept")) expect(loaded.has(entry.file), entry.file).toBe(true);
+      for (const entry of accepted) expect(shown(load(db, entry.file, loaded)), entry.file).toBe("loaded");
+      for (const entry of accepted) expect(loaded.has(entry.file), entry.file).toBe(true);
       const empty = tableListOf(version).tables.filter((table) => db.rowsOf(table.name).length === 0);
       expect(empty.map((table) => table.name)).toEqual([]);
     });
   }
 
-  it("reads every CHECK, unique and EXCLUDE predicate and default of each table list (the model fails loudly on SQL it cannot read)", () => {
-    let read = 0;
-    for (const version of versions) {
+  // One check per version: SQL a later version adds fails loudly in that version's own check, never in v1's (DL-181).
+  for (const version of versions) {
+    it(`reads every CHECK, unique and EXCLUDE predicate and default of core.${version}.tables.json (the model fails loudly on SQL it cannot read)`, () => {
+      let read = 0;
       for (const table of tableListOf(version).tables) {
         const sql = [
           ...(table.checks ?? []).map((check) => check.expression),
@@ -1239,8 +1300,18 @@ describe("db-schema core fixtures: the index, the count and the table list", () 
             expect(["=", "&&"], exclusion.name).toContain(element.operator);
         }
       }
-    }
-    expect(read).toBeGreaterThan(50);
+      expect(read).toBeGreaterThan(50);
+    });
+  }
+
+  it("places each version of the index, so a minor version's check loads v1's accepted fixtures first", () => {
+    for (const version of versions) expect(versionsUpTo(version), version).toContain(version);
+    expect(versionsUpTo("v1")).toEqual(["v1"]);
+    expect(acceptedUpTo("v1")).toEqual(ofVersion("v1", "accept"));
+    const minor = versionsUpTo("v1.1");
+    expect(minor[0]).toBe("v1");
+    expect(minor.every((version) => placeOf(version)[0] === 1 && placeOf(version)[1] <= 1)).toBe(true);
+    expect(() => placeOf("1.1")).toThrow();
   });
 });
 
@@ -1877,7 +1948,135 @@ function storedValues(table: string, column: string): unknown[] {
     .map((row) => row.values[column]);
 }
 
+/** README rule 2: the tables whose rows are written once or only appended, which carry no version. */
+const WRITTEN_ONCE_OR_APPENDED = ["bundle_values", "event_log", "handles", "openers_sent", "person_handles"];
+
+/** A row's primary key as an update's `where`, in the README's input forms (text and integers). */
+function keyOf(table: Table, row: Row): Record<string, unknown> {
+  return Object.fromEntries(
+    table.primaryKey.map((name) => {
+      const value = row[name] ?? null;
+      if (typeof value !== "string" && typeof value !== "number")
+        throw new Error(`the model writes back only text and integer keys, not ${table.name}.${name}`);
+      return [name, value];
+    }),
+  );
+}
+
+// README line 84 (rule 9): phone numbers in the 555-01xx range, emails at example.com. A phone number is found as
+// E.164 (+ and 8 to 15 digits), as a North American number with or without separators, or as a local 555-0101.
+const PHONE_LIKE =
+  /\+\d{8,15}\b|\(\d{3}\)\s?\d{3}[ .-]\d{4}\b|\b\d{3}[ .-]\d{3}[ .-]\d{4}\b|(?<![\w+-])\d{3}-\d{4}(?![\w-])|(?<![\w+])1?\d{10}(?!\w)/g;
+const IN_555_01XX = /^(?:1?\d{3})?55501\d{2}$/;
+const EMAIL_LIKE = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
+const AT_EXAMPLE_COM = /@(?:[\w-]+\.)*example\.com$/i;
+
+/** Every string a fixture file holds, with its path: row values, jsonb inside them and a refused action alike. */
+function stringsOf(value: unknown, at = ""): { at: string; text: string }[] {
+  if (typeof value === "string") return [{ at, text: value }];
+  if (Array.isArray(value)) return value.flatMap((item, place) => stringsOf(item, `${at}[${String(place)}]`));
+  if (typeof value === "object" && value !== null)
+    return Object.entries(value).flatMap(([key, item]) => stringsOf(item, at === "" ? key : `${at}.${key}`));
+  return [];
+}
+
+/** The phone numbers and emails a fixture file holds, and one line for each outside README line 84's ranges. */
+function castOf(file: unknown): { phones: string[]; emails: string[]; problems: string[] } {
+  const cast = { phones: [] as string[], emails: [] as string[], problems: [] as string[] };
+  for (const { at, text } of stringsOf(file)) {
+    for (const number of text.match(PHONE_LIKE) ?? []) {
+      cast.phones.push(number);
+      if (!IN_555_01XX.test(number.replace(/\D/g, "")))
+        cast.problems.push(`${at}: ${number} is not in the 555-01xx range`);
+    }
+    for (const email of text.match(EMAIL_LIKE) ?? []) {
+      cast.emails.push(email);
+      if (!AT_EXAMPLE_COM.test(email)) cast.problems.push(`${at}: ${email} is not at example.com`);
+    }
+  }
+  return cast;
+}
+
 describe("db-schema core fixtures: what the table list leaves to the README, each shown firing on a damaged copy", () => {
+  for (const version of versions) {
+    it(`README rule 2 (${version}): every versioned table has version integer not null default 1, and an update that does not raise it by one is refused by <table>_version_raised (23514, as migration 0002's trigger); the tables written once or appended carry none`, () => {
+      const list = tableListOf(version);
+      const unversioned = list.tables.filter((table) => !table.versioned).map((table) => table.name);
+      expect(unversioned).toEqual(expect.arrayContaining(WRITTEN_ONCE_OR_APPENDED));
+      if (version === "v1") expect([...unversioned].sort()).toEqual(WRITTEN_ONCE_OR_APPENDED);
+      expect(list.tables.filter((table) => table.versioned).length).toBeGreaterThan(0);
+      const db = loadedDb(
+        acceptedUpTo(version).map((entry) => entry.file),
+        version,
+      );
+      for (const table of list.tables) {
+        const old = must(db.rowsOf(table.name)[0], `a row of ${table.name}`);
+        const where = keyOf(table, old);
+        const first = must(table.primaryKey[0]);
+        const keyAsItIs = { [first]: where[first] };
+        if (!table.versioned) {
+          if (NEVER_EDITED.has(table.name)) {
+            const refused = refusalOf(() => {
+              db.update(RUNTIME, table.name, keyAsItIs, where);
+            });
+            expect(refused?.sqlstate, `${table.name} is never edited (rule 5)`).toBe("42501");
+          } else {
+            expect(db.update(RUNTIME, table.name, keyAsItIs, where), `${table.name} has no version`).toBe(1);
+          }
+          continue;
+        }
+        const column = must(table.versionColumn, `the version column of ${table.name}`);
+        expect(
+          table.columns.find((candidate) => candidate.name === column),
+          table.name,
+        ).toMatchObject({ name: "version", type: "integer", null: false, default: "1" });
+        const reached = numberArg(old[column] ?? null);
+        const unraisedUpdates: [string, Record<string, unknown>][] = [
+          ["left out", keyAsItIs],
+          ["unchanged", { [column]: reached }],
+          ["skipped ahead", { [column]: reached + 2 }],
+          ["null", { [column]: null }],
+        ];
+        for (const [what, set] of unraisedUpdates) {
+          const refused = refusalOf(() => {
+            db.update(RUNTIME, table.name, set, where);
+          });
+          expect([refused?.sqlstate, refused?.constraint], `${table.name}, its version ${what}`).toEqual([
+            "23514",
+            `${table.name}_version_raised`,
+          ]);
+        }
+        expect(db.update(RUNTIME, table.name, { [column]: reached + 1 }, where), table.name).toBe(1);
+        expect(must(db.select(RUNTIME, table.name, where)[0])[column], table.name).toBe(reached + 1);
+      }
+    });
+  }
+
+  it("README rule 2 on a damaged copy: refuse-seats-over-capacity's put-right (taken = 10) passes with set.version 4, one above the 3 it read, and is refused by class_seats_version_raised with 3, with 5 or with the version left out", () => {
+    const file = "invalid/refuse-seats-over-capacity.json";
+    const content = fixtureOf(file);
+    const right = must(MENDS[file]).mend(structuredClone(must(content.refused)));
+    const set = must(right.set);
+    expect([set.taken, set.version, must(right.where).version]).toEqual([10, 4, 3]);
+    const withVersion = (version: number | undefined): Outcome => {
+      const db = freshDb("v1");
+      expect(shown(load(db, file, new Set(), content))).toBe("loaded");
+      const damaged = structuredClone(set);
+      if (version === undefined) Reflect.deleteProperty(damaged, "version");
+      else damaged.version = version;
+      return run(db, { ...right, set: damaged });
+    };
+    const passed = withVersion(4);
+    expect([passed.rows, passed.error?.message ?? null]).toEqual([1, null]);
+    for (const version of [3, 5, undefined]) {
+      const refused = withVersion(version);
+      expect(
+        [refused.error?.sqlstate, refused.error?.constraint],
+        `set.version ${version === undefined ? "left out" : String(version)}`,
+      ).toEqual(["23514", "class_seats_version_raised"]);
+    }
+  });
+
   it("README rule 4: a Tool API call sees and writes only its own business's rows, a row with no business is seen by no scope, the runtime side runs unscoped", () => {
     const db = loadedDb(["seed-event-log.json", "seed-booking-head.json"]);
     const barber = toolApi("biz-lees-barbershop");
@@ -1902,12 +2101,30 @@ describe("db-schema core fixtures: what the table list leaves to the README, eac
         db.insert(barber, "bookings", booking);
       }),
     ).toBeNull();
-    expect(db.update(yoga, "bookings", { stage: "done" }, { id: "booking-alex-haircut" }), "hidden").toBe(0);
-    expect(db.update(barber, "bookings", { stage: "done" }, { id: "booking-alex-haircut" })).toBe(1);
-    const moveOut = refusalOf(() => {
+    // The haircut is at version 7, so an update raises it to 8 (rule 2).
+    const done = { stage: "done", version: 8 };
+    expect(db.update(yoga, "bookings", done, { id: "booking-alex-haircut" }), "hidden").toBe(0);
+    expect(
+      db.update(yoga, "bookings", { stage: "done" }, { id: "booking-alex-haircut" }),
+      "hidden, so the version trigger never sees it",
+    ).toBe(0);
+    expect(db.update(barber, "bookings", done, { id: "booking-alex-haircut" })).toBe(1);
+    const unraised = refusalOf(() => {
       db.update(barber, "bookings", { business_id: "biz-yoga-studio" }, { id: "booking-alex-beard" });
     });
-    expect(moveOut?.sqlstate).toBe("42501");
+    expect(
+      [unraised?.sqlstate, unraised?.constraint],
+      "the version trigger fires before row-level security's check",
+    ).toEqual(["23514", "bookings_version_raised"]);
+    const moveOut = refusalOf(() => {
+      db.update(
+        barber,
+        "bookings",
+        { business_id: "biz-yoga-studio", version: 2 },
+        { id: "booking-alex-beard" },
+      );
+    });
+    expect([moveOut?.sqlstate, moveOut?.constraint]).toEqual(["42501", null]);
   });
 
   it("README rule 5: the event log is never edited by either side, while both insert and read it, and other tables update", () => {
@@ -1924,7 +2141,9 @@ describe("db-schema core fixtures: what the table list leaves to the README, eac
         db.insert(toolApi("biz-lees-barbershop"), "event_log", { ...evlog0001(), id: "evlog-0005" });
       }),
     ).toBeNull();
-    expect(db.update(RUNTIME, "bookings", { stage: "done" }, { id: "booking-alex-haircut" })).toBe(1);
+    expect(
+      db.update(RUNTIME, "bookings", { stage: "done", version: 8 }, { id: "booking-alex-haircut" }),
+    ).toBe(1);
     const readme = readFileSync(path.join(CORE_DIR, "README.md"), "utf8");
     expect(readme).toContain("**The event log is never edited**");
     expect(readme).toContain("**Row-level security per business**");
@@ -2039,6 +2258,52 @@ describe("db-schema core fixtures: what the table list leaves to the README, eac
     expect(finalParts(parts)).toBe(false);
     expect(option({ id: "A7-03/1" })).toBe(false);
   });
+
+  it("README (K-03): outbox_rows_channel_known holds K-03 v1's channel list, no more and no less, and a channel outside it is refused", () => {
+    const k03Channels = (
+      readJson(path.join(CONTRACTS_ROOT, "message-plan", "message-plan.v1.schema.json")) as {
+        $defs: { channel: { enum: string[] } };
+      }
+    ).$defs.channel.enum;
+    expect(k03Channels.length).toBeGreaterThan(0);
+    const check = must(
+      tableOf(tableListOf("v1"), "outbox_rows").checks?.find(
+        (each) => each.name === "outbox_rows_channel_known",
+      ),
+      "outbox_rows_channel_known",
+    );
+    const node = sqlOf(check.expression);
+    if (node.op !== "in" || node.negated || node.arg.op !== "column")
+      throw new Error(`outbox_rows_channel_known is not a column in a list: ${check.expression}`);
+    expect(node.arg.name).toBe("channel");
+    const listed = node.list.map((item) => (item.op === "literal" ? textArg(item.value) : "(not a literal)"));
+    expect([...listed].sort()).toEqual([...k03Channels].sort());
+    for (const channel of k03Channels) expect(holds(check.expression, { channel }), channel).toBe(true);
+    const copy = fixtureOf("seed-outbox-row.json");
+    valuesWhere(copy, "id", "out-a7-03-alex").channel = "voice";
+    const refusal = load(freshDb("v1"), "seed-outbox-row.json", new Set(), copy);
+    expect([refusal?.error.sqlstate, refusal?.error.constraint], shown(refusal)).toEqual([
+      "23514",
+      "outbox_rows_channel_known",
+    ]);
+  });
+
+  it("README line 84 (rule 9): every phone number in the fixtures is in the 555-01xx range and every email at example.com; a copy with another is caught, though the table list takes it", () => {
+    const found = entries.map((entry) => ({ file: entry.file, cast: castOf(fixtureOf(entry.file)) }));
+    expect(found.flatMap(({ file, cast }) => cast.problems.map((line) => `${file}: ${line}`))).toEqual([]);
+    expect(found.flatMap(({ cast }) => cast.phones).length).toBeGreaterThan(0);
+    expect(found.flatMap(({ cast }) => cast.emails).length).toBeGreaterThan(0);
+    for (const sample of ["(555) 555-0100", "555-555-0199", "5555550101", "555-0102"])
+      expect(castOf({ words: sample }), sample).toEqual({ phones: [sample], emails: [], problems: [] });
+    const copy = fixtureOf("seed-person-roles.json");
+    valuesWhere(copy, "id", "handle-alex").address = "+15555550200";
+    valuesWhere(copy, "id", "handle-alex-email").address = "alex@example.org";
+    expect(shown(load(freshDb("v1"), "seed-person-roles.json", new Set(), copy))).toBe("loaded");
+    expect(castOf(copy).problems).toEqual([
+      "rows[7].values.address: +15555550200 is not in the 555-01xx range",
+      "rows[12].values.address: alex@example.org is not at example.com",
+    ]);
+  });
 });
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -2074,7 +2339,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-135 double-booking guard",
     ],
     needs:
-      "02-contracts K-04 \"Contract test\" and section 2 item 12, against PostgreSQL: migrate a fresh schema; compare the catalog with the table list (every table and column with its type, null and default, every primary key, foreign key, unique key, EXCLUDE, CHECK and index, the row-level security of each business-scoped table, btree_gist, and the README's rules beyond the list: versions, text ids, commit_seq as an identity, the event log's privileges, the sealed fields); load the seeds, all accepted fixtures together and each alone with its after chain; and refuse the refused rows with the SQLSTATE and constraint each names, each passing once its one fault is removed, as this file's model shows.",
+      "02-contracts K-04 \"Contract test\" and section 2 item 12, against PostgreSQL: migrate a fresh schema; compare the catalog with the table list (every table and column with its type, null and default, every primary key, foreign key, unique key, EXCLUDE, CHECK and index, the row-level security of each business-scoped table, btree_gist, and the README's rules beyond the list: versions, text ids, commit_seq as an identity, the event log's privileges, the sealed fields), allowing the triggers those rules need (DL-110 (5)): 0011's event_log_never_edited, and 0002's <table>_version_raised on each versioned table, which refuses an update that does not raise the version by one with 23514 before row-level security's check, as this file's model does; load the seeds, all accepted fixtures together and each alone with its after chain; and refuse the refused rows with the SQLSTATE and constraint each names, each passing once its one fault is removed, as this file's model shows. Two rules stay in code, with no trigger: reservations.queued_at is written with the row and never changed (README, Queue order), and bookings.flow is written once at booking (the table list's writtenOnceAtBooking).",
   },
   {
     id: "consumer-action-layer",
@@ -2132,6 +2397,30 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
   },
 ];
 
+/**
+ * The owner groups of the README's "- **Producers:**" or "- **Consumers:**" line: "<owner>[ (...)]: <components>",
+ * separated by "; " (an owner is followed by its first ": "; a component may hold one inside its parentheses).
+ */
+function ownerGroups(
+  listed: string,
+  label: "Producers" | "Consumers",
+): { owner: string; components: string }[] {
+  const lead = `- **${label}:** `;
+  const line = must(
+    listed.split("\n").find((text) => text.startsWith(lead)),
+    `the README's ${label} line`,
+  );
+  return line
+    .slice(lead.length)
+    .replace(/[.]$/, "")
+    .split("; ")
+    .map((group) => {
+      const at = group.indexOf(": ");
+      if (at < 0) throw new Error(`an owner group with no owner: ${group}`);
+      return { owner: group.slice(0, at), components: group.slice(at + 2) };
+    });
+}
+
 describe("db-schema.core.v1 sides: the list where each producer and consumer side is added", () => {
   const readme = readFileSync(path.join(CORE_DIR, "README.md"), "utf8");
   const start = readme.indexOf("## Producers and consumers");
@@ -2163,6 +2452,39 @@ describe("db-schema.core.v1 sides: the list where each producer and consumer sid
       expect(listed, side.id).toContain(side.owner);
       for (const component of side.components) expect(listed, side.id).toContain(component);
     }
+  });
+
+  it("puts each side's components under its own owner, in the README's Producers or Consumers line, each owner's group held by one side", () => {
+    for (const kind of ["producer", "consumer"] as const) {
+      const sides = SIDE_CHECKS.filter((side) => side.side === kind);
+      const groups = ownerGroups(listed, kind === "producer" ? "Producers" : "Consumers");
+      expect(groups.length, kind).toBe(sides.length);
+      for (const group of groups) {
+        const owners = sides.filter(
+          (side) => group.owner === side.owner || group.owner.startsWith(`${side.owner} (`),
+        );
+        expect(
+          owners.map((side) => side.id),
+          `${kind}s: ${group.owner}`,
+        ).toHaveLength(1);
+        const side = must(owners[0]);
+        for (const component of side.components) expect(group.components, side.id).toContain(component);
+        expect(new Set(group.components.match(/C-\d{3}/g)), side.id).toEqual(
+          new Set(side.components.join(" ").match(/C-\d{3}/g)),
+        );
+      }
+    }
+  });
+
+  it("carries in the producer's needs the triggers its catalog check allows (DL-110 (5)) and the two rules that stay in code", () => {
+    const producer = must(SIDE_CHECKS.find((side) => side.side === "producer"));
+    for (const named of [
+      "event_log_never_edited",
+      "<table>_version_raised",
+      "queued_at",
+      "writtenOnceAtBooking",
+    ])
+      expect(producer.needs, named).toContain(named);
   });
 
   for (const side of SIDE_CHECKS) {
