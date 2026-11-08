@@ -4,7 +4,12 @@
 // Lee's Barbershop, Alex's haircut), K-22 v1's team at Lee Home Services (Pat, the office manager; Jordan), K-09 v1's
 // exchanges (Sam's new mobile, Alex's Nov 14 visit), T-308's examples (A4-26's gift, A4-55's employer) and the master's
 // steps (S2-22, S11-42, S11-53, S11-22, S11-25, S11-61, S12-23, S12-24, A7-66, A7-02, A7-11, A7-17, A7-81, A7-98, A3-30,
-// A3-48, A3-50, A3-51, A4-14, A4-24, A4-82); phone numbers in the 555-01xx range (rule 9).
+// A3-48, A3-50, A3-51, A4-14, A4-24, A4-82; round 3: A10-09, A7-92, A7-93, A4-01, A4-09, A4-12, A4-28, A4-80, B4-92);
+// phone numbers in the 555-01xx range (rule 9). The turn's bundle (K-01 v1) is a double too: the steps the scenarios
+// reach, each with who it is from and to as the master writes it (MASTER_STEPS below), and K-01's own sample bundle.
+
+import { readFileSync } from "node:fs";
+import path from "node:path";
 
 import type { BookingHead } from "../../../../db/repo/bookings-head";
 import { createIdentityAccess, type IdentityAccess } from "../../domain/identity-access";
@@ -39,17 +44,21 @@ import {
   type PartScript,
   type Script,
 } from "../framework/test-support";
+import { CONTRACTS_DIR } from "../../tool-api/validator";
 import {
   bookingStagesOver,
   sideOf,
+  stepCardsOf,
   type BookingStages,
   type CodeAsk,
   type ContactsOnFile,
+  type Lane,
   type OwnAsk,
   type PlannedCode,
   type ProofCodes,
+  type StepCards,
 } from "./facts";
-import { createLimit1, type AllowedLimit } from "./index";
+import { createLimit1, type AllowedLimit, type Limit1Deps } from "./index";
 
 export type Text = Context["texts"][number];
 export type ContextQuestion = Context["openQuestions"][number];
@@ -162,6 +171,31 @@ export const NEW_REQUEST = "booking-alex-new-request";
 export const SERVED_UNKNOWN = "booking-alex-served-unknown";
 /** A booked visit at Lee Home Services (flow B), where Pat is an admin: Alex books it for himself and pays. */
 export const HOME_VISIT = "booking-alex-home-visit";
+/** Round 3: Sam's own haircut at his barbershop, where he is the owner: he books it, is the person served and pays. */
+export const SAM_OWN_CUT = "booking-sam-own-cut";
+/** Round 3: Pat's own visit at Lee Home Services, where she is an admin: she books it, is the person served and pays. */
+export const PAT_OWN_VISIT = "booking-pat-own-visit";
+
+/** A booked visit someone books for themself and pays for. */
+function ownBooking(
+  id: string,
+  businessId: string,
+  flow: BookingHead["flow"],
+  personId: string,
+): BookingHead {
+  return {
+    id,
+    businessId,
+    flow,
+    stage: "booked",
+    bookerPersonId: personId,
+    servedPersonId: personId,
+    payerPersonId: personId,
+    private: false,
+    deceased: false,
+    version: 1,
+  };
+}
 
 function alexBooking(
   id: string,
@@ -207,6 +241,8 @@ export function limitRecord(): TestRecord {
         businessId: HOME_SERVICES,
         flow: "B",
       },
+      ownBooking(SAM_OWN_CUT, BARBERSHOP, "A", "person-sam"),
+      ownBooking(PAT_OWN_VISIT, HOME_SERVICES, "B", "person-pat"),
     ],
   });
 }
@@ -233,6 +269,165 @@ export function identityFrom(record: TestRecord): (repo: unknown, businessId: st
 /** The stage read over a test record (K-04's booking heads). */
 export function stagesFrom(record: TestRecord): (repo: unknown, businessId: string) => BookingStages {
   return (_repo, businessId) => bookingStagesOver(readerOf(record), businessId);
+}
+
+// The turn's bundle (K-01 v1), as limit 1 reads each step's side (DL-188 ruling 1)
+
+/** A step as the double writes it: who it is from, who it is to (null: nobody), how, and a split's branches. */
+type StepSeed = readonly [
+  who: Lane,
+  to: Lane | null,
+  via: string,
+  branches?: readonly (readonly [label: string, steps: readonly string[]])[],
+];
+
+/**
+ * The master's steps the scenarios reach, as master-A.json and master-B.json write them (the step index of each flow,
+ * "who→to via", and a split's branches with their own steps, from MASTER-FLOW-A.md and MASTER-FLOW-B.md). A split whose
+ * branches no walk follows (an open question's step) is written without them. A7-02, the booked hub, lists its seven
+ * cases and, last, the two cases the round 1 scenarios pick (addPayer, moveVisit), each leading to the master step it
+ * stands for: A4-55 "Someone else pays on the page" (other→san page) and A7-03 "Offers new times; moves it" (A7-92's
+ * "Alex moves it"). The master's A7-02 does not list those two.
+ */
+const MASTER_STEPS: Readonly<Record<string, StepSeed>> = {
+  "A3-30": ["san", "owner", "msg"],
+  "A4-01": ["san", null, "auto"],
+  "A4-09": ["san", "owner", "msg"],
+  "A4-12": ["san", "cust", "msg"],
+  "A4-14": ["agent", "cust", "chat"],
+  "A4-15": ["cust", "agent", "chat"],
+  "A4-23": ["agent", "san", "sync"],
+  "A4-24": ["san", null, "auto"],
+  "A4-28": ["san", null, "auto"],
+  "A4-55": ["other", "san", "page"],
+  "A4-80": ["agent", "cust", "chat"],
+  "A4-82": ["agent", "cust", "chat"],
+  "A7-02": [
+    "san",
+    null,
+    "auto",
+    [
+      ["Nothing changes", []],
+      ["Alex changes the plan", ["A7-92"]],
+      ["The business can't give it", ["A7-93"]],
+      ["A plan or count is due", ["A7-94"]],
+      ["Something needed first", ["A7-74"]],
+      ["A question, note or stop word", ["A7-96"]],
+      ["Safety, privacy or a death", ["A7-97"]],
+      ["Someone else pays", ["A4-55"]],
+      ["Move it", ["A7-03"]],
+    ],
+  ],
+  "A7-03": ["san", "cust", "msg"],
+  "A7-05": [
+    "san",
+    "cust",
+    "msg",
+    [
+      ["2 Cancel it", []],
+      ["1 Keep it", []],
+      ["No reply", []],
+    ],
+  ],
+  "A7-06": [
+    "san",
+    "cust",
+    "msg",
+    [
+      ["2 Cancel anyway", []],
+      ["1 Keep it", []],
+      ["No reply", []],
+    ],
+  ],
+  "A7-14": ["staff", "san", "msg"],
+  "A7-15": ["san", "owner", "msg"],
+  "A7-17": ["san", "cust", "msg"],
+  "A7-23": ["owner", "san", "msg"],
+  "A7-31": ["san", "cust", "msg"],
+  "A7-32": ["san", "cust", "msg"],
+  "A7-66": ["owner", "san", "msg"],
+  "A7-68": ["san", "owner", "msg"],
+  "A7-70": ["san", "cust", "msg"],
+  "A7-92": [
+    "san",
+    null,
+    "auto",
+    [
+      ["Alex moves it", ["A7-03"]],
+      ["Alex cancels in time", ["A7-05"]],
+      ["Alex cancels late", ["A7-06"]],
+      ["Alex changes what's booked", ["A7-31"]],
+      ["Alex runs late", ["A7-70"]],
+      ["A plan is skipped, paused or ended", ["A7-32"]],
+    ],
+  ],
+  "A7-93": [
+    "san",
+    null,
+    "auto",
+    [
+      ["The pro can't come", ["A7-15", "A7-17"]],
+      ["The pro runs late", ["A7-14"]],
+      ["Sam moves it", ["A7-23"]],
+      ["The business cancels it", ["A7-66"]],
+      ["Too few booked to run", ["A7-68"]],
+    ],
+  ],
+  "A7-98": ["cust", "san", "msg"],
+  "A10-09": ["san", "owner", "msg"],
+  "B4-01": ["san", null, "auto"],
+  "B4-92": ["agent", "cust", "chat"],
+};
+
+/** A K-01 v1 flow graph value holding the seeded steps of one flow, as the turn's bundle stores it. */
+function flowGraphOf(flow: "A" | "B"): unknown {
+  const steps: Record<string, unknown> = {};
+  for (const [id, [who, to, via, branches = []]] of Object.entries(MASTER_STEPS)) {
+    if (!id.startsWith(flow)) continue;
+    steps[id] = {
+      id,
+      section: Number(/^[AB](\d+)-/u.exec(id)?.[1]),
+      lines: [],
+      who,
+      ...(to === null ? {} : { to }),
+      via,
+      title: id,
+      does: "",
+      pageTypes: [],
+      next: null,
+      lint: [],
+      ...(branches.length === 0
+        ? {}
+        : {
+            type: "split",
+            branches: branches.map(([label, own]) => ({
+              label,
+              tag: "message",
+              steps: [...own],
+              rejoinAt: null,
+              answerFields: [],
+              effects: [],
+            })),
+          }),
+    };
+  }
+  return { contract: "bundle.v1", flow, steps };
+}
+
+/** The turn's bundle's step cards over the seeded master steps (both flows). */
+export const MASTER_STEP_CARDS: StepCards = stepCardsOf([flowGraphOf("A"), flowGraphOf("B")]);
+
+/** limit 1's `steps` port answering `cards` for any turn (default: the seeded master steps). */
+export function stepsOf(cards: StepCards = MASTER_STEP_CARDS): NonNullable<Limit1Deps["steps"]> {
+  return () => cards;
+}
+
+/** A K-01 v1 sample bundle's flow graph (contracts/bundle/fixtures), freshly parsed. */
+export function sampleFlowGraph(file: string, flow: "A" | "B"): unknown {
+  const bundle = JSON.parse(readFileSync(path.join(CONTRACTS_DIR, "bundle", "fixtures", file), "utf8")) as {
+    flows?: Record<string, unknown>;
+  };
+  return bundle.flows?.[flow] ?? null;
 }
 
 /** A business role's own mobile or email on file (K-22 accounts, staff): the handle that proves it. */
@@ -300,6 +495,8 @@ export interface World {
   readonly codeAsked?: CodeAsk[];
   /** T-322's codes; default a double answering SAM_NEW_MOBILE_CODE; null for none (the shipped default). */
   readonly proofCodes?: ProofCodes | null;
+  /** The turn's bundle's step cards (K-01 v1); default the seeded master steps (MASTER_STEP_CARDS). */
+  readonly steps?: StepCards;
 }
 
 /** Limit 1 itself, over doubles of its ports. */
@@ -310,6 +507,7 @@ export function limitIn(world: World = {}): AllowedLimit {
     identity: identityFrom(record),
     stages: stagesFrom(record),
     contacts: contactsOf(record, world.roles ?? ROLE_CONTACTS, world.ownAsked ?? []),
+    steps: stepsOf(world.steps),
     ...(proofCodes === null ? {} : { proofCodes }),
   });
 }
@@ -803,6 +1001,60 @@ export function unwalked(bookingId: string): Choice {
   return option("c-unwalked", "oq-a7-17", "A7-17", "3 Cancel, no fee", barbershop(bookingId), [
     { why: "unknown", step: null, ref: null },
   ]);
+}
+
+// The round 3 scenarios (DL-188)
+
+/** A10-09 "Asks Sam about a refund" (san→owner msg): "1 Refund it", whose branch refunds (A10-10 "Refunds it; tells Alex"). */
+export function refundIt(bookingId: string, businessId: string = BARBERSHOP): Choice {
+  return option("c-a10-09-1", "oq-a10-09", "A10-09", "1 Refund it", targetOf(businessId, bookingId), [
+    { why: "refund", step: "A10-10", ref: "pay.back" },
+  ]);
+}
+
+/** The booked hub (A7-02)'s case "The business can't give it" (to A7-93: A7-15 asks Sam, A7-66 the business cancels). */
+export function businessCantGiveIt(bookingId: string): Choice {
+  return hubCase("c-cant-give", "A7-02", "booked", "The business can't give it", barbershop(bookingId));
+}
+
+/** The booked hub (A7-02)'s case "Alex changes the plan" (to A7-92: each of its steps a text to Alex). */
+export function alexChangesThePlan(bookingId: string): Choice {
+  return hubCase("c-changes", "A7-02", "booked", "Alex changes the plan", barbershop(bookingId));
+}
+
+/** Journey 4's customer steps about no booking yet (ruling 2), each with one of its branches. */
+export const NEW_VISIT_CHOICES: readonly (readonly [string, () => Choice])[] = [
+  [
+    "A4-01 'Where?' (san, auto): '1 At the shop'",
+    () => option("c-a4-01", "oq-a4-01", "A4-01", "1 At the shop", barbershop(null)),
+  ],
+  [
+    "A4-12 'Texts Alex the price' (san→cust msg): 'Picks a time'",
+    () => option("c-a4-12", "oq-a4-12", "A4-12", "Picks a time", barbershop(null)),
+  ],
+  [
+    "A4-28 'Anything special?' (san, auto): 'A repeat plan'",
+    () => option("c-a4-28", "oq-a4-28", "A4-28", "A repeat plan", barbershop(null)),
+  ],
+  ["A4-80 'Asks who it's for' (agent→cust chat): 'Fine to go on'", () => whoItsFor(null)],
+  [
+    "B4-01 'Where?' at Lee Home Services (san, auto): 'Only at the customer's place'",
+    () => option("c-b4-01", "oq-b4-01", "B4-01", "Only at the customer's place", homeServices(null)),
+  ],
+  [
+    "B4-92 'Asks who it's for' at Lee Home Services (agent→cust chat): 'Fine to go on'",
+    () => option("c-b4-92", "oq-b4-92", "B4-92", "Fine to go on", homeServices(null)),
+  ],
+];
+
+/** A4-80 "Asks who it's for, and if they're 18 or older" (agent→cust chat): "Fine to go on". */
+export function whoItsFor(bookingId: string | null): Choice {
+  return option("c-a4-80", "oq-a4-80", "A4-80", "Fine to go on", barbershop(bookingId));
+}
+
+/** A4-09 "Sam OKs the price" (san→owner msg), a journey 4 step for the owner: "1 Send it", about no booking yet. */
+export function sendThePrice(): Choice {
+  return option("c-a4-09", "oq-a4-09", "A4-09", "1 Send it", barbershop(null));
 }
 
 /** The one "which booking?" choice for a booking (arch 03 line 167). */

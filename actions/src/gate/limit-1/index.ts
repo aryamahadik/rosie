@@ -6,13 +6,16 @@
 // `limit1` reads through the call's database transaction (the Tool API's scoped repo): T-308's identity and access
 // service with its defaults, the booking's stage, and S13-45's one rule over K-04's links. A call that holds no database
 // transaction cannot be read, so a part that needs a read is refused (notBuilt); a protect-only part needs none. It has no
-// proof codes yet (T-322), so a part whose sender must be proven by a code is refused (notBuilt) until they land.
+// proof codes yet (T-322), so a part whose sender must be proven by a code is refused (notBuilt) until they land. It is
+// not given the turn's bundle yet (K-01 v1), so it reads no step's card: every step's side cannot be read, and every
+// choice is the business's (DL-188 ruling 1; fails closed) until the gate hands it the bundle's steps (`steps`).
 // createLimit1 takes other ports, as the tests do.
 
 import { identityReaderOf, type IdentityAccess } from "../../domain/identity-access";
 import type { GatePart, GateTurn, Limit, LimitVerdict } from "../framework";
 import { decideAllowed, type AllowedDecision, type AllowedPorts } from "./allowed";
 import {
+  NO_STEP_CARDS,
   NoCallDatabaseError,
   bookingStagesOver,
   contactsOnFileOver,
@@ -22,9 +25,18 @@ import {
   type ContactsOnFile,
   type IdentityDefaults,
   type ProofCodes,
+  type StepCards,
 } from "./facts";
 
+/** The bundle a turn runs on (K-02 v1 context.bundleId: the content hash and the build). */
+export type TurnBundleId = GateTurn["context"]["bundleId"];
+
 export interface Limit1Deps {
+  /**
+   * The turn's bundle's step cards (K-01 v1), read under the context's bundle id, the context's flow first. Default: none
+   * (NO_STEP_CARDS), so every step's side cannot be read and every choice is the business's (DL-188 ruling 1).
+   */
+  readonly steps?: (bundleId: TurnBundleId, flow: GateTurn["context"]["flow"]) => StepCards;
   /** Who decides at the call's business. Default: T-308's service on the call's transaction (identity defaults). */
   readonly identity?: (repo: unknown, businessId: string) => IdentityAccess;
   /** Admins' powers and the served person's facts for the default identity service. */
@@ -79,10 +91,12 @@ export function createLimit1(deps: Limit1Deps = {}): AllowedLimit {
     ((repo: unknown, businessId: string) =>
       bookingStagesOver(identityReaderOf(databaseOf(repo)), businessId));
   const contactsOf = deps.contacts ?? ((identity: IdentityAccess) => contactsOnFileOver(() => identity));
+  const stepsOf = deps.steps ?? (() => NO_STEP_CARDS);
   const decide = async (part: GatePart, turn: GateTurn): Promise<AllowedDecision> => {
     const identity = once(() => identityOf(turn.repo, turn.businessId));
     const ports: AllowedPorts = {
       identity,
+      steps: once(() => stepsOf(turn.context.bundleId, turn.context.flow)),
       stages: once(() => stagesOf(turn.repo, turn.businessId)),
       contacts: once(() => contactsOf(identity())),
       proofCodes: deps.proofCodes ?? null,
@@ -110,6 +124,7 @@ export const limit1: AllowedLimit = createLimit1();
 
 export {
   BUSINESS_ROLES,
+  NEW_BOOKING_DOORS,
   NEW_VISIT_STEPS,
   OWNER_ONLY_STEPS,
   OWN_RECORD_STEPS,
@@ -117,6 +132,7 @@ export {
   changeOf,
   decideAllowed,
   proofCodeSentOutcome,
+  sideOfStep,
   type AllowedDecision,
   type AllowedNext,
   type AllowedPorts,
@@ -128,24 +144,31 @@ export {
   type LimitMatter,
   type NobodyWhy,
   type PassWhy,
+  type StepSide,
 } from "./allowed";
 export {
   BUSINESS_STANDINGS,
+  NO_STEP_CARDS,
   NoCallDatabaseError,
   bookingStagesOver,
   contactsOnFileOver,
   databaseOf,
   identityOver,
   sideOf,
+  stepCardsOf,
   type BookingStages,
   type CallerKind,
   type CodeAsk,
   type ContactsOnFile,
   type IdentityDefaults,
+  type Lane,
   type OwnAsk,
   type PlannedCode,
   type ProofCodes,
   type ProofStanding,
   type Side,
   type Standing,
+  type StepBranch,
+  type StepCard,
+  type StepCards,
 } from "./facts";

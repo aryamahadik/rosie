@@ -85,26 +85,58 @@
 //      out (DL-183 N4). The frontier offers such a handle no booking of anyone's.
 //   8. A choice at another business than the call's has no decider here (T-308 answers for the call's business alone),
 //      unless it only protects.
+//
+// Round 3 (the lead's rulings on the card, DL-188): a step's side is read from its card in the turn's bundle (K-01 v1
+// step: who it is from and to), never from step-id lists. Where round 3 differs from the defaults above, this wins:
+//   9. A step is the business's (sideOfStep) when its card is to or from the owner (K-01 lane owner: the owner or office
+//      manager, an admin) or staff; every S1, S2 and S11 step (as before), every S12 and S13 step; and any step whose card
+//      cannot be read (no bundle, no such step, no lane). Any other step is the customer's: K-01's lanes for the customer
+//      (cust, agent), anyone else (other), Stripe or an outside service (pay, out), or Rosie alone (san, an automatic
+//      step: A4-01 and A4-28, which ruling 2 names as the customer's). A hub asks nobody itself (K-01: san, auto), so a hub
+//      case's side is that of the steps its branch leads to (sideOfCase): its own steps and, through each split among
+//      them, every branch's own steps; one of them the business's or unread makes the case the business's (A7-02's "The
+//      business can't give it" leads to A7-93, whose branches lead to A7-15, a question to the owner). An any-time row's
+//      side is its handler's.
+//  10. A choice at a business step is the business's whoever answers, on a booking or not (it replaces 3c's S1, S2 and S11
+//      list): its fee or refund stake needs the owner or an admin with the money power, anything else the owner or an
+//      admin with the matching power (3a, 3b). On a booking this business does not hold it is a visit nobody decides
+//      (bookingNotFound, fails closed). A sender who plays a part on the booking (booker, person served or payer) and
+//      holds a live business role here is asked which role (S13-31, A 7023: "When two roles fit, ask which"; A3-51 "Both
+//      fit? Ask"), never passed: askWhichRole, in K-09 v1's ask outcome (askedDecider), the only question limit 1 has.
+//      At a customer step, 3c stands: the booking's visit, or for a business role with no part in it only its fee or
+//      refund (DL-183 N2).
+//  11. S13-45 row 1 ("see times, book a new visit: anyone") covers, about no booking yet, every customer step of journey 4
+//      (K-01 v1 step.section 4: K-01's journey N holds section N's steps), beside NEW_VISIT_STEPS, and the new-booking
+//      door's meaning-search entries (NEW_BOOKING_DOORS: A3-51, flow B's B3-40; closest-entries.json's "Asks for a
+//      person"). OWN_RECORD_STEPS, which add a way in or a name to the sender's own existing record, are not row 1 and
+//      are read first: that is this round's default for "a choice that would add a person, a way in or authority to
+//      anything that already exists"; with no booking, nothing else exists to add to.
+//  12. With no bundle read (the shipped default, NO_STEP_CARDS) every step but row 1's doors and entries, the any-time
+//      rows read without a step and the owner, settings and team hubs counts as unread, so the business's.
 
 import { holdClassOf } from "../../commit/hold";
-import type {
-  BusinessMatter,
-  IdentityAccess,
-  Matter,
-  NoDecider,
-  OwnerOnlyMatter,
-  Role,
+import {
+  partsOf,
+  type BusinessMatter,
+  type IdentityAccess,
+  type Matter,
+  type NoDecider,
+  type OwnerOnlyMatter,
+  type Role,
 } from "../../domain/identity-access";
 import type { Choice, GatePart, GateTurn, LimitOutcomes } from "../framework";
 import type {
   BookingStages,
   CodeAsk,
   ContactsOnFile,
+  Lane,
   PlannedCode,
   ProofCodes,
   ProofStanding,
   Side,
   Standing,
+  StepCard,
+  StepCards,
 } from "./facts";
 
 /** Limit 1's outcomes when it fails (K-09 v1 limit1Outcome). */
@@ -140,17 +172,32 @@ export type Change =
   | { readonly kind: "anyone" }
   /**
    * Needs the decider's own yes for every one of these matters. inRole: a question about a booking put to the sender in
-   * the business role they hold there (default 3c), so their role's contact on file proves them (default 5).
+   * the business role they hold there (default 3c), so their role's contact on file proves them (default 5). twoRoles:
+   * the business's choice on a booking the sender plays a part on while holding a business role here, so they are asked
+   * which role, never passed (default 10).
    */
-  | { readonly kind: "decided"; readonly matters: readonly LimitMatter[]; readonly inRole: boolean }
+  | {
+      readonly kind: "decided";
+      readonly matters: readonly LimitMatter[];
+      readonly inRole: boolean;
+      readonly twoRoles: boolean;
+    }
   /** Nothing says who decides it: nobody does (fails closed). */
   | { readonly kind: "unknown" };
+
+/** A change that needs the decider's own yes. */
+type DecidedChange = Extract<Change, { kind: "decided" }>;
 
 const NOTHING: Change = { kind: "nothing" };
 const PROTECTS: Change = { kind: "protects" };
 const ANYONE: Change = { kind: "anyone" };
 const UNKNOWN: Change = { kind: "unknown" };
-const decided = (...matters: LimitMatter[]): Change => ({ kind: "decided", matters, inRole: false });
+const decided = (...matters: LimitMatter[]): DecidedChange => ({
+  kind: "decided",
+  matters,
+  inRole: false,
+  twoRoles: false,
+});
 
 /**
  * The steps whose matter is the owner's alone (S13-45 row 8: "Admins never close the business, export, hand it over, or
@@ -213,14 +260,73 @@ export const NEW_VISIT_STEPS: readonly string[] = [
 /** The roles that answer for the business (K-04 v1 person_roles). */
 export const BUSINESS_ROLES: readonly Role[] = ["owner", "admin", "staff"];
 
+/**
+ * The new-booking door in each flow, whose meaning-search entries are row 1 (default 11; arch 03 line 165: "a new booking
+ * or a question about the business, A3-51 (B3-40)"; K-09 closest-entries.json adds A3-51's "Asks for a person").
+ */
+export const NEW_BOOKING_DOORS: readonly string[] = ["A3-51", "B3-40"];
+
 /** The business's own matter at a step (default 3a): team for S2 (journey 2), settings for any other step. */
 function businessBase(step: string): "team" | "settings" {
   return step.startsWith("S2-") ? "team" : "settings";
 }
 
-/** The steps whose choices stay the business's on a booking too (default 3c): S1, S2 and S11 (journeys 1, 2 and 11). */
-function staysBusiness(step: string): boolean {
-  return step.startsWith("S1-") || step.startsWith("S2-") || step.startsWith("S11-");
+// ---- a step's side (DL-188 ruling 1; default 9) ----------------------------------------------------------------------
+
+/** Which side a step is on: the business's, or the customer's. */
+export type StepSide = "business" | "customer";
+
+/** The lanes that are the business (K-01 v1 lane): owner (the owner or office manager, an admin) and staff. */
+const BUSINESS_LANES: readonly (Lane | null)[] = ["owner", "staff"];
+
+/** Every step of S1 and S2 (setup and the team) and S11 (running the business), as before, and of S12 and S13. */
+function businessSection(step: string): boolean {
+  return /^S(?:1|2|11|12|13)-/u.test(step);
+}
+
+/**
+ * A step's side from its card (default 9): the business's at a business section, for a card that cannot be read, or
+ * for a step to or from the owner or staff; else the customer's.
+ */
+export function sideOfStep(step: string, card: StepCard | null): StepSide {
+  if (businessSection(step) || card === null) return "business";
+  if (card.who === null) return "business";
+  return BUSINESS_LANES.includes(card.who) || BUSINESS_LANES.includes(card.to) ? "business" : "customer";
+}
+
+/** The most steps a hub case's walk reads before its side counts as unread (as the frontier's stakes walk: 64). */
+const MAX_CASE_STEPS = 64;
+
+/**
+ * A hub case's side (default 9): the hub's own, then that of every step its branch leads to, its own steps and, through
+ * each split among them, every branch's own steps, until one is the business's or cannot be read (the business's), or
+ * none is left (the customer's). A case its hub's card does not list, or a walk longer than MAX_CASE_STEPS, is the
+ * business's.
+ */
+async function sideOfCase(choice: Choice, steps: StepCards): Promise<StepSide> {
+  const hub = await steps.step(choice.step);
+  if (hub === null || sideOfStep(choice.step, hub) === "business") return "business";
+  const branch = hub.branches.find((each) => each.label === choice.branch);
+  if (branch === undefined) return "business";
+  const queue = [...branch.steps];
+  const seen = new Set<string>();
+  for (let id = queue.shift(); id !== undefined; id = queue.shift()) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    if (seen.size > MAX_CASE_STEPS) return "business";
+    const card = await steps.step(id);
+    if (card === null || sideOfStep(id, card) === "business") return "business";
+    for (const each of card.branches) queue.push(...each.steps);
+  }
+  return "customer";
+}
+
+/** Journey 4, booking a new visit: K-01 v1 step.section 4 (K-01 README: journey N holds section N's steps). */
+const NEW_VISIT_SECTION = 4;
+
+/** A customer step of booking a new visit (default 11): on NEW_VISIT_STEPS or in journey 4, by its card. */
+function newVisitStep(step: string, card: StepCard): boolean {
+  return NEW_VISIT_STEPS.includes(step) || card.section === NEW_VISIT_SECTION;
 }
 
 /** The money matters a choice's stakes name on the business's side (K-02 v1 stakesReason; default 3b). */
@@ -234,7 +340,7 @@ function moneyMatters(choice: Choice): BusinessMatter[] {
 }
 
 /** A business choice's matters: owner-only steps, else its money, else its base (team or settings). */
-function businessChange(choice: Choice, base: "team" | "settings"): Change {
+function businessChange(choice: Choice, base: "team" | "settings"): DecidedChange {
   const ownerOnly = OWNER_ONLY_STEPS[choice.step];
   if (ownerOnly !== undefined) return decided({ kind: ownerOnly });
   const money = moneyMatters(choice);
@@ -252,58 +358,70 @@ function businessChange(choice: Choice, base: "team" | "settings"): Change {
  * stake names) is the booking's visit, for its decider; an unknown stake may be all three. Another option's stake
  * (question) says nothing about this one's own.
  */
-function forTheBusiness(choice: Choice, bookingId: string): Change {
+function forTheBusiness(choice: Choice, bookingId: string): DecidedChange {
   const why = new Set(choice.stakesFrom.map((reason) => reason.why).filter((each) => each !== "question"));
   const matters: LimitMatter[] = [];
   if (why.has("charge") || why.has("unknown")) matters.push({ kind: "fee" });
   if (why.has("refund") || why.has("unknown")) matters.push({ kind: "refund" });
   const feeOrRefundOnly = why.size > 0 && [...why].every((each) => each === "charge" || each === "refund");
   if (!feeOrRefundOnly) matters.push({ kind: "visit", bookingId });
-  return { kind: "decided", matters, inRole: true };
-}
-
-/** A choice on a booking (its visit), or with none, what `none` says. */
-function onBooking(choice: Choice, none: Change): Change {
-  const bookingId = choice.target.bookingId;
-  return bookingId === null ? none : decided({ kind: "visit", bookingId });
+  return { kind: "decided", matters, inRole: true, twoRoles: false };
 }
 
 /** What reads a choice needs beyond itself, made only when asked. */
 export interface ChangeReads {
   readonly identity: () => IdentityAccess;
-}
-
-/** Whether the sender answers a choice about a booking for the business: a business role, and no part in it. */
-async function putToBusiness(bookingId: string, turn: GateTurn, reads: ChangeReads): Promise<boolean> {
-  const sender = turn.request.caller.personId;
-  if (sender === null) return false;
-  const identity = reads.identity();
-  const roles = await identity.rolesOf(sender);
-  if (!roles.some((role) => BUSINESS_ROLES.includes(role))) return false;
-  // A booking this business does not hold is no business question here: it stays a visit nobody decides (fails closed).
-  const parties = await identity.parties(bookingId);
-  if (parties === null) return false;
-  return parties.booker !== sender && parties.served !== sender && parties.payer !== sender;
+  /** The turn's bundle's step cards (K-01 v1), which say each step's side (default 9). */
+  readonly steps: () => StepCards;
 }
 
 /**
- * An open question's option or a meaning-search entry (defaults 1 and 3): about no booking, the sender's own record at an
- * own-record step, anyone's at a new visit's times (row 1), and the business's matter anywhere else (3a); on a booking,
- * the owner's at an owner-only step, then a question put to the business (3c), then the business's at an S1, S2 or S11
- * step, then the booking's visit.
+ * A choice on a booking at a step of this side (defaults 3c and 10): the owner's at an owner-only step; a visit nobody
+ * decides on a booking this business does not hold (fails closed); at a business step the business's whoever answers,
+ * with twoRoles for a sender who plays a part on the booking and holds a business role here; at a customer step, for a
+ * business role with no part in it only its fee or refund (DL-183 N2), else the booking's visit.
+ */
+async function onBookingAt(
+  side: StepSide,
+  choice: Choice,
+  bookingId: string,
+  turn: GateTurn,
+  reads: ChangeReads,
+): Promise<Change> {
+  const ownerOnly = OWNER_ONLY_STEPS[choice.step];
+  if (ownerOnly !== undefined) return decided({ kind: ownerOnly });
+  const identity = reads.identity();
+  const parties = await identity.parties(bookingId);
+  if (parties === null) return decided({ kind: "visit", bookingId });
+  const sender = turn.request.caller.personId;
+  const plays = sender !== null && partsOf(parties, sender).length > 0;
+  const holdsRole =
+    sender !== null && (await identity.rolesOf(sender)).some((role) => BUSINESS_ROLES.includes(role));
+  if (side === "business") {
+    return { ...businessChange(choice, businessBase(choice.step)), twoRoles: plays && holdsRole };
+  }
+  return holdsRole && !plays ? forTheBusiness(choice, bookingId) : decided({ kind: "visit", bookingId });
+}
+
+/**
+ * An open question's option or a meaning-search entry (defaults 1, 3, 9 to 11): about no booking, row 1 for the
+ * new-booking door's entries; then, by the step's card, the business's matter at a business step, the sender's own record
+ * at an own-record step, row 1 at a customer step of booking a new visit, and the business's matter anywhere else (3a);
+ * on a booking, as onBookingAt says for the step's side.
  */
 async function atStep(choice: Choice, turn: GateTurn, reads: ChangeReads): Promise<Change> {
   const bookingId = choice.target.bookingId;
-  if (bookingId === null) {
-    if (OWN_RECORD_STEPS.includes(choice.step)) return decided({ kind: "own" });
-    if (NEW_VISIT_STEPS.includes(choice.step)) return ANYONE;
-    return businessChange(choice, businessBase(choice.step));
+  if (bookingId === null && choice.kind === "searchEntry" && NEW_BOOKING_DOORS.includes(choice.step)) {
+    return ANYONE;
   }
-  const ownerOnly = OWNER_ONLY_STEPS[choice.step];
-  if (ownerOnly !== undefined) return decided({ kind: ownerOnly });
-  if (await putToBusiness(bookingId, turn, reads)) return forTheBusiness(choice, bookingId);
-  if (staysBusiness(choice.step)) return businessChange(choice, businessBase(choice.step));
-  return decided({ kind: "visit", bookingId });
+  const card = await reads.steps().step(choice.step);
+  const side = sideOfStep(choice.step, card);
+  if (bookingId !== null) return onBookingAt(side, choice, bookingId, turn, reads);
+  if (side === "customer" && card !== null) {
+    if (OWN_RECORD_STEPS.includes(choice.step)) return decided({ kind: "own" });
+    if (newVisitStep(choice.step, card)) return ANYONE;
+  }
+  return businessChange(choice, businessBase(choice.step));
 }
 
 /** What one gated part changes (defaults 1 to 3). */
@@ -341,8 +459,13 @@ export async function changeOf(part: GatePart, turn: GateTurn, reads: ChangeRead
         case "child-elder-or-unsafe-at-home":
         case null:
           return UNKNOWN;
-        default:
-          return onBooking(choice, UNKNOWN);
+        default: {
+          // Any other row on a booking, by its handler's side (default 9).
+          const bookingId = choice.target.bookingId;
+          if (bookingId === null) return UNKNOWN;
+          const handler = await reads.steps().step(choice.step);
+          return onBookingAt(sideOfStep(choice.step, handler), choice, bookingId, turn, reads);
+        }
       }
     case "hub":
       switch (choice.hub) {
@@ -354,8 +477,12 @@ export async function changeOf(part: GatePart, turn: GateTurn, reads: ChangeRead
         case "entry":
         case "booked":
         case "checkedIn":
-        case "done":
-          return onBooking(choice, UNKNOWN);
+        case "done": {
+          // A booking stage's hub case, by the side of the steps its branch leads to (default 9).
+          const bookingId = choice.target.bookingId;
+          if (bookingId === null) return UNKNOWN;
+          return onBookingAt(await sideOfCase(choice, reads.steps()), choice, bookingId, turn, reads);
+        }
         default:
           return UNKNOWN;
       }
@@ -479,8 +606,8 @@ async function proofStandingOf(
 /** Why a part passes: it only protects, it is open to anyone (row 1), or the decider's own word. */
 export type PassWhy = "protects" | "anyone" | "decider";
 
-/** Why a part fails: an unproven sender, the wrong person, or nobody who may decide it. */
-export type FailWhy = "unproven" | "notDecider" | "nobodyDecides";
+/** Why a part fails: an unproven sender, the wrong person, nobody who may decide it, or two roles that fit (default 10). */
+export type FailWhy = "unproven" | "notDecider" | "nobodyDecides" | "twoRoles";
 
 /** What the commit runs for a failed part (T-305 default 8). */
 export type AllowedNext =
@@ -493,7 +620,12 @@ export type AllowedNext =
       readonly matters: readonly LimitMatter[];
     }
   /** Nobody to ask: the step's safe default runs and a person is told (S13-31). */
-  | { readonly kind: "nobodyDecides"; readonly why: NobodyWhy; readonly step: string };
+  | { readonly kind: "nobodyDecides"; readonly why: NobodyWhy; readonly step: string }
+  /**
+   * Two roles fit (a part on the booking, a business role here): a question in the sender's own chat, which role this is
+   * in (S13-31: "When two roles fit, ask which"; default 10). Nothing changes until it is answered.
+   */
+  | { readonly kind: "askWhichRole"; readonly personId: string; readonly matters: readonly LimitMatter[] };
 
 export type AllowedDecision =
   | { readonly result: "pass"; readonly why: PassWhy }
@@ -607,5 +739,14 @@ export async function decideAllowed(
   // Then the rows: their own word, but are they someone who decides it?
   if (!deciders.ok) return nobodyDecides(deciders.why, step);
   if (mine === undefined) return askOrDefault("notDecider");
+  // A decider who also plays a part on the booking, on the business's choice: asked which role, never passed (default 10).
+  if (change.twoRoles) {
+    return {
+      result: "fail",
+      why: "twoRoles",
+      outcome: askedDeciderOutcome(),
+      next: { kind: "askWhichRole", personId: sender, matters: [...change.matters] },
+    };
+  }
   return pass("decider");
 }

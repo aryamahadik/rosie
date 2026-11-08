@@ -7,7 +7,10 @@
 //     contact on file, in its own one-to-one thread");
 //   - the code an unproven sender gets (K-09 v1 sendProofCode purpose unprovenSender; K-22 v1 proof_codes purpose
 //     link_record): ProofCodes, T-322's. It is not built yet, so the shipped limit has none, and a part that needs a code
-//     is refused (notBuilt), never passed.
+//     is refused (notBuilt), never passed;
+//   - each step's card in the turn's bundle (K-01 v1 step: its section, who it is from and to, a split's branches), which
+//     says the step's side (DL-188 ruling 1): StepCards. The gate is not given the turn's bundle yet, so the shipped limit
+//     reads none (NO_STEP_CARDS): every step's side cannot be read, and every choice is the business's (fails closed).
 //
 // Every read takes and gives ids and closed labels: never a person's words, name, number or email (the action layer never
 // reads free text: arch 02 line 139), so nothing limit 1 answers can carry one into a log, a span or an error.
@@ -143,6 +146,106 @@ export function bookingStagesOver(reader: IdentityReader, businessId: string): B
     async stageOf(bookingId) {
       const head = await reader.bookingHead(bookingId);
       return head !== null && head.id === bookingId && head.businessId === businessId ? head.stage : null;
+    },
+  };
+}
+
+// ---- each step's card in the turn's bundle (K-01 v1; DL-188 ruling 1) ---------------------------------------------
+
+/**
+ * Who acts or is told on a step (K-01 v1 lane): owner (the owner or office manager), san (Rosie), staff, cust (the
+ * customer), agent (the customer's own AI), pay (Stripe), out (an outside service), other (anyone else).
+ */
+export type Lane = "owner" | "san" | "staff" | "cust" | "agent" | "pay" | "out" | "other";
+
+const LANES: readonly string[] = ["owner", "san", "staff", "cust", "agent", "pay", "out", "other"];
+
+/** One branch of a split as limit 1 reads it (K-01 v1 branch): its label, word for word, and its own steps. */
+export interface StepBranch {
+  readonly label: string;
+  readonly steps: readonly string[];
+}
+
+/** One step as limit 1 reads it from the turn's bundle (K-01 v1 step): its section, who it is from and to, its branches. */
+export interface StepCard {
+  readonly id: string;
+  /** K-01 v1 step.section, 1 to 13; null when the value holds none. */
+  readonly section: number | null;
+  /** K-01 v1 step.who: who acts, so who it is from; null when the value holds no lane. */
+  readonly who: Lane | null;
+  /** K-01 v1 step.to: who it is for, when someone is; null for nobody (an automatic step) or no lane. */
+  readonly to: Lane | null;
+  /** A split's branches (K-01 v1 step.branches); none for a plain step. */
+  readonly branches: readonly StepBranch[];
+}
+
+export interface StepCards {
+  /** The step as the turn's bundle holds it, or null when it cannot be read: no bundle read, or no such step in it. */
+  step(stepId: string): Promise<StepCard | null>;
+}
+
+/**
+ * No bundle read: every step's side cannot be read, so every choice is the business's (DL-188 ruling 1). The shipped
+ * limit's default until the gate is given the turn's bundle (the frontier reads it through FrontierBundles).
+ */
+export const NO_STEP_CARDS: StepCards = { step: () => Promise.resolve(null) };
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+function laneOf(value: unknown): Lane | null {
+  return typeof value === "string" && LANES.includes(value) ? (value as Lane) : null;
+}
+
+function branchesOf(value: unknown): StepBranch[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item): StepBranch[] =>
+    isRecord(item) && typeof item.label === "string" && Array.isArray(item.steps)
+      ? [{ label: item.label, steps: item.steps.filter((step): step is string => typeof step === "string") }]
+      : [],
+  );
+}
+
+function stepCardOf(id: string, value: unknown): StepCard | null {
+  if (!isRecord(value) || value.id !== id) return null;
+  const { section } = value;
+  return {
+    id,
+    section:
+      typeof section === "number" && Number.isInteger(section) && section >= 1 && section <= 13
+        ? section
+        : null,
+    who: laneOf(value.who),
+    to: laneOf(value.to),
+    branches: branchesOf(value.branches),
+  };
+}
+
+/**
+ * The step cards of the turn's bundle, from its K-01 v1 flow graphs (each a parsed `flowGraph` value), narrowed field by
+ * field: a value that is not K-01's graph of flow A or B gives no step, and a step value that does not carry its own id
+ * gives none, never a wrong one. An A or B step is read from its own flow's graph only; a shared step from the first
+ * graph that holds it, in the order given.
+ */
+export function stepCardsOf(graphs: readonly unknown[]): StepCards {
+  const views = graphs.flatMap((graph): { flow: string; steps: Record<string, unknown> }[] =>
+    isRecord(graph) &&
+    graph.contract === "bundle.v1" &&
+    (graph.flow === "A" || graph.flow === "B") &&
+    isRecord(graph.steps)
+      ? [{ flow: graph.flow, steps: graph.steps }]
+      : [],
+  );
+  return {
+    step(stepId) {
+      const own = stepId.startsWith("A") ? "A" : stepId.startsWith("B") ? "B" : null;
+      for (const view of views) {
+        if (own !== null && view.flow !== own) continue;
+        if (!Object.hasOwn(view.steps, stepId)) continue;
+        const card = stepCardOf(stepId, view.steps[stepId]);
+        if (card !== null) return Promise.resolve(card);
+      }
+      return Promise.resolve(null);
     },
   };
 }
