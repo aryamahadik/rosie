@@ -266,6 +266,12 @@ function distinct<T>(items: readonly T[]): T[] {
   return out;
 }
 
+/** Whether only spaces and commas stand between two spans of the folded words, in either order. */
+function besideOnly(folded: string, a: Span, b: Span): boolean {
+  const between = a.end <= b.at ? folded.slice(a.end, b.at) : folded.slice(b.end, a.at);
+  return /^[ ,]*$/.test(between);
+}
+
 const meridiemOf = (word: string | undefined, letter: string | undefined): "am" | "pm" | null => {
   if (word === "am" || letter === "a") return "am";
   if (word === "pm" || letter === "p") return "pm";
@@ -277,27 +283,32 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
   const folded = foldWords(words);
   const counted = countedIn(folded, languages);
   const taken: Span[] = [];
-  const take = (span: Span): boolean => {
+  const daySpans: Span[] = [];
+  const clockSpans: Span[] = [];
+  const take = (span: Span, into: Span[] | null): boolean => {
     if (overlaps(span, taken)) return false;
     taken.push(span);
+    into?.push(span);
     return true;
   };
+  const takeDay = (span: Span): boolean => take(span, daySpans);
+  const takeClock = (span: Span): boolean => take(span, clockSpans);
 
-  const elapsed = inUnits(folded, counted, ELAPSED_UNIT).filter((each) => take(each.span));
+  const elapsed = inUnits(folded, counted, ELAPSED_UNIT).filter((each) => take(each.span, null));
   const days: DayWords[] = [];
   let pmFromDay = false;
   for (const each of inUnits(folded, counted, DAY_UNIT)) {
-    if (take(each.span)) days.push({ kind: "relative", days: each.value });
+    if (takeDay(each.span)) days.push({ kind: "relative", days: each.value });
   }
   for (const [pattern, offset, hint] of RELATIVE) {
     for (const found of findAll(folded, pattern)) {
-      if (!take(found)) continue;
+      if (!takeDay(found)) continue;
       days.push({ kind: "relative", days: offset });
       if (hint === "pm") pmFromDay = true;
     }
   }
   const dated = (found: Found, month: number | null, day: number, year: string | undefined): void => {
-    if (month === null || !take(found)) return;
+    if (month === null || !takeDay(found)) return;
     const full = year === undefined ? null : Number(year) < 100 ? 2000 + Number(year) : Number(year);
     days.push({ kind: "date", month, day, year: full });
   };
@@ -311,12 +322,12 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
     dated(found, Number(found.groups[0]), Number(found.groups[1]), found.groups[2]);
   }
   for (const found of findAll(folded, DAY_OF_MONTH)) {
-    if (take(found)) days.push({ kind: "dayOfMonth", day: Number(found.groups[0]) });
+    if (takeDay(found)) days.push({ kind: "dayOfMonth", day: Number(found.groups[0]) });
   }
   const weekdays: WeekdayWords[] = [];
   for (const found of findAll(folded, WEEKDAY)) {
     const weekday = lookup(WEEKDAYS, found.groups[1]);
-    if (weekday === null || !take(found)) continue;
+    if (weekday === null || !takeDay(found)) continue;
     const before = found.groups[0];
     const next =
       before === "next" || before === "proximo" || before === "el proximo" || found.groups[2] !== undefined;
@@ -324,23 +335,25 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
   }
 
   const clocks: ClockWords[] = [];
-  for (const found of findAll(folded, NOON)) if (take(found)) clocks.push({ kind: "noon" });
-  for (const found of findAll(folded, MIDNIGHT)) if (take(found)) clocks.push({ kind: "midnight" });
+  for (const found of findAll(folded, NOON)) if (takeClock(found)) clocks.push({ kind: "noon" });
+  for (const found of findAll(folded, MIDNIGHT)) if (takeClock(found)) clocks.push({ kind: "midnight" });
   for (const found of findAll(folded, COLON_TIME)) {
-    if (!take(found)) continue;
+    if (!takeClock(found)) continue;
     const meridiem = meridiemOf(found.groups[2], found.groups[3]);
     clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: Number(found.groups[1]), meridiem });
   }
   for (const found of findAll(folded, MERIDIEM_TIME)) {
-    if (!take(found)) continue;
+    if (!takeClock(found)) continue;
     const meridiem = meridiemOf(found.groups[1], found.groups[2]);
     clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem });
   }
   for (const found of findAll(folded, OCLOCK_TIME)) {
-    if (take(found)) clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem: null });
+    if (takeClock(found))
+      clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem: null });
   }
   for (const found of findAll(folded, CUED_TIME)) {
-    if (take(found)) clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem: null });
+    if (takeClock(found))
+      clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem: null });
   }
   const hourWords = hourWordsOf(languages);
   const hourNames = [...hourWords.keys()].sort((a, b) => b.length - a.length).join("|");
@@ -348,15 +361,16 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
     const worded = new RegExp(String.raw`\b(?:${CUE} (${hourNames})\b|(${hourNames}) ?(am|pm)\b)`, "g");
     for (const found of findAll(folded, worded)) {
       const hour = hourWords.get(found.groups[0] ?? found.groups[1] ?? "");
-      if (hour === undefined || !take(found)) continue;
+      if (hour === undefined || !takeClock(found)) continue;
       const meridiem = found.groups[2] === "am" ? "am" : found.groups[2] === "pm" ? "pm" : null;
       clocks.push({ kind: "clock", hour, minute: 0, meridiem });
     }
   }
-  const clockSpans = [...taken];
-  if (clocks.length === 0 && (days.length > 0 || weekdays.length > 0)) {
+  if (clocks.length === 0) {
+    // A bare number is an hour only right beside the day it is on: "Thu 2", "tomorrow 3", "Sat Oct 24, 11".
     for (const found of findAll(folded, BARE_NUMBER)) {
-      if (take(found))
+      if (!daySpans.some((day) => besideOnly(folded, day, found))) continue;
+      if (takeClock(found))
         clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem: null });
     }
   }
