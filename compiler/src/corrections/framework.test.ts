@@ -183,7 +183,7 @@ describe("the edit context", () => {
 
 describe("the list of corrections", () => {
   it("runs C1 and C2, in that order, and gives their ids the tag", () => {
-    expect(CORRECTIONS.map((correction) => correction.id)).toStrictEqual(["C1", "C2"]);
+    expect(CORRECTIONS.map((correction) => correction.id)).toStrictEqual(["C1", "C2", "C9", "C10"]);
     expect(tagOf("C2")).toBe("MC:C2");
     for (const correction of CORRECTIONS) {
       expect(correction.title.length).toBeGreaterThan(0);
@@ -212,6 +212,6 @@ describe("the list of corrections", () => {
     expect(order).toContain("C1");
     expect(order).toContain("C2");
     expect(order.lastIndexOf("C1")).toBeLessThan(order.indexOf("C2"));
-    expect(done.corrections).toStrictEqual(["C1", "C2"]);
+    expect(done.corrections).toStrictEqual(["C1", "C2", "C9", "C10"]);
   });
 });

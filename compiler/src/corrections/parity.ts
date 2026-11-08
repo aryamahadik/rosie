@@ -99,7 +99,7 @@ export function correctionsShard(shard: number): void {
           const lines = renderDiff(done.changes);
           expect(lines.length).toBeGreaterThan(0);
           expect(
-            lines.every((line) => /^MC:C[12] [-+] /.test(line)),
+            lines.every((line) => new RegExp(`^(${done.corrections.map(tagOf).join("|")}) [-+] `).test(line)),
             where,
           ).toBe(true);
         }
