@@ -22,6 +22,8 @@ export {
   type ClaimWhy,
   type ClaimedPlan,
   type ClaimedText,
+  type Refusal,
+  type RefusalWhy,
   type SlotClaim,
   type Verdict,
 } from "./claim-check";

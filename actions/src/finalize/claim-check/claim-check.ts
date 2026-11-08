@@ -11,8 +11,16 @@
 //                  (or the words after '|'), since the service is secure page only (K-03 v1 `sensitiveForm`);
 //   securePage     the field is secure page only: the slot reads "Read it on the secure page";
 //   cut            the reader may never see it, or its audience cannot be read: its sentence is cut.
-// A slot outside the vocabulary is left as written, so the fill refuses the plan (K-03 refuse-hold-slot.json). The
-// claims carry slot names and closed reasons only, never a value, so they may be logged (the value never is).
+// The fill reads the claimed text again with the same pieces() (slots/syntax.ts), so a text it could read otherwise
+// than the claim did is refused whole and nothing in it is filled (DL-131; fail closed, as the fill and K-03's
+// slottedText pattern refuse it):
+//   broken         a '{{' that opens no slot or a '}}' that closes none, as written or after the claim;
+//   unclaimed      the second guard: read again after the claim, a slot that is not, in its place and as written, one
+//                  the claims showed this reader (show or sensitiveForm), a slot outside the vocabulary among them
+//                  (K-03 refuse-hold-slot.json). So no cut sentence and no secure-page words can complete a slot that
+//                  no claim judged.
+// The claims and refusals carry slot names, line numbers and closed reasons only, never a value, so they may be logged
+// (the value never is).
 
 import {
   FILLERS,
@@ -25,11 +33,12 @@ import {
   type PlanQuestion,
   type PlanText,
   type SlotName,
+  type SlotProblem,
   type SlotSource,
   type SlotValue,
   type TextFill,
 } from "../slots";
-import { pieces, type Piece } from "../slots/syntax";
+import { pieces, type Piece, type SlotRef } from "../slots/syntax";
 import { narrowest, type Reader } from "./audience";
 import { QUOTE_SLOT, SLOT_FIELDS, fieldAudience, slotAudienceOf } from "./fields";
 
@@ -63,6 +72,20 @@ export interface SlotClaim {
   readonly slot: SlotName;
   readonly verdict: Verdict;
   readonly why: ClaimWhy;
+}
+
+/** Why limit 7 refused a text whole, so nothing in it is filled: closed reasons only, never a value (DL-131). */
+export type RefusalWhy =
+  /** A '{{' that opens no slot or a '}}' that closes none, as written or after the claim (slots/syntax.ts; K-03). */
+  | "broken"
+  /** Read again after the claim, a slot that is not, in its place and as written, one the claims showed this reader. */
+  | "unclaimed";
+
+/** A text limit 7 refused: which one and why, never a value. */
+export interface Refusal {
+  /** The line's index in the plan's lines as given, or "question"; claimText's one text is line 0. */
+  readonly line: number | "question";
+  readonly why: RefusalWhy;
 }
 
 /** What the claim check reads besides the plan and the slot source. */
@@ -179,20 +202,28 @@ export function claimSlot(slot: SlotName, source: SlotSource, context: ClaimCont
 /** Each slot's claim, worked out once, in order of first use. */
 interface Claims {
   of(slot: SlotName): SlotClaim;
+  /** The claim already worked out for a slot of that name, if any: it never claims a slot anew. */
+  known(name: string): SlotClaim | undefined;
   list(): SlotClaim[];
 }
 
 /** The claims of one text or plan, on a source whose switch is already applied (switched). */
 function claimsFor(source: SlotSource, context: ClaimContext): Claims {
-  const known = new Map<SlotName, SlotClaim>();
+  const worked = new Map<SlotName, SlotClaim>();
   return {
     of(slot) {
-      const claimed = known.get(slot) ?? claimAt(slot, source, context, 0);
-      known.set(slot, claimed);
+      const claimed = worked.get(slot) ?? claimAt(slot, source, context, 0);
+      worked.set(slot, claimed);
       return claimed;
     },
-    list: () => [...known.values()],
+    known: (name) => (isSlotName(name) ? worked.get(name) : undefined),
+    list: () => [...worked.values()],
   };
+}
+
+/** A claim that leaves its slot in the text for the fill: shown as it is, or in its sensitive form. */
+function leavesForFill(claim: SlotClaim | undefined): boolean {
+  return claim?.verdict === "show" || claim?.verdict === "sensitiveForm";
 }
 
 // A sentence ends after '.', '!' or '?' (with any closing quote or bracket) and the spaces after it, or after a line
@@ -200,11 +231,11 @@ function claimsFor(source: SlotSource, context: ClaimContext): Claims {
 // a sentence.
 const SENTENCE_END = /[.!?]+["'”’)\]]*[ \t]+|\r?\n/g;
 
-/** A text's pieces, sentence by sentence (slots/syntax.ts pieces: the filler's own reading of the slots). */
-function sentencesOf(text: string): Piece[][] {
+/** A text's pieces (slots/syntax.ts pieces: the filler's own reading of the slots), sentence by sentence. */
+function sentencesOf(parts: readonly Piece[]): Piece[][] {
   const sentences: Piece[][] = [];
   let sentence: Piece[] = [];
-  for (const piece of pieces(text)) {
+  for (const piece of parts) {
     if (piece.kind !== "words") {
       sentence.push(piece);
       continue;
@@ -223,21 +254,59 @@ function sentencesOf(text: string): Piece[][] {
   return sentences;
 }
 
+/** Two closing braces: outside a slot, a '}}' that closes none. */
+const CLOSE = "}}";
+
+/** A '{{' that opens no slot (slots/syntax.ts's broken piece) or a '}}' that closes none (DL-131; K-03 slottedText). */
+function hasBroken(parts: readonly Piece[]): boolean {
+  return parts.some(
+    (piece) => piece.kind === "broken" || (piece.kind === "words" && piece.text.includes(CLOSE)),
+  );
+}
+
+/**
+ * The second guard (DL-131): the claimed text read again with the same pieces() the fill uses. Each slot in it must be,
+ * in its place and as written, a slot the claims left for the fill (show or sensitiveForm); the names of any others,
+ * each once, and of any such slot the text read again has lost. Empty when the text is the one the claims judged.
+ */
+function unclaimedIn(reread: readonly Piece[], left: readonly SlotRef[], claims: Claims): string[] {
+  const found = reread.flatMap((piece) => (piece.kind === "slot" ? [piece.ref] : []));
+  const names: string[] = [];
+  const name = (ref: SlotRef): void => {
+    if (!names.includes(ref.name)) names.push(ref.name);
+  };
+  found.forEach((ref, index) => {
+    if (left[index]?.raw !== ref.raw || !leavesForFill(claims.known(ref.name))) name(ref);
+  });
+  left.slice(found.length).forEach(name);
+  return names;
+}
+
 interface Claimed {
+  /** The text with limit 7 applied, its slots still to fill. */
   readonly text: string;
   /** A sentence was cut. */
   readonly cut: boolean;
+  /** Why the text may not be filled, each once; empty when it may. */
+  readonly refused: readonly RefusalWhy[];
+  /** The slots the second guard found unclaimed, by name (the words the rewrite is told). */
+  readonly unclaimed: readonly string[];
 }
 
 /**
  * A text with limit 7 applied, its slots still to fill: a sentence with a slot the reader may never see is cut, a
- * secure-page-only slot becomes "Read it on the secure page", every other slot stays for the fill.
+ * secure-page-only slot becomes "Read it on the secure page", every other slot stays for the fill. Then both guards: a
+ * broken piece as written or after the claim, and a slot in the claimed text that the claims did not leave for the fill
+ * (DL-131).
  */
 function claimWords(text: string, claims: Claims): Claimed {
+  const written = pieces(text);
   const kept: string[] = [];
+  const left: SlotRef[] = [];
   let cut = false;
-  for (const sentence of sentencesOf(text)) {
+  for (const sentence of sentencesOf(written)) {
     const words: string[] = [];
+    const slots: SlotRef[] = [];
     let dropped = false;
     for (const piece of sentence) {
       if (piece.kind !== "slot") {
@@ -245,20 +314,65 @@ function claimWords(text: string, claims: Claims): Claimed {
         continue;
       }
       const { ref } = piece;
-      // A slot outside the vocabulary stays as written: the fill refuses it, so the text never goes as it is.
+      // A slot outside the vocabulary stays as written, claimed by none, so the second guard refuses the text.
       if (!isSlotName(ref.name)) {
         words.push(ref.raw);
         continue;
       }
       const claim = claims.of(ref.name);
       if (claim.verdict === "cut") dropped = true;
-      words.push(claim.verdict === "securePage" ? SECURE_PAGE_WORDS : ref.raw);
+      else if (claim.verdict === "securePage") words.push(SECURE_PAGE_WORDS);
+      else {
+        words.push(ref.raw);
+        slots.push(ref);
+      }
     }
     if (dropped) cut = true;
-    else kept.push(words.join(""));
+    else {
+      kept.push(words.join(""));
+      left.push(...slots);
+    }
   }
   const joined = kept.join("");
-  return { text: cut ? joined.trim() : joined, cut };
+  const claimed = cut ? joined.trim() : joined;
+  const reread = pieces(claimed);
+  const unclaimed = unclaimedIn(reread, left, claims);
+  const refused: RefusalWhy[] = [];
+  if (hasBroken(written) || hasBroken(reread)) refused.push("broken");
+  if (unclaimed.length > 0) refused.push("unclaimed");
+  return { text: claimed, cut, refused, unclaimed };
+}
+
+/** What a refused text's rewrite is told for a broken piece (K-03 checkOutcome.detail), naming no value. */
+const BROKEN: SlotProblem = {
+  kind: "unknown",
+  slot: "",
+  detail: "A '{{' opens no slot or a '}}' closes none, so nothing in the text is filled.",
+  why: null,
+};
+
+/** What a refused text's rewrite is told for a slot the second guard found unclaimed, naming no value. */
+function unclaimedProblem(slot: string): SlotProblem {
+  const detail = isSlotName(slot)
+    ? `The slot {{${slot}}} is not one limit 7 left for this reader there, so nothing in the text is filled.`
+    : `The slot {{${slot}}} is not in the slot vocabulary, so nothing in the text is filled.`;
+  return { kind: "unknown", slot, detail, why: null };
+}
+
+/** Notes one text's refusals and the words its rewrite is told, each once. */
+function noteRefusals(
+  line: Refusal["line"],
+  claimed: Claimed,
+  refused: Refusal[],
+  problems: SlotProblem[],
+): void {
+  const add = (problem: SlotProblem): void => {
+    if (!problems.some((known) => known.slot === problem.slot && known.detail === problem.detail))
+      problems.push(problem);
+  };
+  for (const why of claimed.refused) refused.push({ line, why });
+  if (claimed.refused.includes("broken")) add(BROKEN);
+  for (const slot of claimed.unclaimed) add(unclaimedProblem(slot));
 }
 
 /** A plan's lines and question after limit 7, filled; with each slot's claim. */
@@ -270,12 +384,18 @@ export type ClaimedPlan<Line extends { readonly text: string }> = PlanFill<Line>
    * field this reader may never see in its question, which the rewrite is told (arch 02 line 123).
    */
   readonly questionCut: boolean;
+  /**
+   * Each line limit 7 refused, and why (DL-131); empty when none was. Any refusal fails the plan closed: ok is false,
+   * its lines and question come back as written, nothing in them is filled and slotValues is empty.
+   */
+  readonly refused: readonly Refusal[];
 };
 
 /**
  * Limit 7 on a plan, then the fill (arch 02 line 123): each line and the question claimed for this reader, a line left
  * with no words removed, every remaining slot filled from the slot source (T-310), whose sensitive switch is the one
- * limit 7 applies, so the filler writes the sensitive forms the claims name.
+ * limit 7 applies, so the filler writes the sensitive forms the claims name. A line or question limit 7 refuses fails
+ * the whole plan, and nothing is filled (DL-131).
  */
 export function claimPlan<Line extends { readonly text: string }>(
   plan: PlanText<Line>,
@@ -284,31 +404,61 @@ export function claimPlan<Line extends { readonly text: string }>(
 ): ClaimedPlan<Line> {
   const sourced = switched(source);
   const claims = claimsFor(sourced, context);
+  const refused: Refusal[] = [];
+  const problems: SlotProblem[] = [];
   const lines: Line[] = [];
-  for (const line of plan.lines) {
+  for (const [index, line] of plan.lines.entries()) {
     const claimed = claimWords(line.text, claims);
+    noteRefusals(index, claimed, refused, problems);
     if (claimed.cut && claimed.text === "") continue;
     lines.push({ ...line, text: claimed.text });
   }
   let question: PlanQuestion | null = null;
   if (plan.question !== null) {
     const claimed = claimWords(plan.question.text, claims);
+    noteRefusals("question", claimed, refused, problems);
     if (!claimed.cut || claimed.text !== "")
       question = { text: claimed.text, optionIds: [...plan.question.optionIds] };
   }
+  if (refused.length > 0)
+    return {
+      ok: false,
+      lines: plan.lines.map((line) => ({ ...line })),
+      question:
+        plan.question === null ? null : { text: plan.question.text, optionIds: [...plan.question.optionIds] },
+      slotValues: [],
+      problems,
+      claims: claims.list(),
+      questionCut: false,
+      refused,
+    };
   const filled = fillPlan({ lines, question }, sourced);
-  return { ...filled, claims: claims.list(), questionCut: plan.question !== null && question === null };
+  return {
+    ...filled,
+    claims: claims.list(),
+    questionCut: plan.question !== null && question === null,
+    refused,
+  };
 }
 
 /** One text after limit 7, filled, with each slot's claim: the step's fallback text, its master line (arch 02 line 123). */
-export type ClaimedText = TextFill & { readonly claims: readonly SlotClaim[] };
+export type ClaimedText = TextFill & {
+  readonly claims: readonly SlotClaim[];
+  /** Line 0's refusals (DL-131); when any, ok is false and the text comes back as written, unfilled, with no value. */
+  readonly refused: readonly Refusal[];
+};
 
 /** Limit 7 on one text, then the fill: the step's fallback text goes through the same checks (arch 02 line 123). */
 export function claimText(text: string, source: SlotSource, context: ClaimContext): ClaimedText {
   const sourced = switched(source);
   const claims = claimsFor(sourced, context);
   const claimed = claimWords(text, claims);
-  return { ...fillText(claimed.text, sourced), claims: claims.list() };
+  const refused: Refusal[] = [];
+  const problems: SlotProblem[] = [];
+  noteRefusals(0, claimed, refused, problems);
+  if (refused.length > 0)
+    return { ok: false, text, slotValues: [], problems, claims: claims.list(), refused };
+  return { ...fillText(claimed.text, sourced), claims: claims.list(), refused };
 }
 
 /**

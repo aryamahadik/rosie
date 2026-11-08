@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import planRelay from "../../../../contracts/message-plan/fixtures/plan-relay-private-a7-12.json";
 import planSensitive from "../../../../contracts/message-plan/fixtures/plan-sensitive.json";
 import { ROLES } from "../../domain/identity-access";
-import { SLOT_NAMES, type SlotName, type SlotSource } from "../slots";
+import { SLOT_NAMES, type SlotName, type SlotProblem, type SlotSource } from "../slots";
 import {
   SECURE_PAGE_WORDS,
   claimFacts,
@@ -14,7 +14,9 @@ import {
   claimText,
   readerOf,
   type ClaimContext,
+  type ClaimedText,
   type Reader,
+  type RefusalWhy,
   type SlotClaim,
 } from "./index";
 import { CARD_COUNTER, RECORD_ROWS, barberSource, sampleValues, therapistSource } from "./test-support";
@@ -399,5 +401,108 @@ describe("the recipient's role (identity and access, T-308)", () => {
       customer: "customer",
     };
     expect(Object.fromEntries(ROLES.map((role) => [role, readerOf(role)]))).toEqual(expected);
+  });
+});
+
+// DL-131 (the security reviewer's FAIL on 2bb3657): a '{{' that opens no slot or a '}}' that closes none is never
+// passed on, and the claimed text is read again, so no cut and no secure-page words can complete a slot no claim judged.
+describe("a text with a broken piece is refused, with no value written (DL-131)", () => {
+  // Every value the barber source holds, and the forms the fill writes them in.
+  const VALUES = [...sampleValues(barberSource()), "Elm St", "Sat Oct 24", "11:00am", "$35"];
+
+  function writesNoValue(result: unknown): void {
+    const written = JSON.stringify(result);
+    for (const value of VALUES) expect(written).not.toContain(value);
+  }
+
+  function problemsOf(
+    result: { readonly ok: true } | { readonly ok: false; readonly problems: readonly SlotProblem[] },
+  ) {
+    return result.ok ? [] : result.problems;
+  }
+
+  /** The text as line 1 of a plan whose line 0 passes on its own: the whole plan is refused, line 0's day unfilled. */
+  function planWith(text: string) {
+    return {
+      lines: [
+        { role: "first", text: "See you {{day}}." },
+        { role: "fact", text },
+      ],
+      question: null,
+    };
+  }
+
+  /** The text refused alone (claimText, line 0) and as a plan's line 1 (claimPlan), each as written and unfilled. */
+  function refusedBoth(text: string, context: ClaimContext, why: readonly RefusalWhy[]): ClaimedText {
+    const claimed = claimText(text, barberSource(), context);
+    expect(claimed.ok).toBe(false);
+    expect(claimed.text).toBe(text);
+    expect(claimed.slotValues).toEqual([]);
+    expect(claimed.refused).toEqual(why.map((reason) => ({ line: 0, why: reason })));
+    writesNoValue(claimed);
+    const plan = claimPlan(planWith(text), barberSource(), context);
+    expect(plan.ok).toBe(false);
+    expect(texts(plan)).toEqual(["See you {{day}}.", text]);
+    expect(plan.slotValues).toEqual([]);
+    expect(plan.refused).toEqual(why.map((reason) => ({ line: 1, why: reason })));
+    writesNoValue(plan);
+    return claimed;
+  }
+
+  it("'{{visit.place:{{visit.place}}}}' to a customer: the secure-page words never become a slot's example", () => {
+    const claimed = refusedBoth("{{visit.place:{{visit.place}}}}", { reader: "customer" }, [
+      "broken",
+      "unclaimed",
+    ]);
+    expect(claimed.claims).toEqual([{ slot: "visit.place", verdict: "securePage", why: "securePageOnly" }]);
+    expect(problemsOf(claimed).map((problem) => problem.slot)).toEqual(["", "visit.place"]);
+  });
+
+  it("'{{visit.code:{{relay.quote}}}}' to staff: the customer's code is never written, nor the quote", () => {
+    const claimed = refusedBoth("{{visit.code:{{relay.quote}}}}", { reader: "staff" }, [
+      "broken",
+      "unclaimed",
+    ]);
+    expect(claimed.claims).toEqual([{ slot: "relay.quote", verdict: "securePage", why: "privateWords" }]);
+    expect(problemsOf(claimed).map((problem) => problem.slot)).toEqual(["", "visit.code"]);
+  });
+
+  it("'{{visit.code:a. {{visit.code}} b. c}}' to staff: a cut sentence never joins its neighbours into a slot", () => {
+    const claimed = refusedBoth("{{visit.code:a. {{visit.code}} b. c}}", { reader: "staff" }, [
+      "broken",
+      "unclaimed",
+    ]);
+    expect(claimed.claims).toEqual([{ slot: "visit.code", verdict: "cut", why: "notInAudience" }]);
+  });
+
+  it("a broken piece alone: a '{{' that opens no slot, in a line or in the question", () => {
+    const claimed = refusedBoth("See you {{day} at {{visit.time}}.", { reader: "customer" }, ["broken"]);
+    expect(problemsOf(claimed)).toEqual([
+      {
+        kind: "unknown",
+        slot: "",
+        detail: "A '{{' opens no slot or a '}}' closes none, so nothing in the text is filled.",
+        why: null,
+      },
+    ]);
+    const question = { text: "Does {{visit.time} work?", optionIds: OPTION_IDS };
+    const plan = claimPlan({ lines: [{ text: "See you {{day}}." }], question }, barberSource(), {
+      reader: "customer",
+    });
+    expect(plan.ok).toBe(false);
+    expect(plan.refused).toEqual([{ line: "question", why: "broken" }]);
+    expect(plan.question).toEqual(question);
+    expect(plan.questionCut).toBe(false);
+    writesNoValue(plan);
+  });
+
+  it("a stray '}}' alone: a '}}' that closes no slot", () => {
+    refusedBoth("See you {{day}} }} at {{visit.time}}.", { reader: "customer" }, ["broken"]);
+  });
+
+  it("the second guard on its own: a slot no claim showed is refused, a slot outside the vocabulary among them", () => {
+    const claimed = refusedBoth("Your deposit {{hold}} is kept.", { reader: "customer" }, ["unclaimed"]);
+    expect(problemsOf(claimed).map((problem) => problem.slot)).toEqual(["hold"]);
+    expect(claimPlan(planRelay, barberSource(), { reader: "staff" }).refused).toEqual([]);
   });
 });
