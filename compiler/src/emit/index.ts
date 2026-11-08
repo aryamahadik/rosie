@@ -1,0 +1,81 @@
+// The bundle emitter (T-149; C-058; K-01 v1): manifest, per-flow graphs, record, routing, shared lists and one compiled
+// overlay per trade (Q-34's layout), checked against K-01 v1 and written as a bundle directory (compiler/src/emit).
+export {
+  buildBundle,
+  byteLength,
+  compilerVersion,
+  emitBundle,
+  markedRules,
+  treeSha256,
+  writeBundle,
+  type BuildOptions,
+  type BuiltBundle,
+  type BundleFile,
+  type EmitInputs,
+  type EmittedBundle,
+} from "./emit";
+export {
+  MASTER_TRADE,
+  compileFlow,
+  correctedMaster,
+  masterShape,
+  type CompiledFlow,
+  type JudgmentRules,
+} from "./flow";
+export { checkBundleDir, readBundleDir } from "./read";
+export {
+  SHARED_LIST_FILE,
+  SHARED_LIST_NAMES,
+  SharedListError,
+  collectSharedLists,
+  loadSharedListParts,
+  mergeSharedLists,
+  sharedListFiles,
+  type CollectedLists,
+  type SharedListName,
+  type SharedListPart,
+} from "./shared-lists";
+export {
+  PROMPT_KINDS,
+  STANDIN_BUILT_AT,
+  STANDIN_BUNDLE_ID,
+  STANDIN_LIST_FIXTURES,
+  standInBuiltAt,
+  standInBundleId,
+  standInInputs,
+  standInJudgmentRules,
+  standInList,
+  standInModelRouting,
+  standInPrompts,
+  type BundleId,
+  type InputFile,
+  type ModelRouting,
+  type PromptKind,
+  type PromptTexts,
+  type StandIn,
+  type StandInValue,
+} from "./standins";
+export {
+  compileSteps,
+  messageTuple,
+  sectionOf,
+  toBundleMessage,
+  toBundleMessages,
+  toBundleVary,
+  toScreenRows,
+  type BundleStep,
+  type CompiledSteps,
+} from "./steps";
+export { compileTrade, settingsFor, type CompiledTrade } from "./trade";
+export {
+  BUNDLE_SCHEMA_ID,
+  BundleValidationError,
+  SCHEMA_FILES,
+  assertBundlePart,
+  bundleSchema,
+  checkBundlePart,
+  formatErrors,
+  lintMarksOf,
+  lintRuleOrder,
+  stepSchemaChecks,
+} from "./validate";
