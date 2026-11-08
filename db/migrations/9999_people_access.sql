@@ -711,12 +711,20 @@ create policy page_links_runtime on page_links for all to rosie_job
 -- output columns share names with columns. Each one's search_path is pinned below, once made: this file's own schema,
 -- then pg_temp last, so neither another schema's object nor a temporary table the caller makes stands in for a table
 -- here. The four SQL calls are also bound to this schema's tables when made (BEGIN ATOMIC), as 0012's are.
+-- Each call fails closed on a NULL argument, and none raises an error whose detail could carry a row (DL-170): a CHECK
+-- error's detail is the whole row, code_hash included, read as the owner. check_proof_code answers before any write a
+-- NULL could break, and every value it writes is one the CHECKs admit; the other four only read.
 
 -- check_proof_code (rule 5): the only way a typed code is checked. The caller hashes the typed code with the key
 -- hash_key_name names, which never enters the database. Locks the row; answers unknown, used, paused (after five wrong
 -- codes), expired (outside its 10 minutes), right (sets used_at) or wrong (raises wrong_tries, sets last_wrong_at, and
 -- at the fifth sets paused_until 15 minutes on and answers paused). It runs in the caller's transaction, so a try is
 -- counted in the turn's one commit. Keyed by the code id the caller made, not by the call's person (D77, D100).
+-- A NULL code id answers unknown and a NULL time expired, each before any write; a NULL typed hash is never right, so it
+-- is a wrong code, counted as any other. A write comes only for an unused, unpaused code (so at most four wrong tries)
+-- at a known time inside its 10 minutes, so each value it writes passes the table's CHECKs: right sets used_at inside
+-- the 10 minutes, a wrong code sets last_wrong_at with its count, and the fifth sets the pause 15 minutes from that same
+-- time. A time outside the 10 minutes, minus or plus infinity among them, is expired.
 create function check_proof_code(code_id text, typed_hash text, at timestamptz)
 returns text
 language plpgsql
@@ -736,7 +744,9 @@ begin
   if code.paused_until is not null then
     return 'paused';
   end if;
-  if check_proof_code.at < code.sent_at or check_proof_code.at > code.expires_at then
+  if check_proof_code.at is null
+     or check_proof_code.at < code.sent_at
+     or check_proof_code.at > code.expires_at then
     return 'expired';
   end if;
   if code.code_hash = check_proof_code.typed_hash then
@@ -762,22 +772,34 @@ $$;
 -- proof_code_limits (rule 5): for the contact a code is about to go to, how many codes went to it since `since`, for
 -- every person and purpose (S13-45: 'At most a few codes a day per contact'), and the latest paused_until after `at` of
 -- a code for that contact and purpose (default 8), else null. One row; never an id, a person, a business or a hash.
+-- A NULL argument answers as paused with no end ('infinity'), never 0 sent and no pause, and a NULL since counts every
+-- code to the contact (the widest window), so a sender that lost a value sends nothing.
 create function proof_code_limits(handle_id text, purpose text, since timestamptz, at timestamptz)
 returns table (sent_since integer, paused_until timestamptz)
 language sql
 stable
 security definer
 begin atomic
-  select (count(*) filter (where c.sent_at >= proof_code_limits.since))::integer,
-         max(c.paused_until) filter (
-           where c.purpose = proof_code_limits.purpose and c.paused_until > proof_code_limits.at
-         )
+  select (count(*) filter (
+           where proof_code_limits.since is null or c.sent_at >= proof_code_limits.since
+         ))::integer,
+         case
+           when proof_code_limits.handle_id is null
+             or proof_code_limits.purpose is null
+             or proof_code_limits.since is null
+             or proof_code_limits.at is null
+           then 'infinity'::timestamptz
+           else max(c.paused_until) filter (
+             where c.purpose = proof_code_limits.purpose and c.paused_until > proof_code_limits.at
+           )
+         end
     from proof_codes c
     where c.sent_to_handle_id = proof_code_limits.handle_id;
 end;
 
 -- session_for_token (rule 5): the session with that token hash that has not ended and has not expired at `at`, with its
--- person, whom the call then acts for (rule 4); no row otherwise; never a hash.
+-- person, whom the call then acts for (rule 4); no row otherwise, a NULL token or time among them (no comparison with
+-- NULL is true); never a hash.
 create function session_for_token(token_sha256 text, at timestamptz)
 returns table (session_id text, person_id text)
 language sql
@@ -792,7 +814,8 @@ begin atomic
 end;
 
 -- device_known (rule 5): true when the call's own person (rosie.person_id) has a session, live or ended, from that
--- device, so a sign-in from a new device asks the extra proof (S13-45 row 8); false otherwise and with no person set.
+-- device, so a sign-in from a new device asks the extra proof (S13-45 row 8); false otherwise and with no person set,
+-- and for a NULL device, which matches no session, not even one with no device.
 create function device_known(device_sha256 text)
 returns boolean
 language sql
@@ -808,7 +831,8 @@ begin atomic
 end;
 
 -- page_link_for_code (rule 8): the link with that code hash that has not ended and has not lapsed at `at`, else no
--- row, so an unknown, a lapsed and an ended code answer alike (K-21 linkExpired); never the hash.
+-- row, so an unknown, a lapsed and an ended code answer alike (K-21 linkExpired), as do a NULL code and a NULL time;
+-- never the hash.
 create function page_link_for_code(code_sha256 text, at timestamptz)
 returns table (
   page_link_id text,

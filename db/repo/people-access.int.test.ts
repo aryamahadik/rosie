@@ -393,15 +393,24 @@ async function refusal(promise: Promise<unknown>): Promise<Refusal> {
   throw new Error("the statement was accepted; the database should have refused it");
 }
 
-/** check_proof_code's outcome (README rule 5) for a typed code's hash at `at`. */
-async function checkCode(tx: Tx, codeId: string, typedHash: string, at: string): Promise<string | undefined> {
+/**
+ * check_proof_code's outcome (README rule 5) for a typed code's hash at `at`; null passes SQL NULL (DL-170). The time
+ * goes as text, cast on the server, so 'infinity' and '-infinity' reach PostgreSQL as given: postgres.js would make a
+ * timestamptz parameter a JavaScript Date first, which has neither.
+ */
+async function checkCode(
+  tx: Tx,
+  codeId: string | null,
+  typedHash: string | null,
+  at: string | null,
+): Promise<string | undefined> {
   const [row] = await tx<{ outcome: string }[]>`
-    select check_proof_code(${codeId}, ${typedHash}, ${at}::timestamptz) as outcome
+    select check_proof_code(${codeId}, ${typedHash}, ${at}::text::timestamptz) as outcome
   `;
   return row?.outcome;
 }
 
-async function deviceKnown(tx: Tx, device: string): Promise<boolean | undefined> {
+async function deviceKnown(tx: Tx, device: string | null): Promise<boolean | undefined> {
   const [row] = await tx<{ known: boolean }[]>`select device_known(${device}) as known`;
   return row?.known;
 }
@@ -459,7 +468,7 @@ function sessionStarted(
   codeId: string,
   provenVia: string,
   at: string,
-  device = SAM_DEVICE,
+  device: string | null = SAM_DEVICE,
 ): Values {
   return {
     id,
@@ -1520,6 +1529,279 @@ describe("proof codes: 10 minutes and 5 tries (RULES 6.2), held by the schema an
       own: ["code-jordan-sign-in-paused"],
     });
   });
+});
+
+describe("the five definer calls fail closed on a NULL argument, and none raises an error whose detail could carry a row (DL-170)", () => {
+  beforeAll(loadEverySeed, 120_000);
+
+  const at = "2026-11-04T11:00:00.000Z";
+
+  /** The columns check_proof_code moves, of one code. */
+  interface CodeState {
+    used: Date | null;
+    tries: number;
+    last: Date | null;
+    paused: Date | null;
+    version: number;
+  }
+
+  async function codeState(tx: Tx, codeId: string): Promise<CodeState | undefined> {
+    const [row] = await tx<CodeState[]>`
+      select used_at as used, wrong_tries as tries, last_wrong_at as last, paused_until as paused, version
+      from proof_codes where id = ${codeId}
+    `;
+    return row;
+  }
+
+  /** Runs `fn` in a savepoint of `tx` and rolls the savepoint back: fn's answer, or the SQLSTATE it raised. */
+  async function inSavepoint<T>(
+    tx: Tx,
+    fn: (inner: Tx) => Promise<T>,
+  ): Promise<T | { raised: string | undefined }> {
+    try {
+      await tx.savepoint(async (inner) => {
+        throw new RolledBack(await fn(inner));
+      });
+    } catch (error) {
+      if (error instanceof RolledBack) {
+        return error.answer as T;
+      }
+      return { raised: (error as { code?: string }).code };
+    }
+    throw new Error("the savepoint was not rolled back");
+  }
+
+  it("check_proof_code at a NULL time answers expired before any update: the right code and a wrong one each answer expired, change no row and raise nothing, and so does a wrong code at the fifth try, whose pause a NULL time would break", async () => {
+    const right = codeSent("code-probe-null-time-right", "sign_in", SAM, "handle-sam", at);
+    const wrong = codeSent("code-probe-null-time-wrong", "sign_in", SAM, "handle-sam", at);
+    const fifth = codeSent("code-probe-null-time-fifth", "sign_in", SAM, "handle-sam", at);
+    const fourWrong: FixtureRow = {
+      table: "proof_codes",
+      values: { ...fifth.values, wrong_tries: 4, last_wrong_at: plus(at, 4), version: 5 },
+    };
+    // A sign-in call with no person, as the security reviewer's probe: it sends the codes and checks them.
+    const answer = await as(
+      TOOL_API,
+      null,
+      async (tx) => {
+        await insertRow(tx, "proof_codes", right.values);
+        await insertRow(tx, "proof_codes", wrong.values);
+        const outcomes = [
+          await checkCode(tx, right.id, right.hash, null),
+          await checkCode(tx, wrong.id, standIn("a wrong code"), null),
+          await checkCode(tx, fifth.id, standIn("a wrong code"), null),
+        ];
+        // That call reads no code: the rows are read on the runtime side, in the same transaction.
+        await tx.unsafe(`set local role ${RUNTIME}`);
+        return {
+          outcomes,
+          rows: [await codeState(tx, right.id), await codeState(tx, wrong.id), await codeState(tx, fifth.id)],
+        };
+      },
+      [fourWrong],
+    );
+    const unchanged = { used: null, tries: 0, last: null, paused: null, version: 1 };
+    expect(answer).toEqual({
+      outcomes: ["expired", "expired", "expired"],
+      rows: [
+        unchanged,
+        unchanged,
+        { used: null, tries: 4, last: new Date(plus(at, 4)), paused: null, version: 5 },
+      ],
+    });
+  });
+
+  it("check_proof_code with a NULL code id answers unknown; a NULL typed hash is never right: it answers wrong and counts the try as any wrong code does (README rule 5), and the right code then answers right", async () => {
+    const code = codeSent("code-probe-null-hash", "sign_in", SAM, "handle-sam", at);
+    const answer = await as(TOOL_API, { personId: SAM }, async (tx) => {
+      await insertRow(tx, "proof_codes", code.values);
+      return {
+        noId: await checkCode(tx, null, code.hash, plus(at, 1)),
+        noHash: await checkCode(tx, code.id, null, plus(at, 2)),
+        counted: await codeState(tx, code.id),
+        right: await checkCode(tx, code.id, code.hash, plus(at, 3)),
+      };
+    });
+    expect(answer).toEqual({
+      noId: "unknown",
+      noHash: "wrong",
+      counted: { used: null, tries: 1, last: new Date(plus(at, 2)), paused: null, version: 2 },
+      right: "right",
+    });
+  });
+
+  it("proof_code_limits with any NULL argument answers as paused with no end (infinity), never 0 sent and no pause; a NULL since counts every code to the contact, where the same window given counts none", async () => {
+    const since = "2026-10-26T07:20:00Z";
+    const now = "2026-10-26T07:40:00Z";
+    const answer = await as(TOOL_API, null, async (tx) => {
+      const limits = async (
+        handle: string | null,
+        purpose: string | null,
+        from: string | null,
+        to: string | null,
+      ) => {
+        const rows = await tx<{ sentSince: number; pausedUntil: string | null }[]>`
+          select sent_since as "sentSince", paused_until::text as "pausedUntil"
+          from proof_code_limits(${handle}, ${purpose}, ${from}::timestamptz, ${to}::timestamptz)
+        `;
+        return [...rows];
+      };
+      return {
+        given: await limits("handle-jordan", "sign_in", since, now),
+        noSince: await limits("handle-jordan", "sign_in", null, now),
+        noTime: await limits("handle-jordan", "sign_in", since, null),
+        noHandle: await limits(null, "sign_in", since, now),
+        noPurpose: await limits("handle-jordan", null, since, now),
+        none: await limits(null, null, null, null),
+        nobodyNoSince: await limits("handle-avery", "sign_in", null, now),
+      };
+    });
+    const paused = (sentSince: number) => [{ sentSince, pausedUntil: "infinity" }];
+    expect(answer).toEqual({
+      given: [{ sentSince: 0, pausedUntil: null }],
+      noSince: paused(1),
+      noTime: paused(0),
+      noHandle: paused(0),
+      noPurpose: paused(0),
+      none: paused(0),
+      nobodyNoSince: paused(0),
+    });
+  });
+
+  it("session_for_token fails closed on NULL: no session for a NULL token, at a NULL time or with neither, where Sam's live token at a time finds his", async () => {
+    const answer = await as(TOOL_API, null, async (tx) => {
+      const found = async (token: string | null, time: string | null) =>
+        (await tx`select * from session_for_token(${token}, ${time}::timestamptz)`).length;
+      const time = "2026-10-26T09:10:00Z";
+      return {
+        live: await found(SAM_LIVE_TOKEN, time),
+        noToken: await found(null, time),
+        noTime: await found(SAM_LIVE_TOKEN, null),
+        neither: await found(null, null),
+      };
+    });
+    expect(answer).toEqual({ live: 1, noToken: 0, noTime: 0, neither: 0 });
+  });
+
+  it("page_link_for_code fails closed on NULL: no link for a NULL code, at a NULL time or with neither, where Sam's live registration code at a time finds its link", async () => {
+    const registration = textOf(
+      fixtureFile("seed-page-link.json").rows.find((row) => row.values.id === "page-link-sam-registration")
+        ?.values.code_sha256,
+    );
+    const answer = await as(TOOL_API, null, async (tx) => {
+      const found = async (code: string | null, time: string | null) =>
+        (await tx`select * from page_link_for_code(${code}, ${time}::timestamptz)`).length;
+      const time = "2026-10-20T09:00:00Z";
+      return {
+        live: await found(registration, time),
+        noCode: await found(null, time),
+        noTime: await found(registration, null),
+        neither: await found(null, null),
+      };
+    });
+    expect(answer).toEqual({ live: 1, noCode: 0, noTime: 0, neither: 0 });
+  });
+
+  it("device_known fails closed on NULL: in Sam's own call a NULL device is not known, even beside a session of his with no device, where his own device is; nor with no person set", async () => {
+    const used = codeUsed("code-probe-no-device", "sign_in", SAM, "handle-sam", "2026-11-01T08:00:00.000Z");
+    const noDevice: FixtureRow = {
+      table: "sessions",
+      values: sessionStarted(
+        "session-probe-no-device",
+        SAM,
+        "code-probe-no-device",
+        "code",
+        "2026-11-01T08:01:00.000Z",
+        null,
+      ),
+    };
+    const own = await as(
+      TOOL_API,
+      { personId: SAM },
+      async (tx) => ({ device: await deviceKnown(tx, SAM_DEVICE), noDevice: await deviceKnown(tx, null) }),
+      [used, noDevice],
+    );
+    expect(own).toEqual({ device: true, noDevice: false });
+    expect(await as(TOOL_API, null, (tx) => deviceKnown(tx, null), [used, noDevice])).toBe(false);
+  });
+
+  it(
+    "none of these inputs makes check_proof_code raise, so no error detail can carry a row: a live code, one at four wrong tries, a paused one, a used one and an unknown id, each with the right hash, a wrong one and none, at no time, minus and plus infinity, before it was sent, as it was sent, at its 10 minutes and after, answer in README rule 5's order; only right, wrong and the fifth wrong write",
+    SLOW,
+    async () => {
+      const sentAt = "2026-11-04T12:00:00.000Z";
+      const made = (state: string, change: Values) => {
+        const code = codeSent(`code-probe-any-input-${state}`, "sign_in", SAM, "handle-sam", sentAt);
+        const row: FixtureRow = { table: "proof_codes", values: { ...code.values, ...change } };
+        return { ...code, row };
+      };
+      const codes = {
+        live: made("live", {}),
+        fourWrong: made("four-wrong", { wrong_tries: 4, last_wrong_at: plus(sentAt, 4), version: 5 }),
+        paused: made("paused", {
+          wrong_tries: 5,
+          last_wrong_at: plus(sentAt, 5),
+          paused_until: plus(sentAt, 20),
+          version: 6,
+        }),
+        used: made("used", { used_at: plus(sentAt, 1), version: 2 }),
+        unknown: made("unknown", {}),
+      };
+      const times = {
+        none: null,
+        minusInfinity: "-infinity",
+        beforeSent: plus(sentAt, -1),
+        asSent: sentAt,
+        tenMinutes: plus(sentAt, 10),
+        after: plus(sentAt, 10 + 1 / 60),
+        plusInfinity: "infinity",
+      };
+      const results = await as(
+        TOOL_API,
+        { personId: SAM },
+        async (tx) => {
+          const lines: string[] = [];
+          for (const [state, code] of Object.entries(codes)) {
+            const hashes = { right: code.hash, wrong: standIn("a wrong code"), none: null };
+            for (const [hash, typed] of Object.entries(hashes)) {
+              for (const [time, when] of Object.entries(times)) {
+                const was = JSON.stringify(await codeState(tx, code.id));
+                const answer = await inSavepoint(tx, async (inner) => ({
+                  outcome: await checkCode(inner, code.id, typed, when),
+                  wrote: JSON.stringify(await codeState(inner, code.id)) !== was,
+                }));
+                lines.push(`${state} ${hash} ${time}: ${JSON.stringify(answer)}`);
+              }
+            }
+          }
+          return lines;
+        },
+        [codes.live.row, codes.fourWrong.row, codes.paused.row, codes.used.row],
+      );
+      /** README rule 5's order: unknown, used, paused, expired, then right, or wrong (paused at the fifth). */
+      const expected = (state: string, hash: string, time: string): { outcome: string; wrote: boolean } => {
+        if (state === "unknown" || state === "used" || state === "paused") {
+          return { outcome: state, wrote: false };
+        }
+        if (time !== "asSent" && time !== "tenMinutes") {
+          return { outcome: "expired", wrote: false };
+        }
+        if (hash === "right") {
+          return { outcome: "right", wrote: true };
+        }
+        return { outcome: state === "fourWrong" ? "paused" : "wrong", wrote: true };
+      };
+      expect(results).toEqual(
+        Object.keys(codes).flatMap((state) =>
+          ["right", "wrong", "none"].flatMap((hash) =>
+            Object.keys(times).map(
+              (time) => `${state} ${hash} ${time}: ${JSON.stringify(expected(state, hash, time))}`,
+            ),
+          ),
+        ),
+      );
+    },
+  );
 });
 
 /** One way a refused fixture passes once its one fault is gone (README, "Seed and refused-row fixtures"). */
