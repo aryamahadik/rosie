@@ -53,9 +53,11 @@ export {
   type PromptKind,
   type PromptTexts,
   type StandIn,
+  type StandInValue,
 } from "./standins";
 export {
   compileSteps,
+  messageTuple,
   sectionOf,
   toBundleMessage,
   toBundleMessages,

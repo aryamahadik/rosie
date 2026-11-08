@@ -44,6 +44,7 @@ import {
   type ModelRouting,
   type PromptTexts,
   type StandIn,
+  type StandInValue,
 } from "./standins";
 import type { BundleStep } from "./steps";
 import { compileTrade } from "./trade";
@@ -262,7 +263,8 @@ export function compilerVersion(): string {
  */
 export async function buildBundle(options: BuildOptions = {}): Promise<BuiltBundle> {
   const standIns: StandIn[] = [];
-  const take = <T>(given: T | undefined, standIn: () => { value: T; standIn: StandIn }): T => {
+  /** The value given, or else the stand-in's, which is then named. */
+  const take = <T>(given: T | undefined, standIn: () => StandInValue<T>): T => {
     if (given !== undefined) return given;
     const made = standIn();
     standIns.push(made.standIn);
@@ -272,36 +274,16 @@ export async function buildBundle(options: BuildOptions = {}): Promise<BuiltBund
   const master = options.master ?? loadMaster();
   const tradeIds = options.trades ?? listTradeIds();
   const trades = tradeIds.map((id) => loadTrade(id));
-  const bundleId = take(options.bundleId, () => {
-    const made = standInBundleId();
-    return { value: made.bundleId, standIn: made.standIn };
-  });
-  const builtAt = take(options.builtAt, () => {
-    const made = standInBuiltAt();
-    return { value: made.builtAt, standIn: made.standIn };
-  });
-  const inputs = take(options.inputs, () => {
-    const made = standInInputs(tradeIds);
-    return { value: made.inputs, standIn: made.standIn };
-  });
-  const prompts = take(options.prompts, () => {
-    const made = standInPrompts();
-    return { value: made.prompts, standIn: made.standIn };
-  });
-  const routing = take(options.routing, () => {
-    const made = standInModelRouting();
-    return { value: made.routing, standIn: made.standIn };
-  });
-  const judgmentRules = take(options.judgmentRules, () => {
-    const made = standInJudgmentRules();
-    return { value: made.rules, standIn: made.standIn };
-  });
+  const bundleId = take(options.bundleId, standInBundleId);
+  const builtAt = take(options.builtAt, standInBuiltAt);
+  const inputs = take(options.inputs, () => standInInputs(tradeIds));
+  const prompts = take(options.prompts, standInPrompts);
+  const routing = take(options.routing, standInModelRouting);
+  const judgmentRules = take(options.judgmentRules, standInJudgmentRules);
 
   const collected = await collectSharedLists(options.srcDir);
   const lists = {} as Record<SharedListName, unknown>;
-  for (const name of SHARED_LIST_NAMES) {
-    lists[name] = take(collected.lists[name], () => standInList(name));
-  }
+  for (const name of SHARED_LIST_NAMES) lists[name] = take(collected.lists[name], () => standInList(name));
 
   const emitted = emitBundle({
     master,

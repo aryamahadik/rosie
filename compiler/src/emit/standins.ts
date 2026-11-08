@@ -99,8 +99,14 @@ function fixture(name: string): Obj {
   return parsed as Obj;
 }
 
+/** A stand-in's value, and what it stands in for. */
+export interface StandInValue<T> {
+  value: T;
+  standIn: StandIn;
+}
+
 /** The stand-in prompts: the sample prompts of contracts/bundle/fixtures/manifest.json, each its version and text. */
-export function standInPrompts(): { prompts: PromptTexts; standIn: StandIn } {
+export function standInPrompts(): StandInValue<PromptTexts> {
   const given = fixture("manifest.json").prompts as Record<string, { version: string; text: string }>;
   const prompts = {} as PromptTexts;
   for (const kind of PROMPT_KINDS) {
@@ -109,7 +115,7 @@ export function standInPrompts(): { prompts: PromptTexts; standIn: StandIn } {
     prompts[kind] = { version: prompt.version, text: prompt.text };
   }
   return {
-    prompts,
+    value: prompts,
     standIn: {
       what: "prompts",
       owner: "the AI engineer (C-119): pass --prompts <file>",
@@ -119,10 +125,10 @@ export function standInPrompts(): { prompts: PromptTexts; standIn: StandIn } {
 }
 
 /** The stand-in model ids and routing by stakes: contracts/bundle/fixtures/manifest.json's (arch 11 line 564; Q-26). */
-export function standInModelRouting(): { routing: ModelRouting; standIn: StandIn } {
+export function standInModelRouting(): StandInValue<ModelRouting> {
   const manifest = fixture("manifest.json");
   return {
-    routing: {
+    value: {
       models: structuredClone(manifest.models) as ModelRouting["models"],
       policy: structuredClone(manifest.policy) as ModelRouting["policy"],
     },
@@ -135,9 +141,9 @@ export function standInModelRouting(): { routing: ModelRouting; standIn: StandIn
 }
 
 /** The stand-in judgment rules: contracts/bundle/fixtures/judgment-rules.json (MC R6, word for word from S13-23 on). */
-export function standInJudgmentRules(): { rules: JudgmentRules; standIn: StandIn } {
+export function standInJudgmentRules(): StandInValue<JudgmentRules> {
   return {
-    rules: fixture("judgment-rules.json") as unknown as JudgmentRules,
+    value: fixture("judgment-rules.json") as unknown as JudgmentRules,
     standIn: {
       what: "judgment rules",
       owner: "T-1050",
@@ -147,7 +153,7 @@ export function standInJudgmentRules(): { rules: JudgmentRules; standIn: StandIn
 }
 
 /** The stand-in of one shared list no module gives: its K-01 v1 fixture. */
-export function standInList(list: SharedListName): { value: unknown; standIn: StandIn } {
+export function standInList(list: SharedListName): StandInValue<unknown> {
   const file = STANDIN_LIST_FIXTURES[list];
   return {
     value: fixture(file),
@@ -156,9 +162,9 @@ export function standInList(list: SharedListName): { value: unknown; standIn: St
 }
 
 /** The stand-in bundle id (T-150 gives the real one). */
-export function standInBundleId(): { bundleId: BundleId; standIn: StandIn } {
+export function standInBundleId(): StandInValue<BundleId> {
   return {
-    bundleId: { ...STANDIN_BUNDLE_ID },
+    value: { ...STANDIN_BUNDLE_ID },
     standIn: {
       what: "bundle id",
       owner: "T-150: pass --bundle-id <hash>/<build>",
@@ -168,9 +174,9 @@ export function standInBundleId(): { bundleId: BundleId; standIn: StandIn } {
 }
 
 /** The stand-in build time (the publish gives the real one). */
-export function standInBuiltAt(): { builtAt: string; standIn: StandIn } {
+export function standInBuiltAt(): StandInValue<string> {
   return {
-    builtAt: STANDIN_BUILT_AT,
+    value: STANDIN_BUILT_AT,
     standIn: {
       what: "built at",
       owner: "the publish (T-152): pass --built-at <utc>",
@@ -187,7 +193,7 @@ const REFERENCE = /^engine\/work\/build\/[a-z-]+\.js$/;
  * The stand-in inputs: the lines of fixtures/master/SHA256SUMS (T-130, `<sha256>  <path>`) for the two flows,
  * LINES.md, the reference scripts and the trades in `trades`, in the file's order.
  */
-export function standInInputs(trades: readonly TradeId[]): { inputs: InputFile[]; standIn: StandIn } {
+export function standInInputs(trades: readonly TradeId[]): StandInValue<InputFile[]> {
   const wanted = new Set(trades);
   const inputs: InputFile[] = [];
   for (const line of readFileSync(SHA256SUMS, "utf8").split("\n")) {
@@ -204,7 +210,7 @@ export function standInInputs(trades: readonly TradeId[]): { inputs: InputFile[]
     if (!inputs.some((input) => input.trade === trade))
       throw new Error(`fixtures/master/SHA256SUMS has no line for engine/work/prof/${trade}.json`);
   return {
-    inputs,
+    value: inputs,
     standIn: {
       what: "inputs",
       owner: "T-150 (adds Master Corrections, the approved overlays and fixture set v1's MANIFEST.sha256)",

@@ -55,17 +55,51 @@ export function sectionOf(id: string): number {
 }
 
 /**
- * One message as K-01 writes it (bundleMessage, T-134). A trade may write a message with no words, `[from, to,
- * elements]` (appraiser.json): its words are "" here, as K-01's `text` is required.
+ * A message as [from, to, text, elements?]. A trade may write a message with no words, `[from, to, elements]`
+ * (appraiser.json): its words are "" here, as K-01's `text` is required, and its elements stay fourth, where the stages
+ * read them (pageTypesOf, the effects' pay element).
  */
-export function toBundleMessage(message: unknown, where: string): BundleMessage {
+export function messageTuple(message: unknown, where: string): Message {
   if (!Array.isArray(message) || message.length < 3)
     throw new Error(`${where}: a message is [from, to, text, elements?]`);
   const parts = message as unknown[];
   const tuple: unknown[] =
     typeof parts[2] === "string" ? parts.slice(0, 4) : [parts[0], parts[1], "", parts[2]];
   if (tuple[3] === undefined) tuple.length = 3;
-  return bundleMessage(tuple as Message);
+  return tuple as Message;
+}
+
+/** One message as K-01 writes it, with its plain-text form (bundleMessage, T-134). */
+export function toBundleMessage(message: unknown, where: string): BundleMessage {
+  return bundleMessage(messageTuple(message, where));
+}
+
+/** The steps (branch steps included) with every message of their `say` and their variants' as messageTuple() writes it. */
+function worded(steps: readonly AppliedStep[], where: string): AppliedStep[] {
+  return steps.map((step) => {
+    const at = `${where} ${step.id}`;
+    const out: AppliedStep = { ...step };
+    if (Array.isArray(step.say))
+      out.say = step.say.map((message, k) => messageTuple(message, `${at}.say[${String(k)}]`));
+    if (isObj(step.vary)) {
+      const vary: Obj = {};
+      for (const [key, patch] of Object.entries(step.vary)) {
+        const copy: Obj = isObj(patch) ? { ...patch } : {};
+        for (const list of ["say", "addSay"]) {
+          const messages = copy[list];
+          if (Array.isArray(messages))
+            copy[list] = messages.map((message: unknown, k) =>
+              messageTuple(message, `${at}.vary.${key}.${list}[${String(k)}]`),
+            );
+        }
+        vary[key] = isObj(patch) ? copy : patch;
+      }
+      out.vary = vary;
+    }
+    if (step.branches !== undefined)
+      out.branches = step.branches.map((branch) => ({ ...branch, steps: worded(branch.steps, at) }));
+    return out;
+  });
 }
 
 /** A list of messages as K-01 writes them. */
@@ -204,19 +238,23 @@ function compileStep(step: AppliedStep, next: string | null, parts: Parts, where
  * flow (branch steps included) or only those `only` names. `applied.flow.steps` is the main path with the branches'
  * steps nested, as master-A.json writes it.
  */
-export function compileSteps(applied: AppliedTrade, only?: ReadonlySet<string>): CompiledSteps {
+export function compileSteps(given: AppliedTrade, only?: ReadonlySet<string>): CompiledSteps {
+  const flow = given.flow.id;
+  const name = `${given.trade} flow ${flow}`;
+  const applied: AppliedTrade = { ...given, flow: { ...given.flow, steps: worded(given.flow.steps, name) } };
   const parts: Parts = {
     cards: compileTradeCards(applied),
     branches: compileTradeBranches(applied),
     fallbacks: compileFallbackTexts(applied.flow.steps),
   };
-  const flow = applied.flow.id;
   const steps = new Map<string, BundleStep>();
+  const seen = new Set<string>();
   const off = new Set<string>();
 
   const visit = (list: readonly AppliedStep[], where: string): void => {
     list.forEach((step, k) => {
-      if (steps.has(step.id)) throw new Error(`${where}: step ${step.id} is in the flow twice`);
+      if (seen.has(step.id)) throw new Error(`${where}: step ${step.id} is in the flow twice`);
+      seen.add(step.id);
       if (step.off !== undefined) off.add(step.id);
       const next = list.slice(k + 1).find((later) => later.off === undefined)?.id ?? null;
       const at = `${where} ${step.id}`;
@@ -226,10 +264,9 @@ export function compileSteps(applied: AppliedTrade, only?: ReadonlySet<string>):
       });
     });
   };
-  visit(applied.flow.steps, `${applied.trade} flow ${flow}`);
+  visit(applied.flow.steps, name);
   if (only !== undefined) {
-    for (const id of only)
-      if (!steps.has(id)) throw new Error(`${applied.trade} flow ${flow}: no step ${id} to compile`);
+    for (const id of only) if (!steps.has(id)) throw new Error(`${name}: no step ${id} to compile`);
   }
   return { flow, steps, off };
 }

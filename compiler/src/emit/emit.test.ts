@@ -18,6 +18,7 @@ import {
   buildBundle,
   byteLength,
   markedRules,
+  messageTuple,
   settingsFor,
   toScreenRows,
   treeSha256,
@@ -449,6 +450,14 @@ describe("the values K-01 v1 writes otherwise than the sources", () => {
     expect(stamped.length).toBeGreaterThan(0);
     for (const step of unstamped) expect(flows.B.steps[step.id], step.id).not.toHaveProperty("timing");
     for (const step of stamped) expect(flows.B.steps[step.id], step.id).toHaveProperty("timing", "B");
+  });
+
+  it("a message a trade writes with no words, [from, to, elements], has the words '' and its elements fourth", () => {
+    const photos = { photos: ["Price board"] };
+    expect(messageTuple(["owner", "san", photos], "test")).toEqual(["owner", "san", "", photos]);
+    expect(messageTuple(["san", "owner", "Hi", photos], "test")).toEqual(["san", "owner", "Hi", photos]);
+    expect(messageTuple(["san", "owner", "Hi"], "test")).toEqual(["san", "owner", "Hi"]);
+    expect(() => messageTuple(["san", "owner"], "test")).toThrow(/a message is/);
   });
 
   it("a flow B step the master types `step` is a plain step, with no type", () => {
