@@ -3,6 +3,7 @@
 export {
   SafetyOnArrival,
   isReadable,
+  isReadableEvent,
   setSafetyDeps,
   type HoldEntry,
   type SafetyEntry,

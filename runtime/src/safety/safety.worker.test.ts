@@ -56,7 +56,7 @@ interface SafetyRpc {
   readSafety(): Promise<SafetyEntry[]>;
   readHolds(): Promise<HoldEntry[]>;
   routineHeld(): Promise<boolean>;
-  markHoldReleased(eventId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
+  markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   writeSafetyOnReturn(): Promise<number>;
   safetyIdle(): Promise<void>;
 }
@@ -203,8 +203,9 @@ describe("a verdict with danger", () => {
       ]);
       expect(await actorOf().routineHeld()).toBe(true);
 
-      // The turn's gate released it through K-09's releaseSafetyHold after a clear "we're safe"; the actor notes it.
-      expect(await actorOf().markHoldReleased(answer.eventId)).toBe("released");
+      // The turn's gate released it through K-09's releaseSafetyHold after a clear "we're safe"; the actor notes it by the
+      // core's hold id.
+      expect(await actorOf().markHoldReleased(`hold-${answer.eventId}`)).toBe("released");
       expect(await actorOf().routineHeld()).toBe(false);
     });
   });
@@ -217,7 +218,7 @@ describe("a verdict with danger", () => {
 
       const [hold] = await actorOf().readHolds();
       expect(hold).toMatchObject({ rule: "never", released: false });
-      expect(await actorOf().markHoldReleased(answer.eventId)).toBe("neverReleased");
+      expect(await actorOf().markHoldReleased(`hold-${answer.eventId}`)).toBe("neverReleased");
       expect(await actorOf().routineHeld()).toBe(true);
     });
   });
@@ -347,6 +348,50 @@ describe("a read that never answers", () => {
         expect(await actorOf().routineHeld()).toBe(false);
       });
       expect(h.core.fixed).toHaveLength(1);
+    });
+  });
+
+  it("an unread hold is never lifted by a release: only the read's late verdict lifts it (T-247 security note a)", async () => {
+    await withSafety({}, {}, async (h) => {
+      await arrive("evt-unread-1", PLAIN_TEXT);
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+      expect(await actorOf().readHolds()).toEqual([
+        { eventId: "evt-unread-1", holdId: null, rule: "unread", blocksBooking: false, released: false },
+      ]);
+
+      // It has no hold id to name: neither its event id nor a made-up hold id releases it.
+      expect(await actorOf().markHoldReleased("evt-unread-1")).toBe("noSuchHold");
+      expect(await actorOf().markHoldReleased("hold-evt-unread-1")).toBe("noSuchHold");
+      expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: false }]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("a hold made while PostgreSQL was down is released only once the core has recorded it, by its id (note a)", async () => {
+    const answer = asResult(safetyCrisisWords);
+    await withSafety({ [answer.eventId]: answer }, {}, async (h) => {
+      h.core.down = true;
+      await arrive(answer.eventId, CRISIS_TEXT);
+      await actorOf().safetyIdle();
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: answer.eventId, rule: "after_safe", holdId: null, released: false },
+      ]);
+      // No hold id yet: nothing names it, so it stays held.
+      expect(await actorOf().markHoldReleased(answer.eventId)).toBe("noSuchHold");
+      expect(await actorOf().markHoldReleased(`hold-${answer.eventId}`)).toBe("noSuchHold");
+      expect(await actorOf().routineHeld()).toBe(true);
+
+      // Back up: the record is written and the core's hold id lands on the hold; an event id still names nothing.
+      h.core.down = false;
+      expect(await actorOf().writeSafetyOnReturn()).toBe(1);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { holdId: `hold-${answer.eventId}`, released: false },
+      ]);
+      expect(await actorOf().markHoldReleased(answer.eventId)).toBe("noSuchHold");
+      expect(await actorOf().routineHeld()).toBe(true);
+      expect(await actorOf().markHoldReleased(`hold-${answer.eventId}`)).toBe("released");
+      expect(await actorOf().routineHeld()).toBe(false);
     });
   });
 

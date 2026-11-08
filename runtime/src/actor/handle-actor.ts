@@ -1,27 +1,31 @@
 // The handle actor (T-244; C-046, C-030, C-184): one Durable Object per handle, named `actorNameOf(handle)`, which the
 // gateway's door (runtime/src/gateway/actor-door.ts) reaches with `accept`. It keeps the handle's ordered inbox of
 // sealed events in its own storage (inbox.ts), drops a known event id, starts no turn for Rosie's own reaction, and
-// sends a receipt that reaches it to the receipt hooks, never to the inbox.
+// sends a receipt that reaches it to the receipt hooks, never to the inbox. Each raw text goes to the safety read on
+// arrival (T-246, ../safety), then into the batch window (T-247, batch.ts), whose closed batches go to the turn lease
+// (T-248, lease.ts) once no safety hold keeps them back.
 //
-// Not here: the safety read on arrival (T-246), batching (T-247), the lease (T-248), edits and vote changes after a
-// commit (T-245). The actor never opens a sealed box. Never logged: a word, a phone number, a key, a sealed body.
+// Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). The actor never opens
+// a sealed box. Never logged: a word, a phone number, a key, a sealed body.
 
 import { DurableObject } from "cloudflare:workers";
 
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
-import { SafetyOnArrival, isReadable, type HoldEntry, type SafetyEntry } from "../safety";
+import { SafetyOnArrival, isReadable, isReadableEvent, type HoldEntry, type SafetyEntry } from "../safety";
 import { isLabel, logSink, openTrace, type BundleId, type SpanSink } from "../trace";
 import { BatchWindow, type BatchEntry } from "./batch";
 import {
   createInboxTables,
   markReceiptSeen,
   readInbox,
+  readInboxEvents,
   startsTurn,
   unmarkReceipt,
   writeToInbox,
   type InboxEntry,
 } from "./inbox";
+import { TurnLease, type TurnEntry } from "./lease";
 
 /** A delivery receipt as the actor passes it on: the scrubbed K-06 event (no words) with `partKey` beside it. */
 export interface ReceiptHandoff {
@@ -82,6 +86,7 @@ function checkHandoff(handoff: SealedHandoff): "inbox" | "receipt" {
 export class HandleActor extends DurableObject {
   private readonly safety: SafetyOnArrival;
   private readonly batch: BatchWindow;
+  private readonly lease: TurnLease;
   private readonly batchWork = new Set<Promise<void>>();
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
@@ -90,19 +95,39 @@ export class HandleActor extends DurableObject {
     this.safety = new SafetyOnArrival({
       storage: ctx.storage,
       spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
+      // A late verdict: danger closes the open batch at once, and a lifted hold lets the waiting batches go on.
+      afterLate: (eventId) => {
+        this.lend(
+          Promise.resolve()
+            .then(() => {
+              this.batch.afterSafety(eventId);
+            })
+            .then(() => this.settleBatch()),
+        );
+      },
     });
     this.batch = new BatchWindow({
       storage: ctx.storage,
-      held: () => this.safety.routineHeld(),
+      held: () => this.safety.routineHeld() || this.unreadInBatch(),
       isDanger: (eventId) =>
         this.safety.readSafety().some((entry) => entry.eventId === eventId && entry.danger),
+      lease: (batch) => this.lease.take(batch),
     });
-    // After a restart the alarm is set again from the stored schedule, so a batch open at the restart still closes.
+    this.lease = new TurnLease({
+      storage: ctx.storage,
+      arm: () => this.batch.arm(),
+      lend: (work) => {
+        this.lend(work);
+      },
+    });
+    // After a restart the alarm is set again from the stored schedule, so a batch open at the restart still closes and a
+    // lease that lapsed while the actor was gone still reruns its turn.
     ctx.waitUntil(this.batch.arm());
   }
 
-  /** The Durable Object alarm: the stored schedule's due entries (the batch close, a held batch's hand-off). */
+  /** The Durable Object alarm: the stored schedule's due entries (a lapsed lease, the batch close, a batch's hand-off). */
   override async alarm(): Promise<void> {
+    await this.lease.onAlarm();
     await this.batch.onAlarm();
   }
 
@@ -167,10 +192,14 @@ export class HandleActor extends DurableObject {
     return this.safety.routineHeld();
   }
 
-  /** Notes that the shared core released the hold of this text; a threat's is never released (A3-48) and answers "neverReleased". */
-  markHoldReleased(eventId: string): "released" | "neverReleased" | "noSuchHold" {
-    const answer = this.safety.markHoldReleased(eventId);
-    // A lifted hold lets the batches that waited for it go to the lease.
+  /**
+   * Notes that the shared core released the hold with this id (K-09 releaseSafetyHold's holdId). Only a hold the core
+   * recorded, named by its id, is released: an unread hold, or one the core has no id for yet, answers "noSuchHold". A
+   * threat's is never released (A3-48) and answers "neverReleased".
+   */
+  markHoldReleased(holdId: string): "released" | "neverReleased" | "noSuchHold" {
+    const answer = this.safety.markHoldReleased(holdId);
+    // A lifted hold lets the batches that waited for it go to the lease (nothing polls while they wait).
     if (answer === "released") this.lend(this.settleBatch());
     return answer;
   }
@@ -178,6 +207,26 @@ export class HandleActor extends DurableObject {
   /** Every batch the actor holds, in order: closed ones with how they closed and whether the lease has them, and the open one last. */
   readBatches(): BatchEntry[] {
     return this.batch.read();
+  }
+
+  /** Every turn the lease has opened, in order, with its state and, while it holds the lease, when the lease lapses. */
+  readTurns(): TurnEntry[] {
+    return this.lease.read();
+  }
+
+  /** The batch ids the lease has taken that wait for the next turn. */
+  readWaitingBatches(): number[] {
+    return this.lease.waiting();
+  }
+
+  /**
+   * True when a batched text the safety read reads has no safety row: its read never started (the read's start failed after
+   * the text was stored). Routine work waits, as for a text still unread (T-247 security note d: fail closed).
+   */
+  private unreadInBatch(): boolean {
+    const missing = this.safety.withoutSafetyRow(this.batch.pendingEventIds());
+    if (missing.length === 0) return false;
+    return readInboxEvents(this.ctx.storage.sql, missing).some((entry) => isReadableEvent(entry.event));
   }
 
   /** Resolves when the batch work started so far is done (tests). */
