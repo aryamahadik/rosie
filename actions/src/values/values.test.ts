@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import {
   amountsIn,
   countsIn,
+  foundAtWordEdges,
   instantsAt,
   instantsFor,
   optionsNamedIn,
@@ -241,6 +242,86 @@ describe("dates and times, from the send time in a zone", () => {
 
   it.each(["the usual", "barbering and some other stuff", "1"])("'%s' names no time", (words) => {
     expect(readTimeWords(words).kind).toBe("none");
+  });
+});
+
+describe("words found in a text only whole, at word edges (DL-184)", () => {
+  it.each([
+    ["raise haircut to 140", "40", "140"],
+    ["can we do tomorrow at 10", "tomorrow at 1", "tomorrow at 10"],
+    ["raise haircut to $1,200", "$1", "$1,200"],
+    ["can I come in Oct 24", "Oct 2", "Oct 24"],
+    ["can you fit 12 people tomorrow", "2 people", "12 people"],
+    ["can you fit 12 people tomorrow", "2", "12"],
+    ["10am works", "1", "10am"],
+    ["yesterday was better", "yes", "yesterday"],
+    ["you know", "no", "know"],
+  ])("in '%s', '%s' is cut out of a longer word or number and not found; '%s' is", (text, cut, whole) => {
+    expect(text.includes(cut)).toBe(true);
+    expect(foundAtWordEdges(text, cut)).toBe(false);
+    expect(foundAtWordEdges(text, whole)).toBe(true);
+  });
+
+  it.each([
+    ["$1,200", "200"],
+    ["at 10:30", "30"],
+    ["at 10:30", "at 10"],
+    ["10/24 at 2pm", "24 at 2pm"],
+    ["10/24 at 2pm", "10"],
+    ["$12.50", "$12"],
+    ["$12.50", "50"],
+    ["about .5 hours", "5 hours"],
+  ])("a number's own marks join it: in '%s', '%s' is not found", (text, cut) => {
+    expect(foundAtWordEdges(text, cut)).toBe(false);
+  });
+
+  it.each([
+    ["twenty-five people", "twenty"],
+    ["twenty-five people", "five people"],
+    ["tile is $12-15 a foot", "$12"],
+    ["BLOCK Thu 2-5", "Thu 2"],
+    ["2–5pm", "5pm"],
+    ["I can't make it", "I can"],
+    ["I can’t make it", "I can"],
+    ["Sam's price board", "Sam"],
+  ])("a hyphen, dash or apostrophe joins words: in '%s', '%s' is not found", (text, cut) => {
+    expect(foundAtWordEdges(text, cut)).toBe(false);
+  });
+
+  it.each([
+    ["tile is $12 a foot from now on", "$12 a foot"],
+    ["yes, 2", "yes"],
+    ["yes, 2", "2"],
+    ["2, you know", "2"],
+    ["move me to tomorrow at 3.", "tomorrow at 3"],
+    ["(3pm) works", "3pm"],
+    ["'yes' please", "yes"],
+    ["Sat Oct 24 · 11:00am", "Sat Oct 24 · 11:00am"],
+    ["BLOCK Thu 2-5", "Thu 2-5"],
+    ["tomorrow - 3pm", "tomorrow"],
+    ["I can't make it", "I can't"],
+    ["I said yesterday, and yes I meant it", "yes"],
+  ])(
+    "words with spaces, punctuation or the text's end around them are found: in '%s', '%s'",
+    (text, whole) => {
+      expect(foundAtWordEdges(text, whole)).toBe(true);
+    },
+  );
+
+  it("is word for word otherwise: case and spacing count, and empty words or spaces are never found", () => {
+    expect(foundAtWordEdges("yes please", "Yes")).toBe(false);
+    expect(foundAtWordEdges("yes  please", "yes please")).toBe(false);
+    expect(foundAtWordEdges("yes please", "")).toBe(false);
+    expect(foundAtWordEdges("yes please", " ")).toBe(false);
+    expect(foundAtWordEdges("", "yes")).toBe(false);
+  });
+
+  it("an accent typed apart, or a letter outside the basic plane, is part of its word", () => {
+    expect(foundAtWordEdges("café at 3", "cafe")).toBe(false);
+    expect(foundAtWordEdges("café at 3", "café")).toBe(true);
+    expect(foundAtWordEdges("𝐀yes", "yes")).toBe(false);
+    expect(foundAtWordEdges("👍 yes", "yes")).toBe(true);
+    expect(foundAtWordEdges("yes👍", "yes")).toBe(true);
   });
 });
 
