@@ -7,6 +7,12 @@
 //      channel through the linq port goes like any other, text only (K-07 README; DL-031).
 //   1. Stopped: only a safety line and a stop reply go, with the opt-out override on the send, at any hour (RULES 4.3,
 //      4.12; arch 02 line 125); any other row is dropped, and its question takes step 9's never-delivered path (T-255).
+//      A texts yes newer than the stop turns texts back on only when it is the person's own word sent from the number
+//      that stopped (T-1099; RULES 7.1, 7.5; S13-32 lines 7213 to 7215, 7242): a START, or a fresh yes for this row's
+//      booking. A yes the business entered ('1 Yes' by text or on the Today page, which writes a texts row newer than
+//      the STOP that K-05 v1.2 default 35 reads as the covering row), or one whose record does not say who gave it
+//      (K-05 v1.2's textsConsent as frozen), never does: the row is dropped. A row the person's own yes lifted goes on
+//      to the checks below, where a stopped phone's closed chat holds it (K-04 phones_stop_closes_chat).
 //   2. Not stopped and no open chat: every row waits, whatever its class (a safety line too) and audience (customer,
 //      owner, team), with no text and no clock: Rosie never writes first (RULES 4.1b; MC C9; CQ-37).
 //   3. A safety line and a stop reply then go at any hour, with no check of versions.
@@ -26,8 +32,11 @@ import type { ClaimedRow, MarkRowRequest, SendState, Utc } from "../types";
 export type Limit8Decision =
   /** Go on and send. `overrideOptout` is set when the recipient is stopped and the row is one a stop does not bind. */
   | { action: "send"; reason: SendReason; overrideOptout: boolean }
-  /** Mark the row with this limit-8 outcome and send nothing. */
-  | { action: "mark"; outcome: MarkRowRequest["outcome"]; heldUntil: Utc | null }
+  /**
+   * Mark the row with this limit-8 outcome and send nothing. `yesRefused` is set when a stopped phone's newest texts row
+   * was a yes that did not lift the stop (a label for the span).
+   */
+  | { action: "mark"; outcome: MarkRowRequest["outcome"]; heldUntil: Utc | null; yesRefused?: YesRefused }
   /** An SMS port: nothing is sent and the row is not marked (no K-05 move exists for it; CQ-55 (1)). */
   | { action: "refuseSms" }
   /** The send state cannot be read as it is (a zone or hours that are not valid): nothing is sent. */
@@ -61,6 +70,47 @@ export const isSafety = (row: ClaimedRow): boolean => row.sendClass === "safety"
  */
 export const isSmsPort = (row: ClaimedRow): boolean => row.port === "sms";
 
+/** Why a stopped phone's newest texts row, a yes, did not lift the stop: a label for the span, never words or numbers. */
+export type YesRefused =
+  /** The record does not say who gave it, its booking or when the stop came (K-05 v1.2 as frozen): fail closed. */
+  | "notKnown"
+  /** Not the person's own text from that number: the business's '1 Yes' (by text or on the Today page), a page's. */
+  | "notFromContact"
+  /** Not newer than the stop. */
+  | "notAfterStop"
+  /** A fresh yes for another booking, or for none: it turns only its own booking's texts back on (S13-32 line 7242). */
+  | "otherBooking";
+
+/** What the newest texts row does to a stopped phone's stop for one row. */
+export type YesAfterStop = { lifts: true } | { lifts: false; refused: YesRefused | null };
+
+/**
+ * Whether the person's own yes since the stop turns texts back on for this row (T-1099). After a STOP, only START or a
+ * fresh yes on a new booking sent from that number does, for that booking (RULES 7.5; S13-32 line 7242): never someone
+ * else's word (RULES 7.1; S13-32 line 7214), and the business's word counts only for someone who gave the business their
+ * number for this booking (line 7215), which a stop takes back. Every check fails closed: a row the record does not
+ * describe in full lifts nothing. `refused` is null when there is no yes to refuse (no row, or the newest withdraws).
+ */
+export function yesAfterStop(row: ClaimedRow, state: SendState): YesAfterStop {
+  const yes = state.textsConsent;
+  if (yes === undefined || yes === null || yes.revoked) return { lifts: false, refused: null };
+  if (yes.fromContact === undefined) return { lifts: false, refused: "notKnown" };
+  if (!yes.fromContact) return { lifts: false, refused: "notFromContact" };
+  const stopAt = state.stopAt ?? null;
+  if (stopAt === null) return { lifts: false, refused: "notKnown" };
+  if (!(Date.parse(yes.at) > Date.parse(stopAt))) return { lifts: false, refused: "notAfterStop" };
+  // A START covers every business, and so every row; a fresh yes names its business and its booking.
+  if (yes.businessId === null) return { lifts: true };
+  if (yes.bookingId === undefined) return { lifts: false, refused: "notKnown" };
+  if (yes.bookingId === null || yes.bookingId !== row.bookingId)
+    return { lifts: false, refused: "otherBooking" };
+  return { lifts: true };
+}
+
+/** Whether the recipient's stop stands for this row: the stopped flag is set and no yes of the person's own lifts it. */
+export const stopStands = (row: ClaimedRow, state: SendState): boolean =>
+  state.stopped && !yesAfterStop(row, state).lifts;
+
 /** The row's read versions that moved: any not found in the current versions, or found at another version. */
 export function versionsChanged(row: ClaimedRow, state: SendState): boolean {
   return row.versionsRead.some((read) => {
@@ -86,11 +136,20 @@ export function decideLimit8(input: Limit8Input): Limit8Decision {
   const { row, state, now } = input;
   if (isSmsPort(row)) return { action: "refuseSms" };
 
-  // A stopped phone: only a safety line and a stop reply go, with the opt-out override (STOP clears chat_open).
+  // A stopped phone: only a safety line and a stop reply go, with the opt-out override (STOP clears chat_open), unless
+  // the person's own yes from that number since the stop turned this row's texts back on (T-1099).
   if (state.stopped) {
     if (isSafety(row)) return { action: "send", reason: "safety", overrideOptout: true };
     if (isStopReply(row)) return { action: "send", reason: "stopReply", overrideOptout: true };
-    return { action: "mark", outcome: "droppedStopped", heldUntil: null };
+    const yes = yesAfterStop(row, state);
+    if (!yes.lifts) {
+      return {
+        action: "mark",
+        outcome: "droppedStopped",
+        heldUntil: null,
+        ...(yes.refused === null ? {} : { yesRefused: yes.refused }),
+      };
+    }
   }
   if (input.partOut) return { action: "send", reason: "partOut", overrideOptout: false };
 

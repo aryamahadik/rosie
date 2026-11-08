@@ -515,7 +515,8 @@ export class FakeRecipients implements RecipientDirectory {
 /**
  * A send-state read that answers as K-04's and K-07's fixtures state (NQ-RT-2's default until K-05 v1.2): an open chat,
  * a customer, a business in New York with text hours 08:00 to 20:00 (seed-business-head.json), not stopped, no override,
- * and the versions the row read still current. A test sets what differs, for a recipient (handle id) or for one row.
+ * and the versions the row read still current. It gives no stop time and no texts row (K-05 v1.2 `phone.stopAt` and
+ * `textsConsent`) unless a test sets them (T-1099). A test sets what differs, for a recipient (handle id) or for one row.
  */
 export class FakeSendState implements SendStateReader {
   private readonly byHandle = new Map<string, Partial<SendState>>();
