@@ -10,11 +10,18 @@
 // What the model is not shown: the row and turn ids, the master line's step id (a step id is never in a message: arch
 // 07 line 415) and the send times (the composer states no time but a slot: arch 07 line 409).
 //
+// Each fact is one element in <facts>, in the input's order. A slot fact reads <fact slot="name">value</fact>. A term
+// fact (K-03 v1.1: one of Rosie's own fixed terms that the step's card states) has no slot, so it is marked as a term,
+// with its words alone: <term>its words</term> (README "v1.1": the prompt shows a term fact in <facts> with no slot
+// name). Its source line is never shown (DL-163 rule 4): it names the step and K-01 paths, and T-1104's AI-engineer
+// review keeps every step id and K-01 path from the model (arch 07 line 415); the words alone are what may be stated.
+// The source stays in the input, for the checks (check.ts reads a term fact's words, never its source).
+//
 // The worked examples in the system prompt show their inputs with composeInputText, so an example reads exactly as a
 // real row does; the composer (C-118) sends composeInputText(input) as each call's per-turn part (T-364's layout).
 
 import { dataElement, parentElement } from "../../context/tags";
-import type { ComposeInput, MessagePlan, PlanLine } from "./types";
+import type { ComposeInput, InputFact, MessagePlan, PlanLine } from "./types";
 
 /** The input tags, in the order the model reads them; inbound comes only in a reply to its sender. */
 export const INPUT_TAGS = [
@@ -43,6 +50,13 @@ function listElement(name: InputTag, item: string, values: readonly string[]): s
   );
 }
 
+/** One fact: a slot fact with its slot; a term fact (K-03 v1.1 `termFact`) as a term, its words alone: no slot, no source. */
+function factElement(fact: InputFact): string {
+  return "slot" in fact
+    ? dataElement("fact", { slot: fact.slot }, fact.value)
+    : dataElement("term", {}, fact.value);
+}
+
 /** The row's input as tagged parts, every value escaped as data. */
 export function composeInputText(input: ComposeInput): string {
   const { audience } = input;
@@ -53,11 +67,7 @@ export function composeInputText(input: ComposeInput): string {
       input.conversation.map((message) => dataElement("message", { from: message.from }, message.text)),
     ),
     dataElement("master_text", {}, input.masterText.text),
-    parentElement(
-      "facts",
-      {},
-      input.facts.map((fact) => dataElement("fact", { slot: fact.slot }, fact.value)),
-    ),
+    parentElement("facts", {}, input.facts.map(factElement)),
     parentElement("audience", { role: audience.role, way: audience.way }, [
       ...(audience.name === null ? [] : [dataElement("name", {}, audience.name)]),
       ...(audience.handlingLine === null ? [] : [dataElement("handling_line", {}, audience.handlingLine)]),

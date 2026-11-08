@@ -1,10 +1,14 @@
-// The parts of K-03 v1 (contracts/message-plan/message-plan.v1.schema.json) the composer's prompt reads, written by
-// hand: the generated types are git-ignored (ADR-005) and the Worker must not depend on them. Two documents:
+// The parts of K-03 (contracts/message-plan) the composer's prompt reads, written by hand: the generated types are
+// git-ignored (ADR-005) and the Worker must not depend on them. Two documents:
 //
-//   - `$defs/composeInput`: the composer's input, one per outbox row (arch 07 line 397);
-//   - `$defs/plan`: the composer's structured output, the message plan (arch 07 line 397; arch 01 line 97).
+//   - `$defs/composeInput`: the composer's input, one per outbox row (arch 07 line 397), at K-03 v1.1
+//     (message-plan.v1.1.schema.json): each fact is a slot fact (v1's `fact`) or a term fact (v1.1's `termFact`, one
+//     of Rosie's own fixed terms that the step's card states, with its source line; README "v1.1"), so every v1 input
+//     is a v1.1 input;
+//   - `$defs/plan`: the composer's structured output, the message plan (arch 07 line 397; arch 01 line 97), v1's
+//     exactly (v1.1 leaves it unchanged).
 //
-// The schema is the one definition of both; the prompt's tests check every worked example against it.
+// The schemas are the one definition of both; the prompt's tests check every worked example against them.
 
 /** A format the plan may pick (K-03 `format`; arch 07 lines 373 to 393). */
 export type Format = "text" | "poll" | "linkCard" | "calendarFile" | "tapback";
@@ -61,11 +65,24 @@ export interface ConversationMessage {
   readonly sentAt: InputTime;
 }
 
-/** One fact the reader may see: a slot and its value (K-03 `fact`). */
+/** One fact the reader may see as a slot: the slot and its value (K-03 `fact`, a slot fact). */
 export interface Fact {
   readonly slot: string;
   readonly value: string;
 }
+
+/**
+ * One of Rosie's own fixed terms that the step's card states (K-03 v1.1 `termFact`): the card line's words exactly as the
+ * card states them, and its source line. It has no slot: the composer states its words as they are or leaves it out,
+ * never as a slot and never changed (README "v1.1").
+ */
+export interface TermFact {
+  readonly value: string;
+  readonly source: string;
+}
+
+/** One fact of the composer's input (K-03 v1.1 `inputFact`): a slot fact or a term fact, never both. */
+export type InputFact = Fact | TermFact;
 
 /** Who reads the message (K-03 `audience`). */
 export interface Audience {
@@ -93,13 +110,13 @@ export interface Inbound {
   readonly sentAt: InputTime;
 }
 
-/** The composer's input for one outbox row (K-03 `composeInput`). */
+/** The composer's input for one outbox row (K-03 v1.1 `composeInput`): its facts are slot facts and term facts. */
 export interface ComposeInput {
   readonly row: string;
   readonly turn: string;
   readonly conversation: readonly ConversationMessage[];
   readonly masterText: { readonly step: string; readonly text: string };
-  readonly facts: readonly Fact[];
+  readonly facts: readonly InputFact[];
   readonly audience: Audience;
   readonly language: string;
   readonly channel: Channel;
@@ -110,4 +127,9 @@ export interface ComposeInput {
   readonly pageTypes: readonly string[];
   readonly openQuestions: readonly OpenQuestion[];
   readonly inbound: Inbound | null;
+}
+
+/** A K-03 v1 `composeInput`: every fact a slot fact, as the prompt's worked examples are (prompt.test.ts checks them). */
+export interface ComposeInputV1 extends Omit<ComposeInput, "facts"> {
+  readonly facts: readonly Fact[];
 }

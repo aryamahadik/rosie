@@ -11,6 +11,7 @@ export {
   LANGUAGE_RULE,
   MASTER_LINE_RULE,
   ROLE_SENTENCE,
+  TERM_FACT_RULE,
   composerPromptText,
   exampleText,
 } from "./prompt";
@@ -20,10 +21,12 @@ export type {
   Audience,
   Channel,
   ComposeInput,
+  ComposeInputV1,
   ConversationMessage,
   Fact,
   Format,
   Inbound,
+  InputFact,
   InputTime,
   LineRole,
   LinkSlot,
@@ -35,4 +38,5 @@ export type {
   Reach,
   ReaderRole,
   Situation,
+  TermFact,
 } from "./types";
