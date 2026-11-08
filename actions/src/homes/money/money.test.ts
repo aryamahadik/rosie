@@ -1571,12 +1571,17 @@ describe("round 4 (DL-187): one money word, sign or slot makes a money sentence,
     for (const text of [
       "We'll put a temporary stop on your plastic until the visit.",
       "If we don't hear back by 7pm, it goes through anyway.",
-      "We'll put a h0ld on it until the visit.",
     ]) {
       expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: true, refused: [] });
       for (const reading of gateReadings())
         expect(checkMoneyText(text, reading, gate()), text).toEqual({ ok: true, claims: [], refused: [] });
     }
+    // Round 6 (DL-204 2c): a word that mixes letters and digits is also read with digits as letters, so "h0ld" reads
+    // "hold" and is no longer the residual (round 4 passed this line).
+    const digits = "We'll put a h0ld on it until the visit.";
+    expect(gateMoneyText(digits, NOTHING_APPROVED)).toEqual({ ok: false, refused: [HOLD] });
+    for (const reading of gateReadings())
+      expect(checkMoneyText(digits, reading, gate()).refused).toEqual([HOLD]);
   });
 });
 
@@ -1843,11 +1848,17 @@ describe("round 5 (DL-194, 2): bidi controls, narrow spaces, auth, every currenc
     }
   });
 
-  it("the residual: letter-shaped symbols with no plain-letter form (🅷🅾🅻🅳) are not this check's to catch (CQ-120); ones NFKD reads as letters are", () => {
-    for (const text of ["We'll put a 🅷🅾🅻🅳 on it until the visit.", "If you don't reply, we'll 🅲🅷🅰🆁🅶🅴 it."]) {
-      expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: true, refused: [] });
+  it("letter-shaped symbols with no plain-letter form (🅷🅾🅻🅳), round 5's residual, now fail as DL-204 1c's characters; ones NFKD reads as letters fail too", () => {
+    // Round 6 (DL-204 1c): a negative squared letter makes a money sentence and reads as the letter it shows, so these
+    // two lines fail with their labels (round 5 passed them as CQ-120's residual).
+    const lines = [
+      ["We'll put a 🅷🅾🅻🅳 on it until the visit.", HOLD],
+      ["If you don't reply, we'll 🅲🅷🅰🆁🅶🅴 it.", SILENCE],
+    ] as const;
+    for (const [text, refusal] of lines) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: false, refused: [refusal] });
       for (const reading of gateReadings())
-        expect(checkMoneyText(text, reading, gate()), text).toEqual({ ok: true, claims: [], refused: [] });
+        expect(checkMoneyText(text, reading, gate()).refused, text).toEqual([refusal]);
     }
     // Squared and circled letters have a plain-letter form, so they are read as those letters.
     for (const text of ["We'll put a 🄷🄾🄻🄳 on it until the visit.", "We'll put a ⓗⓞⓛⓓ on it until the visit."])
@@ -1891,6 +1902,358 @@ describe("round 5 (DL-194, 3): a refund said as a noun needs money the booking t
     ]) {
       expect(corpus.has(text), text).toBe(true);
       expect(checkMoneyLine(text, asked).claims, text).not.toContain("backToCard");
+    }
+  });
+});
+
+// Round 6 (DL-204): the method changes. A sentence that holds a character of a class that hides a word is a money
+// sentence: a bidi control, a compatibility letter, a letter-shaped character with no plain form, a word that mixes
+// scripts. Money emoji are money signs; every space separator but U+0020 is read joined and split; a word that mixes
+// letters and digits is read with digits as letters. The residual is a closed form (gate.ts header; CQ-120).
+
+/** The numbers from start to end, both included. */
+function range(start: number, end: number): number[] {
+  return Array.from({ length: end - start + 1 }, (_, offset) => start + offset);
+}
+
+/** "charge" in Latin small capitals (U+1D04 U+029C U+1D00 U+0280 U+0262 U+1D07). */
+const SMALL_CAPITAL_CHARGE = "\u{1D04}\u{29C}\u{1D00}\u{280}\u{262}\u{1D07}";
+
+/** The security reviewer's round 5 lines (card T-593) and DL-204 3a's ˢᴹ and ᴹᴰ forms, each with its label. */
+const REVIEWER_ROUND_5: readonly (readonly [string, GateWhy])[] = [
+  // GAP 1: an override that its isolate's end (U+2069) closes, with letters glued outside it.
+  ["If you don't reply by 7pm, we'll ch\u{2066}\u{202E}egra\u{2069} you.", "neverChargeOnSilence"],
+  ["We'll place a h\u{2066}\u{202E}dlo\u{2069} on it.", "neverHold"],
+  ["You were ch\u{2066}\u{202E}degra\u{2069}.", "moneyNotFromRecord"],
+  // GAP 1: a left-to-right override (U+202D) nested in a right-to-left one: U+202E "eg" U+202D "ar" U+202C "hc"
+  // U+202C shows "charge".
+  ["If you don't reply by 7pm, we'll \u{202E}eg\u{202D}ar\u{202C}hc\u{202C} you.", "neverChargeOnSilence"],
+  ["We'll place a \u{202E}d\u{202D}ol\u{202C}h\u{202C} on it.", "neverHold"],
+  // GAP 2: the trademark mark in small modifier letters (U+1D57 U+1D50), and ˢᴹ (U+02E2 U+1D39) and ᴹᴰ (U+1D39 U+1D30).
+  ["We'll freeze your Mastercard\u{1D57}\u{1D50} until the visit.", "neverHold"],
+  ["If you don't reply by 7pm, it goes on your Mastercard\u{1D57}\u{1D50}.", "neverChargeOnSilence"],
+  ["We'll freeze your Mastercard\u{2E2}\u{1D39} until the visit.", "neverHold"],
+  ["If you don't reply by 7pm, it goes on your Mastercard\u{1D39}\u{1D30}.", "neverChargeOnSilence"],
+];
+
+describe("round 6 (DL-204, 1): a character that hides a word makes a money sentence, wherever it stands", () => {
+  it("the security reviewer's round 5 lines fail with their labels: an override an isolate's end closes, a nested override, ᵗᵐ, ˢᴹ and ᴹᴰ", () => {
+    let checked = 0;
+    for (const [line, why] of REVIEWER_ROUND_5)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, gate()).refused, JSON.stringify(text)).toEqual([BY_WHY[why]]);
+        for (const reading of gateReadings()) {
+          const check = checkMoneyText(text, reading, gate());
+          expect(check.ok, JSON.stringify(text)).toBe(false);
+          expect(check.refused, JSON.stringify(text)).toContainEqual(BY_WHY[why]);
+          // The claim check alone refuses the hold and the silence topics too, with no line approved.
+          if (why !== "moneyNotFromRecord")
+            expect(checkMoneyLine(text, reading).refused, JSON.stringify(text)).toContainEqual(BY_WHY[why]);
+          checked += 1;
+        }
+      }
+    expect(checked).toBe(REVIEWER_ROUND_5.length * 3 * 6);
+    // The claim check reads the text as its controls show it: "charged" closed by an isolate's end, before the money
+    // step.
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    expect(checkMoneyLine("You were ch\u{2066}\u{202E}degra\u{2069} $55.", asked).refused).toEqual([
+      { claim: "charged", why: "notTaken" },
+    ]);
+  });
+
+  it("every bidi control makes a money sentence, whatever closes it: U+061C, U+200E, U+200F, U+202A to U+202E, U+2066 to U+2069", () => {
+    const controls = [0x61c, 0x200e, 0x200f, ...range(0x202a, 0x202e), ...range(0x2066, 0x2069)].map(
+      (point) => String.fromCodePoint(point),
+    );
+    expect(controls).toHaveLength(12);
+    for (const control of controls) {
+      for (const text of [
+        `See you soon${control}.`,
+        `${control}See you soon.`,
+        `See ${control}you${control} soon.`,
+      ])
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([
+          NOT_FROM_RECORD,
+        ]);
+      // A control in an approved line's words makes it another sentence, which is refused.
+      expect(gateMoneyText(`The card is saved for a {{keep}} fee${control}.`, gate()).refused).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+      // Its words still give its label.
+      expect(gateMoneyText(`If you don't reply${control}, see you soon.`, NOTHING_APPROVED).refused).toEqual([
+        SILENCE,
+      ]);
+    }
+    // A slot value that holds a bidi control stands for no slot (gate.ts default 13): a control reorders what follows
+    // it. A value with a compatibility letter stands for its slot.
+    expect(approved().sentences.has("{{biz.name}} booked this for you")).toBe(true);
+    const value = "Sam\u{202E}";
+    expect(
+      gateMoneyText(`${value} booked this for you.`, gate([{ slot: "biz.name", value }])).refused,
+    ).toEqual([NOT_FROM_RECORD]);
+    const marked = "Acme\u{2122}";
+    expect(
+      gateMoneyText(`${marked} booked this for you.`, gate([{ slot: "biz.name", value: marked }])),
+    ).toEqual({
+      ok: true,
+      refused: [],
+    });
+    expect(gateMoneyText(`${marked} booked this for you.`, gate()).refused).toEqual([NOT_FROM_RECORD]);
+  });
+
+  it("a compatibility letter makes a money sentence: fullwidth, mathematical, circled, squared, parenthesized, modifier, superscript and subscript letters, ligatures, ™ ℠ ᵗᵐ ˢᴹ ᴹᴰ", () => {
+    const letters = [
+      "\u{FF41}", // fullwidth a
+      "\u{1D41A}", // mathematical bold a
+      "\u{24D0}", // circled a
+      "\u{1F130}", // squared A
+      "\u{249C}", // parenthesized a
+      "\u{2B0}", // modifier h
+      "\u{2071}", // superscript i
+      "\u{2090}", // subscript a
+      "\u{FB01}", // the fi ligature
+      "\u{2122}", // ™
+      "\u{2120}", // ℠
+      "\u{1D57}\u{1D50}", // ᵗᵐ
+      "\u{2E2}\u{1D39}", // ˢᴹ
+      "\u{1D39}\u{1D30}", // ᴹᴰ
+    ];
+    for (const letter of letters) {
+      for (const char of letter) {
+        expect(char.normalize("NFKC"), JSON.stringify(char)).not.toBe(char.normalize("NFC"));
+        expect(char.normalize("NFKC"), JSON.stringify(char)).toMatch(/\p{L}/u);
+      }
+      for (const text of [`See you soon ${letter}.`, `See you soon${letter}.`, `${letter}See you soon.`])
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([
+          NOT_FROM_RECORD,
+        ]);
+    }
+    // Its words, read as their plain letters, give its label: "hold" in modifier letters (U+02B0 U+1D52 U+02E1 U+1D48).
+    expect(
+      gateMoneyText("We'll put a \u{2B0}\u{1D52}\u{2E1}\u{1D48} on it.", NOTHING_APPROVED).refused,
+    ).toEqual([HOLD]);
+    // A compatibility character that holds no letter is none: an ellipsis, a no-break space, a fraction, a superscript 2.
+    for (const text of [
+      "See you soon\u{2026}",
+      "See you\u{A0}soon.",
+      "See you in \u{BD} an hour.",
+      "Room 2\u{B2}.",
+    ])
+      expect(gateMoneyText(text, NOTHING_APPROVED), JSON.stringify(text)).toEqual({ ok: true, refused: [] });
+  });
+
+  it("a Latin small capital, or a negative circled or squared letter, makes a money sentence and reads as the letter it shows", () => {
+    const lines = [
+      [`If you don't reply by 7pm, we'll ${SMALL_CAPITAL_CHARGE} you.`, SILENCE],
+      [`We'll ${SMALL_CAPITAL_CHARGE} it.`, NOT_FROM_RECORD],
+      // ʜᴏʟᴅ (U+029C U+1D0F U+029F U+1D05).
+      ["We'll put a \u{29C}\u{1D0F}\u{29F}\u{1D05} on it.", HOLD],
+      // 🅷🅾🅻🅳 (negative squared) and 🅗🅞🅛🅓 (negative circled).
+      ["We'll put a \u{1F177}\u{1F17E}\u{1F17B}\u{1F173} on it until the visit.", HOLD],
+      ["We'll put a \u{1F157}\u{1F15E}\u{1F15B}\u{1F153} on it until the visit.", HOLD],
+      // ꜰee: a small capital F, one of the other letters Unicode names Latin small capitals (gate.ts default 11).
+      ["That is the \u{A730}ee.", NOT_FROM_RECORD],
+    ] as const;
+    for (const [line, refusal] of lines)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([refusal]);
+        for (const reading of gateReadings())
+          expect(checkMoneyText(text, reading, gate()).refused, text).toContainEqual(refusal);
+      }
+    // Every character of DL-204 1c's two lists (and default 11's), alone in a plain sentence, makes a money sentence; so
+    // does a capital whose small letter is one (U+01A6, read in lower case).
+    const points = [
+      ...range(0x1d00, 0x1d22),
+      ...[0x299, 0x262, 0x29c, 0x26a, 0x29f, 0x274, 0x280, 0x28f, 0x276],
+      ...range(0x1f150, 0x1f169),
+      ...range(0x1f170, 0x1f189),
+      ...[0x281, 0x29b, 0x1d7b, 0x1d7e, 0xa730, 0xa731, 0xa7ae, 0xa7af, 0xa7fa, 0x1a6],
+    ];
+    expect(points).toHaveLength(35 + 9 + 26 + 26 + 10);
+    for (const point of points)
+      expect(
+        gateMoneyText(`See you ${String.fromCodePoint(point)} soon.`, NOTHING_APPROVED).refused,
+        point.toString(16),
+      ).toEqual([NOT_FROM_RECORD]);
+    // The claim check reads the letters they show: "charged" in small capitals, before the money step.
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    expect(checkMoneyLine(`You were ${SMALL_CAPITAL_CHARGE}\u{1D05} $55.`, asked).refused).toEqual([
+      { claim: "charged", why: "notTaken" },
+    ]);
+  });
+
+  it("a word that mixes Latin letters with another script's makes a money sentence; a word all in one script does not", () => {
+    const lines = [
+      // "сharge" with a Cyrillic с (U+0441).
+      ["If you don't reply by 7pm, we'll \u{441}harge you.", SILENCE],
+      // A Cyrillic р (U+0440) in "plan" and a Greek ο (U+03BF) in "office": no money word, a word that mixes scripts.
+      ["That is the \u{440}lan.", NOT_FROM_RECORD],
+      ["See you at the \u{3BF}ffice.", NOT_FROM_RECORD],
+    ] as const;
+    for (const [line, refusal] of lines)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([refusal]);
+        for (const reading of gateReadings())
+          expect(checkMoneyText(text, reading, gate()).refused, text).toContainEqual(refusal);
+      }
+    for (const text of [
+      "Thanks, Σοφία, see you soon.",
+      "Thanks, Дмитрий, see you soon.",
+      "Спасибо, see you soon.",
+    ])
+      expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: true, refused: [] });
+  });
+});
+
+describe("round 6 (DL-204, 2): money emoji, every space separator but U+0020, digits read as letters", () => {
+  it("the money emoji are money signs: 💲 💳 💰 💵 💴 💶 💷 💸 🤑", () => {
+    for (const emoji of ["💲", "💳", "💰", "💵", "💴", "💶", "💷", "💸", "🤑"]) {
+      expect(gateMoneyText(`That is ${emoji}40.`, NOTHING_APPROVED).refused, emoji).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+      expect(gateMoneyText(`See you soon ${emoji}`, NOTHING_APPROVED).refused, emoji).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+    }
+    for (const text of threeForms("If you don't reply by 7pm, it's 💲40.")) {
+      expect(gateMoneyText(text, gate()).refused, text).toEqual([SILENCE]);
+      for (const reading of gateReadings()) {
+        expect(checkMoneyText(text, reading, gate()).refused, text).toContainEqual(SILENCE);
+        expect(checkMoneyLine(text, reading).refused, text).toContainEqual(SILENCE);
+      }
+    }
+  });
+
+  it("every space separator but U+0020 is read joined and split: U+2006, U+2008 and U+205F among them", () => {
+    const spaces = [0xa0, 0x1680, ...range(0x2000, 0x200a), 0x202f, 0x205f, 0x3000].map((point) =>
+      String.fromCodePoint(point),
+    );
+    // These are every space separator of Unicode but U+0020.
+    expect(
+      range(0, 0xffff).filter((point) => point !== 0x20 && /\p{Zs}/u.test(String.fromCodePoint(point))),
+    ).toEqual(spaces.map((space) => space.codePointAt(0)));
+    for (const space of ["\u{2006}", "\u{2008}", "\u{205F}"]) expect(spaces).toContain(space);
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    for (const space of spaces) {
+      const lines = [
+        [`If you don't reply, we'll ch${space}arge it.`, SILENCE],
+        [`We'll place a h${space}old.`, HOLD],
+        [`That is the f${space}ee.`, NOT_FROM_RECORD],
+        [`That is the${space}fee.`, NOT_FROM_RECORD],
+      ] as const;
+      for (const [text, refusal] of lines) {
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([refusal]);
+        for (const reading of gateReadings())
+          expect(checkMoneyText(text, reading, gate()).refused, JSON.stringify(text)).toContainEqual(refusal);
+      }
+      // Two plain words such a space parts are no money sentence, joined or split.
+      expect(gateMoneyText(`See you${space}soon.`, NOTHING_APPROVED), JSON.stringify(space)).toEqual({
+        ok: true,
+        refused: [],
+      });
+      // The claim check reads the joined words too: "charged" split, before the money step.
+      expect(checkMoneyLine(`You were ch${space}arged $55.`, asked).refused, JSON.stringify(space)).toEqual([
+        { claim: "charged", why: "notTaken" },
+      ]);
+    }
+  });
+
+  it("a word that mixes letters and digits is also read with digits as letters: h0ld, ch4rge and c4rd fail with their labels", () => {
+    const lines = [
+      ["We'll put a h0ld on it until the visit.", HOLD],
+      ["If you don't reply by 7pm, we'll ch4rge you.", SILENCE],
+      ["It goes on your c4rd.", NOT_FROM_RECORD],
+      // 1 as i, 1 as l, and 1s that stand for both (gate.ts default 12).
+      ["We'll b1ll you.", NOT_FROM_RECORD],
+      ["We'll bi11 you.", NOT_FROM_RECORD],
+      ["We'll b1l1 you.", NOT_FROM_RECORD],
+      ["It's pa1d.", NOT_FROM_RECORD],
+      ["Your s1lence by 7pm means a f33.", SILENCE],
+      // 3, 5, 7, 8 and @.
+      ["That is the f33.", NOT_FROM_RECORD],
+      ["It's 5ettled at a c0st of 8ucks.", NOT_FROM_RECORD],
+      ["We'll 7ake it from the c@rd.", NOT_FROM_RECORD],
+      // A digit of another script is read by its value (default 12): a Devanagari zero (U+0966) in "hold".
+      ["We'll put a h\u{966}ld on it.", HOLD],
+    ] as const;
+    for (const [line, refusal] of lines)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([refusal]);
+        for (const reading of gateReadings())
+          expect(checkMoneyText(text, reading, gate()).refused, text).toContainEqual(refusal);
+      }
+    // The claim check reads digits as letters too: "ch4rged", before the money step.
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    expect(checkMoneyLine("You were ch4rged $55.", asked).refused).toEqual([
+      { claim: "charged", why: "notTaken" },
+    ]);
+  });
+});
+
+describe("round 6 (DL-204, 3b): plain text the classes must not refuse is no money sentence", () => {
+  it("José and Zoë in NFC and NFD, curly quotes, an em dash, '…', a no-break space, '7pm' and '2nd', 🙂, a whole Greek or Cyrillic name", () => {
+    const nfc = ["Jos\u{E9}", "Zo\u{EB}"];
+    const nfd = ["Jose\u{301}", "Zoe\u{308}"];
+    for (const name of nfc) expect(name.normalize("NFC")).toBe(name);
+    for (const name of nfd) {
+      expect(name.normalize("NFD")).toBe(name);
+      expect(name.normalize("NFC")).not.toBe(name);
+    }
+    const plain = [
+      ...[...nfc, ...nfd].map((name) => `See you soon, ${name}.`),
+      "She said \u{201C}see you soon\u{201D} and it\u{2019}s \u{2018}on\u{2019} for Friday.",
+      "See you Friday \u{2014} Riley will be there.",
+      "See you soon\u{2026}",
+      "See you\u{A0}soon.",
+      "See you at 7pm on the 2nd.",
+      "See you soon \u{1F642}",
+      "Thanks, Σοφία, see you soon.",
+      "Thanks, Дмитрий, see you soon.",
+    ];
+    for (const text of plain) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), JSON.stringify(text)).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings()) {
+        expect(checkMoneyText(text, reading, gate()), JSON.stringify(text)).toEqual({
+          ok: true,
+          claims: [],
+          refused: [],
+        });
+        expect(checkMoneyLine(text, reading), JSON.stringify(text)).toEqual({
+          ok: true,
+          claims: [],
+          refused: [],
+        });
+      }
+    }
+  });
+});
+
+describe("round 6 (DL-204, 4): the residual is a closed form, and every class is written in code as escapes", () => {
+  it("a wording with no money word, sign or slot in any reading form and none of DL-204 1's characters is not this check's (gate.ts header; CQ-120)", () => {
+    for (const text of [
+      "We'll put a temporary stop on your plastic until the visit.",
+      "If we don't hear back by 7pm, it goes through anyway.",
+      // A word parted by a plain space, a digit DL-204 2c does not read as a letter, a letter-shaped symbol outside
+      // DL-204 1c's two lists (U+25CB for o), regional indicator letters.
+      "If you don't reply by 7pm, we'll ch arge you.",
+      "If you don't reply by 7pm, we'll char9e you.",
+      "We'll put a h\u{25CB}ld on it until the visit.",
+      "We'll put a \u{1F1ED}\u{1F1F4}\u{1F1F1}\u{1F1E9} on it until the visit.",
+    ]) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(text, reading, gate()), text).toEqual({ ok: true, claims: [], refused: [] });
+    }
+  });
+
+  it("the module's own files hold no invisible format character and no space but U+0020: each class is written with escapes", () => {
+    const invisible = /[\p{Cf}\p{Zl}\p{Zp}\u{2800}\u{115F}\u{1160}\u{3164}\u{FFA0}]|(?!\u{20})\p{Zs}/u;
+    for (const file of ["gate.ts", "claims.ts", "home.ts", "index.ts", "lines.ts", "money.ts", "record.ts"]) {
+      const source = readFileSync(new URL(`./${file}`, import.meta.url), "utf8");
+      const found = Array.from(source)
+        .filter((char) => invisible.test(char))
+        .map((char) => char.codePointAt(0)?.toString(16));
+      expect(found, file).toEqual([]);
     }
   });
 });
