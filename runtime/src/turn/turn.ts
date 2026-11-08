@@ -28,11 +28,19 @@
 //      run that has the turn now does it.
 //
 // Fails closed: a run that cannot finish one of steps 1 to 6 commits nothing and ends; the lease reruns the turn from its
-// sealed texts when its 60 s lapse (a third lapse waits for T-253's park). Never logged or put in a span: a text's words,
-// a plan's words, a number, a key (K-08 README line 79); the spans hold counts, labels and ids only.
+// sealed texts when its 60 s lapse, and parks it after a third lapse with no commit (T-253, ./park.ts: K-05 v1 parkTurn,
+// its one "nothing changed" row, the dispatcher woken). Never logged or put in a span: a text's words, a plan's words, a
+// number, a key (K-08 README line 79); the spans hold counts, labels and ids only.
 //
-// Not here: the planner after meaning search (C-117: `planner` is null); the safety read (T-246); the crash path after
-// the commit (T-253); wiring the real Tool API, AI, K-05 and dispatcher calls into the ports (D-017, T-552 onward).
+// The crash path after the commit (T-253; arch 11 line 576): the commit goes through the lease with `reply`, so the
+// committed turn keeps its lease until step 7 has ended, when every row the commit wrote holds a plan or is closed and the
+// dispatcher was woken (`replied`). A run that crashes before then, or whose rows did not all get a plan, leaves the lease
+// to lapse: the turn reruns from its sealed texts, its commit answers repeated (K-05 v1 commitTurn), and step 7 composes
+// only the rows with no plan (K-05 unplannedRows), from today's record; the dispatcher sends unsent parts under their
+// stored keys (K-07), never a new key for a part it has.
+//
+// Not here: the planner after meaning search (C-117: `planner` is null); the safety read (T-246); wiring the real Tool
+// API, AI, K-05 and dispatcher calls into the ports (D-017, T-552 onward).
 
 import type {
   CommitAnswer,
@@ -62,6 +70,7 @@ import { isLabel, type Outcome, type SpanFacts, type TraceContext } from "../tra
 import type { LimitResult, ModelCall, RowRef } from "../trace/types";
 import { composeCommitted, type ComposeReport } from "./compose";
 import { withKeywordCommit } from "./keywords";
+import { parkThroughRows } from "./park";
 import type {
   BuildFrontierRequest,
   CoreAction,
@@ -365,10 +374,14 @@ export async function runTurn(turn: LeasedTurn): Promise<void> {
   await runTurnLoop(turn);
 }
 
-/** The turn loop as the lease's hooks: D-017 hands them to `setLeaseHooks` (and `turnReplyCore` to `setReplyDeps`). */
+/**
+ * The turn loop as the lease's hooks: D-017 hands them to `setLeaseHooks` (and `turnReplyCore` to `setReplyDeps`). The park
+ * after a third lapse with no commit goes through the turn's K-05 face (T-253, ./park.ts).
+ */
 export const turnHooks: Required<LeaseHooks> = {
   runTurn,
   commit: commitThroughToolApi,
+  park: (turn) => parkThroughRows(deps, turn),
 };
 
 // ---- 1. opening the texts ---------------------------------------------------------------------------------------
@@ -864,7 +877,8 @@ async function sendWithResend(run: Run, request: GateAndCommitRequest): Promise<
 
 /**
  * One gateAndCommit through the lease (`LeasedTurn.commit`), with its gate and commit spans. A run that is no longer the
- * turn's sends nothing: a lapsed turn's rerun has the turn now, and a replaced turn's texts are in its restart.
+ * turn's sends nothing: a lapsed turn's rerun has the turn now, and a replaced turn's texts are in its restart. The run
+ * replies after its commit, so the lease holds a committed turn until the reply has ended (T-253).
  */
 async function sendCommit(run: Run, request: GateAndCommitRequest): Promise<Sent> {
   if (replaced(run.turn)) return { kind: "refused", error: "replaced", answer: null, request };
@@ -873,7 +887,7 @@ async function sendCommit(run: Run, request: GateAndCommitRequest): Promise<Sent
   const commitSpan = run.trace.start("commit");
   let answer: CommitAnswer;
   try {
-    answer = await run.turn.commit(leaseRequestOf(request, run.trace));
+    answer = await run.turn.commit(leaseRequestOf(request, run.trace), { reply: true });
   } catch {
     answer = { error: "noAnswer" };
   }
@@ -984,8 +998,10 @@ const businessOf = (run: Run): { businessId?: string } =>
 
 /**
  * The turn has committed (first or repeated): step 7, the second half (./compose.ts), composes the rows the commit wrote
- * and wakes the dispatcher once, then the run ends committed. A run no longer the turn's by then (a lapse's rerun took
- * it) composes nothing and wakes no one: the run that has the turn now commits as a repeat and does both.
+ * that hold no plan and wakes the dispatcher once, then the run ends committed. A run no longer the turn's by then (a
+ * lapse's rerun took it) composes nothing and wakes no one: the run that has the turn now commits as a repeat and does
+ * both. Once the reply has ended (`replyEnded`), the lease is told and released (T-253); otherwise it lapses, and the
+ * rerun composes the rows still with no plan.
  */
 async function finishCommitted(
   run: Run,
@@ -1003,7 +1019,23 @@ async function finishCommitted(
         answer,
         wordsWritten: replies?.replies.flatMap((reply) => reply.rowsWritten) ?? [],
       });
+  if (composed !== null && replyEnded(composed) && !replaced(run.turn)) {
+    try {
+      await run.turn.replied();
+    } catch {
+      // The lease was not told: it lapses, and the rerun finds every row planned.
+    }
+  }
   return { result: "committed", answer, reread: run.rereadRan, gateCalls: run.gateCalls, replies, composed };
+}
+
+/**
+ * True when step 7 has ended for the commit (T-253): the turn's rows with no plan were read, and none of them was left
+ * with no plan (each was composed, copied, found planned or closed). The dispatcher's wake counts as given either way: a
+ * wake not taken leaves the rows to the minute sweep.
+ */
+export function replyEnded(report: ComposeReport): boolean {
+  return report.rowsError === null && report.rows.every((row) => row.result !== "left");
 }
 
 function outcomeOf(run: Run, sent: Sent, replies: RepliesResult<OpenedText> | null): Promise<TurnOutcome> {

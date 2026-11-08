@@ -7,7 +7,7 @@
 //     finalize-passed-on.json);
 //   - K-02 v1's decide and re-read (`fakeDecide`): the decide-*.json results, with the model calls a stage reports;
 //   - the second half's ports (`fakeReply`, T-252): the composer (K-03 plans, with its model calls), K-05 v1's
-//     unplannedRows and writePlan, and the dispatcher's wake;
+//     unplannedRows and writePlan, and the dispatcher's wake; and K-05 v1's parkTurn as park-turn.json answers it (T-253);
 //   - the handle's directory, the safety results (safety-no.json under each text's event id) and a clock of the fixtures'
 //     `now` values;
 //   - K-05 v1.2 handleTargets for the guard (`targetsAnswer`), so the guard's targets are the fixtures' `targets`;
@@ -18,6 +18,7 @@
 // frozen fixtures' ids; phones in the fictional 555-01xx range (rule 9).
 
 import buildFrontierS102 from "../../../contracts/tool-api/fixtures/build-frontier-s1-02.json";
+import parkTurn from "../../../contracts/data-access/fixtures/park-turn.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
 import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
 import type { CommitAnswer, CommitContext, CommitTurnRequest, InboxEntry, LeasedTurn } from "../actor";
@@ -46,6 +47,9 @@ import type {
   GateAndCommitAnswer,
   GateAndCommitRequest,
   MessagePlan,
+  ParkTurnAnswer,
+  ParkTurnRequest,
+  ParkTurnResponse,
   RereadRequest,
   RewriteRequest,
   RowsAnswer,
@@ -91,6 +95,17 @@ export function hold(closed = true): Hold {
 // ---- the fixtures' parties ----------------------------------------------------------------------------------------
 
 const ZONE = "America/New_York";
+
+/** Maya, staff at the yoga studio (K-04's seed-person-roles.json handle-maya; park-turn.json's turn). */
+export const MAYA = {
+  handle: { kind: "phone", address: "+15555550104" } as HandleRef,
+  party: {
+    handleId: "handle-maya",
+    businessId: "biz-yoga-studio",
+    personId: "person-maya",
+    zone: ZONE,
+  } satisfies TurnParty,
+};
 
 /** Sam Lee, owner of Lee's Barbershop and Lee Home Services (the fixtures' handle-sam). */
 export const SAM = {
@@ -182,6 +197,8 @@ export interface TestTurn {
   readonly context: CommitContext;
   /** Every commit the turn sent through its lease, with the answer it got, in order. */
   readonly commits: { request: CommitTurnRequest; answer: CommitAnswer }[];
+  /** How many times the run told its lease that its reply had ended (T-253). */
+  readonly replied: { count: number };
   /** Ends this run as the lease does when a restart replaces it or a lapse reruns it. */
   abort(): void;
 }
@@ -213,6 +230,7 @@ export function testTurn(spec: TestTurnSpec): TestTurn {
   const controller = new AbortController();
   const context: CommitContext = spec.context ?? { holds: [], unread: [] };
   const commits: TestTurn["commits"] = [];
+  const replied = { count: 0 };
   const bundle: PinnedBundle = {
     bundleId: spec.bundleId,
     manifest: spec.manifest,
@@ -244,6 +262,10 @@ export function testTurn(spec: TestTurnSpec): TestTurn {
       commits.push({ request, answer });
       return answer;
     },
+    replied() {
+      replied.count += 1;
+      return Promise.resolve();
+    },
     bundleId: spec.bundleId,
     bundle,
     trace,
@@ -254,6 +276,7 @@ export function testTurn(spec: TestTurnSpec): TestTurn {
     spans,
     context,
     commits,
+    replied,
     abort: () => {
       controller.abort();
     },
@@ -290,8 +313,8 @@ export interface FakeTurnFace {
   readonly loseGate: Set<number>;
   /** What compose input answers for a row (a throw: the answer lost on its way). */
   composeInput: (request: ComposeInputRequest) => ComposeInputAnswer;
-  /** What finalizeMessage answers (a throw: the answer lost on its way). */
-  finalize: (request: FinalizeMessageRequest) => FinalizeMessageAnswer;
+  /** What finalizeMessage answers (a throw: the answer lost on its way). It may wait: a test's hold. */
+  finalize: (request: FinalizeMessageRequest) => FinalizeMessageAnswer | Promise<FinalizeMessageAnswer>;
 }
 
 export function fakeTurnFace(): FakeTurnFace {
@@ -347,7 +370,7 @@ export function turnFaceOf(fake: FakeTurnFace): TurnDeps["toolApi"] {
       fake.finalizeCalls.push(structuredClone(request));
       fake.log.push(`finalize:${request.attempt}:${request.outboxRowId}`);
       await flush(1);
-      return structuredClone(fake.finalize(request));
+      return structuredClone(await fake.finalize(request));
     },
   };
 }
@@ -382,8 +405,8 @@ export const ONE_REREAD: readonly ModelCall[] = [call("sonnet", "reread")];
 export interface FakeDecide {
   readonly decideCalls: DecideContext[];
   readonly rereadCalls: RereadRequest[];
-  /** What decide answers for a context. */
-  decide: (context: DecideContext) => DecideAnswer;
+  /** What decide answers for a context. It may wait (a promise that never settles: a run that hangs, T-253). */
+  decide: (context: DecideContext) => DecideAnswer | Promise<DecideAnswer>;
   /** What the re-read answers. */
   reread: (request: RereadRequest) => DecideAnswer;
   /** While closed, decide waits before it answers. */
@@ -481,23 +504,50 @@ export interface FakeRows {
   readonly unplannedReads: string[];
   /** Each writePlan request, in order. */
   readonly writes: WriteRowPlanRequest[];
+  /** Each parkTurn request (T-253), in order. */
+  readonly parks: ParkTurnRequest[];
   /** What unplannedRows answers for a turn id (a throw: no answer). Unset by a test: none of the turn's rows. */
   unplanned: (turnId: string) => RowsAnswer;
   /** What writePlan answers (a throw: no answer). Unset by a test: written, at the next version. */
   write: (request: WriteRowPlanRequest) => WriteRowPlanAnswer;
+  /**
+   * What parkTurn answers (a throw: no answer). Unset by a test: park-turn.json's outcome for the request's own turn,
+   * parked once, then the first result again with `repeated` (K-05 v1 item 12).
+   */
+  park: (request: ParkTurnRequest) => ParkTurnAnswer;
   readonly log: string[];
+}
+
+/** K-05 v1 parkTurn as park-turn.json answers it, for whichever turn asks: parked once per turn id, then repeated. */
+export function parkTurnFixture(): (request: ParkTurnRequest) => ParkTurnAnswer {
+  const first = new Map<string, ParkTurnResponse>();
+  return (request) => {
+    const known = first.get(request.turn.id);
+    if (known !== undefined) return { ...structuredClone(known), repeated: true };
+    const answer: ParkTurnResponse = {
+      ...(structuredClone(parkTurn.outcome) as ParkTurnResponse),
+      turnId: request.turn.id,
+      parkedAt: request.parkedAt,
+      outboxRows: request.outboxRows.map((row, index) => ({ id: row.id, commitSeq: index + 1 })),
+      repeated: false,
+    };
+    first.set(request.turn.id, answer);
+    return structuredClone(answer);
+  };
 }
 
 export function fakeRows(log: string[] = []): FakeRows {
   return {
     unplannedReads: [],
     writes: [],
+    parks: [],
     unplanned: () => ({ result: "rows", rows: [] }),
     write: (request) => ({
       result: "written",
       outboxRowId: request.outboxRowId,
       version: request.expectVersion + 1,
     }),
+    park: parkTurnFixture(),
     log,
   };
 }
@@ -515,6 +565,12 @@ export function rowsOf(fake: FakeRows): TurnDeps["rows"] {
       fake.log.push(`writePlan:${request.outboxRowId}`);
       await flush(1);
       return structuredClone(fake.write(request));
+    },
+    async parkTurn(request) {
+      fake.parks.push(structuredClone(request));
+      fake.log.push(`parkTurn:${request.turn.id}`);
+      await flush(1);
+      return structuredClone(fake.park(request));
     },
   };
 }

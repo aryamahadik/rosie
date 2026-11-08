@@ -14,6 +14,22 @@
 //   - A lease that lapses (60 s and no commit) reruns the turn from its sealed texts under the same turn id, so a commit
 //     that went through before the crash comes back as the first result (K-05 v1 commitTurn: a repeat writes nothing).
 //
+// A crash in the middle of a turn (T-253; C-180; arch 11 line 576):
+//
+//   - Before the commit, the lapse above reruns the turn. The safety read is not the turn's (it ran on each text's
+//     arrival, and its own record keeps a line from going twice after an eviction: T-1088), so a rerun sends no safety
+//     line again.
+//   - After the commit: a run that will reply commits with `reply`, and its committed turn keeps the lease, renewed for
+//     60 s, until the run says its reply ended (`replied`: every row the commit wrote holds a plan or is closed, and the
+//     dispatcher was woken). A crash before then lets the lease lapse, and the turn reruns under the same id: its commit
+//     answers repeated, and only the rows with no plan are composed (the dispatcher sends unsent parts under their stored
+//     keys). Later batches wait for the reply, then open the next turn.
+//   - A turn starts at most 3 times. A third lapse with no commit parks it (`park`, K-05 v1 parkTurn through the turn's
+//     K-05 face): the turn row parked, its one "nothing changed" row and its event-log entries; the lease is released and
+//     the waiting batches open the next turn. A park that cannot be done now is tried again 30 s later; no run commits
+//     once the park has begun. K-05 answering alreadyCommitted (the third run's commit went through) finishes the turn as
+//     committed. A committed turn whose reply has not ended by its third lapse is given up: the lease is released.
+//
 // The batch window hands a batch at least once (a crash between the hand-off and its mark hands it again): a batch id the
 // lease has seen counts as handed and never starts a second turn (T-247 security note b).
 //
@@ -31,9 +47,10 @@
 // open (arch 06 lines 327 and 329), and until it is wired no turn runs at all.
 //
 // Not here: what runs inside a turn (the guard and frontier, T-251; decide, gate and commit, T-252), joined through the
-// `runTurn` and `commit` hooks. Unwired, no turn runs and each closed batch stays stored with the batch window (fails
-// closed). The park after a third crash is T-253: a third lapse is left as it is, with no fourth try. Never logged or put
-// in a span: a text's words (K-08 README line 75). Nothing here logs (the pin records the turn's `lease` span).
+// `runTurn` and `commit` hooks, and the park's request (T-253, ../turn/park.ts), joined through `park`. Unwired, no turn
+// runs and each closed batch stays stored with the batch window (fails closed); with no park wired, a third lapse is left
+// as it is, with no fourth try. Never logged or put in a span: a text's words (K-08 README line 75). Nothing here logs
+// (the pin records the turn's `lease` span; the park, its own).
 
 import type { PinnedBundle, PinRequest, TurnPin } from "../bundle";
 import type { OpenHold } from "../safety";
@@ -45,6 +62,11 @@ import { readInboxEvents, type InboxEntry } from "./inbox";
 export const LEASE_MS = 60_000;
 /** A turn starts at most 3 times; a third crash before the commit parks it (arch 11 line 576; K-04 turns.tries; T-253). */
 export const MAX_TRIES = 3;
+/**
+ * When a park that could not be done (K-05 not answering or not wired, the handle not known) is tried again (T-253). No
+ * source gives it; 30 s is the cadence of the turn's retries in an outage (arch 11 line 564) and of the safety re-read.
+ */
+export const PARK_RETRY_MS = 30_000;
 /** The lease's kind in the actor's stored schedule. */
 export const SCHEDULE_LEASE = "turnLease";
 
@@ -103,7 +125,7 @@ export type CommitTurnAnswer = CommitTurnCommitted | CommitTurnError;
 /**
  * The lease's own answers, given instead of the commit call's:
  * - `replaced`: a restart replaced this turn, so it never commits (its texts are in the restart's turn);
- * - `parked`: the turn was parked;
+ * - `parked`: the turn was parked, or the lease has begun to park it after its third lapse (T-253);
  * - `wrongTurn`: the request names another turn id;
  * - `unknownTurn`: the lease holds no such turn;
  * - `unwired`: no commit call is set yet (D-017); nothing was sent;
@@ -138,10 +160,22 @@ export interface LeasedTurn {
   restart: boolean;
   /** When the lease lapses, on the actor's clock. */
   leaseUntil: number;
-  /** Aborted when this run is no longer the turn's: a restart replaced the turn, or a lapse started a rerun. */
+  /**
+   * Aborted when this run is no longer the turn's: a restart replaced the turn, a lapse started a rerun, the lease began to
+   * park it, or its reply was given up.
+   */
   signal: AbortSignal;
-  /** Commits the turn through the lease (K-05 commitTurn); refused once a restart has replaced the turn. */
-  commit(request: CommitTurnRequest): Promise<CommitAnswer>;
+  /**
+   * Commits the turn through the lease (K-05 commitTurn); refused once a restart has replaced the turn or the lease has
+   * begun to park it. With `reply` (T-253), a committed answer keeps the turn's lease for the run's reply, renewed for
+   * LEASE_MS, until `replied`; later batches wait, and a lapse before then reruns the turn, whose commit answers repeated.
+   */
+  commit(request: CommitTurnRequest, options?: CommitOptions): Promise<CommitAnswer>;
+  /**
+   * The run's reply has ended (T-253): every row its commit wrote holds a plan or is closed, and the dispatcher was woken.
+   * The lease is released and the waiting batches open the next turn. From a run no longer the turn's it changes nothing.
+   */
+  replied(): Promise<void>;
   /**
    * The bundle id pinned at the turn's start (T-249): the same for every run of this turn id, whatever the active id is by
    * then. The commit names it (K-05 turn.bundleId; arch 10 line 548: the bundle id on every turn).
@@ -173,6 +207,61 @@ export interface CommitContext {
   unread: string[];
 }
 
+/** How a run commits through the lease. */
+export interface CommitOptions {
+  /** The run replies after the commit and calls `replied` when its reply has ended (T-253). */
+  reply?: boolean;
+}
+
+/**
+ * What the park is handed (T-253): the turn after its third lapse with no commit, its sealed texts in arrival order, and
+ * its trace. Its texts' words are never logged or put in a span.
+ */
+export interface ParkingTurn {
+  turnId: string;
+  /** The texts' event ids, in arrival order (K-05 turn.eventIds). */
+  eventIds: string[];
+  entries: InboxEntry[];
+  /** The first text's trace id, and the other texts' (CQ-06). */
+  traceId: string;
+  joinedTraceIds: string[];
+  /** How many times the turn started: MAX_TRIES (K-05 parkTurn's turn.tries is 3). */
+  tries: number;
+  /** The bundle pinned for the turn (T-249), or, when no run was ever pinned, the one its first text arrived under. */
+  bundleId: BundleId;
+  /** The turn's trace under that bundle id: the park's span goes on it, and the dispatcher's wake carries it. */
+  trace: TraceContext;
+}
+
+/** K-05 v1 parkTurn answered parked (first or repeated): the turn row is parked and its one row written. */
+export interface ParkParked {
+  result: "parked";
+  parkedAt: string;
+  repeated: boolean;
+}
+
+/** K-05 v1 parkTurn answered alreadyCommitted: the third run's commit went through, so the turn is never parked. */
+export interface ParkAlreadyCommitted {
+  error: "alreadyCommitted";
+  committedAt: string;
+}
+
+/** The park could not be done now (K-05 transient or not answering, not wired, the handle not known): tried again. */
+export interface ParkNotDone {
+  error: string;
+}
+
+export type ParkAnswer = ParkParked | ParkAlreadyCommitted | ParkNotDone;
+
+function isParked(answer: ParkAnswer): answer is ParkParked {
+  return (answer as { result?: unknown }).result === "parked";
+}
+
+function isAlreadyCommitted(answer: ParkAnswer): answer is ParkAlreadyCommitted {
+  const fields = answer as { error?: unknown; committedAt?: unknown };
+  return fields.error === "alreadyCommitted" && typeof fields.committedAt === "string";
+}
+
 /** Joined at D-017; a test sets doubles. Unwired, no turn runs and no turn commits (fails closed). */
 export interface LeaseHooks {
   /** The turn's work (T-251, T-252). A throw is a crash: the lease lapses and the turn reruns. */
@@ -182,6 +271,13 @@ export interface LeaseHooks {
    * safety holds open and the texts not read yet at commit time, so it can refuse a routine commit while either is there.
    */
   commit?: (request: CommitTurnRequest, at: CommitContext) => Promise<CommitTurnAnswer>;
+  /**
+   * K-05 v1 parkTurn after a third crash before the commit (T-253; arch 11 line 576), through the turn's K-05 face: the
+   * turn row parked, its one "nothing changed" row and its event-log entries, then the dispatcher woken for that row. A
+   * throw is an answer not had: the park is tried again. Unwired, a third lapse is left as it is (T-248: no fourth try,
+   * nothing polls, and later batches wait).
+   */
+  park?: (turn: ParkingTurn) => Promise<ParkAnswer>;
 }
 
 let leaseHooks: LeaseHooks = {};
@@ -197,8 +293,12 @@ export function setLeaseHooks(next: LeaseHooks): () => void {
 
 // ---- the stored state -------------------------------------------------------------------------------------------
 
-/** leased: running. committing: a commit was sent (sticky: it may have gone through). The rest are final. */
-export type TurnState = "leased" | "committing" | "committed" | "replaced" | "parked";
+/**
+ * leased: running. committing: a commit was sent (sticky: it may have gone through). committed: final, though while it
+ * still holds the lease its run's reply has not ended (T-253). parking: its third lapse came with no commit, and the park
+ * is under way (T-253). replaced and parked are final.
+ */
+export type TurnState = "leased" | "committing" | "committed" | "replaced" | "parking" | "parked";
 
 /** One turn as a reader sees it. */
 export interface TurnEntry {
@@ -298,6 +398,21 @@ export interface LeaseHost {
   holds(): OpenHold[];
   /** The handle's texts not read yet now, by event id in arrival order (CommitContext.unread). */
   unread(): string[];
+  /**
+   * The turn's trace for its park (T-253): under the bundle pinned for the turn id (T-249), or `arrivedUnder` when no run
+   * was ever pinned; null when neither is known. It records nothing.
+   */
+  parkTrace(request: ParkTraceRequest): { bundleId: BundleId; trace: TraceContext } | null;
+}
+
+/** What the park's trace is opened from (T-253). */
+export interface ParkTraceRequest {
+  turnId: string;
+  /** The first text's trace id, and the other texts' (CQ-06). */
+  traceId: string;
+  joinedTraceIds: readonly string[];
+  /** The bundle id the turn's first text arrived under, the fallback when no run was ever pinned. */
+  arrivedUnder: BundleId | null;
 }
 
 const bySeq = (items: Item[]): Item[] => [...items].sort((a, b) => a.seq - b.seq);
@@ -446,7 +561,8 @@ export class TurnLease {
       restart: turn.restart === 1,
       leaseUntil: lease.until_ms,
       signal,
-      commit: (request) => this.commit(turnId, request),
+      commit: (request, options) => this.commit(turnId, request, options?.reply === true),
+      replied: () => this.replied(turnId, controller),
     };
     const pinRequest: PinRequest = {
       turnId,
@@ -476,20 +592,21 @@ export class TurnLease {
     );
   }
 
-  /** Tells a run that is no longer the turn's to stop (a restart replaced it). */
+  /** Tells a run that is no longer the turn's to stop (a restart replaced it, a park began, or its reply was given up). */
   private stop(turnId: string): void {
     this.runs.get(turnId)?.abort();
     this.runs.delete(turnId);
   }
 
   /**
-   * The commit, through the lease: a replaced turn never commits; the first commit call of a turn marks it committing, so
-   * no later batch restarts it (the call may go through even when its answer is lost). The commit hook is handed the
-   * safety holds open now and the texts not read yet, read again after the gate, so a hold that opened mid-turn binds this
-   * commit (DL-119, DL-127). Committed (first or repeat), or parked: the lease is released and the waiting batches open
-   * the next turn.
+   * The commit, through the lease: a replaced turn never commits, nor one the lease has begun to park; the first commit
+   * call of a turn marks it committing, so no later batch restarts it (the call may go through even when its answer is
+   * lost). The commit hook is handed the safety holds open now and the texts not read yet, read again after the gate, so a
+   * hold that opened mid-turn binds this commit (DL-119, DL-127). Committed (first or repeat): with `reply` the turn keeps
+   * the lease for its reply (T-253), otherwise the lease is released and the waiting batches open the next turn; parked:
+   * the lease is released.
    */
-  private async commit(turnId: string, request: CommitTurnRequest): Promise<CommitAnswer> {
+  private async commit(turnId: string, request: CommitTurnRequest, reply: boolean): Promise<CommitAnswer> {
     if (request.turn.id !== turnId) return { error: "wrongTurn" };
     const port = leaseHooks.commit;
     if (port === undefined) return { error: "unwired" };
@@ -497,7 +614,7 @@ export class TurnLease {
       const turn = this.turnRow(turnId);
       if (turn === undefined) return { error: "unknownTurn" };
       if (turn.state === "replaced") return { error: "replaced" };
-      if (turn.state === "parked") return { error: "parked" };
+      if (turn.state === "parked" || turn.state === "parking") return { error: "parked" };
       if (turn.state === "leased") {
         this.sql.exec("UPDATE lease_turns SET state = 'committing' WHERE turn_id = ?", turnId);
       }
@@ -512,14 +629,63 @@ export class TurnLease {
       return { error: "noAnswer" };
     }
     if (isCommitted(answer)) {
-      await this.finish(turnId, "committed", answer.committedAt);
+      if (reply) await this.holdForReply(turnId, answer.committedAt);
+      else await this.finish(turnId, "committed", answer.committedAt);
     } else if (answer.error === "turnParked") {
       await this.finish(turnId, "parked", null);
     }
     return answer;
   }
 
-  /** The turn is done: the lease is released and the waiting batches open the next turn. A later answer changes nothing. */
+  /**
+   * The turn has committed and its run replies (T-253): it keeps the lease for the reply, renewed for LEASE_MS, so a crash
+   * before the reply ends lets the lease lapse into a rerun (its commit answers repeated; only the rows with no plan are
+   * composed). Later batches wait, as for a turn that has begun its commit. A turn already committed keeps what it has: a
+   * rerun's repeat changes nothing, nor does a late answer once its lease went.
+   */
+  private async holdForReply(turnId: string, committedAt: string): Promise<void> {
+    this.host.storage.transactionSync(() => {
+      const turn = this.turnRow(turnId);
+      const state = turn?.state;
+      if (state === undefined || state === "committed" || state === "parked" || state === "replaced") return;
+      this.sql.exec(
+        "UPDATE lease_turns SET state = 'committed', committed_at = ? WHERE turn_id = ?",
+        committedAt,
+        turnId,
+      );
+      this.sql.exec(
+        "UPDATE turn_lease SET until_ms = ? WHERE one = 1 AND turn_id = ?",
+        actorClock().now() + LEASE_MS,
+        turnId,
+      );
+      this.syncSchedule();
+    });
+    await this.host.arm();
+  }
+
+  /**
+   * The run's reply has ended (T-253): its committed turn gives the lease up and the waiting batches open the next turn.
+   * Only the run that has the turn now is heard: a run a lapse replaced leaves it to its rerun.
+   */
+  private async replied(turnId: string, run: AbortController): Promise<void> {
+    if (this.runs.get(turnId) !== run) return;
+    const released = this.host.storage.transactionSync((): boolean => {
+      const turn = this.turnRow(turnId);
+      if (turn?.state !== "committed" || this.leaseRow()?.turn_id !== turnId) return false;
+      this.sql.exec("DELETE FROM turn_lease WHERE turn_id = ?", turnId);
+      this.syncSchedule();
+      return true;
+    });
+    if (!released) return;
+    this.runs.delete(turnId);
+    await this.advance();
+    await this.host.arm();
+  }
+
+  /**
+   * The turn is done: the lease is released and the waiting batches open the next turn. A later answer changes nothing,
+   * and a turn already committed keeps its lease until its reply ends (T-253).
+   */
   private async finish(
     turnId: string,
     state: "committed" | "parked",
@@ -545,38 +711,99 @@ export class TurnLease {
   // ---- the lapse ------------------------------------------------------------------------------------------------------
 
   /**
-   * The schedule's lease entry (the actor's alarm): a lease past its 60 s with no commit reruns the turn from its sealed
-   * texts under the same turn id, with one more try. A third lapse is left for the park (T-253): no fourth try. Then any
-   * batch still waiting is given its turn (a crash may have come between taking a batch and giving it a turn). With no
-   * lapsed lease the entry is put in step with what is stored, so an entry due now that a wired `runTurn` left cannot
-   * re-arm the alarm at once on every run after `runTurn` becomes unwired (T-248 security note c).
+   * The schedule's lease entry (the actor's alarm): a lease past its 60 s with no commit, or with a reply that has not
+   * ended (T-253), reruns the turn from its sealed texts under the same turn id, with one more try. A third lapse with no
+   * commit parks the turn (T-253; with no park wired it is left as it is: no fourth try); a third lapse of a reply gives
+   * the reply up. Then any batch still waiting is given its turn (a crash may have come between taking a batch and giving
+   * it a turn). With no lapsed lease the entry is put in step with what is stored, so an entry due now that a wired
+   * `runTurn` left cannot re-arm the alarm at once on every run after `runTurn` becomes unwired (T-248 security note c).
    */
   async onAlarm(): Promise<void> {
     const now = actorClock().now();
-    const rerun = this.host.storage.transactionSync((): string | null => {
+    const due = this.host.storage.transactionSync((): { act: Lapse; turnId: string } | null => {
       const lease = this.leaseRow();
       if (lease === undefined || lease.until_ms > now) {
         this.syncSchedule();
         return null;
       }
       const turn = this.turnRow(lease.turn_id);
-      const running = turn !== undefined && (turn.state === "leased" || turn.state === "committing");
-      if (!running || leaseHooks.runTurn === undefined || turn.tries >= MAX_TRIES) {
+      const act = turn === undefined ? null : lapseOf(turn);
+      if (turn === undefined || act === null || leaseHooks.runTurn === undefined) {
         this.syncSchedule();
         return null;
       }
-      this.sql.exec("UPDATE lease_turns SET tries = tries + 1 WHERE turn_id = ?", lease.turn_id);
-      this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + LEASE_MS);
+      if (act === "park") {
+        if (leaseHooks.park === undefined) {
+          this.syncSchedule();
+          return null;
+        }
+        // Marked first, so no run commits from now on and no batch restarts it; tried again PARK_RETRY_MS on if it fails.
+        this.sql.exec("UPDATE lease_turns SET state = 'parking' WHERE turn_id = ?", lease.turn_id);
+        this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + PARK_RETRY_MS);
+      } else if (act === "giveUp") {
+        this.sql.exec("DELETE FROM turn_lease WHERE one = 1");
+      } else {
+        this.sql.exec("UPDATE lease_turns SET tries = tries + 1 WHERE turn_id = ?", lease.turn_id);
+        this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + LEASE_MS);
+      }
       this.syncSchedule();
-      return lease.turn_id;
+      return { act, turnId: lease.turn_id };
     });
-    if (rerun !== null) this.start(rerun);
+    if (due?.act === "rerun") this.start(due.turnId);
+    else if (due?.act === "park") await this.park(due.turnId);
+    else if (due?.act === "giveUp") this.stop(due.turnId);
     await this.advance();
   }
 
   /**
-   * Keeps the lease's schedule entry in step with the stored state: due when the lease lapses; due now when batches wait
-   * and no lease is held; none when nothing can happen (no turn can run, or a third lapse waits for the park).
+   * Parks the turn after its third lapse with no commit (T-253): the last run is told to stop, and the park hook gets the
+   * turn, its sealed texts and its trace. Parked (first or repeated): the lease is released and the waiting batches open
+   * the next turn. alreadyCommitted: the turn finishes as committed. Anything else, a throw included: the turn stays
+   * parking and the park is tried again when the lease entry falls due, PARK_RETRY_MS after this try began.
+   */
+  private async park(turnId: string): Promise<void> {
+    const park = leaseHooks.park;
+    const turn = this.turnRow(turnId);
+    if (park === undefined || turn?.state !== "parking") return;
+    this.stop(turnId);
+    const eventIds = (JSON.parse(turn.items) as Item[]).map((item) => item.eventId);
+    const entries = readInboxEvents(this.sql, eventIds);
+    const traceId = entries[0]?.traceId ?? "";
+    const joinedTraceIds = [...new Set(entries.slice(1).map((entry) => entry.traceId))].filter(
+      (id) => id !== traceId,
+    );
+    const traced = this.host.parkTrace({
+      turnId,
+      traceId,
+      joinedTraceIds,
+      arrivedUnder: entries[0]?.bundleId ?? null,
+    });
+    let answer: ParkAnswer = { error: "noBundle" };
+    if (traced !== null) {
+      try {
+        answer = await park({
+          turnId,
+          eventIds,
+          entries,
+          traceId,
+          joinedTraceIds,
+          tries: turn.tries,
+          bundleId: traced.bundleId,
+          trace: traced.trace,
+        });
+      } catch {
+        answer = { error: "noAnswer" };
+      }
+    }
+    if (isParked(answer)) await this.finish(turnId, "parked", null);
+    else if (isAlreadyCommitted(answer)) await this.finish(turnId, "committed", answer.committedAt);
+    else await this.host.arm();
+  }
+
+  /**
+   * Keeps the lease's schedule entry in step with the stored state: due when the lease lapses (a park under way: when it
+   * is tried again); due now when batches wait and no lease is held; none when nothing can happen (no turn can run, or a
+   * third lapse with no commit while no park is wired).
    */
   private syncSchedule(): void {
     const now = actorClock().now();
@@ -585,7 +812,9 @@ export class TurnLease {
     if (lease !== undefined) {
       const turn = this.turnRow(lease.turn_id);
       const lapsed = lease.until_ms <= now;
-      const stuck = lapsed && (!wired || (turn?.tries ?? MAX_TRIES) >= MAX_TRIES);
+      const act = turn === undefined ? null : lapseOf(turn);
+      const nothingToDo = act === null || (act === "park" && leaseHooks.park === undefined);
+      const stuck = lapsed && (!wired || nothingToDo);
       if (stuck) unscheduleEntry(this.sql, SCHEDULE_LEASE);
       else scheduleEntry(this.sql, SCHEDULE_LEASE, lease.until_ms);
       return;
@@ -640,9 +869,32 @@ export class TurnLease {
   }
 }
 
+/** What a lapse does to the turn that holds the lease (T-253). */
+type Lapse = "rerun" | "park" | "giveUp";
+
+/**
+ * A lapse reruns a turn that has started fewer than MAX_TRIES times, before its commit or while its reply has not ended;
+ * after the last try it parks a turn with no commit (and goes on parking one already parking) and gives a reply up. A
+ * replaced or parked turn holds no lease (null: nothing to do).
+ */
+function lapseOf(turn: TurnRow): Lapse | null {
+  switch (turn.state) {
+    case "leased":
+    case "committing":
+      return turn.tries >= MAX_TRIES ? "park" : "rerun";
+    case "parking":
+      return "park";
+    case "committed":
+      return turn.tries >= MAX_TRIES ? "giveUp" : "rerun";
+    default:
+      return null;
+  }
+}
+
 /**
  * What the waiting batches do: open a turn (no lease is held), restart the running turn once (it holds the lease, has not
- * restarted and has not begun its commit; a third try that lapsed is left for the park), or wait (null).
+ * restarted and has not begun its commit; a third try that lapsed is left for the park), or wait (null): a turn that has
+ * begun its commit, is replying (T-253) or is being parked keeps them waiting.
  */
 function planOf(state: Snapshot, now: number): { items: Item[]; replaces: string | null } | null {
   if (state.waiting.length === 0) return null;
