@@ -251,6 +251,7 @@ describe("what the staging target collects", () => {
       ["out-a7-03-alex/2/1", "accepted"],
     ]);
     expect(collected.outbox).toBeNull();
+    expect(collected.linqEvents).toBeNull();
     expect(collected.trace).toBeNull();
     expect(collected.traceProblems).toEqual([
       "no span reader: trace trace-alex-a7-03 is in Workers Logs, read on the build Mac (DL-024)",
@@ -269,6 +270,12 @@ describe("what the staging target collects", () => {
     expect(collected.trace).toEqual(skeleton);
     const report = checkRun(collected);
     expect(report.problems).toEqual([]);
-    expect(report.parts).toEqual({ parts: 2, sends: 2, duplicateSends: [], repeatedKeys: [] });
+    expect(report.parts).toEqual({
+      parts: 2,
+      sends: 2,
+      duplicateSends: [],
+      unjudgedSends: [],
+      repeatedKeys: [],
+    });
   });
 });

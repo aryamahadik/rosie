@@ -254,6 +254,8 @@ export async function openStagingTarget(options: StagingTargetOptions): Promise<
           traceProblems: problems,
           // K-21 v1 RecordedPart is K-11 v1 sendPart's request and outcome, as checked above.
           parts: got.parts as unknown as SentPart[],
+          // K-21 v1 gives neither the double's failure reports nor the outbox rows (no call reads them).
+          linqEvents: null,
           outbox: null,
         };
       };

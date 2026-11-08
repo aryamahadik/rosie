@@ -5,9 +5,12 @@
 //     time, and posted to the gateway the caller wires (the Worker's fetch); the spans are the Worker's log lines;
 //   - staging target (openStagingTarget), by name only and never in CI (DL-024): GET {BASE_PATH}/health first, staging
 //     or nothing; then K-21 v1's testPhoneSend, and testPhoneParts for what the test phone got.
-// Then: the trace (K-08 v1), the Linq double's parts (K-11 v1; K-21 v1 RecordedPart), the outbox rows under the trace
-// (K-07 v1 schema and lifeChain), and the hop check: the walking skeleton's hops (02-contracts section 11) once each, in
-// turn order (checkHops); a repeated webhook (a known K-06 event id) dropped at receipt (readReceipt, checkRepeat).
+// Then: the trace (K-08 v1), the Linq double's parts (K-11 v1; K-21 v1 RecordedPart) and its faked receipts and
+// failures, the outbox rows under the trace (K-07 v1 schema and lifeChain), and the hop check: the walking skeleton's
+// hops (02-contracts section 11) once each, in turn order, with the AI gateway's model-call spans set aside (checkHops;
+// CQ-36); a repeated webhook (a known K-06 event id) dropped at receipt (readReceipt, checkRepeat); no part reached the
+// person twice, counted by K-07's part states or the double's reports, a retry on the same key being one message
+// (checkParts).
 //
 //   const target = createLocalTarget({ gateway: (request) => worker.fetch(request, env, ctx), outbox });
 //   const sent = await target.sendEvent(joinText);
@@ -21,6 +24,7 @@ export {
   SKELETON_HOPS,
   checkHops,
   checkRepeat,
+  isModelCallSpan,
   readReceipt,
   spansInOrder,
   type HopCheck,
@@ -36,7 +40,18 @@ export {
   type SendOptions,
 } from "./local-target";
 export { checkOutboxRows, type OutboxCheck, type OutboxReader } from "./outbox";
-export { RecordingLinqDouble, checkParts, partsOf, type PartsCheck, type SentPart } from "./parts";
+export {
+  RecordingLinqDouble,
+  checkParts,
+  deliveryName,
+  partsOf,
+  type Delivery,
+  type PartDeliveries,
+  type PartReports,
+  type PartsCheck,
+  type RecordingLinqDoubleOptions,
+  type SentPart,
+} from "./parts";
 export {
   checkRun,
   settle,

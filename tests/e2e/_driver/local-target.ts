@@ -1,6 +1,7 @@
 // The local target (T-465; C-148): sends a text into the gateway as Linq would, signed by the Linq double's own hook
 // (K-11 v1 doubleWebhook, C-211's createLinqWebhookDouble), then collects the trace by the trace id the gateway answers
-// with, the parts the Linq double sent and the outbox rows written under that trace.
+// with, the parts the Linq double sent with its faked receipts and failures (fakeFailure, fakeDelivered: what says a
+// sent part failed, as eventFromDoubleEvent carries them to the gateway), and the outbox rows written under that trace.
 //
 // No key is read. The webhook secret is made here, at run time, from random bytes ("whsec_" and base64, the form the
 // double and the adapter take); the caller gives the same made-up secret to the gateway's verifier. Nothing reads an
@@ -96,7 +97,15 @@ export function createLocalTarget(options: LocalTargetOptions): LocalTarget {
     const { trace, problems } = traceOf(traceId, spansOfLogLines(await spans(traceId)));
     const outbox =
       options.outbox === undefined ? null : await checkOutboxRows(await options.outbox(traceId), traceId);
-    return { target: "local", traceId, trace, traceProblems: problems, parts: partsOf(linq), outbox };
+    return {
+      target: "local",
+      traceId,
+      trace,
+      traceProblems: problems,
+      parts: partsOf(linq),
+      linqEvents: linq.events(),
+      outbox,
+    };
   };
 
   return {

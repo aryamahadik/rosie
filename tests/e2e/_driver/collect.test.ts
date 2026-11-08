@@ -164,19 +164,34 @@ describe("the Linq double's parts", () => {
       ["out-a7-03-alex/1/1", "failed"],
       ["out-a7-03-alex/1/2", "accepted"],
     ]);
-    expect(checkParts(parts)).toEqual({ parts: 2, sends: 1, duplicateSends: [], repeatedKeys: [] });
+    expect(checkParts(parts)).toEqual({
+      parts: 2,
+      sends: 1,
+      duplicateSends: [],
+      unjudgedSends: [],
+      repeatedKeys: [],
+    });
     linq.reset();
     expect(partsOf(linq)).toEqual([]);
   });
 
-  it("finds a part accepted under two keys: the person got it twice", () => {
+  it("finds a part accepted under two keys, neither reported failed: the person got it twice", () => {
     const linq = new RecordingLinqDouble();
     linq.sendPart(request);
     linq.sendPart(retry);
-    expect(checkParts(partsOf(linq))).toEqual({
+    expect(checkParts(partsOf(linq), { events: linq.events() })).toEqual({
       parts: 2,
       sends: 2,
-      duplicateSends: ["out-a7-03-alex/1"],
+      duplicateSends: [
+        {
+          part: "out-a7-03-alex/1",
+          deliveries: [
+            { key: "out-a7-03-alex/1/1", messageId: "linq-msg-double-0001" },
+            { key: "out-a7-03-alex/1/2", messageId: "linq-msg-double-0002" },
+          ],
+        },
+      ],
+      unjudgedSends: [],
       repeatedKeys: [],
     });
   });
@@ -192,13 +207,14 @@ describe("the run's report", () => {
   const part = new RecordingLinqDouble();
   part.sendPart(sendText.request);
 
-  async function collected(trace: Trace, parts = partsOf(part)): Promise<Collected> {
+  async function collected(trace: Trace, linq: LinqDouble = part): Promise<Collected> {
     return {
       target: "local",
       traceId: trace.trace_id,
       trace,
       traceProblems: [],
-      parts,
+      parts: partsOf(linq),
+      linqEvents: linq.events(),
       outbox: await checkOutboxRows(
         [{ ...outboxDelivered, row: { ...outboxDelivered.row, traceId: trace.trace_id } }],
         trace.trace_id,
@@ -220,8 +236,10 @@ describe("the run's report", () => {
     const twice = new RecordingLinqDouble();
     twice.sendPart(sendText.request);
     twice.sendPart({ ...sendText.request, idempotencyKey: "out-a7-03-alex/1/2" });
-    const report = checkRun(await collected(shorter, partsOf(twice)));
+    const report = checkRun(await collected(shorter, twice));
     expect(report.problems).toContain("hop commit is missing: every hop runs once");
-    expect(report.problems).toContain("part out-a7-03-alex/1 was accepted under more than one key");
+    expect(report.problems).toContain(
+      "part out-a7-03-alex/1 reached the person 2 times (out-a7-03-alex/1/1 (linq-msg-double-0001), out-a7-03-alex/1/2 (linq-msg-double-0002)): each part once",
+    );
   });
 });

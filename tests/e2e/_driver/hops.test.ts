@@ -1,6 +1,7 @@
 // The hop checker against K-08 v1's frozen fixtures (T-465, "Proves it with"): trace-skeleton.json passes, every hop
 // once and in order; a copy with any one hop missing or repeated fails, naming that hop; trace-duplicate-webhook.json is
-// read as dropped at receipt. Run by `npm run test:e2e -- _driver`.
+// read as dropped at receipt. With the AI gateway's model-call spans between the hops (T-361; CQ-36), the same holds.
+// Run by `npm run test:e2e -- _driver`.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -9,7 +10,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Hop, Span, Trace } from "../../../contracts/generated/event-trace/event-trace.v1";
 import { CONTRACTS_ROOT } from "../../contract/_harness";
-import { SKELETON_HOPS, asTrace, checkHops, checkRepeat, readReceipt } from "./index";
+import { SKELETON_HOPS, asTrace, checkHops, checkRepeat, isModelCallSpan, readReceipt } from "./index";
 
 const FIXTURES = path.join(CONTRACTS_ROOT, "event-trace", "fixtures");
 
@@ -170,6 +171,144 @@ describe("the hop checker", () => {
     expect(check.problems.map((problem) => [problem.kind, problem.hop])).toEqual(
       SKELETON_HOPS.slice(1).map((hop) => ["missing", hop]),
     );
+  });
+});
+
+type ModelCall = NonNullable<Span["model_calls"]>[number];
+
+/** One model call's own span as T-361's AI gateway writes it (ai/src/gateway): a portCall to anthropic, call messages. */
+function modelCallSpan(hop: Span, call: ModelCall, index: number, at: string): Span {
+  return {
+    trace_id: hop.trace_id,
+    span_id: `${hop.span_id}-model-${String(index + 1)}`,
+    seq: hop.seq,
+    hop: "portCall",
+    at,
+    ms: call.ms,
+    bundle_id: { ...hop.bundle_id },
+    turn_id: hop.turn_id,
+    handle_ref: hop.handle_ref,
+    provider: "anthropic",
+    call: "messages",
+    attempt: 1,
+    got: { purpose: call.purpose, stage: hop.hop === "compose" ? "composer" : "decide" },
+    decided: { role: call.role, fallback: false },
+    model_calls: [call],
+    outcome: "ok",
+    error_code: null,
+  };
+}
+
+/** A Google Places search at the same place: a portCall that is not a model call (K-08 README, portCall). */
+function placesCallSpan(like: Span): Span {
+  return {
+    trace_id: like.trace_id,
+    span_id: `${like.span_id}-places`,
+    seq: like.seq,
+    hop: "portCall",
+    at: like.at,
+    ms: 200,
+    bundle_id: { ...like.bundle_id },
+    turn_id: like.turn_id,
+    handle_ref: like.handle_ref,
+    provider: "google_places",
+    call: "search",
+    attempt: 1,
+    outcome: "ok",
+    error_code: null,
+  };
+}
+
+/** `trace` with the gateway's span for each model call of decideReads (two) and compose (one), right after that hop. */
+function withModelCalls(trace: Trace): Trace {
+  return withSpans(
+    trace,
+    trace.spans.flatMap((span) => {
+      if (span.hop !== "decideReads" && span.hop !== "compose") return [span];
+      const start = Date.parse(span.at);
+      const calls = (span.model_calls ?? []).map((call, index) =>
+        modelCallSpan(span, call, index, new Date(start + 40 * (index + 1)).toISOString()),
+      );
+      return [span, ...calls];
+    }),
+  );
+}
+
+describe("the hop checker with the AI gateway's model-call spans between the hops (T-361; CQ-36)", () => {
+  const calls = withModelCalls(skeleton);
+
+  it("passes trace-skeleton.json with them: they are spans, not hops", () => {
+    expect(asTrace(calls)).toBe(calls);
+    expect(
+      calls.spans.filter((span) => span.hop === "portCall").map((span) => [span.seq, span.provider]),
+    ).toEqual([
+      [9, "anthropic"],
+      [10, "anthropic"],
+      [14, "anthropic"],
+    ]);
+    const check = checkHops(calls);
+    expect(check.problems).toEqual([]);
+    expect(check.hops).toEqual([...SKELETON_HOPS]);
+    expect(check.modelCallSeqs).toEqual([9, 10, 14]);
+  });
+
+  it.each(SKELETON_HOPS)("still fails a copy without %s, naming that hop alone", (hop) => {
+    const copy = withoutHop(calls, hop);
+    expect(asTrace(copy)).toBe(copy);
+    const check = checkHops(copy);
+    expect(check.problems).toEqual([
+      { kind: "missing", hop, message: `hop ${hop} is missing: every hop runs once` },
+    ]);
+    expect(check.modelCallSeqs).toHaveLength(3);
+  });
+
+  it.each(SKELETON_HOPS)("still fails a copy with %s repeated, naming that hop alone", (hop) => {
+    const copy = withHopRepeated(calls, hop);
+    expect(asTrace(copy)).toBe(copy);
+    const seqs = copy.spans.filter((span) => span.hop === hop).map((span) => String(span.seq));
+    expect(seqs).toHaveLength(2);
+    expect(checkHops(copy).problems).toEqual([
+      {
+        kind: "repeated",
+        hop,
+        message: `hop ${hop} runs 2 times (seq ${seqs.join(", ")}): every hop runs once`,
+      },
+    ]);
+  });
+
+  it("takes a portCall to another provider for a hop, one the skeleton does not run", () => {
+    const copy = withSpans(
+      calls,
+      calls.spans.map((span) => (span.seq === 14 ? placesCallSpan(span) : span)),
+    );
+    expect(asTrace(copy)).toBe(copy);
+    expect(copy.spans.filter(isModelCallSpan).map((span) => span.seq)).toEqual([9, 10]);
+    const check = checkHops(copy);
+    expect(check.problems).toEqual([
+      {
+        kind: "unexpected",
+        hop: "portCall",
+        message: "hop portCall (seq 14) is not one of this trace's hops",
+      },
+    ]);
+    expect(check.modelCallSeqs).toEqual([9, 10]);
+  });
+
+  it("checks a model-call span as any span: under the trace's id, never starting before the span before it", () => {
+    const spans = calls.spans.map((span) => {
+      if (span.seq === 9) return { ...span, trace_id: "trace-other-0001" };
+      if (span.seq === 14) return { ...span, at: "2026-10-19T14:01:50Z" };
+      return span;
+    });
+    const check = checkHops(withSpans(calls, spans));
+    expect(check.problems.map((problem) => [problem.kind, problem.hop, problem.message])).toEqual([
+      [
+        "traceId",
+        "portCall",
+        "hop portCall (seq 9) is under trace trace-other-0001, not trace-sam-0000: one trace id from webhook to delivery receipt",
+      ],
+      ["time", "portCall", "hop portCall (seq 14) starts before hop compose (seq 13): time never goes back"],
+    ]);
   });
 });
 

@@ -1,6 +1,7 @@
 // The hop checker (T-465; C-148): reads one K-08 v1 trace and says whether it shows the walking skeleton's hops once
 // each, in D-017's turn order, under one trace id and one bundle id; and reads how a webhook ended at receipt, so a
-// repeated webhook (a known K-06 event id) is seen dropped there.
+// repeated webhook (a known K-06 event id) is seen dropped there. The AI gateway's own model-call spans (a portCall to
+// provider anthropic per attempt: T-361; CQ-36's default) may sit between the hops; they are spans, not hops.
 //
 // Every problem names its hop by K-08's hop name and its place by seq. Nothing here reads a span's words: a span holds
 // none (K-08 v1 README "Never the raw number or words"), and the checker reports hops, seqs, ids and labels only.
@@ -58,8 +59,10 @@ export interface HopCheck {
   /** True when no problem was found. */
   readonly ok: boolean;
   readonly traceId: string;
-  /** The trace's hops in seq order. */
+  /** The trace's hops in seq order, model-call spans left out. */
   readonly hops: readonly Hop[];
+  /** The seqs of the model-call spans set aside (isModelCallSpan), in order. */
+  readonly modelCallSeqs: readonly number[];
   readonly problems: readonly HopProblem[];
 }
 
@@ -73,12 +76,23 @@ export function spansInOrder(trace: Trace): Span[] {
 }
 
 /**
+ * A model call's own span: a portCall to provider anthropic, which T-361's AI gateway writes per attempt beside the
+ * turn's hops (ai/src/gateway; CQ-36's default: the cost meter sums these spans' model calls). It is no hop of the turn,
+ * so checkHops never counts it as one, missing, repeated or unexpected; a portCall to any other provider is a hop.
+ */
+export function isModelCallSpan(span: Span): boolean {
+  return span.hop === "portCall" && span.provider === "anthropic";
+}
+
+/**
  * Checks that `trace` shows each of `expected` once, in that order, and no other hop: by default the walking skeleton's
- * hops (SKELETON_HOPS). Also that every span is under the trace's id and bundle id, seq runs 1, 2, 3 ... and no span
- * starts before the one before it (K-08 v1 README, the contract test's checks).
+ * hops (SKELETON_HOPS). Model-call spans (isModelCallSpan) may sit anywhere between them and are not hops. Every span,
+ * model calls too, must be under the trace's id and bundle id, seq runs 1, 2, 3 ... and no span starts before the one
+ * before it (K-08 v1 README, the contract test's checks).
  */
 export function checkHops(trace: Trace, expected: readonly Hop[] = SKELETON_HOPS): HopCheck {
   const spans = spansInOrder(trace);
+  const hopSpans = spans.filter((span) => !isModelCallSpan(span));
   const problems: HopProblem[] = [];
 
   spans.forEach((span, index) => {
@@ -114,7 +128,7 @@ export function checkHops(trace: Trace, expected: readonly Hop[] = SKELETON_HOPS
   });
 
   const seqsOf = new Map<Hop, number[]>();
-  for (const span of spans) {
+  for (const span of hopSpans) {
     const seqs = seqsOf.get(span.hop) ?? [];
     seqs.push(span.seq);
     seqsOf.set(span.hop, seqs);
@@ -142,8 +156,8 @@ export function checkHops(trace: Trace, expected: readonly Hop[] = SKELETON_HOPS
   }
 
   // The turn order, read from each expected hop's first run.
-  const firsts = spans.filter(
-    (span, index) => expected.includes(span.hop) && spans.findIndex((s) => s.hop === span.hop) === index,
+  const firsts = hopSpans.filter(
+    (span, index) => expected.includes(span.hop) && hopSpans.findIndex((s) => s.hop === span.hop) === index,
   );
   firsts.forEach((span, index) => {
     const before = firsts[index - 1];
@@ -156,7 +170,13 @@ export function checkHops(trace: Trace, expected: readonly Hop[] = SKELETON_HOPS
     }
   });
 
-  return { ok: problems.length === 0, traceId: trace.trace_id, hops: spans.map((s) => s.hop), problems };
+  return {
+    ok: problems.length === 0,
+    traceId: trace.trace_id,
+    hops: hopSpans.map((s) => s.hop),
+    modelCallSeqs: spans.filter(isModelCallSpan).map((s) => s.seq),
+    problems,
+  };
 }
 
 /** How a webhook ended at receipt: the trace's receive span (arch 02 line 109; K-08 v1 hop receive). */
