@@ -1,0 +1,13 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-alex-0005",
+    "businessId": "biz-lees-barbershop",
+    "personId": null,
+    "traceId": "trace-agent-alex-0001"
+  },
+  "bookingId": "booking-agent-alex-oct21",
+  "way": "texts",
+  "contacts": { "mobile": "+15555550146", "email": null }
+}

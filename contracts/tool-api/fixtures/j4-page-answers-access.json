@@ -1,0 +1,37 @@
+{
+  "call": "saveSecurePage",
+  "given": {
+    "seeds": ["core/seed-sealing-key.json"],
+    "after": ["j4-secure-link-turn.json", "j4-check-address-page.json"],
+    "now": "2026-11-02T14:07:45Z",
+    "stated": { "step": "B4-34", "gives": ["access", "answers"] },
+    "note": "B4-34 on the secure page: Alex's access note and the plug-in's question 'Is the sink still full of water?' (K-30's seed-booking-flow-b words). Two K-30 page_answers rows, each sealed under his key, insert only; the job page opens them for Jordan, never a text. The answers' words are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-drain2-0009",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-drain2-0008"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "save": {
+      "kind": "answers",
+      "step": "B4-34",
+      "answers": [
+        { "kind": "access", "question": null, "answer": "Side door; the gate latch sticks" },
+        { "kind": "question", "question": "Is the sink still full of water?", "answer": "Yes, about half full" }
+      ]
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "answerIds": ["answer-alex-drain2-1", "answer-alex-drain2-2"],
+    "meetsPro": null,
+    "gives": ["access", "answers"],
+    "written": [],
+    "repeated": false
+  }
+}

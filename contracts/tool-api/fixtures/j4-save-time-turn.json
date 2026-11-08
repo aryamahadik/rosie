@@ -1,0 +1,47 @@
+{
+  "call": "saveTime",
+  "given": {
+    "seeds": [
+      "people-access/seed-staff-joined.json",
+      "services-prices/seed-service-money-paths.json",
+      "business-setup/seed-location-flow-b.json"
+    ],
+    "after": ["j4-check-place-area-turn.json", "j4-show-times-turn.json"],
+    "now": "2026-11-02T14:03:10Z",
+    "stated": { "step": "B4-16", "gives": ["choice", "time_saved"] },
+    "note": "B4-16 then the automatic B4-23 in Alex's turn: he replies '1'. The pick names the card's open question and its option; the action layer rebuilds the card from its versions_read (the same versions give the same times: README default 69). In one commit: booking_details.timing settime (set once; version 3), Thu Nov 5 8 to 11 with Jordan held for the booking by K-05 reserve for 10 minutes with one extension still on offer (Q-12), the open question answered (version 2), and the K-30 line copied as shown: the drain clearing, list|card|bill, $179 and the way's $89 fee. The part gives choice and time_saved."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-drain2-0006",
+      "requestId": "turn-alex-drain2-0006",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-alex-drain2-0001"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "pick": { "kind": "cardOption", "openQuestionId": "oq-alex-drain2-times", "optionId": "opt-alex-drain2-thu-0800" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "timing": "settime",
+    "reservation": {
+      "reservationId": "rsv-alex-drain2",
+      "version": 1,
+      "heldUntil": "2026-11-02T14:13:10Z",
+      "minutes": 10,
+      "extendable": true
+    },
+    "lineId": "line-alex-drain2-1",
+    "linePrice": { "cents": 17900, "currency": "USD" },
+    "gives": ["choice", "time_saved"],
+    "written": [
+      { "table": "booking_details", "rowId": "booking-alex-chat-drain2", "version": 3 },
+      { "table": "reservations", "rowId": "rsv-alex-drain2", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-alex-drain2-1", "version": 1 },
+      { "table": "open_questions", "rowId": "oq-alex-drain2-times", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

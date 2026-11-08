@@ -1,0 +1,39 @@
+{
+  "call": "sendSecureLink",
+  "given": {
+    "seeds": ["core/seed-phone-chat-open.json", "rules/seed-rules-tap-list.json"],
+    "after": ["j4-check-place-area-turn.json", "j4-save-time-turn.json"],
+    "now": "2026-11-02T14:03:10Z",
+    "stated": { "step": "B4-29", "gives": ["link"] },
+    "note": "B4-29 in the same turn as the save (the walk passes B4-32 and B4-63, automatic, to B4-29): the secure link for Alex, the booker, texted into his open chat as an outbox row whose final parts hold the link (never logged); only its code's hash is kept, with his mobile on file as the contact it went to. B4-38 puts no form on the page, and B4-115 decides once that it books on the yes (approval now: Alex is Lee Home Services' customer already), booking_details version 4."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-drain2-0006",
+      "requestId": "turn-alex-drain2-0006",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-alex-drain2-0001"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "for": "booker",
+    "via": "text"
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "secureLinkId": "link-alex-drain2-secure",
+    "givenVia": "text",
+    "url": null,
+    "outboxRowId": "row-alex-drain2-link",
+    "approval": "now",
+    "formsOnPage": false,
+    "notListed": false,
+    "gives": ["link"],
+    "written": [
+      { "table": "secure_links", "rowId": "link-alex-drain2-secure", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-alex-chat-drain2", "version": 4 }
+    ],
+    "repeated": false
+  }
+}

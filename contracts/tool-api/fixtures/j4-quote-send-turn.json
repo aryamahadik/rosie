@@ -1,0 +1,51 @@
+{
+  "call": "setPrice",
+  "given": {
+    "seeds": ["people-access/seed-staff-joined.json", "rules/seed-price-ok-limit.json", "core/seed-phone-chat-open.json"],
+    "after": ["j4-quote-price-page.json"],
+    "now": "2026-11-03T00:38:05Z",
+    "stated": { "step": "B4-13", "gives": ["price_known"] },
+    "note": "B4-10's '1 Send it' then B4-13, in Sam's turn: the owner's answer (quoteFromPhotos ownerAnswer, send) and this send ride the same commit. The quote goes sent (version 3), good for 7 days (168 hours), with a secure link of purpose quote for Alex to pick a time, and one row tells Alex the price in his open chat (RULES 4.1b; MC C9). The customer OKs the price by picking a time (B4-13)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-heater-ok",
+      "requestId": "turn-sam-heater-ok",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-sam-heater-ok"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "price": { "path": "photos", "step": "B4-13", "quoteId": "quote-alex-heater", "expectVersion": 2 }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "path": "photos",
+    "price": null,
+    "fromPrice": null,
+    "quote": {
+      "quoteId": "quote-alex-heater",
+      "state": "sent",
+      "sentAt": "2026-11-03T00:38:05Z",
+      "goodUntil": "2026-11-10T00:38:05Z",
+      "version": 3,
+      "options": [
+        {
+          "quoteOptionId": "qopt-alex-heater-1",
+          "label": null,
+          "price": { "cents": 64000, "currency": "USD" },
+          "upTo": null
+        }
+      ],
+      "secureLinkId": "link-alex-heater-quote"
+    },
+    "outboxRowIds": ["row-alex-heater-price"],
+    "gives": ["price_known"],
+    "written": [
+      { "table": "quotes", "rowId": "quote-alex-heater", "version": 3 },
+      { "table": "secure_links", "rowId": "link-alex-heater-quote", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

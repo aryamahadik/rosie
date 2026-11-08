@@ -1,0 +1,12 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-alex-0020",
+    "businessId": "biz-lee-home-services",
+    "personId": "person-alex",
+    "traceId": "trace-agent-alex-0020"
+  },
+  "bookingId": "booking-alex-chat-drain2",
+  "check": { "kind": "street", "position": 1, "address": "42 Oak Street, Springfield" }
+}

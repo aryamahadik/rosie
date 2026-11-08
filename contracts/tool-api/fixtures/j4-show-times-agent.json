@@ -1,0 +1,92 @@
+{
+  "call": "showTimes",
+  "given": {
+    "seeds": [
+      "core/seed-resources.json",
+      "availability/seed-hours.json",
+      "services-prices/seed-service-money-paths.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-agent.json", "j4-match-service-agent.json", "j4-price-list-agent.json"],
+    "now": "2026-10-21T23:16:30Z",
+    "stated": { "step": "A4-14", "gives": ["times"] },
+    "note": "A4-66 (a person's time) then A4-14: Alex asked for Saturday, so the card starts on Sat Oct 24, when the shop is open 10am to 2pm and Riley works alone (K-27's seed-hours). Five set starts with Riley, soonest first, each at the exact $35 for that time and person; 30 minutes is the haircut's length as an example. booking_details.times is set once to setstart (K-23 flow_defaults.arrive for the shop) and the details row goes to version 2. From an AI there is no open question: the Agent API keeps the card with the token (README default 57)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0008",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "serviceId": "svc-lees-haircut",
+    "serviceMoneyId": "way-lees-haircut-shop",
+    "quoteOptionId": null,
+    "filter": { "resourceId": null, "fromDay": "2026-10-24", "needBy": null }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "timesKind": "setstart",
+    "times": [
+      {
+        "optionId": "opt-agent-alex-sat-1000",
+        "resourceId": "res-riley",
+        "during": { "start": "2026-10-24T14:00:00Z", "end": "2026-10-24T14:30:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      {
+        "optionId": "opt-agent-alex-sat-1030",
+        "resourceId": "res-riley",
+        "during": { "start": "2026-10-24T14:30:00Z", "end": "2026-10-24T15:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      {
+        "optionId": "opt-agent-alex-sat-1100",
+        "resourceId": "res-riley",
+        "during": { "start": "2026-10-24T15:00:00Z", "end": "2026-10-24T15:30:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      {
+        "optionId": "opt-agent-alex-sat-1130",
+        "resourceId": "res-riley",
+        "during": { "start": "2026-10-24T15:30:00Z", "end": "2026-10-24T16:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      {
+        "optionId": "opt-agent-alex-sat-1200",
+        "resourceId": "res-riley",
+        "during": { "start": "2026-10-24T16:00:00Z", "end": "2026-10-24T16:30:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      }
+    ],
+    "nobodyFree": false,
+    "sentNowOffered": false,
+    "openQuestionId": null,
+    "gives": ["times"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 2 }],
+    "repeated": false
+  }
+}

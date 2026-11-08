@@ -1,0 +1,39 @@
+{
+  "call": "addCustomer",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [
+      "j3-open-request-agent.json",
+      "j4-match-service-agent.json",
+      "j4-who-for-agent.json",
+      "j4-reach-card-agent.json"
+    ],
+    "now": "2026-10-21T23:16:09Z",
+    "stated": { "step": "A4-23", "gives": ["customer"] },
+    "note": "A4-23: the AI sends Alex's name, 'Alex M.'. In one commit the K-28 row for the booker at Lee's Barbershop is added with that name, his mobile handle, the way texts from the reach card and the age band 18_or_older from A4-80 (both kept until now: README default 57), with the K-04 customer role (K-28 v1 rule 7); his K-04 persons.name was null and is set (version 2). The token is bound (README default 70)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0006",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "name": "Alex M."
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "customerId": "customer-agent-alex-barbershop",
+    "added": true,
+    "gives": ["customer"],
+    "written": [
+      { "table": "customers", "rowId": "customer-agent-alex-barbershop", "version": 1 },
+      { "table": "person_roles", "rowId": "role-agent-alex-barbershop", "version": 1 },
+      { "table": "persons", "rowId": "person-agent-alex-0001", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

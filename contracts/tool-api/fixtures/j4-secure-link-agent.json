@@ -1,0 +1,44 @@
+{
+  "call": "sendSecureLink",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "rules/seed-rules-tap-list.json"],
+    "after": [
+      "j3-open-request-agent.json",
+      "j4-who-for-agent.json",
+      "j4-add-customer-agent.json",
+      "j4-save-time-agent.json"
+    ],
+    "now": "2026-10-21T23:17:02Z",
+    "stated": { "step": "A4-42", "gives": ["contact"] },
+    "note": "A4-42 through Alex's own AI: the secure link for the booker is given to the AI (given_via ai), which passes it on; only its code's sha256 is kept (K-30 secure_links.code_sha256), and the link comes back once in url, never logged. The walk's automatic steps ride the same commit: A4-43 puts no form on the page, and A4-98 decides once that this is a request Sam OKs first (approval ownerok: Alex is new at the barbershop, K-26's new-customer OK rule), booking_details version 4. The code in url is a placeholder; the link host is a config value (Q-51)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0010",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "for": "booker",
+    "via": "ai"
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "secureLinkId": "link-agent-alex-secure",
+    "givenVia": "ai",
+    "url": "rosfield.com/s/placeholder-link-code-0042",
+    "outboxRowId": null,
+    "approval": "ownerok",
+    "formsOnPage": false,
+    "notListed": false,
+    "gives": ["contact"],
+    "written": [
+      { "table": "secure_links", "rowId": "link-agent-alex-secure", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 4 }
+    ],
+    "repeated": false
+  }
+}

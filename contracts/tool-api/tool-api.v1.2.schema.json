@@ -1,0 +1,2701 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.2.schema.json",
+  "title": "ToolApiV1dot2",
+  "description": "K-09 Tool API v1.2, a minor version for journey 4 (T-051; 02-contracts K-09 version table, row v1.2; section 9 F16). It only adds to v1.1 (tool-api.v1.1.schema.json, frozen by T-050 and unchanged, referred to here, which refers to v1): every v1 and v1.1 definition is here under its own name, the unchanged ones by reference; the changed ones (stepKey, given, partResult, gateAndCommit.committed, gateAndCommit.response, gateAndCommit.exchange, callName) take only new enum values, so every v1 and v1.1 exchange is a v1.2 exchange. Added: the calls of journey 4 (A4-01 to A4-99, B4-01 to B4-115; S12-01 to S12-05 and S12-28 with journey 4): matchService (gives service), setWhoFor (who_for), setReachWay (reach_by), addCustomer (customer), setPrice (price_known, visit_fee), quoteFromPhotos (quote), showTimes (times), saveTime (choice, time_saved), joinWaitlist, sendSecureLink (contact, link), checkPlace (place, address) and saveSecurePage (access, answers). Each key journey 4 writes is written by exactly one call, named in that call's request description with its step ids (02-contracts section 8; README 'v1.2', 'Each key's one call'). K-16 v1, K-17 v1, K-27 v1 and K-30 v1 are frozen on main: the calls name their tables, columns and calls, never redefine them. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/buildFrontier.exchange" },
+    { "$ref": "#/$defs/closestEntries.exchange" },
+    { "$ref": "#/$defs/gateAndCommit.exchange" },
+    { "$ref": "#/$defs/composeInput.exchange" },
+    { "$ref": "#/$defs/finalizeMessage.exchange" },
+    { "$ref": "#/$defs/recordSafetyOutcome.exchange" },
+    { "$ref": "#/$defs/releaseSafetyHold.exchange" },
+    { "$ref": "#/$defs/recordStopOrStart.exchange" },
+    { "$ref": "#/$defs/setRecordFlag.exchange" },
+    { "$ref": "#/$defs/handOff.exchange" },
+    { "$ref": "#/$defs/answerHandOff.exchange" },
+    { "$ref": "#/$defs/pageTeam.exchange" },
+    { "$ref": "#/$defs/acknowledgePage.exchange" },
+    { "$ref": "#/$defs/openReviewItem.exchange" },
+    { "$ref": "#/$defs/decideReviewItem.exchange" },
+    { "$ref": "#/$defs/enterDoor.exchange" },
+    { "$ref": "#/$defs/sendFixedLine.exchange" },
+    { "$ref": "#/$defs/sendsFailing.exchange" },
+    { "$ref": "#/$defs/textingBack.exchange" },
+    { "$ref": "#/$defs/calendarLinkDropped.exchange" },
+    { "$ref": "#/$defs/calendarLinkBack.exchange" },
+    { "$ref": "#/$defs/sendProofCode.exchange" },
+    { "$ref": "#/$defs/proveCode.exchange" },
+    { "$ref": "#/$defs/issueChatLink.exchange" },
+    { "$ref": "#/$defs/matchKinds.exchange" },
+    { "$ref": "#/$defs/lookupListing.exchange" },
+    { "$ref": "#/$defs/saveSetupStep.exchange" },
+    { "$ref": "#/$defs/readSetup.exchange" },
+    { "$ref": "#/$defs/openRequest.exchange" },
+    { "$ref": "#/$defs/confirmBusinessBooking.exchange" },
+    { "$ref": "#/$defs/readBackBusinessBooking.exchange" },
+    { "$ref": "#/$defs/findCustomer.exchange" },
+    { "$ref": "#/$defs/checkBookingFirst.exchange" },
+    { "$ref": "#/$defs/setCustomerBlock.exchange" },
+    { "$ref": "#/$defs/matchService.exchange" },
+    { "$ref": "#/$defs/setWhoFor.exchange" },
+    { "$ref": "#/$defs/setReachWay.exchange" },
+    { "$ref": "#/$defs/addCustomer.exchange" },
+    { "$ref": "#/$defs/setPrice.exchange" },
+    { "$ref": "#/$defs/quoteFromPhotos.exchange" },
+    { "$ref": "#/$defs/showTimes.exchange" },
+    { "$ref": "#/$defs/saveTime.exchange" },
+    { "$ref": "#/$defs/joinWaitlist.exchange" },
+    { "$ref": "#/$defs/sendSecureLink.exchange" },
+    { "$ref": "#/$defs/checkPlace.exchange" },
+    { "$ref": "#/$defs/saveSecurePage.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "tool-api.v1.1.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "tool-api.v1.1.schema.json#/$defs/nullableId" },
+    "turnId": { "$ref": "tool-api.v1.1.schema.json#/$defs/turnId" },
+    "utc": { "$ref": "tool-api.v1.1.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "tool-api.v1.1.schema.json#/$defs/nullableUtc" },
+    "stepId": { "$ref": "tool-api.v1.1.schema.json#/$defs/stepId" },
+    "fixedLineId": { "$ref": "tool-api.v1.1.schema.json#/$defs/fixedLineId" },
+    "phoneNumber": { "$ref": "tool-api.v1.1.schema.json#/$defs/phoneNumber" },
+    "rowRef": { "$ref": "tool-api.v1.1.schema.json#/$defs/rowRef" },
+    "tableName": { "$ref": "tool-api.v1.1.schema.json#/$defs/tableName" },
+    "version": { "$ref": "tool-api.v1.1.schema.json#/$defs/version" },
+    "caller": { "$ref": "tool-api.v1.1.schema.json#/$defs/caller" },
+    "sentByActor": { "$ref": "tool-api.v1.1.schema.json#/$defs/sentByActor" },
+    "notFoundError": { "$ref": "tool-api.v1.1.schema.json#/$defs/notFoundError" },
+    "transientError": { "$ref": "tool-api.v1.1.schema.json#/$defs/transientError" },
+    "constraintError": { "$ref": "tool-api.v1.1.schema.json#/$defs/constraintError" },
+    "versionChangedError": { "$ref": "tool-api.v1.1.schema.json#/$defs/versionChangedError" },
+    "notAllowedError": { "$ref": "tool-api.v1.1.schema.json#/$defs/notAllowedError" },
+    "bookingPausedError": { "$ref": "tool-api.v1.1.schema.json#/$defs/bookingPausedError" },
+    "turnParkedError": { "$ref": "tool-api.v1.1.schema.json#/$defs/turnParkedError" },
+    "gateOutcome": { "$ref": "tool-api.v1.1.schema.json#/$defs/gateOutcome" },
+    "limit1Outcome": { "$ref": "tool-api.v1.1.schema.json#/$defs/limit1Outcome" },
+    "limit2Outcome": { "$ref": "tool-api.v1.1.schema.json#/$defs/limit2Outcome" },
+    "limit3Outcome": { "$ref": "tool-api.v1.1.schema.json#/$defs/limit3Outcome" },
+    "limit4Outcome": { "$ref": "tool-api.v1.1.schema.json#/$defs/limit4Outcome" },
+    "limit5Outcome": { "$ref": "tool-api.v1.1.schema.json#/$defs/limit5Outcome" },
+    "limit6Outcome": { "$ref": "tool-api.v1.1.schema.json#/$defs/limit6Outcome" },
+    "limitOutcome": { "$ref": "tool-api.v1.1.schema.json#/$defs/limitOutcome" },
+    "guardTargets": { "$ref": "tool-api.v1.1.schema.json#/$defs/guardTargets" },
+    "buildFrontier.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/buildFrontier.request" },
+    "buildFrontier.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/buildFrontier.response" },
+    "buildFrontier.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/buildFrontier.errors" },
+    "closestEntries.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/closestEntries.request" },
+    "closestEntries.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/closestEntries.response" },
+    "closestEntries.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/closestEntries.errors" },
+    "plannerVerbs.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/plannerVerbs.request" },
+    "plannerVerbs.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/plannerVerbs.response" },
+    "plannerVerbs.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/plannerVerbs.errors" },
+    "coreAction": { "$ref": "tool-api.v1.1.schema.json#/$defs/coreAction" },
+    "coreResult": { "$ref": "tool-api.v1.1.schema.json#/$defs/coreResult" },
+    "partResult": {
+      "title": "PartResult",
+      "description": "What the gate did with one part, as v1.1 (arch 02 line 121; arch 06 lines 295 to 309), with one change: gives may also name the keys journey 4 gives (journeyFourKey; v1.2), so a turn that commits a journey 4 step's write names the keys it wrote. Every v1 and v1.1 part result is a v1.2 part result.",
+      "type": "object",
+      "properties": {
+        "part": {
+          "description": "The part's index in the decide result's parts (K-02 v1 decideResult.parts).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "choiceId": {
+          "description": "The choice the part chose or entered (K-02 v1 choose or enter), or null for another verb.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "result": {
+          "description": "committed, stopped, dependsOnStopped, held, asked or noAction, as v1 (README 'Limits 1 to 6 at the gate').",
+          "type": "string",
+          "enum": ["committed", "stopped", "dependsOnStopped", "held", "asked", "noAction"]
+        },
+        "limits": {
+          "description": "Each of limits 1 to 6 with its result, as the gate span logs them (K-08 v1 limitResult).",
+          "type": "array",
+          "items": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/limitResult" }
+        },
+        "stoppedBy": {
+          "description": "For stopped, the limit that failed and its outcome; null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/limitOutcome" }, { "type": "null" }]
+        },
+        "gives": {
+          "description": "For committed, the keys the part's step gives that this commit wrote (A-keys.md, B-keys.md; arch 12 line 590): a key of journeys 1 and 2 (setupKey), of journey 3 (journeyThreeKey) or of journey 4 (journeyFourKey, v1.2: README 'v1.2', 'Each key's one call'), including those of the automatic steps its walk passes (arch 03 line 191); empty otherwise.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/stepKey" },
+          "uniqueItems": true
+        },
+        "dependsOnPart": {
+          "description": "For dependsOnStopped, the part it depends on; null otherwise.",
+          "anyOf": [
+            {
+              "description": "The index of the stopped part it depends on.",
+              "type": "integer",
+              "minimum": 0
+            },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["part", "choiceId", "result", "limits", "stoppedBy", "gives", "dependsOnPart"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/gateAndCommit.request" },
+    "gateAndCommit.response": {
+      "title": "GateAndCommitResponse",
+      "description": "committed for a turn's decided texts or core actions (gateAndCommit.committed, v1.2: its parts may name journey 4's keys); fired for a clock's firing (as v1; K-05 v1 fireClock.response).",
+      "oneOf": [{ "$ref": "#/$defs/gateAndCommit.committed" }, { "$ref": "#/$defs/gateAndCommit.fired" }]
+    },
+    "effectWritten": { "$ref": "tool-api.v1.1.schema.json#/$defs/effectWritten" },
+    "openQuestionsWritten": { "$ref": "tool-api.v1.1.schema.json#/$defs/openQuestionsWritten" },
+    "gateAndCommit.fired": { "$ref": "tool-api.v1.1.schema.json#/$defs/gateAndCommit.fired" },
+    "gateAndCommit.committed": {
+      "title": "GateAndCommitCommitted",
+      "description": "Committed, as v1.1; v1.2 changes only the parts' items, whose gives may name journey 4's keys (partResult).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "committed" },
+        "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" },
+        "committedAt": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+        "repeated": {
+          "description": "true when this turn id had committed before: nothing was written and the first commit comes back (K-05 v1 commitTurn).",
+          "type": "boolean"
+        },
+        "parts": {
+          "description": "One result per decide part, in order; empty for a core-only turn.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/partResult" }
+        },
+        "planner": {
+          "description": "The planner's verb as committed; null when no planner ran, or when code refused its output.",
+          "anyOf": [{ "$ref": "#/$defs/plannerVerbs.response" }, { "type": "null" }]
+        },
+        "core": {
+          "description": "One result per core action, in the request's order (v1.1's coreResult).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/coreResult" }
+        },
+        "written": {
+          "description": "What the commit wrote (K-05 v1 commitResult).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/commitResult"
+        },
+        "effects": {
+          "description": "Effect rows written in the commit, to run after it (K-07 v1; K-05 v1.1).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/effectWritten" }
+        },
+        "openQuestions": { "$ref": "#/$defs/openQuestionsWritten" }
+      },
+      "required": [
+        "result",
+        "turnId",
+        "committedAt",
+        "repeated",
+        "parts",
+        "planner",
+        "core",
+        "written",
+        "effects",
+        "openQuestions"
+      ],
+      "additionalProperties": false
+    },
+    "gateAndCommit.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/gateAndCommit.errors" },
+    "composeInput.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/composeInput.request" },
+    "composeInput.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/composeInput.response" },
+    "composeInput.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/composeInput.errors" },
+    "finalizeMessage.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/finalizeMessage.request" },
+    "finalizeMessage.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/finalizeMessage.response" },
+    "finalizeMessage.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/finalizeMessage.errors" },
+    "recordSafetyOutcome.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/recordSafetyOutcome.request" },
+    "recordSafetyOutcome.arrival": { "$ref": "tool-api.v1.1.schema.json#/$defs/recordSafetyOutcome.arrival" },
+    "arrivalCaller": { "$ref": "tool-api.v1.1.schema.json#/$defs/arrivalCaller" },
+    "recordSafetyOutcome.response": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/recordSafetyOutcome.response"
+    },
+    "recordSafetyOutcome.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/recordSafetyOutcome.errors" },
+    "releaseSafetyHold.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/releaseSafetyHold.request" },
+    "releaseSafetyHold.arrival": { "$ref": "tool-api.v1.1.schema.json#/$defs/releaseSafetyHold.arrival" },
+    "releaseSafetyHold.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/releaseSafetyHold.response" },
+    "releaseSafetyHold.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/releaseSafetyHold.errors" },
+    "recordStopOrStart.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/recordStopOrStart.request" },
+    "recordStopOrStart.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/recordStopOrStart.response" },
+    "recordStopOrStart.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/recordStopOrStart.errors" },
+    "setRecordFlag.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/setRecordFlag.request" },
+    "setRecordFlag.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/setRecordFlag.response" },
+    "setRecordFlag.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/setRecordFlag.errors" },
+    "handOff.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/handOff.request" },
+    "handOff.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/handOff.response" },
+    "handOff.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/handOff.errors" },
+    "answerHandOff.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/answerHandOff.request" },
+    "answerHandOff.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/answerHandOff.response" },
+    "answerHandOff.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/answerHandOff.errors" },
+    "pageTeam.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/pageTeam.request" },
+    "pageTeam.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/pageTeam.response" },
+    "pageTeam.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/pageTeam.errors" },
+    "acknowledgePage.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/acknowledgePage.request" },
+    "acknowledgePage.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/acknowledgePage.response" },
+    "acknowledgePage.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/acknowledgePage.errors" },
+    "openReviewItem.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/openReviewItem.request" },
+    "openReviewItem.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/openReviewItem.response" },
+    "openReviewItem.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/openReviewItem.errors" },
+    "decideReviewItem.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/decideReviewItem.request" },
+    "decideReviewItem.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/decideReviewItem.response" },
+    "decideReviewItem.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/decideReviewItem.errors" },
+    "enterDoor.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/enterDoor.request" },
+    "enterDoor.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/enterDoor.response" },
+    "enterDoor.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/enterDoor.errors" },
+    "sendFixedLine.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendFixedLine.request" },
+    "sendFixedLine.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendFixedLine.response" },
+    "sendFixedLine.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendFixedLine.errors" },
+    "sendsFailing.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendsFailing.request" },
+    "sendsFailing.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendsFailing.response" },
+    "sendsFailing.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendsFailing.errors" },
+    "textingBack.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/textingBack.request" },
+    "textingBack.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/textingBack.response" },
+    "textingBack.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/textingBack.errors" },
+    "calendarLinkDropped.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/calendarLinkDropped.request" },
+    "calendarLinkDropped.response": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/calendarLinkDropped.response"
+    },
+    "calendarLinkDropped.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/calendarLinkDropped.errors" },
+    "calendarLinkBack.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/calendarLinkBack.request" },
+    "calendarLinkBack.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/calendarLinkBack.response" },
+    "calendarLinkBack.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/calendarLinkBack.errors" },
+    "sendProofCode.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendProofCode.request" },
+    "sendProofCode.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendProofCode.response" },
+    "sendProofCode.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendProofCode.errors" },
+    "proveCode.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/proveCode.request" },
+    "proveCode.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/proveCode.response" },
+    "proveCode.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/proveCode.errors" },
+    "issueChatLink.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/issueChatLink.request" },
+    "issueChatLink.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/issueChatLink.response" },
+    "issueChatLink.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/issueChatLink.errors" },
+    "setupKey": { "$ref": "tool-api.v1.1.schema.json#/$defs/setupKey" },
+    "journeyThreeKey": { "$ref": "tool-api.v1.1.schema.json#/$defs/journeyThreeKey" },
+    "journeyFourKey": {
+      "title": "JourneyFourKey",
+      "description": "A needs and gives key journey 4 gives, as the step index prints it (A-keys.md and B-keys.md, section 4; A-J4.md, B-J4.md), with the one call that writes it in journey 4 (README 'v1.2', 'Each key's one call'; 02-contracts section 8 its home): service (A4-81, B4-114: matchService), who_for (A4-80, B4-92: setWhoFor), place (B4-77: checkPlace), reach_by (A4-82, B4-93: setReachWay), customer (A4-23, B4-25: addCustomer), price_known (A4-06, A4-12, B4-07, B4-13) and visit_fee (A4-13, B4-14: setPrice), quote (B4-09: quoteFromPhotos), times (A4-14, A4-33, A4-62, A4-68, B4-15, B4-84, B4-85, B4-89: showTimes), choice (B4-16) and time_saved (A4-21, B4-23: saveTime), contact (A4-42) and link (B4-29: sendSecureLink), address (B4-30: checkPlace), access and answers (B4-34, A4-65: saveSecurePage). who_for, reach_by, times and customer at a booking the business adds stay journey 3's (confirmBusinessBooking, A3-30, B3-08).",
+      "type": "string",
+      "enum": [
+        "service",
+        "who_for",
+        "place",
+        "reach_by",
+        "customer",
+        "price_known",
+        "visit_fee",
+        "quote",
+        "times",
+        "choice",
+        "time_saved",
+        "contact",
+        "link",
+        "address",
+        "access",
+        "answers"
+      ]
+    },
+    "stepKey": {
+      "title": "StepKey",
+      "description": "A key a step gives: journeys 1 and 2's (setupKey, v1), journey 3's (journeyThreeKey, v1.1) or journey 4's (journeyFourKey, v1.2).",
+      "anyOf": [
+        { "$ref": "#/$defs/setupKey" },
+        { "$ref": "#/$defs/journeyThreeKey" },
+        { "$ref": "#/$defs/journeyFourKey" }
+      ]
+    },
+    "kindId": { "$ref": "tool-api.v1.1.schema.json#/$defs/kindId" },
+    "objectKey": { "$ref": "tool-api.v1.1.schema.json#/$defs/objectKey" },
+    "emailAddress": { "$ref": "tool-api.v1.1.schema.json#/$defs/emailAddress" },
+    "localDate": { "$ref": "tool-api.v1.1.schema.json#/$defs/localDate" },
+    "money": { "$ref": "tool-api.v1.1.schema.json#/$defs/money" },
+    "licenseAsGiven": { "$ref": "tool-api.v1.1.schema.json#/$defs/licenseAsGiven" },
+    "given": {
+      "title": "Given",
+      "description": "What an exchange assumes before its request runs, as v1.1 (seeds, the fixtures run first, the clock, what it states), with one change: a stated step may give journey 4's keys (stepKey; v1.2), which the named rule givesJourneyFourKeys checks. Every v1 and v1.1 given is a v1.2 given.",
+      "type": "object",
+      "properties": {
+        "seeds": {
+          "description": "Seed fixtures of the frozen table parts, as <folder under contracts/db-schema>/<file>.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z-]+/seed-[a-z0-9-]+[.]json$" }
+        },
+        "after": {
+          "description": "Fixtures of this folder whose requests run first, in order.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9-]+[.]json$" }
+        },
+        "now": {
+          "description": "The time the call reads 'now' at (the fake clock on staging: BP 9.4).",
+          "$ref": "#/$defs/utc"
+        },
+        "stated": {
+          "description": "What the fixture states: for a limit fixture, the limit that fails, the kind of its outcome and its action; for a step's fixture, the step and the keys it gives (A-keys.md, B-keys.md; journey 3's from v1.1, journey 4's from v1.2); null otherwise.",
+          "anyOf": [
+            {
+              "title": "StatedOutcome",
+              "type": "object",
+              "properties": {
+                "limit": { "type": "integer", "minimum": 1, "maximum": 6 },
+                "outcome": { "$ref": "#/$defs/gateOutcome" },
+                "action": { "type": "string", "minLength": 1 }
+              },
+              "required": ["limit", "outcome", "action"],
+              "additionalProperties": false
+            },
+            {
+              "title": "StatedGives",
+              "type": "object",
+              "properties": {
+                "step": { "$ref": "#/$defs/stepId" },
+                "gives": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/stepKey" },
+                  "uniqueItems": true
+                }
+              },
+              "required": ["step", "gives"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "note": {
+          "description": "Anything else the exchange assumes, in plain words.",
+          "type": "string"
+        }
+      },
+      "required": ["seeds", "after", "now", "stated"],
+      "additionalProperties": false
+    },
+    "matchKinds.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/matchKinds.request" },
+    "matchKinds.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/matchKinds.response" },
+    "matchKinds.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/matchKinds.errors" },
+    "lookupListing.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/lookupListing.request" },
+    "lookupListing.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/lookupListing.response" },
+    "lookupListing.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/lookupListing.errors" },
+    "saveSetupStep.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/saveSetupStep.request" },
+    "setupStepS2_05": { "$ref": "tool-api.v1.1.schema.json#/$defs/setupStepS2_05" },
+    "saveSetupStepInTurn": { "$ref": "tool-api.v1.1.schema.json#/$defs/saveSetupStepInTurn" },
+    "saveSetupStep.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/saveSetupStep.response" },
+    "saveSetupStep.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/saveSetupStep.errors" },
+    "readSetup.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/readSetup.request" },
+    "readSetup.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/readSetup.response" },
+    "readSetup.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/readSetup.errors" },
+    "businessCaller": { "$ref": "tool-api.v1.1.schema.json#/$defs/businessCaller" },
+    "customerBlockedError": { "$ref": "tool-api.v1.1.schema.json#/$defs/customerBlockedError" },
+    "notLiveError": { "$ref": "tool-api.v1.1.schema.json#/$defs/notLiveError" },
+    "safetyHeldError": { "$ref": "tool-api.v1.1.schema.json#/$defs/safetyHeldError" },
+    "waitsForOwnerError": { "$ref": "tool-api.v1.1.schema.json#/$defs/waitsForOwnerError" },
+    "timeEntered": { "$ref": "tool-api.v1.1.schema.json#/$defs/timeEntered" },
+    "serviceEntered": { "$ref": "tool-api.v1.1.schema.json#/$defs/serviceEntered" },
+    "newCustomerEntered": { "$ref": "tool-api.v1.1.schema.json#/$defs/newCustomerEntered" },
+    "enteredBooking": { "$ref": "tool-api.v1.1.schema.json#/$defs/enteredBooking" },
+    "heldTime": { "$ref": "tool-api.v1.1.schema.json#/$defs/heldTime" },
+    "openRequest.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/openRequest.request" },
+    "openRequest.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/openRequest.response" },
+    "openRequest.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/openRequest.errors" },
+    "openRequest.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/openRequest.exchange" },
+    "confirmBusinessBooking.request": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/confirmBusinessBooking.request"
+    },
+    "confirmBusinessBooking.response": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/confirmBusinessBooking.response"
+    },
+    "wrongDoorError": { "$ref": "tool-api.v1.1.schema.json#/$defs/wrongDoorError" },
+    "timeTakenError": { "$ref": "tool-api.v1.1.schema.json#/$defs/timeTakenError" },
+    "confirmBusinessBooking.errors": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/confirmBusinessBooking.errors"
+    },
+    "confirmBusinessBooking.exchange": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/confirmBusinessBooking.exchange"
+    },
+    "readBackBusinessBooking.request": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/readBackBusinessBooking.request"
+    },
+    "readBackBusinessBooking.response": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/readBackBusinessBooking.response"
+    },
+    "readBackBusinessBooking.errors": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/readBackBusinessBooking.errors"
+    },
+    "readBackBusinessBooking.exchange": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/readBackBusinessBooking.exchange"
+    },
+    "findCustomer.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/findCustomer.request" },
+    "findCustomer.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/findCustomer.response" },
+    "findCustomer.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/findCustomer.errors" },
+    "findCustomer.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/findCustomer.exchange" },
+    "checkBookingFirst.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/checkBookingFirst.request" },
+    "checkBookingFirst.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/checkBookingFirst.response" },
+    "checkBookingFirst.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/checkBookingFirst.errors" },
+    "checkBookingFirst.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/checkBookingFirst.exchange" },
+    "setCustomerBlock.request": { "$ref": "tool-api.v1.1.schema.json#/$defs/setCustomerBlock.request" },
+    "setCustomerBlock.response": { "$ref": "tool-api.v1.1.schema.json#/$defs/setCustomerBlock.response" },
+    "setCustomerBlock.errors": { "$ref": "tool-api.v1.1.schema.json#/$defs/setCustomerBlock.errors" },
+    "setCustomerBlock.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/setCustomerBlock.exchange" },
+    "customerSideCaller": {
+      "title": "CustomerSideCaller",
+      "description": "Who may call a journey 4 call on the customer's side (README 'v1.2', 'Callers'): the handle actor's turn in the person's own chat with Rosie's number (door chat; caller.kind turn: the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6), the booking page (door page; caller.kind page, through K-21's server) or the customer's own AI (door ai; caller.kind agent, through the Agent API, K-20). Never the console or a job: a booking's own answers come from its own people (arch 02 line 129: 'The same calls serve texts, secure pages and outside AIs under the same limits').",
+      "type": "string",
+      "enum": ["turn", "page", "agent"]
+    },
+    "wayOffered": {
+      "title": "WayOffered",
+      "description": "One of a service's ways for the request's flow (K-25 v1 service_money: the place it is done and its money path), with its version, as matchService answers it and A4-01 or B4-01 and B4-02 pick from.",
+      "type": "object",
+      "properties": {
+        "serviceMoneyId": {
+          "description": "K-25 v1 service_money.id, of the matched service.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "place": {
+          "description": "K-25 v1 service_money.place, as stored: where the service is done (at the business, at the customer's place, by video or phone: A4-01, B4-01).",
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "description": "K-25 v1 service_money.path, price|before|after (one of the master's 28 for the flow; K-30 booking_lines_path_form).",
+          "type": "string",
+          "pattern": "^(list|photos|visit)[|](none|card|deposit|full)[|](none|counter|bill|card|own)$"
+        },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "required": ["serviceMoneyId", "place", "path", "version"],
+      "additionalProperties": false
+    },
+    "timeOffered": {
+      "title": "TimeOffered",
+      "description": "One time on the times card (A4-14, B4-15 and their kinds A4-33, A4-62, A4-68, B4-84, B4-85, B4-89): the person, session, space or vehicle it is with (K-04 v1 resources), the time to reserve (K-05 v1 during: for an arrival window, the reserved time that also holds the job's length, K-30 README 'Times'), the zone it is shown in (the visit's, else the business's: CQ-05), the arrival window the card says for times window, and its exact price for that time and person (arch 05: 'exact prices'; K-25 v1 price rules, staff prices included), or a from price on a visit path, never shown as a set price (A4-05).",
+      "type": "object",
+      "properties": {
+        "optionId": {
+          "description": "The time's option id on the card (K-03 v1 option id; in a turn the times card's open question's option, K-04 v1 open_questions.options).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "resourceId": {
+          "description": "K-04 v1 resources.id, this business's: a worker, room, vehicle or class session.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "during": {
+          "description": "The time to reserve (K-04 v1 reservations.during).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/during"
+        },
+        "zone": { "$ref": "../common/formats.v1.schema.json#/$defs/zone" },
+        "arrivalWindow": {
+          "description": "For times window, the arrival window the card shows ('arriving 8–10am': B4-15; K-30 booking_visits.arrival_window), inside during; null otherwise.",
+          "anyOf": [{ "$ref": "../data-access/data-access.v1.schema.json#/$defs/during" }, { "type": "null" }]
+        },
+        "price": {
+          "description": "The exact price for this time and person, in integer minor units (K-25 v1 rule 7), or null on a visit path (fromPrice) or a photos path (the quote option's price).",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
+        "fromPrice": {
+          "description": "On a visit path, the 'from' price (K-25 v1 price_rules.from_cents), only as 'from'; null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
+        "seatsLeft": {
+          "description": "For a seat in a session, the seats left (K-04 v1 class_seats: capacity less taken; A4-33, B4-89); null otherwise.",
+          "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+        }
+      },
+      "required": [
+        "optionId",
+        "resourceId",
+        "during",
+        "zone",
+        "arrivalWindow",
+        "price",
+        "fromPrice",
+        "seatsLeft"
+      ],
+      "additionalProperties": false
+    },
+    "readBackYes": {
+      "title": "ReadBackYes",
+      "description": "The exact yes to a question or read-back (arch 01 line 89; arch 06 line 303): in a turn, the open question it answers and the reply's event (its words and versions are the open question's, K-04 v1 open_questions); on a page, the confirm tap's event, the words being what the page server showed from its session (K-21; v1.1 default 52), never the browser's.",
+      "oneOf": [
+        {
+          "title": "YesInTurn",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "openQuestion" },
+            "openQuestionId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "yesEventId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+          },
+          "required": ["kind", "openQuestionId", "yesEventId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "YesOnPage",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "page" },
+            "exactWords": {
+              "description": "The words shown, as the page server kept them with its session (K-21), never the browser's.",
+              "type": "string",
+              "minLength": 1
+            },
+            "yesEventId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+          },
+          "required": ["kind", "exactWords", "yesEventId"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "wrongDetailsError": {
+      "title": "WrongDetailsError",
+      "description": "S12-05 ('The AI sent wrong details'): a service or a price the customer's AI or page sent is not this business's as listed now (K-25 v1), so nothing was written and nothing held; the follow-ups (S12-06 switches to the right service, S12-27 answers with the real price) are K-09 v1.10's, and the caller asks again with today's list.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "wrongDetails" },
+        "what": {
+          "description": "service (not listed, or not this way's) or price (not the price for that time, person and way now).",
+          "type": "string",
+          "enum": ["service", "price"]
+        }
+      },
+      "required": ["error", "what"],
+      "additionalProperties": false
+    },
+    "overBookingLimitError": {
+      "title": "OverBookingLimitError",
+      "description": "S12-28 ('Stops bookings over a phone or address limit', pf.safety; S12-23's branch): the plug-in's limit of open bookings per phone or per address is reached, so nothing was held and Rosie's team gets a review item (v1's openReviewItem, S12-28; README 'v1.2' default 64). To the caller only that the booking can't go on now, with no reason (as S11-62's customerBlocked).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "overBookingLimit" },
+        "reviewItemId": {
+          "description": "The team review item opened (K-37 v1 review_items), never shown to the caller's AI.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        }
+      },
+      "required": ["error", "reviewItemId"],
+      "additionalProperties": false
+    },
+    "quoteStateError": {
+      "title": "QuoteStateError",
+      "description": "The quote is not in a state this stage takes (K-30 v1 quotes.state: a price only while pricing; an owner's answer only while with_owner; a send only once priced and, where an OK was asked, OK'd), so nothing was written (limit 4: arch 06 line 305).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "quoteState" },
+        "state": {
+          "type": "string",
+          "enum": ["pricing", "with_owner", "sent", "see_first", "declined", "not_priced"]
+        }
+      },
+      "required": ["error", "state"],
+      "additionalProperties": false
+    },
+    "notReachableError": {
+      "title": "NotReachableError",
+      "description": "The link cannot go the way asked, so nothing was written: noContact (no mobile or email on file for that person at this business: K-28 v1 customers), or chatNotOpen (a text into a mobile whose chat with Rosie is not open: RULES 4.1b; MC C9: Rosie never texts first). The caller gives it through the customer's own AI or page instead.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "notReachable" },
+        "why": { "type": "string", "enum": ["noContact", "chatNotOpen"] }
+      },
+      "required": ["error", "why"],
+      "additionalProperties": false
+    },
+    "mobileRequiredError": {
+      "title": "MobileRequiredError",
+      "description": "The reach card has no mobile, and one is required when the customer or their own AI books (MC C2; D103; K-28 v1 customers.mobile_handle_id; Q-07's default): nothing was written. A customer with only a landline is booked by the business (A3-19; Q-07).",
+      "type": "object",
+      "properties": { "error": { "const": "mobileRequired" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "geoUnavailableError": {
+      "title": "GeoUnavailableError",
+      "description": "The geo port answered an error (K-17 v1 geocode.errors: unavailable or rateLimited), so nothing is known about the place and nothing was written; the step's safe default holds (B4-77: ask for the ZIP; B4-30: ask again; nothing is booked until it checks).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "geoUnavailable" },
+        "retryAfterSeconds": {
+          "description": "K-17 v1's Retry-After, or null.",
+          "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        }
+      },
+      "required": ["error", "retryAfterSeconds"],
+      "additionalProperties": false
+    },
+    "matchService.request": {
+      "title": "MatchServiceRequest",
+      "description": "Is it a service the business offers? Gives service (A4-81, B4-114; 02-contracts section 8: K-30 the booking line's service), the one call that writes it in journey 4. The request's words for the service, as typed (in a turn decide's part field, re-parsed from that text under limit 6 before any write: arch 03 line 185; arch 06 line 309; from a page or an AI their field, read first: openRequest.safetyOutcomeId, arch 02 line 129), are matched by code to this business's own listed K-25 v1 services and their ways for the request's flow: one fits (matched, gives service), several fit (whichOne: one 'which?' and nothing written; in a turn limit 6's one question, whose answered option, K-04 v1 open_questions.answered_option_id, names the service picked), none fits (notOnList: A4-85, B4-03 'Says plainly the business doesn't do it'), or it is listed but can't be booked (cantBeBooked: A4-99, B4-117 'Declines plainly; tells the owner', v1's handOff, kind other, in the same commit). How code matches the words (the names on the list, or Q-42's meaning index) is C-099's (v1.1 open gap 39); never a guess. The matched service's own home is K-30 booking_lines.service_id, which saveTime writes when the time is saved (K-30 README writer table: A4-21, B4-23); until then it is kept as README default 57 says (open gap 54). Primary, uncached. Business: caller.businessId, the request's; row-level security scopes every row (arch 10 line 546). Person: set on the server (K-22 v1 rule 4). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: reads each service's and way's version, which saveTime compares (limit 4).",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": {
+          "description": "The request openRequest opened at its door (K-04 v1 bookings.id, stage entry).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "words": {
+          "description": "The service as typed, or, after a 'which?', the service picked from the candidates this call answered (in a turn the answered option of its question; from a page or an AI the candidate's id, checked against the list again).",
+          "oneOf": [
+            {
+              "title": "ServiceAsTyped",
+              "type": "object",
+              "properties": { "asTyped": { "type": "string", "minLength": 1 } },
+              "required": ["asTyped"],
+              "additionalProperties": false
+            },
+            {
+              "title": "ServicePicked",
+              "type": "object",
+              "properties": { "pickedServiceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } },
+              "required": ["pickedServiceId"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "words"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "bookingId": {
+          "description": "The customer's side only: a turn, the booking page or the customer's own AI.",
+          "properties": {
+            "caller": { "type": "object", "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } } }
+          }
+        }
+      }
+    },
+    "matchService.response": {
+      "title": "MatchServiceResponse",
+      "description": "Matched (gives service), which one, not on the list, or can't be booked.",
+      "oneOf": [
+        {
+          "title": "ServiceMatched",
+          "type": "object",
+          "properties": {
+            "result": { "const": "matched" },
+            "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "serviceVersion": { "$ref": "#/$defs/version" },
+            "ways": {
+              "description": "Its ways for the request's flow (A4-01, B4-01, B4-02 pick the place from them).",
+              "type": "array",
+              "items": { "$ref": "#/$defs/wayOffered" },
+              "minItems": 1
+            },
+            "openQuestionId": {
+              "description": "In a turn, the open question the walk's next asking step opened in the same commit (A4-01 or B4-02 'where?', else A4-80, B4-92), whose options and versions_read carry the service and its ways (README default 57); null for a page or an AI.",
+              "$ref": "#/$defs/nullableId"
+            },
+            "gives": {
+              "type": "array",
+              "items": { "const": "service" },
+              "minItems": 1,
+              "maxItems": 1
+            },
+            "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+            "repeated": { "type": "boolean" }
+          },
+          "required": [
+            "result",
+            "serviceId",
+            "serviceVersion",
+            "ways",
+            "openQuestionId",
+            "gives",
+            "written",
+            "repeated"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "ServiceWhichOne",
+          "type": "object",
+          "properties": {
+            "result": { "const": "whichOne" },
+            "candidates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                  "name": { "type": "string", "minLength": 1 }
+                },
+                "required": ["serviceId", "name"],
+                "additionalProperties": false
+              },
+              "minItems": 2
+            },
+            "openQuestionId": { "$ref": "#/$defs/nullableId" },
+            "gives": { "type": "array", "maxItems": 0 },
+            "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+            "repeated": { "type": "boolean" }
+          },
+          "required": ["result", "candidates", "openQuestionId", "gives", "written", "repeated"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ServiceNotOnList",
+          "description": "A4-85, B4-03: the reply says plainly the business doesn't do it; nothing written.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "notOnList" },
+            "gives": { "type": "array", "maxItems": 0 },
+            "written": { "type": "array", "maxItems": 0 },
+            "repeated": { "type": "boolean" }
+          },
+          "required": ["result", "gives", "written", "repeated"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ServiceCantBeBooked",
+          "description": "A4-99, B4-117: listed but not booked by Rosie (K-25 v1 services.active false, or a kind not booked: K-24 v1 picked_kinds not_booked); declines plainly and tells the owner through v1's handOff (kind other; K-36 v1 hand_offs), in the same commit; a call made alone writes the hand-off row and its message waits for CQ-44 (v1.1 open gap 43).",
+          "type": "object",
+          "properties": {
+            "result": { "const": "cantBeBooked" },
+            "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "handOffId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "gives": { "type": "array", "maxItems": 0 },
+            "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+            "repeated": { "type": "boolean" }
+          },
+          "required": ["result", "serviceId", "handOffId", "gives", "written", "repeated"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "matchService.errors": {
+      "title": "MatchServiceErrors",
+      "description": "Refused, nothing written.",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/safetyHeldError" },
+        { "$ref": "#/$defs/customerBlockedError" },
+        { "$ref": "#/$defs/waitsForOwnerError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "matchService.exchange": {
+      "title": "MatchServiceExchange",
+      "description": "One matchService request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "matchService" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/matchService.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/matchService.response" }, { "$ref": "#/$defs/matchService.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "setWhoFor.request": {
+      "title": "SetWhoForRequest",
+      "description": "Who it's for, and if they're 18 or older; gives who_for (A4-80, B4-92; 02-contracts section 8: the K-04 v1 booking head's booker, person served and payer with K-30), the one call that writes it in journey 4; and who's who on the booking after the save (A4-24, B4-32, with A4-25, A4-26, A4-55, A4-64, A4-89, B4-74, B4-107, B4-110, B4-112, B4-113), which gives no key. Writes the head's served_person_id and payer_person_id (the booker for themself; a new K-04 person, named as typed, for someone else; never a person id the browser or the AI sends: K-22 v1 rule 4), compare-and-set on the head's version (expectVersion, limit 4); a teen who may agree alone gets a private booking (A4-90, B4-106: K-04 bookings.private, as v1's setRecordFlag sets it). The age band (never an exact age: A4-80) goes to K-28 v1 customers.age_band of the person served when they have a row at this business (compare-and-set); else it is kept as README default 57 says until addCustomer writes the row (open gap 54). An unclear or refused age counts as under 18, so a parent books (A4-80; CQ-71's default). Under 13 and alone (A4-86, B4-98), a teen booking alone (A4-96, B4-108), adults only for a child (B4-99) and a booker not allowed (B4-100) give no key and keep nothing about the child (RULES 4.7): the request ends (K-30 booking_details.request_ended_why dropped; README default 60). Primary, uncached. Business: caller.businessId. Person: the booker is the head's, named by openRequest. Repeat: caller.requestId is the key. Version: the head's version compared and set; a new person inserted at version 1.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "expectVersion": {
+          "description": "The head's version the question was asked on (limit 4).",
+          "$ref": "#/$defs/version"
+        },
+        "answer": {
+          "oneOf": [
+            {
+              "title": "WhoForAnswer",
+              "description": "A4-80, B4-92: for themself or someone else, and the age band.",
+              "type": "object",
+              "properties": {
+                "step": { "type": "string", "enum": ["A4-80", "B4-92"] },
+                "for": { "type": "string", "enum": ["self", "someoneElse"] },
+                "name": {
+                  "description": "For someoneElse, their name as typed, or null; null for self.",
+                  "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+                },
+                "ageBand": {
+                  "description": "The person served's answer to 'are you 18 or older?': 18_or_older, under_18, or unclear (counts as under 18: A4-80).",
+                  "type": "string",
+                  "enum": ["18_or_older", "under_18", "unclear"]
+                }
+              },
+              "required": ["step", "for", "name", "ageBand"],
+              "additionalProperties": false
+            },
+            {
+              "title": "WhoIsWhoAnswer",
+              "description": "A4-24, B4-32 after the save: the booker an adult (nothing changes), a child (A4-25, B4-112: the child served, the parent booker and payer; the child's details on the page, K-30 page_answers child_details), another adult (A4-26, B4-113: served, with their own link), an adult the booker acts for (A4-64, B4-74: on the page, its papers a page answer of kind authority), someone else pays (A4-55, B4-110: on the page, a new payer) or an organization (A4-89, B4-107: no organization entity, K-28 v1 open gaps: writes nothing, README open gap 58).",
+              "type": "object",
+              "properties": {
+                "step": { "type": "string", "enum": ["A4-24", "B4-32"] },
+                "branch": {
+                  "type": "string",
+                  "enum": ["bookerAdult", "child", "otherAdult", "actsFor", "someoneElsePays", "organization"]
+                },
+                "name": {
+                  "description": "The new person's name as typed (child, otherAdult, actsFor, someoneElsePays), or null.",
+                  "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+                }
+              },
+              "required": ["step", "branch", "name"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "expectVersion", "answer"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "answer": {
+          "description": "The customer's side; the page-only branches (A4-55, A4-64, A4-89 are 'other → san page') only from the page.",
+          "allOf": [
+            {
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "answer": {
+                    "type": "object",
+                    "properties": { "branch": { "enum": ["actsFor", "someoneElsePays", "organization"] } },
+                    "required": ["branch"]
+                  }
+                },
+                "required": ["answer"]
+              },
+              "then": {
+                "properties": {
+                  "caller": { "type": "object", "properties": { "kind": { "const": "page" } } }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "setWhoFor.response": {
+      "title": "SetWhoForResponse",
+      "description": "Who the booking is for and who pays, the head's version, where the age band was kept, and the key it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "outcome": {
+          "description": "goOn (A4-80 'Fine to go on'), teenPrivate (A4-90, B4-106), childGetsParent (A4-86, B4-98), teenParentLink (A4-96, B4-108), adultsOnly (B4-99), bookerNotAllowed (B4-100), or whoIsWhoSet (A4-24, B4-32).",
+          "type": "string",
+          "enum": [
+            "goOn",
+            "teenPrivate",
+            "childGetsParent",
+            "teenParentLink",
+            "adultsOnly",
+            "bookerNotAllowed",
+            "whoIsWhoSet"
+          ]
+        },
+        "servedPersonId": { "$ref": "#/$defs/nullableId" },
+        "payerPersonId": { "$ref": "#/$defs/nullableId" },
+        "private": { "type": "boolean" },
+        "ageBandKept": {
+          "description": "customerRow (K-28 customers.age_band written), pending (README default 57, until addCustomer), or nothingKept (a child under 13 or a teen alone, RULES 4.7; who's who).",
+          "type": "string",
+          "enum": ["customerRow", "pending", "nothingKept"]
+        },
+        "headVersion": { "$ref": "#/$defs/version" },
+        "gives": {
+          "type": "array",
+          "items": { "const": "who_for" },
+          "maxItems": 1
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "outcome",
+        "servedPersonId",
+        "payerPersonId",
+        "private",
+        "ageBandKept",
+        "headVersion",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "outcome": {
+          "description": "Only A4-80's two going-on branches give who_for (A-J4.md: the step's gives); the ending branches and who's who give none.",
+          "if": { "properties": { "outcome": { "enum": ["goOn", "teenPrivate"] } }, "required": ["outcome"] },
+          "then": { "properties": { "gives": { "type": "array", "minItems": 1 } } },
+          "else": { "properties": { "gives": { "type": "array", "maxItems": 0 } } }
+        }
+      }
+    },
+    "setWhoFor.errors": {
+      "title": "SetWhoForErrors",
+      "description": "Refused, nothing written.",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "setWhoFor.exchange": {
+      "title": "SetWhoForExchange",
+      "description": "One setWhoFor request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "setWhoFor" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/setWhoFor.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/setWhoFor.response" }, { "$ref": "#/$defs/setWhoFor.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "setReachWay.request": {
+      "title": "SetReachWayRequest",
+      "description": "The reach card: how to reach the customer; gives reach_by (A4-82, B4-93; 02-contracts section 8: K-28 v1 customers.way), the one call that writes it in journey 4. The way is texts, textsonly or email (K-01 v1 bookingValues.reach); calls only is not offered, textsonly works like texts while there is no voice, and email adds email as the way (Q-07; MC C2). A mobile is required when the customer or their own AI books (MC C2; D103: mobileRequired otherwise). For a person with no K-28 row at this business, the contacts given are written as the booker's own K-04 v1 handles in this commit (handles, person_handles, and for a mobile a phones row with its contacts/add effect, added when it is saved: Q-03; CQ-04), and a number or address Rosie already holds is linked as this person's own handle too, so no answer tells whether Rosie knew it (RULES 4.9, 6.5; v1.1 default 49); in a turn from the person's own phone the mobile is the sender's own handle and is not typed. For a customer already on the list the contact on file stays (another phone or email is a contact change that waits for their own code: S13-45 row 3; v1.1 default 49), so contacts is null, and the way is set on their own word (A7-98). The way's home is K-28 v1 customers.way: written here, compare-and-set, when the row exists; for a new customer it is kept as README default 57 says until addCustomer writes the row (A4-23 comes after A4-82: open gap 54). Primary, uncached. Business: caller.businessId. Person: the head's booker, never a person id the browser or the AI sends. Repeat: caller.requestId is the key. Version: new handles and phone rows at version 1; a listed customer's row compared and set.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "way": {
+          "description": "K-28 v1 customers.way (customers_way_known): texts, textsonly or email; never calls only (Q-07).",
+          "type": "string",
+          "enum": ["texts", "textsonly", "email"]
+        },
+        "contacts": {
+          "description": "For a new customer, the contacts the reach card gives (v1.1's newCustomerEntered: mobile and email, either may be null, a mobile required when the customer or their AI books); null for a customer on the list, or a turn whose sender's phone is the mobile and who adds no email.",
+          "anyOf": [{ "$ref": "#/$defs/newCustomerEntered" }, { "type": "null" }]
+        }
+      },
+      "required": ["caller", "bookingId", "way", "contacts"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "way": {
+          "description": "The customer's side; an AI's token must be bound to the person whose contacts these are (CQ-13: an unbound token may search, see prices and times and save a time; Q-09's tie, K-20's; README default 70).",
+          "allOf": [
+            {
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "agent" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "setReachWay.response": {
+      "title": "SetReachWayResponse",
+      "description": "The way taken, where it was kept, the handles linked and the key it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "way": { "type": "string", "enum": ["texts", "textsonly", "email"] },
+        "wayKept": {
+          "description": "customerRow (K-28 customers.way written) or pending (README default 57, until addCustomer).",
+          "type": "string",
+          "enum": ["customerRow", "pending"]
+        },
+        "handles": {
+          "description": "The booker's handles the card linked (K-04 v1 handles.id; a phone row is named by its handle id: K-08 v1 default 3), never the number or the address.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "handleId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+              "kind": { "type": "string", "enum": ["mobile", "email"] }
+            },
+            "required": ["handleId", "kind"],
+            "additionalProperties": false
+          }
+        },
+        "effects": {
+          "description": "contacts/add for a new mobile not yet a Linq contact (Q-03; CQ-04).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/effectWritten" }
+        },
+        "gives": {
+          "type": "array",
+          "items": { "const": "reach_by" },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["bookingId", "way", "wayKept", "handles", "effects", "gives", "written", "repeated"],
+      "additionalProperties": false
+    },
+    "setReachWay.errors": {
+      "title": "SetReachWayErrors",
+      "description": "Refused, nothing written.",
+      "oneOf": [
+        { "$ref": "#/$defs/mobileRequiredError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "setReachWay.exchange": {
+      "title": "SetReachWayExchange",
+      "description": "One setReachWay request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "setReachWay" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/setReachWay.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/setReachWay.response" }, { "$ref": "#/$defs/setReachWay.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "addCustomer.request": {
+      "title": "AddCustomerRequest",
+      "description": "The AI sends the customer's name; gives customer (A4-23, B4-25; 02-contracts section 8: the K-28 v1 customers row), the one call that writes it in journey 4. In one commit: the K-28 row for the head's booker at this business (customers_business_person_key), with the name as the AI or the page sent it or as typed in the person's own chat (in a turn decide's field, re-parsed under limit 6), the booker's handles setReachWay linked (customers_mobile_own_fk, customers_email_own_fk), the way the reach card gave and the age band A4-80 gave when the booker is the person served (README default 57), else the way their contacts imply (customers_way_fits_contact); and the K-04 v1 person_roles customer row (K-28 v1 rule 7); and K-04 persons.name when it is still null. A customer already on the list keeps their row and the name on file (a different name is not changed here: S13-45; RULES 4.10), and the call still gives customer. A blocked person or number hears only that the business can't take it, with no reason (customerBlocked: S11-62). K-28 says a new customer is added 'once booked' (A4-23); the row is written here, in A4-23's commit, so the key's home holds it when given (arch 03 line 161), and a request that ends unbooked keeps it (README open gap 57). Primary, uncached. Business: caller.businessId. Person: the head's booker. Repeat: caller.requestId is the key; the row found by (business, person) answers added false. Version: a new row at version 1.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "name": {
+          "description": "The name for the business's list (K-28 v1 customers.name), as sent or typed.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["caller", "bookingId", "name"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "name": {
+          "description": "The customer's side; an AI's token must be bound to the booker (CQ-13; Q-09's tie, K-20's; README default 70).",
+          "allOf": [
+            {
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "agent" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "addCustomer.response": {
+      "title": "AddCustomerResponse",
+      "description": "The customer row found or added and the key it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "customerId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "added": {
+          "description": "true when this call added the row; false for a customer already on the list.",
+          "type": "boolean"
+        },
+        "gives": {
+          "type": "array",
+          "items": { "const": "customer" },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["bookingId", "customerId", "added", "gives", "written", "repeated"],
+      "additionalProperties": false
+    },
+    "addCustomer.errors": {
+      "title": "AddCustomerErrors",
+      "description": "Refused, nothing written. customerBlocked names no block toward the customer's ways (blockId null: v1.1's rule).",
+      "oneOf": [
+        { "$ref": "#/$defs/customerBlockedError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "addCustomer.exchange": {
+      "title": "AddCustomerExchange",
+      "description": "One addCustomer request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "addCustomer" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/addCustomer.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/addCustomer.response" }, { "$ref": "#/$defs/addCustomer.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "setPrice.request": {
+      "title": "SetPriceRequest",
+      "description": "How the price is set (A4-05, B4-06); gives price_known (A4-06 and B4-07 from the list; A4-12 and B4-13 the price texted from a quote) or visit_fee (A4-13, B4-14: the visit promised, priced there), the one call that writes each in journey 4 (02-contracts section 8: K-30 the booking line's price copied in, or the visit fee). list: the price resolver's price for the service's way now (K-25 v1 price rules; a per-unit or per-hour price with its unit), shown before any time; visit: the visit's own price that is promised and any 'from' price, never shown as a set price (A4-05; A4-13 'Promises the $25 consult'); photos: the quote sent (K-30 v1 quotes.state sent, sent_at, good_until 168 hours later: quotes_sent_good_7_days) with its options, and a secure link of purpose quote to pick a time (K-30 secure_links; the customer OKs the price by picking a time: A4-12). The list and visit prices are copied into K-30 booking_lines when the time is saved (saveTime; K-30 README writer table; S11-54: the price on the customer's screen holds through the saved time); until then they are kept as README default 57 says (open gap 54); a quote is its own home. The quote's text to the customer goes into their open chat in a turn (RULES 4.1b; MC C9), else to the email on file in a turn, else waits for their own AI or page to read it (README open gap 59). Primary, uncached. Business: caller.businessId. Person: list and visit on the customer's side; photos only from the owner's answer turn or the pro's or owner's pricing page (caller.personId the owner, an admin or staff: K-04 person_roles). Repeat: caller.requestId is the key. Version: a quote compared and set (expectVersion).",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "price": {
+          "oneOf": [
+            {
+              "title": "PriceFromList",
+              "type": "object",
+              "properties": {
+                "path": { "const": "list" },
+                "step": { "type": "string", "enum": ["A4-06", "B4-07"] },
+                "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "serviceMoneyId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+              },
+              "required": ["path", "step", "serviceId", "serviceMoneyId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "PriceAtVisit",
+              "type": "object",
+              "properties": {
+                "path": { "const": "visit" },
+                "step": { "type": "string", "enum": ["A4-13", "B4-14"] },
+                "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "serviceMoneyId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+              },
+              "required": ["path", "step", "serviceId", "serviceMoneyId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "PriceQuoteSent",
+              "type": "object",
+              "properties": {
+                "path": { "const": "photos" },
+                "step": { "type": "string", "enum": ["A4-12", "B4-13"] },
+                "quoteId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "expectVersion": { "$ref": "#/$defs/version" }
+              },
+              "required": ["path", "step", "quoteId", "expectVersion"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "price"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "price": {
+          "allOf": [
+            {
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } }
+                }
+              }
+            },
+            {
+              "description": "A quote is sent by the business: the owner's answer in a turn or the pricing page; never an AI.",
+              "if": {
+                "properties": {
+                  "price": {
+                    "type": "object",
+                    "properties": { "path": { "const": "photos" } },
+                    "required": ["path"]
+                  }
+                },
+                "required": ["price"]
+              },
+              "then": {
+                "properties": {
+                  "caller": { "type": "object", "properties": { "kind": { "enum": ["turn", "page"] } } }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "setPrice.response": {
+      "title": "SetPriceResponse",
+      "description": "The price shown, the quote sent and the key it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "path": { "type": "string", "enum": ["list", "visit", "photos"] },
+        "price": {
+          "description": "The set price shown (list), or the visit's own price (visit); null for photos (the options).",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
+        "fromPrice": {
+          "description": "A 'from' price, only as 'from' (A4-05); null for none.",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
+        "quote": {
+          "description": "For photos, the quote as sent; null otherwise.",
+          "anyOf": [
+            {
+              "title": "QuoteSent",
+              "type": "object",
+              "properties": {
+                "quoteId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "state": { "const": "sent" },
+                "sentAt": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+                "goodUntil": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+                "version": { "$ref": "#/$defs/version" },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "quoteOptionId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                      "label": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+                      "price": { "$ref": "#/$defs/money" },
+                      "upTo": { "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }] }
+                    },
+                    "required": ["quoteOptionId", "label", "price", "upTo"],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                },
+                "secureLinkId": {
+                  "description": "The quote link (K-30 secure_links purpose quote): only its code's hash is kept.",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["quoteId", "state", "sentAt", "goodUntil", "version", "options", "secureLinkId"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "outboxRowIds": {
+          "description": "In a turn, the row that tells the customer the price (A4-12, B4-13), into their open chat or to their email; empty for a page's commit (v1.1 open gap 43).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "gives": {
+          "type": "array",
+          "items": { "enum": ["price_known", "visit_fee"] },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "path",
+        "price",
+        "fromPrice",
+        "quote",
+        "outboxRowIds",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "path": {
+          "description": "A visit path gives visit_fee; a list or photos path price_known (A-J4.md, B-J4.md).",
+          "allOf": [
+            {
+              "if": { "properties": { "path": { "const": "visit" } }, "required": ["path"] },
+              "then": { "properties": { "gives": { "type": "array", "items": { "const": "visit_fee" } } } },
+              "else": { "properties": { "gives": { "type": "array", "items": { "const": "price_known" } } } }
+            },
+            {
+              "if": { "properties": { "path": { "const": "photos" } }, "required": ["path"] },
+              "then": { "properties": { "quote": { "type": "object" } } },
+              "else": { "properties": { "quote": { "type": "null" } } }
+            }
+          ]
+        }
+      }
+    },
+    "setPrice.errors": {
+      "title": "SetPriceErrors",
+      "description": "Refused, nothing written. wrongDetails: the service or way is not this business's as listed now (S12-05).",
+      "oneOf": [
+        { "$ref": "#/$defs/quoteStateError" },
+        { "$ref": "#/$defs/wrongDetailsError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "setPrice.exchange": {
+      "title": "SetPriceExchange",
+      "description": "One setPrice request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "setPrice" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/setPrice.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/setPrice.response" }, { "$ref": "#/$defs/setPrice.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "quoteFromPhotos.request": {
+      "title": "QuoteFromPhotosRequest",
+      "description": "A price made for one customer from photos or answers (A4-07 to A4-11, A4-51, A4-94, A4-95; B4-08 to B4-12, B4-80, B4-101, B4-102); gives quote (B4-09: the pro prices it from the photos; 02-contracts section 8: K-30 v1 quotes), the one call that writes it in journey 4 (flow A's A4-08 gives no key). Three stages. askPhotos (A4-07, B4-08: no time is saved while it's priced): the K-30 quotes row (state pricing, basis photos or answers, the service, its currency) and a secure link of purpose photos for the customer to add them (K-30 secure_links: only its code's hash), and a K-04 clock row 4 hours on (A4-08: 'If nobody prices it in 4 hours, Sam is asked to'). price (A4-08, B4-09; the pro's or the owner's signed-in pricing page, K-21, caller.personId set by the page server): the K-30 quote_options (one, or options; each a set price or a range set at the visit inside it) and priced_by_person_id, priced_at; when a K-26 v1 price OK limit asks (every quote, or one over its amount: S1-21 price_oks; quotes.price_ok_limit_id) the state with_owner and a K-30 owner_oks row (about quote, answer_by 4 of the owner's text hours, one reminder after 30 minutes), and, since a page's commit writes no outbox row (v1.1 open gap 43), a K-04 clock row due at once on the owner's handle whose clock turn writes the owner's question (A4-09, B4-10: 'Reply 1 Send it, 2 Change it, 3 See it first, 4 Decline'), as v1.1 default 56 does; else the quote stays pricing, priced, for setPrice to send. ownerAnswer (A4-09, A4-10, B4-10, B4-11; the owner's or an admin's reply in their own chat, or Needs you on the portal, K-21): the K-30 owner_oks answer with who gave it (K-08 approvalOwnerYes: person, role, question, option, event) and send (the walk goes on to setPrice photos in the same commit: A4-12), change (the new price read back first and, on its exact yes, the options changed: only before it is sent; A4-10, B4-11), seeFirst (A4-94, B4-101: state see_first, a visit to be priced there offered) or decline (A4-95, B4-102: state declined, the request ended declined). No answer in 30 minutes tells the customer it's with the shop (A4-11, B4-12) and none by the deadline is not_priced (A4-51, B4-80): clock firings (v1's gateAndCommit clock branch), not this call. Primary, uncached. Business: caller.businessId; quotes_service_fk holds the service to it. Person: askPhotos on the customer's side; price and ownerAnswer only by the owner, an admin or staff who may (K-04 person_roles; K-22 who OKs what), else notAllowed. Repeat: caller.requestId is the key. Version: the quote compared and set (expectVersion); options inserted at version 1.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": {
+          "oneOf": [
+            {
+              "title": "QuoteAskPhotos",
+              "type": "object",
+              "properties": {
+                "stage": { "const": "askPhotos" },
+                "step": { "type": "string", "enum": ["A4-07", "B4-08"] },
+                "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "basis": { "type": "string", "enum": ["photos", "answers"] }
+              },
+              "required": ["stage", "step", "serviceId", "basis"],
+              "additionalProperties": false
+            },
+            {
+              "title": "QuotePrice",
+              "type": "object",
+              "properties": {
+                "stage": { "const": "price" },
+                "step": { "type": "string", "enum": ["A4-08", "B4-09"] },
+                "quoteId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "expectVersion": { "$ref": "#/$defs/version" },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+                      "price": { "$ref": "#/$defs/money" },
+                      "upTo": { "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }] }
+                    },
+                    "required": ["label", "price", "upTo"],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": ["stage", "step", "quoteId", "expectVersion", "options"],
+              "additionalProperties": false
+            },
+            {
+              "title": "QuoteOwnerAnswer",
+              "type": "object",
+              "properties": {
+                "stage": { "const": "ownerAnswer" },
+                "step": { "type": "string", "enum": ["A4-09", "A4-10", "B4-10", "B4-11"] },
+                "quoteId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "ownerOkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "expectVersion": { "$ref": "#/$defs/version" },
+                "answer": { "type": "string", "enum": ["send", "change", "seeFirst", "decline"] },
+                "yes": { "$ref": "#/$defs/readBackYes" }
+              },
+              "required": ["stage", "step", "quoteId", "ownerOkId", "expectVersion", "answer", "yes"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "stage"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "stage": {
+          "description": "askPhotos on the customer's side; a price only on the pricing page; an owner's answer in their turn or on the portal; never an AI for the business's side (A3-03).",
+          "allOf": [
+            {
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "stage": { "const": "price" } },
+                    "required": ["stage"]
+                  }
+                },
+                "required": ["stage"]
+              },
+              "then": {
+                "properties": {
+                  "caller": { "type": "object", "properties": { "kind": { "const": "page" } } }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "stage": { "const": "ownerAnswer" } },
+                    "required": ["stage"]
+                  }
+                },
+                "required": ["stage"]
+              },
+              "then": {
+                "properties": {
+                  "caller": { "type": "object", "properties": { "kind": { "enum": ["turn", "page"] } } }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "quoteFromPhotos.response": {
+      "title": "QuoteFromPhotosResponse",
+      "description": "The quote after the stage, the owner's ask, the photos link and the key it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "quoteId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "state": {
+          "description": "K-30 v1 quotes.state after the call.",
+          "type": "string",
+          "enum": ["pricing", "with_owner", "sent", "see_first", "declined", "not_priced"]
+        },
+        "version": { "$ref": "#/$defs/version" },
+        "ownerOkId": {
+          "description": "The owner's ask (K-30 owner_oks, about quote) written or answered; null when none.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "ownerAskClockRowId": {
+          "description": "For a price made on a page that asks the owner: the K-04 clock row due at once on the owner's handle whose clock turn writes the question (v1.1 default 56's way); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "photosLinkId": {
+          "description": "For askPhotos, the photos link (K-30 secure_links purpose photos); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "requestEnded": {
+          "description": "true when a decline ended the request (K-30 booking_details.request_ended_why declined).",
+          "type": "boolean"
+        },
+        "gives": {
+          "type": "array",
+          "items": { "const": "quote" },
+          "maxItems": 1
+        },
+        "outboxRowIds": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "quoteId",
+        "state",
+        "version",
+        "ownerOkId",
+        "ownerAskClockRowId",
+        "photosLinkId",
+        "requestEnded",
+        "gives",
+        "outboxRowIds",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "quoteFromPhotos.errors": {
+      "title": "QuoteFromPhotosErrors",
+      "description": "Refused, nothing written.",
+      "oneOf": [
+        { "$ref": "#/$defs/quoteStateError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "quoteFromPhotos.exchange": {
+      "title": "QuoteFromPhotosExchange",
+      "description": "One quoteFromPhotos request with its outcome. A price made on the pricing page writes no outbox row (v1.1 open gap 43).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "quoteFromPhotos" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/quoteFromPhotos.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/quoteFromPhotos.response" },
+            { "$ref": "#/$defs/quoteFromPhotos.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "caller": {
+                "type": "object",
+                "properties": { "kind": { "const": "page" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["caller"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": { "outboxRowIds": { "type": "array", "maxItems": 0 } }
+          }
+        }
+      }
+    },
+    "showTimes.request": {
+      "title": "ShowTimesRequest",
+      "description": "The times card; gives times (A4-14, with A4-33 sessions with seats left, A4-62 spaces that fit, A4-68 a stay's start and end; B4-15, with B4-84 a set start, B4-85 a stay, B4-89 seats in a session; 02-contracts section 8: K-30 the times card shown and the time chosen), the one call that writes it in journey 4. Five times, soonest then nearest, with exact prices (arch 05; K-25 v1 price rules for that time and person, staff prices included): inside the owner's hours (K-27 v1 weekly_hours) and outside time off asked or OK'd (time_off), K-04 reservations held or booked (saved times count across businesses: K-05 item 8), the person's busy blocks read through the business's live share (K-27 v1 busy_blocks, calendar_link_shares; K-16 v1's sync and 30-minute poll keep them; a dropped link's person is not offered, a connecting link takes nothing out) and scheduled sessions; no further than 90 days after the link's synced_at (arch 05 line 265); a need-by date limits it (A4-17; K-30 booking_details.need_by, written here); one person by name shows only their times (A4-16, B4-17), another day starts the search there (A4-17, B4-20). The fresh free/busy read (K-16 v1 freeBusy) is the booking write's (A6-10, K-09 v1.4), not this card's. Writes K-30 booking_details.times, set once (window or setstart as the plug-in or K-23 v1 flow_defaults.arrive says for a person's time, seat for a session, stay for a stay: A4-66, B4-83), and in a turn the times card's open question (its options the times; its versions_read the rows the card was built from, so the same versions give the same times when the pick comes back, as v1.1 default 52's words). Nobody free gives no key (A4-19, B4-21: says plainly, and offers the waitlist or next in line: joinWaitlist). Primary, uncached. Time budget: none in the sources; at most 200 ms proposed, the 'Search, one indexed query' budget (arch 04 line 217; v1 default 3). Business: caller.businessId. Person: the customer's side. Repeat: a read with one set-once write; a repeat answers the same card for the same versions. Version: booking_details compared and set.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "serviceMoneyId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "quoteOptionId": {
+          "description": "On a photos path, the quote option the customer picks with the time (A4-12, B4-13); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "filter": {
+          "type": "object",
+          "properties": {
+            "resourceId": {
+              "description": "One person by name, matched by code from the name typed (A4-16, B4-17); null for anyone.",
+              "$ref": "#/$defs/nullableId"
+            },
+            "fromDay": {
+              "description": "Another day (A4-17, B4-20), a day in the visit's zone; null for soonest.",
+              "anyOf": [{ "$ref": "#/$defs/localDate" }, { "type": "null" }]
+            },
+            "needBy": {
+              "description": "The need-by date (A4-83, B4-94; S13-57), written to K-30 booking_details.need_by; null for none.",
+              "anyOf": [{ "$ref": "#/$defs/localDate" }, { "type": "null" }]
+            }
+          },
+          "required": ["resourceId", "fromDay", "needBy"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["caller", "bookingId", "serviceId", "serviceMoneyId", "quoteOptionId", "filter"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "bookingId": {
+          "description": "The customer's side only.",
+          "properties": {
+            "caller": { "type": "object", "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } } }
+          }
+        }
+      }
+    },
+    "showTimes.response": {
+      "title": "ShowTimesResponse",
+      "description": "The card: how the times read, up to five times, whether nobody is free, and the key it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "timesKind": {
+          "description": "K-30 v1 booking_details.times as set once.",
+          "type": "string",
+          "enum": ["window", "setstart", "stay", "seat"]
+        },
+        "times": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/timeOffered" },
+          "maxItems": 5
+        },
+        "nobodyFree": { "type": "boolean" },
+        "sentNowOffered": {
+          "description": "Flow B: 'Send someone now' is offered, only where the plug-in lists sentnow (B4-16, B4-91).",
+          "type": "boolean"
+        },
+        "openQuestionId": {
+          "description": "In a turn, the times card's open question; null for a page or an AI, whose server or token session keeps the card (README default 57).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "gives": {
+          "type": "array",
+          "items": { "const": "times" },
+          "maxItems": 1
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "timesKind",
+        "times",
+        "nobodyFree",
+        "sentNowOffered",
+        "openQuestionId",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "nobodyFree": {
+          "description": "A card with times gives times; nobody free gives none (A4-19, B4-21).",
+          "if": { "properties": { "nobodyFree": { "const": true } }, "required": ["nobodyFree"] },
+          "then": {
+            "properties": {
+              "times": { "type": "array", "maxItems": 0 },
+              "gives": { "type": "array", "maxItems": 0 }
+            }
+          },
+          "else": {
+            "properties": {
+              "times": { "type": "array", "minItems": 1 },
+              "gives": { "type": "array", "minItems": 1 }
+            }
+          }
+        }
+      }
+    },
+    "showTimes.errors": {
+      "title": "ShowTimesErrors",
+      "description": "Refused, nothing written. wrongDetails: the service or way the page or the AI sent is not listed now (S12-05).",
+      "oneOf": [
+        { "$ref": "#/$defs/wrongDetailsError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "showTimes.exchange": {
+      "title": "ShowTimesExchange",
+      "description": "One showTimes request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "showTimes" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/showTimes.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/showTimes.response" }, { "$ref": "#/$defs/showTimes.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "saveTime.request": {
+      "title": "SaveTimeRequest",
+      "description": "The pick and the saved time; gives choice (B4-16: the pick, K-30 v1 booking_details.timing) and time_saved (A4-21, B4-23: K-04 reservations, the saved time; 02-contracts section 8), the one call that writes each in journey 4 (flow A's pick, A4-15, gives no key; in a turn the walk passes the automatic save, arch 03 line 191, so the part gives both). In one commit: K-30 booking_details.timing, set once (settime, or sentnow for 'Send someone now' where the plug-in lists it: B4-91); the time held for the booking by K-05 v1 reserve (held_until 10 minutes on, with one 10-minute extension offered once, K-05 extend, Q-12; for the customer's own AI's door 15 minutes, never extended: MC C3; Q-12); and the K-30 booking_lines row, written when the time is saved (K-30 README writer table), copying the service, the way, its price rule or the quote option picked, the path, price kind, units, price, deposit, fee and currency as shown on the card (S11-54; RULES 3.7; K-30 rule 10). In a turn the pick names the times card's option, and the action layer rebuilds the card from its open question's versions_read (the same versions give the same times); a row that moved fails limit 4 (fresh times) and a time taken limit 5 (nextOpenTimes). From a page or an AI the time comes back as the card answered it and is checked again: a service, way or price that is not today's is wrongDetails (S12-05) and nothing is held; a time another customer took first is timeTaken, and the caller shows the next times or a place in line (S12-01, S12-02). Over the plug-in's limit of open bookings for a phone or an address: overBookingLimit, and Rosie's team gets an S12-28 review item (README default 64). The AI going quiet lets the time go at held_until (S12-03, S12-04: K-05's sweep and the saved-time clock row; its one text to the customer only into an open chat: MC C9). Primary, uncached. Business: caller.businessId; reserve counts saved times across businesses (K-05 item 8). Person: the head's booker; reservations.for_phone_number is their mobile on file. Repeat: caller.requestId is the key; the reservation id is the caller's (K-05 reserve: repeated). Version: booking_details compared and set; the reservation and line at version 1.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "pick": {
+          "oneOf": [
+            {
+              "title": "PickInTurn",
+              "description": "In a turn: the times card's open question and the option picked (its answered_option_id).",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "cardOption" },
+                "openQuestionId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "optionId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+              },
+              "required": ["kind", "openQuestionId", "optionId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "PickOffered",
+              "description": "From a page or an AI: the time as the card answered it, with the service and way, checked again.",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "offered" },
+                "time": { "$ref": "#/$defs/timeOffered" },
+                "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "serviceMoneyId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "quoteOptionId": { "$ref": "#/$defs/nullableId" }
+              },
+              "required": ["kind", "time", "serviceId", "serviceMoneyId", "quoteOptionId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "PickSentNow",
+              "description": "Flow B, 'Send someone now' (B4-91): timing sentnow; the on-call pro and the arrival estimate are the booking write's (B6, K-09 v1.4), so nothing is reserved here (README open gap 61).",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "sentNow" },
+                "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "serviceMoneyId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+              },
+              "required": ["kind", "serviceId", "serviceMoneyId"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "pick"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "pick": {
+          "allOf": [
+            {
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } }
+                }
+              }
+            },
+            {
+              "description": "A card option is a turn's; a time as offered comes from a page or an AI.",
+              "if": {
+                "properties": {
+                  "pick": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "cardOption" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["pick"]
+              },
+              "then": {
+                "properties": {
+                  "caller": { "type": "object", "properties": { "kind": { "const": "turn" } } }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "pick": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "offered" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["pick"]
+              },
+              "then": {
+                "properties": {
+                  "caller": { "type": "object", "properties": { "kind": { "enum": ["page", "agent"] } } }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "saveTime.response": {
+      "title": "SaveTimeResponse",
+      "description": "The pick, the time saved, the line copied and the keys it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "timing": { "type": "string", "enum": ["settime", "sentnow"] },
+        "reservation": {
+          "description": "The time held (K-05 v1 reserve.response); null for sentNow.",
+          "anyOf": [
+            {
+              "title": "TimeSaved",
+              "type": "object",
+              "properties": {
+                "reservationId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "version": { "$ref": "#/$defs/version" },
+                "heldUntil": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+                "minutes": {
+                  "description": "10 (Q-12), or 15 for the customer's own AI's door (MC C3).",
+                  "type": "integer",
+                  "enum": [10, 15]
+                },
+                "extendable": {
+                  "description": "Whether the one 10-minute extension may still be offered (Q-12); never for the 15 minutes of MC C3.",
+                  "type": "boolean"
+                }
+              },
+              "required": ["reservationId", "version", "heldUntil", "minutes", "extendable"],
+              "additionalProperties": false,
+              "if": { "properties": { "minutes": { "const": 15 } }, "required": ["minutes"] },
+              "then": { "properties": { "extendable": { "const": false } } }
+            },
+            { "type": "null" }
+          ]
+        },
+        "lineId": {
+          "description": "The K-30 booking_lines row copied at the save; null for sentNow (copied at the booking write).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "linePrice": {
+          "description": "The price the line copied (K-30 booking_lines.price_cents with its currency); null when no line.",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
+        "gives": {
+          "description": "time_saved (A4-21, B4-23), and in flow B choice (B4-16); choice alone for sentNow.",
+          "type": "array",
+          "items": { "enum": ["choice", "time_saved"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "timing",
+        "reservation",
+        "lineId",
+        "linePrice",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "saveTime.errors": {
+      "title": "SaveTimeErrors",
+      "description": "Refused, nothing held or written.",
+      "oneOf": [
+        { "$ref": "#/$defs/timeTakenError" },
+        { "$ref": "#/$defs/wrongDetailsError" },
+        { "$ref": "#/$defs/overBookingLimitError" },
+        { "$ref": "#/$defs/customerBlockedError" },
+        { "$ref": "#/$defs/safetyHeldError" },
+        { "$ref": "#/$defs/waitsForOwnerError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "saveTime.exchange": {
+      "title": "SaveTimeExchange",
+      "description": "One saveTime request with its outcome. The customer's own AI's door holds 15 minutes, never extended (MC C3); every other door 10 (Q-12).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "saveTime" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/saveTime.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/saveTime.response" }, { "$ref": "#/$defs/saveTime.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "caller": {
+                "type": "object",
+                "properties": { "kind": { "const": "agent" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["caller"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "reservation": {
+                "anyOf": [
+                  { "type": "null" },
+                  { "type": "object", "properties": { "minutes": { "const": 15 } } }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "reservation": {
+                "anyOf": [
+                  { "type": "null" },
+                  { "type": "object", "properties": { "minutes": { "const": 10 } } }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "joinWaitlist.request": {
+      "title": "JoinWaitlistRequest",
+      "description": "Joins the waitlist, or next in line for a time that's taken (A4-60, B4-64; A4-15, B4-16 'Joins the waitlist'; A4-18, B4-18 'Puts Alex next in line'; A4-33 a full class); gives no key. In one commit, with the customer's own yes to messages about it (K-29 v1 consents, kind texts, bound to the words shown and their sha256: RULES 2.5): a K-30 waitlist_entries row (the service, the session or the one person asked for, the times wanted; one open entry per person and service), and the request ends there (K-30 booking_details.request_ended_why waitlist). Nothing is taken or saved; when a spot opens everyone on it hears at once and the first to book gets it, as a new booking (A4-60), whose notices are journey 7's. Primary, uncached. Callers: a turn or the booking page; never an AI, whose call is never the customer's own yes (A3-03). Business: caller.businessId. Person: the head's booker. Repeat: caller.requestId is the key; an open entry for the same person and service answers repeated. Version: inserts at version 1; booking_details compared and set.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "resourceId": {
+          "description": "A full class session, or the one person they asked for (K-30 waitlist_entries.resource_id); null for anyone free.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "wanted": {
+          "description": "The times they want (K-30 waitlist_entries), or null for any.",
+          "anyOf": [{ "$ref": "../data-access/data-access.v1.schema.json#/$defs/during" }, { "type": "null" }]
+        },
+        "yes": { "$ref": "#/$defs/readBackYes" }
+      },
+      "required": ["caller", "bookingId", "serviceId", "resourceId", "wanted", "yes"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "yes": {
+          "description": "Only the customer's own yes: a turn or the booking page (A3-03).",
+          "properties": {
+            "caller": { "type": "object", "properties": { "kind": { "enum": ["turn", "page"] } } }
+          }
+        }
+      }
+    },
+    "joinWaitlist.response": {
+      "title": "JoinWaitlistResponse",
+      "description": "The entry, the yes and the request ended.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "waitlistEntryId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "consentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "requestEnded": { "const": true },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["bookingId", "waitlistEntryId", "consentId", "requestEnded", "written", "repeated"],
+      "additionalProperties": false
+    },
+    "joinWaitlist.errors": {
+      "title": "JoinWaitlistErrors",
+      "description": "Refused, nothing written.",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "joinWaitlist.exchange": {
+      "title": "JoinWaitlistExchange",
+      "description": "One joinWaitlist request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "joinWaitlist" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/joinWaitlist.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/joinWaitlist.response" }, { "$ref": "#/$defs/joinWaitlist.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "sendSecureLink.request": {
+      "title": "SendSecureLinkRequest",
+      "description": "The secure link; gives contact (A4-42, flow A) or link (B4-29, flow B) (02-contracts section 8: K-30 the secure link issued; K-28 the contact it went to), the one call that writes each in journey 4. Writes a K-30 v1 secure_links row of purpose secure_page for the person (the head's booker, or the person served when it is someone else, who gets their own link for their private answers and their own yes: A4-24, A4-42), its given_via and, for text or email, the contact on file it went to (K-28 customers.mobile_handle_id or email_handle_id: one of that person's own handles, secure_links_handle_own_fk); only the sha256 of its short code is kept (secure_links.code_sha256; BP rule 7). How it goes: in a turn by text into that mobile's open chat (RULES 4.1b; MC C9: Rosie never texts first; notReachable chatNotOpen otherwise) or to the email on file, as an outbox row whose final parts hold the link, which never enters a span, a trace or the event log (v1 default 30); to the customer's own AI as given_via ai and on the booking page as given_via page, the link returned to that caller once in url (FS line 679: 'It must give an AI exactly ... the secure link'), never logged, and never by text from a call made alone, whose commit writes no outbox row (v1.1 open gap 43). The walk's automatic steps after it ride the same commit: A4-43, B4-38 the plug-in's forms go on the secure page ('Not on the business's own list': the request ends not_listed), and A4-98, B4-115 decide once whether it books on the yes or asks the owner first (K-30 booking_details.approval now or ownerok, from K-26 v1 ok_same_day, ok_new_customer, ok_dates: set once). Primary, uncached. Business: caller.businessId. Person: the link's person is named by the server from the head, never sent by the browser or the AI. Repeat: caller.requestId is the key; a repeat makes no second link and answers the first without its url, since the code is not kept (a later message that needs a link gets a new one: K-30 default 12). Version: the link at version 1; booking_details compared and set.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "for": {
+          "description": "booker (the head's booker) or served (the head's person served, when it is someone else).",
+          "type": "string",
+          "enum": ["booker", "served"]
+        },
+        "via": {
+          "description": "K-30 secure_links.given_via: text or email in a turn, ai for the customer's own AI, page on the booking page.",
+          "type": "string",
+          "enum": ["text", "email", "ai", "page"]
+        }
+      },
+      "required": ["caller", "bookingId", "for", "via"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "via": {
+          "description": "Each caller its own way: a turn by text or email; the AI as ai; the booking page as page.",
+          "allOf": [
+            {
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "turn" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              },
+              "then": { "properties": { "via": { "enum": ["text", "email"] } } }
+            },
+            {
+              "if": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "agent" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              },
+              "then": {
+                "properties": {
+                  "via": { "const": "ai" },
+                  "caller": {
+                    "type": "object",
+                    "properties": { "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "page" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              },
+              "then": { "properties": { "via": { "const": "page" } } }
+            }
+          ]
+        }
+      }
+    },
+    "sendSecureLink.response": {
+      "title": "SendSecureLinkResponse",
+      "description": "The link issued, how it went, what the walk after it decided, and the key it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "secureLinkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "givenVia": { "type": "string", "enum": ["text", "email", "ai", "page"] },
+        "url": {
+          "description": "For given_via ai or page, the link itself (rosfield.com/ then a short code: A4-42; the host a config value, Q-51), given to that caller once; null in a turn (the outbox row carries it) and on a repeat. Never logged, never in a span (v1 default 30).",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "outboxRowId": {
+          "description": "In a turn, the row carrying the link; null for the AI and the page.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "approval": {
+          "description": "K-30 booking_details.approval as decided once (A4-98, B4-115); null when the request ended at the forms (notListed).",
+          "anyOf": [{ "type": "string", "enum": ["now", "ownerok"] }, { "type": "null" }]
+        },
+        "formsOnPage": {
+          "description": "A form to sign goes on the secure page (A4-43, B4-38).",
+          "type": "boolean"
+        },
+        "notListed": {
+          "description": "Only the business's own customers book this, and this person is not one: the request ended not_listed (A4-43, B4-38).",
+          "type": "boolean"
+        },
+        "gives": {
+          "type": "array",
+          "items": { "enum": ["contact", "link"] },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "secureLinkId",
+        "givenVia",
+        "url",
+        "outboxRowId",
+        "approval",
+        "formsOnPage",
+        "notListed",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "sendSecureLink.errors": {
+      "title": "SendSecureLinkErrors",
+      "description": "Refused, nothing written.",
+      "oneOf": [
+        { "$ref": "#/$defs/notReachableError" },
+        { "$ref": "#/$defs/customerBlockedError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "sendSecureLink.exchange": {
+      "title": "SendSecureLinkExchange",
+      "description": "One sendSecureLink request with its outcome. In a turn the link goes only in its outbox row (url null); to the AI or the page only in url (no outbox row).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "sendSecureLink" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/sendSecureLink.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/sendSecureLink.response" },
+            { "$ref": "#/$defs/sendSecureLink.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "caller": {
+                "type": "object",
+                "properties": { "kind": { "const": "turn" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["caller"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "null" },
+              "outboxRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "outcome": { "type": "object", "properties": { "outboxRowId": { "type": "null" } } }
+        }
+      }
+    },
+    "checkPlace.request": {
+      "title": "CheckPlaceRequest",
+      "description": "Where the job is, flow B; gives place (B4-77: the town or ZIP checked against the travel area before any times) and address (B4-30: the street address checked on the secure page) (02-contracts section 8: K-30 booking_addresses), the one call that writes each in journey 4. area: the town or ZIP as given, geocoded (K-17 v1 geocode, kind town or zip) and checked by distance in PostGIS against the travel area of the way's location (K-23 v1 locations: travel centre and miles; K-25 service_money.location_id) and against the states whose form the business filled in (B4-31): inside, a K-30 booking_addresses row at position 1 with the area and the location (address null), gives place; outside, the reply says the business can't go there (B4-31) and the request ends outside_area; several matches (a town two states share), not found, or a null state: askZip, nothing written (B4-77's safe default; K-17 v1 default 8). street (page only: an address never passes through an AI, A6-14; 'An address an AI puts in a message is never saved', B4-30): geocoded (kind streetAddress) and checked again; inside and in a filled-in state, the row's address sealed under the key of the person who typed it on their own link (sealed_for_person_id; K-04 v1 rule 6), its zone and state_code from the match and checked_at, gives address; a partial match (a coarser precision than asked: K-17 v1) is askAgain, nothing checked (B4-30's safe default); outside after all, the request ends outside_area. Two addresses (a move, a ride, a tow) are positions 1 and 2, each with its own check. The address and the normalized address are never returned, logged or in a span (K-17 v1 'No address in a span or log'). Primary, uncached, and the geo port. Business: caller.businessId. Person: for street, caller.personId is the secure link's person, set by the page server from the link it found by its code's hash (K-30 rule 5). Repeat: caller.requestId is the key. Version: a new row at version 1; a street check compares and sets the area row's version.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "check": {
+          "oneOf": [
+            {
+              "title": "CheckArea",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "area" },
+                "typed": { "type": "string", "enum": ["town", "zip"] },
+                "text": {
+                  "description": "The town or ZIP as given (K-17 v1 geocode.request text); kept as K-30 booking_addresses.area once inside.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": ["kind", "typed", "text"],
+              "additionalProperties": false
+            },
+            {
+              "title": "CheckStreet",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "street" },
+                "position": { "type": "integer", "enum": [1, 2] },
+                "address": {
+                  "description": "The street address as typed on the secure page, sealed on write; never returned.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": ["kind", "position", "address"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "check"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "check": {
+          "allOf": [
+            {
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } }
+                }
+              }
+            },
+            {
+              "description": "A street address only from the secure page, for the link's own person (A6-14; B4-30).",
+              "if": {
+                "properties": {
+                  "check": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "street" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["check"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": {
+                      "kind": { "const": "page" },
+                      "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "checkPlace.response": {
+      "title": "CheckPlaceResponse",
+      "description": "The check's result, the row, the visit's zone and the key it gave; never an address.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "check": { "type": "string", "enum": ["area", "street"] },
+        "result": {
+          "description": "inside (gives the key), outside (the request ends outside_area: B4-31, B4-30), askZip (B4-77) or askAgain (B4-30).",
+          "type": "string",
+          "enum": ["inside", "outside", "askZip", "askAgain"]
+        },
+        "addressRowId": {
+          "description": "The K-30 booking_addresses row written or checked; null when nothing was written.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "zone": {
+          "description": "For a street checked inside, its IANA zone (the visit's: S13-03; CQ-05); null otherwise.",
+          "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/zone" }, { "type": "null" }]
+        },
+        "requestEnded": { "type": "boolean" },
+        "gives": {
+          "type": "array",
+          "items": { "enum": ["place", "address"] },
+          "maxItems": 1
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "check",
+        "result",
+        "addressRowId",
+        "zone",
+        "requestEnded",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "result": {
+          "description": "Only inside gives a key: place for the area, address for the street.",
+          "allOf": [
+            {
+              "if": { "properties": { "result": { "const": "inside" } }, "required": ["result"] },
+              "then": { "properties": { "gives": { "type": "array", "minItems": 1 } } },
+              "else": { "properties": { "gives": { "type": "array", "maxItems": 0 } } }
+            },
+            {
+              "if": { "properties": { "check": { "const": "area" } }, "required": ["check"] },
+              "then": { "properties": { "gives": { "type": "array", "items": { "const": "place" } } } },
+              "else": { "properties": { "gives": { "type": "array", "items": { "const": "address" } } } }
+            }
+          ]
+        }
+      }
+    },
+    "checkPlace.errors": {
+      "title": "CheckPlaceErrors",
+      "description": "Refused, nothing written.",
+      "oneOf": [
+        { "$ref": "#/$defs/geoUnavailableError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "checkPlace.exchange": {
+      "title": "CheckPlaceExchange",
+      "description": "One checkPlace request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "checkPlace" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/checkPlace.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/checkPlace.response" }, { "$ref": "#/$defs/checkPlace.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "saveSecurePage.request": {
+      "title": "SaveSecurePageRequest",
+      "description": "What a person types on the booking's secure page; gives answers (A4-65: the page's questions) and access with answers (B4-34: access, door and job notes) (02-contracts section 8: K-30 page answers, access and job notes, secure page only), the one call that writes each in journey 4; and who meets the pro (B4-26, with B4-27 and B4-105), which gives no key. answers: one K-30 v1 page_answers row per answer (kind question, note, access, entry_code, safety_need, emergency_contact, child_details, authority or photo; a question's words are the plug-in's), each sealed under the key of the person who typed it (page_answers.answer, sealedBy person_id; K-04 v1 rule 6), never edited (a resubmission is a new row and the newest wins); B4-34 carries at least one access or entry_code answer, which gives access. An entry code shows to the pro only on the visit's day (B4-34), an emergency contact is called by the business and never texted by Rosie, and none goes in a text, an email or to an AI (S13-05; RULES 4.5; B6-14). meetsPro: K-30 booking_details.meets_pro (served, someone_else or nobody_home, only where the plug-in marks the work so: B4-105), compare-and-set; for someone_else, that adult is a new K-04 person named as typed, and meets_pro_person_id is set only once their own yes on their own forwarded link is in (B4-27: 'Rosie never texts the parent on Alex's word'), so their link is sendSecureLink's for that person. Primary, uncached. Only the secure page's server side (K-21; a page's commit writes no outbox row, v1.1 open gap 43; CQ-44). Business: caller.businessId. Person: caller.personId, the secure link's person, set by the page server from the link it found by its code's hash, never by the browser (K-30 rule 5). Repeat: caller.requestId is the key. Version: answers are inserted and carry no version (K-30 rule 4); booking_details compared and set.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "save": {
+          "oneOf": [
+            {
+              "title": "SaveAnswers",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "answers" },
+                "step": { "type": "string", "enum": ["A4-65", "B4-34"] },
+                "answers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "description": "K-30 v1 page_answers.kind.",
+                        "type": "string",
+                        "enum": [
+                          "question",
+                          "note",
+                          "access",
+                          "entry_code",
+                          "safety_need",
+                          "emergency_contact",
+                          "child_details",
+                          "authority",
+                          "photo"
+                        ]
+                      },
+                      "question": {
+                        "description": "For kind question, the plug-in's question as shown; null otherwise (page_answers_kind_known).",
+                        "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+                      },
+                      "answer": {
+                        "description": "As typed (for a photo, its file reference, as K-13 names it); sealed on write, never returned.",
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": ["kind", "question", "answer"],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": ["kind", "step", "answers"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SaveMeetsPro",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "meetsPro" },
+                "step": { "const": "B4-26" },
+                "expectVersion": {
+                  "description": "K-30 booking_details.version the page showed (limit 4).",
+                  "$ref": "#/$defs/version"
+                },
+                "who": { "type": "string", "enum": ["served", "someone_else", "nobody_home"] },
+                "otherName": {
+                  "description": "For someone_else, their name as typed; null otherwise.",
+                  "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+                }
+              },
+              "required": ["kind", "step", "expectVersion", "who", "otherName"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "save"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "save": {
+          "description": "Only the secure page, for the link's own person (K-30 page_answers: secure page only).",
+          "properties": {
+            "caller": {
+              "type": "object",
+              "properties": {
+                "kind": { "const": "page" },
+                "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "saveSecurePage.response": {
+      "title": "SaveSecurePageResponse",
+      "description": "The answers saved (ids only, never their words), who meets the pro, and the keys it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "answerIds": {
+          "description": "The K-30 page_answers rows inserted (not versioned, so not in written).",
+          "type": "array",
+          "items": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+        },
+        "meetsPro": {
+          "description": "K-30 booking_details.meets_pro after a meetsPro save; null for answers.",
+          "anyOf": [
+            { "type": "string", "enum": ["served", "someone_else", "nobody_home"] },
+            { "type": "null" }
+          ]
+        },
+        "gives": {
+          "description": "answers (A4-65); access and answers (B4-34); none for who meets the pro.",
+          "type": "array",
+          "items": { "enum": ["access", "answers"] },
+          "uniqueItems": true,
+          "maxItems": 2
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["bookingId", "answerIds", "meetsPro", "gives", "written", "repeated"],
+      "additionalProperties": false
+    },
+    "saveSecurePage.errors": {
+      "title": "SaveSecurePageErrors",
+      "description": "Refused, nothing written.",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "saveSecurePage.exchange": {
+      "title": "SaveSecurePageExchange",
+      "description": "One saveSecurePage request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "saveSecurePage" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/saveSecurePage.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/saveSecurePage.response" },
+            { "$ref": "#/$defs/saveSecurePage.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "buildFrontier.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/buildFrontier.exchange" },
+    "closestEntries.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/closestEntries.exchange" },
+    "gateAndCommit.exchange": {
+      "title": "GateAndCommitExchange",
+      "description": "One gateAndCommit request with its outcome, as v1.1, its committed answer's parts able to name journey 4's keys and its given able to state a journey 4 step (v1.2).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "gateAndCommit" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/gateAndCommit.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/gateAndCommit.response" }, { "$ref": "#/$defs/gateAndCommit.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "composeInput.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/composeInput.exchange" },
+    "finalizeMessage.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/finalizeMessage.exchange" },
+    "recordSafetyOutcome.exchange": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/recordSafetyOutcome.exchange"
+    },
+    "releaseSafetyHold.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/releaseSafetyHold.exchange" },
+    "recordStopOrStart.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/recordStopOrStart.exchange" },
+    "setRecordFlag.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/setRecordFlag.exchange" },
+    "handOff.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/handOff.exchange" },
+    "answerHandOff.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/answerHandOff.exchange" },
+    "pageTeam.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/pageTeam.exchange" },
+    "acknowledgePage.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/acknowledgePage.exchange" },
+    "openReviewItem.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/openReviewItem.exchange" },
+    "decideReviewItem.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/decideReviewItem.exchange" },
+    "enterDoor.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/enterDoor.exchange" },
+    "sendFixedLine.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendFixedLine.exchange" },
+    "sendsFailing.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendsFailing.exchange" },
+    "textingBack.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/textingBack.exchange" },
+    "calendarLinkDropped.exchange": {
+      "$ref": "tool-api.v1.1.schema.json#/$defs/calendarLinkDropped.exchange"
+    },
+    "calendarLinkBack.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/calendarLinkBack.exchange" },
+    "sendProofCode.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/sendProofCode.exchange" },
+    "proveCode.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/proveCode.exchange" },
+    "issueChatLink.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/issueChatLink.exchange" },
+    "matchKinds.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/matchKinds.exchange" },
+    "lookupListing.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/lookupListing.exchange" },
+    "saveSetupStep.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/saveSetupStep.exchange" },
+    "readSetup.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/readSetup.exchange" },
+    "callName": {
+      "description": "Every call v1.2 holds: v1.1's and journey 4's (matchService, setWhoFor, setReachWay, addCustomer, setPrice, quoteFromPhotos, showTimes, saveTime, joinWaitlist, sendSecureLink, checkPlace, saveSecurePage). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2), and each but plannerVerbs a <call>.exchange.",
+      "type": "string",
+      "enum": [
+        "buildFrontier",
+        "closestEntries",
+        "gateAndCommit",
+        "composeInput",
+        "finalizeMessage",
+        "recordSafetyOutcome",
+        "releaseSafetyHold",
+        "recordStopOrStart",
+        "setRecordFlag",
+        "handOff",
+        "answerHandOff",
+        "pageTeam",
+        "acknowledgePage",
+        "openReviewItem",
+        "decideReviewItem",
+        "enterDoor",
+        "sendFixedLine",
+        "sendsFailing",
+        "textingBack",
+        "calendarLinkDropped",
+        "calendarLinkBack",
+        "sendProofCode",
+        "proveCode",
+        "issueChatLink",
+        "plannerVerbs",
+        "matchKinds",
+        "lookupListing",
+        "saveSetupStep",
+        "readSetup",
+        "openRequest",
+        "confirmBusinessBooking",
+        "readBackBusinessBooking",
+        "findCustomer",
+        "checkBookingFirst",
+        "setCustomerBlock",
+        "matchService",
+        "setWhoFor",
+        "setReachWay",
+        "addCustomer",
+        "setPrice",
+        "quoteFromPhotos",
+        "showTimes",
+        "saveTime",
+        "joinWaitlist",
+        "sendSecureLink",
+        "checkPlace",
+        "saveSecurePage"
+      ]
+    }
+  }
+}

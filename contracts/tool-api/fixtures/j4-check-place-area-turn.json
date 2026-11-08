@@ -1,0 +1,37 @@
+{
+  "call": "checkPlace",
+  "given": {
+    "seeds": [
+      "core/seed-business-head.json",
+      "business-setup/seed-location-flow-b.json",
+      "business-setup/seed-location-travel-centre.json"
+    ],
+    "after": [],
+    "now": "2026-11-02T14:00:12Z",
+    "stated": { "step": "B4-77", "gives": ["place"] },
+    "note": "B4-77 in Alex's own chat with Lee Home Services: 'Can someone clear my kitchen drain? I'm in Springfield.' opened a request at door chat (booking-alex-chat-drain2, flow B, as openRequest door chat writes it). Before any times, the town is geocoded (K-17's double: geocode-town.json, Springfield, state MA) and found inside the travel area of the office (1200 Main St, 25 miles) in a state whose form the business filled in: a K-30 booking_addresses row at position 1 with the area and the location, no address yet. This write rides Alex's turn inside gateAndCommit."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-drain2-0002",
+      "requestId": "turn-alex-drain2-0002",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-alex-drain2-0001"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "check": { "kind": "area", "typed": "town", "text": "Springfield" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "check": "area",
+    "result": "inside",
+    "addressRowId": "addr-alex-drain2-1",
+    "zone": null,
+    "requestEnded": false,
+    "gives": ["place"],
+    "written": [{ "table": "booking_addresses", "rowId": "addr-alex-drain2-1", "version": 1 }],
+    "repeated": false
+  }
+}

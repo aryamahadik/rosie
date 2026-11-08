@@ -1,0 +1,33 @@
+{
+  "call": "setReachWay",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j3-open-request-agent.json", "j4-match-service-agent.json", "j4-who-for-agent.json"],
+    "now": "2026-10-21T23:16:02Z",
+    "stated": { "step": "A4-82", "gives": ["reach_by"] },
+    "note": "A4-82: the reach card through Alex's AI: texts, with his mobile (a mobile is required when the customer or their own AI books: MC C2; Q-07). Before it the AI's token was bound to its person by Q-09's tie (Alex texted the ready text from that mobile: K-20's, MC C9), which wrote handle-agent-alex-mobile as his own handle and made it a Linq contact (Q-03), so this card links nothing new and adds no contacts/add effect. He has no K-28 row at the barbershop yet, so the way texts is kept as README default 57 says until addCustomer writes the row. The number is a placeholder in the 555-01xx range, new to Rosie."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0005",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "way": "texts",
+    "contacts": { "mobile": "+15555550146", "email": null }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "way": "texts",
+    "wayKept": "pending",
+    "handles": [{ "handleId": "handle-agent-alex-mobile", "kind": "mobile" }],
+    "effects": [],
+    "gives": ["reach_by"],
+    "written": [],
+    "repeated": false
+  }
+}

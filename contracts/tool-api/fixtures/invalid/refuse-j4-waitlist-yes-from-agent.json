@@ -1,0 +1,15 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-dee-0001",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-dee",
+    "traceId": "trace-agent-dee-0001"
+  },
+  "bookingId": "booking-dee-skin-fade-wait",
+  "serviceId": "svc-lees-skin-fade",
+  "resourceId": null,
+  "wanted": { "start": "2026-10-31T14:00:00Z", "end": "2026-10-31T16:00:00Z" },
+  "yes": { "kind": "page", "exactWords": "Want a text if a spot opens?", "yesEventId": "evt-agent-dee-0001" }
+}
