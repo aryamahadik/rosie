@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/message-plan/message-plan.v1.1.schema.json",
+  "title": "MessagePlanV1dot1",
+  "description": "K-03 v1.1, a minor version of the composer's message plan and slots (T-1104; QUESTIONS.md CQ-82; DECISIONS.md DL-145; contracts/message-plan/README.md section 'v1.1'). It only adds to v1 (message-plan.v1.schema.json, frozen and unchanged, referred to here): every v1 definition is here under its own name, the unchanged ones by reference, so every v1 document is a v1.1 document. composeInput is restated so that each of its facts is a slot fact (v1's fact) or a term fact (termFact): one of Rosie's own fixed terms that the step's card states, such as S1-02's setup time and Rosie's $2 fee, with its source line (RULES 3.15; arch 12 line 592: Rosie's own fee terms stay words, not slots). So a plan may state such a term and arch 07 line 403 ('Only <facts> may be stated') still holds. inputAndPlan pairs an input with the plan made from it, for the named rule numbersHeldByFacts (message-plan.rules.mjs). The plan, the model's structured output, is v1's exactly; so are the slots, the plan an outbox row stores, the final parts and the check result. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/plan"
+    },
+    {
+      "$ref": "#/$defs/composeInput"
+    },
+    {
+      "$ref": "#/$defs/rowPlan"
+    },
+    {
+      "$ref": "#/$defs/slotVocabulary"
+    },
+    {
+      "$ref": "#/$defs/finalParts"
+    },
+    {
+      "$ref": "#/$defs/checkResult"
+    },
+    {
+      "$ref": "#/$defs/inputAndPlan"
+    }
+  ],
+  "$defs": {
+    "format": {
+      "$ref": "message-plan.v1.schema.json#/$defs/format"
+    },
+    "slotName": {
+      "$ref": "message-plan.v1.schema.json#/$defs/slotName"
+    },
+    "linkSlot": {
+      "$ref": "message-plan.v1.schema.json#/$defs/linkSlot"
+    },
+    "slottedText": {
+      "$ref": "message-plan.v1.schema.json#/$defs/slottedText"
+    },
+    "lineRole": {
+      "$ref": "message-plan.v1.schema.json#/$defs/lineRole"
+    },
+    "line": {
+      "$ref": "message-plan.v1.schema.json#/$defs/line"
+    },
+    "question": {
+      "$ref": "message-plan.v1.schema.json#/$defs/question"
+    },
+    "plan": {
+      "$ref": "message-plan.v1.schema.json#/$defs/plan"
+    },
+    "readerRole": {
+      "$ref": "message-plan.v1.schema.json#/$defs/readerRole"
+    },
+    "audienceKind": {
+      "$ref": "message-plan.v1.schema.json#/$defs/audienceKind"
+    },
+    "channel": {
+      "$ref": "message-plan.v1.schema.json#/$defs/channel"
+    },
+    "situation": {
+      "$ref": "message-plan.v1.schema.json#/$defs/situation"
+    },
+    "reach": {
+      "$ref": "message-plan.v1.schema.json#/$defs/reach"
+    },
+    "language": {
+      "$ref": "message-plan.v1.schema.json#/$defs/language"
+    },
+    "fact": {
+      "$ref": "message-plan.v1.schema.json#/$defs/fact"
+    },
+    "termFact": {
+      "title": "TermFact",
+      "description": "One of Rosie's own fixed terms that the step's card states, given to the composer as a fact so that a plan may state it in words (v1.1, T-1104; CQ-82; arch 07 line 403: only <facts> may be stated). For S1-02: the setup times, free to use, and Rosie's $2 fee (RULES 3.15). It is not a slot: the compiler turns the sample cast's values into slots, except Rosie's own fee terms (arch 12 line 592), and a term is the same for every business. Nor is it the fee slot, which is the business's own late-cancel and no-show fee (RULES 3.3); Rosie's own fee is never part of the price (RULES 3.14). Code copies it word for word from the step's card in the bundle (K-01 step say[].elements.card.lines) when it builds the row's input; the composer states it in its words or leaves it out, never as a slot; the slot filler fills nothing from it (C-088).",
+      "type": "object",
+      "properties": {
+        "value": {
+          "description": "The term's words exactly as the step's card states them for this business, such as 'About 15 minutes for your first kind of work' or '$2 a booking, counted at its check-in or DONE, explained before you go live' (S1-02's card; MASTER-FLOW-A.md line 28). With the no-$2 switch on, the card's $2 line reads as that switch says (RULES 3.15; K-01 record.switches.no2). The composer's literal check and the Values check read it as they read any fact's value (README 'v1.1').",
+          "type": "string",
+          "pattern": "."
+        },
+        "source": {
+          "description": "The source line of the term: the step's card line it is copied from and, where one sets the term, the rule, such as 'S1-02's card, line 4 (...); RULES 3.15' (CQ-82: each term with its source line; 02-contracts section 2 item 4).",
+          "type": "string",
+          "pattern": "."
+        }
+      },
+      "required": ["value", "source"],
+      "additionalProperties": false
+    },
+    "inputFact": {
+      "title": "InputFact",
+      "description": "One fact of the composer's input (v1.1; CQ-82): a slot fact, a slot name and its value (v1's fact), or a term fact (termFact). The two never overlap: a slot fact has a slot and no source, a term fact a source and no slot.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/fact"
+        },
+        {
+          "$ref": "#/$defs/termFact"
+        }
+      ]
+    },
+    "conversationMessage": {
+      "$ref": "message-plan.v1.schema.json#/$defs/conversationMessage"
+    },
+    "option": {
+      "$ref": "message-plan.v1.schema.json#/$defs/option"
+    },
+    "openQuestion": {
+      "$ref": "message-plan.v1.schema.json#/$defs/openQuestion"
+    },
+    "audience": {
+      "$ref": "message-plan.v1.schema.json#/$defs/audience"
+    },
+    "masterText": {
+      "$ref": "message-plan.v1.schema.json#/$defs/masterText"
+    },
+    "inbound": {
+      "$ref": "message-plan.v1.schema.json#/$defs/inbound"
+    },
+    "composeInput": {
+      "title": "ComposeInput",
+      "description": "The composer's input, one per outbox row (arch 07 line 397; 02-contracts K-03 'The composer's input'), given to the model as tagged inputs, long ones first: <conversation>, <master_text>, <facts>, <audience>, <language>, <channel>, <situation>, <allowed_formats>, <allowed_links>, then <inbound>. v1.1 (T-1104; CQ-82) changes only facts: each is a slot fact or a term fact (inputFact), so every v1 input is a v1.1 input. It carries the committed choices and only what limit 7 lets the recipient see, never the frontier (arch 07 line 397): no other field is allowed (v1's refuse-frontier-in-input). The Tool API's compose input serves it (K-09).",
+      "type": "object",
+      "properties": {
+        "row": {
+          "description": "The outbox row this plan is for: one message to one recipient on one channel (arch 07 line 397; 02-contracts K-04 outbox rows).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "turn": {
+          "description": "The turn that committed the row (arch 02 line 121; CQ-09).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "conversation": {
+          "description": "<conversation>: the reader's last 6 messages with this business, redacted (arch 07 line 397). That there are at most 6 is a code check.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/conversationMessage"
+          }
+        },
+        "masterText": {
+          "$ref": "#/$defs/masterText"
+        },
+        "facts": {
+          "description": "<facts>: only what limit 7 lets this reader see (arch 07 lines 397, 403; arch 06 line 311), each a slot fact, a slot name and its value (v1), or a term fact, one of Rosie's own fixed terms the step's card states, with its source line (v1.1; CQ-82). The composer's literal check (C-118) and the Values check (C-092) read every fact's value, slot facts' and term facts' alike (README 'v1.1').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inputFact"
+          }
+        },
+        "audience": {
+          "$ref": "#/$defs/audience"
+        },
+        "language": {
+          "$ref": "#/$defs/language"
+        },
+        "channel": {
+          "$ref": "#/$defs/channel"
+        },
+        "situation": {
+          "$ref": "#/$defs/situation"
+        },
+        "allowedFormats": {
+          "description": "<allowed_formats>: what this phone allows right now, from the channel, whether the chat exists and the step's elements (arch 07 line 365; C-128).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/format"
+          },
+          "minItems": 1
+        },
+        "allowedLinks": {
+          "description": "<allowed_links>: the link slots this message may carry (arch 07 line 397; 02-contracts K-03 'links').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/linkSlot"
+          }
+        },
+        "options": {
+          "description": "The open question's options, in order, with their labels (arch 07 line 365: 'the step's elements'; K-01 elements.buttons). Empty when the step asks nothing with options.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/option"
+          }
+        },
+        "pageTypes": {
+          "description": "The page types the step allows (K-01 step pageTypes; arch 01 line 97; arch 07 line 365: 'the step's page types'). Free strings until K-21 (CQ-16).",
+          "type": "array",
+          "items": {
+            "description": "One page type (K-01 step pageTypes; CQ-16).",
+            "type": "string"
+          }
+        },
+        "openQuestions": {
+          "description": "The questions still open with this reader, for a threaded reply (arch 07 line 389). Empty when none is open.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/openQuestion"
+          }
+        },
+        "inbound": {
+          "description": "<inbound>, only in a reply to its sender; else null (arch 07 line 397).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/inbound"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "row",
+        "turn",
+        "conversation",
+        "masterText",
+        "facts",
+        "audience",
+        "language",
+        "channel",
+        "situation",
+        "allowedFormats",
+        "allowedLinks",
+        "options",
+        "pageTypes",
+        "openQuestions",
+        "inbound"
+      ],
+      "additionalProperties": false
+    },
+    "inputAndPlan": {
+      "title": "InputAndPlan",
+      "description": "A composer input and the plan made from it, side by side (v1.1, T-1104), so that the named rule numbersHeldByFacts (message-plan.rules.mjs) can hold across the two what one JSON Schema cannot: every number the plan states outside its slots is held by a fact of the input (arch 07 lines 403, 409; README 'Named rule (v1.1)'). A form for fixtures, as K-02's contextAndDecide pairs a context with its decide result: at run time the composer (C-118) and the message checks (C-092) read the two apart, and nothing stores or sends the pair.",
+      "type": "object",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/composeInput"
+        },
+        "plan": {
+          "$ref": "#/$defs/plan"
+        }
+      },
+      "required": ["input", "plan"],
+      "additionalProperties": false
+    },
+    "rowPlan": {
+      "$ref": "message-plan.v1.schema.json#/$defs/rowPlan"
+    },
+    "slotKind": {
+      "$ref": "message-plan.v1.schema.json#/$defs/slotKind"
+    },
+    "valueType": {
+      "$ref": "message-plan.v1.schema.json#/$defs/valueType"
+    },
+    "sensitiveForm": {
+      "$ref": "message-plan.v1.schema.json#/$defs/sensitiveForm"
+    },
+    "slotStatus": {
+      "$ref": "message-plan.v1.schema.json#/$defs/slotStatus"
+    },
+    "slot": {
+      "$ref": "message-plan.v1.schema.json#/$defs/slot"
+    },
+    "slotVocabulary": {
+      "$ref": "message-plan.v1.schema.json#/$defs/slotVocabulary"
+    },
+    "calendarFile": {
+      "$ref": "message-plan.v1.schema.json#/$defs/calendarFile"
+    },
+    "sendKind": {
+      "$ref": "message-plan.v1.schema.json#/$defs/sendKind"
+    },
+    "send": {
+      "$ref": "message-plan.v1.schema.json#/$defs/send"
+    },
+    "finalParts": {
+      "$ref": "message-plan.v1.schema.json#/$defs/finalParts"
+    },
+    "checkName": {
+      "$ref": "message-plan.v1.schema.json#/$defs/checkName"
+    },
+    "checkOutcome": {
+      "$ref": "message-plan.v1.schema.json#/$defs/checkOutcome"
+    },
+    "checkResult": {
+      "$ref": "message-plan.v1.schema.json#/$defs/checkResult"
+    }
+  }
+}

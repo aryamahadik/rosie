@@ -5,10 +5,16 @@
 // one part per producer or consumer side, added later by a QA side task that depends on this task and on that side's
 // build task. SIDE_CHECKS (at the end) is the list where each side is added.
 //
+// K-03 is frozen at v1 and v1.1 (T-1104), and fixtures/index.json lists both versions' fixtures. The checks here are
+// v1's own and read v1's entries only, selected by `version` (DL-125, DL-153). The T-003 harness still checks every
+// entry against the schema its own `version` names, and each entry that names a rule is run through that rule, as
+// inbound-event.v1.test.ts does. v1.1's own part is QA's task (contracts/message-plan/README.md "v1.1").
+//
 // What this part proves:
 //   1. every fixture in contracts/message-plan/fixtures/index.json is checked against its $defs entry (the T-003
-//      harness): accepted ones are accepted, refused ones are refused, none is left out; each refused one is refused
-//      for its one reason (put right, it is accepted);
+//      harness): accepted ones are accepted, refused ones are refused (an entry that names a rule of
+//      message-plan.rules.mjs passes the schema and is decided by that rule), none is left out; v1's counts are v1's
+//      own; each refused v1 fixture is refused for its one reason (put right, it is accepted);
 //   2. the schema is not vacuous: removing any one required field from a copy of an accepted fixture makes the copy
 //      refused, and so does one field the schema does not know;
 //   3. what the schema cannot check and the fixtures can show (the README's list), each also run on a damaged copy
@@ -31,12 +37,19 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { isDeepStrictEqual } from "node:util";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import type { ValidateFunction } from "ajv";
 import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
-import { CONTRACTS_ROOT, describeContractFixtures, formatErrors, type FixtureEntry } from "./_harness";
+import {
+  CONTRACTS_ROOT,
+  checkContractFixtures,
+  formatErrors,
+  type EntryResult,
+  type FixtureEntry,
+} from "./_harness";
 
 // ---------------------------------------------------------------------------------------------------------------
 // The fixtures
@@ -51,7 +64,12 @@ function readJson(file: string): unknown {
   return JSON.parse(readFileSync(file, "utf8")) as unknown;
 }
 
-const index = readJson(path.join(FIXTURES_DIR, "index.json")) as { fixtures: FixtureEntry[] };
+/** An index entry; `rule` names a rule of message-plan.rules.mjs (contracts/common/fixtures-index.meta.schema.json). */
+type Entry = FixtureEntry & { rule?: string };
+
+const index = readJson(path.join(FIXTURES_DIR, "index.json")) as { fixtures: Entry[] };
+/** v1's entries of the shared index (v1 and v1.1 list their fixtures in it): v1's counts and checks read these. */
+const entries = index.fixtures.filter((entry) => entry.version === "v1");
 const fixture = (file: string): unknown => readJson(path.join(FIXTURES_DIR, ...file.split("/")));
 const bundleFixture = (file: string): unknown => readJson(path.join(BUNDLE_FIXTURES_DIR, ...file.split("/")));
 
@@ -145,7 +163,7 @@ interface SlotVocabulary {
   slots: Slot[];
 }
 
-const acceptedFiles = index.fixtures.filter((entry) => entry.expect === "accept").map((entry) => entry.file);
+const acceptedFiles = entries.filter((entry) => entry.expect === "accept").map((entry) => entry.file);
 const checkFiles = acceptedFiles.filter((file) => file.startsWith("check-"));
 const planFiles = acceptedFiles.filter((file) => file.startsWith("plan-") && file !== "plan-email-copy.json");
 
@@ -183,6 +201,13 @@ function validatorFor(entry: FixtureEntry): ValidateFunction {
   return defValidator(must(entry.def));
 }
 const requiredOf = (entry: FixtureEntry): string[] => schema.$defs[must(entry.def)]?.required ?? [];
+
+// The named rules (message-plan.rules.mjs, v1.1's): an entry that names one is decided by it once the schema
+// takes it, as contracts/scripts/check-fixtures.mjs runs it. No v1 entry names a rule.
+type Rule = (payload: unknown) => string[];
+const rulesFile = path.join(PLAN_DIR, "message-plan.rules.mjs");
+const { rules } = (await import(pathToFileURL(rulesFile).href)) as { rules: Record<string, Rule> };
+const rule = (name: string): Rule => must(rules[name]);
 
 // ---------------------------------------------------------------------------------------------------------------
 // Checks that read only fixtures. Each returns one line per problem; an empty list means the check holds.
@@ -600,34 +625,89 @@ const STATED: Record<string, { failed: string[]; attempt: string; outcome: strin
 // ---------------------------------------------------------------------------------------------------------------
 // 1. Every fixture of the index, checked by the T-003 harness (the plan refers to the bundle schema: it is shared)
 
-const report = describeContractFixtures("message-plan", { sharedFolders: ["common", "bundle"] });
+// The harness checks every entry of the shared index against the schema its `version` names, and checks the
+// schema only: an entry that names a `rule` and is marked refuse (v1.1's two refused pairs) passes the schema and
+// is refused by its rule, so the harness reports it as accepted-but-marked-refuse. Each entry that names a rule is
+// run through that rule here; every other entry must be ok in the harness. The counts and checks after that are
+// v1's own.
+const report = checkContractFixtures("message-plan", { sharedFolders: ["common", "bundle"] });
+const resultOf = (file: string): EntryResult => must(report.entries.find((result) => result.file === file));
+const v1Results = report.entries.filter((result) => result.version === "v1");
+const refusedBySchema = index.fixtures.filter(
+  (entry) => entry.expect === "refuse" && entry.rule === undefined,
+);
+const refusedByRule = index.fixtures.filter((entry) => entry.expect === "refuse" && entry.rule !== undefined);
+/** The harness's passes and refusals (FixtureReport), counted over some of its results: v1's. */
+const passesOf = (results: EntryResult[]): number =>
+  results.filter((result) => result.expect === "accept" && result.outcome === "accepted").length;
+const refusalsOf = (results: EntryResult[]): number =>
+  results.filter((result) => result.expect === "refuse" && result.outcome === "refused").length;
+
+describe("message-plan fixtures", () => {
+  it("has a valid fixtures/index.json that lists every fixture file and every file it lists", () => {
+    expect(report.problems).toEqual([]);
+  });
+
+  it("checks every entry of the shared index: accepted, refused by the schema, or refused by its named rule", () => {
+    expect(report.entries.map((result) => result.file)).toEqual(index.fixtures.map((entry) => entry.file));
+    expect(report.passes).toBe(index.fixtures.filter((entry) => entry.expect === "accept").length);
+    expect(report.refusals).toBe(refusedBySchema.length);
+    expect(report.passes + report.refusals + refusedByRule.length).toBe(index.fixtures.length);
+    for (const entry of index.fixtures) {
+      if (entry.rule !== undefined) expect(typeof rules[entry.rule], entry.file).toBe("function");
+    }
+  });
+
+  for (const entry of index.fixtures) {
+    const name = entry.rule;
+    if (entry.expect === "refuse" && name !== undefined) {
+      it(`refuses ${entry.file} by its rule ${name}, after the schema takes it`, () => {
+        const result = resultOf(entry.file);
+        expect(result.schema).toBe(`message-plan.${entry.version}.schema.json`);
+        // The schema takes it, so the harness's one problem is its own "must be refused" line.
+        expect(result.outcome, `${entry.file} must pass the schema`).toBe("accepted");
+        expect(result.problems).toHaveLength(1);
+        const problems = rule(name)(fixture(entry.file));
+        expect(problems.length, `${entry.file} must be refused by ${name}`).toBeGreaterThan(0);
+      });
+    } else {
+      it(`${entry.expect === "accept" ? "accepts" : "refuses"} ${entry.file}`, () => {
+        const result = resultOf(entry.file);
+        expect(result.problems).toEqual([]);
+        expect(result.ok).toBe(true);
+        if (name !== undefined) {
+          expect(rule(name)(fixture(entry.file)), `${entry.file} must pass ${name}`).toEqual([]);
+        }
+      });
+    }
+  }
+});
 
 describe("message-plan.v1 fixtures: the index and the count", () => {
   it("checks as many fixtures as fixtures/index.json lists, none left out", () => {
-    expect(index.fixtures.length).toBeGreaterThan(0);
-    expect(report.entries).toHaveLength(index.fixtures.length);
+    expect(entries.length).toBeGreaterThan(0);
+    expect(v1Results.map((result) => result.file)).toEqual(entries.map((entry) => entry.file));
     expect(report.seedRows).toBe(0);
-    expect(report.passes + report.refusals).toBe(index.fixtures.length);
+    expect(passesOf(v1Results) + refusalsOf(v1Results)).toBe(entries.length);
   });
 
   it("accepts every entry marked accept and refuses every entry marked refuse", () => {
-    expect(report.passes).toBe(acceptedFiles.length);
-    expect(report.refusals).toBe(index.fixtures.filter((entry) => entry.expect === "refuse").length);
-    for (const result of report.entries) {
+    expect(passesOf(v1Results)).toBe(acceptedFiles.length);
+    expect(refusalsOf(v1Results)).toBe(entries.filter((entry) => entry.expect === "refuse").length);
+    for (const result of v1Results) {
       expect(result.outcome, result.file).toBe(result.expect === "accept" ? "accepted" : "refused");
     }
   });
 
   it("names its definition in every entry and holds each of the six documents and the three refusals", () => {
-    expect(index.fixtures.every((entry) => entry.version === "v1")).toBe(true);
-    expect(index.fixtures.every((entry) => entry.def !== undefined)).toBe(true);
-    const defs = new Set(
-      index.fixtures.filter((entry) => entry.expect === "accept").map((entry) => entry.def),
-    );
+    // Every entry read here is v1's: the harness checked each against v1's schema, whose $defs this file uses.
+    expect(v1Results.map((result) => result.schema)).toEqual(entries.map(() => SCHEMA_FILE));
+    expect(entries.every((entry) => entry.def !== undefined)).toBe(true);
+    const defs = new Set(entries.filter((entry) => entry.expect === "accept").map((entry) => entry.def));
     expect([...defs].sort()).toEqual(
       ["checkResult", "composeInput", "finalParts", "plan", "rowPlan", "slotVocabulary"].sort(),
     );
-    const refused = index.fixtures.filter((entry) => entry.expect === "refuse").map((entry) => entry.file);
+    const refused = entries.filter((entry) => entry.expect === "refuse").map((entry) => entry.file);
     expect(refused.sort()).toEqual([
       "invalid/refuse-format-not-allowed.json",
       "invalid/refuse-frontier-in-input.json",
@@ -641,7 +721,7 @@ describe("message-plan.v1 fixtures: each refused fixture is refused for its one 
 
   it("refuse-format-not-allowed: put right (no contact card), it is accepted", () => {
     const entry = must(
-      index.fixtures.find((candidate) => candidate.file === "invalid/refuse-format-not-allowed.json"),
+      entries.find((candidate) => candidate.file === "invalid/refuse-format-not-allowed.json"),
     );
     const validate = validatorFor(entry);
     const original = refused(entry.file);
@@ -653,7 +733,7 @@ describe("message-plan.v1 fixtures: each refused fixture is refused for its one 
 
   it("refuse-frontier-in-input: put right (no frontier), it is accepted", () => {
     const entry = must(
-      index.fixtures.find((candidate) => candidate.file === "invalid/refuse-frontier-in-input.json"),
+      entries.find((candidate) => candidate.file === "invalid/refuse-frontier-in-input.json"),
     );
     const validate = validatorFor(entry);
     const original = refused(entry.file);
@@ -668,9 +748,7 @@ describe("message-plan.v1 fixtures: each refused fixture is refused for its one 
   });
 
   it("refuse-hold-slot: put right ({{hold}} read as {{deposit}}), it is accepted", () => {
-    const entry = must(
-      index.fixtures.find((candidate) => candidate.file === "invalid/refuse-hold-slot.json"),
-    );
+    const entry = must(entries.find((candidate) => candidate.file === "invalid/refuse-hold-slot.json"));
     const validate = validatorFor(entry);
     const original = refused(entry.file);
     expect(validate(original)).toBe(false);
@@ -692,7 +770,7 @@ function without(value: unknown, where: (string | number)[]): unknown {
 }
 
 describe("message-plan.v1 fixtures: removing a required field makes an accepted fixture refused", () => {
-  for (const entry of index.fixtures.filter((candidate) => candidate.expect === "accept")) {
+  for (const entry of entries.filter((candidate) => candidate.expect === "accept")) {
     it(`${entry.file} (${must(entry.def)})`, () => {
       const validate = validatorFor(entry);
       const original = fixture(entry.file) as Record<string, unknown>;
@@ -831,7 +909,7 @@ describe("message-plan.v1 fixtures: the slot vocabulary", () => {
   });
 
   it("has every slot the K-03 fixtures use in slots.json", () => {
-    for (const entry of index.fixtures.filter((candidate) => candidate.expect === "accept")) {
+    for (const entry of entries.filter((candidate) => candidate.expect === "accept")) {
       expect(slotsOutsideVocabulary(fixture(entry.file), names), entry.file).toEqual([]);
     }
   });
