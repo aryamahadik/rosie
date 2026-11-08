@@ -9,7 +9,7 @@
     "after": ["j4-quote-price-page.json"],
     "now": "2026-11-03T00:39:30Z",
     "stated": null,
-    "note": "B4-10's '3 See it first' then B4-101, in Sam's turn (a what-if beside j4-quote-send-turn.json): the quote goes see_first (version 3), the owner's ask is answered see_first, and Alex is offered an estimate visit with its times link in the same commit (round 2: DL-162 ruling 2b; README default 79): a K-30 secure_links row of purpose quote, whose page offers the visit to be priced there and its times ('See times: rosfield.com/q/r3e'), only its code's hash kept. It goes in a row into Alex's open chat ('Lee Home Services would like to see the job before pricing it ... Reply 1 Book a visit, 2 No thanks.'), url null; its K-03 slot does not exist yet (README open gap 70: link.quote). Nothing else is saved or taken; gives no key. Row and link ids are examples (README default 48)."
+    "note": "B4-10's '3 See it first' then B4-101, in Sam's turn (a what-if beside j4-quote-send-turn.json): the quote goes see_first (version 3), the owner's ask is answered see_first, and Alex is offered an estimate visit with its times link in the same commit (round 2: DL-162 ruling 2b; README default 79): a K-30 secure_links row of purpose quote, whose page offers the visit to be priced there and its times ('See times: rosfield.com/q/r3e'), only its code's hash kept. It goes in a row into Alex's open chat ('Lee Home Services would like to see the job before pricing it ... Reply 1 Book a visit, 2 No thanks.'), url null; its K-03 slot does not exist yet (README open gap 70: link.quote). The row asks Alex a question, so the same commit writes it (round 3: runtime note f): a K-04 open question to Alex's handle (step B4-101, its options '1 Book a visit' and '2 No thanks' as sent, its versions_read the quote at version 3 and the link, status waiting) and its question clock row (kind question, owned by his handle, waiting), which C-055 arms at the row's first delivery receipt: B4-101 prints no Clock line, so step 9's default holds (arch 02 line 127: with no visit yet, 8pm the day after delivery), and at its deadline B4-101's safe default, nothing booked. So his reply has a question to answer: '1 Book a visit' goes on to the estimate visit's times on the service's visit-path way (README default 79), and '2 No thanks' books nothing. Nothing else is saved or taken; gives no key. Row, link, question and clock ids are examples (README default 48)."
   },
   "request": {
     "caller": {
@@ -55,7 +55,9 @@
     "written": [
       { "table": "quotes", "rowId": "quote-alex-heater", "version": 3 },
       { "table": "owner_oks", "rowId": "ok-alex-heater", "version": 2 },
-      { "table": "secure_links", "rowId": "link-alex-heater-see-first", "version": 1 }
+      { "table": "secure_links", "rowId": "link-alex-heater-see-first", "version": 1 },
+      { "table": "open_questions", "rowId": "oq-alex-heater-see-first", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-oq-alex-heater-see-first", "version": 1 }
     ],
     "repeated": false
   }
