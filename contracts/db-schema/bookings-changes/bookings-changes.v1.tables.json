@@ -1,0 +1,2566 @@
+{
+  "part": "bookings-changes",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "booking_details",
+      "description": "The rest of the booking beside K-04's head row: one row per booking, written with the head when the request comes in (A3-51, B3-40; the owner's BOOK, A3-19, B3-08; a walk-in, A3-20). It holds the door the request came in by, the booking number the customer's own AI gets, the booking values K-01's path model reads (madeby, approval, timing, times, taken), the need-by date, who meets the pro (flow B), when the first chat link was given and the pro was told, the upset count, and how a request that was never booked ended. Each written-once value is set once, when it is decided, and never changed after (FS lines 750, 752; README rule 6, trigger booking_details_set_once). The head's columns (stage, flow, booker, person served, payer, private, deceased, version) stay K-04's and are not repeated here.",
+      "source": "02-contracts section 7 row K-30 ('The rest of the booking (the head row is in core): source door ..., made by, approval, timing, times, privacy, reach, ...'); FS line 729 (booking); FS line 752; K-04 v1 bookings (the head row, CQ-03); K-01 v1 bookingValues; SPEC-master 5e; S13-57",
+      "columns": [
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking (K-04 bookings.id): one row per booking, beside its head row. Never changes.",
+          "source": "K-04 v1 bookings.id; FS line 729 (id); CQ-03"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business, the same as its head's (README rule 5 holds it), so row-level security can scope the row. Never changes.",
+          "source": "FS line 729 (business_id); arch 10 line 546; K-04 v1 rule 4"
+        },
+        {
+          "name": "number",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "The booking number: what the customer's own AI gets for the booking, never the check-in code (A6-14: 'The AI gets a booking number, but not the code'; FS line 675), and what the customer, the owner and staff name it by. Code makes it, unique within the business, and never parses it (CQ-09). Set when the row is written; never changed.",
+          "source": "A6-14; B6-13; FS line 675 ('It gets a booking number, never the code, a street address or a card'); CQ-09"
+        },
+        {
+          "name": "door",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "How the request came in: ai (the customer's own AI, A3-02, B3-02), page (the business's booking page, A3-04, B3-07), chat (the person's own chat with Rosie's number, such as '1 Book it' to a waitlist spot, A4-60), business (the business books it, by text or on the portal, A3-19, B3-08) or walk_in (flow A, A3-20). A phone call, a voicemail and an AI on a call are out: there is no voice provider (Q-05; 01-inventory C-231, C-232). Set when the row is written; never changed.",
+          "source": "FS line 729 ('source door (AI, page, call, voicemail, business)'); 02-contracts section 7 row K-30 ('source door (AI, page, business, walk-in; call and voicemail out)'); A3-01, B3-01; A4-60; Q-05"
+        },
+        {
+          "name": "made_by",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "customer, or shop: the business booked it for its own customer (K-01 v1 bookingValues.madeby). Follows the door: business and walk_in are the business's own (RULES 2.5), ai, page and chat the customer's (booking_details_made_by_door). Set when the row is written; never changed.",
+          "source": "FS line 752 (made_by, written once); K-01 v1 bookingValues.madeby; SPEC-master 5e; RULES 2.5"
+        },
+        {
+          "name": "approval",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "now (it books on the yes) or ownerok (a request the owner OKs first: 'This is a request: Lee's Barbershop answers by 11:20am tomorrow'), decided once at A4-98 (B4-115) from the owner's OK rules (K-26 ok_same_day, ok_new_customer, ok_dates) and followed by A6-01 (B6-03), never decided again. A booking the business adds is now (A4-98). Null until decided: a step reading it before then reads K-01's first value, now. Set once.",
+          "source": "FS line 752 (approval, written once); K-01 v1 bookingValues.approval (expert cut by record.live.off); A4-98, B4-115; A6-01, B6-03; K-26 v1 rule kinds ok_same_day, ok_new_customer, ok_dates"
+        },
+        {
+          "name": "timing",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "settime (a set time) or sentnow (sent now: the customer took 'Send someone now', marked at B4-91, only where the plug-in lists sentnow; its arrival estimate stands in for a time). Null until the pick (B4-16; A4-15). Set once.",
+          "source": "FS line 752 (timing, written once); K-01 v1 bookingValues.timing; B4-16, B4-91 ('That one mark decides the rest, with nothing asked again'); B7-55"
+        },
+        {
+          "name": "times",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "How the times read: window (an arrival window, 'arriving 8–10am'), setstart (a set start, 'starts at 8:00am'), stay (a start and an end) or seat (a seat in a session), as the plug-in or the owner's arrival setting (K-23 flow_defaults.arrive) says. Null until the times step (A4-66, B4-83). Set once.",
+          "source": "FS line 752 (times, written once); K-01 v1 bookingValues.times; A4-66; B4-83 ('This is chosen once. Later steps follow it and never ask again'); S13-35; K-23 v1 flow_defaults.arrive (H07)"
+        },
+        {
+          "name": "taken",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "What the booking took: asked (as the service asks) or nothing (the owner's yes to book with nothing taken, A5-08; a booking the business adds). Null until the money step. Set once: 'What the booking took stays as it was' (SPEC-master 5e).",
+          "source": "K-01 v1 bookingValues.taken; SPEC-master 5e; A5-04 ('This is the one place that sets what this booking took'); A5-08"
+        },
+        {
+          "name": "need_by",
+          "type": "date",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The need-by date the customer gave, like a filing date or an event, set before the times: only times before it are offered, and new times only before it (S13-56). A day in the visit's zone (README rule 9). Null: none.",
+          "source": "S13-57 ('The need-by date the customer gave, like a filing date or an event. It's set before the times (A4-83, B4-94)'); A4-17 ('A need-by date limits the search'); S13-56"
+        },
+        {
+          "name": "meets_pro",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "Flow B: who meets the pro at the place (B4-26): served (the person served will be there), someone_else (another adult, who gives their own yes on a forwarded link, B4-27), or nobody_home (only where the plug-in marks the work so, B4-105). Null in flow A and until asked.",
+          "source": "B4-26 ('Who meets the pro there'); B4-27; B4-105; FS section 7 screen 11 ('who meets the pro')"
+        },
+        {
+          "name": "meets_pro_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For someone_else: that adult (persons.id), once their own yes on their link is in ('Rosie never texts the parent on Alex's word'). Null otherwise, or until then.",
+          "source": "B4-27; S13-31 ('Visit messages go to whoever meets the pro'); S13-32"
+        },
+        {
+          "name": "first_link_given_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "When the booking's first chat link was given (the issued_at of its first K-29 chat_links row): FS line 729's first_sms_at under Q-33's default, since there is no first-contact SMS (MC C9). Null: none given (the chat was already open). Set once.",
+          "source": "FS line 729 (first_sms_at, D103); Q-33 ('first_sms_at becomes first_link_given_at'); MC C9; K-29 v1 chat_links.issued_at; K-04 v1 README (Q-33: 'a K-30 booking field')"
+        },
+        {
+          "name": "staff_told_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "When the message telling the pro about the job (A6-15, B6-14) was delivered: the key staff_told. Null: not yet. Set once.",
+          "source": "A6-15, B6-14 (gives staff_told); 02-contracts section 8 (staff_told: 'when the pro's message was delivered (a field under Q-33)'); Q-33"
+        },
+        {
+          "name": "upset_count",
+          "type": "integer",
+          "null": false,
+          "default": "0",
+          "audience": "never",
+          "description": "How many times the customer was upset on this booking; a second upset goes to a person. Raised by one by the commit that reads an upset.",
+          "source": "arch 09 line 490 ('Bookings keep an upset count; a second upset goes to a person (S13-29 rule 54)'); S13-29 rule 54"
+        },
+        {
+          "name": "request_ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "For a request that ended without being booked: when it ended. Null: booked, or still open. Set once.",
+          "source": "A5-06, A5-23, A6-05, A6-07, A6-13, A6-17, A6-32, A4-15, A4-43, B4-30 (each ends a request with nothing booked)"
+        },
+        {
+          "name": "request_ended_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "Why it ended: let_go (the page or the saved time ran out, A5-06, A6-13), declined (the owner said no, A6-05, A4-95), no_answer (no owner answer in time, A6-07, A4-51), dropped (the customer said no or went quiet, A6-17, A4-12, A4-15), not_signed (A5-23), not_paid (A6-32), outside_area (B4-30), not_listed (only the business's own customers book, A4-43, B4-38) or waitlist (the customer joined the waitlist instead, A4-15, A4-60). Set once, with request_ended_at.",
+          "source": "A4-15, A4-43, A4-51, A4-60, A4-95, A5-06, A5-23, A6-05, A6-07, A6-13, A6-17, A6-32; B4-30, B4-38"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["booking_id"],
+      "foreignKeys": [
+        {
+          "name": "booking_details_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_details_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_details_meets_pro_fk",
+          "columns": ["meets_pro_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "booking_details_number_key",
+          "columns": ["business_id", "number"],
+          "source": "A6-14 (a booking number); CQ-09"
+        }
+      ],
+      "checks": [
+        {
+          "name": "booking_details_number_form",
+          "expression": "number ~ '^[^[:space:]]+$'",
+          "source": "A6-14; CQ-09 (opaque, never parsed)"
+        },
+        {
+          "name": "booking_details_door_known",
+          "expression": "door in ('ai', 'page', 'chat', 'business', 'walk_in')",
+          "source": "02-contracts section 7 row K-30; A3-01, B3-01; A4-60; Q-05 (call and voicemail out)"
+        },
+        {
+          "name": "booking_details_made_by_known",
+          "expression": "made_by in ('customer', 'shop')",
+          "source": "K-01 v1 bookingValues.madeby"
+        },
+        {
+          "name": "booking_details_made_by_door",
+          "expression": "(door in ('business', 'walk_in')) = (made_by = 'shop')",
+          "source": "RULES 2.5 ('A walk-in and a job the business adds itself (BOOK) are the business's own'); SPEC-master 5e (madeby shop)"
+        },
+        {
+          "name": "booking_details_approval_known",
+          "expression": "approval is null or approval in ('now', 'ownerok')",
+          "source": "K-01 v1 bookingValues.approval"
+        },
+        {
+          "name": "booking_details_shop_books_now",
+          "expression": "made_by = 'customer' or approval is null or approval = 'now'",
+          "source": "A4-98 ('A booking the business adds is booked on the owner's reply (A3-30), as entered: it isn't a request')"
+        },
+        {
+          "name": "booking_details_timing_known",
+          "expression": "timing is null or timing in ('settime', 'sentnow')",
+          "source": "K-01 v1 bookingValues.timing"
+        },
+        {
+          "name": "booking_details_times_known",
+          "expression": "times is null or times in ('window', 'setstart', 'stay', 'seat')",
+          "source": "K-01 v1 bookingValues.times (noperson and line cut by record.live.off)"
+        },
+        {
+          "name": "booking_details_taken_known",
+          "expression": "taken is null or taken in ('asked', 'nothing')",
+          "source": "K-01 v1 bookingValues.taken"
+        },
+        {
+          "name": "booking_details_meets_pro_known",
+          "expression": "(meets_pro is null or meets_pro in ('served', 'someone_else', 'nobody_home')) and (meets_pro_person_id is null or meets_pro = 'someone_else')",
+          "source": "B4-26, B4-27, B4-105"
+        },
+        {
+          "name": "booking_details_upset_count",
+          "expression": "upset_count >= 0",
+          "source": "arch 09 line 490"
+        },
+        {
+          "name": "booking_details_request_end",
+          "expression": "(request_ended_at is null) = (request_ended_why is null) and (request_ended_why is null or request_ended_why in ('let_go', 'declined', 'no_answer', 'dropped', 'not_signed', 'not_paid', 'outside_area', 'not_listed', 'waitlist'))",
+          "source": "A4-15, A4-43, A4-51, A4-60, A4-95, A5-06, A5-23, A6-05, A6-07, A6-13, A6-17, A6-32; B4-30, B4-38"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "booking_visits",
+      "description": "Each visit of a booking: the one visit of most bookings, and each day of a multi-day job or each visit of a series booked as one (A7-01: 'Each later day the customer comes in gets its own reminder, with a new code'; A7-05). It names the visit's reservation, whose during is the booked time itself (K-04 reservations), and holds the arrival window or sent-now estimate, the free-cancel time and the check-in code, new each visit and sealed. Written when the booking is written (A6-10, B6-10). A move points it at the new reservation and moves its window and free-cancel time, with a booking_changes row; the code never changes ('The code stays the same: it's still the same visit', A7-03).",
+      "source": "02-contracts section 7 row K-30 ('start, end, arrival text, ... check-in code (new each visit), free-cancel time'); FS line 729 (start, end, arrival text, check_in_code, cutoff_at); A6-10, A6-14; A7-01, A7-03, A7-05; K-04 v1 reservations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit's id: an opaque string code makes and never parses (CQ-09). The visit part (K-31) names it for check-ins, DONE and no-shows.",
+          "source": "CQ-09; 02-contracts section 7 row K-31 (check-ins, DONE, no-show marks)"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking (K-04 bookings.id).",
+          "source": "FS line 729; K-04 v1 bookings"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The visit's place in the booking, from 1: a multi-day job's days, or a series' visits, in order.",
+          "source": "A7-01 ('Each later day the customer comes in'); A7-05 ('One visit of a series or package paid as one booking'); S13-56 ('On a job over several days, only that day is called off')"
+        },
+        {
+          "name": "reservation_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The visit's reservation (K-04 reservations.id): the worker's, room's, vehicle's or class session's time; its during is the booked time, [start, end). A move points it at the new reservation. Null only while nothing is reserved for the visit (a crew, seat or drop-off where nobody was named and the business staffs it: S13-56).",
+          "source": "K-04 v1 reservations ('booked as', arch 09 line 457); FS line 729 (start, end); A6-10; A7-03; S13-56"
+        },
+        {
+          "name": "arrival_window",
+          "type": "tstzrange",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For times window: the arrival window the texts say ('arriving 8–10am'), inside the reserved time, which also holds the job's length; for a job sent now: the arrival estimate ('arriving in about 60 to 90 minutes'). Null for a set start (the reservation's start: 'starts at 8:00am'), a stay or a seat. Instants in UTC, shown in the visit's zone (README rule 9), so a window stays right when the clocks change. A move moves it.",
+          "source": "FS line 729 (arrival text); FS line 752 (arrive text); B4-15 ('Arrival windows are 2 hours, as Sam set at sign-up'); B4-91 (the arrival estimate); S13-35 ('A set start reads starts at 8:00am, never a window'); S13-03 ('A booked window stays right when the clocks change'); SPEC-master 5h ({{arrive}}, {{window}})"
+        },
+        {
+          "name": "cutoff_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When free cancel ends, worked out when the booking is written from the cancel rule its terms snapshot keeps (booking_terms) and shown in the visit's zone (README rule 9); before it, a cancel or move is free. A booking made after it shows 'No free cancel'. A move before it moves it with the visit (A6-12: 'anything set by date moves with it'); a late move the owner accepts keeps it (A7-03). Null: no free-cancel time (a job sent now: free cancel ends at the on-my-way text, B4-91).",
+          "source": "FS line 729 (cutoff_at); FS line 752; A7-01; A7-03 ('A late move Sam accepts keeps the old free-cancel time'); A6-12; S13-35; B4-91; RULES 3.7"
+        },
+        {
+          "name": "check_in_code",
+          "type": "bytea",
+          "null": true,
+          "audience": ["customer"],
+          "sealedBy": "code_for_person_id",
+          "writtenOnceAtBooking": true,
+          "description": "The visit's check-in code, new each visit, sealed under the key of code_for_person_id. Only that person gets it, to give at the chair, the door or the start of a video visit; the pro, the owner, the payer and any AI never see it (A6-14, A6-15, B6-14). Never changed: a move keeps it. Null: no code (nobody home, where a photo at DONE confirms the visit, B4-105; a walk-in).",
+          "source": "FS line 729 (check_in_code, new each visit); A6-14 ('a check-in code that's new for this visit. Only they get the code'); A7-01; A7-03 ('The code stays the same'); A6-15; B6-14; B4-105; arch 01 line 93"
+        },
+        {
+          "name": "code_for_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "Who gets the code (persons.id), and whose key seals it: the person served, or whoever meets the pro at the place (B4-27: 'the parent gets the visit texts and the code, and Alex a copy without it'). Null with no code.",
+          "source": "A6-14; B4-27; S13-31 ('Visit messages go to whoever meets the pro'); arch 01 line 93"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "booking_visits_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_visits_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_visits_reservation_fk",
+          "columns": ["reservation_id"],
+          "references": {
+            "table": "reservations",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_visits_code_person_fk",
+          "columns": ["code_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "booking_visits_position_key",
+          "columns": ["booking_id", "position"],
+          "source": "A7-01 (each visit its own)"
+        },
+        {
+          "name": "booking_visits_id_booking_key",
+          "columns": ["id", "booking_id"],
+          "source": "A change names a visit of its own booking (booking_changes_visit_fk)"
+        },
+        {
+          "name": "booking_visits_reservation_key",
+          "columns": ["reservation_id"],
+          "source": "K-04 v1 reservations (one reserved time is one visit)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "booking_visits_position_from_one",
+          "expression": "position >= 1",
+          "source": "A7-01"
+        },
+        {
+          "name": "booking_visits_code_with_person",
+          "expression": "(check_in_code is null) = (code_for_person_id is null)",
+          "source": "A6-14; arch 01 line 93 (sealed under a named person's key)"
+        },
+        {
+          "name": "booking_visits_window_bounded",
+          "expression": "arrival_window is null or (not isempty(arrival_window) and not lower_inf(arrival_window) and not upper_inf(arrival_window))",
+          "source": "B4-15; B4-91; S13-03"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "booking_changes",
+      "description": "Each change to a booking after it was written, as its own row, appended and never edited: a move, a cancel, a stand-in, or a change of what is booked. Who asked and who said yes (in K-08's approval shape), when, by which turn or job, whether it came after free cancel ended, the plain fields before and after, and the versions before and after of the head and of every other row it wrote. Changes after booking add rows; they never rewrite the fields written once.",
+      "source": "02-contracts section 7 row K-30 ('changes (moves, cancels, stand-ins: S13-56)'); FS line 756 ('Changes after booking add rows ... They do not rewrite the fields above'); S13-56; A7-03, A7-05, A7-06, A7-31, A7-92; S11-53 ('A change to a booking already made is a new change: the customer is told, and pays no fee for it')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The change's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking it changed (K-04 bookings.id).",
+          "source": "FS line 756"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "visit_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The visit it changed (booking_visits.id), held to this booking; null when it changed the whole booking.",
+          "source": "S13-56 ('On a job over several days, only that day is called off'); A7-05 ('One visit of a series ... this visit's share only')"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "moved (another time: A7-03; the owner moves it: S11-13, S13-56), cancelled (called off: by the customer in time or late, A7-05, A7-06; by the business, S13-56, S11-75; or by a deadline's safe default, S11-62, S13-56), stand_in (another pro, where the booking named nobody: S13-56), or what_changed (another service, an added service, another place: A7-31; RULES 3.8).",
+          "source": "02-contracts section 7 row K-30 (moves, cancels, stand-ins); A7-92 ('a move, a cancel, another service or place'); A7-31; S13-56; RULES 3.8"
+        },
+        {
+          "name": "asked_by",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who asked for it: customer (the person served, or someone allowed to decide for them: S13-31, S13-45 row 2), owner (the owner or an admin), staff, team (Rosie's team, when the owner can't act: S13-56, judgment rule 57), or rosie (a deadline's safe default, such as a pause still on at 7pm the day before: S11-62, S13-56).",
+          "source": "S13-31; S13-45 rows 2, 8; S13-56; S11-62; arch 03 line 177"
+        },
+        {
+          "name": "asked_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who asked (persons.id): required for customer, owner and staff; null for rosie, and for team until K-37 names how Rosie's team gets a person row (QUESTIONS.md CQ-34).",
+          "source": "S13-45; CQ-34"
+        },
+        {
+          "name": "approved_by",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "The exact yes behind it, in K-08 v1's approval shape (event-trace.v1.schema.json $defs/approval): an answer (open question, option, inbound event), a consent row, or the owner's yes (person, role, question, option, event). Null for a change a deadline's safe default made: silence moves nothing but a call-off (S13-56).",
+          "source": "K-08 v1 approval; arch 09 line 457 ('approved by'); arch 01 line 89; A7-03 ('After free cancel ends, a move is a request to Sam'); S13-56 ('Nothing moves on silence')"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that committed it (K-04 turns.id); null for a change no turn made.",
+          "source": "K-04 v1 turns; arch 10 line 508 (one commit per turn)"
+        },
+        {
+          "name": "job_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a change no turn made (a clock's firing, a page call, the owner console): the job's id, as K-04's event_log names it.",
+          "source": "K-04 v1 event_log.job_id; 02-contracts K-08"
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When it was committed.",
+          "source": "FS line 756; arch 09 line 457 (when)"
+        },
+        {
+          "name": "after_free_cancel",
+          "type": "boolean",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "Whether it came after the visit's free-cancel time, judged by the clock the customer was shown: a late move is a request to the owner, and a late cancel goes through the fee door.",
+          "source": "B7-10 ('Late is judged by the clock the customer was shown'); A7-03; A7-06; S11-22; S13-03 ('A cancel in time by the clock the customer was shown is in time')"
+        },
+        {
+          "name": "old_values",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "The plain fields it changed, before, keyed by column, such as the reservation, the booked time and the free-cancel time; never a private value (an address, an answer, a code), as K-04's event_log keeps them out.",
+          "source": "arch 09 line 457 (old → new); K-04 v1 event_log.old_values; S13-05"
+        },
+        {
+          "name": "new_values",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "The same fields after.",
+          "source": "arch 09 line 457 (old → new); K-04 v1 event_log.new_values"
+        },
+        {
+          "name": "booking_version_before",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "K-04 bookings.version before the change: every change raises the head's version, so a write made from an old read is refused (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; arch 09 line 457 ('Booking: state · version')"
+        },
+        {
+          "name": "booking_version_after",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "K-04 bookings.version after the change.",
+          "source": "arch 01 line 85; arch 10 line 506"
+        },
+        {
+          "name": "rows_changed",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "Every other row it wrote, with its version before and after: a JSON array of {\"table\", \"rowId\", \"versionBefore\", \"versionAfter\"}, versionBefore null for a row it added, as K-04's versions_read names rows.",
+          "source": "arch 01 line 85; K-04 v1 open_questions.versions_read ({table, rowId, version}); K-02 v1 fact"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "booking_changes_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_changes_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_changes_visit_fk",
+          "columns": ["visit_id", "booking_id"],
+          "references": {
+            "table": "booking_visits",
+            "columns": ["id", "booking_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_changes_asked_by_fk",
+          "columns": ["asked_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_changes_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "booking_changes_id_booking_key",
+          "columns": ["id", "booking_id"],
+          "source": "A removed line names a change of its own booking (booking_lines_removed_by_fk)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "booking_changes_kind_known",
+          "expression": "kind in ('moved', 'cancelled', 'stand_in', 'what_changed')",
+          "source": "02-contracts section 7 row K-30; A7-92; A7-31; S13-56"
+        },
+        {
+          "name": "booking_changes_asked_by_known",
+          "expression": "asked_by in ('customer', 'owner', 'staff', 'team', 'rosie') and (asked_by not in ('customer', 'owner', 'staff') or asked_by_person_id is not null) and (asked_by <> 'rosie' or asked_by_person_id is null)",
+          "source": "S13-31; S13-45; S13-56"
+        },
+        {
+          "name": "booking_changes_turn_or_job",
+          "expression": "turn_id is not null or job_id is not null",
+          "source": "K-04 v1 event_log_turn_or_job"
+        },
+        {
+          "name": "booking_changes_versions",
+          "expression": "booking_version_before >= 1 and booking_version_after > booking_version_before",
+          "source": "arch 01 line 85; arch 10 line 506"
+        },
+        {
+          "name": "booking_changes_json_shapes",
+          "expression": "jsonb_typeof(old_values) = 'object' and jsonb_typeof(new_values) = 'object' and jsonb_typeof(rows_changed) = 'array' and (approved_by is null or jsonb_typeof(approved_by) = 'object')",
+          "source": "K-04 v1 event_log (old and new values); K-08 v1 approval"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "booking_changes_booking_at_idx",
+          "columns": ["booking_id", "at"],
+          "why": "A booking's changes in order: the owner's Bookings page, the record (S13-57) and the late-cancel count."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "quotes",
+      "description": "A price made for one customer before any time is saved: the service, whether it was priced from the customer's photos or answers, who priced it and when, the owner's price OK limit that asked for an OK (the OK itself is an owner_oks row), the state, when it was sent and how long it stays good (7 days). Its prices are quote_options. A price set at the visit is the visit part's (K-31), not a quote here.",
+      "source": "02-contracts section 7 row K-30 ('quotes and owner OKs (arch 02 diagram, Bookings & quotes)'); 02-contracts section 8 (quote: B4-09); A4-07 to A4-12; B4-08 to B4-13; K-25 v1 README ('a photos path takes the quote made for the booking (A4-08 to A4-12, K-30), never a rule')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The quote's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking request it was made for (K-04 bookings.id), still at the entry stage: no time is saved while it is priced.",
+          "source": "A4-07 ('No time is saved while it's priced'); B4-08; 02-contracts section 8 (request: a booking request in progress)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), held to the service's by quotes_service_fk.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service quoted (K-25 services.id), such as a water heater replacement.",
+          "source": "A4-07; B4-08; K-25 v1 services"
+        },
+        {
+          "name": "basis",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "photos (priced from the customer's photos and answers) or answers ('Other work may quote first from answers instead, like a guest count or a menu. The path is the same').",
+          "source": "A4-07, A4-08; B4-08, B4-09"
+        },
+        {
+          "name": "priced_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who priced it (persons.id): the pro on the secure page, or the owner when nobody priced it in 4 hours. Null until priced.",
+          "source": "A4-08, B4-09 ('If nobody prices it in 4 hours, Sam is asked to')"
+        },
+        {
+          "name": "priced_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was priced; null until then.",
+          "source": "A4-08; B4-09"
+        },
+        {
+          "name": "price_ok_limit_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The owner's price OK limit that asked for the owner's OK first (K-26 price_ok_limits.id): every quote, or one over its amount ('Sam OKs any price over $500 made for one customer'). Null: no OK was needed (the owner's choice to send them).",
+          "source": "A4-09, B4-10 ('Sam picked one of three choices for prices made for one customer. Send them, ask every time, or ask above an amount'); B4-06; S1-21 (price_oks); K-26 v1 price_ok_limits"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'pricing'",
+          "audience": ["customer", "staff", "owner"],
+          "description": "pricing (waiting for the pro's price), with_owner (waiting for the owner's OK: nothing goes out until someone OKs it), sent (sent to the customer, with a link to pick a time), see_first (the owner wants to see it first, so a visit to be priced there is offered: A4-94, B4-101), declined (A4-95, B4-102) or not_priced (no answer in 4 of the owner's text hours: A4-51, B4-80).",
+          "source": "A4-08 to A4-12, A4-51, A4-94, A4-95; B4-09 to B4-13, B4-80, B4-101, B4-102"
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the price went to the customer; null until sent. The customer OKs the price by picking a time.",
+          "source": "A4-12, B4-13 ('The customer OKs the price by picking a time')"
+        },
+        {
+          "name": "good_until",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the sent price stops being good: 7 days after it was sent, shown in the visit's zone (README rule 9). Null until sent.",
+          "source": "A4-12, B4-13 ('The price stays good for 7 days')"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The currency of its options' amounts, such as USD.",
+          "source": "CQ-09; K-25 v1 rule 7"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "quotes_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "quotes_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "quotes_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": {
+            "table": "services",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "quotes_priced_by_fk",
+          "columns": ["priced_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "quotes_price_ok_limit_fk",
+          "columns": ["price_ok_limit_id"],
+          "references": {
+            "table": "price_ok_limits",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "quotes_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "arch 10 line 546 (a quote's options and OKs carry its business)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "quotes_basis_known",
+          "expression": "basis in ('photos', 'answers')",
+          "source": "A4-07; B4-08"
+        },
+        {
+          "name": "quotes_state_known",
+          "expression": "state in ('pricing', 'with_owner', 'sent', 'see_first', 'declined', 'not_priced')",
+          "source": "A4-08 to A4-12, A4-51, A4-94, A4-95; B4-09 to B4-13, B4-80, B4-101, B4-102"
+        },
+        {
+          "name": "quotes_priced_pair",
+          "expression": "(priced_by_person_id is null) = (priced_at is null) and (state in ('pricing', 'not_priced') or priced_at is not null)",
+          "source": "A4-08; B4-09 ('Price it before anyone says yes')"
+        },
+        {
+          "name": "quotes_sent_good_7_days",
+          "expression": "(state = 'sent') = (sent_at is not null) and (sent_at is null) = (good_until is null) and (good_until is null or good_until = sent_at + interval '168 hours')",
+          "source": "A4-12, B4-13 ('The price stays good for 7 days'): 168 hours, so the check never depends on the session's zone"
+        },
+        {
+          "name": "quotes_currency_form",
+          "expression": "currency ~ '^[A-Z]{3}$'",
+          "source": "CQ-09"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "quotes_booking_idx",
+          "columns": ["booking_id"],
+          "why": "A booking request's quotes, for the times card and the booking line's copy."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "quote_options",
+      "description": "The prices a quote holds: one, or several the customer picks one of before any yes ('One quote can hold options'), each a set price or a range set at the visit inside it ('$80 to $100'), in integer minor units in the quote's currency. Written by the pro's pricing and changed only by the owner's read-back change before it is sent (A4-10, B4-11); once the quote is sent its options never change, and the booking line copies the one picked.",
+      "source": "A4-08, B4-09 ('Riley may price a range, like $80 to $100, set at the visit inside it. One quote can hold options. The customer picks one before any yes'); A4-10, B4-11; A4-12, B4-13",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The option's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "quote_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The quote (quotes.id), held with business_id to the quote's business.",
+          "source": "A4-08; B4-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The quote's business, so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The option's place in the quote, from 1.",
+          "source": "A4-12, B4-13 ('A range or options show as quoted')"
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "What the option is, as the pro wrote it; null for a quote with one option.",
+          "source": "A4-08, B4-09 ('One quote can hold options')"
+        },
+        {
+          "name": "price_cents",
+          "type": "bigint",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The price, or a range's low end, in integer minor units (cents for USD).",
+          "source": "A4-08, B4-09; CQ-09; K-25 v1 rule 7"
+        },
+        {
+          "name": "up_to_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "A range's high end, in minor units; null for a set price.",
+          "source": "A4-08, B4-09 ('a range, like $80 to $100, set at the visit inside it')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "quote_options_quote_fk",
+          "columns": ["quote_id", "business_id"],
+          "references": {
+            "table": "quotes",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "quote_options_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "quote_options_position_key",
+          "columns": ["quote_id", "position"],
+          "source": "A4-12, B4-13"
+        },
+        {
+          "name": "quote_options_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "arch 10 line 546 (a booking line names an option of its own business)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "quote_options_position_from_one",
+          "expression": "position >= 1",
+          "source": "A4-12"
+        },
+        {
+          "name": "quote_options_money",
+          "expression": "price_cents >= 0 and (up_to_cents is null or up_to_cents > price_cents) and (label is null or length(btrim(label)) > 0)",
+          "source": "A4-08, B4-09; CQ-09"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "booking_lines",
+      "description": "One row per service on a booking, with the way and the price copied in when the time is saved (A4-21, B4-23), or on the owner's reply for a booking the business adds (A3-30, B3-08): the money path, the price kind, the units, the price, the deposit and the fee in integer minor units with their currency, and how it is paid (money or a credit). The copy is written once and never changed, whatever K-25's list does later: a booking keeps the price it was made with, even for a visit after a price change. A change of what is booked adds a line and marks the old one removed; it never rewrites one.",
+      "source": "FS line 730 (booking_service); FS lines 750, 751 (written once: price_kind, price, before, after, deposit, fee, paid_by, path); RULES 3.7, 3.8; S11-54 ('Haircuts already booked keep $35, even after Nov 2. A time being saved right now keeps the price on the customer's screen'); S11-56; arch 09 line 457 ('Booking line: price copied in'); 02-contracts section 8 (service, price_known, visit_fee); A7-31",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The line's id: an opaque string code makes and never parses (CQ-09). K-32's credits and payments name it.",
+          "source": "CQ-09; FS line 739 (credit.booking_service_id)"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking (K-04 bookings.id).",
+          "source": "FS line 730 (booking_id)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), held to the service's by booking_lines_service_fk, so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The line's place on the booking, from 1, such as a haircut and then a beard trim (A4-34).",
+          "source": "A4-34 ('Books a haircut and a beard trim'); RULES 3.2 ('Several services in one booking')"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service (K-25 services.id): the key service (A4-81, B4-114).",
+          "source": "FS line 730 (service_id); 02-contracts section 8 (service: the booking line's service); A4-81"
+        },
+        {
+          "name": "service_money_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The way it copies (K-25 service_money.id): the service's place and money path when the time was saved, held to the same service.",
+          "source": "FS line 725 (service_money); K-25 v1 README ('each booking keeps the way it copied (K-30)')"
+        },
+        {
+          "name": "price_rule_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The price rule the price came from (K-25 price_rules.id), as the price resolver found it for this booking, held to the same service. Null on a path priced from photos, where the quote option gives the price.",
+          "source": "K-25 v1 README ('How a price is found'; 'The booking line copies it, written once (K-30)'); arch 09 line 488"
+        },
+        {
+          "name": "quote_option_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "On a path priced from photos: the quote option the customer picked (quote_options.id), whose price it copies. Null otherwise.",
+          "source": "A4-12, B4-13 ('The customer picks one with the time'); K-25 v1 README ('a photos path takes the quote made for the booking')"
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "The money path copied from the way, written price|before|after, one of the master's 28 for the booking's flow: FS booking_service's path, before and after (before and after are its second and third parts). A later change to the way (S11-56: 'Haircuts already booked keep only their saved card') leaves it as it is.",
+          "source": "FS lines 730, 751 (path, before, after); FS section 4; S11-56; K-25 v1 service_money.path"
+        },
+        {
+          "name": "price_kind",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "Copied from the service (K-25 services.price_kind): one_price, per_hour, per_unit or by_answers.",
+          "source": "FS lines 730, 751 (price_kind); K-25 v1 services.price_kind"
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "For per_unit, what one unit is, copied (K-25 services.unit), such as night; null otherwise.",
+          "source": "K-25 v1 services.unit"
+        },
+        {
+          "name": "units",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "How many units the line books: 1 for one price; the hours booked (per hour, from its minimum), the nights or other units (per unit), or the people (by the customer's answers).",
+          "source": "K-25 v1 README open gaps ('How many units a booking holds ... the count is the booking's (K-30)'); S13-17 ('A price per unit says what one unit is, and is counted from their answers before the yes')"
+        },
+        {
+          "name": "price_cents",
+          "type": "bigint",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "The line's price in integer minor units (cents for USD), as shown before the yes and copied in: on a list path the rule's price times units; on a photos path the picked option's price (a range's low end); on a visit path the visit's own price that is promised, such as the $25 consult (A4-13) or the $89 service call (B4-14). Never changed.",
+          "source": "FS lines 730, 751 (price); RULES 3.7; S11-54; A4-06, A4-12, A4-13; B4-07, B4-13, B4-14; CQ-09; K-25 v1 rule 7"
+        },
+        {
+          "name": "up_to_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "On a photos path whose option is a range: the range's high end, copied; the price is set at the visit inside it. Null otherwise.",
+          "source": "A4-08, B4-09 ('set at the visit inside it')"
+        },
+        {
+          "name": "from_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "On a visit path, the 'from' price copied from the rule (K-25 price_rules.from_cents), shown only as 'from', never as a set price; a deposit is never more than it. Null: none.",
+          "source": "A4-05 ('Never: show a from price as a set price'); A4-13; K-25 v1 price_rules.from_cents"
+        },
+        {
+          "name": "deposit_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "On a deposit path, the deposit in minor units, worked out when copied: the way's set amount, or its percent of the price (K-25 service_money.deposit_cents, deposit_percent), never more than the price known then. Null otherwise.",
+          "source": "FS lines 730, 751 (deposit); S1-13 ('A deposit is never more than the price known then'); A5-13; K-25 v1 service_money"
+        },
+        {
+          "name": "fee_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "The way's late-cancel and no-show fee, copied (K-25 service_money.fee_cents). The booking's one fee is the largest of its open lines', never more than what was paid now; with a deposit and no fee of its own, the deposit is the fee. Null: none of its own.",
+          "source": "FS lines 730, 751 (fee); S13-55 ('One late-cancel and no-show fee per booking ... the largest counts'; 'A deposit service with no fee of its own: its deposit is the fee'); RULES 3.3"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "The currency of every amount on the line (three letters, such as USD), copied with them.",
+          "source": "CQ-09; K-25 v1 rule 7"
+        },
+        {
+          "name": "paid_by",
+          "type": "text",
+          "null": false,
+          "default": "'money'",
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "money (as its path says) or credit (a pack or membership credit pays this service: 'A credit covers its own service only').",
+          "source": "FS lines 730, 751 (paid_by: money or credit); K-01 v1 bookingValues.paidby; A5-03; RULES 3.9"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'open'",
+          "audience": ["customer", "staff", "owner"],
+          "description": "open, or removed: taken off by a change of what is booked (A7-31) or replaced before the booking was written (the customer picked another service). A removed line keeps its row.",
+          "source": "FS line 730 (status); FS line 756; A7-31; RULES 3.8"
+        },
+        {
+          "name": "removed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was removed; null while open.",
+          "source": "A7-31"
+        },
+        {
+          "name": "removed_by_change_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The change that removed it, once the booking was written (booking_changes.id, of this booking); null before then, or while open.",
+          "source": "FS line 756; A7-31"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: raised by one when the line is removed (the only update), and compared and set by a commit (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "booking_lines_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_lines_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_lines_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": {
+            "table": "services",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_lines_way_fk",
+          "columns": ["service_money_id", "service_id"],
+          "references": {
+            "table": "service_money",
+            "columns": ["id", "service_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_lines_price_rule_fk",
+          "columns": ["price_rule_id", "service_id"],
+          "references": {
+            "table": "price_rules",
+            "columns": ["id", "service_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_lines_quote_option_fk",
+          "columns": ["quote_option_id", "business_id"],
+          "references": {
+            "table": "quote_options",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_lines_removed_by_fk",
+          "columns": ["removed_by_change_id", "booking_id"],
+          "references": {
+            "table": "booking_changes",
+            "columns": ["id", "booking_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "booking_lines_position_key",
+          "columns": ["booking_id", "position"],
+          "source": "A4-34; RULES 3.2"
+        }
+      ],
+      "checks": [
+        {
+          "name": "booking_lines_path_form",
+          "expression": "path ~ '^(list|photos|visit)[|](none|card|deposit|full)[|](none|counter|bill|card|own)$'",
+          "source": "FS section 4; SPEC-master D66 amendment (no hold); K-25 v1 service_money_path_known (the way's own list of 28 per flow)"
+        },
+        {
+          "name": "booking_lines_price_kind_known",
+          "expression": "price_kind in ('one_price', 'per_hour', 'per_unit', 'by_answers') and (price_kind = 'per_unit') = (unit is not null)",
+          "source": "K-25 v1 services_price_kind_known, services_unit_with_per_unit"
+        },
+        {
+          "name": "booking_lines_units",
+          "expression": "units >= 1 and (price_kind <> 'one_price' or units = 1)",
+          "source": "K-25 v1 README open gaps (the count is the booking's); S13-17"
+        },
+        {
+          "name": "booking_lines_money",
+          "expression": "price_cents >= 0 and (up_to_cents is null or up_to_cents > price_cents) and (from_cents is null or from_cents > 0) and (deposit_cents is null or deposit_cents > 0) and (fee_cents is null or fee_cents > 0) and currency ~ '^[A-Z]{3}$'",
+          "source": "CQ-09; K-25 v1 price_rules_money, service_money_deposit_in_range"
+        },
+        {
+          "name": "booking_lines_price_source",
+          "expression": "(split_part(path, '|', 1) = 'photos') = (quote_option_id is not null) and (split_part(path, '|', 1) = 'photos') = (price_rule_id is null)",
+          "source": "K-25 v1 README ('a photos path takes the quote made for the booking, never a rule'); A4-06, A4-12, A4-13"
+        },
+        {
+          "name": "booking_lines_range_and_from",
+          "expression": "(up_to_cents is null or split_part(path, '|', 1) = 'photos') and (from_cents is null or split_part(path, '|', 1) = 'visit')",
+          "source": "A4-08 (a range set at the visit); A4-05 (a from price on a visit path)"
+        },
+        {
+          "name": "booking_lines_deposit_with_deposit_path",
+          "expression": "(split_part(path, '|', 2) = 'deposit') = (deposit_cents is not null) and (deposit_cents is null or deposit_cents <= (case when split_part(path, '|', 1) = 'visit' then coalesce(from_cents, price_cents) else price_cents end))",
+          "source": "FS section 4; S1-13 ('A deposit is never more than the price known then'); A5-13 RULE ('a deposit is never more than the price set before the visit, or the starting price when it's set at the visit')"
+        },
+        {
+          "name": "booking_lines_fee_needs_money_before",
+          "expression": "fee_cents is null or split_part(path, '|', 2) <> 'none'",
+          "source": "FS section 4 (a nothing-taken path: 'no fee possible'); K-25 v1 service_money_fee_needs_money_before"
+        },
+        {
+          "name": "booking_lines_paid_by_known",
+          "expression": "paid_by in ('money', 'credit')",
+          "source": "K-01 v1 bookingValues.paidby; FS line 730"
+        },
+        {
+          "name": "booking_lines_state",
+          "expression": "state in ('open', 'removed') and (state = 'removed') = (removed_at is not null) and (removed_by_change_id is null or state = 'removed')",
+          "source": "FS line 756; A7-31"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "booking_lines_service_idx",
+          "columns": ["service_id"],
+          "where": "state = 'open'",
+          "why": "The open lines of a service: what a price or way change leaves as it is (S11-54, S11-56), and K-32's packs and memberships."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "booking_terms",
+      "description": "The terms snapshot: one row per booking, written once in the commit that writes the booking (A6-10, B6-10; A6-12 at a new time; the owner's reply for a booking the business adds, A3-30, B3-08) and never changed. It names the terms the customer ticked (K-29's consent row holds the exact words), their version and language, the notices shown at booking, and the cancel rule each visit's free-cancel time is worked out from; booking_terms_rules lists the owner's rules in force. A move or a later settings change leaves it as it is.",
+      "source": "arch 09 line 457 ('Terms snapshot: rules copied in'); 02-contracts section 7 row K-30 ('terms text and version, notices shown'; 'terms snapshots (arch 09 line 457)'); FS lines 750, 752 (terms_text, terms_version, notices_shown, cutoff_at); S1-21 ('A booking keeps the rules it was made with'); S11-53, S11-57; RULES 3.7",
+      "columns": [
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking (K-04 bookings.id): one snapshot per booking.",
+          "source": "FS line 752"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "terms_consent_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "The K-29 consent row of kind ticked_terms for this booking (consents.id), whose exact_words are the words the customer ticked (FS line 752's terms_text) and whose words_sha256 is their proof. Named, never copied, so the words have one home. Null: nothing was ticked (a nothing-taken yes, A5-05; a booking the business adds).",
+          "source": "FS line 752 (terms_text: 'the exact words the customer ticked, A5-07'); A5-07 ('The exact words the customer ticked are stored with the booking'); K-29 v1 consents (consents_ticked_terms_has_booking; README: 'the same words are K-30's terms_text')"
+        },
+        {
+          "name": "terms_version",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "The version of the booking terms it was made under, as code names the checked terms text it showed; its form is code's (README open gaps).",
+          "source": "FS line 752 (terms_version: 'S1-29: each booking keeps the terms it was made with'); S1-29; S13-37 ('from a checked text')"
+        },
+        {
+          "name": "terms_language",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "The language the terms were shown in, from a checked text, as a BCP 47 tag such as en.",
+          "source": "A4-42 ('Terms show in their language from a checked text'); S13-37; RULES 6 (nobody agrees to what they can't read)"
+        },
+        {
+          "name": "notices_shown",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "Each notice said at booking, word for word as shown, in order; the secure page and the confirmation repeat them. Empty: none (a barbershop has none).",
+          "source": "FS line 752 (notices_shown, A4-41); A4-41, B4-28 ('the booking records it was shown'); A6-14 ('Any notice said at booking is on it too')"
+        },
+        {
+          "name": "cutoff_before",
+          "type": "interval",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "The cancel rule copied in: free cancel ends this long before a visit's start. It is the way's own (K-25 service_money.cutoff_before, such as a skin fade's 2 hours), else the business's default for the flow (K-23 flow_defaults.cutoff_before). Null: cutoff_day_before_at gives the rule, or neither does (a job sent now).",
+          "source": "FS line 752 (cutoff_at); FS row H06; S13-55 ('A booking keeps the price, fees and cancel rules it was made with'); K-25 v1 service_money.cutoff_before; K-23 v1 flow_defaults.cutoff_before"
+        },
+        {
+          "name": "cutoff_day_before_at",
+          "type": "time",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "Or: free cancel ends at this clock time on the day before a visit, read in cutoff_zone (the way's own, K-25 service_money.cutoff_day_before_at, else K-23's default).",
+          "source": "FS row H06; K-25 v1 service_money.cutoff_day_before_at; K-23 v1 flow_defaults.cutoff_day_before_at"
+        },
+        {
+          "name": "cutoff_zone",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "The IANA zone cutoff_day_before_at is read in: the business's, as K-25 v1 and K-23 v1 read that clock time (QUESTIONS.md CQ-05 may move both to the visit's zone). Set exactly with cutoff_day_before_at.",
+          "source": "S13-03 ('Every time is saved with its time zone'); CQ-05; K-25 v1 service_money.cutoff_day_before_at ('in the business's zone')"
+        },
+        {
+          "name": "written_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "When the snapshot was written: the commit that wrote the booking. The owner's rules in force are those whose effective dates hold this instant.",
+          "source": "K-26 v1 README ('Bookings follow the rules in effect when they are made ... K-30's terms snapshot copies them'); A6-10"
+        }
+      ],
+      "primaryKey": ["booking_id"],
+      "foreignKeys": [
+        {
+          "name": "booking_terms_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_terms_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_terms_consent_fk",
+          "columns": ["terms_consent_id"],
+          "references": {
+            "table": "consents",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "booking_terms_consent_key",
+          "columns": ["terms_consent_id"],
+          "source": "A5-07 (the terms ticked for one booking)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "booking_terms_version_given",
+          "expression": "length(btrim(terms_version)) > 0 and terms_language ~ '^[a-z]{2,3}(-[A-Za-z0-9]+)*$'",
+          "source": "S1-29; S13-37"
+        },
+        {
+          "name": "booking_terms_one_cutoff",
+          "expression": "num_nonnulls(cutoff_before, cutoff_day_before_at) <= 1 and (cutoff_before is null or cutoff_before > interval '0')",
+          "source": "FS row H06; K-23 v1 flow_defaults_one_cutoff; K-25 v1 service_money_one_cutoff"
+        },
+        {
+          "name": "booking_terms_zone_with_clock",
+          "expression": "(cutoff_day_before_at is null) = (cutoff_zone is null) and (cutoff_zone is null or cutoff_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$')",
+          "source": "S13-03; CQ-09 (an IANA zone name)"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "booking_terms_rules",
+      "description": "The owner's rules in force when the booking was written, each named in its terms snapshot: one row per K-26 rule or price OK limit in force for the booking's flow and kind of work. K-26 never edits a row's value in place or deletes it (an update only closes it), so naming the row in force copies its value exactly; a later change opens a new row and applies to new bookings only. Written once with the snapshot, never changed.",
+      "source": "arch 09 line 457 ('Terms snapshot: rules copied in'); S1-21 ('A booking keeps the rules it was made with'); S11-57 ('for new bookings only'); K-26 v1 README ('Values are never edited in place and rows are never deleted'; 'K-30's terms snapshot copies them')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking whose snapshot it belongs to (booking_terms.booking_id).",
+          "source": "arch 09 line 457"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "rule_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "A K-26 rule in force at booking (rules.id): its kind, scope and typed value, or a note in the owner's words.",
+          "source": "K-26 v1 rules; S1-21 (booking_rules)"
+        },
+        {
+          "name": "price_ok_limit_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Or a K-26 price OK limit in force at booking (price_ok_limits.id): a bill over it after the visit goes to the owner first.",
+          "source": "K-26 v1 price_ok_limits; S1-21 (price_oks)"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "booking_terms_rules_terms_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "booking_terms",
+            "columns": ["booking_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_terms_rules_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_terms_rules_rule_fk",
+          "columns": ["rule_id"],
+          "references": {
+            "table": "rules",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_terms_rules_limit_fk",
+          "columns": ["price_ok_limit_id"],
+          "references": {
+            "table": "price_ok_limits",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "booking_terms_rules_rule_key",
+          "columns": ["booking_id", "rule_id"],
+          "source": "arch 09 line 457 (each rule once per snapshot)"
+        },
+        {
+          "name": "booking_terms_rules_limit_key",
+          "columns": ["booking_id", "price_ok_limit_id"],
+          "source": "arch 09 line 457 (each limit once per snapshot)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "booking_terms_rules_one_ref",
+          "expression": "num_nonnulls(rule_id, price_ok_limit_id) = 1",
+          "source": "K-26 v1 (a rule or a price OK limit)"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "owner_oks",
+      "description": "Each time the owner, or an admin the owner lets answer (such as the office manager), is asked to OK something about one booking: a booking request (A6-02, B6-04), a price made for one customer (A4-09, B4-10), booking with nothing taken (A5-08), or a move after free cancel ends (A7-03). It holds when it was asked, the deadline and the one reminder, and the answer with who gave it in K-08's ownerYes shape (approvalOwnerYes: the person, their role, the question, the option, the inbound event), or no answer by the deadline. The first answer from someone allowed counts; silence never says yes.",
+      "source": "02-contracts section 7 row K-30 ('approval', 'request deadline'; 'quotes and owner OKs (arch 02 diagram, Bookings & quotes)'); FS line 729 (request_deadline); A4-09 to A4-11; A5-08; A6-01 to A6-07 ('The first answer from Sam or Pat counts'); A7-03; B4-10 to B4-12; B6-03, B6-04; K-08 v1 approvalOwnerYes; S13-26 (silence never says yes)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The ask's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking or booking request it is about (K-04 bookings.id).",
+          "source": "A6-02; A4-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "about",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "request (book this request? A6-02, B6-04), quote (send this price? A4-09, B4-10), nothing_taken (book it with nothing taken? A5-08) or late_move (a move asked after free cancel ends, A7-03).",
+          "source": "A6-02; B6-04; A4-09; B4-10; A5-08; A7-03"
+        },
+        {
+          "name": "quote_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a quote: the quote (quotes.id), held to the same business; null otherwise.",
+          "source": "A4-09; B4-10"
+        },
+        {
+          "name": "asked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the owner was asked.",
+          "source": "A6-02; A4-09"
+        },
+        {
+          "name": "answer_by",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The deadline, always before the visit: for a request, 4 of the owner's text hours (FS line 729's request_deadline: 'answers by 11:20am tomorrow'), or the plug-in's shorter clock (5 minutes for a job sent now, B4-115); for a quote, 4 of the owner's text hours; for nothing taken, 30 minutes of them. Shown in the visit's zone (README rule 9).",
+          "source": "FS line 729 (request_deadline); A4-98; A6-02 ('No answer in 4 of Sam's text hours: not booked'); B4-115; A4-11; A5-08; S13-35 ('Every deadline ends before the visit')"
+        },
+        {
+          "name": "reminded_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the one reminder went (after 30 minutes with no answer). Null: none.",
+          "source": "A6-02 ('No answer in 30 minutes: the customer is told to wait, and Sam gets one reminder'); A4-11"
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a request or a late move: accept, another_time or decline; for a quote: send, change (a new price, read back first), see_first or decline; for nothing taken: book or let_go; for any: no_answer, when the deadline passed with none. Null while waiting.",
+          "source": "A6-02 ('Reply 1 Accept, 2 Another time, 3 Decline'); A4-09, B4-10 ('Reply 1 Send it, 2 Change it, 3 See it first, 4 Decline'); A5-08 ('Reply 1 Book it, 2 Let it go'); A7-03; A6-07; A4-51"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the answer came, or when the deadline passed with none.",
+          "source": "A6-02; A4-09"
+        },
+        {
+          "name": "answered_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "K-08 approvalOwnerYes.person_id: who answered (persons.id), the owner or an admin allowed to OK it. Null while waiting and for no_answer.",
+          "source": "K-08 v1 approvalOwnerYes; A6-01 ('Pat, the office manager, gets the same requests. The first answer from Sam or Pat counts'); S13-31"
+        },
+        {
+          "name": "answered_by_role",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "K-08 approvalOwnerYes.role: owner or admin.",
+          "source": "K-08 v1 approvalOwnerYes; S13-45 row 8"
+        },
+        {
+          "name": "open_question_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "K-08 approvalOwnerYes.open_question_id: the question that asked them (K-04 open_questions.id); for a change typed and read back (A4-10, A6-04), the read-back's question.",
+          "source": "K-08 v1 approvalOwnerYes; arch 01 line 89"
+        },
+        {
+          "name": "option_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "K-08 approvalOwnerYes.option_id: the option they picked, as sent; null for a typed answer.",
+          "source": "K-08 v1 approvalOwnerYes; K-04 v1 open_questions.options"
+        },
+        {
+          "name": "event_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "K-08 approvalOwnerYes.event_id: the inbound event that carried the answer (K-06 event id).",
+          "source": "K-08 v1 approvalOwnerYes; K-06 v1 event id"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "owner_oks_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "owner_oks_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "owner_oks_quote_fk",
+          "columns": ["quote_id", "business_id"],
+          "references": {
+            "table": "quotes",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "owner_oks_answered_by_fk",
+          "columns": ["answered_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "owner_oks_question_fk",
+          "columns": ["open_question_id"],
+          "references": {
+            "table": "open_questions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "owner_oks_one_waiting",
+          "columns": ["booking_id", "about"],
+          "where": "answer is null and quote_id is null",
+          "source": "A6-02 (one request waits for one answer: 'The first answer from Sam or Pat counts'); A5-08 ('Sam is asked once'); a repeated ask writes no second row"
+        },
+        {
+          "name": "owner_oks_one_waiting_per_quote",
+          "columns": ["quote_id"],
+          "where": "answer is null and quote_id is not null",
+          "source": "A4-09, B4-10 (a price made for one customer goes to Sam once); a repeated ask writes no second row"
+        }
+      ],
+      "checks": [
+        {
+          "name": "owner_oks_about_known",
+          "expression": "about in ('request', 'quote', 'nothing_taken', 'late_move') and (about = 'quote') = (quote_id is not null)",
+          "source": "A6-02; A4-09; A5-08; A7-03"
+        },
+        {
+          "name": "owner_oks_answer_fits",
+          "expression": "answer is null or answer = 'no_answer' or (about in ('request', 'late_move') and answer in ('accept', 'another_time', 'decline')) or (about = 'quote' and answer in ('send', 'change', 'see_first', 'decline')) or (about = 'nothing_taken' and answer in ('book', 'let_go'))",
+          "source": "A6-02; A7-03; A4-09; B4-10; A5-08"
+        },
+        {
+          "name": "owner_oks_answered_by",
+          "expression": "(answer is null) = (answered_at is null) and (answer is null or answer = 'no_answer') = (answered_by_person_id is null) and (answered_by_person_id is null) = (answered_by_role is null) and (answered_by_person_id is null) = (open_question_id is null) and (answered_by_person_id is null) = (event_id is null) and (option_id is null or answered_by_person_id is not null) and (answered_by_role is null or answered_by_role in ('owner', 'admin'))",
+          "source": "K-08 v1 approvalOwnerYes (person, role, question, option, event all required with a yes); S13-26 (silence never says yes)"
+        },
+        {
+          "name": "owner_oks_times",
+          "expression": "answer_by > asked_at and (reminded_at is null or reminded_at >= asked_at) and (answered_at is null or answered_at >= asked_at) and (answer is distinct from 'no_answer' or answered_at >= answer_by)",
+          "source": "A6-02; A4-11; S13-35"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "owner_oks_booking_idx",
+          "columns": ["booking_id"],
+          "why": "A booking's asks to the owner."
+        },
+        {
+          "name": "owner_oks_waiting_idx",
+          "columns": ["business_id", "answer_by"],
+          "where": "answer is null",
+          "why": "What waits on the owner, soonest deadline first (S11-03, 'Sam answers what's waiting'; A6-02's reminder)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "booking_addresses",
+      "description": "Where a visit at the customer's place happens (flow B): the town or ZIP checked against the travel area before any times (B4-77), then the street address typed on the secure page and checked again (B4-30), sealed and shown only on the secure page; two addresses for a move, a ride or a tow, each with its own travel check. Its IANA zone is the visit's zone, and its US state decides which state's rules apply.",
+      "source": "02-contracts section 7 row K-30 ('address (secure page only)'); 02-contracts section 8 (place: B4-77; address: B4-30); FS line 729 ('location or address (secure)'); B4-30 ('Two addresses, like a move or a ride: both are typed here, and each gets its own travel check'); S13-03; QUESTIONS.md CQ-05, CQ-08; K-17 v1 (geo port match: point, zone, state)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking (K-04 bookings.id), in flow B.",
+          "source": "B4-77; B4-30"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "1: where the visit is, or where it starts; 2: where it ends (a move's, a ride's or a tow's second address).",
+          "source": "B4-30; B4-77 ('Two addresses, like a move, a ride or a tow: both are asked')"
+        },
+        {
+          "name": "area",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The town or ZIP as checked before the times: the AI may name it ('comes to you in Springfield'), and someone who hasn't taken the job yet sees the area.",
+          "source": "B4-77 ('the town or ZIP in the request is checked against the travel area, before any times'); S13-05 ('Someone who hasn't taken a job yet sees the kind of job and the area')"
+        },
+        {
+          "name": "address",
+          "type": "bytea",
+          "null": true,
+          "audience": "secure-page-only",
+          "sealedBy": "sealed_for_person_id",
+          "description": "The street address as typed on the secure page, sealed under the key of sealed_for_person_id; never through an AI ('An address an AI puts in a message is never saved'), never in a text; the job page opens it. Null until typed.",
+          "source": "B4-30; FS line 729 ('address (secure)'); A6-14 ('No street address ... ever passes through the AI'); B6-14 ('The address, answers and notes open in the job, never in the text'); arch 01 line 93; RULES 4.5"
+        },
+        {
+          "name": "sealed_for_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Whose key seals the address (persons.id): the person who typed it on their own link. Set exactly with the address.",
+          "source": "arch 01 line 93; RULES 4.10"
+        },
+        {
+          "name": "zone",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The address's IANA zone, from the geo port (K-17 v1 match timeZone): for position 1, the visit's zone. Null until the address is checked.",
+          "source": "S13-03 ('a visit at the customer's place uses that place's'); QUESTIONS.md CQ-05, CQ-08; K-17 v1"
+        },
+        {
+          "name": "state_code",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The address's US state, as the geo port gives it: it decides which state's rules apply to the job. Null until checked.",
+          "source": "B4-30 ('The address decides which state's rules apply to the job'); K-17 v1 (the US state on each match)"
+        },
+        {
+          "name": "location_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The location whose travel area it is checked against (K-23 locations.id): the way's location (K-25 service_money.location_id).",
+          "source": "B4-77; K-23 v1 locations (travel area L02); K-25 v1 service_money.location_id"
+        },
+        {
+          "name": "checked_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the street address was found inside the travel area, in a state whose form the business filled in. Null: not yet; nothing is booked until it checks.",
+          "source": "B4-30 ('Means Inside the travel area'; 'Safe default: ask for the address again; nothing is booked until it checks')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "booking_addresses_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_addresses_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_addresses_sealed_for_fk",
+          "columns": ["sealed_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "booking_addresses_location_fk",
+          "columns": ["location_id"],
+          "references": {
+            "table": "locations",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "booking_addresses_position_key",
+          "columns": ["booking_id", "position"],
+          "source": "B4-30"
+        }
+      ],
+      "checks": [
+        {
+          "name": "booking_addresses_position_known",
+          "expression": "position in (1, 2) and length(btrim(area)) > 0",
+          "source": "B4-30; B4-77"
+        },
+        {
+          "name": "booking_addresses_sealed_with_person",
+          "expression": "(address is null) = (sealed_for_person_id is null)",
+          "source": "arch 01 line 93"
+        },
+        {
+          "name": "booking_addresses_zone_state_form",
+          "expression": "(zone is null or zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$') and (state_code is null or state_code ~ '^[A-Z]{2}$')",
+          "source": "CQ-09 (an IANA zone name); K-17 v1 (a US state)"
+        },
+        {
+          "name": "booking_addresses_checked_has_address",
+          "expression": "checked_at is null or (address is not null and zone is not null and state_code is not null)",
+          "source": "B4-30"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "secure_links",
+      "description": "Each secure link Rosie issues for a booking: the page it opens, the person it is for, the contact it went to (a K-04 handle of that person) or where else it was given, a hash of its short code (never the code), and when it ended. Opening a link never proves who someone is. A change of where updates go ends every link made before it for that person's bookings at that business, and new links go only to the new contact.",
+      "source": "02-contracts section 8 (contact, link: 'K-30: the secure link issued; K-28: the contact it went to'); A4-42, B4-29; A4-07, B4-08; A4-12, B4-13; S13-45 ('Opening a link never counts'); S13-19 ('Every link and page made before the switch stops working'); D75; SPEC-master FIX7 P-1; K-28 v1 README (K-30 names the customer's handle, never a copy of the number)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The link's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking or booking request (K-04 bookings.id).",
+          "source": "A4-42; B4-29"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "secure_page (the page where everything is settled and the yes is given: A4-42, B4-29; each person served or who meets the pro gets their own: A4-24, A4-26, B4-27), photos (add photos for a quote: A4-07, B4-08), or quote (the price, then pick a time: A4-12, B4-13).",
+          "source": "A4-42, B4-29; A4-24 ('each person gets their own link'); A4-26; B4-27; A4-07, B4-08; A4-12, B4-13"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person it is for (persons.id): their private answers and their own yes go on it.",
+          "source": "A4-42 ('Booked for someone else? The person served gets their own link, for their private answers and their own yes'); B4-27"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The contact it went to: a K-04 handle of that person (person_handles), the mobile or email on file. Null when given on the booking page or to the customer's own AI.",
+          "source": "02-contracts section 8 (contact: 'K-28: the contact it went to'); K-28 v1 README; S13-19"
+        },
+        {
+          "name": "given_via",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Where it was given: text or email (to handle_id), ai (the customer's own AI passes it on) or page (shown on the booking page).",
+          "source": "A4-42; FS line 679 ('It must give an AI exactly ... the secure link'); MC C9"
+        },
+        {
+          "name": "code_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of the link's short code (the part after rosfield.com/<letter>/), lowercase hex. The code is a bearer secret, so only its hash is kept, as K-22 keeps session tokens; the page server finds the link by hashing the code it is given. A later message that needs a link gets a new one.",
+          "source": "A4-42 ('Our links are always rosfield.com/ then a short code'); BP rule 7; K-22 v1 sessions.token_sha256"
+        },
+        {
+          "name": "issued_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When it was made.",
+          "source": "A4-42; B4-29"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it stopped working; null while it works.",
+          "source": "S13-19; D75"
+        },
+        {
+          "name": "ended_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "contact_switched (where updates go changed: D75, FIX7 P-1), booking_ended (the request ended or the booking was cancelled) or replaced (a new link for the same purpose and person).",
+          "source": "S13-19; D75; SPEC-master FIX7 P-1; A5-06"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: raised by one when the link ends (the only update), and compared and set by a commit (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "secure_links_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "secure_links_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "secure_links_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "secure_links_handle_own_fk",
+          "columns": ["person_id", "handle_id"],
+          "references": {
+            "table": "person_handles",
+            "columns": ["person_id", "handle_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "secure_links_code_key",
+          "columns": ["code_sha256"],
+          "source": "A4-42 (a short code finds one link)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "secure_links_purpose_known",
+          "expression": "purpose in ('secure_page', 'photos', 'quote')",
+          "source": "A4-42, B4-29; A4-07, B4-08; A4-12, B4-13"
+        },
+        {
+          "name": "secure_links_given_via",
+          "expression": "given_via in ('text', 'email', 'ai', 'page') and (given_via in ('text', 'email')) = (handle_id is not null)",
+          "source": "A4-42; S13-19 ('Every message goes their way')"
+        },
+        {
+          "name": "secure_links_code_hash_form",
+          "expression": "code_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7; K-22 v1 sessions token hash form"
+        },
+        {
+          "name": "secure_links_ended",
+          "expression": "(ended_at is null) = (ended_why is null) and (ended_why is null or ended_why in ('contact_switched', 'booking_ended', 'replaced')) and (ended_at is null or ended_at >= issued_at)",
+          "source": "S13-19; D75"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "secure_links_person_open_idx",
+          "columns": ["person_id", "business_id"],
+          "where": "ended_at is null",
+          "why": "A change of where updates go ends a person's open links at that business at once (D75; S13-19; FIX7 P-1)."
+        },
+        {
+          "name": "secure_links_booking_idx",
+          "columns": ["booking_id"],
+          "why": "A booking's links, ended when the booking ends."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "page_answers",
+      "description": "What a person typed on the booking's secure page: the plug-in's questions that change neither the time nor the price, the open note for the pro, access and door notes, an entry code, a health need that keeps someone safe, an emergency contact where the plug-in asks, a child's details, the papers a booker acts under, and photos added for a quote. Secure page only: each answer is sealed under the key of the person who typed it, never in a text, an email, a call summary or a customer's AI; the job page opens it. Each answer is its own row, never edited; a newer answer of the same kind and question wins.",
+      "source": "02-contracts section 8 (answers: A4-65; access: B4-34: 'K-30: page answers, access and job notes (secure page only)'); A4-65; B4-34; A4-25; A4-64; A4-07, A4-08; S13-05; RULES 4.5; B6-14",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The answer's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking or booking request (K-04 bookings.id).",
+          "source": "A4-65; B4-34"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who typed it (persons.id), on their own link, and whose key seals it: each person served gives their own private answers.",
+          "source": "S13-31 ('Each person served gives their own private answers on their own link'); arch 01 line 93"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "question (one of the plug-in's questions), note (anything the pro should know), access (how to get in, the building's limits, what helps at the door), entry_code (a gate, door or alarm code: to the pro only on the visit's day), safety_need (a health need that keeps someone safe, such as an allergy: to the person on the job), emergency_contact (where the plug-in asks; the business calls them, Rosie never texts them), child_details (A4-25), authority (which papers a booker acts under and what they cover, A4-64), or photo (a photo added for a quote: its file reference, as K-13 names it).",
+          "source": "A4-65; B4-34 ('A gate or door code shows to Jordan only on the day of the visit'); B6-14; A4-25 ('The child's details go on the secure page'); A4-64 ('The page records which authority'); A4-07, A4-08 ('Photos and answers added'); S13-05"
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For kind question: the plug-in's question as shown, such as 'Is the sink still full of water?' (its words are the plug-in's, not private). Null for any other kind.",
+          "source": "B4-34; A4-65 ('How would you like it on top?')"
+        },
+        {
+          "name": "answer",
+          "type": "bytea",
+          "null": false,
+          "audience": "secure-page-only",
+          "sealedBy": "person_id",
+          "description": "The answer as typed (for a photo, its file reference), sealed under the key of person_id: unreadable once that key is deleted.",
+          "source": "S13-05 ('Private details are typed, read and kept only on the secure page'); RULES 4.5, 4.10; arch 01 line 93; A6-15 ('Answers and notes are never in the text ... They open on the signed-in job page')"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When it was typed; the newest answer of a kind and question wins.",
+          "source": "B4-34 ('Safe default: save the answer as given')"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "page_answers_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "page_answers_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "page_answers_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "page_answers_kind_known",
+          "expression": "kind in ('question', 'note', 'access', 'entry_code', 'safety_need', 'emergency_contact', 'child_details', 'authority', 'photo') and (kind = 'question') = (question is not null) and (question is null or length(btrim(question)) > 0)",
+          "source": "A4-65; B4-34; A4-25; A4-64; A4-07"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "page_answers_booking_idx",
+          "columns": ["booking_id", "kind", "answered_at"],
+          "why": "A booking's answers for the job page, the newest of each kind first."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "waitlist_entries",
+      "description": "A customer on the waitlist: no time fit, or a class was full, and with their own yes to messages about it they wait for a spot of a service, in the times they want. Nothing is taken or saved. When a spot opens, everyone on it hears at once and the first to book gets it, the usual way, as a new booking; they can leave any time, and when the time passes they hear once and are off the list.",
+      "source": "02-contracts section 7 row K-30 ('the waitlist (A4-60)'); A4-60, B4-64; A4-15 ('Joins the waitlist'); A4-33 ('A full one offers the waitlist'); K-26 v1 rule kind waitlist",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The entry's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id), held to the service's, so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking request that joined the list (K-04 bookings.id); that request ends there (booking_details.request_ended_why waitlist).",
+          "source": "A4-15 ('Joins the waitlist' ends the request: 'On the waitlist')"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who waits (persons.id).",
+          "source": "A4-60"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service they wait for (K-25 services.id), held to the business.",
+          "source": "A4-60 ('Waitlist · Lee's Barbershop')"
+        },
+        {
+          "name": "resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "A full class session they wait for a seat in, or the one person they asked for (K-04 resources.id); null: anyone free.",
+          "source": "A4-33 ('A full one offers the waitlist'); A4-60 ('A full class or seat works the same way')"
+        },
+        {
+          "name": "wanted",
+          "type": "tstzrange",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The times they wait for ('Sat Oct 24 · any time before noon'), instants in UTC shown in the visit's zone (README rule 9).",
+          "source": "A4-60"
+        },
+        {
+          "name": "consent_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Their own yes to messages about the list (K-29 consents.id, kind texts): nothing about the list is sent without it.",
+          "source": "A4-60 ('With the customer's yes to messages about it'; 'Never: send anything about the list without their own yes'); K-29 v1 consents"
+        },
+        {
+          "name": "joined_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When they joined.",
+          "source": "A4-60"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When they came off the list; null while they wait.",
+          "source": "A4-60 ('They can leave the list any time. When the time passes, they hear once, and they're off the list')"
+        },
+        {
+          "name": "ended_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "left (they left the list), time_passed (they heard once and are off it) or booked (they booked a spot that opened, as a new booking).",
+          "source": "A4-60"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: raised by one when the entry ends (the only update), and compared and set by a commit (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "waitlist_entries_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "waitlist_entries_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "waitlist_entries_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "waitlist_entries_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": {
+            "table": "services",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "waitlist_entries_resource_fk",
+          "columns": ["resource_id"],
+          "references": {
+            "table": "resources",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "waitlist_entries_consent_fk",
+          "columns": ["consent_id"],
+          "references": {
+            "table": "consents",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "waitlist_entries_one_open",
+          "columns": ["business_id", "person_id", "service_id"],
+          "where": "ended_at is null",
+          "source": "A4-60 ('they join the waitlist'; 'They can leave the list any time'): a person is on a service's list once; a repeated join writes no second row"
+        }
+      ],
+      "checks": [
+        {
+          "name": "waitlist_entries_wanted_bounded",
+          "expression": "not isempty(wanted) and not lower_inf(wanted) and not upper_inf(wanted)",
+          "source": "A4-60 ('When the time passes, they hear once')"
+        },
+        {
+          "name": "waitlist_entries_ended",
+          "expression": "(ended_at is null) = (ended_why is null) and (ended_why is null or ended_why in ('left', 'time_passed', 'booked')) and (ended_at is null or ended_at >= joined_at)",
+          "source": "A4-60"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "waitlist_entries_open_idx",
+          "columns": ["business_id", "service_id"],
+          "where": "ended_at is null",
+          "why": "When a spot opens, everyone waiting for that service hears at once (A4-60)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

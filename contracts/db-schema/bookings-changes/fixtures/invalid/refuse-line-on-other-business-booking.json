@@ -1,0 +1,40 @@
+{
+  "after": ["seed-booking-flow-a.json", "seed-booking-flow-b.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "booking_lines",
+    "values": {
+      "id": "line-barbershop-on-drain",
+      "booking_id": "booking-alex-drain",
+      "business_id": "biz-lees-barbershop",
+      "position": 2,
+      "service_id": "svc-lees-haircut",
+      "service_money_id": "way-lees-haircut-shop",
+      "price_rule_id": "price-lees-haircut-35",
+      "quote_option_id": null,
+      "path": "list|card|counter",
+      "price_kind": "one_price",
+      "unit": null,
+      "units": 1,
+      "price_cents": 3500,
+      "up_to_cents": null,
+      "from_cents": null,
+      "deposit_cents": null,
+      "fee_cents": 2000,
+      "currency": "USD",
+      "paid_by": "money",
+      "state": "open",
+      "removed_at": null,
+      "removed_by_change_id": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

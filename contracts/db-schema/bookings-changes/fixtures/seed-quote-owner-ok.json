@@ -1,0 +1,281 @@
+{
+  "after": ["seed-booking-flow-b.json", "../../core/fixtures/seed-bundle-registry.json"],
+  "rows": [
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lee-plumbing-water-heater",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "plumber",
+        "name": "Water heater replacement",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "4 hours",
+        "position": 4,
+        "active": true,
+        "extras": "{\"pf.services\":{\"service\":\"Water heater replacement\",\"price kind\":\"quoted from photos, or after a free estimate visit\",\"price\":\"the quote (the example: $640)\",\"length\":\"half a day\",\"place\":\"at the customer's place\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\",\"note\":\"The business pulls the permit, where the local rules require one\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lee-plumbing-water-heater-home",
+        "service_id": "svc-lee-plumbing-water-heater",
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "place": "customer",
+        "location_id": "loc-lee-home-services-office",
+        "path": "photos|deposit|bill",
+        "deposit_cents": null,
+        "deposit_percent": 25,
+        "fee_cents": null,
+        "currency": null,
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "stage": "entry",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 3
+      }
+    },
+    {
+      "table": "booking_details",
+      "values": {
+        "booking_id": "booking-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "number": "LH2205",
+        "door": "ai",
+        "made_by": "customer",
+        "approval": null,
+        "timing": null,
+        "times": null,
+        "taken": null,
+        "need_by": null,
+        "meets_pro": null,
+        "meets_pro_person_id": null,
+        "first_link_given_at": null,
+        "staff_told_at": null,
+        "upset_count": 0,
+        "request_ended_at": null,
+        "request_ended_why": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_addresses",
+      "values": {
+        "id": "addr-alex-water-heater-1",
+        "booking_id": "booking-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "position": 1,
+        "area": "Springfield",
+        "address": null,
+        "sealed_for_person_id": null,
+        "zone": null,
+        "state_code": null,
+        "location_id": "loc-lee-home-services-office",
+        "checked_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "secure_links",
+      "values": {
+        "id": "link-alex-water-heater-photos",
+        "booking_id": "booking-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "purpose": "photos",
+        "person_id": "person-alex",
+        "handle_id": "handle-alex",
+        "given_via": "text",
+        "code_sha256": "20377cec9f51f6bf5ba1fa64649f3b1614e4eee833fd0fc5893f24f6e0accbaf",
+        "issued_at": "2026-10-19T22:44:00Z",
+        "ended_at": null,
+        "ended_why": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "page_answers",
+      "values": {
+        "id": "ans-alex-water-heater-photo-1",
+        "booking_id": "booking-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-alex",
+        "kind": "photo",
+        "question": null,
+        "answer": "\\x6b33302d7365616c2d70686f746f2d31",
+        "answered_at": "2026-10-19T23:10:00Z"
+      }
+    },
+    {
+      "table": "quotes",
+      "values": {
+        "id": "quote-alex-water-heater",
+        "booking_id": "booking-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "service_id": "svc-lee-plumbing-water-heater",
+        "basis": "photos",
+        "priced_by_person_id": "person-jordan",
+        "priced_at": "2026-10-19T23:30:00Z",
+        "price_ok_limit_id": "pok-lee-home-services",
+        "state": "sent",
+        "sent_at": "2026-10-19T23:40:00Z",
+        "good_until": "2026-10-26T23:40:00Z",
+        "currency": "USD",
+        "version": 4
+      }
+    },
+    {
+      "table": "quote_options",
+      "values": {
+        "id": "qopt-alex-water-heater-1",
+        "quote_id": "quote-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "position": 1,
+        "label": null,
+        "price_cents": 64000,
+        "up_to_cents": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-jordan-priced-water-heater",
+        "handle_id": "handle-jordan",
+        "event_ids": ["evt-jordan-0004"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-jordan-0004",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-19T23:31:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-sam-send-water-heater",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0047"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0047",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-19T23:38:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-b4-10-alex-water-heater",
+        "turn_id": "turn-jordan-priced-water-heater",
+        "handle_id": "handle-sam",
+        "person_id": "person-sam",
+        "business_id": "biz-lee-home-services",
+        "booking_id": "booking-alex-water-heater",
+        "step": "B4-10",
+        "options": [
+          {
+            "id": "B4-10/1",
+            "label": "Send it"
+          },
+          {
+            "id": "B4-10/2",
+            "label": "Change it"
+          },
+          {
+            "id": "B4-10/3",
+            "label": "See it first"
+          },
+          {
+            "id": "B4-10/4",
+            "label": "Decline"
+          }
+        ],
+        "readback": "Jordan priced a water heater replacement for Alex M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you. / Water heater replacement · $640 / Alex M. · priced by Jordan, from photos / Reply 1 Send it, 2 Change it, 3 See it first, 4 Decline.",
+        "versions_read": [
+          {
+            "table": "quotes",
+            "rowId": "quote-alex-water-heater",
+            "version": 2
+          },
+          {
+            "table": "quote_options",
+            "rowId": "qopt-alex-water-heater-1",
+            "version": 1
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "4 text hours",
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "B4-10/1",
+        "closed_at": "2026-10-19T23:38:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "owner_oks",
+      "values": {
+        "id": "ok-alex-water-heater-quote",
+        "booking_id": "booking-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "about": "quote",
+        "quote_id": "quote-alex-water-heater",
+        "asked_at": "2026-10-19T23:31:00Z",
+        "answer_by": "2026-10-20T15:30:00Z",
+        "reminded_at": null,
+        "answer": "send",
+        "answered_at": "2026-10-19T23:38:00Z",
+        "answered_by_person_id": "person-sam",
+        "answered_by_role": "owner",
+        "open_question_id": "oq-b4-10-alex-water-heater",
+        "option_id": "B4-10/1",
+        "event_id": "evt-sam-0047",
+        "version": 2
+      }
+    },
+    {
+      "table": "secure_links",
+      "values": {
+        "id": "link-alex-water-heater-quote",
+        "booking_id": "booking-alex-water-heater",
+        "business_id": "biz-lee-home-services",
+        "purpose": "quote",
+        "person_id": "person-alex",
+        "handle_id": "handle-alex",
+        "given_via": "text",
+        "code_sha256": "e49d63b2a8a78f048bafc4b4590029603a5a4165ee8bf98af15d62f24cd83479",
+        "issued_at": "2026-10-19T23:40:00Z",
+        "ended_at": null,
+        "ended_why": null,
+        "version": 1
+      }
+    }
+  ]
+}

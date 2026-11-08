@@ -1,0 +1,108 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-booking-flow-a.json",
+      "version": "v1",
+      "table": "booking_details",
+      "expect": "accept",
+      "shows": "The record's main path for flow A (list|card|counter): Alex M.'s haircut at Lee's Barbershop with Riley, Sat Oct 24 at 11:00am, asked through Alex's own AI. Alex is new there, so Sam's OK rules make it a request: Sam is asked at 7:20pm Wed with an answer due by 11:20am Thu, reminded once, and answers 1 Accept at 8:05am Thu, recorded in K-08's ownerYes shape (Sam, owner, the A6-02 question, option 1, the inbound event). The booking's details (door ai, made by the customer, approval ownerok, a set time, a set start, card asked), its one visit naming K-04's reservation, its free-cancel time Fri 11am and its check-in code sealed under Alex's key, its line with the $35 list price and the $20 fee copied in, and its terms snapshot: the words Alex ticked (a K-29 consent row, named not copied), the version and language, the 24-hour cancel rule copied from K-23's default, and the four K-26 rows in force (same-day and new-customer OKs, the kids-cut note, the price OK limit)",
+      "source": "SPEC-master 6 (Alex M., Lee's Barbershop, Riley, Wed Oct 21 7:15pm, Sat Oct 24 11:00am, Haircut $35, the $20 fee, check-in code 5160); master-A.json record.main.A (list|card|counter); A4-98; A6-01, A6-02 ('Reply 1 Accept, 2 Another time, 3 Decline'; 'You'll hear by Thu 11:20am'); A6-10; A6-14; A6-15; A5-07; FS lines 729, 730, 750 to 752; K-08 v1 approvalOwnerYes; K-26 v1 seed-rules-tap-list, seed-note-only-rule; record.slots pay.price, pay.asks, pay.cancel (the words ticked)"
+    },
+    {
+      "file": "seed-booking-flow-b.json",
+      "version": "v1",
+      "table": "booking_details",
+      "expect": "accept",
+      "shows": "Flow B's main path (list|card|bill): Alex M.'s kitchen drain clearing at home, booked through Alex's own AI with Lee Home Services, Thu Oct 22 arriving 8–10am with Jordan. The town checked against the 25-mile travel area, then the street address typed on the secure page, sealed under Alex's key, with its zone and state; the secure link texted to Alex's own mobile, kept only as a hash of its code; two page answers (the plug-in's 'Is the sink still full of water?' and an access note), sealed; who meets the pro (Alex). One visit whose reservation holds 8 to 11am while its arrival window is 8–10am, free cancel until 7am Thu from the way's own 1-hour rule, and a sealed code; the line copying $179 and the $89 fee; the terms snapshot with the 1-hour rule and the price OK limit in force. Jordan is K-22's staff member; the service, its way and its price are added here",
+      "source": "SPEC-master 6 (Lee Home Services, Jordan, Alex M. at home in Springfield, Mon Oct 19 6:40pm, Thu Oct 22 arriving 8–10am); master-B.json record.main.B (list|card|bill); fixtures/v1/test-kit/shops/plumber.json (flow B: Kitchen drain clearing $179, a card saved for the $89 fee, Rosie texts the bill; arrive window); fixtures/master/engine/work/prof/plumber.json pf.services; B4-06 ('Each service keeps free cancel until 7am Thu, as Sam set'); B4-15; B4-26; B4-29; B4-30; B4-34; B4-77; B6-10; B6-13; B6-14; K-22 v1 seed-staff-joined (Jordan)"
+    },
+    {
+      "file": "seed-booking-line-price-copied.json",
+      "version": "v1",
+      "table": "booking_lines",
+      "expect": "accept",
+      "shows": "A booking line keeps the price it was made with: Dee books a haircut with Avery for Sat Nov 7 on Fri Oct 23, while the $35 rule is still open-ended, so the line copies $35 and the $20 fee in integer cents with USD. On Mon Oct 26 Sam raises the haircut to $40 for visits from Mon Nov 2 (K-25's seed: the $35 rule closed at Nov 2, a $40 rule open since), and on Wed Oct 28 Dee moves the visit to 11:00am before free cancel ends: the move is its own change row (who, when, the yes as K-08's answer, the fields and versions before and after), the visit points at the new reservation and its free-cancel time moves with it, and the line still says $35",
+      "source": "S11-54 ('Sam raises the haircut to $40 for visits from Mon Nov 2'; 'Haircuts already booked keep $35, even after Nov 2'); RULES 3.7; arch 09 line 488; FS lines 750, 751; A7-03 ('The code stays the same'; 'Money taken moves with the booking'; 'A move before free cancel ends is free'); A6-12 ('anything set by date moves with it'); FS line 756; K-25 v1 seed-price-rule-dates; SPEC-master 6 (Dee among Lee's Barbershop's customers; Avery)"
+    },
+    {
+      "file": "seed-terms-snapshot.json",
+      "version": "v1",
+      "table": "booking_terms",
+      "expect": "accept",
+      "shows": "The terms snapshot copies what was in force when the booking was written, and nothing later: Dee asked her own AI for a Saturday-morning skin fade, joined the waitlist with her own yes to messages about it (that request ended there), and when a spot opened at 10:00am with Riley she booked it in her own chat. Its snapshot names the words she ticked, copies the skin fade's own 2-hour cancel rule (the way's, not K-23's 24-hour default), and names the four K-26 rows in force on Thu Oct 22, but not the no-show count Sam turns on from Wed Oct 28; the waitlist entry ends 'booked'",
+      "source": "arch 09 line 457 ('Terms snapshot: rules copied in'); S1-21 ('A booking keeps the rules it was made with'); S11-57 ('for new bookings only'); K-26 v1 README ('Bookings follow the rules in effect when they are made ... K-30's terms snapshot copies them'); K-25 v1 seed-service-money-paths (the skin fade's own 2-hour cancel time); A4-60 ('Want a text if a Saturday-morning spot opens?'; 'A spot opened at Lee's Barbershop: Sat Oct 24 · 10:00am · Riley'; 'Reply 1 Book it'); A4-15; FS line 752"
+    },
+    {
+      "file": "seed-quote-owner-ok.json",
+      "version": "v1",
+      "table": "quotes",
+      "expect": "accept",
+      "shows": "A quote needs the owner's OK before it is sent: Alex asks for a water heater replacement at home, priced from photos (a photos link texted to Alex, the photo kept as a sealed page answer). Jordan prices it at $640 at 7:30pm Mon; over Sam's $500 price OK limit, so Sam is asked at 7:31pm with an answer due by 11:30am Tue; Sam replies 1 Send it at 7:38pm, recorded in K-08's ownerYes shape (Sam, owner, the B4-10 question, option 1, the inbound event). It is sent at 7:40pm, good for 7 days, with a link to pick a time; the request is still at the entry stage, with its booking values not yet decided and only the town known",
+      "source": "SPEC-master 6 ('Water heater replacement priced from photos at $640 (over $500, so Sam OKs it)'); fixtures/v1/test-kit/shops/plumber.json (photos|deposit|bill, $640, a 25% deposit); B4-08 (6:44pm); B4-09 (7:30pm); B4-10 (7:31pm; 'Reply 1 Send it, 2 Change it, 3 See it first, 4 Decline'); B4-11 ('The rest of this example keeps Jordan's first price'); B4-12 ('No answer by 11:30am Tue'); B4-13 (7:40pm; 'Good for 7 days'); K-26 v1 seed-price-ok-limit; K-08 v1 approvalOwnerYes"
+    },
+    {
+      "file": "invalid/refuse-booking-line-price-change.json",
+      "version": "v1",
+      "table": "booking_lines",
+      "expect": "refuse",
+      "shows": "After Sam's raise, a Tool API call scoped to Lee's Barbershop sets Dee's booked haircut line to $40: refused (the copied price is written once, so no application role may update it: SQLSTATE 42501); the same call setting the line removed (state, removed_at) passes",
+      "source": "FS lines 750, 751 (booking_service price, written once); RULES 3.7; S11-54 ('Haircuts already booked keep $35, even after Nov 2'); 02-contracts section 7 row K-30 (refuse-booking-line-price-change)"
+    },
+    {
+      "file": "invalid/refuse-terms-snapshot-update.json",
+      "version": "v1",
+      "table": "booking_terms",
+      "expect": "refuse",
+      "shows": "Changing the cancel rule in Dee's skin fade's terms snapshot to 24 hours is refused (the snapshot is written once: no update privilege, SQLSTATE 42501); a snapshot for a booking that has none is inserted",
+      "source": "arch 09 line 457; FS line 752; S1-21 ('A booking keeps the rules it was made with'); S11-53 ('Bookings already made keep their terms')"
+    },
+    {
+      "file": "invalid/refuse-change-row-update.json",
+      "version": "v1",
+      "table": "booking_changes",
+      "expect": "refuse",
+      "shows": "Rewriting Dee's move as late is refused (a change row is appended and never edited: SQLSTATE 42501); a new change row is appended",
+      "source": "FS line 756 ('Changes after booking add rows ... They do not rewrite the fields above'); arch 09 line 457 (every write appends)"
+    },
+    {
+      "file": "invalid/refuse-booking-value-reset.json",
+      "version": "v1",
+      "table": "booking_details",
+      "expect": "refuse",
+      "shows": "Setting Alex's haircut, a request the owner OK'd, back to 'books now' is refused (a booking value is set once and never changed: trigger booking_details_set_once, SQLSTATE 23514); the same update of the need-by date, which is not set once, passes",
+      "source": "FS line 752 (approval, written once); A4-98 ('Decided once ... never decided again'); A6-01 ('It is never decided again')"
+    },
+    {
+      "file": "invalid/refuse-cross-business-booking-read.json",
+      "version": "v1",
+      "table": "booking_lines",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio does not see Lee's Barbershop's line for Alex's haircut, though Alex is the yoga studio's customer too (row-level security per business: no row); the barbershop's own scope sees it",
+      "source": "arch 10 line 546; K-04 v1 rule 4; RULES 4.10 ('never joined across businesses'); S13-42"
+    },
+    {
+      "file": "invalid/refuse-line-on-other-business-booking.json",
+      "version": "v1",
+      "table": "booking_lines",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop adds a barbershop line, with its own business and service, to Lee Home Services' booking of Alex's drain: refused (the insert policy requires a booking the call's scope can see: SQLSTATE 42501), though K-04's booking key alone would let it through; the same line on the barbershop's own booking passes",
+      "source": "arch 10 line 546; K-04 v1 rule 4; README rule 5 (a row names a booking of its own business); S13-42 ('Each business's customer data is used only for that business')"
+    },
+    {
+      "file": "invalid/refuse-owner-ok-without-who.json",
+      "version": "v1",
+      "table": "owner_oks",
+      "expect": "refuse",
+      "shows": "An owner's OK of a late move recorded as 'accept' with nobody named is refused (CHECK owner_oks_answered_by, SQLSTATE 23514: an answer names the person, their role, the question and the inbound event, as K-08's ownerYes does); the same row naming Sam as owner, the question and the event passes",
+      "source": "K-08 v1 approvalOwnerYes; A7-03 ('After free cancel ends, a move is a request to Sam'); S13-26 (silence never says yes); arch 09 line 457 (approved by)"
+    },
+    {
+      "file": "invalid/refuse-link-code-read.json",
+      "version": "v1",
+      "table": "secure_links",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee Home Services reading the whole row of Alex's secure link is refused (the code's hash is not in the Tool API's select grant: SQLSTATE 42501); its other columns are read, and only the runtime side finds a link by its hash",
+      "source": "BP rule 7; S13-45 ('Opening a link never counts'); K-22 v1 README rule 5 (no grant reaches a hash)"
+    }
+  ]
+}

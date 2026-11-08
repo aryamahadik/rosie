@@ -1,0 +1,311 @@
+{
+  "after": [
+    "../../people-access/fixtures/seed-staff-joined.json",
+    "../../services-prices/fixtures/seed-service-money-paths.json",
+    "../../rules/fixtures/seed-price-ok-limit.json",
+    "../../core/fixtures/seed-sealing-key.json"
+  ],
+  "rows": [
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-jordan",
+        "business_id": "biz-lee-home-services",
+        "kind": "worker",
+        "name": "Jordan",
+        "person_id": "person-jordan",
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lee-plumbing-drain-clearing",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "plumber",
+        "name": "Kitchen drain clearing",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "60 minutes",
+        "position": 3,
+        "active": true,
+        "extras": "{\"pf.services\":{\"service\":\"Clogged drain (sink, tub, shower)\",\"price kind\":\"one price\",\"price\":\"$179, the $89 call included\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call\",\"after\":\"Rosie texts the bill\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lee-plumbing-drain-home",
+        "service_id": "svc-lee-plumbing-drain-clearing",
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "place": "customer",
+        "location_id": "loc-lee-home-services-office",
+        "path": "list|card|bill",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 8900,
+        "currency": "USD",
+        "cutoff_before": "1 hour",
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lee-plumbing-drain-clearing",
+        "business_id": "biz-lee-home-services",
+        "service_id": "svc-lee-plumbing-drain-clearing",
+        "service_money_id": null,
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 17900,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-alex-home-services",
+        "person_id": "person-alex",
+        "business_id": "biz-lee-home-services",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "customers",
+      "values": {
+        "id": "customer-alex-home-services",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-alex",
+        "name": "Alex M.",
+        "mobile_handle_id": "handle-alex",
+        "email_handle_id": "handle-alex-email",
+        "way": "texts",
+        "contact_times": null,
+        "first_name_only": false,
+        "no_voicemail": false,
+        "age_band": "18_or_older",
+        "fee_free": false,
+        "added_at": "2026-10-19T21:17:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "stage": "booked",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 5
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "resource_id": "res-jordan",
+        "resource_kind": "worker",
+        "worker_person_id": "person-jordan",
+        "during": "[2026-10-22T12:00:00Z,2026-10-22T15:00:00Z)",
+        "state": "booked",
+        "queued_at": "2026-10-19T21:13:00Z",
+        "seats": 1,
+        "held_until": null,
+        "extended": false,
+        "for_phone_number": "+15555550101",
+        "booking_id": "booking-alex-drain",
+        "version": 2
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-alex-ticked-terms-drain",
+        "person_id": "person-alex",
+        "business_id": "biz-lee-home-services",
+        "kind": "ticked_terms",
+        "revoked": false,
+        "handle_id": null,
+        "booking_id": "booking-alex-drain",
+        "exact_words": "Lee Home Services · Kitchen drain clearing / Thu Oct 22 · arriving 8–10am · Jordan / $179 · the bill comes after the visit / A card is saved when you book, for a $89 fee / Free to cancel until 7am Thu, then a $89 fee may apply",
+        "words_sha256": "ef88220bd9ed76233d36b1250b29e7075b958eeb1a10a5385dd64bcec15bcf20",
+        "at": "2026-10-19T21:16:30Z",
+        "channel": "page",
+        "chat_link_id": null,
+        "turn_id": null
+      }
+    },
+    {
+      "table": "booking_details",
+      "values": {
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "number": "LH2201",
+        "door": "ai",
+        "made_by": "customer",
+        "approval": "now",
+        "timing": "settime",
+        "times": "window",
+        "taken": "asked",
+        "need_by": null,
+        "meets_pro": "served",
+        "meets_pro_person_id": null,
+        "first_link_given_at": null,
+        "staff_told_at": "2026-10-19T21:18:10Z",
+        "upset_count": 0,
+        "request_ended_at": null,
+        "request_ended_why": null,
+        "version": 7
+      }
+    },
+    {
+      "table": "booking_addresses",
+      "values": {
+        "id": "addr-alex-drain-1",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "position": 1,
+        "area": "Springfield",
+        "address": "\\x6b33302d7365616c2d616464722d31",
+        "sealed_for_person_id": "person-alex",
+        "zone": "America/New_York",
+        "state_code": "IL",
+        "location_id": "loc-lee-home-services-office",
+        "checked_at": "2026-10-19T21:15:40Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "secure_links",
+      "values": {
+        "id": "link-alex-drain-page",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "purpose": "secure_page",
+        "person_id": "person-alex",
+        "handle_id": "handle-alex",
+        "given_via": "text",
+        "code_sha256": "db77fd01af957221a4989b64b3770a83a3c56068405b9f0e9408feae57fd17e4",
+        "issued_at": "2026-10-19T21:14:00Z",
+        "ended_at": null,
+        "ended_why": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "page_answers",
+      "values": {
+        "id": "ans-alex-drain-sink",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-alex",
+        "kind": "question",
+        "question": "Is the sink still full of water?",
+        "answer": "\\x6b33302d7365616c2d616e737765722d31",
+        "answered_at": "2026-10-19T21:15:50Z"
+      }
+    },
+    {
+      "table": "page_answers",
+      "values": {
+        "id": "ans-alex-drain-access",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-alex",
+        "kind": "access",
+        "question": null,
+        "answer": "\\x6b33302d7365616c2d616e737765722d32",
+        "answered_at": "2026-10-19T21:16:00Z"
+      }
+    },
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-alex-drain-1",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "position": 1,
+        "reservation_id": "rsv-alex-drain",
+        "arrival_window": "[2026-10-22T12:00:00Z,2026-10-22T14:00:00Z)",
+        "cutoff_at": "2026-10-22T11:00:00Z",
+        "check_in_code": "\\x6b33302d7365616c2d636f64652d32",
+        "code_for_person_id": "person-alex",
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-alex-drain-1",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "position": 1,
+        "service_id": "svc-lee-plumbing-drain-clearing",
+        "service_money_id": "way-lee-plumbing-drain-home",
+        "price_rule_id": "price-lee-plumbing-drain-clearing",
+        "quote_option_id": null,
+        "path": "list|card|bill",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 17900,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": null,
+        "fee_cents": 8900,
+        "currency": "USD",
+        "paid_by": "money",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_terms",
+      "values": {
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "terms_consent_id": "consent-alex-ticked-terms-drain",
+        "terms_version": "2026-10-19.1",
+        "terms_language": "en",
+        "notices_shown": [],
+        "cutoff_before": "1 hour",
+        "cutoff_day_before_at": null,
+        "cutoff_zone": null,
+        "written_at": "2026-10-19T21:17:00Z"
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-alex-drain-price-oks",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "rule_id": null,
+        "price_ok_limit_id": "pok-lee-home-services"
+      }
+    }
+  ]
+}

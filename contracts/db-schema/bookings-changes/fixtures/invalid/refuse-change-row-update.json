@@ -1,0 +1,21 @@
+{
+  "after": ["seed-booking-line-price-copied.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "booking_changes",
+    "set": {
+      "after_free_cancel": true
+    },
+    "where": {
+      "id": "change-dee-haircut-moved"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "after": ["seed-terms-snapshot.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "booking_terms",
+    "set": {
+      "cutoff_before": "24 hours"
+    },
+    "where": {
+      "booking_id": "booking-dee-skin-fade"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}
