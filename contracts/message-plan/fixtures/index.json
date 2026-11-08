@@ -167,6 +167,41 @@
       "expect": "refuse",
       "shows": "A plan whose line names the slot {{hold}}, refused since D66: no hold (the rest of the plan is valid)",
       "source": "SPEC-master D66 amendments (#3; the 5h amendment: a {{hold}} slot is an error); 02-contracts K-03 'hold is refused since D66'"
+    },
+    {
+      "file": "input-s1-02-v1.1.json",
+      "version": "v1.1",
+      "def": "composeInput",
+      "expect": "accept",
+      "shows": "input-s1-02.json's v1.1 twin: v1's input word for word, plus S1-02's card terms as term facts, each with its source line: the setup times (about 15 minutes for the first kind of work, about 5 for each one after), free to use, and Rosie's $2 fee, counted at its check-in or DONE. Each is copied word for word from S1-02's card; none is a slot",
+      "source": "CQ-82; DL-145; T-373's STUCK (cards/T-373.md); S1-02's card (K-01 flows.A.steps.S1-02.say[0].elements.card.lines, as in bundle-v0-skeleton.json; MASTER-FLOW-A.md line 28); RULES 3.15; arch 12 line 592; arch 07 lines 397, 403"
+    },
+    {
+      "file": "input-and-plan-s1-02.json",
+      "version": "v1.1",
+      "def": "inputAndPlan",
+      "rule": "numbersHeldByFacts",
+      "expect": "accept",
+      "shows": "input-s1-02-v1.1.json with plan-s1-02.json, each word for word: the plan's numbers, 15 (the setup time) and 2 (Rosie's fee), are held by the input's term facts, so the plan states only facts (arch 07 line 403) with no list of allowed words",
+      "source": "CQ-82; DL-145; arch 07 lines 403, 409; S1-02's card; RULES 3.15; arch 12 line 592"
+    },
+    {
+      "file": "invalid/refuse-term-no-fact-holds.json",
+      "version": "v1.1",
+      "def": "inputAndPlan",
+      "rule": "numbersHeldByFacts",
+      "expect": "refuse",
+      "shows": "input-s1-02-v1.1.json with a plan that adds 'At most $49 a month' to plan-s1-02's fact line: RULES 3.15's cap is one of Rosie's own terms, but S1-02's card does not state it, so no fact holds 49 and the plan is refused (the schema accepts the pair; the rule alone refuses it). Without the added term the pair is input-and-plan-s1-02.json, which is accepted",
+      "source": "arch 07 line 403 ('Only <facts> may be stated'); S13-26 rule 27; RULES 3.15 (the $49 cap); S1-02's card; CQ-82"
+    },
+    {
+      "file": "invalid/refuse-plan-s1-02-on-v1-input.json",
+      "version": "v1.1",
+      "def": "inputAndPlan",
+      "rule": "numbersHeldByFacts",
+      "expect": "refuse",
+      "shows": "v1's input-s1-02.json (no facts) with plan-s1-02.json, each word for word: no fact holds 15 or 2, T-373's finding that made v1.1 (the schema accepts the pair; the rule alone refuses it). With the term facts of input-s1-02-v1.1.json the same plan is accepted (input-and-plan-s1-02.json)",
+      "source": "T-373's STUCK (cards/T-373.md); CQ-82; DL-145; arch 07 line 403"
     }
   ]
 }

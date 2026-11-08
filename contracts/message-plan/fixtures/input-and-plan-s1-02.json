@@ -1,0 +1,69 @@
+{
+  "input": {
+    "row": "outbox-s1-02-sam-1",
+    "turn": "turn-s1-01-sam",
+    "conversation": [],
+    "masterText": {
+      "step": "S1-02",
+      "text": "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them."
+    },
+    "facts": [
+      {
+        "value": "About 15 minutes for your first kind of work",
+        "source": "S1-02's card, line 1: Rosie's setup time for the first kind of work (K-01 flows.A.steps.S1-02.say[0].elements.card.lines[0]; MASTER-FLOW-A.md line 28)"
+      },
+      {
+        "value": "About 5 minutes for each one after",
+        "source": "S1-02's card, line 2: Rosie's setup time for each later kind of work (K-01 flows.A.steps.S1-02.say[0].elements.card.lines[1]; MASTER-FLOW-A.md line 28)"
+      },
+      {
+        "value": "Free to use",
+        "source": "S1-02's card, line 3 (K-01 flows.A.steps.S1-02.say[0].elements.card.lines[2]; MASTER-FLOW-A.md line 28)"
+      },
+      {
+        "value": "$2 a booking, counted at its check-in or DONE, explained before you go live",
+        "source": "S1-02's card, line 4 (K-01 flows.A.steps.S1-02.say[0].elements.card.lines[3]; MASTER-FLOW-A.md line 28); RULES 3.15 (Rosie's own fee: $2 a booking, counted at the first check-in code or at DONE, paid by the business); arch 12 line 592 (Rosie's own fee terms are not slots)"
+      }
+    ],
+    "audience": {
+      "role": "owner",
+      "name": "Sam",
+      "way": "texts",
+      "handlingLine": null
+    },
+    "language": "en",
+    "channel": "imessage",
+    "situation": "routine",
+    "allowedFormats": ["text"],
+    "allowedLinks": [],
+    "options": [],
+    "pageTypes": [],
+    "openQuestions": [],
+    "inbound": {
+      "text": "Hi, I want to put my barbershop on Rosie",
+      "sentAt": {
+        "utc": "2026-10-19T18:05:00Z",
+        "zone": "America/New_York"
+      }
+    }
+  },
+  "plan": {
+    "formats": ["text"],
+    "lines": [
+      {
+        "role": "first",
+        "text": "I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you."
+      },
+      {
+        "role": "fact",
+        "text": "About 15 minutes for your first kind of work · Free to use · $2 a booking, counted at its check-in or DONE, explained before you go live"
+      }
+    ],
+    "question": {
+      "text": "What kinds of work do you do? Just type them.",
+      "optionIds": []
+    },
+    "pageType": null,
+    "threadReplyTo": null
+  }
+}

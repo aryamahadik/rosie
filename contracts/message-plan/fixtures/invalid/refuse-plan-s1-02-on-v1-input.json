@@ -1,0 +1,52 @@
+{
+  "input": {
+    "row": "outbox-s1-02-sam-1",
+    "turn": "turn-s1-01-sam",
+    "conversation": [],
+    "masterText": {
+      "step": "S1-02",
+      "text": "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them."
+    },
+    "facts": [],
+    "audience": {
+      "role": "owner",
+      "name": "Sam",
+      "way": "texts",
+      "handlingLine": null
+    },
+    "language": "en",
+    "channel": "imessage",
+    "situation": "routine",
+    "allowedFormats": ["text"],
+    "allowedLinks": [],
+    "options": [],
+    "pageTypes": [],
+    "openQuestions": [],
+    "inbound": {
+      "text": "Hi, I want to put my barbershop on Rosie",
+      "sentAt": {
+        "utc": "2026-10-19T18:05:00Z",
+        "zone": "America/New_York"
+      }
+    }
+  },
+  "plan": {
+    "formats": ["text"],
+    "lines": [
+      {
+        "role": "first",
+        "text": "I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you."
+      },
+      {
+        "role": "fact",
+        "text": "About 15 minutes for your first kind of work · Free to use · $2 a booking, counted at its check-in or DONE, explained before you go live"
+      }
+    ],
+    "question": {
+      "text": "What kinds of work do you do? Just type them.",
+      "optionIds": []
+    },
+    "pageType": null,
+    "threadReplyTo": null
+  }
+}

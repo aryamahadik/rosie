@@ -1,14 +1,16 @@
 # message-plan (K-03): the composer's message plan and slots
 
-**Status: v1, frozen** (`frozen.json`: `{"frozen": ["v1"]}`). Written and frozen by T-012. The freeze takes effect when T-012 merges, and the merge waits for every review below (build prompt 6.2, 6.5).
+**Status: v1 and v1.1, frozen** (`frozen.json`: `{"frozen": ["v1", "v1.1"]}`). v1 written and frozen by T-012; v1.1, a minor version in which Rosie's own fixed terms reach the composer as facts, by T-1104 (section "v1.1"). Each freeze takes effect when its task merges, and the merge waits for every review below (build prompt 6.2, 6.5).
 
 ## Freeze record
+
+Frozen v1.1, 2026-11-08, reviews required: QA, AI engineer, action-layer engineer (T-1104). The AI engineer checks that the composer's input and its literal check read term facts as section "v1.1" says (C-118; T-373 round 2) and that the plan, the model-facing schema, is v1's unchanged; the action-layer engineer that the slot filler fills nothing from a term fact, whose words pass through the fill unchanged (C-088), and that the Values check can hold a term's numbers against the row's facts (C-092); QA the fixtures, the named rule and the contract-test changes section "v1.1" names. The lead records the freeze in `ops/DECISIONS.md` and on the board (build prompt 5.7).
 
 Frozen v1, 2026-11-07, reviews required: AI engineer, action-layer engineer, runtime engineer, database engineer, playbook engineer, QA and eval engineer.
 
 Each reviewer checks its own side (02-contracts section 1): the AI engineer the composer's input and the plan it returns, inside the structured-outputs subset (C-118, C-119); the action-layer engineer the slot vocabulary, the final parts and the check result (C-088 slot filler, C-089 fixed-line inserter, C-090 situation tag, C-091 claim check, C-092 message checks, C-093 rewrite and fallback path); the runtime engineer the formats, the two sends and the email row (C-124, C-127, C-128, C-129); the database engineer the plan an outbox row stores (`rowPlan`, for K-04 and K-07); the playbook engineer the slot names the compiler writes and the proposed CQ-17 names (C-062, C-064); QA and eval the fixtures and the check cases (C-140; the contract test T-082). The lead records the freeze in `ops/DECISIONS.md` and on the board (build prompt 5.7).
 
-**Owner:** the architect. **Schema:** `message-plan.v1.schema.json` (JSON Schema 2020-12, `$id` `https://rosie.invalid/contracts/message-plan/message-plan.v1.schema.json`). **Checked by:** `npm run contracts:check`. **Contract test:** `tests/contract/message-plan.v1.test.ts` (QA, T-082). A change after the freeze is a new minor version file, `message-plan.v1.1.schema.json`, with new fixtures (build prompt 6.4); the frozen-contract guard fails any edit to v1's schema, its fixtures or their index entries.
+**Owner:** the architect. **Schemas:** `message-plan.v1.schema.json` and `message-plan.v1.1.schema.json`, which refers to v1 for every definition it leaves unchanged (JSON Schema 2020-12, `$id` `https://rosie.invalid/contracts/message-plan/<file name>`). **Named rule (v1.1):** `message-plan.rules.mjs`. **Checked by:** `npm run contracts:check`. **Contract test:** `tests/contract/message-plan.v1.test.ts` (QA, T-082); v1.1's part is QA's own task (section "v1.1"). A change after the freeze is a new minor version file, `message-plan.v1.2.schema.json`, with new fixtures (build prompt 6.4); the frozen-contract guard fails any edit to a frozen version's schema, its fixtures or their index entries.
 
 ## What it defines
 
@@ -58,14 +60,59 @@ The root is any one of the six documents (an `anyOf` of their `$ref`s), so the t
 - **Final parts** are what code sends: options inserted word for word, fixed lines added (by K-01 `fixedLine` id; arch 07 line 361; the opt-out line's place per Q-30), slots filled; at most two sends, the words with any calendar file and then one poll or card (arch 07 line 367). The schema holds a poll to 2 to 5 options with no words and no file, and a link card to its link. `slotValues` are the code-supplied facts the Values check matches every number, time, date, price, code, phone, link and name against (arch 07 line 409).
 - **The check result** names the attempt (`composed`, `rewrite`, `fallback`), the final parts checked, each check's result with what failed, and the outcome (arch 02 line 123; arch 07 line 417): `send`; `rewrite` on a first miss; `sendAndLog` when only shape, length and reading or format still miss after the rewrite; `fallback` when the rewrite misses a blocking check (fixed lines, values, one question, never in a message); `passedOn` when the fallback text misses too, with the question withdrawn and the team paged (the schema requires both exactly then). That each check appears once, and that each `check-*` fixture's outcome follows from its checked parts, are QA's contract-test checks.
 
+## v1.1 (T-1104): Rosie's own fixed terms reach the composer as facts
+
+**Why.** T-373's composer refused v1's own expected plan: `plan-s1-02.json` states S1-02's card terms "About 15 minutes" and "$2 a booking", but `input-s1-02.json` carries no fact that holds either, and the composer may state only `<facts>` (arch 07 line 403). Arch 12 line 592 and RULES 3.15 keep Rosie's own fee terms as words, not slots, and no source covered the setup time (T-373's STUCK in `ops/cards/T-373.md`; QUESTIONS.md CQ-82). The lead's ruling (DECISIONS.md DL-145, option b): Rosie's own fixed terms that a step's card states reach the composer as facts, each with its source line. The literal check stays strict, and no list of allowed words exists anywhere.
+
+**What v1.1 adds** (`message-plan.v1.1.schema.json`; every v1 definition is there under its own name, the unchanged ones by reference):
+
+| Added or changed                                                                                                       | Where                                                                    | Source                                                           |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| A term fact: the term's words exactly as the step's card states them (`value`) and its source line (`source`); no slot | `$defs/termFact`                                                         | CQ-82; DL-145; arch 07 line 403; arch 12 line 592; RULES 3.15    |
+| Each fact of the composer's input is a slot fact (v1's `fact`) or a term fact                                          | `$defs/inputFact`; `composeInput.facts` (restated; nothing else changes) | arch 07 lines 397, 403                                           |
+| A composer input and the plan made from it, side by side, for the named rule; the root lists it as a seventh document  | `$defs/inputAndPlan`; `message-plan.rules.mjs`                           | arch 07 lines 403, 409; K-02's `contextAndDecide` (T-011's hook) |
+
+Unchanged: the plan (`$defs/plan` is v1's, so the model-facing schema and its structured-outputs subset are v1's exactly, and the composer still sends v1's `$defs/plan`), the slot vocabulary and `slottedText`, the plan an outbox row stores, the final parts and the check result. Every v1 document is a v1.1 document: `npm run contracts:check` checks every accepted v1 fixture against v1.1 too.
+
+**Which terms, and where they come from.** A term fact is a line of the step's card (K-01 `step.say[].elements.card.lines`) that states one of Rosie's own fixed terms: the same words for every business, never a value of the sample cast, so never a slot (arch 12 line 592). Code copies it word for word, with its source line, when it builds the row's input (the Tool API's compose input, K-09), with the row's other facts and through limit 7 like each of them (C-091). S1-02's card states four (MASTER-FLOW-A.md line 28; `bundle-v0-skeleton.json`): "About 15 minutes for your first kind of work", "About 5 minutes for each one after", "Free to use" and "$2 a booking, counted at its check-in or DONE, explained before you go live" (RULES 3.15). With the no-$2 switch on, the card's $2 line reads as that switch says (RULES 3.15; K-01 `record.switches.no2`), and the term fact carries those words. Rosie's own fee is never the `fee` slot, which is the business's late-cancel and no-show fee (RULES 3.3), and never part of the price (RULES 3.14).
+
+**Where the composer's literal check reads these facts** (C-118; T-373 round 2): in the row's input, `composeInput.facts`, each entry's `value`, slot facts and term facts alike. A term fact holds a literal only by its own words: "About 15 minutes for your first kind of work" holds 15, and "$2 a booking, counted at its check-in or DONE, ..." holds 2. The check needs no second source and no list of allowed words (CQ-82). The plan rule is unchanged: no literal number, date or price the facts do not hold.
+
+**What each side does with a term fact.**
+
+- The composer (C-118, C-119) states the term in its words or leaves it out, never as a slot and never changed: a changed number is a literal no fact holds. The prompt shows a term fact in `<facts>` with no slot name.
+- The slot filler (C-088) fills nothing from it, since it has no slot: the term's words pass through the fill as the plan wrote them, and `finalParts.slotValues` keeps only the slots filled.
+- The Values check (C-092; arch 07 line 409) holds a stated number against the same facts, a term fact being a code-supplied fact. The message checks take the row's composer facts beside the final parts; a check result holds only the final parts (T-012's default 6 below), so no `check-*` fixture shows a term fact.
+
+**Named rule (v1.1).** `message-plan.rules.mjs` exports `numbersHeldByFacts`. `npm run contracts:check` runs it on each `inputAndPlan` fixture whose index entry names it, once the schema has accepted the fixture (T-011's hook in `contracts/scripts/check-fixtures.mjs`): every number the plan states outside its slots, that is each run of the digits 0 to 9 in a line's text or the question's text once every `{{...}}` slot is taken out, must be held by a fact of the input, that is, some fact's `value` (a slot fact's or a term fact's) holds the same run (T-373's reading of "held"). A slot's example words are the filler's, never the composer's (MC C6; S13-28 rule 51). The rule states the number part of the plan rule: amounts, times, dates, durations, counts and codes written in digits, which every language writes alike. Dates and prices written in words, such as "Saturday" or "two dollars", stay with the composer's literal check and the Values check, which hold the whole rule; the named rule never widens them, and a fixture it accepts must pass them too. It reads the facts only, never the master text, whose words may still hold an unslotted sample value (T-373's "do not try again" (b)).
+
+**Fixtures (v1.1).** Accepted: `input-s1-02-v1.1.json` (`composeInput`: input-s1-02's twin, word for word, with S1-02's four card terms as term facts, each with its source line); `input-and-plan-s1-02.json` (`inputAndPlan`, rule `numbersHeldByFacts`: that input with `plan-s1-02.json` word for word, whose 15 and 2 the term facts hold). Refused by the rule alone (the schema accepts each pair), in `fixtures/invalid/`: `refuse-term-no-fact-holds` (the plan adds "At most $49 a month", RULES 3.15's cap, which S1-02's card does not state, so no fact holds 49) and `refuse-plan-s1-02-on-v1-input` (v1's input-s1-02, which has no facts, with plan-s1-02: no fact holds 15 or 2, T-373's finding). Each is refused for its one reason: without the added term, or with the twin's term facts, the pair is `input-and-plan-s1-02.json`, which is accepted (checked 2026-11-08).
+
+**Consumers of v1.1.** Each adopts it in a task that needs it; work in flight stays on v1 (build prompt 6.4).
+
+| Role                  | Component                          | What it adopts                                                                                                              | Task                                        |
+| --------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| AI engineer           | C-118 composer                     | its input and literal check take term facts (`composeInput.facts[].value`); `input-s1-02-v1.1.json` gives `plan-s1-02.json` | T-373 round 2, after T-1104 merges (DL-145) |
+| AI engineer           | C-119 composer prompt              | `<facts>` shows a term fact, which has no slot name (the prompt writes each fact with its slot today)                       | with T-373 round 2, or its own task         |
+| action-layer engineer | C-088 slot filler                  | nothing to fill from a term fact; its words pass through                                                                    | T-1104's review                             |
+| action-layer engineer | C-092 message checks               | the Values check takes term facts among the row's composer facts                                                            | a new task                                  |
+| action-layer engineer | C-091 and K-09's compose input     | term facts built from the step's card, with their source lines                                                              | a new task, after the K-09 version below    |
+| architect             | K-09, the Tool API's compose input | a minor version whose compose input answer refers to v1.1's `composeInput`, so the Tool API can serve a term fact           | a new task                                  |
+| QA                    | the contract test                  | each version's entries selected from the shared index; v1.1's part (below)                                                  | a new task                                  |
+
+**Contract test (QA, its own task).** The index is shared by v1 and v1.1, so the test selects each version's entries by `version` (DL-125's rule; K-06's test holds both of its versions, DL-124). v1.1's part: every v1.1 entry against `message-plan.v1.1.schema.json`; `numbersHeldByFacts` run on each `inputAndPlan` fixture, every refused one refused by the rule alone and accepted once put right; every accepted v1 fixture accepted by v1.1; the twin is v1's `input-s1-02.json` plus its term facts only; `input-and-plan-s1-02.json` holds the twin and `plan-s1-02.json` word for word; and each term fact's value is a line of S1-02's card in `bundle-v0-skeleton.json`, word for word.
+
 ## Producers and consumers (02-contracts K-03)
 
 - **Producers:** AI engineer: C-118 composer, C-119 composer prompt and style rules; action-layer engineer: C-090 situation tag, C-091 claim check (which facts a reader may see), served through the Tool API's compose input (K-09); runtime engineer: C-128 allowed formats and format rules.
 - **Consumers:** action-layer engineer: C-088 slot filler, C-089 fixed-line inserter, C-091 claim check, C-092 message checks, C-093 rewrite and fallback path; runtime engineer: C-124 outbox dispatcher, C-127 two-part send, C-129 email rows; database engineer: the outbox row stores the plan (K-04, K-07); playbook engineer: C-062 sample-value slotting and C-064 element text forms (slot names); QA: C-140 eval harness.
 - **Contract test** (QA, its own task, T-082): `tests/contract/message-plan.v1.test.ts`, as 02-contracts K-03 describes: every fixture against its definition; every slot in K-01's sample bundles is in `slots.json`; the message checks turn each `check-*` fixture into its stated outcome. What the schema cannot check and the test must: `slotName`, the `slottedText` pattern and `slots.json` name the same slots, each once; each check once per check result; a plan's formats, page type, option ids, links and thread target are the input's (C-092, C-128).
 - The prompt texts are the AI engineer's (C-119) and ship inside the bundle (K-01 `prompts`).
+- v1.1's consumers, what each adopts and the tasks building on it: section "v1.1".
 
 ## Fixtures (`fixtures/`, listed in `fixtures/index.json`)
+
+v1's fixtures follow; v1.1 adds four to the same index, each listed for v1.1 (section "v1.1").
 
 Accepted: `slots.json` (`slotVocabulary`); `input-s1-02.json` (`composeInput`); `plan-s1-02.json`, `plan-block-readback-poll.json`, `plan-confirmation-a6-14.json`, `plan-relay-private-a7-12.json`, `plan-sensitive.json`, `plan-tapback-thanks.json` (`plan`); `plan-email-copy.json` (`rowPlan`); `final-two-sends.json` (`finalParts`); `check-pass.json`, `check-two-questions.json`, `check-raw-price.json`, `check-emoji.json`, `check-unfilled-slot.json`, `check-optout-only-option.json`, `check-fallback.json`, `check-passed-on.json` (`checkResult`). Refused, in `fixtures/invalid/`: `refuse-format-not-allowed` (a contact card), `refuse-frontier-in-input` (the input with a frontier field), `refuse-hold-slot` (a plan line naming `{{hold}}`). Each refused fixture is refused for its one reason: without it (the contact card dropped, the frontier dropped, `{{hold}}` read as `{{deposit}}`) it is accepted (checked 2026-11-07).
 
@@ -82,6 +129,15 @@ Names and values come from the master's sample cast (SPEC-master 6: Sam, Lee's B
 7. **`sms` is a channel** for Linq's SMS service on an Android phone in the same chat (RULES 4.1b), not an SMS provider (MC C9; DL-012).
 8. **The situation tag's names** (`gentle`, `problem`, `moneyOrConsent`, `routine`) name arch 07 line 357's four tones.
 
+## Defaults used (T-1104, v1.1)
+
+1. **Term facts sit in `facts`**, beside the slot facts, not in a new input field: CQ-82 has them reach the composer "as facts", so arch 07 line 403's `<facts>` stays the one thing a plan may state and the literal check has one place to read.
+2. **A term fact is a whole card line, word for word, with its source as plain words**, and no term name: no source names Rosie's terms beyond RULES 3.15's fee, so a closed list of term names would be a guess (build prompt 3.3).
+3. **All four of S1-02's card lines are term facts**, not only the two that hold numbers: each states one of Rosie's terms, and `plan-s1-02.json` also states "Free to use", which arch 07 line 403 lets it state only as a fact.
+4. **The named rule states the number part of the plan rule only** and reads the facts only (section "v1.1"); dates and prices in words stay code's.
+5. **The final parts are unchanged**: the Values check reads term facts among the row's composer facts, which the message checks already take beside the final parts.
+6. **`inputAndPlan` is a form for fixtures**, as K-02's `contextAndDecide` is: nothing stores or sends it.
+
 ## Open gaps
 
 - **Q-30** (where the opt-out line and the privacy link go): default in use, on Rosie's first reply in a chat the person opened, as K-01's `optOutLine` says; code adds it (`fixedLines`), never the composer.
@@ -91,7 +147,10 @@ Names and values come from the master's sample cast (SPEC-master 6: Sam, Lee's B
 - **CQ-07** (which stage reports a text's language): `language` is given to the composer; default in use, the two decide reads, which must agree.
 - **CQ-16** (the page types): `pageType` and `pageTypes` are free strings until K-21 names the closed list; checking the plan's pick against the input's is code's.
 - **CQ-17** (the compiler-made slot names): the 15 names marked `proposedCQ17` are proposals until the CTO rules; K-01 v1.1 adds them to the bundle's slot list in its own task.
+- **New in v1.1 (T-1104): which card lines are Rosie's own terms on steps other than S1-02.** No source lists Rosie's own terms beyond RULES 3.15's fee, and some cards mix them with the sample cast's values (S1-08's plan card puts "about 15 minutes" beside the barbershop and Lee Home Services, which the compiler slots: arch 12 line 592). Default in use: a line of the step's compiled card that names no slot is one of Rosie's own fixed terms, copied word for word with its source; a line with a slot is not a term fact, and its values reach the composer as slot facts.
+- **Still open for a later K-03 minor version, not taken by v1.1 (its card is the term facts alone):** CQ-66 (the Values check and translated relay quotes; line roles in the final parts), CQ-75 (limit 7's audiences) and CQ-77 (a stray `}}` passes `slottedText`).
 
 ## Change log
 
+- v1.1, 2026-11-08 (T-1104): term facts in the composer's input (Rosie's own fixed terms that the step's card states, each with its source line), so a plan may state them; `inputAndPlan` with the named rule `numbersHeldByFacts` (`message-plan.rules.mjs`); four fixtures (two accepted, two refused by the rule); frozen. Why: CQ-82, from T-373's STUCK (DL-145).
 - v1, 2026-11-07 (T-012): first version, frozen.
