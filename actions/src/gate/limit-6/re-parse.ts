@@ -17,14 +17,24 @@
 //      "Oct 24", "2" out of "12 people", "1" out of "10am" and "40" out of 140 with a zero-width space inside are carried
 //      by no text, so they fail (noText) and never re-parse as a value the person did not say. A number's value (money,
 //      a count, a date or time) is then re-read from its whole value phrase in each text that carries its words (values
-//      wholePhraseFault; DL-189 item 2), so a unit, part of an hour or a zone the words leave out fails: "40" out of
-//      "40%" (noText) or "40¢" (differs), "3 tomorrow" out of "quarter to 3 tomorrow" (differs), "tomorrow at 3pm" out of
-//      "tomorrow at 3pm PST" for a New York visit (wrongZone);
+//      wholePhraseFault; DL-189 item 2), and the phrase is the readers' own (DL-199): the person's whole text is read
+//      with the same reader that read the field, and the value must hold on the reading whose span holds the cited
+//      words, every number and zone word in it read. So a unit, currency, scale, day, part of the day or zone the words
+//      leave out fails: "40" out of "40%" (noText), "40¢" or "40 euros" (differs), "$1" out of "$1 million" (differs),
+//      "3 tomorrow" out of "quarter to 3 tomorrow", "tomorrow at 3pm" out of "the day after tomorrow at 3pm", "at 3" out
+//      of "tomorrow afternoon at 3", "tomorrow" out of "tomorrow at noon" (differs), "tomorrow at 3pm" out of "tomorrow
+//      at 3pm, PST" for a New York visit (wrongZone);
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
 //      visit also the other side's zone, since both are shown (S13-03): a value in either zone re-parses.
 // Every field that fails is named, by its K-02 name; the part fails on any.
+//
+// The residual (DL-199 item 4; CQ-121): words no reader knows are not read, so a cut beside them is not caught here:
+// "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from", "around 3" with no
+// cue the time reader knows, "$40 off", and a sentence mark (". ! ? ;") between a day and its time (values/phrase.ts).
+// Limit 3's read-back shows the person every value before any commit, and limit 5 checks a time against the open times,
+// so neither books on such a cut.
 //
 // Nothing here logs. What it returns names fields, labels and limits: never a value or a person's words.
 //
@@ -50,9 +60,11 @@
 //   7. Words several texts of the turn carry must re-parse as each one sent them.
 //   8. The text's language (K-02 v1 decideResult.language) picks the number words read: English or Spanish, both when
 //      decide gave none.
-//   9. Words that stand whole at several places in a text must hold their value on the whole phrase at each place; the
-//      whole phrase's pieces, and a per-unit after an amount being no part of its value ("$40/hr" is $40, as "$12 a
-//      foot" is $12), are values/phrase.ts's (DL-189).
+//   9. Words that stand whole at several places in a text must hold their value on the whole phrase at each place. What
+//      joins a phrase (the time cues, the range words, a number right after a time or an amount) and a per-unit after an
+//      amount being no part of its value ("$40/hr" is $40, as "$12 a foot" is $12) are values/phrase.ts's and
+//      values/money.ts's (DL-189, DL-199). A currency sign the reader does not know is no dollar (ISO's XXX), "pesos"
+//      are Mexican pesos, and "mil" is a thousand in a Spanish text and a million in an English one (values/money.ts).
 
 import {
   foundAtWordEdges,

@@ -315,6 +315,30 @@ describe("the edges are judged on the folded text the readers read (T-304 round 
   });
 });
 
+describe("an underscore and the fullwidth range mark join words in a quote (T-304 round 4, DL-199 N3 and N4)", () => {
+  /** Alex's bare "2" (decide-bare-2) with his text's words `words` and part 0's quote `quote`. */
+  function quoting(words: string, quote: string): Decided {
+    const decided = changePart(bareTwo(), 0, (part) => {
+      part.quote = quote;
+    });
+    decided.context.texts[0].words = words;
+    return decided;
+  }
+
+  it.each([
+    ["'no' out of 'no_reply@example.com'", "2, no_reply@example.com", "no", "no_reply@example.com"],
+    ["'5pm' out of '3～5pm'", "2, at 3～5pm", "5pm", "3～5pm"],
+    ["'$12' out of '$12～15'", "2, tile is $12～15", "$12", "$12～15"],
+  ])("a quote %s is refused (quoteNotInText); the whole is a quote", (_name, words, cut, whole) => {
+    expect(words.includes(cut)).toBe(true);
+    const refused = quoting(words, cut);
+    expect(checkDecideOutput(refused)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [0] });
+    expect(onlyProblem(refused, 0)).toEqual({ check: "quote", why: "quoteNotInText" });
+    expect(checkDecideOutput(quoting(words, whole))).toBeNull();
+    expect(checkDecideOutput(quoting(words, words))).toBeNull();
+  });
+});
+
 describe("the order of the checks and what is refused", () => {
   it("a part takes its verb, quote, option and value words in that order: its first failing check is its problem", () => {
     const quoteAndOption = samsSecondPart((part) => {

@@ -119,8 +119,19 @@ function theOne<T>(found: readonly T[], same: (a: T, b: T) => boolean, value: T)
 
 // ---- counts, yes or no, zones, options --------------------------------------------------------------------------------
 
-const NUMERAL = /(?<![\w.,:/$])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?![\w,:/%$]|\.\d)/g;
+/** A count in digits: "4", "1,200", "2.5"; a comma right after it is no thousands mark unless a digit follows ("4, 5"). */
+const NUMERAL = /(?<![\w.,:/$])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?![\w:/%$]|[.,]\d)/g;
 const NONE = /\b(?:none|ninguno|ninguna)\b/g;
+/** Dozens in words (T-304 round 4, DL-199 item 2: a count is read with its scale): half a dozen is 6, a dozen 12. */
+const DOZENS: readonly (readonly [RegExp, number])[] = [
+  [/\b(?:half (?:a )?dozen|half-dozen|media docena)\b/g, 6],
+  [/\b(?:a|one|una|un) (?:dozen|docena)\b/g, 12],
+];
+/** A dozen after a count: "2 dozen" is 24, "dos docenas" 24. */
+const DOZEN_AFTER = /^ (?:dozens?|docenas?)\b/;
+/** A count's unit after it, part of its words and not its value (DL-199 item 1: "the number with its unit"). */
+const COUNT_UNIT =
+  /^ (?:people|persons?|adults?|kids?|children|child|guests?|of us|personas?|adultos?|ninos?|ninas?|invitados?)\b/;
 
 /** One count and where it stands in the folded words. */
 export interface FoundCount extends Span {
@@ -128,8 +139,9 @@ export interface FoundCount extends Span {
 }
 
 /**
- * Every count in the words, with where it stands in their folded form: digits and number words, "none" as 0. Amounts of
- * money, dates and times of day stand apart: "a table for 4 at 7pm" holds the count 4.
+ * Every count in the words, with where it stands in their folded form: digits and number words, with a dozen after them
+ * ("2 dozen" is 24; "a dozen" 12, "half a dozen" 6), "none" as 0. Amounts of money, dates and times of day stand apart:
+ * "a table for 4 at 7pm" holds the count 4.
  */
 export function countSpansIn(
   words: string,
@@ -141,13 +153,31 @@ export function countSpansIn(
     ...timeSpansIn(folded),
   ];
   const counts: FoundCount[] = [];
+  const withUnit = (count: FoundCount): FoundCount => {
+    const unit = COUNT_UNIT.exec(folded.slice(count.end));
+    return unit === null ? count : { ...count, end: count.end + unit[0].length };
+  };
+  const take = (count: FoundCount): void => {
+    if (overlaps(count, counts)) return;
+    const dozen = DOZEN_AFTER.exec(folded.slice(count.end));
+    counts.push(
+      withUnit(
+        dozen === null ? count : { value: count.value * 12, at: count.at, end: count.end + dozen[0].length },
+      ),
+    );
+  };
+  for (const [pattern, value] of DOZENS) {
+    for (const found of findAll(folded, pattern)) {
+      if (!overlaps(found, counts)) counts.push(withUnit({ value, at: found.at, end: found.end }));
+    }
+  }
   for (const found of findAll(folded, NUMERAL)) {
     const whole = Number((found.groups[0] ?? "").replaceAll(",", ""));
     const value = found.groups[1] === undefined ? whole : Number(`${String(whole)}.${found.groups[1]}`);
-    counts.push({ value, at: found.at, end: found.end });
+    take({ value, at: found.at, end: found.end });
   }
-  for (const phrase of numberPhrasesIn(folded, languages)) counts.push(phrase);
-  for (const found of findAll(folded, NONE)) counts.push({ value: 0, at: found.at, end: found.end });
+  for (const phrase of numberPhrasesIn(folded, languages)) take(phrase);
+  for (const found of findAll(folded, NONE)) take({ value: 0, at: found.at, end: found.end });
   return counts.filter((count) => !overlaps(count, apart)).sort((a, b) => a.at - b.at);
 }
 
@@ -208,20 +238,25 @@ export function zoneWordSpansIn(words: string): ZoneWord[] {
 }
 
 /**
- * The distinct zones named inside the time the words read or right beside it (T-304 round 3, DL-189 item 2): "3pm PST",
- * "3pm (Pacific time)", "PT 3pm". A zone word elsewhere in the words ("PT session") names no zone for the time.
+ * The zone words inside the time the words read (its spans, `read`) or right beside it, a space, a comma or a bracket
+ * between (T-304 round 3, DL-189 item 2; round 4, DL-199 item 2: "3pm, PST"): "3pm PST", "3pm (Pacific time)", "PT 3pm",
+ * "PST, 3pm". A zone word elsewhere in the words ("PT session") names no zone for the time.
  */
-function zonesOfTime(words: string, read: readonly Span[]): string[] {
+export function zoneWordsOfTime(words: string, read: readonly Span[]): ZoneWord[] {
   if (read.length === 0) return [];
   const folded = foldWords(words);
   const from = Math.min(...read.map((span) => span.at));
   const to = Math.max(...read.map((span) => span.end));
-  const beside = zoneWordSpansIn(words).filter((word) => {
-    if (word.at >= to) return /^[ (]*$/.test(folded.slice(to, word.at));
-    if (word.end <= from) return /^ *$/.test(folded.slice(word.end, from));
+  return zoneWordSpansIn(words).filter((word) => {
+    if (word.at >= to) return /^[ ,(]*$/.test(folded.slice(to, word.at));
+    if (word.end <= from) return /^[ ,]*$/.test(folded.slice(word.end, from));
     return true;
   });
-  return [...new Set(beside.map((word) => word.zone))];
+}
+
+/** The distinct zones named inside the time the words read or right beside it (zoneWordsOfTime). */
+function zonesOfTime(words: string, read: readonly Span[]): string[] {
+  return [...new Set(zoneWordsOfTime(words, read).map((word) => word.zone))];
 }
 
 const LETTERS = "abcdefghijklmnopqrstuvwxyz";

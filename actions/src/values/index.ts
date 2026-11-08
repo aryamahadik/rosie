@@ -3,9 +3,18 @@
 // caller; finalize's separate Values check may share it (T-1107). foundAtWordEdges is the one rule for words found in a
 // text, judged on the folded text the readers read, which limit 6 and the gate's quote check
 // (actions/src/gate/framework/checks.ts) both use (DL-184, DL-189); wholePhraseFault re-reads a number's whole value phrase
-// around its words (DL-189). Pure code: no clock, no I/O, no log.
+// around its words, the phrase being the readers' own spans of the whole text (DL-189, DL-199). Pure code: no clock, no
+// I/O, no log.
 
-export { DEFAULT_CURRENCY, amountsIn, distinctMoney, sameMoney, type FoundAmount, type Money } from "./money";
+export {
+  DEFAULT_CURRENCY,
+  UNKNOWN_CURRENCY,
+  amountsIn,
+  distinctMoney,
+  sameMoney,
+  type FoundAmount,
+  type Money,
+} from "./money";
 export { numberPhrasesIn, numberWordsOf, type NumberPhrase } from "./numbers";
 export { isPhraseType, wholePhraseFault, type PhraseFault, type PhraseType } from "./phrase";
 export {
@@ -18,6 +27,7 @@ export {
   reparse,
   yesOrNoIn,
   zoneWordSpansIn,
+  zoneWordsOfTime,
   zonesNamedIn,
   type ChoiceOption,
   type FieldType,
