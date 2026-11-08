@@ -107,7 +107,9 @@ function isJsonBody(value: unknown): value is JobBody {
   } catch {
     return false;
   }
-  return text.length <= MAX_BODY_BYTES && isJsonEqual(value, JSON.parse(text) as unknown);
+  return (
+    new TextEncoder().encode(text).length <= MAX_BODY_BYTES && isJsonEqual(value, JSON.parse(text) as unknown)
+  );
 }
 
 function isJsonEqual(a: unknown, b: unknown): boolean {
@@ -123,6 +125,18 @@ function isJsonEqual(a: unknown, b: unknown): boolean {
   return keys.length === Object.keys(right).length && keys.every((key) => isJsonEqual(left[key], right[key]));
 }
 
+/**
+ * True when every name and every string in a JSON value is a label (K-37 rule 4: "jobs carry ids, not values"), so no
+ * phone number, address or sentence can ride the queue or reach a dead letter. Numbers, yes or no and null pass.
+ */
+function holdsIdsOnly(value: unknown): boolean {
+  if (typeof value === "string") return isLabel(value);
+  if (Array.isArray(value)) return value.every(holdsIdsOnly);
+  if (isRecord(value))
+    return Object.entries(value).every(([key, item]) => isLabel(key) && holdsIdsOnly(item));
+  return true;
+}
+
 /** Why a job cannot ride the queue (a label), or null when it can. */
 export function jobProblem(job: unknown): string | null {
   if (!isRecord(job)) return "jobNotObject";
@@ -131,6 +145,7 @@ export function jobProblem(job: unknown): string | null {
   if (job.businessId !== null && !isLabel(job.businessId)) return "businessNotLabel";
   if (!isLabel(job.traceId)) return "traceNotLabel";
   if (!isJsonBody(job.body)) return "bodyNotJson";
+  if (!holdsIdsOnly(job.body)) return "bodyNotIds";
   return null;
 }
 

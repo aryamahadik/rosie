@@ -170,6 +170,10 @@ describe("a body that is no retry message is never run", () => {
       [{ ...base, job: { ...base.job, traceId: "" } }, "traceNotLabel"],
       [{ ...base, job: { ...base.job, businessId: undefined } }, "businessNotLabel"],
       [{ ...base, job: { ...base.job, body: ["calendar_poll"] } }, "bodyNotJson"],
+      [
+        { ...base, job: { ...base.job, body: { personId: "Riley M.", phone: "+15555550103" } } },
+        "bodyNotIds",
+      ],
       [{ ...base, try: 1 }, "tryOutOfRange"],
       [{ ...base, try: 6 }, "tryOutOfRange"],
       [{ ...base, try: 2.5 }, "tryOutOfRange"],

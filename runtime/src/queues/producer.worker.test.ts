@@ -65,6 +65,14 @@ describe("enqueueRetry: the next try of a failed job goes on the retry queue", (
       { ...poll, body: { count: Number.NaN } },
       { ...poll, body: { when: new Date(0) } },
       { ...poll, body: { big } },
+      // 40,000 characters but 80,000 bytes as JSON: the limit is bytes.
+      { ...poll, body: { wide: "é".repeat(40_000) } },
+      // Jobs carry ids, not values (K-37 rule 4): no number, address or words, as a value or a name.
+      { ...poll, body: { phone: "+15555550103" } },
+      { ...poll, body: { email: "riley@example.com" } },
+      { ...poll, body: { note: "pick me up at 9" } },
+      { ...poll, body: { "+15555550103": true } },
+      { ...poll, body: { people: [{ id: "person-riley" }, { id: "Riley M." }] } },
     ];
     for (const job of bad) {
       expect(await enqueueRetry(queue, job, firstFailure(clock.now()), clock.now())).toEqual({
@@ -72,6 +80,11 @@ describe("enqueueRetry: the next try of a failed job goes on the retry queue", (
       });
     }
     expect(queue.sent).toEqual([]);
+    const fits = {
+      ...poll,
+      body: { ...poll.body, cents: 3500, paid: false, note: null, pad: "x".repeat(63_000) },
+    };
+    expect(await enqueueRetry(queue, fits, firstFailure(0), 0)).toMatchObject({ result: "queued" });
   });
 
   it("refuses a failure that is not one: a try below 1, a time that is no instant, an error that is not name:label", async () => {
