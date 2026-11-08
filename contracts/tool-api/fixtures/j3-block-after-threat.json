@@ -1,0 +1,36 @@
+{
+  "call": "setCustomerBlock",
+  "given": {
+    "seeds": ["customers/seed-customer-mobile-email.json"],
+    "after": ["safety-outcome-hold.json", "flag-paused.json"],
+    "now": "2026-10-23T20:00:02Z",
+    "stated": null,
+    "note": "A3-48 then S11-62: after Alex's threat to Riley (safety-outcome-hold.json) Sam paused Alex (flag-paused.json); told 'keep them paused, or block them', Sam tells the AI to block him at 4:00pm and answers the read-back's yes. In Sam's turn the block is the chosen choice's effect inside gateAndCommit, checked by limit 1 (Sam is the account owner) and limit 3 (the read-back's exact yes). The person is named by the threat's own safety read (the person at its handle), never by Sam's words, and the number is Alex's own mobile (K-28 customer_blocks_phone_own_fk). The block names the barbershop and Alex; his Nov 14 visit with Riley is a booking already made, which Sam keeps or cancels with no fee (journey 7's cancel, K-09 v1.5). S11-62 prints no read-back words, so these are placeholders."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-block-alex",
+      "requestId": "turn-sam-block-alex",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-0210"
+    },
+    "action": {
+      "do": "block",
+      "who": { "safetyOutcomeId": "safety-outcome-alex-0204" },
+      "target": { "kind": "number" },
+      "readBack": {
+        "exactWords": "Block Alex M.'s number at Lee's Barbershop? AI assistants will hear you can't take their booking, with no reason given. No plan, membership or credit ends. His Nov 14 visit stays until you decide it. / Reply 1 Block, 2 Not now.",
+        "yesEventId": "evt-sam-0210"
+      }
+    }
+  },
+  "outcome": {
+    "blockId": "block-alex-number",
+    "version": 1,
+    "state": "open",
+    "bookingsAlreadyMade": ["booking-alex-riley-nov14"],
+    "repeated": false
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "call": "openRequest",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j3-safety-agent-request.json"],
+    "now": "2026-10-21T23:15:03Z",
+    "stated": { "step": "A3-02", "gives": ["request"] },
+    "note": "A3-02: Alex's AI asks to book a haircut on Saturday, with no name, phone or street address yet. Its words read No (j3-safety-agent-request.json) and as a new booking (A3-51), so the request opens at door ai: a K-04 booking head at stage entry, flow A, whose booker is a new person with no name (K-04 persons.name, null until known), which the Agent API binds to the AI's token (K-20; C-110) and never shows the AI; and the K-30 details row (door ai, made_by customer, a booking number). The AI's call never counts as Alex's own yes (A3-03). Who it is for, the service and the times come next (A4-80, A4-81, A4-14: K-09 v1.2)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-agent-alex-0001"
+    },
+    "door": "ai",
+    "flow": "A",
+    "booker": { "kind": "new", "name": null },
+    "safetyOutcomeId": "safety-outcome-agent-alex-0001",
+    "entered": null
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "number": "LB-1021-07",
+    "bookerPersonId": "person-agent-alex-0001",
+    "gives": ["request"],
+    "written": [
+      { "table": "persons", "rowId": "person-agent-alex-0001", "version": 1 },
+      { "table": "bookings", "rowId": "booking-agent-alex-oct21", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 1 }
+    ],
+    "held": null,
+    "effects": [],
+    "repeated": false
+  }
+}

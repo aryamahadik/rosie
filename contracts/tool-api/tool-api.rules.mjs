@@ -1,4 +1,7 @@
-// K-09's named rules (T-018): what an exchange states that one JSON Schema cannot check across its parts.
+// K-09's named rules (T-018; v1.1's givesJourneyKeys and arrivalTurn added by T-050): what an exchange states that
+// one JSON Schema cannot check across its parts.
+
+import { createHash } from "node:crypto";
 // `npm run contracts:check` runs the rule a fixtures/index.json entry names ("rule") on an exchange that has already
 // passed its schema (contracts/scripts/check-fixtures.mjs). QA's contract test (T-088) and the Tool API mock (C-186)
 // read the same statements. README "Named rules". Rules are only ever added: a later minor version adds a rule under a
@@ -229,4 +232,182 @@ export function givesStepKeys(exchange) {
   return problems;
 }
 
-export const rules = Object.freeze({ statedOutcome, givesStepKeys, rereadBeforeQuestion, clockTurn });
+// ---------------------------------------------------------------------------------------------------------------
+// v1.1 (T-050): journey 3. Added beside the rules above, which stay as they are.
+
+/**
+ * The keys each step of journey 3 gives, as the step index prints them (A-J3.md and B-J3.md, the gives column; the
+ * call-only steps A3-06 and A3-14 are out: C-231). In flow B the door's request is B3-01's (B3-02 and B3-07 give none).
+ */
+export const J3_STEP_GIVES = Object.freeze({
+  "A3-01": ["request"],
+  "A3-02": ["request"],
+  "A3-04": ["request"],
+  "A3-19": ["request"],
+  "A3-22": ["safe"],
+  "A3-30": ["who_for", "reach_by", "times", "customer"],
+  "B3-01": ["request"],
+  "B3-17": ["safe"],
+  "B3-08": ["who_for", "reach_by", "times", "customer"],
+});
+
+/**
+ * The one call that writes each key journey 3 gives (02-contracts section 8 names each key's home; README "v1.1",
+ * "Each key's one call"). In a turn the same write is the chosen choice's effect inside gateAndCommit, whose committed
+ * part names the keys (partResult.gives).
+ */
+export const KEY_CALL = Object.freeze({
+  request: "openRequest",
+  safe: "recordSafetyOutcome",
+  who_for: "confirmBusinessBooking",
+  reach_by: "confirmBusinessBooking",
+  times: "confirmBusinessBooking",
+  customer: "confirmBusinessBooking",
+});
+
+/**
+ * givesJourneyKeys: an exchange that states a journey 3 step writes exactly the keys that step gives (J3_STEP_GIVES),
+ * its outcome wrote exactly the stated keys, and, made alone, its call is the one call that writes each of them
+ * (KEY_CALL; the card's "each key written by exactly one call").
+ */
+export function givesJourneyKeys(exchange) {
+  const stated = exchange.given?.stated;
+  if (stated === null || stated === undefined || stated.step === undefined) {
+    return ["given.stated names no step"];
+  }
+  const own = J3_STEP_GIVES[stated.step];
+  if (own === undefined) return [`${stated.step} is no step of journey 3 that gives a key`];
+  const problems = [];
+  const expected = [...own].sort();
+  if (JSON.stringify([...stated.gives].sort()) !== JSON.stringify(expected)) {
+    problems.push(
+      `${stated.step} gives [${expected.join(", ")}], not the stated [${stated.gives.join(", ")}]`,
+    );
+  }
+  const written = [...keysWritten(exchange)].sort();
+  if (JSON.stringify(written) !== JSON.stringify(expected)) {
+    problems.push(`the outcome wrote [${written.join(", ")}], not [${expected.join(", ")}]`);
+  }
+  if (exchange.call !== "gateAndCommit") {
+    for (const key of written) {
+      if (KEY_CALL[key] !== exchange.call) {
+        problems.push(`${key} is written by ${KEY_CALL[key] ?? "no journey 3 call"}, not ${exchange.call}`);
+      }
+    }
+  }
+  return problems;
+}
+
+/** Whether a K-02 safety result holds danger (any outcome but No) or timed out (arch 02 line 111). */
+const dangerOrTimeout = (safety) =>
+  safety?.timedOut === true || (safety?.outcomes ?? []).some((outcome) => outcome !== "No");
+
+/**
+ * The marker an arrival turn's hash input starts with (README default 36). A batch turn's id is the hash of its sorted
+ * event ids alone (CQ-09; T-248), so an arrival turn's input, the marker and then the event id, is never a batch's, as
+ * a clock turn's input is its clock row's id (K-05 v1 default 9).
+ */
+export const ARRIVAL_MARK = "arrival:";
+
+/**
+ * The arrival turn's id for a text's event id: the SHA-256 of the UTF-8 bytes of ARRIVAL_MARK followed by the event
+ * id, in lowercase hex (README default 36). The handle actor (C-047) and QA (T-117) compute it with this function.
+ */
+export function arrivalTurnId(eventId) {
+  return createHash("sha256").update(`${ARRIVAL_MARK}${eventId}`, "utf8").digest("hex");
+}
+
+/** A batch turn of texts that had an arrival record: its id is never one of its texts' arrival turn ids. */
+function batchAfterArrival(exchange) {
+  const request = exchange.request ?? {};
+  const { caller = {}, turn } = request;
+  const problems = [];
+  if (caller.kind !== "turn" || turn === null || turn === undefined) {
+    return ["a batch turn after an arrival record is called with caller.kind turn and its turn"];
+  }
+  if (caller.turnId !== turn.id || caller.requestId !== turn.id) {
+    problems.push("a batch turn is called with caller.turnId and requestId its id");
+  }
+  for (const eventId of turn.eventIds ?? []) {
+    if (turn.id === arrivalTurnId(eventId)) {
+      problems.push(
+        `the batch turn's id is ${eventId}'s arrival turn id: the two turns must never share one`,
+      );
+    }
+  }
+  const records = (request.core ?? []).filter((action) => action.call === "recordSafetyOutcome");
+  if (records.length === 0) problems.push("the batch carries its texts' safety records as core actions");
+  const outcome = exchange.outcome ?? {};
+  if (outcome.result !== "committed" || outcome.repeated !== false || outcome.turnId !== turn.id) {
+    problems.push("the batch commits under its own id, never as a repeat of the arrival turn");
+  }
+  for (const result of outcome.core ?? []) {
+    if (result.call === "recordSafetyOutcome" && result.response?.repeated !== true) {
+      problems.push(
+        "a text recorded on arrival answers repeated in its batch turn (the event id is the key)",
+      );
+    }
+  }
+  return problems;
+}
+
+/**
+ * arrivalTurn: the handle actor's record on arrival (recordSafetyOutcome, caller.kind actorOnArrival) commits under
+ * the text's own arrival turn: its id arrivalTurnId(the text's event id), never a batch turn's; caller.turnId and
+ * requestId that id; its one event id the text's, its handle the text's, its trace id the caller's (CQ-06, CQ-09;
+ * K-34 v1 safety_outcomes_text_has_handle_and_turn); only a text whose read holds danger or timed out has one (a No
+ * rides in the turn its text joins: README default 5); a first record gives safe and writes its hold at version 1
+ * (K-34 v1 rule 2). An at-once release on arrival (releaseSafetyHold, caller.kind actorOnArrival) runs under the same
+ * arrival turn's id. The batch turn the same text joins (gateAndCommit) has an id of its own, never an arrival turn's,
+ * so it commits, its record answering repeated (README "The safety record on arrival").
+ */
+export function arrivalTurn(exchange) {
+  const request = exchange.request ?? {};
+  const caller = request.caller ?? {};
+  if (exchange.call === "gateAndCommit") return batchAfterArrival(exchange);
+  if (caller.kind !== "actorOnArrival")
+    return ["arrivalTurn needs a call made by caller.kind actorOnArrival, or the batch turn after it"];
+  const problems = [];
+  if (caller.requestId !== caller.turnId) problems.push("caller.requestId is the arrival turn's id");
+  if (!/^[0-9a-f]{64}$/.test(caller.turnId ?? "")) {
+    problems.push("the arrival turn's id is a SHA-256 in lowercase hex (arrivalTurnId)");
+  }
+  if (exchange.call === "releaseSafetyHold") return problems;
+  if (exchange.call !== "recordSafetyOutcome")
+    return ["arrivalTurn applies to recordSafetyOutcome, releaseSafetyHold and the batch turn after them"];
+  const { turn, safety } = request;
+  if (turn?.id !== caller.turnId) problems.push("caller.turnId is the arrival turn's id");
+  const expectedId = arrivalTurnId(safety?.eventId);
+  if (turn?.id !== expectedId) {
+    problems.push(`the arrival turn's id is arrivalTurnId(${safety?.eventId}), ${expectedId}`);
+  }
+  if (JSON.stringify(turn?.eventIds) !== JSON.stringify([safety?.eventId])) {
+    problems.push("the arrival turn's one event id is the text's own");
+  }
+  if (turn?.handleId !== request.handleId) problems.push("the arrival turn's handle is the text's");
+  if (turn?.traceId !== caller.traceId)
+    problems.push("the arrival turn's trace id is the text's own (CQ-06)");
+  if (safety?.source !== "text") problems.push("only a text arrives at the handle actor");
+  if (!dangerOrTimeout(safety)) {
+    problems.push(
+      "a read of No has no arrival record: it rides in the turn its text joins (README default 5)",
+    );
+  }
+  const outcome = exchange.outcome ?? {};
+  if (outcome.outcomeId !== undefined) {
+    if (JSON.stringify(outcome.gives) !== JSON.stringify(["safe"])) problems.push("the record gives safe");
+    if (outcome.repeated === false && outcome.hold !== null && outcome.hold?.version !== 1) {
+      problems.push("a hold the record wrote is at version 1 (K-34 v1 rule 2)");
+    }
+  }
+  return problems;
+}
+
+export const rules = Object.freeze({
+  statedOutcome,
+  givesStepKeys,
+  rereadBeforeQuestion,
+  clockTurn,
+  givesJourneyKeys,
+  arrivalTurn,
+});

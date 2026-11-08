@@ -161,9 +161,14 @@ function readJson(file: string): unknown {
 
 const FIXTURES_DIR = path.join(CONTRACTS_DIR, "tool-api", "fixtures");
 
-/** K-09 v1's fixtures/index.json entries. */
+/**
+ * K-09 v1's fixtures/index.json entries. The index also lists later minor versions' fixtures (v1.1 for journey 3,
+ * T-050); this base implements and checks v1 only, so it reads the entries whose version is v1.
+ */
 export function fixtureEntries(): FixtureEntry[] {
-  return (readJson(path.join(FIXTURES_DIR, "index.json")) as { fixtures: FixtureEntry[] }).fixtures;
+  return (readJson(path.join(FIXTURES_DIR, "index.json")) as { fixtures: FixtureEntry[] }).fixtures.filter(
+    (entry) => entry.version === "v1",
+  );
 }
 
 /** One fixture, freshly parsed (a test may change its copy). */

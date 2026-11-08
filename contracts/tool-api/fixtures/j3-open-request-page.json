@@ -1,0 +1,39 @@
+{
+  "call": "openRequest",
+  "given": {
+    "seeds": ["business-setup/seed-company-two-kinds.json"],
+    "after": ["j3-safety-page-request.json"],
+    "now": "2026-10-20T12:15:03Z",
+    "stated": { "step": "B3-01", "gives": ["request"] },
+    "note": "B3-07 then B3-01: the booking page's words read No (j3-safety-page-request.json) and as a new booking (B3-40), and Lee Home Services is live (B3-01 needs live), so the request opens at door page, flow B: a booking head whose booker is a new person with no name, which the page server keeps with its session (K-21), and the K-30 details row (door page, made_by customer). In flow B the request is B3-01's to give (B3-07 gives none). The town comes before the times (B4-77: K-09 v1.2)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-home-0002",
+      "businessId": "biz-lee-home-services",
+      "personId": null,
+      "traceId": "trace-page-home-0001"
+    },
+    "door": "page",
+    "flow": "B",
+    "booker": { "kind": "new", "name": null },
+    "safetyOutcomeId": "safety-outcome-page-home-0001",
+    "entered": null
+  },
+  "outcome": {
+    "bookingId": "booking-page-home-oct20",
+    "number": "LHS-1020-03",
+    "bookerPersonId": "person-page-home-0001",
+    "gives": ["request"],
+    "written": [
+      { "table": "persons", "rowId": "person-page-home-0001", "version": 1 },
+      { "table": "bookings", "rowId": "booking-page-home-oct20", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-page-home-oct20", "version": 1 }
+    ],
+    "held": null,
+    "effects": [],
+    "repeated": false
+  }
+}

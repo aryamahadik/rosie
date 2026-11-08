@@ -1,0 +1,23 @@
+{
+  "call": "checkBookingFirst",
+  "given": {
+    "seeds": ["customers/seed-customer-mobile-email.json"],
+    "after": ["j3-confirm-business-booking-yes.json"],
+    "now": "2026-10-22T22:00:02Z",
+    "stated": null,
+    "note": "A3-43: a new conversation texts 'I booked a haircut for Saturday. Can I move it to 2pm?' on Thu Oct 22; the reply in that turn gives the page and sends nothing yet. On the page they type the name and the day and tap: a booking under Alex M. on Sat Oct 24 matches, so a link_record code goes to Alex's contact on file, his way (his email on file, or a text into his open chat), never back to the page. The answer is the same as when nothing matches, and says nothing about a visit; the page holds only the attempt id, and the server keeps the code's id and person with it (K-22 v1 rule 4). The tap acts for no one, so caller.personId is null."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-check-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-page-check-0001"
+    },
+    "nameTyped": "Alex M.",
+    "dayTyped": "2026-10-24"
+  },
+  "outcome": { "result": "sentIfMatched", "attemptId": "attempt-check-0001", "repeated": false }
+}

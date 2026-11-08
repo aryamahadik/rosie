@@ -1,0 +1,43 @@
+{
+  "call": "recordStopOrStart",
+  "given": {
+    "seeds": [
+      "customers/seed-customer-mobile-email.json",
+      "core/seed-resources.json",
+      "core/seed-phone-chat-open.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-business-text.json", "j3-confirm-business-booking-yes.json"],
+    "now": "2026-10-22T16:52:30Z",
+    "stated": null,
+    "note": "S13-32 and A3-12 with no turn: as j3-stop-tells-businesses.json, except that PostgreSQL was down when Alex texted only STOP at 12:45pm, so his handle actor sent the stop reply straight through Linq from its local copy and writes the record on return (caller.kind actorOnReturn, turnId null, as start-recorded.json does for Ben's START; arch 11 line 566; README default 6). The record has no turn, so its commit cannot write an outbox row (K-04 outbox_rows.turn_id is not null). For Lee's Barbershop, which has Alex's open booking (booking-alex-sam-book, booked), it writes instead one K-04 clock_rows row of kind step (fires: S13-32's notice, the fixed line textsOffReachTheirWay), owned by Sam's handle, with the barbershop's business id and that booking, armed and due at once in the business's zone; its firing, a clock turn on Sam's handle (its one event id the clock row's id: README default 24), writes the notice row to Sam within the minute (Sam's actor at once, else the minute sweep: arch 10 line 540), held for his text hours as any owner row is, never saying where the stop came from, and nothing is texted to Alex (README default 56; open gap 43). So businessesTold names the barbershop with no row yet. A page's or an email's STOP for the caller's own number (caller.kind page, inboundEventId null) tells each business the same way. The visit stays booked: alone, a stop never cancels it (S13-32). phoneVersion 5 is an example."
+  },
+  "request": {
+    "caller": {
+      "kind": "actorOnReturn",
+      "turnId": null,
+      "requestId": "evt-alex-0230",
+      "businessId": null,
+      "personId": "person-alex",
+      "traceId": "trace-alex-0230"
+    },
+    "kind": "stop",
+    "phoneNumber": "+15555550101",
+    "inboundEventId": "evt-alex-0230",
+    "words": "STOP",
+    "alsoCancelVisit": false,
+    "workPhoneBusinessIds": null,
+    "sentByActor": { "at": "2026-10-22T16:45:11Z", "fixedLineId": "stopReply", "linqMessageId": "linq-msg-alex-stop-1" }
+  },
+  "outcome": {
+    "consentRowIds": ["consent-alex-stop-0230"],
+    "stopped": true,
+    "chatOpen": false,
+    "phoneVersion": 5,
+    "reply": { "fixedLineId": "stopReply", "outboxRowId": null },
+    "askedWhichTexts": null,
+    "flaggedBookingIds": [],
+    "repeated": false,
+    "businessesTold": [{ "businessId": "biz-lees-barbershop", "fixedLineId": "textsOffReachTheirWay", "outboxRowId": null }]
+  }
+}

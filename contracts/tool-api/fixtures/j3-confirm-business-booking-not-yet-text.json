@@ -1,0 +1,47 @@
+{
+  "call": "confirmBusinessBooking",
+  "given": {
+    "seeds": [
+      "customers/seed-customer-mobile-email.json",
+      "core/seed-resources.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-business-text.json"],
+    "now": "2026-10-22T14:02:02Z",
+    "stated": { "step": "A3-30", "gives": ["who_for", "reach_by", "times", "customer"] },
+    "note": "A3-30 then A3-40 by text: as j3-confirm-business-booking-yes.json, except that Sam replies '2' to the read-back. The BOOK's commit (j3-open-request-business-text.json: openRequest at door business) wrote K-30 booking_details.taken 'nothing' once, in the details row's insert, since a booking the business adds takes nothing (K-30 v1 booking_details.taken; SPEC-master 5e; README default 55). So A3-30's '2 Not yet', whose gate shows only when taken is 'nothing' (master-A.json A3-30's branch 'when booking: nothing'; MASTER-FLOW-A line 1976; arch 03 line 161: a record gate passes when the booking holds the value), is on the frontier of Sam's reply turn, and his '2' answers the open question oq-a3-30-alex-sam-book. In Sam's turn the reply is the chosen choice and this write is its effect inside gateAndCommit. It books it as entered, as '1 Yes' does (A3-30: 'The reply books it, as entered'; A3-40: 'The booking is made'): the held reservation confirmed booked with the booking (version 2) and the head's stage booked, inside the 10-minute hold. It gives who_for (Alex as person served and payer, 18 or older as his row says), reach_by (texts, his way on file), times (booking_details.times setstart, the barbershop's flow default) and customer (Alex's row, found and unchanged, so not rewritten). No consent is written, so Rosie texts Alex nothing ('Never: message the customer on a guess'), and Sam hears A3-40's 'Booked, with no texts to Alex M. Please tell them the details yourself.' as an outbox row in his own chat."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-book-alex-not-yet",
+      "requestId": "turn-sam-book-alex-not-yet",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-0304"
+    },
+    "bookingId": "booking-alex-sam-book",
+    "expectVersion": 1,
+    "answer": "notYet",
+    "readBack": { "kind": "openQuestion", "openQuestionId": "oq-a3-30-alex-sam-book", "yesEventId": "evt-sam-0304" },
+    "changed": null
+  },
+  "outcome": {
+    "bookingId": "booking-alex-sam-book",
+    "customerId": "customer-alex-barbershop",
+    "gives": ["who_for", "reach_by", "times", "customer"],
+    "answer": "notYet",
+    "stage": "booked",
+    "consentId": null,
+    "reservation": { "reservationId": "rsv-alex-sam-book-riley", "state": "booked", "version": 2 },
+    "textsOff": null,
+    "effects": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-sam-book", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-alex-sam-book", "version": 2 },
+      { "table": "reservations", "rowId": "rsv-alex-sam-book-riley", "version": 2 }
+    ],
+    "outboxRowIds": ["out-sam-alex-booked-no-texts"],
+    "repeated": false
+  }
+}

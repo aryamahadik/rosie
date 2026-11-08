@@ -1,0 +1,18 @@
+{
+  "bookingId": "booking-alex-sam-book",
+  "customerId": "customer-alex-barbershop",
+  "gives": ["who_for", "reach_by", "times", "customer"],
+  "answer": "yesSendLink",
+  "stage": "booked",
+  "consentId": null,
+  "reservation": { "reservationId": "rsv-alex-sam-book-riley", "state": "booked", "version": 2 },
+  "textsOff": null,
+  "effects": [],
+  "written": [
+    { "table": "bookings", "rowId": "booking-alex-sam-book", "version": 2 },
+    { "table": "booking_details", "rowId": "booking-alex-sam-book", "version": 2 },
+    { "table": "reservations", "rowId": "rsv-alex-sam-book-riley", "version": 2 }
+  ],
+  "outboxRowIds": [],
+  "repeated": false
+}

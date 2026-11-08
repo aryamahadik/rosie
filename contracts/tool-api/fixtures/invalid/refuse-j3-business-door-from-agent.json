@@ -1,0 +1,23 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-alex-0003",
+    "businessId": "biz-lees-barbershop",
+    "personId": null,
+    "traceId": "trace-agent-alex-0003"
+  },
+  "door": "business",
+  "flow": "A",
+  "booker": { "kind": "customer", "customerId": "customer-alex-barbershop" },
+  "safetyOutcomeId": null,
+  "entered": {
+    "time": {
+      "resourceId": "res-riley",
+      "during": { "start": "2026-10-24T15:00:00Z", "end": "2026-10-24T15:30:00Z" },
+      "zone": "America/New_York"
+    },
+    "service": { "asTyped": "haircut", "serviceId": "svc-lees-haircut", "serviceMoneyId": "way-lees-haircut-shop" },
+    "newCustomer": null
+  }
+}

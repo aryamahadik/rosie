@@ -1,0 +1,20 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-alex-0004",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-alex",
+    "traceId": "trace-agent-alex-0004"
+  },
+  "bookingId": "booking-alex-sam-book",
+  "expectVersion": 1,
+  "answer": "yesSendLink",
+  "readBack": {
+    "kind": "page",
+    "exactWords": "Book this for Alex M.? Did Alex agree to messages from Rosie? / Haircut · Sat Oct 24 / 11:00am · Riley / For Alex, 18 or older / Alex M. · mobile on file / No Rosie $2: Lee's Barbershop added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-sam-book", "version": 1 }],
+    "yesEventId": "req-agent-alex-0004"
+  },
+  "changed": null
+}

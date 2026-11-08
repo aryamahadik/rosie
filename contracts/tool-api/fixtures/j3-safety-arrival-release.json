@@ -1,0 +1,30 @@
+{
+  "call": "releaseSafetyHold",
+  "given": {
+    "seeds": ["core/seed-person-roles.json", "core/seed-phone-chat-open.json", "core/seed-bundle-registry.json"],
+    "after": ["j3-safety-arrival-own-line.json"],
+    "now": "2026-10-23T16:05:04Z",
+    "stated": null,
+    "note": "A3-26, at once: the handle actor has handed the shop's own line on to the send path, so it releases the at-once hold under the same arrival turn (outcome_message_sent; arch 06 line 319), naming the version the arrival record returned (hold.version 1: K-34 v1 rule 2). redecideTurnId names the hold's turn, the arrival turn: the text's routine parts are its batch turn's, which the hold no longer stops."
+  },
+  "request": {
+    "caller": {
+      "kind": "actorOnArrival",
+      "turnId": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
+      "requestId": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-0207"
+    },
+    "holdId": "hold-alex-0207",
+    "expectVersion": 1,
+    "why": "outcome_message_sent",
+    "releasedByOutcomeId": null
+  },
+  "outcome": {
+    "holdId": "hold-alex-0207",
+    "releasedAt": "2026-10-23T16:05:04Z",
+    "redecideTurnId": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
+    "repeated": false
+  }
+}
