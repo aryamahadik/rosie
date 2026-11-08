@@ -517,6 +517,15 @@ export function holds(reading: MoneyReading, value: RecordValue): boolean {
   return reading.values.includes(value);
 }
 
+/**
+ * The booking took money: from the money step on (took), written, and something paid now (S13-55: "money already
+ * taken"). Before the money step "paid" only means the money is asked for; between the money step and the write
+ * nothing counts as taken.
+ */
+export function moneyTaken(reading: MoneyReading): boolean {
+  return holds(reading, "paid") && holds(reading, "written");
+}
+
 /** A service of this booking paid a deposit now: its way is the deposit and something was paid for it. */
 export function depositTaken(reading: MoneyReading): boolean {
   return reading.services.some((service) => service.way === "deposit" && service.paysNow);
