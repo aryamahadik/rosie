@@ -1,5 +1,5 @@
 // The money home (T-593; C-101, C-088; S13-55): money words follow what the booking took, the four ways, one fee,
-// never a card hold and never a charge on silence. See record.ts, money.ts, claims.ts, lines.ts and home.ts.
+// never a card hold and never a charge on silence. See record.ts, money.ts, gate.ts, claims.ts, lines.ts and home.ts.
 export {
   MONEY_CLAIMS,
   checkMoneyLine,
@@ -19,6 +19,8 @@ export {
   recordGate,
   sentencesOf,
   type ApprovedMoneyLines,
+  type ApprovedSentence,
+  type FormPart,
   type GateCheck,
   type GivenSlotValue,
   type MoneyGate,

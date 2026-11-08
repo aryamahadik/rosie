@@ -12,7 +12,9 @@
 //   - feeFrom: where the booking's one fee would come from: "none", "paidNow" (out of what was paid now, never more) or
 //     "savedCard" (nothing paid now: the saved card, only with the owner's yes, S11-22);
 //   - each money claim a line can make (depositPaid, cardSaved, fee ...): "yes" when the booking's record holds it,
-//     else "no" (a fee per service, never).
+//     else "no" (a fee per service, never). The points that say money was taken (charged, youPaid, depositPaid,
+//     paidInFull and backToCard) say "yes" only once the booking took it (moneyTaken; DL-179 2, DL-187 3), never on money
+//     only asked for before the money step.
 
 import { isLabel } from "../../../../runtime/src/trace";
 import type { HomeModule } from "../registry";
@@ -42,6 +44,13 @@ function isClaimPoint(point: string): point is MoneyClaim {
   return (CLAIM_POINTS as readonly string[]).includes(point);
 }
 
+/** The claim points that say money was taken besides charged and youPaid, whose claims already need it (DL-187 3). */
+const TAKEN_POINTS: ReadonlySet<MoneyClaim> = new Set<MoneyClaim>([
+  "depositPaid",
+  "paidInFull",
+  "backToCard",
+]);
+
 /** The money home's ruling on one point, a label. */
 export function moneyRule(point: string, context: MoneyHomeContext): string {
   const { money } = context as Partial<MoneyHomeContext>;
@@ -50,7 +59,8 @@ export function moneyRule(point: string, context: MoneyHomeContext): string {
     return context.signedSchedule === true && moneyTaken(money) ? "keepSignedShare" : "none";
   if (point === "cardHold") return "never";
   if (point === "feeFrom") return money.oneFee.from;
-  if (isClaimPoint(point)) return claimHolds(point, money) ? "yes" : "no";
+  if (isClaimPoint(point))
+    return claimHolds(point, money) && (!TAKEN_POINTS.has(point) || moneyTaken(money)) ? "yes" : "no";
   throw new MoneyHomeError(`${isLabel(point) ? point : "the point given"} is not a point of the money home`);
 }
 

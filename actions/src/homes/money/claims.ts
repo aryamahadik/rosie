@@ -12,22 +12,33 @@
 // The claims are read from the words with the record's own money phrases (record.lint.phrases.money: "deposit paid",
 // "paid in full", "card is saved", "no card saved", "nothing taken", "keep the deposit", "goes back to your card",
 // "refunded to your card", "paid with a credit", "credit from your pack") and the words of S13-55's rules, after the
-// apostrophe folding the Values check reads with (values.ts: ’ and ‘ as '). What comes back holds labels only, never
-// the words read, so a refusal reaches a log or the rewrite as labels.
+// apostrophe folding the Values check reads with (values.ts: ’ and ‘ as '), in the folded form gate.ts finds money words
+// in (its default 8). What comes back holds labels only, never the words read, so a refusal reaches a log or the rewrite
+// as labels.
 //
-// Round 3 (DL-182). Card holds and charges on silence are no longer read by meaning: the money-topic gate (gate.ts)
-// refuses every money sentence that is not an approved line, a denial included. Two checks:
+// Rounds 3 and 4 (DL-182, DL-187). Card holds and charges on silence are no longer read by meaning: the money-topic gate
+// (gate.ts) refuses every sentence that holds one money word, sign or slot and is not an approved line, a denial
+// included. Two checks:
 //   - checkMoneyText(text, reading, gate): the gate, then the claim check on the booking. For the message checks
 //     (C-092) and the slot filler (C-088): a message goes through this one;
 //   - checkMoneyLine(text, reading): the claim check alone, with the hold and silence topics refused on every booking
 //     and no line approved (any money sentence that holds a hold word, or names a reply, an answer or silence).
 // "Charged" and "you paid" say money was taken, and so do "deposit paid" and "paid in full" said as statements and
-// "refunded", "was refunded" and "we refunded" (DL-182 2): they hold only once the booking took it (moneyTaken: from
-// the money step on, written, something paid now), never on money only asked for before the money step. A term keeps
-// the record's reading (round 2's default 1): "Paid in full when you book" says what the booking asks, "the {{back}} you
-// paid goes back to the card" what goes back on a cancel.
+// "refunded" in any form ("was refunded", "we refunded", "The business refunded your $40."; DL-182 2, DL-187 3): they
+// hold only once the booking took it (moneyTaken: from the money step on, written, something paid now), never on money
+// only asked for before the money step. A term keeps the record's reading (round 2's default 1): "Paid in full when you
+// book" says what the booking asks, "the {{back}} you paid goes back to the card" what goes back on a cancel. Two
+// defaults (DL-187 3, each fail-closed):
+//   1. A term's words open their sentence or a part of it (after , : ; · ( or a dash), with no subject or auxiliary
+//      before them, and the record's own term words follow later in the sentence: "when you book", "when they book" or
+//      "when booking". Any other reading is a statement, so a past statement ("Your deposit was paid at booking.") is
+//      one.
+//   2. "Refunded" is a statement in every form but one: a refund of a supposed payment said as a term ("Anything you
+//      paid the business is refunded its own way", pay.back's row), which says no money was taken, as "anything you
+//      paid" states no payment (round 2's default 1).
+// Residual risk (DL-187 5): what gate.ts's header names; a sentence with no money word, sign or slot is not this check's.
 
-import { gateMoneyText, readingForm, topicRefusals, type MoneyGate } from "./gate";
+import { foldedForm, gateMoneyText, topicRefusals, type MoneyGate } from "./gate";
 import { depositTaken, holds, moneyTaken, type MoneyReading } from "./money";
 
 /** The claims a money line can make (labels). */
@@ -89,10 +100,19 @@ function everyMatch(pattern: RegExp): RegExp {
 }
 
 /**
- * A term, not a statement: the words say what the booking asks when it is booked ("Paid in full when you book"), later
- * in the same sentence (DL-182 2, round 2's default 1).
+ * A term, not a statement (DL-182 2, round 2's default 1; DL-187 3, default 1): the words open their sentence or a part
+ * of it, with no subject or auxiliary before them, and say what the booking asks when it is booked in the record's own
+ * words ("Paid in full when you book"), later in the same sentence. A past statement ("Your deposit was paid at
+ * booking.") is a statement.
  */
-const TERM = String.raw`(?=[^.!?\n]*\b(?:when (?:you|they) book|when booking|at booking|on booking|to book)\b)`;
+const OPENS = String.raw`(?<=(?:^|[.!?:;,·(\n—–])\s*)`;
+const TERM = String.raw`(?=[^.!?\n]*\b(?:when (?:you|they) book|when booking)\b)`;
+
+/**
+ * A refund of a supposed payment said as a term (DL-187 3, default 2): "anything you paid the business is refunded its
+ * own way" says no money was taken. Read before "refunded", in the same part of a sentence.
+ */
+const SUPPOSED_REFUND = String.raw`\b(?:anything|everything|whatever|all)\s+(?:(?:that|which)\s+)?(?:you(?:'ve|\s+have|\s+had)?\s+)?(?:already\s+)?paid\b[^.!?\n;]*?\b(?:is|are|gets?|will\s+be)\s+`;
 
 /** A claim's words; `said` marks words that say the money was taken, which hold only once it was (DL-182 2). */
 interface ClaimWords {
@@ -118,20 +138,17 @@ const CLAIM_WORDS: readonly ClaimWords[] = [
   },
   {
     claim: "depositPaid",
-    patterns: [
-      new RegExp(String.raw`\bdeposit (?:was |is |has been )?paid\b${TERM}`, "i"),
-      new RegExp(String.raw`\bpaid (?:a |the |your )?(?:${AMOUNT} )?deposit\b${TERM}`, "i"),
-    ],
+    patterns: [new RegExp(String.raw`${OPENS}(?:(?:a|the) )?(?:${AMOUNT} )?deposit paid\b${TERM}`, "i")],
   },
   {
     claim: "depositPaid",
     said: true,
     patterns: [
-      /\bdeposit (?:was |is |has been )?paid\b/i,
+      /\bdeposits?(?:'s)?(?:\s+(?:was|were|is|are|has|have|had|been|already|just|now|fully|also|all))*\s+paid\b/i,
       new RegExp(String.raw`\bpaid (?:a |the |your )?(?:${AMOUNT} )?deposit\b`, "i"),
     ],
   },
-  { claim: "paidInFull", patterns: [new RegExp(String.raw`\bpaid in full\b${TERM}`, "i")] },
+  { claim: "paidInFull", patterns: [new RegExp(String.raw`${OPENS}paid in full\b${TERM}`, "i")] },
   { claim: "paidInFull", said: true, patterns: [/\bpaid in full\b/i] },
   { claim: "keepDeposit", patterns: [/\bkeeps? (?:your|the|its) [^.]{0,12}deposit\b/i] },
   {
@@ -143,16 +160,12 @@ const CLAIM_WORDS: readonly ClaimWords[] = [
       /\byour credit\b(?!\s*card)/i,
     ],
   },
-  // "Refunded", "was refunded", "we refunded": money went back, so it was taken (DL-182 2).
+  // "Refunded" in any form ("was refunded", "we refunded", "the business refunded"): money went back, so it was taken
+  // (DL-182 2, DL-187 3); a refund of a supposed payment said as a term is the one form that is not (default 2).
   {
     claim: "backToCard",
     said: true,
-    patterns: [
-      /\b(?:was|were|been|got)\s+(?:(?:already|just|now|fully|also)\s+)?refunded\b/i,
-      /\b(?:we|we've|we have|we had|i|i've|they|they've)\s+(?:(?:already|just|now|fully|also)\s+)?refunded\b/i,
-      /(?<=(?:^|[.!?]\s+|\n)\s*)refunded\b/i,
-      /(?<!\b(?:is|are|be|gets?)\s)\brefunded (?:to|on) (?:your|the) card\b/i,
-    ],
+    patterns: [new RegExp(String.raw`(?<!${SUPPOSED_REFUND})refunded`, "i")],
   },
   // What goes back on a cancel in time: a term.
   {
@@ -233,9 +246,9 @@ interface ReadClaim {
   readonly said: boolean;
 }
 
-/** The claims read from a text's words, in the reading form (gate.ts readingForm); the words are not kept. */
+/** The claims read from a text's words, in the folded form money words are found in (gate.ts foldedForm, default 8); the words are not kept. */
 function readClaims(text: string): ReadClaim[] {
-  const words = readingForm(text);
+  const words = foldedForm(text);
   const found: ReadClaim[] = [];
   if (HOLD_SLOT.test(words)) found.push({ claim: "cardHold", said: false });
   if (FEE_PER_SERVICE.some((pattern) => pattern.test(words)))

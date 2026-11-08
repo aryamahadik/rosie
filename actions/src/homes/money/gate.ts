@@ -1,39 +1,67 @@
-// The money-topic gate (T-593 round 3; DL-182; S13-55; card line 9: "A message naming a card hold or a charge on
-// silence fails the check"; RULES 3.2 to 3.4).
+// The money-topic gate (T-593 rounds 3 and 4; DL-182, DL-187; S13-55; card line 9: "A message naming a card hold or a
+// charge on silence fails the check"; RULES 3.2 to 3.4).
 //
-// Two rounds showed that reading a card hold or a charge on silence from word patterns always leaves a new wording
-// through. So a sentence that speaks of money passes only as words the record or the master already wrote (DL-182 1):
-//   - a sentence ends only at . ! ? or a line break; commas, dashes, parentheses, quotes and semicolons stay inside it.
-//     It is read after the apostrophe folding the Values check reads with (values.ts: ’ and ‘ as '), in lower case;
-//   - it is a money sentence when it pairs a money action word with a money object anywhere in it, in any order, tense
-//     or voice; when it names a card with an amount or a money slot, whatever its verb ("your card will be used for
-//     $40"); or when it names a reply, an answer or silence with a charge word;
-//   - a money sentence passes only if it is, word for word, an approved line, each slot standing for the value the slot
-//     filler gave it: one of the record's rows (both flows), S13-55's own lines or a message text of either master flow;
-//   - every other money sentence fails, a denial included (DL-179's denied clause is withdrawn for these topics):
-//     neverHold when it holds a hold word, neverChargeOnSilence when it names a reply, an answer or silence, otherwise
+// Reading a card hold or a charge on silence from word patterns always left a new wording through, and so did every rule
+// that needs two words to meet in one sentence. So one money word is enough (DL-187): a sentence that holds one passes
+// only as words the record or the master already wrote.
+//   - A sentence ends only at . ! ? or a line break; commas, dashes, parentheses, quotes and semicolons stay inside it.
+//     Each sentence is judged alone, so a hold is never split away from its card: "We'll place a hold." is a money
+//     sentence by "hold". It is read after the apostrophe folding the Values check reads with (values.ts: ’ and ‘ as
+//     '), in lower case.
+//   - A money sentence holds one money word: a word that begins with charg, bill, pay, paid, cost, pric, refund,
+//     deposit, debit, authori, hold, held, owe, deduct, invoic, withdraw, fund, dollar, buck, money or amount; the whole
+//     word fee, fees, cent or cents; a word that ends in card or cards (Mastercard, postcard); a $, € or £ anywhere; or a
+//     K-03 money slot. A stem counts only at the start of a word, so "feel", "coffee", "recently" and "percent" are no
+//     money words. Round 3's pairs still make one too (default 4).
+//   - A money sentence passes only if it is, word for word, a sentence of an approved line, each slot standing for the
+//     value the slot filler gave it: one of the record's rows (both flows), S13-55's own lines or a message text of
+//     either master flow.
+//   - Every other money sentence fails, a denial included: neverHold when it holds a hold word (hold, held, authori ...),
+//     neverChargeOnSilence when it names a reply, an answer, a confirmation, a response or silence, otherwise
 //     moneyNotFromRecord.
-// A false refusal costs a fallback (one rewrite, then the fixed words), never a wrong promise. Approved lines then go
+// A false refusal costs a fallback (one rewrite, then the fixed words), never a wrong promise: a time the model says it
+// is "holding" falls back to the approved wording, since Rosie's word for a time is "saved". Approved lines then go
 // through the claim check (claims.ts) for the booking at hand. What comes back holds labels only, never the words.
+//
+// Residual risk (DL-187 5; CQ-120): a card hold or a charge on silence worded with no money word, sign or slot at all
+// ("We'll put a stop on your plastic until the visit.", "If we don't hear back by 7pm, it goes through anyway.") is not
+// caught here, nor one spelled with digits or symbols for letters ("h0ld") or with look-alike letters default 8 does not
+// know. The composer prompt rule (STATE note 56: money sentences come from the record's rows, filled by T-310, never the
+// model's own) and the Values check (an amount needs a fact) back it up.
 //
 // Defaults (each fail-closed):
 //   1. A sentence ends at . ! ? only before a space or the end of the text, so "$40.00" and "rosfield.com" end none;
-//      "7 p.m." reads "7pm".
-//   2. Approved lines are read sentence by sentence, as a message is: its money sentence passes when it is one sentence
-//      of an approved line, compared with runs of spaces as one, each slot written {{name}} and its end marks left out.
-//   3. A slot stands for the value the slot filler gave it (finalParts.slotValues); a slot given no value matches only
-//      the slot as written. A value stands for its slot alone, never for other words around it.
-//   4. Money action words also count in their other forms (surcharge, prepaid, withhold, reservation, unblock) and as
-//      owe, deduct, withdraw and invoice; money objects also as "payment method" and an amount in words ("40 dollars");
-//      money slots are K-03's money slots, {{keep}} and the money home's slots (pay.*, clock.pay, link.pay).
-//   5. A reply, an answer or silence with a money object, or with pay, keep, refund, owe or deduct, is a money sentence
-//      too (DL-182 names it with a charge word).
+//      "7 p.m." reads "7pm". A slot is read whole: words inside its braces never end a sentence.
+//   2. Approved lines are read sentence by sentence, as a message is: a message's money sentence passes when it is one
+//      sentence of an approved line, compared with runs of spaces as one, each slot written {{name}} and its end marks
+//      left out.
+//   3. A slot stands for the value the slot filler gave it (finalParts.slotValues), filled into the approved sentence
+//      that holds it, never re-split after filling; a slot given no value matches only the slot as written. A value that
+//      holds a sentence end (. ! ? before a space or its end, or a line break) is refused: it stands for no slot, so a
+//      money sentence that holds it is no approved line. A value stands for its slot alone, never for words around it.
+//   4. Forms of the listed money words that do not begin with the stem's letters count too: a stem after un, non, pre,
+//      re, post, over, under, sur, with, co, auto, mis, up, down or e (unauthorized, prepaid, surcharge, withhold, copay,
+//      upcharge), owing, withdrew, cardholder, auth and pre-auth, and a ¢ sign. Round 3's money sentences stay money
+//      sentences: a hold, charge or other money action word (reserve, block, freeze, set or put aside, keep, collect,
+//      take ...) with a money object (an amount also in words, "40 euros"), a card with an amount, a reply, an answer or
+//      silence with a charge or other money action word. Money slots are K-03's money slots, {{keep}} and the money
+//      home's slots (pay.*, clock.pay, link.pay).
+//   5. Hold words, for the label: a word that begins with hold, held or authori (with a prefix of default 4), auth,
+//      pre-auth, reserve, block, freeze, set or put aside. Silence words, for the label: reply, answer, confirm, respond,
+//      response, responsive and silence in any form (unanswered, unconfirmed, unresponsive), hear, heard, ignore, "no
+//      word", and "text back", "write back", "get back" or "call back".
 //   6. A sentence that names a reply, an answer or silence and asks or trails off ("No reply by 7pm?") reads with the
 //      sentence after it, as round 2 read it; such a pair passes only when each of its sentences is approved.
 //   7. A message text is every string of a step's say and of its variants' say and addSay (words, plain text and
 //      elements), and the step's fallback text; S13-55's own lines are the money home step's does, more and rule.
+//   8. Money words are found as a person reads them (foldedForm): compatibility forms as their plain letters and signs
+//      (a fullwidth ＄ is $), combining marks and invisible format characters left out (a soft hyphen or a zero-width
+//      space inside "charge"), and Cyrillic and Greek letters that look like Latin ones read as those ("сharge" with a
+//      Cyrillic с). A word that mixes Latin letters with another script's letters counts as a money word (a word all in
+//      one script, such as a Russian one, does not). The claim check reads its claims in the same form. Approved
+//      sentences are still compared as written (default 2).
 
-import { pieces } from "../../finalize/slots/syntax";
+import { pieces, type Piece } from "../../finalize/slots/syntax";
 import { VOCABULARY } from "../../finalize/slots/vocabulary";
 import type { ClaimRefusal } from "./claims";
 import { MoneyHomeError, readMoneyRecord, type FlowLetter, type MoneyRecord } from "./record";
@@ -52,23 +80,210 @@ export function readingForm(text: string): string {
   return text.replace(/[’‘]/gu, "'").replace(/(\d)\s*([ap])\.m\.?/giu, "$1$2m");
 }
 
+/**
+ * Letters that look like Latin ones, in lower case, and the Latin letter each reads as (default 8). The keys are
+ * Cyrillic letters, then Greek ones, then Latin letters NFKD leaves as they are (dotless i, script a and g).
+ */
+const LOOKALIKE: ReadonlyMap<string, string> = new Map(
+  Object.entries({
+    а: "a",
+    в: "b",
+    ь: "b",
+    с: "c",
+    ԁ: "d",
+    е: "e",
+    һ: "h",
+    н: "h",
+    і: "i",
+    ј: "j",
+    к: "k",
+    ӏ: "l",
+    м: "m",
+    п: "n",
+    о: "o",
+    р: "p",
+    ԛ: "q",
+    г: "r",
+    ѕ: "s",
+    т: "t",
+    у: "y",
+    ү: "y",
+    х: "x",
+    ԝ: "w",
+    α: "a",
+    β: "b",
+    ϲ: "c",
+    ε: "e",
+    η: "h",
+    ι: "i",
+    ϳ: "j",
+    κ: "k",
+    μ: "m",
+    ν: "v",
+    ο: "o",
+    ρ: "p",
+    τ: "t",
+    υ: "u",
+    χ: "x",
+    ı: "i",
+    ɑ: "a",
+    ɡ: "g",
+  }),
+);
+
+/**
+ * The reading form in lower case, compatibility forms as their plain letters and signs (a fullwidth ＄ is $), combining
+ * marks and invisible format characters left out (default 8).
+ */
+function plainForm(text: string): string {
+  return readingForm(text)
+    .normalize("NFKD")
+    .replace(/[\p{M}\p{Cf}]/gu, "")
+    .toLowerCase();
+}
+
+/** Any one of the look-alike letters. */
+const LOOKALIKE_LETTER = new RegExp(`[${[...LOOKALIKE.keys()].join("")}]`, "gu");
+
+/** The form money words are found in (default 8): the plain form, with look-alike letters read as Latin ones. */
+export function foldedForm(text: string): string {
+  return plainForm(text).replace(LOOKALIKE_LETTER, (letter) => LOOKALIKE.get(letter) ?? letter);
+}
+
+/**
+ * Does a word of the text mix Latin letters with letters of another script (default 8)? Such a word may hide a money
+ * word. Read on the plain form, before look-alike letters are read as Latin ones, so a word of one script is none.
+ */
+function mixesScripts(text: string): boolean {
+  return (plainForm(text).match(/\p{L}+/gu) ?? []).some(
+    (word) => /\p{Script=Latin}/u.test(word) && /[^\P{L}\p{Script=Latin}]/u.test(word),
+  );
+}
+
+/** Where a sentence ends inside plain words: after . ! ? before a space, or at a line break (default 1). */
+const SENTENCE_END = /(?<=[.!?])\s+|[\r\n]+/u;
+
+/** A text's sentences, in the reading form, each as its pieces: a slot is read whole, never cut by a sentence end. */
+function sentencePieces(text: string): Piece[][] {
+  const sentences: Piece[][] = [];
+  let current: Piece[] = [];
+  const close = (): void => {
+    if (current.length > 0) sentences.push(current);
+    current = [];
+  };
+  for (const piece of pieces(readingForm(text))) {
+    if (piece.kind === "slot") {
+      current.push(piece);
+      continue;
+    }
+    piece.text.split(SENTENCE_END).forEach((part, index) => {
+      if (index > 0) close();
+      if (part !== "") current.push({ kind: "words", text: part });
+    });
+  }
+  close();
+  return sentences;
+}
+
+/** A sentence as written, its slots whole, trimmed. */
+function sentenceText(parts: readonly Piece[]): string {
+  return parts
+    .map((piece) => (piece.kind === "slot" ? piece.ref.raw : piece.text))
+    .join("")
+    .trim();
+}
+
 /** A text's sentences, in the reading form: one ends only at . ! ? (before a space or the end) or at a line break. */
 export function sentencesOf(text: string): string[] {
-  return readingForm(text)
-    .split(/(?<=[.!?])\s+|[\r\n]+/u)
-    .map((sentence) => sentence.trim())
+  return sentencePieces(text)
+    .map(sentenceText)
     .filter((sentence) => sentence !== "");
 }
 
-/** A sentence as it is compared: lower case, each slot written {{name}}, spaces as one, its end marks left out. */
-function comparedForm(sentence: string): string {
-  return pieces(sentence.toLowerCase())
-    .map((piece) => (piece.kind === "slot" ? `{{${piece.ref.name}}}` : piece.text))
-    .join("")
+/** A part of a compared form: lower-case words, or a slot by its name. An approved sentence is filled from its parts. */
+export type FormPart = string | { readonly slot: string };
+
+function formParts(parts: readonly Piece[]): FormPart[] {
+  return parts.map((piece) => (piece.kind === "slot" ? { slot: piece.ref.name } : piece.text.toLowerCase()));
+}
+
+/** Runs of spaces as one, trimmed, the end marks left out. */
+function compared(words: string): string {
+  return words
     .replace(/\s+/gu, " ")
     .trim()
     .replace(/[\s.!?]+$/u, "");
 }
+
+/** Joins a compared form's parts, each slot given a value written as that value, any other as {{name}}. */
+function joined(parts: readonly FormPart[], values: ReadonlyMap<string, string>): string {
+  return compared(
+    parts
+      .map((part) => (typeof part === "string" ? part : (values.get(part.slot) ?? `{{${part.slot}}}`)))
+      .join(""),
+  );
+}
+
+const NO_VALUES: ReadonlyMap<string, string> = new Map();
+
+/** A sentence as it is compared: lower case, each slot written {{name}}, spaces as one, its end marks left out. */
+function comparedForm(parts: readonly Piece[]): string {
+  return joined(formParts(parts), NO_VALUES);
+}
+
+// Round 4 (DL-187 1): one money word is enough. A stem counts at the start of a word (never after a letter), so
+// "coffee", "recently" and "percent" hold none; a whole word (fee, cent) has no letter after it either, so "feel" is none.
+const NOT_AFTER_LETTER = String.raw`(?<![\p{L}\p{M}])`;
+const NOT_BEFORE_LETTER = String.raw`(?![\p{L}\p{M}])`;
+/** A prefix a money stem may carry (default 4): unauthorized, prepaid, surcharge, withhold, copay, upcharge. */
+const STEM_PREFIX = String.raw`(?:(?:un|non|pre|re|post|over|under|sur|with|co|auto|mis|up|down|e)-?)?`;
+/** DL-187's stems, and owing and withdrew (default 4), which do not begin with the letters of owe and withdraw. */
+const MONEY_STEMS = [
+  "charg",
+  "bill",
+  "pay",
+  "paid",
+  "cost",
+  "pric",
+  "refund",
+  "deposit",
+  "debit",
+  "authori",
+  "hold",
+  "held",
+  "owe",
+  "owing",
+  "deduct",
+  "invoic",
+  "withdr[ae]w",
+  "fund",
+  "dollar",
+  "buck",
+  "money",
+  "amount",
+];
+/** One money word: a stem at the start of a word; fee, fees, cent or cents; a word ending in card(s); a money sign. */
+const ONE_MONEY_WORD = new RegExp(
+  [
+    `${NOT_AFTER_LETTER}${STEM_PREFIX}(?:${MONEY_STEMS.join("|")})`,
+    `${NOT_AFTER_LETTER}(?:fees?|cents?|(?:pre-?)?auths?)${NOT_BEFORE_LETTER}`,
+    `card(?:holder)?s?${NOT_BEFORE_LETTER}`,
+    "[$€£¢]",
+  ].join("|"),
+  "iu",
+);
+/** Hold words, for the label (DL-187 4, default 5): a word that begins with hold, held or authori; auth, pre-auth. */
+const HOLD_STEM = new RegExp(
+  `${NOT_AFTER_LETTER}${STEM_PREFIX}(?:hold|held|authori)|${NOT_AFTER_LETTER}(?:pre-?)?auths?${NOT_BEFORE_LETTER}`,
+  "iu",
+);
+/** Silence words, for the label (DL-187 4, default 5): reply, answer, confirm, respond and silence, in any form. */
+const SILENCE_STEM = new RegExp(
+  `${NOT_AFTER_LETTER}(?:(?:un|non|re)-?)?(?:repl(?:y|ies|ied|ying)|answer|confirm|respon(?:d|se|siv)|silen)`,
+  "iu",
+);
+
+// Round 3's pairs (DL-182 1), kept: each sentence they made a money sentence stays one.
 
 /** Hold words, any form (DL-182): hold (held, holding, hold onto, on hold), authorize or authorise (authorization,
  * pre-authorize, pre-auth), reserve, block, freeze, set aside, put aside. */
@@ -101,7 +316,7 @@ const CARD = /\bcards?\b|\bpayment\s+methods?\b/iu;
 const AMOUNT =
   /[$€£]\s?\d|\b\d[\d,]*(?:\.\d+)?\s?(?:dollars?|euros?|pounds?|usd|eur|gbp)\b|\b(?:usd|eur|gbp)\s?\d/iu;
 /** Money named: a deposit, a fee, a payment, funds, an amount, money. */
-const MONEY_WORD = /\b(?:deposits?|fees?|(?:pre-?)?payments?|funds?|amounts?|money)\b/iu;
+const MONEY_NAMED = /\b(?:deposits?|fees?|(?:pre-?)?payments?|funds?|amounts?|money)\b/iu;
 /** The slots that stand for money (in the compared form, {{name}}): K-03's money slots, {{keep}}, the money home's slots. */
 const MONEY_SLOT_NAMES: readonly string[] = [
   ...new Set([
@@ -116,6 +331,21 @@ const MONEY_SLOT = new RegExp(
   "u",
 );
 
+/** Round 3's money sentence (DL-182 1), read on the compared form: a money action word with a money object, a card with
+ * an amount or a money slot, or a reply, an answer or silence with a charge or other money action word or object. */
+function pairedMoney(form: string): boolean {
+  const hold = HOLD_WORD.test(form);
+  const silence = SILENCE_WORD.test(form);
+  const charge = CHARGE_WORD.test(form);
+  const other = OTHER_ACTION.test(form);
+  const card = CARD.test(form);
+  const amount = AMOUNT.test(form) || MONEY_SLOT.test(form);
+  const object = card || amount || MONEY_NAMED.test(form);
+  return (
+    ((hold || charge || other) && object) || (card && amount) || (silence && (charge || other || object))
+  );
+}
+
 /** What a sentence speaks of: money, and whether it holds a hold word or names a reply, an answer or silence. */
 interface Topic {
   readonly money: boolean;
@@ -123,44 +353,77 @@ interface Topic {
   readonly silence: boolean;
 }
 
-function topicOf(words: string): Topic {
-  const hold = HOLD_WORD.test(words);
-  const silence = SILENCE_WORD.test(words);
-  const charge = CHARGE_WORD.test(words);
-  const other = OTHER_ACTION.test(words);
-  const card = CARD.test(words);
-  const amount = AMOUNT.test(words) || MONEY_SLOT.test(words);
-  const object = card || amount || MONEY_WORD.test(words);
-  const money =
-    ((hold || charge || other) && object) || (card && amount) || (silence && (charge || other || object));
-  return { money, hold, silence };
+/** One sentence of a text, read for the gate. */
+interface ReadSentence {
+  /** As written, trimmed. */
+  readonly text: string;
+  /** Folded (default 8), its slots as written (their example words read too). */
+  readonly words: string;
+  /** A word of it mixes Latin letters with another script's (default 8). */
+  readonly mixed: boolean;
+  /** The compared form (default 2). */
+  readonly form: string;
+}
+
+function readSentences(text: string): ReadSentence[] {
+  return sentencePieces(text).flatMap((parts) => {
+    const form = comparedForm(parts);
+    if (form === "") return [];
+    const written = sentenceText(parts);
+    return [{ text: written, words: foldedForm(written), mixed: mixesScripts(written), form }];
+  });
 }
 
 /**
- * A text's units in the compared form: each sentence alone, except that a sentence naming a reply, an answer or silence
- * that asks or trails off reads with the sentence after it (default 6).
+ * The topic of a sentence, or of a question read with the sentence after it: from its words (folded, slots as written),
+ * its compared form (slots as {{name}}, read folded for round 3's pairs) and whether a word mixes scripts (default 8).
  */
-function unitsOf(text: string): (readonly string[])[] {
-  const units: string[][] = [];
-  let open: string[] | null = null;
-  for (const sentence of sentencesOf(text)) {
-    const form = comparedForm(sentence);
-    if (form === "") continue;
+function topicOf(group: readonly ReadSentence[]): Topic {
+  const words = group.map((sentence) => sentence.words).join(" ");
+  const form = group.map((sentence) => sentence.form).join(" ");
+  return {
+    money:
+      ONE_MONEY_WORD.test(words) ||
+      group.some((sentence) => sentence.mixed) ||
+      MONEY_SLOT.test(form) ||
+      pairedMoney(foldedForm(form)),
+    hold: HOLD_STEM.test(words) || HOLD_WORD.test(words),
+    silence: SILENCE_STEM.test(words) || SILENCE_WORD.test(words),
+  };
+}
+
+/** A unit of a text: one sentence, or a reply, answer or silence question with the sentence after it (default 6). */
+interface Unit {
+  readonly forms: readonly string[];
+  readonly topic: Topic;
+}
+
+function unitsOf(text: string): Unit[] {
+  const groups: ReadSentence[][] = [];
+  let open: ReadSentence[] | null = null;
+  for (const sentence of readSentences(text)) {
     if (open === null) {
-      open = [form];
-      units.push(open);
-    } else open.push(form);
-    if (!(/(?:\?|\.\.\.)$/u.test(sentence) && SILENCE_WORD.test(form))) open = null;
+      open = [sentence];
+      groups.push(open);
+    } else open.push(sentence);
+    if (!(/(?:\?|\.\.\.)$/u.test(sentence.text) && SILENCE_WORD.test(foldedForm(sentence.form)))) open = null;
   }
-  return units;
+  return groups.map((group) => ({ forms: group.map((sentence) => sentence.form), topic: topicOf(group) }));
+}
+
+/** An approved sentence that holds a slot: its compared form, its slots' names and its parts to fill. */
+export interface ApprovedSentence {
+  readonly form: string;
+  readonly slots: ReadonlySet<string>;
+  readonly parts: readonly FormPart[];
 }
 
 /** The approved lines, read for the gate. */
 export interface ApprovedMoneyLines {
   /** Every sentence of every approved line, in the compared form (slots as {{name}}). */
   readonly sentences: ReadonlySet<string>;
-  /** The approved lines that hold a slot, with their slots' names: filled with a message's slot values when checked. */
-  readonly slotted: readonly { readonly text: string; readonly slots: ReadonlySet<string> }[];
+  /** The approved sentences that hold a slot: filled with a message's slot values when checked, never re-split. */
+  readonly slotted: readonly ApprovedSentence[];
 }
 
 /** A slot and the value the slot filler gave it (K-03 finalParts.slotValues; T-310 SlotValue). */
@@ -181,35 +444,39 @@ export interface GateCheck {
   readonly refused: readonly ClaimRefusal[];
 }
 
-/** Reads approved lines for the gate: each line's sentences in the compared form. */
+/** Reads approved lines for the gate: each line's sentences in the compared form, its slots read whole (default 2). */
 export function approvedMoneyLines(lines: Iterable<string>): ApprovedMoneyLines {
   const sentences = new Set<string>();
-  const slotted: { text: string; slots: ReadonlySet<string> }[] = [];
-  for (const line of lines) {
-    for (const sentence of sentencesOf(line)) sentences.add(comparedForm(sentence));
-    const slots = new Set(pieces(line).flatMap((piece) => (piece.kind === "slot" ? [piece.ref.name] : [])));
-    if (slots.size > 0) slotted.push({ text: line, slots });
-  }
-  return { sentences, slotted };
+  const slotted = new Map<string, ApprovedSentence>();
+  for (const line of lines)
+    for (const parts of sentencePieces(line)) {
+      const form = comparedForm(parts);
+      if (form === "") continue;
+      sentences.add(form);
+      const slots = new Set(parts.flatMap((piece) => (piece.kind === "slot" ? [piece.ref.name] : [])));
+      if (slots.size > 0 && !slotted.has(form)) slotted.set(form, { form, slots, parts: formParts(parts) });
+    }
+  return { sentences, slotted: [...slotted.values()] };
 }
 
-/** A line with each slot it holds that was given a value written as that value (default 3). */
-function filledWith(text: string, values: ReadonlyMap<string, string>): string {
-  return pieces(text)
-    .map((piece) => (piece.kind === "slot" ? (values.get(piece.ref.name) ?? piece.ref.raw) : piece.text))
-    .join("");
+/** Does a slot value hold a sentence end (default 3): . ! ? before a space or its end, or a line break? */
+function holdsSentenceEnd(value: string): boolean {
+  return /[.!?](?:\s|$)|[\r\n]/u.test(readingForm(value));
 }
 
-/** Is a sentence, in the compared form, an approved line's: as written, or with its slots standing for their values? */
+/**
+ * Is a sentence, in the compared form, an approved sentence: as written, or with its slots standing for the values
+ * given, filled into the approved sentence and never re-split (default 3)? A value that holds a sentence end is refused.
+ */
 function approvedIn(gate: MoneyGate): (form: string) => boolean {
   const { sentences, slotted } = gate.approved;
-  const values = new Map<string, string>((gate.slotValues ?? []).map(({ slot, value }) => [slot, value]));
+  const values = new Map<string, string>();
+  for (const { slot, value } of gate.slotValues ?? [])
+    if (!holdsSentenceEnd(value)) values.set(slot, readingForm(value).toLowerCase());
   if (values.size === 0) return (form) => sentences.has(form);
   const filled = new Set<string>();
-  for (const line of slotted) {
-    if (![...line.slots].some((slot) => values.has(slot))) continue;
-    for (const sentence of sentencesOf(filledWith(line.text, values))) filled.add(comparedForm(sentence));
-  }
+  for (const sentence of slotted)
+    if ([...sentence.slots].some((slot) => values.has(slot))) filled.add(joined(sentence.parts, values));
   return (form) => sentences.has(form) || filled.has(form);
 }
 
@@ -227,15 +494,14 @@ function refusalsOf(topics: readonly Topic[], notFromRecord: boolean): ClaimRefu
 }
 
 /** The money units of a text, with what each speaks of. */
-function moneyUnits(text: string): { readonly forms: readonly string[]; readonly topic: Topic }[] {
-  return unitsOf(text)
-    .map((forms) => ({ forms, topic: topicOf(forms.join(" ")) }))
-    .filter((unit) => unit.topic.money);
+function moneyUnits(text: string): Unit[] {
+  return unitsOf(text).filter((unit) => unit.topic.money);
 }
 
 /**
- * The money-topic gate: every money sentence of the text must be an approved line, word for word, its slots standing
- * for the values given; any other money sentence is refused (neverHold, neverChargeOnSilence or moneyNotFromRecord).
+ * The money-topic gate: every money sentence of the text must be an approved sentence, word for word, its slots
+ * standing for the values given; any other money sentence is refused (neverHold, neverChargeOnSilence or
+ * moneyNotFromRecord).
  */
 export function gateMoneyText(text: string, gate: MoneyGate): GateCheck {
   const units = moneyUnits(text);
