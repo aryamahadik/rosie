@@ -7,7 +7,7 @@
 
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createPromptCache, messagesParams, sha256Hex } from "../cache";
+import { CacheLayoutError, createPromptCache, messagesParams, sha256Hex } from "../cache";
 import {
   API_URL,
   API_VERSION,
@@ -39,6 +39,7 @@ import {
   safetyReadTurn,
   type SafetyLabel,
   type SafetyReadAnswer,
+  type SafetyReadCallOptions,
   type SafetyReadInput,
   type SafetyReader,
   type SafetyResult,
@@ -90,6 +91,17 @@ afterEach(() => {
 
 function readerOver(api: { fetch: FetchLike }, env: Record<string, string | undefined> = ENV): SafetyReader {
   return createSafetyReader({ bundle: BUNDLE, prompts: PROMPTS, env, fetch: api.fetch });
+}
+
+/** A read with the fake clock run to the 4 s mark, so an answer with no verdict, given then, comes too. */
+async function readThrough(
+  reader: SafetyReader,
+  input: SafetyReadInput,
+  options?: SafetyReadCallOptions,
+): Promise<SafetyReadAnswer> {
+  const pending = reader.read(input, options);
+  await vi.advanceTimersByTimeAsync(SAFETY_VERDICT_MS);
+  return pending;
 }
 
 const models = (seen: readonly Seen[]): string[] => seen.map((entry) => entry.model);
@@ -190,7 +202,7 @@ describe("several labels per text", () => {
       outcome,
       tense,
       evidence,
-      atRisk: "the writer",
+      atRisk: "unknown",
       writer: "the person at the handle",
     });
     const labels = [
@@ -200,7 +212,11 @@ describe("several labels per text", () => {
       label("A threat to staff or others", "now", "I'll hurt Riley too"),
     ];
     const api = fakeMessagesApi(recorded, always({ kind: "ok", output: { labels } }));
-    const answer = await readerOver(api).read({ eventId: "evt-alex-0302", source: "text", text: "made up" });
+    const answer = await readerOver(api).read({
+      eventId: "evt-alex-0302",
+      source: "text",
+      text: "I'll hurt him, the shop is on fire, and I'll hurt Riley too",
+    });
     expect(answer.result.read?.labels).toEqual(labels);
     expect(answer.result.outcomes).toEqual(["A threat to staff or others", "An emergency"]);
     expectK02(answer);
@@ -319,7 +335,7 @@ describe("Haiku, then Sonnet if Haiku fails or times out, 2 s each (fake clock)"
     expectK02(answer);
   });
 
-  it("gives Sonnet its own 2 s after a Haiku failure, so the answer comes within 4 s however Haiku failed", async () => {
+  it("gives Sonnet its own 2 s after a Haiku failure, and with no verdict answers at the 4 s mark", async () => {
     const api = fakeMessagesApi(recorded, (seen) =>
       seen.model === HAIKU_MODEL ? { kind: "status", status: 500 } : { kind: "hang" },
     );
@@ -330,7 +346,9 @@ describe("Haiku, then Sonnet if Haiku fails or times out, 2 s each (fake clock)"
         settled = true;
         return answer;
       });
-    await vi.advanceTimersByTimeAsync(SAFETY_TRY_MS - 1);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(models(api.seen)).toEqual([HAIKU_MODEL, SONNET_MODEL]);
+    await vi.advanceTimersByTimeAsync(SAFETY_VERDICT_MS - 1);
     expect(settled).toBe(false);
     await vi.advanceTimersByTimeAsync(1);
     const answer = await pending;
@@ -338,7 +356,12 @@ describe("Haiku, then Sonnet if Haiku fails or times out, 2 s each (fake clock)"
       { model: "haiku", result: "error" },
       { model: "sonnet", result: "timeout" },
     ]);
+    expect(answer.modelCalls.map((call) => [call.model, call.outcome, call.ms])).toEqual([
+      [HAIKU_MODEL, "failed", 0],
+      [SONNET_MODEL, "timedOut", 2000],
+    ]);
     expect(answer.result.read).toBeNull();
+    expectK02(answer);
   });
 });
 
@@ -381,9 +404,21 @@ describe("no verdict: both tries fail", () => {
     expect(api.seen).toHaveLength(2);
   });
 
-  it("returns no verdict at once when both fail fast, naming each failure as an error", async () => {
+  it("gives no verdict at the 4 s mark too when both tries fail fast, naming each failure as an error", async () => {
     const api = fakeMessagesApi(recorded, always({ kind: "status", status: 503 }));
-    const answer = await readerOver(api).read(inputOf("safety-no.json"));
+    let settled = false;
+    const pending = readerOver(api)
+      .read(inputOf("safety-no.json"))
+      .then((answer) => {
+        settled = true;
+        return answer;
+      });
+    await vi.advanceTimersByTimeAsync(SAFETY_VERDICT_MS - 1);
+    expect(models(api.seen)).toEqual([HAIKU_MODEL, SONNET_MODEL]);
+    expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(settled).toBe(true);
+    const answer = await pending;
     expect(answer.result).toMatchObject({
       read: null,
       timedOut: true,
@@ -403,9 +438,7 @@ describe("no verdict: both tries fail", () => {
     const api = fakeMessagesApi(recorded, (seen) =>
       seen.model === HAIKU_MODEL ? { kind: "hang" } : { kind: "ok", output: {}, stop: "refusal" },
     );
-    const pending = readerOver(api).read(inputOf("safety-no.json"));
-    await vi.advanceTimersByTimeAsync(SAFETY_TRY_MS);
-    const answer = await pending;
+    const answer = await readThrough(readerOver(api), inputOf("safety-no.json"));
     expect(answer.result.tries).toEqual([
       { model: "haiku", result: "timeout" },
       { model: "sonnet", result: "error" },
@@ -431,7 +464,7 @@ describe("every output validates against K-02", () => {
       for (const [n, script] of scripts.entries()) {
         const source = sources[n % sources.length] ?? "text";
         const api = fakeMessagesApi(recorded, script);
-        const answer = await readerOver(api).read({
+        const answer = await readThrough(readerOver(api), {
           eventId: `evt-${recording.id}-${String(n)}`,
           source,
           text: recording.request.text ?? "",
@@ -522,7 +555,7 @@ describe("what one call sends", () => {
 
   it("calls claude-haiku-5-5 and then claude-sonnet-5-5, never another model, at the Messages endpoint only", async () => {
     const api = fakeMessagesApi(recorded, always({ kind: "status", status: 500 }));
-    await readerOver(api).read(inputOf("safety-no.json"));
+    await readThrough(readerOver(api), inputOf("safety-no.json"));
     expect(models(api.seen)).toEqual(["claude-haiku-5-5", "claude-sonnet-5-5"]);
     expect(api.seen.map((entry) => entry.url)).toEqual([API_URL, API_URL]);
   });
@@ -549,6 +582,20 @@ describe("set-up and calls that cannot be made", () => {
     expect(() =>
       createSafetyReader({ bundle: otherBundle, prompts: PROMPTS, env: ENV, fetch: api.fetch }),
     ).toThrow(GatewayConfigError);
+  });
+
+  it("refuses, at set-up, a bundle whose safety read prompt is empty", () => {
+    const api = fakeMessagesApi(recorded, always({ kind: "double" }));
+    const empty = { version: "safety-read-0", sha256: sha256Hex(""), text: "" };
+    expect(() =>
+      createSafetyReader({
+        bundle: BUNDLE,
+        prompts: createPromptCache(cacheBundleWith(empty)),
+        env: ENV,
+        fetch: api.fetch,
+      }),
+    ).toThrow(CacheLayoutError);
+    expect(api.seen).toHaveLength(0);
   });
 
   it("refuses a trace of another bundle before any call", async () => {
@@ -756,8 +803,8 @@ describe("the key", () => {
     ];
     const api = fakeMessagesApi(recorded, (_seen, n) => script[n] ?? { kind: "double" });
     const reader = readerOver(api);
-    const first = await reader.read(inputOf("safety-no.json"), { trace: context });
-    const second = await reader.read(inputOf("safety-no.json"), { trace: context });
+    const first = await readThrough(reader, inputOf("safety-no.json"), { trace: context });
+    const second = await readThrough(reader, inputOf("safety-no.json"), { trace: context });
     expect(first.result.read).toBeNull();
     expect(second.result.read).toBeNull();
 

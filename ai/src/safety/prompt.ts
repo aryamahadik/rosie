@@ -194,33 +194,31 @@ export const SAFETY_EXAMPLES: readonly SafetyExample[] = [
   },
 ];
 
-/** A label as the prompt shows it: K-02's field order, as JSON. */
-const labelsText = (read: SafetyRead): string =>
-  read.labels
-    .map((label) =>
-      JSON.stringify({
-        outcome: label.outcome,
-        tense: label.tense,
-        evidence: label.evidence,
-        atRisk: label.atRisk,
-        writer: label.writer,
-      }),
-    )
-    .join("\n");
+/** A read as the model returns it (K-02 `safetyRead`), each label's fields in K-02's order, as one line of JSON. */
+export const answerText = (read: SafetyRead): string =>
+  JSON.stringify({
+    labels: read.labels.map((label) => ({
+      outcome: label.outcome,
+      tense: label.tense,
+      evidence: label.evidence,
+      atRisk: label.atRisk,
+      writer: label.writer,
+    })),
+  });
 
-/** One worked example as the prompt shows it: the text as the user message gives it, the labels, and why. */
+/** One worked example as the prompt shows it: the text as the user message gives it, the answer, and why. */
 export function exampleText(example: SafetyExample, n: number): string {
   return [
     `<example n="${String(n)}" title="${escapeAttribute(example.title)}">`,
     safetyReadTurn({ source: "text", text: example.text }),
-    section("labels", [labelsText(example.read)]),
+    section("answer", [answerText(example.read)]),
     section("why", [example.why]),
     "</example>",
   ].join("\n");
 }
 
 const EXAMPLES = section("examples", [
-  "Five worked examples. Each shows a text as it comes to you, the labels to return, and why.",
+  "Five worked examples. Each shows a text as it comes to you, the answer to return, and why.",
   ...SAFETY_EXAMPLES.map((example, index) => exampleText(example, index + 1)),
 ]);
 

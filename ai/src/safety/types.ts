@@ -123,10 +123,11 @@ export interface SafetyReadCallOptions {
 /** The safety read (C-113): Haiku, then Sonnet if Haiku fails or times out, 2 s each, outside the AI gateway. */
 export interface SafetyReader {
   /**
-   * Reads one text. Never rejects for a failed model call: a read that gets no verdict answers with no verdict
-   * (`read` null, `timedOut` true), at the latest when both 2 s tries have timed out, 4 s after the call. It rejects
-   * only for a call that cannot be made at all, before any model call: no key, a trace of another bundle, or a bundle
-   * with no safety read prompt (a set-up fault, loud; the actor then applies its own no-verdict rule).
+   * Reads one text. A verdict comes as soon as a try gives one. Never rejects for a failed model call: a read that
+   * gets no verdict answers with no verdict (`read` null, `timedOut` true) 4 s after the call, when both 2 s tries
+   * have timed out, and then too when they failed sooner (no verdict in 4 s: arch 02 line 111). It rejects
+   * only for a call that cannot be made at all, before any model call: no key, or a trace of another bundle (a set-up
+   * fault, loud; the actor then applies its own no-verdict rule).
    */
   read(input: SafetyReadInput, options?: SafetyReadCallOptions): Promise<SafetyReadAnswer>;
 }

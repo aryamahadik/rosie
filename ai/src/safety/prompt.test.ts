@@ -15,6 +15,7 @@ import {
   SAFETY_READ_PROMPT_VERSION,
   SAFETY_SOURCES,
   TENSES,
+  answerText,
   exampleText,
   safetyReadPromptText,
   safetyReadTurn,
@@ -90,12 +91,16 @@ describe("the worked examples", () => {
     }
   });
 
-  it("are all in the prompt, each as the user message would give its text", () => {
+  it("are all in the prompt, each text as the user message would give it, each answer as the model returns one", () => {
     SAFETY_EXAMPLES.forEach((example, index) => {
       const shown = exampleText(example, index + 1);
       expect(SAFETY_READ_PROMPT.text).toContain(shown);
       expect(shown).toContain(safetyReadTurn({ source: "text", text: example.text }));
-      for (const label of example.read.labels) expect(shown).toContain(JSON.stringify(label));
+      expect(shown).toContain(`<answer>\n${answerText(example.read)}\n</answer>`);
+      // The answer shown is the example's read, and a K-02 read as JSON.
+      const answer = JSON.parse(answerText(example.read)) as unknown;
+      expect(answer).toEqual(example.read);
+      expect(contract.validate("safetyRead", answer)).toEqual([]);
     });
   });
 

@@ -19,6 +19,7 @@ export {
   SAFETY_READ_PROMPT,
   SAFETY_READ_PROMPT_TEXT,
   SAFETY_READ_PROMPT_VERSION,
+  answerText,
   exampleText,
   safetyReadPromptText,
   safetyReadTurn,
