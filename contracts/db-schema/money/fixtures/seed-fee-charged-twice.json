@@ -204,7 +204,8 @@
         "option_id": "S11-25/1",
         "event_id": "evt-sam-0081",
         "state": "charged",
-        "ended_at": "2026-11-07T14:00:02Z",
+        "charged_at": "2026-11-07T14:00:02Z",
+        "dropped_at": null,
         "version": 3
       }
     },
@@ -280,6 +281,7 @@
         "effect_id": "eff-dee-late-cancel-fee",
         "saved_card_id": "card-dee-beard-trim",
         "booking_fee_id": "fee-dee-late-cancel",
+        "plan_charge_id": null,
         "recorded_by_person_id": null,
         "asked_at": "2026-11-07T14:00:00Z",
         "paid_at": "2026-11-07T14:00:02Z",

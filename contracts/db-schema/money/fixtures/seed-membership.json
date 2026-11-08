@@ -333,30 +333,6 @@
       }
     },
     {
-      "table": "payments",
-      "values": {
-        "id": "pay-owen-plan-oct31",
-        "business_id": "biz-lees-barbershop",
-        "payer_person_id": "person-owen",
-        "booking_id": "booking-owen-plan-oct31",
-        "purpose": "plan_charge",
-        "method": "card",
-        "amount_cents": 3500,
-        "currency": "USD",
-        "state": "paid",
-        "effect_id": "eff-owen-plan-oct31-charge",
-        "saved_card_id": "card-owen-plan",
-        "booking_fee_id": null,
-        "recorded_by_person_id": null,
-        "asked_at": "2026-10-31T14:40:00Z",
-        "paid_at": "2026-10-31T14:40:02Z",
-        "failed_at": null,
-        "failed_why": null,
-        "cancelled_at": null,
-        "version": 2
-      }
-    },
-    {
       "table": "plan_charges",
       "values": {
         "id": "plancharge-owen-2026-10-31",
@@ -371,9 +347,35 @@
         "reminder_outbox_row_id": "out-a7-54-owen-oct31",
         "state": "charged",
         "skipped_why": null,
-        "payment_id": "pay-owen-plan-oct31",
-        "ended_at": "2026-10-31T14:40:02Z",
+        "charged_at": "2026-10-31T14:40:02Z",
+        "failed_at": null,
+        "skipped_at": null,
         "version": 3
+      }
+    },
+    {
+      "table": "payments",
+      "values": {
+        "id": "pay-owen-plan-oct31",
+        "business_id": "biz-lees-barbershop",
+        "payer_person_id": "person-owen",
+        "booking_id": "booking-owen-plan-oct31",
+        "purpose": "plan_charge",
+        "method": "card",
+        "amount_cents": 3500,
+        "currency": "USD",
+        "state": "paid",
+        "effect_id": "eff-owen-plan-oct31-charge",
+        "saved_card_id": "card-owen-plan",
+        "booking_fee_id": null,
+        "plan_charge_id": "plancharge-owen-2026-10-31",
+        "recorded_by_person_id": null,
+        "asked_at": "2026-10-31T14:40:00Z",
+        "paid_at": "2026-10-31T14:40:02Z",
+        "failed_at": null,
+        "failed_why": null,
+        "cancelled_at": null,
+        "version": 2
       }
     },
     {

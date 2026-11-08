@@ -188,6 +188,7 @@
         "effect_id": "eff-alex-hot-flow-pack",
         "saved_card_id": null,
         "booking_fee_id": null,
+        "plan_charge_id": null,
         "recorded_by_person_id": null,
         "asked_at": "2026-11-05T15:00:00Z",
         "paid_at": "2026-11-05T15:00:02Z",

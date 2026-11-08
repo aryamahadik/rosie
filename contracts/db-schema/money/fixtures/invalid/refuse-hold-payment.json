@@ -199,6 +199,7 @@
       "effect_id": "eff-alex-grooms-deposit",
       "saved_card_id": "card-alex-grooms-package",
       "booking_fee_id": null,
+      "plan_charge_id": null,
       "recorded_by_person_id": null,
       "asked_at": "2026-11-07T15:20:00Z",
       "paid_at": null,

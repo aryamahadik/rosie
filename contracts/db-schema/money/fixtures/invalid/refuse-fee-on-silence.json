@@ -73,7 +73,8 @@
       "option_id": null,
       "event_id": null,
       "state": "charged",
-      "ended_at": "2026-11-15T15:30:00Z",
+      "charged_at": "2026-11-15T15:30:00Z",
+      "dropped_at": null,
       "version": 1
     },
     "expect": {

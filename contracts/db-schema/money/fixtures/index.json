@@ -37,7 +37,7 @@
       "version": "v1",
       "table": "memberships",
       "expect": "accept",
-      "shows": "A plan with its own yes, its card, and one charge after its reminder: Owen H.'s haircut plan at Lee's Barbershop with Riley, every 4 weeks on Saturdays, $35 a visit paid by the visit, renewing Sat Dec 26. Owen said yes to its terms on the page before any card (a K-29 plan_terms consent row, named not copied), and his card was saved for its charges. Fri Oct 30 at 10:00am the reminder of Saturday's $35 charge reached him (a delivered outbox row); Sat Oct 31, after the visit, $35 was charged on the saved card without him present: one plan charge for that visit names its reminder and its payment, which names its K-07 effect, and one charge line",
+      "shows": "A plan with its own yes, its card, and one charge after its reminder: Owen H.'s haircut plan at Lee's Barbershop with Riley, every 4 weeks on Saturdays, $35 a visit paid by the visit, renewing Sat Dec 26. Owen said yes to its terms on the page before any card (a K-29 plan_terms consent row, named not copied), and his card was saved for its charges. Fri Oct 30 at 10:00am the reminder of Saturday's $35 charge reached him (a delivered outbox row); Sat Oct 31, after the visit, $35 was charged on the saved card without him present: one plan charge for that visit names its reminder and keeps the time it was charged (set once); its payment names the plan charge (plan_charge_id) and its K-07 effect, and one charge line",
       "source": "A5-21 ('The plan's terms, before any card'; 'Haircut plan · every 4 weeks'; 'Each visit: $35'); A7-32 ('Say Owen H. has a haircut plan with Riley, every 4 weeks'); A7-54 ('Each charge is told the day before'; 'Your haircut plan with Lee's Barbershop charges $35 to your saved card on Sat Oct 31'; 'Charged Sat Oct 31, after the visit'; Fri Oct 30, 10:00am); A7-91 ('renews on Sat Dec 26'); S13-39 ('No reminder that reached them: no charge'); RULES 3.9; FS line 737; FEES-TERMS-DRAFT 3.3; K-29 v1 consents (plan_terms); K-33 v1 fixtures/seed-monthly-bill.json (Owen H., booking-owen-plan-oct31)"
     },
     {
@@ -53,7 +53,7 @@
       "version": "v1",
       "table": "pay_links",
       "expect": "accept",
-      "shows": "Rosie sends the bill, and it is paid by the link: Alex's $179 home grooming visit at his home (list|card|bill) is marked done; the bill matches the booking's price, so it goes at once (A9-04): one K-07 stripe_pay_link effect makes the payment Rosie's own pay page takes (purpose rest, pending), and one pay link to it is texted and emailed to Alex, kept only as its code's hash, with no deadline. Alex pays that evening: the payment is paid, the link ended paid, its item puts the $179 against the line, and the charge line is written from Stripe's paymentSucceeded event",
+      "shows": "Rosie sends the bill, and it is paid by the link: Alex's $179 home grooming visit at his home (list|card|bill) is marked done; the bill matches the booking's price, so it goes at once (A9-04): one K-07 stripe_pay_link effect makes the payment Rosie's own pay page takes (purpose rest, pending), and one pay link to it is texted and emailed to Alex, kept only as the hash of its long demo code (README default 21), with no deadline. Alex pays that evening: the payment is paid, the link ended paid, its item puts the $179 against the line, and the charge line is written from Stripe's paymentSucceeded event",
       "source": "A9-04 ('A bill that matches the booking's price ... goes out at once with no OK'); A9-05 ('The bill goes the way the customer picked. They pay by the link'; 'Pay $125 for Visit with Riley: rosfield.com/p/a2'); A9-06; S13-55; RULES 3.2, 3.14; fixtures/v1/test-kit/shops/barber.json (flow B: home grooming visit $179, a card saved for the $89 fee, Rosie texts the bill); K-25 v1 seed-service-money-paths (way-lees-home-grooming-home); K-14 v1 payLink, pageIntent, paymentSucceeded"
     },
     {
@@ -69,7 +69,7 @@
       "version": "v1",
       "table": "payments",
       "expect": "refuse",
-      "shows": "Alex's $40 deposit written as held on his card, to be captured later, instead of charged at once is refused (CHECK payments_state_known, SQLSTATE 23514: there is no held state, purpose or column); the same payment charged at once, state paid with its paid time, passes",
+      "shows": "Alex's $40 deposit written as held on his card, to be captured later, instead of charged at once is refused (CHECK payments_state_known, SQLSTATE 23514: there is no held state, purpose or column); the same payment written pending, for its effect to charge at once and its result to make paid (README rule 5: a Tool API write never makes it paid), passes",
       "source": "RULES 3.2 ('Nothing is ever held on a card'); S13-55; D65; K-14 v1 refuse-card-hold.json, intentState ('Stripe's requires_capture never comes'); 02-contracts section 7 row K-32 (refuse-hold-payment.json)"
     },
     {

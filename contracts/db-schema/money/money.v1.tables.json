@@ -277,7 +277,7 @@
     },
     {
       "name": "saved_cards",
-      "description": "A card saved on the business's own Stripe for a customer, for charges without them that the words they ticked allow (A5-07: 'The card goes on file through Stripe, in Lee's Barbershop's own account, and nothing is charged now. It's there only for what the customer ticks'): for a booking (the fee, a rest charged at DONE, a deposit or full price at the owner's OK) or for a plan's charges. Only Stripe's opaque ids are kept, never a card number or any card detail (RULES 3.12, 4.5); the card's brand and last four are read live through K-14 (pageIntent, savedCard), never stored. A card the network replaced, and a card removed once nothing needs it, keep their row.",
+      "description": "A card saved on the business's own Stripe for a customer, for charges without them that the words they ticked allow (A5-07: 'The card goes on file through Stripe, in Lee's Barbershop's own account, and nothing is charged now. It's there only for what the customer ticks'): for a booking (the fee, a rest charged at DONE, a deposit or full price at the owner's OK) or for a plan's charges. Only Stripe's opaque ids are kept, never a card number or any card detail (RULES 3.12, 4.5); the card's brand and last four are read live through K-14 (pageIntent, savedCard), never stored. The row is written with its save effect at the commit, before Stripe has made a customer for a person's first save, so the customer id, the payment-method id and the times are each set once later, by the save's result and its cardSaved event. A card the network replaced, and a card removed once nothing needs it, keep their row.",
       "source": "A5-07; A5-13 ('the card stays saved'); A6-32 ('that card is the one saved for it'); A9-12; A9-14; S11-26; S13-55 ('A saved card is removed once nothing needs it'); RULES 3.11, 3.12, 4.5; 02-contracts section 8 (card_saved: K-32); K-14 v1 saveCard, cardSaved, cardReplaced, removeCard; K-33 v1 bill_cards (the same pattern)",
       "columns": [
         {
@@ -323,10 +323,10 @@
         {
           "name": "stripe_customer_id",
           "type": "text",
-          "null": false,
+          "null": true,
           "audience": "never",
-          "description": "The customer on the business's own Stripe the card is saved to, as Stripe's opaque id (K-14 saveCard customerId). It holds no name or contact detail from Rosie (K-14 v1 default 12). Never a card number (saved_cards_no_card_number).",
-          "source": "K-14 v1 saveCard.response customerId; K-14 v1 default 12; RULES 4.5"
+          "description": "The customer on the business's own Stripe the card is saved to, as Stripe's opaque id. Written at the commit when the person already has a customer on that account (the save effect's port request names it, as a pay link that saves its card always does); null on a person's first save, whose port request names none ('null makes one, and the response names it'), until the save's result (K-14 saveCard.response customerId) or its cardSaved event names it, which sets it once (README rule 7). A saved card always has it (saved_cards_saved_with_method). It holds no name or contact detail from Rosie (K-14 v1 default 12). Never a card number (saved_cards_no_card_number).",
+          "source": "K-14 v1 saveCard.portRequest customerId ('null makes one, and the response names it'), saveCard.response customerId, cardSaved customerId, payLink.portRequest customerId; K-14 v1 default 12; RULES 4.5"
         },
         {
           "name": "stripe_payment_method_id",
@@ -462,12 +462,12 @@
       "checks": [
         {
           "name": "saved_cards_no_card_number",
-          "expression": "regexp_replace(stripe_customer_id, '[ -]', '', 'g') !~ '[0-9]{13,}' and (stripe_payment_method_id is null or regexp_replace(stripe_payment_method_id, '[ -]', '', 'g') !~ '[0-9]{13,}')",
+          "expression": "(stripe_customer_id is null or regexp_replace(stripe_customer_id, '[ -]', '', 'g') !~ '[0-9]{13,}') and (stripe_payment_method_id is null or regexp_replace(stripe_payment_method_id, '[ -]', '', 'g') !~ '[0-9]{13,}')",
           "source": "RULES 4.5 ('Never kept at all: full card numbers outside the card box'); RULES 3.12; BP rule 7; K-33 v1 bill_cards_no_card_number"
         },
         {
           "name": "saved_cards_ids_present",
-          "expression": "length(stripe_customer_id) > 0 and (stripe_payment_method_id is null or length(stripe_payment_method_id) > 0)",
+          "expression": "(stripe_customer_id is null or length(stripe_customer_id) > 0) and (stripe_payment_method_id is null or length(stripe_payment_method_id) > 0)",
           "source": "CQ-09 (an opaque id is a non-empty string)"
         },
         {
@@ -482,8 +482,8 @@
         },
         {
           "name": "saved_cards_saved_with_method",
-          "expression": "(saved_at is null) = (stripe_payment_method_id is null)",
-          "source": "K-14 v1 cardSaved"
+          "expression": "(saved_at is null) = (stripe_payment_method_id is null) and (saved_at is null or stripe_customer_id is not null)",
+          "source": "K-14 v1 cardSaved (customerId and paymentMethodId); K-14 v1 paymentSucceeded paymentMethodId with payLink.portRequest customerId"
         },
         {
           "name": "saved_cards_removed_why",
@@ -523,7 +523,7 @@
     },
     {
       "name": "payments",
-      "description": "Money asked of a payer and taken into the business's own Stripe, or recorded as paid outside it (FS payment row): who pays (the payer), whom (the business), what for (a deposit, the full price, the rest, an extra, the one fee, a tip, a pack or a plan's charge), how (a card, a bank transfer, cash or the business's own way), how much in integer minor units, and where it stands. A payment through Stripe runs from exactly one K-07 effect row (a charge or a pay link), named by its effect id, so a retried effect never makes a second payment. Nothing is ever held on a card: there is no hold, authorization or later capture, only a payment taken at once, pending, failed or cancelled (refuse-hold-payment). Once paid, failed or cancelled it never changes; money back is a refunds row.",
+      "description": "Money asked of a payer and taken into the business's own Stripe, or recorded as paid outside it (FS payment row): who pays (the payer), whom (the business), what for (a deposit, the full price, the rest, an extra, the one fee, a tip, a pack or a plan's charge), how (a card, a bank transfer, cash or the business's own way), how much in integer minor units, and where it stands. A payment through Stripe runs from exactly one K-07 effect row (a charge or a pay link), named by its effect id, so a retried effect never makes a second payment, and it becomes paid only by that effect's result or a provider event. A fee's payment names its fee and a plan charge's payment its plan charge, and each is paid once (one pending or paid payment each). Nothing is ever held on a card: there is no hold, authorization or later capture, only a payment taken at once, pending, failed or cancelled (refuse-hold-payment). Once paid, failed or cancelled it never changes; money back is a refunds row.",
       "source": "FS line 731 (payment); arch 09 line 457 ('Payment: idempotency key'); RULES 3.1, 3.2 ('Nothing is ever held on a card'), 3.11, 3.13, 3.14; S13-55; A5-13; A5-16; A5-22; A6-32; A9-01 to A9-14; A9-24; S11-26; D65; 02-contracts section 7 row K-32; 02-contracts section 8 (money_before, deposit_paid, paid_full, settled); K-07 v1 effects; K-14 v1 charge, payLink",
       "columns": [
         {
@@ -596,8 +596,8 @@
           "null": false,
           "default": "'pending'",
           "audience": ["customer", "staff", "owner"],
-          "description": "pending (asked, not yet taken: a pay link out, a bank transfer not yet cleared, a bank's check with the person present); paid (taken: for a bank transfer, once it cleared, FS's cleared); failed (a card declined, never retried, or a bank transfer that bounced); cancelled (a pay link closed unpaid at its deadline). There is no held or authorized state: nothing is ever held on a card (RULES 3.2; D65), and Stripe's requires_capture never comes (K-14 v1 intentState). Money words follow it: a message says paid only once it is paid (RULES 3.14).",
-          "source": "FS line 731 (status: pending, paid, failed, cleared); RULES 3.2, 3.11, 3.14; S13-55; D65; A6-32 ('Not paid in time'); A9-24 ('It counts as paid only once it clears'); K-14 v1 intentState; K-14 v1 README 'Money and cards' ('Never a hold')"
+          "description": "pending (asked, not yet taken: a charge whose effect has not answered, a pay link out, a bank transfer not yet cleared, a bank's check with the person present); paid (taken: for a bank transfer, once it cleared, FS's cleared); failed (a charge's card declined, never retried, or a bank transfer that bounced); cancelled (nothing taken and nothing more will be: a pay link closed unpaid at its deadline, K-14 closePayLink, or a charge whose effect was let go after an outage, K-07 letGo, S12-17). A pay link's paymentFailed is one try on the page and leaves the payment pending, since another card may still pay it before its deadline (K-14 paymentFailed), so failed comes only from a charge's declined result or a bounced transfer. A payment through Stripe becomes paid only on the runtime side, by its effect's result or a provider event, never by a Tool API write (README rule 5). There is no held or authorized state: nothing is ever held on a card (RULES 3.2; D65), and Stripe's requires_capture never comes (K-14 v1 intentState). Money words follow it: a message says paid only once it is paid (RULES 3.14).",
+          "source": "FS line 731 (status: pending, paid, failed, cleared); RULES 3.2, 3.11, 3.14; S13-55; S12-17; D65; A6-32 ('Not paid in time'); A9-24 ('It counts as paid only once it clears'); K-14 v1 intentState, paymentFailed ('the payment stays open for another card until its deadline'), closePayLink; K-07 v1 effect move outage → cancelled (letGo); K-14 v1 README 'Money and cards' ('Never a hold')"
         },
         {
           "name": "effect_id",
@@ -620,8 +620,16 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "For a fee: the late-cancel or no-show fee it takes (booking_fees.id), held to the same business; a declined fee charge and the one pay link that follows both name it (S11-26). Null otherwise.",
-          "source": "S11-26 ('Declined: one pay link goes to the customer'); FS line 733"
+          "description": "For a fee: the late-cancel or no-show fee it takes (booking_fees.id), held to the same business; a declined fee charge and the one pay link that follows both name it (S11-26), and only one of them is ever pending or paid (payments_one_live_per_fee). Written only for a fee the owner answered charge (README rule 10). Null otherwise.",
+          "source": "S11-26 ('Declined: one pay link goes to the customer'); S11-25 ('Only Sam's yes takes it'); FS line 733"
+        },
+        {
+          "name": "plan_charge_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a plan's charge: the plan charge it pays (plan_charges.id), held to the same business. The charge's own payment, written with its effect while the plan charge is due, and, after a decline, the one pay link's payment both name it (A7-54: 'A declined plan charge gets one pay link'), and only one of them is ever pending or paid (payments_one_live_per_plan_charge). So the effect's result or paymentSucceeded finds the plan charge it moves to charged or failed, and C-107 the charge its 1% names (A9-21). Null otherwise.",
+          "source": "A7-54; A9-21 ('A plan charged monthly through Rosie ... pays 1% of each charge'); RULES 3.9, 3.15; S13-39; K-14 v1 purpose planCharge"
         },
         {
           "name": "recorded_by_person_id",
@@ -669,8 +677,8 @@
           "type": "timestamptz",
           "null": true,
           "audience": "never",
-          "description": "When a pay link's payment was closed unpaid at its deadline (K-14 closePayLink): 'Not paid in time: not booked'. Set once.",
-          "source": "A6-32; RULES 3.11 ('Not paid: not booked, nothing taken'); K-14 v1 closePayLink"
+          "description": "When it ended with nothing taken: a pay link's payment closed unpaid at its deadline (K-14 closePayLink: 'Not paid in time: not booked'), or a charge whose effect was let go when the outage outlasted the yes (K-07 letGo; S12-17). Set once.",
+          "source": "A6-32; RULES 3.11 ('Not paid: not booked, nothing taken'); S12-17; K-14 v1 closePayLink; K-07 v1 effect move outage → cancelled (letGo)"
         },
         {
           "name": "version",
@@ -721,6 +729,12 @@
           "onDelete": "restrict"
         },
         {
+          "name": "payments_plan_charge_fk",
+          "columns": ["plan_charge_id", "business_id"],
+          "references": { "table": "plan_charges", "columns": ["id", "business_id"] },
+          "onDelete": "restrict"
+        },
+        {
           "name": "payments_recorded_by_fk",
           "columns": ["recorded_by_person_id"],
           "references": { "table": "persons", "columns": ["id"] },
@@ -731,12 +745,24 @@
         {
           "name": "payments_id_business_key",
           "columns": ["id", "business_id"],
-          "source": "Its items, lines, refunds, packs and plan charges carry its business (README rule 5)"
+          "source": "Its items, lines, refunds, packs, pay links, fees and saved cards carry its business (README rule 5)"
         },
         {
           "name": "payments_effect_key",
           "columns": ["effect_id"],
           "source": "arch 10 lines 508, 542 (an effect runs once on one idempotency key: one payment per effect)"
+        },
+        {
+          "name": "payments_one_live_per_fee",
+          "columns": ["booking_fee_id"],
+          "where": "state in ('pending', 'paid')",
+          "source": "S11-26 ('Declined: one pay link goes to the customer'); S12-26 ('a customer pays only what they agreed to, once'): one fee is paid once"
+        },
+        {
+          "name": "payments_one_live_per_plan_charge",
+          "columns": ["plan_charge_id"],
+          "where": "state in ('pending', 'paid')",
+          "source": "A7-54 ('A declined plan charge gets one pay link'); S13-39; S12-26: one charge per plan and period (plan_charges_one_per_period), paid once"
         }
       ],
       "checks": [
@@ -784,6 +810,11 @@
           "name": "payments_fee_names_fee",
           "expression": "(purpose = 'fee') = (booking_fee_id is not null)",
           "source": "S11-26; FS line 733"
+        },
+        {
+          "name": "payments_plan_charge_names_charge",
+          "expression": "(purpose = 'plan_charge') = (plan_charge_id is not null)",
+          "source": "A7-54; A9-21; S13-39"
         },
         {
           "name": "payments_saved_card_is_card",
@@ -1158,8 +1189,8 @@
     },
     {
       "name": "refunds",
-      "description": "Money given back to the person who paid (FS refund row): what the booking's terms give back, the owner's own call with the owner's yes, or what is refunded at once (a charge made twice, money that landed after a cancel). A refund through Stripe runs from exactly one K-07 stripe_refund effect and refunds one charge's ledger line; a refund of money paid outside Rosie is the business's own, marked done by the person who did it. Rosie never refunds on its own (RULES 3.10). The amount, what it refunds and who decided are written once.",
-      "source": "FS line 732 (refund); RULES 3.10; S13-55; A10-09 to A10-13; A10-47; A7-31; S11-24; S11-25; S12-26; arch 10 line 550; K-07 v1 effects (stripe_refund); K-14 v1 refund",
+      "description": "Money given back to the person who paid (FS refund row): what the booking's terms give back, the owner's own call with the owner's yes, or what is refunded at once (a second Stripe charge no payment asked for, the second of two Rosie payments for one thing, a charge with no bound yes behind it, money that landed after a cancel). A refund through Stripe runs from exactly one K-07 stripe_refund effect and refunds one charge's ledger line; a refund of money paid outside Rosie is the business's own, marked done by the person who did it. Rosie never refunds on its own (RULES 3.10). The amount, what it refunds and who decided are written once.",
+      "source": "FS line 732 (refund); RULES 3.10; S13-55; A10-09 to A10-13; A10-47; A7-31; S11-24; S11-25; S12-26; arch 08 line 447 ('an unbound charge is refunded at once (S12-26)'); arch 10 line 550; 01-inventory C-016, C-018; K-07 v1 effects (stripe_refund); K-14 v1 refund",
       "columns": [
         {
           "name": "id",
@@ -1198,16 +1229,16 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "The payment refunded (payments.id), held to the same business; null only for a second charge no payment asked for (S12-26).",
-          "source": "FS line 732 (payment_id); S12-26"
+          "description": "The payment refunded (payments.id), held to the same business: for a refund at once of a second payment for one thing or of a charge with no bound yes, that payment. Null only for a second charge no payment asked for (double_charge, S12-26).",
+          "source": "FS line 732 (payment_id); S12-26; arch 08 line 447"
         },
         {
           "name": "charge_line_id",
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "For a refund through Stripe: the charge's ledger line it refunds (ledger_lines.id), held to the same business; its Stripe charge is what K-14's refund names. Null for a refund the business makes its own way.",
-          "source": "arch 10 line 550; K-14 v1 refund.portRequest paymentId"
+          "description": "For a refund through Stripe: the charge's ledger line it refunds (ledger_lines.id), held to the same business, which reconciliation matches. K-14's refund names the PaymentIntent, not the charge: its paymentId is the refunded payment's effect's provider object (payments.effect_id, then effects.provider_object_id), or, for a second charge no payment asked for, the listed charge's paymentId (K-14 listItem). Null for a refund the business makes its own way.",
+          "source": "arch 10 line 550; K-14 v1 refund.portRequest paymentId ('the charge's or the pay link's PaymentIntent'), listItem.paymentId; K-07 v1 effects.provider_object_id"
         },
         {
           "name": "to_person_id",
@@ -1230,16 +1261,16 @@
           "type": "text",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "Why (FS refund.reason): cancel_in_time (everything back); called_off (the business cancelled or could not give it: everything back); work_stopped (work stopped partway: money paid ahead for the rest); fee_rest (the rest above the one fee, or everything when no fee is taken); price_lowered (a cheaper service before free cancel ends lowers money paid ahead to match); right_to_cancel (cancelled inside a right-to-cancel period); owner_full and owner_part (the owner's call: all of it, or the part the owner named and the read-back confirmed); double_charge (a charge made twice by mistake, at once); late_money (money toward the price that landed after the booking was cancelled, or a pay link paid late, at once).",
-          "source": "FS line 732 (reason: cancel in time, called off, part, owner decision); RULES 3.10; S13-55; A7-31; A10-09 to A10-12; A10-47; S11-24, S11-25, S11-35 ('Anything paid for the visit goes back, by what was taken'); S12-26; A9-24"
+          "description": "Why (FS refund.reason): cancel_in_time (everything back); called_off (the business cancelled or could not give it: everything back); work_stopped (work stopped partway: money paid ahead for the rest); fee_rest (the rest above the one fee, or everything when no fee is taken); price_lowered (a cheaper service before free cancel ends lowers money paid ahead to match); right_to_cancel (cancelled inside a right-to-cancel period); owner_full and owner_part (the owner's call: all of it, or the part the owner named and the read-back confirmed); at once, without waiting for the owner: double_charge (a second Stripe charge under one effect id that no payment asked for, found by the daily check: it names no payment and no booking), second_payment (the later of two Rosie payments for one thing, such as a bill's pay link paid after the card at DONE took the same rest: it names that payment and its booking), unbound_charge (a charge with no bound yes behind it, found by C-018's hourly check and refunded by C-016: it names that payment and its booking) and late_money (money toward the price that landed after the booking was cancelled, or a pay link paid late).",
+          "source": "FS line 732 (reason: cancel in time, called off, part, owner decision); RULES 3.10 ('A charge made twice by mistake, and money that lands after a cancel, are refunded at once'); S13-55; A7-31; A10-09 to A10-12; A10-47; S11-24, S11-25, S11-35 ('Anything paid for the visit goes back, by what was taken'); S12-26 ('A charge went through twice for the same thing'; 'Any payment through Rosie counts: a deposit, a full price, a fee, an extra, a tip or a bill's pay link'); arch 08 line 447 ('an unbound charge is refunded at once (S12-26)'); 01-inventory C-016, C-018; A9-24"
         },
         {
           "name": "decided_by",
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "terms (what the booking's terms give back goes back: RULES 3.10), owner (any other refund is the owner's call, with the owner's yes below), or at_once (a double charge or late money, refunded at once without waiting for the owner). FS refund.decided_by.",
-          "source": "FS line 732 (decided_by); RULES 3.10; S13-55 ('A charge made twice by mistake is refunded at once, without waiting for Sam')"
+          "description": "terms (what the booking's terms give back goes back: RULES 3.10), owner (any other refund is the owner's call, with the owner's yes below), or at_once (a charge made twice, a second payment for one thing, a charge with no bound yes, or late money, refunded at once without waiting for the owner). FS refund.decided_by.",
+          "source": "FS line 732 (decided_by); RULES 3.10; S13-55 ('A charge made twice by mistake is refunded at once, without waiting for Sam'); S12-26; arch 08 line 447"
         },
         {
           "name": "amount_cents",
@@ -1327,8 +1358,8 @@
           "null": false,
           "default": "'pending'",
           "audience": ["customer", "staff", "owner"],
-          "description": "pending (asked, not yet back), succeeded (back: Stripe refunded it, or the owner marked an own-way refund done) or failed (Stripe reports it failed, even after it succeeded: K-14 refundChanged). A message says refunded only once it succeeded (RULES 3.14).",
-          "source": "RULES 3.14; K-14 v1 refund.response state, refundChanged; A10-10"
+          "description": "pending (asked, not yet back), succeeded (back: Stripe refunded it, or the owner marked an own-way refund done) or failed (it will not go back: Stripe reports it failed, even after it succeeded, or canceled). K-14's refund states map onto it: pending and requiresAction are pending (Stripe still waits), succeeded is succeeded, failed and canceled are failed (the money stays with the business; a refund_failed line is written only for a refund whose refund line was written, so one that never succeeded writes none). Once failed it never changes. A message says refunded only once it succeeded (RULES 3.14).",
+          "source": "RULES 3.14; K-14 v1 refund.response state, refundChanged state (pending, requiresAction, succeeded, failed, canceled), listItem.state; A10-10"
         },
         {
           "name": "asked_at",
@@ -1448,8 +1479,8 @@
         },
         {
           "name": "refunds_reason_known",
-          "expression": "reason in ('cancel_in_time', 'called_off', 'work_stopped', 'fee_rest', 'price_lowered', 'right_to_cancel', 'owner_full', 'owner_part', 'double_charge', 'late_money')",
-          "source": "FS line 732 (reason); RULES 3.10; S13-55"
+          "expression": "reason in ('cancel_in_time', 'called_off', 'work_stopped', 'fee_rest', 'price_lowered', 'right_to_cancel', 'owner_full', 'owner_part', 'double_charge', 'second_payment', 'unbound_charge', 'late_money')",
+          "source": "FS line 732 (reason); RULES 3.10; S13-55; S12-26; arch 08 line 447"
         },
         {
           "name": "refunds_decided_by_known",
@@ -1458,8 +1489,8 @@
         },
         {
           "name": "refunds_reason_fits_decider",
-          "expression": "(reason in ('owner_full', 'owner_part')) = (decided_by = 'owner') and (reason in ('double_charge', 'late_money')) = (decided_by = 'at_once')",
-          "source": "RULES 3.10 ('What the terms give back goes back ... Any other refund is the owner's call'; 'refunded at once'); S13-55"
+          "expression": "(reason in ('owner_full', 'owner_part')) = (decided_by = 'owner') and (reason in ('double_charge', 'second_payment', 'unbound_charge', 'late_money')) = (decided_by = 'at_once')",
+          "source": "RULES 3.10 ('What the terms give back goes back ... Any other refund is the owner's call'; 'refunded at once'); S13-55; S12-26; arch 08 line 447"
         },
         {
           "name": "refunds_owner_yes",
@@ -1564,7 +1595,7 @@
           "type": "text[]",
           "null": false,
           "audience": "never",
-          "description": "Where it was given: text, email, ai (to the customer's own AI) and page; a new place is added, none removed. The texts and emails that carried it are K-04 outbox rows, with their recipients.",
+          "description": "Where it was given: text, email, ai (to the customer's own AI) and page; a new place is added, none removed (README rule 7: a listed array only grows). The texts and emails that carried it are K-04 outbox rows, with their recipients.",
           "source": "MC C3 ('the pay link to the AI, email and any open chat'); S13-55; A6-32; K-29 v1 chat_links.given_via (the same pattern)"
         },
         {
@@ -1572,8 +1603,8 @@
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "The sha256 of the link's code, in lowercase hex: the code itself is never kept, and this column is outside the Tool API's select grant (README rule 6).",
-          "source": "BP rule 7; K-30 v1 secure_links.code_sha256"
+          "description": "The sha256 of the link's code, in lowercase hex: the code itself is never kept, and this column is outside the Tool API's select grant (README rule 6). An unsalted hash is safe only for a code nobody can guess, so the code is long and random: 32 bytes of HMAC-SHA-256 of the link's id under a named secret, in base64url (43 characters; README default 21), never a short code like A9-05's illustrative 'a2'. The same secret lets the code be made again from the id for a message that must carry the live link again, so no column ever holds it.",
+          "source": "BP rule 7; K-30 v1 secure_links.code_sha256; A9-05 ('rosfield.com/p/a2', an illustration); A9-11 ('anyone with it can pay'); README default 21"
         },
         {
           "name": "due_at",
@@ -1974,8 +2005,8 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "cancel_in_time, called_off (the business could not give it), not_booked (the booking was never confirmed, so the credit stays usable), refunded (the owner refunded the visit: A10-09, A10-12). Set once, with returned_at.",
-          "source": "RULES 3.9, 3.10; A10-09; A10-12; S13-55; S13-56"
+          "description": "cancel_in_time, called_off (the business could not give it), not_booked (the booking was never confirmed, so the credit stays usable), refunded (the owner refunded the visit: A10-09, A10-12), no_fee (a late cancel or no-show that took no fee: the owner answered 2 No fee, no answer came by the deadline, so 'the credit stays on the pack', or no fee could be asked, such as for a fee-free customer, since a credit is used for one only if the owner says so). Set once, with returned_at.",
+          "source": "RULES 3.9 ('A late cancel or no-show uses a credit only if the owner says so'), 3.10; A10-09; A10-12; S11-25 ('No answer in 24 hours: the credit stays on the pack'); S11-35; S13-55; S13-56"
         },
         {
           "name": "version",
@@ -2040,8 +2071,8 @@
         },
         {
           "name": "credits_returned",
-          "expression": "(returned_at is null) = (returned_why is null) and (returned_why is null or returned_why in ('cancel_in_time', 'called_off', 'not_booked', 'refunded')) and (returned_at is null or returned_at >= used_at)",
-          "source": "FS line 739; RULES 3.9; A10-09"
+          "expression": "(returned_at is null) = (returned_why is null) and (returned_why is null or returned_why in ('cancel_in_time', 'called_off', 'not_booked', 'refunded', 'no_fee')) and (returned_at is null or returned_at >= used_at)",
+          "source": "FS line 739; RULES 3.9; A10-09; S11-25; S11-35"
         }
       ],
       "indexes": [
@@ -2065,7 +2096,7 @@
     },
     {
       "name": "booking_fees",
-      "description": "The one late-cancel or no-show fee asked about a visit (FS fee row, the kinds asked of the customer): the reason, the amount the customer agreed to, what it comes from (what the booking took: a payment, the saved card, or a pack credit), the owner's answer in K-08's ownerYes shape, and where it stands. Only the owner's yes takes it, never silence; it is never more than the customer agreed to, and when it comes out of what was paid now, never more than that (S11-25; RULES 3.3, 3.4). A charge to the saved card is a payments row naming it.",
+      "description": "The one late-cancel or no-show fee asked about a visit (FS fee row, the kinds asked of the customer): the reason, the amount the customer agreed to, what it comes from (what the booking took: a payment, the saved card, or a pack credit), the owner's answer in K-08's ownerYes shape, and where it stands. Only the owner's yes takes it, never silence; it is never more than the customer agreed to, and when it comes out of what was paid now, never more than that (S11-25; RULES 3.3, 3.4). A charge to the saved card, and the one pay link after a decline, are payments rows naming it, paid once. Once charged or dropped it never changes (set-once charged_at and dropped_at).",
       "source": "FS line 733 (fee: kind late cancel, no-show; status asked, owner yes, charged, dropped); S11-22 to S11-28; S13-55; RULES 3.3, 3.4, 3.5; A7-06; 02-contracts section 7 row K-32 ('fees: late cancel, no-show ... with status')",
       "columns": [
         {
@@ -2242,16 +2273,24 @@
           "null": false,
           "default": "'asked'",
           "audience": ["customer", "staff", "owner"],
-          "description": "asked (the owner is asked), owner_yes (the owner said yes; a charge to the card is running), charged (taken: kept out of the payment, charged to the card or paid by its one pay link, or the credit used) or dropped (no fee: the owner said no, no answer by the deadline, or a declined charge whose one pay link went unpaid). FS fee.status.",
-          "source": "FS line 733 (status: asked, owner yes, charged, dropped); S11-25 to S11-28"
+          "description": "asked (the owner is asked), owner_yes (the owner said yes; a charge to the card, or its one pay link after a decline, is running), charged (taken: kept out of the payment, charged to the card or paid by its one pay link, or the credit used) or dropped (no fee: the owner said no, no answer by the deadline, or a declined charge whose one pay link went unpaid). FS fee.status. charged and dropped are each held by a set-once time (charged_at, dropped_at), so a fee once charged or dropped never moves again (README rule 7); money back from a charged fee is a refunds row.",
+          "source": "FS line 733 (status: asked, owner yes, charged, dropped); S11-25 to S11-28; arch 09 line 457 ('MONEY append-only'); RULES 3.14"
         },
         {
-          "name": "ended_at",
+          "name": "charged_at",
           "type": "timestamptz",
           "null": true,
           "audience": "never",
-          "description": "When it was charged or dropped. Set once.",
-          "source": "S11-26; S11-27; S11-28"
+          "description": "When the fee was taken: kept out of the payment, its payment paid (the charge or its one pay link), or the credit used. Set once, and only with state charged (booking_fees_state_times).",
+          "source": "S11-26; FS line 733 (status charged)"
+        },
+        {
+          "name": "dropped_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the fee was dropped: the owner's 2 No fee, the deadline with no answer, or a declined charge's one pay link left unpaid. Set once, and only with state dropped (booking_fees_state_times).",
+          "source": "S11-27; S11-28; FS line 733 (status dropped)"
         },
         {
           "name": "version",
@@ -2364,12 +2403,12 @@
         },
         {
           "name": "booking_fees_state_times",
-          "expression": "(state in ('charged', 'dropped')) = (ended_at is not null) and (state <> 'asked' or answer is null)",
-          "source": "S11-26 to S11-28"
+          "expression": "(state = 'charged') = (charged_at is not null) and (state = 'dropped') = (dropped_at is not null) and (state <> 'asked' or answer is null)",
+          "source": "S11-26 to S11-28; arch 09 line 457 ('MONEY append-only'): with rule 7's set-once times, a fee once charged or dropped never moves"
         },
         {
           "name": "booking_fees_times",
-          "expression": "answer_by > asked_at and (reminded_at is null or (reminded_at >= asked_at and reminded_at <= answer_by)) and (answered_at is null or answered_at >= asked_at) and (ended_at is null or ended_at >= asked_at)",
+          "expression": "answer_by > asked_at and (reminded_at is null or (reminded_at >= asked_at and reminded_at <= answer_by)) and (answered_at is null or answered_at >= asked_at) and (charged_at is null or charged_at >= asked_at) and (dropped_at is null or dropped_at >= asked_at)",
           "source": "S11-25"
         }
       ],
@@ -2393,7 +2432,7 @@
     },
     {
       "name": "plan_charges",
-      "description": "One charge of a membership or plan: the period or the visit it pays, its amount in integer minor units, its day, the reminder that had to reach the customer first (S13-39: 'No reminder that reached them: no charge'), and the payment that took it. One row per plan and period, so a retried charge job never charges twice; a charge skipped (no reminder reached them, paused, a visit not given) keeps its row with no payment.",
+      "description": "One charge of a membership or plan: the period or the visit it pays, its amount in integer minor units, its day, the reminder that had to reach the customer first (S13-39: 'No reminder that reached them: no charge'), and how it ended. Its payments name it (payments.plan_charge_id): the charge's own, written with its effect while it is due, and after a decline its one pay link's; only one is ever pending or paid. One row per plan and period, so a retried charge job never charges twice; a charge skipped (no reminder reached them, paused, a visit not given) keeps its row with no payment. Each end is a set-once time, so a charge once charged or skipped never changes, and one that failed can only go on to charged, by its one pay link (README rule 7).",
       "source": "S13-39; A7-54 ('Each charge is told the day before, with the amount and the visits it covers'; 'For a plan paid by the visit, only for visits that happened'; 'A declined plan charge gets one pay link'); A7-91; RULES 3.9; FEES-TERMS-DRAFT 3.1; K-14 v1 purpose planCharge",
       "columns": [
         {
@@ -2482,8 +2521,8 @@
           "null": false,
           "default": "'due'",
           "audience": ["customer", "owner"],
-          "description": "due, charged (its payment taken), skipped (not charged: see skipped_why) or failed (its payment declined, never retried; one pay link follows as a payment of its own: A7-54).",
-          "source": "A7-54; S13-39; RULES 3.11"
+          "description": "due (not yet charged, or its charge's payment is running), charged (a payment naming it was taken), skipped (not charged: see skipped_why) or failed (its charge declined, never retried; one pay link follows as a payment of its own naming it, A7-54, and once that is paid the charge moves on to charged, keeping failed_at). Held by the set-once times below.",
+          "source": "A7-54 ('A declined plan charge gets one pay link. Then Sam decides'); S13-39; RULES 3.11"
         },
         {
           "name": "skipped_why",
@@ -2494,20 +2533,28 @@
           "source": "S13-39; A7-32; A7-54 ('For a plan paid by the visit, only for visits that happened')"
         },
         {
-          "name": "payment_id",
-          "type": "text",
-          "null": true,
-          "audience": "never",
-          "description": "The payment that charged it (payments.id, purpose plan_charge), held to the same business; unique. Set once.",
-          "source": "A7-54; RULES 3.9"
-        },
-        {
-          "name": "ended_at",
+          "name": "charged_at",
           "type": "timestamptz",
           "null": true,
           "audience": "never",
-          "description": "When it was charged, skipped or failed. Set once.",
-          "source": "A7-54"
+          "description": "When it was charged: the paid_at of the payment naming it that was taken (the charge, or its one pay link). Set once, and only with state charged (plan_charges_outcome).",
+          "source": "A7-54 ('Charged Sat Oct 31, after the visit'); arch 09 line 457 ('MONEY append-only')"
+        },
+        {
+          "name": "failed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When its charge was declined: from then it is failed, or charged once its one pay link is paid. Set once.",
+          "source": "A7-54 ('A declined plan charge gets one pay link'); RULES 3.11"
+        },
+        {
+          "name": "skipped_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was skipped, with skipped_why. Set once, and only with state skipped.",
+          "source": "S13-39; A7-32; A7-54"
         },
         {
           "name": "version",
@@ -2544,29 +2591,18 @@
           "columns": ["reminder_outbox_row_id"],
           "references": { "table": "outbox_rows", "columns": ["id"] },
           "onDelete": "restrict"
-        },
-        {
-          "name": "plan_charges_payment_fk",
-          "columns": ["payment_id", "business_id"],
-          "references": { "table": "payments", "columns": ["id", "business_id"] },
-          "onDelete": "restrict"
         }
       ],
       "unique": [
         {
           "name": "plan_charges_id_business_key",
           "columns": ["id", "business_id"],
-          "source": "Rosfield's 1% names a charge of its own business (README rule 5)"
+          "source": "Its payments and Rosfield's 1% name a charge of their own business (README rule 5)"
         },
         {
           "name": "plan_charges_one_per_period",
           "columns": ["membership_id", "period_start"],
           "source": "S13-39 (a plan charges once for each period or visit: a retry never charges twice); arch 10 line 508"
-        },
-        {
-          "name": "plan_charges_payment_key",
-          "columns": ["payment_id"],
-          "source": "A7-54 (one payment per charge)"
         }
       ],
       "checks": [
@@ -2591,9 +2627,9 @@
           "source": "S13-39 ('No reminder that reached them: no charge'); A7-91 ('No reminder sent: no charge'); RULES 3.9"
         },
         {
-          "name": "plan_charges_payment",
-          "expression": "(state in ('charged', 'failed')) = (payment_id is not null)",
-          "source": "A7-54"
+          "name": "plan_charges_outcome",
+          "expression": "(state = 'charged') = (charged_at is not null) and (state = 'skipped') = (skipped_at is not null) and (state <> 'failed' or failed_at is not null) and (failed_at is null or state in ('failed', 'charged'))",
+          "source": "A7-54 ('A declined plan charge gets one pay link'); arch 09 line 457 ('MONEY append-only'); RULES 3.14: with rule 7's set-once times, a charge once charged or skipped never moves, and one that failed moves only on to charged"
         },
         {
           "name": "plan_charges_skipped",
@@ -2601,9 +2637,9 @@
           "source": "S13-39; A7-32; A7-54"
         },
         {
-          "name": "plan_charges_ended",
-          "expression": "(state = 'due') = (ended_at is null)",
-          "source": "A7-54"
+          "name": "plan_charges_times",
+          "expression": "(charged_at is null or failed_at is null or charged_at >= failed_at)",
+          "source": "A7-54 (the one pay link after a decline)"
         }
       ],
       "indexes": [
@@ -2669,7 +2705,7 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "For rosfield_1pct: the plan charge it is 1% of (plan_charges.id), held to the same business. Null for rosfield_2.",
+          "description": "For rosfield_1pct: the plan charge it is 1% of (plan_charges.id), held to the same business: a monthly plan's charge once charged, found from its paid payment's plan_charge_id. Null for rosfield_2.",
           "source": "S1-25 ('pays 1% of each charge'); A9-21; FEES-TERMS-DRAFT 3.1"
         },
         {
@@ -2897,7 +2933,7 @@
           "type": "integer",
           "null": true,
           "audience": "never",
-          "description": "How many charges the listing gave; set when finished.",
+          "description": "How many charges the listing gave; set once, when finished.",
           "source": "K-14 v1 listMoney.response"
         },
         {
@@ -2905,7 +2941,7 @@
           "type": "integer",
           "null": true,
           "audience": "never",
-          "description": "How many refunds the listing gave; set when finished.",
+          "description": "How many refunds the listing gave; set once, when finished.",
           "source": "K-14 v1 listMoney.response"
         },
         {
