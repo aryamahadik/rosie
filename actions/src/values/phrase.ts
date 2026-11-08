@@ -1,37 +1,45 @@
-// The whole value phrase around a value's words (T-304 round 3, DL-189 item 2). Words that stand whole in a text can
-// still leave out what the text says right beside them: "40" out of "40%" or "40¢", "$40" out of "$40 /hr", "3 tomorrow"
-// out of "quarter to 3 tomorrow", "mañana a las 3" out of "mañana a las 3 y media", "tomorrow at 3pm" out of "tomorrow at
-// 3pm PST". So a value of a type people write as a number (money, a count, a date or time) is re-read from the whole value
-// phrase of the text its words came from:
-//   1. the words stand whole in the text as the readers fold it (words.ts wholeAt), at each place they do, and the reader
-//      reads the value from a run of them;
-//   2. the whole phrase is that run of the text, widened on either side over the value's own pieces as long as there are
-//      more: digits and their separators; number words as the reader joins them ("a hundred and forty", "forty one") and
-//      scale words ("thousand", "k"); currency signs and units ("$", "%", "¢", "/hr", "percent", "cents", "dollars"); am
-//      or pm, "o'clock", "noon" or "midnight", minutes ("thirty" in "three thirty"), zone words ("PST", "Pacific time");
-//      the day a time is on and the time a day has ("3pm tomorrow", "tomorrow at 3pm", "Fri", "Oct 24"); cents after an
-//      amount ("12 dollars and 50 cents"); the readers' own phrase words ("quarter to", "half past", "y media", "y cuarto",
-//      "menos cuarto", "de la tarde"); and the other end of a range or a choice of two ("$12 to 15", "3 or 4pm", "4-6
-//      people", "today or tomorrow");
-//   3. the whole phrase is re-read, and every piece of it must be part of what the reader read: a piece the reader does
-//      not read ("thirty" in "at three thirty", "k" in "$2k", "twenty" in "twenty to 3") leaves the phrase unread;
-//   4. the value holds only if the whole phrase gives the same value. None, or a piece left unread, is noText; another
-//      value differs; two are several; a zone word other than the value's zone is wrongZone.
-// A per-unit after an amount ("/hr", "a foot") is no part of its value: "$40/hr" is $40, as K-02's "$12 a foot" is $12
-// (default, for ops/QUESTIONS.md). Nothing here keeps or logs a value or the words; what it returns is a label.
+// The whole value phrase around a value's words (T-304 round 4, DL-199: the readers define the phrase). Words that stand
+// whole in a text can still leave out what the text says right beside them: "40" out of "40 euros", "$1" out of "$1
+// million", "tomorrow at 3pm" out of "the day after tomorrow at 3pm", "at 3" out of "tomorrow afternoon at 3", "tomorrow"
+// out of "tomorrow at noon" or "tomorrow, 3pm", "tomorrow at 3pm" out of "tomorrow at 3pm, PST". So a value of a type
+// people write as a number (money, a count, a date or time) is re-read from its whole phrase, and the phrase is the
+// readers' own, never a pattern list of its own (round 3's method, which DL-199 dropped):
+//   1. the person's whole text is read with the same reader that read the field, and every place it reads a value of the
+//      type is one value of the text, with its span: for money each amount with its sign, currency word, scale, per-unit
+//      and range (money.ts amountsIn: "40 euros", "$1 million", "$40/hr", "$12-15"); for a count each count with its
+//      dozen (reparse.ts countSpansIn: "2 dozen"); for a time each day, time of day, elapsed time and morning or
+//      afternoon word the time reader takes (times.ts timeReadingOf: "the day after tomorrow", "next Friday", "pasado
+//      mañana", "noon", "at 3", "quarter to 3", "afternoon", "de la tarde") and each zone word (reparse.ts
+//      zoneWordSpansIn: "PST", "Pacific");
+//   2. values side by side are one phrase when only spaces, commas or joining words stand between them: for a time the
+//      cues ("at", "on", "in the", "a las", "al", "de", "around" and the like, TIME_CUES) and "or" or "and"; for money and
+//      counts a range or choice word ("to", "or", "and", "-", "/", "y", "o", "a");
+//   3. a number the reader did not read belongs to the phrase when a range word joins it to the phrase ("twenty to 3",
+//      "10 - $15", "3 or 4pm"), or when it stands right after a time or an amount with one space between ("at 3 30", "at
+//      three thirty", "$1 200"): a count's reader reads every number that is no amount or time, so a count takes none;
+//   4. the phrase that holds the cited words (where they stand whole: words.ts wholeAt) is re-read on its own with the same
+//      re-parse, and the value holds only if it gives the field's value and every number, currency sign and zone word in
+//      it was read. None, or a piece left unread, is noText; another value differs; two are several; a zone word that is
+//      not the value's zone is wrongZone; cited words that touch two phrases are several.
+// The residual (DL-199 item 4; CQ-121): words no reader knows are no value and join nothing, so a cut beside them is not
+// caught here: "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from Friday",
+// "around 3" (the time reader reads no bare hour after "around"), "$40 off", and a sentence mark (". ! ? ;") between a
+// day and its time. Limit 3's read-back shows the person the value before any commit, and limit 5 checks the time is
+// open, so neither books on one. Nothing here keeps or logs a value or the words; what it returns is a label.
 
 import { amountsIn } from "./money";
-import { numberPhrasesIn, numberWordsOf } from "./numbers";
+import { numberPhrasesIn } from "./numbers";
 import {
   countSpansIn,
   reparse,
   zoneWordSpansIn,
+  zoneWordsOfTime,
   type FieldType,
   type FieldValue,
   type ReparseContext,
   type ReparseFault,
 } from "./reparse";
-import { DAY_PATTERN, timeReadingOf } from "./times";
+import { timeReadingOf } from "./times";
 import { BOTH_LANGUAGES, findAll, foldWords, wholeAt, type Span, type ValueLanguage } from "./words";
 
 /** The field types written as numbers, whose values are re-read from their whole value phrase. */
@@ -45,190 +53,183 @@ export function isPhraseType(type: FieldType): type is PhraseType {
 /** Why a value fails its whole value phrase: a re-parse fault, or noText for a phrase none or not all of is read. */
 export type PhraseFault = ReparseFault | "noText";
 
-/** The spans of folded words the type's reader reads its value from: each amount, each count, or the time's words. */
-function readingOf(type: PhraseType, folded: string, languages: readonly ValueLanguage[]): Span[] {
+const spanOf = ({ at, end }: Span): Span => ({ at, end });
+
+/** Step 1: every value the type's reader reads in folded words, where it stands. */
+function valuesIn(type: PhraseType, folded: string, languages: readonly ValueLanguage[]): Span[] {
   switch (type) {
     case "money":
-      return amountsIn(folded, languages).map(({ at, end }) => ({ at, end }));
+      return amountsIn(folded, languages).map(spanOf);
     case "integer":
-      return countSpansIn(folded, languages).map(({ at, end }) => ({ at, end }));
+      return countSpansIn(folded, languages).map(spanOf);
     case "time":
-      return timeReadingOf(folded, languages).spans.map(({ at, end }) => ({ at, end }));
+      return [...timeReadingOf(folded, languages).spans, ...zoneWordSpansIn(folded)].map(spanOf);
   }
 }
 
-/** What the reader read of folded words: its reading, and for a time also every zone word (reparse reads them). */
-function consumedOf(type: PhraseType, folded: string, languages: readonly ValueLanguage[]): Span[] {
-  const read = readingOf(type, folded, languages);
-  return type === "time" ? [...read, ...zoneWordSpansIn(folded)] : read;
+/**
+ * Step 2: the cues that may stand between the values of one time ("tomorrow at 3pm", "tomorrow afternoon at 3", "3pm on
+ * Friday", "at 3 in the afternoon", "mañana a las 3", "mañana al mediodía", "a eso de las 3"), with "or" and "and" (the
+ * time reader reads two times so joined as several).
+ */
+const TIME_CUES: readonly string[] = [
+  "at",
+  "on",
+  "by",
+  "around",
+  "about",
+  "approximately",
+  "approx",
+  "roughly",
+  "say",
+  "like",
+  "maybe",
+  "from",
+  "after",
+  "before",
+  "till",
+  "til",
+  "until",
+  "between",
+  "the",
+  "this",
+  "in",
+  "of",
+  "for",
+  "or",
+  "and",
+  "either",
+  "a",
+  "al",
+  "el",
+  "la",
+  "las",
+  "los",
+  "de",
+  "del",
+  "en",
+  "por",
+  "para",
+  "como",
+  "sobre",
+  "hacia",
+  "eso",
+  "tipo",
+  "o",
+  "y",
+];
+const TIME_JOIN = new RegExp(String.raw`^(?:[\s,:·•|()/&-]|\b(?:${TIME_CUES.join("|")})\b)*$`, "u");
+/**
+ * Step 2 for money and counts: a range or choice word between two values ("$12 to $15", "4 or 5", "4, maybe 5", "35
+ * dólares y 50 centavos").
+ */
+const NUMBER_JOIN =
+  /^(?:[\s,/&-]|\b(?:to|or|and|maybe|perhaps|possibly|probably|o|y|a|quizas|quiza|tal vez)\b)*$/u;
+/**
+ * Step 3: a range word or a joining mark between a number and the phrase ("twenty to 3", "10 - $15", "$40_000"); Spanish
+ * "y", "o", "a" too.
+ */
+const ENGLISH_RANGE = /^ ?(?:[-/&_]|to|or|and) ?$/u;
+const SPANISH_RANGE = /^ ?(?:[-/&_]|to|or|and|o|y|a) ?$/u;
+/** A whole number: digits and their marks, with no letter or digit right before or after ("30", "1,200"; not "3pm"). */
+const WHOLE_NUMBER = /(?<![\p{L}\p{N}])\d+(?:[.,:]\d+)*(?![\p{L}\p{N}])/gu;
+
+/** The whole numbers in folded words: digits, and numbers written in words. */
+function wholeNumbersIn(folded: string, languages: readonly ValueLanguage[]): Span[] {
+  return [...findAll(folded, WHOLE_NUMBER), ...numberPhrasesIn(folded, languages)].map(spanOf);
 }
 
-/** A number word pattern of the languages given, longest first, or one that never matches. */
-function wordsPattern(words: readonly string[]): string {
-  return words.length === 0 ? "(?!)" : [...words].sort((a, b) => b.length - a.length).join("|");
+/** Spans joined into phrases: overlapping or touching ones, and ones with only what `join` allows between them. */
+function joined(spans: readonly Span[], folded: string, join: RegExp): Span[] {
+  const phrases: Span[] = [];
+  for (const span of [...spans].sort((a, b) => a.at - b.at || a.end - b.end)) {
+    const last = phrases[phrases.length - 1];
+    if (last !== undefined && (span.at <= last.end || join.test(folded.slice(last.end, span.at)))) {
+      phrases[phrases.length - 1] = { at: last.at, end: Math.max(last.end, span.end) };
+    } else {
+      phrases.push(span);
+    }
+  }
+  return phrases;
 }
 
-const MONEY_MARKS =
-  /[\p{Sc}%]|(?<=\d)k\b|\b(?:k|percent|pct|cents?|centavos?|dollars?|bucks?|dolares|dolar|usd|grand|dozen|docenas?)\b/gu;
-const COUNT_MARKS =
-  /[\p{Sc}%]|(?<=\d)(?:am|pm|[ap]|st|nd|rd|th|k)\b|\b(?:am|pm|oclock|percent|pct|cents?|dollars?|bucks?|k|grand|dozen|docenas?)\b/gu;
-const TIME_MARKS =
-  /(?<=\d)(?:am|pm|[ap])\b|\b(?:am|pm|oclock|noon|midnight|midday|mediodia|medianoche|quarter|half|media|cuarto|menos)\b/gu;
+/** Step 3: a phrase with the numbers the reader did not read that belong to it. */
+function grown(
+  type: PhraseType,
+  phrase: Span,
+  numbers: readonly Span[],
+  folded: string,
+  range: RegExp,
+): Span {
+  if (type === "integer") return phrase;
+  let { at, end } = phrase;
+  for (const number of numbers) {
+    if (number.end <= phrase.at && range.test(folded.slice(number.end, phrase.at))) {
+      at = Math.min(at, number.at);
+    } else if (number.at >= phrase.end && range.test(folded.slice(phrase.end, number.at))) {
+      end = Math.max(end, number.end);
+    } else if (number.at === phrase.end + 1 && folded.charAt(phrase.end) === " ") {
+      end = Math.max(end, number.end);
+    }
+  }
+  return { at, end };
+}
 
-/** The pieces of a value phrase that must be read: digits, number words, and the type's signs, units and phrase words. */
-function piecesIn(type: PhraseType, folded: string, languages: readonly ValueLanguage[]): Span[] {
-  const numberWords = wordsPattern([...numberWordsOf(languages).keys()]);
-  const marks = type === "money" ? MONEY_MARKS : type === "integer" ? COUNT_MARKS : TIME_MARKS;
-  const pieces: Span[] = [
-    ...findAll(folded, /\d+/g),
-    ...findAll(folded, new RegExp(String.raw`\b(?:${numberWords})\b`, "g")),
-    ...findAll(folded, marks),
-  ];
-  if (type === "time") pieces.push(...zoneWordSpansIn(folded));
-  return pieces;
+/** Steps 1 to 3: every value phrase of the type in folded words, in order. */
+function phrasesIn(type: PhraseType, folded: string, languages: readonly ValueLanguage[]): Span[] {
+  const join = type === "time" ? TIME_JOIN : NUMBER_JOIN;
+  const range = languages.includes("es") ? SPANISH_RANGE : ENGLISH_RANGE;
+  const numbers = wholeNumbersIn(folded, languages);
+  let phrases = joined(valuesIn(type, folded, languages), folded, join);
+  for (;;) {
+    const next = joined(
+      phrases.map((phrase) => grown(type, phrase, numbers, folded, range)),
+      folded,
+      join,
+    );
+    const before = phrases;
+    const same =
+      next.length === before.length && next.every((phrase, index) => sameSpan(phrase, before[index]));
+    if (same) return next;
+    phrases = next;
+  }
+}
+
+/** Whether two spans stand at the same place. */
+function sameSpan(a: Span, b: Span | undefined): boolean {
+  return b?.at === a.at && b.end === a.end;
+}
+
+/** What the type's reader reads of a phrase on its own: its spans, and for a time the zone words beside it. */
+function readOf(type: PhraseType, said: string, languages: readonly ValueLanguage[]): Span[] {
+  switch (type) {
+    case "money":
+      return amountsIn(said, languages).map(spanOf);
+    case "integer":
+      return countSpansIn(said, languages).map(spanOf);
+    case "time": {
+      const spans = timeReadingOf(said, languages).spans.map(spanOf);
+      return [...spans, ...zoneWordsOfTime(said, spans).map(spanOf)];
+    }
+  }
+}
+
+/** The pieces of a phrase that must all be read: every digit and number word, a currency sign, a zone word. */
+function piecesOf(type: PhraseType, said: string, languages: readonly ValueLanguage[]): Span[] {
+  const numbers = [...findAll(said, /\d+/g), ...numberPhrasesIn(said, languages)].map(spanOf);
+  switch (type) {
+    case "money":
+      return [...numbers, ...findAll(said, /\p{Sc}/gu).map(spanOf)];
+    case "integer":
+      return numbers;
+    case "time":
+      return [...numbers, ...zoneWordSpansIn(said).map(spanOf)];
+  }
 }
 
 /** Whether a piece lies inside one of the spans read. */
 function within(piece: Span, read: readonly Span[]): boolean {
   return read.some((span) => span.at <= piece.at && piece.end <= span.end);
-}
-
-/** How a type's value phrase widens: patterns ending right before it, patterns starting right after it. */
-interface Widening {
-  readonly left: readonly RegExp[];
-  readonly right: readonly RegExp[];
-}
-
-const NUMBER = String.raw`\d+(?:[.,:]\d+)*`;
-const SCALE = String.raw`(?:hundred|thousand|million|mil|grand|k|dozen|docenas?)\b`;
-/** A group of three digits after a space: spaced thousands ("$1 200"), which the readers read as two numbers. */
-const SPACED_THOUSANDS = /^ \d{3}(?!\d)/;
-
-function wideningFor(type: PhraseType, languages: readonly ValueLanguage[]): Widening {
-  const words = numberWordsOf(languages);
-  const all = wordsPattern([...words.keys()]);
-  // Minutes after an hour ("three thirty", "tres y diez"): number words from 2 to 59, never a one ("un", "una", "one").
-  const minutes = wordsPattern(
-    [...words].filter(([, word]) => word.value >= 2 && word.value <= 59).map(([name]) => name),
-  );
-  switch (type) {
-    case "money":
-      return {
-        left: [
-          /(?:us ?\$|usd ?|\$) ?$/,
-          /\p{Sc} ?$/u,
-          new RegExp(String.raw`(?:\$ ?)?${NUMBER} ?(?:-|to|or|o) ?\$? ?$`),
-          new RegExp(String.raw`\b(?:${all}) (?:to|or|o) $`),
-        ],
-        right: [
-          /^(?:[.,]\d+)+/,
-          /^ ?(?:%|¢|k\b)/u,
-          /^ ?\/ ?[a-z]+\b/,
-          new RegExp(
-            String.raw`^ (?:percent|per cent|por ciento|pct|cents?|centavos?|dollars?|bucks?|dolares|dolar|usd|${SCALE})`,
-          ),
-          new RegExp(String.raw`^ ?(?:-|to|or|o) ?\$? ?${NUMBER}`),
-          new RegExp(String.raw`^ (?:to|or|o) (?:${all})\b`),
-          new RegExp(
-            String.raw`^ (?:and|y) (?:\d+ ?(?:cents?\b|centavos?\b|¢)|(?:${all}) (?:cents?|centavos?)\b)`,
-            "u",
-          ),
-          SPACED_THOUSANDS,
-        ],
-      };
-    case "integer":
-      return {
-        left: [
-          /\p{Sc} ?$/u,
-          new RegExp(String.raw`${NUMBER} ?(?:-|to|or|o) ?$`),
-          new RegExp(String.raw`\b(?:${all}) (?:to|or|o) $`),
-        ],
-        right: [
-          /^(?:[.,:/]\d+)+/,
-          /^(?:am|pm|[ap]|st|nd|rd|th|k)\b/,
-          /^ ?(?:%|¢)/u,
-          new RegExp(
-            String.raw`^ (?:am|pm|oclock|percent|per cent|por ciento|pct|cents?|dollars?|bucks?|${SCALE})`,
-          ),
-          new RegExp(String.raw`^ ?(?:-|to|or|o) ?${NUMBER}`),
-          new RegExp(String.raw`^ (?:to|or|o) (?:${all})\b`),
-          SPACED_THOUSANDS,
-        ],
-      };
-    case "time":
-      return {
-        left: [
-          /\b(?:a )?(?:quarter|half) (?:to|till|til|of|before|past|after) $/,
-          new RegExp(
-            String.raw`\b(?:(?:${all})(?: minutes?)?|\d{1,2} minutes?) (?:to|till|til|of|before|past|after) $`,
-          ),
-          /\b\d{1,2}(?:[:.]\d{2})?(?: ?(?:am|pm))? ?(?:-|or|o|and|y) ?$/,
-          // The day the time is on, and a time of day before a day ("tomorrow at 3pm", "3pm tomorrow").
-          new RegExp(String.raw`\b${DAY_PATTERN},? (?:at |a las |a la |para las |on )?$`),
-          /\b\d{1,2}(?:(?:[:.]\d{2})? ?(?:am|pm)|[:.]\d{2}) (?:on )?$/,
-        ],
-        right: [
-          new RegExp(String.raw`^,? (?:on |or |o )?${DAY_PATTERN}(?![\w/])`),
-          new RegExp(String.raw`^ (?:at|a las|a la|para las) (?:\d{1,2}(?:[:.]\d{2})?(?!\d)|(?:${all})\b)`),
-          /^ \d{1,2}(?:(?:[:.]\d{2})? ?(?:am|pm)\b|[:.]\d{2}(?!\d))/,
-          /^ (?:noon|midnight|midday|mediodia|medianoche)\b/,
-          /^(?:[:.]\d+)+/,
-          /^(?:am|pm|[ap])\b/,
-          /^ (?:am|pm|oclock)\b/,
-          /^ (?:y|and) (?:media|cuarto|a half|half)\b/,
-          new RegExp(String.raw`^ menos (?:cuarto|${minutes}|\d{1,2})\b`),
-          new RegExp(String.raw`^ y (?:${minutes})\b`),
-          /^ (?:de|por|en) la (?:tarde|manana|noche)\b/,
-          /^ in the (?:morning|afternoon|evening)\b/,
-          /^ (?:at night|tonight)\b/,
-          new RegExp(String.raw`^ (?:${minutes})\b`),
-          /^ \d{2}(?!\d)/,
-          /^ ?(?:-|or|o|and|y) ?\d{1,2}(?:[:.]\d{2})?(?!\d)/,
-        ],
-      };
-  }
-}
-
-/** The longest match of any pattern, by its length (0 for none). */
-function longest(patterns: readonly RegExp[], text: string): number {
-  let most = 0;
-  for (const pattern of patterns) most = Math.max(most, pattern.exec(text)?.[0].length ?? 0);
-  return most;
-}
-
-/** The whole value phrase: `span` of `folded`, widened over the type's pieces on either side while any is there. */
-function widen(type: PhraseType, folded: string, span: Span, languages: readonly ValueLanguage[]): Span {
-  const widening = wideningFor(type, languages);
-  // Number words the reader joins into one number ("a hundred and forty") widen the phrase as one piece.
-  const numbers = numberPhrasesIn(folded, languages);
-  const zones = type === "time" ? zoneWordSpansIn(folded) : [];
-  let { at, end } = span;
-  for (;;) {
-    let nextAt = at - longest(widening.left, folded.slice(0, at));
-    let nextEnd = end + longest(widening.right, folded.slice(end));
-    if (/^(?:hundred|thousand)\b/.test(folded.slice(nextAt))) {
-      nextAt -= /\b(?:a|an) $/.exec(folded.slice(0, nextAt))?.[0].length ?? 0;
-    }
-    if (type !== "time" && /^\d{3}(?!\d)/.test(folded.slice(nextAt))) {
-      nextAt -= /(?:\$ ?)?\b\d{1,3} $/.exec(folded.slice(0, nextAt))?.[0].length ?? 0;
-    }
-    for (const phrase of numbers) {
-      if (phrase.at < nextEnd && nextAt < phrase.end) {
-        nextAt = Math.min(nextAt, phrase.at);
-        nextEnd = Math.max(nextEnd, phrase.end);
-      }
-    }
-    for (const zone of zones) {
-      if (zone.at >= nextEnd && /^ ?\(?$/.test(folded.slice(nextEnd, zone.at))) {
-        nextEnd = zone.end + (/^(?: time)?\)?/.exec(folded.slice(zone.end))?.[0].length ?? 0);
-      } else if (zone.end <= nextAt && folded.slice(zone.end, nextAt) === " ") {
-        nextAt = zone.at;
-      }
-    }
-    if (nextAt === at && nextEnd === end) return { at, end };
-    at = nextAt;
-    end = nextEnd;
-  }
 }
 
 /**
@@ -247,17 +248,18 @@ export function wholePhraseFault(
   const folded = foldWords(text);
   const cited = foldWords(words);
   const places = wholeAt(folded, cited);
-  const read = readingOf(type, cited, languages);
-  if (places.length === 0 || read.length === 0) return "noText";
-  const from = Math.min(...read.map((span) => span.at));
-  const to = Math.max(...read.map((span) => span.end));
+  if (places.length === 0) return "noText";
+  const phrases = phrasesIn(type, folded, languages);
   for (const place of places) {
-    const whole = widen(type, folded, { at: place + from, end: place + to }, languages);
-    const phrase = folded.slice(whole.at, whole.end);
-    const result = reparse(type, value, phrase, context);
+    const end = place + cited.length;
+    const [phrase, ...more] = phrases.filter((each) => each.at < end && place < each.end);
+    if (phrase === undefined) return "noText";
+    if (more.length > 0) return "several";
+    const said = folded.slice(phrase.at, phrase.end);
+    const result = reparse(type, value, said, context);
     if (!result.ok) return result.why === "noValue" ? "noText" : result.why;
-    const consumed = consumedOf(type, phrase, languages);
-    if (piecesIn(type, phrase, languages).some((piece) => !within(piece, consumed))) return "noText";
+    const read = readOf(type, said, languages);
+    if (piecesOf(type, said, languages).some((piece) => !within(piece, read))) return "noText";
   }
   return null;
 }

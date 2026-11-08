@@ -14,7 +14,10 @@
 // Words that name two days or two times ("3 or 4pm", "Thu 2-5") are several, never one. The readers' own phrase words
 // are read (T-304 round 3, DL-189): "quarter past 3" is 3:15, "quarter to 3pm" 2:45pm, "half past three" 3:30, "las 3 y
 // media" 3:30, "las 3 y cuarto" 3:15, "las 4 menos cuarto" 3:45. timeReadingOf also gives every span of the folded words
-// a reading read, so a reader of the whole value phrase sees what was left unread. Nothing here keeps or logs words.
+// a reading read (each day, time of day, elapsed time and morning or afternoon word), so a reader of the whole value
+// phrase sees what was left unread; those spans, joined by spaces, commas or cues, are the time's whole phrase in a
+// person's text (values/phrase.ts; T-304 round 4, DL-199): "the day after tomorrow at 3pm", "tomorrow afternoon at 3",
+// "tomorrow at noon", "mañana al mediodía", "tomorrow, 3pm". Nothing here keeps or logs words.
 
 import { numberPhrasesIn, numberWordsOf } from "./numbers";
 import {
