@@ -4,9 +4,12 @@
 export { ActorCopies, createCopyTables, readCommit, setCopyDeps, type CopiesHost } from "./copies";
 export {
   createReturnTables,
+  ORDERED_RANKS,
+  readHeld,
   RETURN_RANKS,
   ReturnQueue,
   type Enqueued,
+  type HeldRank,
   type QueuedEntry,
   type QueuedWrite,
   type ReplayReport,
@@ -24,6 +27,7 @@ export type {
   SafetyTimerCopy,
   SafetyTimerRow,
   SafetyTimerSource,
+  StopHold,
   StoppedCopy,
   StoppedWrite,
   TimerRefresh,

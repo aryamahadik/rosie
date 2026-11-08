@@ -82,6 +82,7 @@ import {
 import { readCommit, type ActorCopies } from "./copies";
 import type { QueuedWrite, ReplayStep, ReturnQueue, ReturnWrite } from "./return-queue";
 import { fakeToolApi, SAM_TIMER, type FakeToolApi } from "./test-support";
+import type { StoppedCopy } from "./types";
 
 type Json = Record<string, unknown>;
 
@@ -831,6 +832,8 @@ async function opened(write: QueuedWrite): Promise<unknown> {
 interface ReplayCore {
   /** Every write sent, by key, in order, with the request its box held. */
   readonly sent: { key: string; request: unknown }[];
+  /** Every write the core took, by key, in the order it took them. */
+  readonly taken: string[];
   /** The answer for each key; unset: written. */
   readonly steps: Map<string, ReplayStep>;
   send(write: QueuedWrite): Promise<ReplayStep>;
@@ -839,24 +842,35 @@ interface ReplayCore {
 function replayCore(): ReplayCore {
   const fake: ReplayCore = {
     sent: [],
+    taken: [],
     steps: new Map(),
     async send(write) {
       fake.sent.push({ key: write.key, request: await opened(write) });
-      return fake.steps.get(write.key) ?? "written";
+      const step = fake.steps.get(write.key) ?? "written";
+      if (step === "written") fake.taken.push(write.key);
+      return step;
     },
   };
   return fake;
 }
 
-/** Queues Ben's writes in his actor's own queue, then runs `body` inside the actor with the queue and a replay core. */
-async function withBensQueue<T>(body: (queue: ReturnQueue, core: ReplayCore) => Promise<T>): Promise<T> {
+/**
+ * Queues Ben's writes in his actor's own queue, then runs `body` inside the actor with the queue, a replay core and the
+ * actor's copies.
+ */
+async function withBensQueue<T>(
+  body: (queue: ReturnQueue, core: ReplayCore, copies: ActorCopies) => Promise<T>,
+): Promise<T> {
   const writes = await Promise.all(BEN_WRITES.map(sealed));
   return runInDurableObject(stubOf(BEN), async (instance) => {
-    const queue = insideOf(instance).returns;
+    const { returns: queue, copies } = insideOf(instance);
     for (const write of writes) expect(queue.enqueue(write)).toBe("queued");
-    return body(queue, replayCore());
+    return body(queue, replayCore(), copies);
   });
 }
+
+const STOP_KEY = "recordStopOrStart:evt-ben-0007";
+const START_KEY = "recordStopOrStart:evt-ben-0011";
 
 describe("the write-on-return queue", () => {
   it("replays in order and once: danger, then stops, then the rest, each in the order queued; a second replay sends nothing", async () => {
@@ -924,33 +938,288 @@ describe("the write-on-return queue", () => {
     expect(result.report).toEqual({ written: 0, refused: 0, left: 5 });
   });
 
-  it("a write the core refuses is kept with its code and tried again on the next replay, while the writes after it go on; a write queued again once written is never replayed", async () => {
+  it("a write the core refuses is kept with its code and holds its rank: nothing queued after it in that rank goes before it, the other ranks go on, and once it is taken on a later replay the writes after it follow in their queued order; a write queued again once written is never replayed", async () => {
     const result = await withBensQueue(async (queue, core) => {
-      core.steps.set("recordStopOrStart:evt-ben-0007", { refused: "notFromThatPhone" });
+      // The core refuses Ben's STOP (versionChanged, a refusal that can pass on a retry), and takes it on the next replay.
+      core.steps.set(STOP_KEY, { refused: "versionChanged" });
       const first = await queue.replay((write) => core.send(write));
       const kept = queue.read();
-      core.steps.delete("recordStopOrStart:evt-ben-0007");
+      const held = queue.held();
+      core.steps.delete(STOP_KEY);
       const second = await queue.replay((write) => core.send(write));
+      const heldAfter = queue.held();
       // START written already: queued again, it is known as done and never sent again.
       const again = queue.enqueue(await sealed(benWrite(3)));
       const third = await queue.replay((write) => core.send(write));
-      return { first, kept, second, again, third, sent: core.sent.map((entry) => entry.key) };
+      return {
+        first,
+        kept,
+        held,
+        second,
+        heldAfter,
+        again,
+        third,
+        sent: core.sent.map((entry) => entry.key),
+        taken: core.taken,
+      };
     });
-    expect(result.first).toEqual({ written: 4, refused: 1, left: 1 });
+    // The STOP held the stop rank: the START queued after it was not sent. Danger and the rest went on.
+    expect(result.first).toEqual({ written: 3, refused: 1, left: 2 });
     expect(result.kept).toEqual([
       {
         seq: expect.any(Number) as number,
-        key: "recordStopOrStart:evt-ben-0007",
+        key: STOP_KEY,
         call: "recordStopOrStart",
         rank: "stop",
         tries: 1,
-        refused: "notFromThatPhone",
+        refused: "versionChanged",
+      },
+      {
+        seq: expect.any(Number) as number,
+        key: START_KEY,
+        call: "recordStopOrStart",
+        rank: "stop",
+        tries: 0,
+        refused: null,
       },
     ]);
-    expect(result.second).toEqual({ written: 1, refused: 0, left: 0 });
+    expect(result.held).toEqual([
+      { rank: "stop", key: STOP_KEY, code: "versionChanged", since: expect.any(Number) as number },
+    ]);
+    // Taken on the next replay, the STOP goes first and the START follows it; the rank, written through, is let go.
+    expect(result.second).toEqual({ written: 2, refused: 0, left: 0 });
+    expect(result.heldAfter).toEqual([]);
     expect(result.again).toBe("done");
     expect(result.third).toEqual({ written: 0, refused: 0, left: 0 });
-    expect(result.sent).toEqual([...RETURN_ORDER, "recordStopOrStart:evt-ben-0007"]);
+    expect(result.sent).toEqual([
+      "recordSafetyOutcome:evt-ben-0008",
+      "recordSafetyOutcome:evt-ben-0012",
+      STOP_KEY,
+      "sendFixedLine:evt-ben-0006",
+      STOP_KEY,
+      START_KEY,
+    ]);
+    // The stop records reached the core in the order they were queued: Ben's STOP, then his START.
+    expect(result.taken.filter((key) => key.startsWith("recordStopOrStart:"))).toEqual([STOP_KEY, START_KEY]);
+  });
+
+  it("a replay never lifts a stop: an older START refused with versionChanged, then a newer STOP; the STOP waits for the START, and Ben's phones.stopped ends true, as his last word was STOP", async () => {
+    // Sent by Ben's actor while PostgreSQL was down: his START (start-recorded.json), then a newer STOP from his phone.
+    const start: Pending = {
+      key: START_KEY,
+      call: "recordStopOrStart",
+      rank: "stop",
+      request: startRecorded.request,
+    };
+    const newerStop: Pending = {
+      key: "recordStopOrStart:evt-ben-0013",
+      call: "recordStopOrStart",
+      rank: "stop",
+      request: {
+        ...stopOnReturn.request,
+        caller: {
+          ...stopOnReturn.request.caller,
+          requestId: "evt-ben-0013",
+          personId: "person-ben",
+          traceId: "trace-ben-0013",
+        },
+        phoneNumber: BEN.handle.address,
+        inboundEventId: "evt-ben-0013",
+        sentByActor: {
+          at: "2026-10-22T14:20:11Z",
+          fixedLineId: "stopReply",
+          linqMessageId: "linq-msg-ben-stop-2",
+        },
+      },
+    };
+    const writes = [await sealed(start), await sealed(newerStop)];
+    const result = await runInDurableObject(stubOf(BEN), async (instance) => {
+      const { returns: queue, copies } = insideOf(instance);
+      for (const write of writes) expect(queue.enqueue(write)).toBe("queued");
+      const core = replayCore();
+      // K-04 phones for Ben's number as the core keeps it: stopped since stop-recorded.json, at version 4.
+      const bensPhone = { stopped: true, version: 4 };
+      const send = async (write: QueuedWrite): Promise<ReplayStep> => {
+        const step = await core.send(write);
+        const request = core.sent.at(-1)?.request as { kind?: string } | undefined;
+        if (step === "written") {
+          bensPhone.stopped = request?.kind === "stop";
+          bensPhone.version += 1;
+        }
+        return step;
+      };
+      core.steps.set(start.key, { refused: "versionChanged" });
+      const first = await queue.replay(send);
+      const afterFirst = {
+        phone: { ...bensPhone },
+        sent: core.sent.map((entry) => entry.key),
+        copy: copies.readStopped(),
+      };
+      core.steps.delete(start.key);
+      const second = await queue.replay(send);
+      return { first, afterFirst, second, phone: bensPhone, taken: core.taken, copy: copies.readStopped() };
+    });
+    // First replay: the START is refused, and the newer STOP is not written ahead of it.
+    expect(result.first).toEqual({ written: 0, refused: 1, left: 2 });
+    expect(result.afterFirst.sent).toEqual([start.key]);
+    expect(result.afterFirst.phone).toEqual({ stopped: true, version: 4 });
+    // Meanwhile the actor's copy keeps the stricter reading.
+    expect(result.afterFirst.copy).toMatchObject({
+      stopped: true,
+      held: { key: start.key, code: "versionChanged" },
+    });
+    // Next replay: the START is taken, then the STOP after it. The phone ends stopped.
+    expect(result.second).toEqual({ written: 2, refused: 0, left: 0 });
+    expect(result.taken).toEqual([start.key, newerStop.key]);
+    expect(result.phone).toEqual({ stopped: true, version: 6 });
+    // Every stop or start record written in order: the hold is let go (nothing else was copied here).
+    expect(result.copy).toBeNull();
+  });
+
+  it("a stop record the core can never take holds the stop rank with its code on every replay, and the actor's copy reads stopped meanwhile, whatever was copied last", async () => {
+    const result = await withBensQueue(async (queue, core, copies) => {
+      // Ben's copy says not stopped: his START was copied last (phone version 5).
+      copies.noteStopped({ stopped: false, phoneVersion: 5, turnId: "turn-ben-start" });
+      const before = copies.readStopped();
+      // The core refuses Ben's STOP on every replay (notFromThatPhone never passes).
+      core.steps.set(STOP_KEY, { refused: "notFromThatPhone" });
+      const reports: ReplayReport[] = [];
+      const copiesSeen: (StoppedCopy | null)[] = [];
+      for (let replay = 0; replay < 3; replay += 1) {
+        reports.push(await queue.replay((write) => core.send(write)));
+        copiesSeen.push(copies.readStopped());
+      }
+      return {
+        before,
+        reports,
+        copiesSeen,
+        kept: queue.read(),
+        held: queue.held(),
+        sent: core.sent.map((entry) => entry.key),
+      };
+    });
+    expect(result.before).toMatchObject({ stopped: false, phoneVersion: 5 });
+    expect(result.reports).toEqual([
+      { written: 3, refused: 1, left: 2 },
+      { written: 0, refused: 1, left: 2 },
+      { written: 0, refused: 1, left: 2 },
+    ]);
+    // The START queued after the STOP was never sent: the STOP holds the rank, kept with its code.
+    expect(result.sent).toEqual([
+      "recordSafetyOutcome:evt-ben-0008",
+      "recordSafetyOutcome:evt-ben-0012",
+      STOP_KEY,
+      "sendFixedLine:evt-ben-0006",
+      STOP_KEY,
+      STOP_KEY,
+    ]);
+    expect(result.kept.map(({ key, tries, refused }) => ({ key, tries, refused }))).toEqual([
+      { key: STOP_KEY, tries: 3, refused: "notFromThatPhone" },
+      { key: START_KEY, tries: 0, refused: null },
+    ]);
+    expect(result.held).toEqual([
+      { rank: "stop", key: STOP_KEY, code: "notFromThatPhone", since: expect.any(Number) as number },
+    ]);
+    // The stricter reading on every replay; what was copied last is kept beside it.
+    for (const copy of result.copiesSeen) {
+      expect(copy).toEqual({
+        stopped: true,
+        phoneVersion: 5,
+        turnId: "turn-ben-start",
+        setAt: expect.any(Number) as number,
+        held: { key: STOP_KEY, code: "notFromThatPhone", since: result.held[0]?.since },
+      });
+    }
+  });
+
+  it("what lets the stricter reading go: the refused write taken on a later replay, then every stop or start record after it written in order; until the START is written, the copy still reads stopped", async () => {
+    const result = await withBensQueue(async (queue, core, copies) => {
+      copies.noteStopped({ stopped: false, phoneVersion: 5, turnId: "turn-ben-start" });
+      core.steps.set(STOP_KEY, { refused: "versionChanged" });
+      await queue.replay((write) => core.send(write));
+      const refusedCopy = copies.readStopped();
+      // The STOP is taken now, but the core gives the START after it no answer.
+      core.steps.delete(STOP_KEY);
+      core.steps.set(START_KEY, "notBack");
+      const takenStop = await queue.replay((write) => core.send(write));
+      const beforeStart = copies.readStopped();
+      // The START is written: every stop or start record queued is written, in order.
+      core.steps.delete(START_KEY);
+      const writtenStart = await queue.replay((write) => core.send(write));
+      return {
+        refusedCopy,
+        takenStop,
+        beforeStart,
+        writtenStart,
+        after: copies.readStopped(),
+        held: queue.held(),
+        taken: core.taken,
+      };
+    });
+    expect(result.refusedCopy).toMatchObject({ stopped: true, held: { key: STOP_KEY } });
+    expect(result.takenStop).toEqual({ written: 1, refused: 0, left: 1 });
+    expect(result.beforeStart).toMatchObject({
+      stopped: true,
+      held: { key: STOP_KEY, code: "versionChanged" },
+    });
+    expect(result.writtenStart).toEqual({ written: 1, refused: 0, left: 0 });
+    // Let go: the copy reads what was copied last again, with no hold.
+    expect(result.after).toEqual({
+      stopped: false,
+      phoneVersion: 5,
+      turnId: "turn-ben-start",
+      setAt: expect.any(Number) as number,
+    });
+    expect(result.held).toEqual([]);
+    expect(result.taken.filter((key) => key.startsWith("recordStopOrStart:"))).toEqual([STOP_KEY, START_KEY]);
+  });
+
+  it("the danger rank keeps its own first-in order under the same rule: a refused danger record holds the danger rank while the stops and the rest go on, and the stopped copy is not touched", async () => {
+    const firstDanger = "recordSafetyOutcome:evt-ben-0008";
+    const secondDanger = "recordSafetyOutcome:evt-ben-0012";
+    const result = await withBensQueue(async (queue, core, copies) => {
+      core.steps.set(firstDanger, { refused: "bookingPaused" });
+      const first = await queue.replay((write) => core.send(write));
+      const kept = queue.read().map(({ key, tries, refused }) => ({ key, tries, refused }));
+      const held = queue.held();
+      const copy = copies.readStopped();
+      core.steps.delete(firstDanger);
+      const second = await queue.replay((write) => core.send(write));
+      return {
+        first,
+        kept,
+        held,
+        copy,
+        second,
+        heldAfter: queue.held(),
+        sent: core.sent.map((entry) => entry.key),
+        taken: core.taken,
+      };
+    });
+    expect(result.first).toEqual({ written: 3, refused: 1, left: 2 });
+    expect(result.kept).toEqual([
+      { key: firstDanger, tries: 1, refused: "bookingPaused" },
+      { key: secondDanger, tries: 0, refused: null },
+    ]);
+    expect(result.held).toEqual([
+      { rank: "danger", key: firstDanger, code: "bookingPaused", since: expect.any(Number) as number },
+    ]);
+    expect(result.copy).toBeNull();
+    expect(result.second).toEqual({ written: 2, refused: 0, left: 0 });
+    expect(result.heldAfter).toEqual([]);
+    expect(result.sent).toEqual([
+      firstDanger,
+      STOP_KEY,
+      START_KEY,
+      "sendFixedLine:evt-ben-0006",
+      firstDanger,
+      secondDanger,
+    ]);
+    // The danger records reached the core in the order they were queued.
+    expect(result.taken.filter((key) => key.startsWith("recordSafetyOutcome:"))).toEqual([
+      firstDanger,
+      secondDanger,
+    ]);
   });
 
   it("a write queued again while it waits keeps its place with the newer box; the queue keeps boxes only, never the words or number in plain", async () => {

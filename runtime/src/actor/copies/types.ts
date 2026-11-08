@@ -9,8 +9,12 @@
 // Never logged, put in a span or an error: a number, an address (sealed or not), a contact's name, a text's words. The ids,
 // kinds and codes here are labels.
 
-/** The handle's stopped flag as the actor last saw it written (K-04 v1 `phones.stopped`: one flag for every business). */
+/**
+ * The handle's stopped flag as the actor last saw it written (K-04 v1 `phones.stopped`: one flag for every business), or
+ * the stricter reading while a refusal holds the stop rank of the write-on-return queue (`held`; DL-167 ruling 2).
+ */
 export interface StoppedCopy {
+  /** True while `held` is set, whatever was copied last. */
   readonly stopped: boolean;
   /** K-04 `phones.version` after the write (K-09 v1 recordStopOrStart's `phoneVersion`); null for the actor's own note. */
   readonly phoneVersion: number | null;
@@ -18,6 +22,16 @@ export interface StoppedCopy {
   readonly turnId: string | null;
   /** When the copy was set, on the actor's clock. */
   readonly setAt: number;
+  /** Set only while a refusal holds the stop rank: until every stop or start record queued is written in order. */
+  readonly held?: StopHold;
+}
+
+/** The refusal holding the stop rank of the write-on-return queue: the refused write's key and code (labels), since when. */
+export interface StopHold {
+  readonly key: string;
+  readonly code: string;
+  /** Since the first refusal, on the actor's clock. */
+  readonly since: number;
 }
 
 /** A stopped flag to copy: what a commit (or, with T-270, the actor itself) wrote. */

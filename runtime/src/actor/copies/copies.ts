@@ -7,7 +7,9 @@
 //     comes back committed with a recordStopOrStart result (first or repeated), in the lease's commit before the run that
 //     sent it is answered (`readCommit`; ../lease.ts `committed`), so after a STOP it is set before that turn's stop reply
 //     can go, and a START clears it the same way. The phone row's version orders the writes: an answer older than the copy
-//     changes nothing (a repeat answers its first commit, whose version may be behind a later START);
+//     changes nothing (a repeat answers its first commit, whose version may be behind a later START). While a refusal
+//     holds the stop rank of the write-on-return queue, the copy reads stopped, the stricter reading, whatever was copied
+//     last, until every stop or start record queued (any START among them) is written in order (DL-167 ruling 2);
 //   - the checked safety lines (K-01 v1): every line the safety read can send (911, 988 and 911, the danger question, the
 //     outage line, and each outcome step's own line), copied from the safety read's bundle each time a text is written
 //     (`refreshLines`). A line the bundle gives no words for now keeps the words copied before: a bundle that cannot be
@@ -22,6 +24,7 @@
 // address, a contact's name, a line's or a text's words.
 
 import { isLabel } from "../../trace";
+import { createReturnTables, readHeld } from "./return-queue";
 import type {
   CheckedLineCopy,
   CommitCopies,
@@ -238,6 +241,9 @@ export class ActorCopies {
 
   constructor(private readonly host: CopiesHost) {
     createCopyTables(host.storage.sql);
+    // The stop rank's hold is the write-on-return queue's own (./return-queue.ts): its tables are made here too, so the
+    // stopped flag can be read whichever is made first.
+    createReturnTables(host.storage.sql);
   }
 
   private get sql(): SqlStorage {
@@ -246,8 +252,26 @@ export class ActorCopies {
 
   // ---- the stopped flag -------------------------------------------------------------------------------------------
 
-  /** The handle's stopped flag as last copied, or null when no write of it has been seen. */
+  /**
+   * The handle's stopped flag as last copied, or null when no write of it has been seen. While a refusal holds the stop
+   * rank of the write-on-return queue (DL-167 ruling 2), it reads stopped, the stricter reading, whatever was copied last,
+   * with `held` naming the refusal: until every stop or start record queued (any START among them) is written in order.
+   */
   readStopped(): StoppedCopy | null {
+    const copied = this.copiedStopped();
+    const held = readHeld(this.sql).find((entry) => entry.rank === "stop");
+    if (held === undefined) return copied;
+    return {
+      stopped: true,
+      phoneVersion: copied?.phoneVersion ?? null,
+      turnId: copied?.turnId ?? null,
+      setAt: copied?.setAt ?? held.since,
+      held: { key: held.key, code: held.code, since: held.since },
+    };
+  }
+
+  /** The stopped flag as last copied from a write, without the queue's hold. */
+  private copiedStopped(): StoppedCopy | null {
     const row = this.sql
       .exec<StoppedRow>("SELECT stopped, phone_version, turn_id, set_ms FROM copy_stopped WHERE one = 1")
       .toArray()[0];
@@ -262,16 +286,17 @@ export class ActorCopies {
 
   /**
    * Copies a stopped flag that was written; true when the copy took it. A write with the phone row's version is taken
-   * unless the copy holds a later version; the actor's own note (no version) is always taken.
+   * unless the copy holds a later version; the actor's own note (no version) is always taken. A write taken while the stop
+   * rank is held is kept, and read once the hold is let go.
    */
   noteStopped(write: StoppedWrite): boolean {
     return this.host.storage.transactionSync((): boolean => {
-      const held = this.readStopped();
+      const copied = this.copiedStopped();
       if (
         write.phoneVersion !== null &&
-        held !== null &&
-        held.phoneVersion !== null &&
-        write.phoneVersion < held.phoneVersion
+        copied !== null &&
+        copied.phoneVersion !== null &&
+        write.phoneVersion < copied.phoneVersion
       ) {
         return false;
       }
