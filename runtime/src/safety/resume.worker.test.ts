@@ -240,6 +240,35 @@ describe("the safety alarm", () => {
       restoreSafety();
     }
   });
+
+  it("firing past the deadline while the read's work still runs sends no second read and comes back in 1 s, never in a loop", async () => {
+    const answer = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    const h = harness(keys, { "evt-1": answer });
+    // The shared core takes the record and never answers, so this text's safety work runs on past its 4 s deadline.
+    const restoreSafety = setSafetyDeps({
+      ...h.deps,
+      core: { ...h.core, recordSafetyOutcome: () => new Promise(() => undefined) },
+    });
+    const restoreBatch = setBatchHooks({ clock: h.clock, toLease: () => undefined });
+    try {
+      await arrive("evt-1", EMERGENCY_TEXT);
+      await vi.waitFor(() => {
+        expect(h.read.requests).toHaveLength(1);
+      });
+      await h.clock.advance(4000);
+      await runDurableObjectAlarm(stub());
+      expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-1", state: "reading" }]);
+      expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 5000 });
+
+      await h.clock.advance(1000);
+      await runDurableObjectAlarm(stub());
+      expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 6000 });
+      expect(h.read.requests).toHaveLength(1);
+    } finally {
+      restoreBatch();
+      restoreSafety();
+    }
+  });
 });
 
 describe("a read cut off by an eviction", () => {
